@@ -438,3 +438,13 @@ Mỗi điểm: mức CHẶN hoặc KHÔNG CHẶN; ở đâu; sai gì; bằng ch�
 4. Điều chưa chắc hoặc cần Minh quyết: commit đầu tiên do Codex làm (repo chưa có commit, chưa có remote); SPEC task đầu của P1, P2.
 5. Bước tiếp theo chính xác: Minh mở phiên Codex để commit và push; sau đó agent đề xuất SPEC task đầu tiên của P1 và P2.
 6. Lệnh cuối cùng đã chạy: ghi thêm mục này vào LOG.
+
+---
+
+## Bổ sung sau khi đóng — 03/10/2026 — Claude — laptop của Minh
+
+**Quyết định của Minh:** duyệt prompt mạnh hơn cho người làm ở bước 7 (tự soát độc lập trước khi đọc REVIEW, không mặc nhiên đồng ý reviewer, thêm điểm N1, N2… tự tìm).
+
+**Đã làm:** thêm mục "Prompt cho người làm phản hồi phản biện" vào `docs/review-prompt.md` và sửa dòng 17 trỏ tới mục đó; thêm câu "Prompt mẫu ở `docs/review-prompt.md`." vào AGENTS §5 bước 7. Mỗi chỗ sửa khớp đúng một vị trí. Chưa commit. Đề xuất ghi Q-37 vào DECISIONS đang chờ Minh duyệt.
+Minh duyệt; đã ghi Q-37 vào DECISIONS.
+Đính chính dòng trên: Q-37, Q-38 đã được phiên T-001 dùng trước; quyết định này ghi thành Q-39.

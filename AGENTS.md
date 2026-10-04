@@ -50,13 +50,14 @@ Không có cơ chế nào trong công cụ cưỡng chế Luật 0. Minh đã qu
 2. **Không đoán ý Minh, ở bất kỳ việc gì.** Việc cấp hướng đi càng phải hỏi: câu hỏi nghiên cứu, dataset, thêm hoặc bỏ thành phần, mở test, đổi cổng. Mọi thay đổi file đều theo Luật 0: đề xuất kèm lý do, rồi chờ duyệt.
 3. **Lựa chọn quan trọng phải có mục trong `docs/WHY.md`** trước khi dùng trong kết quả. Mục đó trả lời: chọn gì, vì sao, đã xét phương án nào, bằng chứng, kết luận nào phụ thuộc vào nó.
 4. **Số liệu trong tài liệu lấy từ file kết quả**, có ghi đường dẫn. Không viết từ trí nhớ.
-5. **Đề xuất chưa kiểm phải ghi rõ "chưa kiểm"**, kèm giả định và trường hợp nó sai.
+5. **Đề xuất chưa kiểm phải ghi rõ "chưa kiểm"**, kèm giả định, trường hợp nó sai, và lý do không kiểm được trong task (Q-41).
 6. **Không đưa nhãn vào phương pháp:** tên ca, đường dẫn, file nhãn, thời điểm tiêm lỗi ở chế độ tự phát hiện, và mọi đầu vào suy ra từ chúng (ví dụ chọn SLI theo service gốc).
 7. **Không đọc, không chép từ repo RCA cũ** (`D:/Project/flash-ticket-rca-research`, nay là lưu trữ). Dữ kiện cần thiết đã nằm trong `docs/knowledge/`. Ngoại lệ duy nhất: file dữ liệu thô tải từ nguồn công khai, được chép sang `data/` sau khi kiểm khớp hash của nguồn gốc (Q-08). Việc này đã làm ngày 02/10/2026 cho RCAEval; xem `data/README.md`. Dữ liệu chưa có thì tải mới, nhưng phải trình dung lượng dự kiến cho Minh trước khi tải.
 8. **Báo trước thao tác tốn kém và chờ Minh đồng ý.** Gồm: deep research, dùng hơn 2 subagent, tải hơn 5 GB, một lượt chạy dài hơn 1 giờ. Khi báo, nêu ước lượng chi phí.
 9. **Không tự thêm quy trình, cổng hay cơ chế kiểm soát mới.** Muốn thêm thì hỏi Minh.
 10. **Giữ mọi lượt chạy**, kể cả lượt hỏng.
 11. **Commit và push chỉ khi Minh yêu cầu hoặc duyệt.** Cuối mỗi bước đã được duyệt, agent đề xuất nội dung commit; Minh duyệt thì commit và push lên remote.
+12. **Chủ động đề xuất cách làm nhanh hơn, rẻ hơn hoặc ít chờ hơn, không đánh đổi tính đúng** (Q-43). Áp dụng cho mọi việc, ví dụ: chia việc độc lập chạy song song, xếp việc dài chạy qua đêm, sắp thứ tự theo phụ thuộc, dùng lại kết quả đã có, làm việc khác trong lúc chờ máy. Đề xuất khi viết SPEC hoặc khi thấy; Minh duyệt rồi mới làm.
 
 ## 4. Nguồn sự thật và tổ chức dữ liệu
 
@@ -107,11 +108,14 @@ Một task là một phần việc có đầu ra rõ, làm xong trong **một ph
    - tách theo ô và theo ca;
    - so với số đã công bố nếu có;
    - chạy phép thử giả khi kết quả quá đẹp.
+   - kiểm triệt để (Q-41): mọi thứ kiểm được với chi phí hợp lý phải kiểm trong task;
+   - trước khi dùng số của một phương pháp: tái lập số công bố nếu có, và chạy phép kiểm không cần nhãn;
+   - lượt chạy có thể dài: ghi tiến độ và thời gian từng bước ngay từ đầu.
 5. **Báo cáo.** Ghi mục kết thúc phiên vào `LOG.md` theo mục 7. Cập nhật dòng của task trong STATE thành "chờ phản biện".
 6. **Phản biện.**
    - Minh mở một phiên mới với **agent còn lại**, dán prompt phản biện của task. Prompt nằm ở cuối `LOG.md`, do người làm viết sẵn theo `docs/review-prompt.md`.
    - Người phản biện chỉ ghi `REVIEW.md` (mục 9).
-7. **Phản hồi phản biện.** Người làm (hoặc một phiên mới của người làm) đọc `REVIEW.md`, ghi ý kiến cho từng điểm (đúng, sai, hay chưa kiểm được) vào bảng cuối `REVIEW.md` và vào `LOG.md`, rồi cập nhật dòng của task trong STATE. Minh quyết sửa điểm nào.
+7. **Phản hồi phản biện.** Người làm (hoặc một phiên mới của người làm) đọc `REVIEW.md`, ghi ý kiến cho từng điểm (đúng, sai, hay chưa kiểm được) vào bảng cuối `REVIEW.md` và vào `LOG.md`, rồi cập nhật dòng của task trong STATE. Minh quyết sửa điểm nào. Prompt mẫu ở `docs/review-prompt.md`.
 8. **Sửa** (nếu Minh yêu cầu): làm trong cùng task, ghi LOG.
 9. **Đóng task.**
    - Minh duyệt. Dòng trong STATE chuyển thành "xong".
@@ -179,6 +183,7 @@ Mục LOG phải đủ để **một agent khác, trên một máy khác, không
 ## 9. Phản biện
 
 - Prompt mẫu và cách chạy cho từng agent: `docs/review-prompt.md`.
+- Prompt phản biện chép nguyên văn "Prompt chung" và khối trọng tâm theo cổng trong `docs/review-prompt.md`. Người làm chỉ điền thông tin trung tính; không thêm gợi ý, kết luận hay giới hạn phạm vi (Q-44).
 - Người phản biện chỉ báo lỗi ảnh hưởng tới:
   - tính đúng của lập luận, phương pháp hoặc kết quả;
   - độ khớp với DT18 và hướng dẫn của cô.

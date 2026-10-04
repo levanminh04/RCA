@@ -1,0 +1,120 @@
+{
+  "revision": "ddd6760e00495b3cbca23df794490edfa8cc584d",
+  "catalog": [
+    {
+      "fault": "F1",
+      "description": "#### Industrial fault description:\nF1 is a fault that occurs in using asynchronous tasks in a single request, when we send messages asynchronously without message sequence control.\nSuppose we have Event A and Event B in a request, while Event A always processes and returns earlier than Event B.\nBut sometimes, due to some specific reasons, Event A processes and returns later than Event B.\nThen F1 will occur.\n#### TrainTicket replicated fault description:\nIn ticket-cancellation logic of the TrainTicket system, we have two major events: [Drawback Money] and [Reset Order Status].\nIf the user decided to cancel an order, the Ticket-Cancel-Service firstly call Inside-Payment-Service to drawback money.\nThen Inside-Payment-Service call Order-Service to set the order status to CANCELLING. \nThen the system refunds the money to user.\nAfter that, the Cancel-Service call Order-Service set the order status to CANCEL. \nThen the whole cancel process is done.\nIn our fault reproduction, we made a random delay in event [Drawback Money] to simulate the situation of network congestion.\nIn this case, the event [Reset Order Stauts] will complete before [Drawback Money], then the fault occurs.\n\n\n"
+    },
+    {
+      "fault": "F2",
+      "description": "#### Industrial fault description:\nF2 is a fault that multiple messages are displayed in wrong order.\nSometimes we send many requests at a short time.\nHowever, these requests may returns at a different order with the origin.\nIf we display the information without checking the order of these requests, wrong information may be shown on the screen.\nThen this kind of fault occurs.\n#### TrainTicket replicated fault description:\nIn TrainTicket system, every request for ticket-reservation has a random delay to simulate the unstable network condition.\nIf a user send multiple requests for ticket-reservation at a short time, the order of the result may be wrong due to the random delay.\nThen this fault occurs.\n\n\n"
+    },
+    {
+      "fault": "F3",
+      "description": "#### Industrial fault description:\nF3 is a fault which occurs when the microservice is not properly configured.\nIf a micorservice is implemented by Java and using Docker as container, JVM and Docker configuration is needed.\nHowever, JVM and Docker both have same configuration such as memory limit and cpu limit, while configuration in JVM and configuration in Docker influences each other.\nIf these configuration is not properly set, the microservice will have some unexpected behavior.\n#### TrainTicket replicated fault description:\nIn the reproduction of F3, we mis-configured some microservice such that the JVM memory limit is bigger than the Docker memory limit.\nIn this case, if the requests occupy too much memory, the JVM process will be killed, leading to the microservices unavailable periodly.\nThen the fault occurs.\n\n\n"
+    },
+    {
+      "fault": "F4",
+      "description": "#### Industrial fault description:\nF4 is fault of SSL offloading which leads to the response time for some requests is very long.\n#### TrainTicket replicated fault description:\nIn TrainTicket system, we apply SSL to every microservice.\nWhen we send requests about some complex logic, we will find that the response time is very long.\nIn this scenario, the faults occurs.\n\n"
+    },
+    {
+      "fault": "F5",
+      "description": "#### Industrial fault description:\nF5 is such kind of fault which is caused by the resource competition of multiple requests.\nSometimes a microservice has its maximum number of connections by using thread pool.\nSuppose we have 3 services, A, B, C. A and B both call C for some specific information.\nIf A send some requests to C, but before that B has sent some requests to C and these requests are too complex to process at a short time, then\nthe requests from A must wait until the requests from B completed, leading to a timeout exception.\n#### TrainTicket replicated fault description:\nWe implemented this fault in Basic-Info-Service. \nWe use asynchronous tasks in Basic-Info-Service to collect tickets information.\nThen we use the thread pool which is needed for the implementation of asynchronous tasks as microservice resource.\nWe send many requests at a short period of time and if the thread number is equal or exceeds the max-thread-pool-size, the fault will occur.\n\n"
+    },
+    {
+      "fault": "F6",
+      "description": "#### Industrial fault description:\nA service is slowing down and returns error finally.\nEndless recursive requests of a microservice are caused by SQL errors of another dependent microservice.\n#### TrainTicket replicated fault description:\nIn out train ticket system, we replicate this fault in voucher service.\nThe SQL arg in voucher service is something wrong, make the request fail.\nWhen the request is fail, the host service will send another request.\nAfter many retries, we will receive a timeout error finally.\n\n"
+    },
+    {
+      "fault": "F7",
+      "description": "#### Industrial fault description:\nF7 is a fault which occurs in a third-party service and then leads to a failure.\nWe always need to call a microservice that maintained by a third-party or company.\nSometimes the response from the microservice maintained by others may be timeout and returns nothing, or even return wrong information.\nThen this kind of fault occurs.\n#### TainTicket replicated fault description:\nIn TainTicket system, if the user want to buy a ticket but the balance is not enough, the system will call a third-party service implemented by Node.js to get the ticket money. \nSometimes there will be a delay in this third-party service, then the timeout will be triggered and the fault occurs.\n\n"
+    },
+    {
+      "fault": "F8",
+      "description": "#### Industrial fault description:\nThis fault is caused by the error of redis in the operation of getting the saved key/token.\nThe microservice always save some key/token to redis.\nHowever, sometimes the developer may made a mistake and the program may be mis-implemented.\nIn such case, the key/token may be wrongly read and deliver a missing/wrong key/token to other microservice, leading to an fault.\n#### TrainTicket replicated fault description:\nWe have two types of users in TrainTicket system: normal user and VIP user.\nCompared to the normal user, the VIP user has one more key/token to be used in ticket-booking process.\nHowever, when vip user is processing ticket-reservation logic, the key/token is missing when delivering.\nThen the fault occurs.\n\n\n"
+    },
+    {
+      "fault": "F9",
+      "description": "#### Industrial fault description:\nThere is a Right To Left (RTL) display error for UI words.\nThere is a CSS display style error in bi-directional.\n#### TrainTicket replicated fault description:\nFault occurs when convert from LTR to RTL in Login Block.\n\n"
+    },
+    {
+      "fault": "F10",
+      "description": "#### Industrial fault description:\nF10 is caused by an unexpected output of a microservice, which is used in a special case of business processing.\n#### train_ticket replicated fault description:\nWe replicate this fault in ticket reservation process.\nIn contacts service we have two APIs serve for the ticket reservation process in different situation. \nSometimes in a specific situation that is not correctly handled, these APIs may be wrongly invoded, thus making the ticket reservation process fail.   \n\n\n"
+    },
+    {
+      "fault": "F11",
+      "description": "#### Industrial fault description:\nF11 is a fault due to the lack of sequence control.\nNote that such a fault may not always occur, making  it difficult to analyze.\nSometimes if a return value is too far from the normal value, the microsevice will recheck the correctness of the value and correct it.\nBut this process does not always happen, making the result sometimes wrong but sometimes right.\n#### TrainTicket replicated fault description:\nIn TrainTicket system, there are two microservices set the same value in the database in order cancellation process.\nDue to the lack of control like F1, the two microservices may set the value in a wrong sequence.\nHowever, the second microservice that set the value may recheck the value and correct the value.\nThe recheck process does not always happen.\nIf two microservices set the value in a wrong sequence but the recheck process does not executed, this fault occurs.\n\n"
+    },
+    {
+      "fault": "F12",
+      "description": "#### Industrial fault description:\nF12 is one kind of faults that occurs due to the specific status of some microservice.\nThe word \"status\" has a wide range of meanings, for example, a global value in one microservice.\nIf a microservice is in some specific \"status\", the fault occurs.\nThis kind of faults only occurs in some specific status of a microservice.\nBecause the fault only occurs in specific status, when we analyze the root cause of the microservice, we must combine the microservice status.\n#### TrainTicket replicated fault description:\nWe have two specific status in Order-Service: locked station and thread-pool size.\nIf the admin is operating the orders between two stations, such two stations will be added to the locked station list.\nAnd the thread-pool is used for Order-Service to do some asynchronous tasks.\nIf the user want to cancel a order whose start station or terminal station is in the locked station list, the request will be rejected.\nThen the fault occurs.\n\n"
+    },
+    {
+      "fault": "F13",
+      "description": "#### Industrial fault description:\nF13 is one kind of fault due to the wrong processing order of multiple requests.\nIn a complex business process, we need send many requests in order to complete our business.\nHowever, if we send these requests in a short period of time(eg. fast click), these reqeusts may not be processed in order due to the transmission delay or some other reason.\nIf the latter request needs the result of the previous request, such kind of fault like F13 will occur.\n#### TrainTicket replicated fault description:\nIn TrainTicket system, if a user want to complete a ticket-booking process and a ticket-cancellation process, he/she will send many requests.\nThese reqeusts includes login, searching for tickets, selecting contacts, confirming tickets, payment and comfirming cancellation.\nAll these requests have a random delay to simulate the process delay.\nIf the comfirming cancellation is already begun but the payment process is still not completed yet, this fault will occur.\n\n"
+    },
+    {
+      "fault": "F14",
+      "description": "#### Industrial fault description:\nThe result of the Consumer Price Index (CPI) is wrong.\nThere is a mistake in including the locked product in CPI calculation.\n#### TrainTicket replicated fault description:\nIn our Train Ticket system, we replicate this fault in ticket price calculating.\nWhen calculating the second class seat price, the calculating process is wrong, leading to a fault.\n\n"
+    },
+    {
+      "fault": "F15",
+      "description": "#### Industrial fault description:\nThe data-synchronization job quits unexpectedly.\nThe spark actor is used for the configuration of actorSystem (part of Apache Spark) instead of the system actor.\n#### TrainTicket replicated fault description:\nLimit the post json size to 200 bytes in nginx.conf file.\nIf user select the food and consign, the request body will exceed 200 bytes, and the request will be blocked by nginx.\n\n"
+    },
+    {
+      "fault": "F16",
+      "description": "#### Industrial fault description:\nThe file-uploading process fails.\nThe \"max-content-length\" configuration of spray is only 2 Mb, not allowing to support to upload a big file.\n#### TrainTicket replicated fault description:\nOur system has the ability to add routes in batches. You can upload the file to add routes in batches.\nBut the size of the permitted file is too small, sometimes your file will be rejected because of the size.\n\n"
+    },
+    {
+      "fault": "F17",
+      "description": "#### Industrial fault description:\nThe grid-loading process takes too much time.\nToo many nested \"select\" and \"from\" clauses are in the constructed SQL statement.\n#### TrainTicket replicated fault description:\nTo simulate the nested select clauses, one procedure of mysql to sleep 10s was created in ts-voucher-service.\nSince the front stage has a 5s limit of network request, the query of one order's voucher will be out of time.\n\n"
+    },
+    {
+      "fault": "F18",
+      "description": "#### Industrial fault description:\nLoading the product-analysis chart is erroneous.\nOne key of the returned JSON data for the UI chart includes the null value.\n#### TrainTicket replicated fault description:\nWhen user select a train which doesn't have train food, the return result of 'getFood' will be null.\nBut the front stage should get the first item which represents trainfood of the result without check whether it's null.\n\n"
+    },
+    {
+      "fault": "F19",
+      "description": "#### Industrial fault description:\nThe price is displayed in an unexpectedly format.\nThe product price is not formatted correctly in the French format.\n#### TrainTicket replicated fault description:\nWhen the user chooses to consign his packages and select the French format, the returned price is displayed in wrong format.\nThe product price is not formatted correctly in the French format.\n"
+    },
+    {
+      "fault": "F20",
+      "description": "#### Industrial fault description:\nNothing is returned upon workflow data request.\nThe JBoss startup classpath parameter does not include the right DB2 jar package.\n#### TrainTicket replicated fault description:\nMany microservices share a same lib. This lib contains some basic data structure such as Enum of Order status.\nThe value of same order status in different version is in different value.\nIf some microservice use an old version lib but some use a new version lib, the fault will occur.\n\n"
+    },
+    {
+      "fault": "F21",
+      "description": "#### Industrial fault description:\nJAWS (a screen reader) misses reading some elements.\nThe \"aria-labeled-by\" element for accessibility cannot be located by the JAWS.\n#### TrainTicket replicated fault description:\nJust add the aria label in the login module.\nThere are three input types to read - Email, Password and Verification Code.\nWhen the cursor focuses on the input, the screen reader will read the value in it.\nAdd the \"aria-labelledby\" label to the \"Email\" and \"Password\" inputs to first read the input name,\nso that user can make clear what the input value represent.\nBut the \"Verification Code\" input doesn't add an \"aria-labelledby\" label\nSo user will just heard the input's default value \"abcd\", it will confuse the user.\n\n"
+    },
+    {
+      "fault": "F22",
+      "description": "#### Industrial fault description:\nThe error of SQL column missing is returned upon some data request.\nThe constructed SQL statement includes a wrong column name in the \"select\" part according to its \"from\" part\n#### TrainTicket replicated fault description:\nThe constructed SQL statement includes a wrong column name in the \"select\" part according to its \"from\" part.\nWhen the user switch to Flow Three - Consign & Voucher and click the button of \"Print Voucher\" if any, the result page displays \"Empty. No data!\".\n"
+    }
+  ],
+  "verified_single_location_examples": {
+    "F5": "Basic-Info-Service",
+    "F12": "Order-Service"
+  },
+  "not_instance_gold": true,
+  "release_graph_codes": [
+    "F01",
+    "F02",
+    "F03",
+    "F04",
+    "F05",
+    "F07",
+    "F08",
+    "F11",
+    "F12",
+    "F13",
+    "F14",
+    "F23",
+    "F24",
+    "F25"
+  ],
+  "codes_not_in_current_catalog": [
+    "F23",
+    "F24",
+    "F25"
+  ],
+  "paper_notes": "Paper says instances can occur in different services; catalog is current master, not identified injected branch/version for every instance."
+}

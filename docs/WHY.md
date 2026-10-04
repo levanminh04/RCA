@@ -107,3 +107,37 @@ Mẫu một mục: chọn gì → vì sao → đã xét phương án nào → b�
 - **Vì sao khác người:** reviewer khác model ít chia điểm mù với người viết (LESSONS QT12).
 - **Vì sao không cố định ai làm chính:** usage của mỗi bên có hạn. Cố định một bên làm chính thì công việc dừng mỗi khi bên đó hết lượt.
 - Người phản biện chỉ báo lỗi ảnh hưởng tính đúng hoặc độ khớp đề tài; Minh quyết sửa điểm nào. Như vậy tránh vòng "mọi điểm phản biện đều phải sửa" của v1 (SL5).
+
+## WHY-13. Bảo toàn OpenRCA Bank trước G3 — Codex quyết theo ủy quyền Q-47
+
+- Chọn: toàn biến thể Bank và AIOps Bank cùng lineage khi xác minh; chỉ metadata/schema/đếm nhãn trước G3. Chưa chọn dataset thí nghiệm hoặc chia dev/test thay G1.
+- Vì sao: miền banking và schema công bố root/time/reason, metric/log/trace làm ứng viên đánh giá ngoài thiết kế; không chọn vì sẵn dữ liệu/code.
+- Phương án đã xét: Nezha OB/TT, Eadro SN, DeepTraLog, LEMMA IT, AnoMod/OpenRCA2; trade-off và bằng chứng riêng ở results/T-003/bao-toan-openrca-bank.md và T012 sources run002.
+- Chấp nhận chưa biết lúc quyết Q-49: chất lượng số đo, normal/graph/symptom, injector/collector Bank và census nhãn thực. Sau REVIEW đã kiểm metadata/đếm nhãn: 136 ca, 14 root, 8 reason, 9 ngày, 52 ô; nguồn results/T-012/runs/bank-label-reproduce-002/census.json. Không coi đủ tiêu chí9 hoặc bảo đảm dùng được ở G3.
+- Kết luận phụ thuộc: khả năng đánh giá ngoài thiết kế G1/G3/RQ3; tiêu chí7 Bank OPEN tới G3. RQ3 trên Bank chỉ bao quát các reason CPU/memory/disk/network/JVM đã có, **không kiểm lỗi mã nguồn**. Không đổi thiết kế theo số đo giữ ngoài sau mở.
+- Đính chính R3 (04/10, theo Q-51): lúc chọn, nhãn release của Bank cũng chưa xác minh; thiếu census không phân biệt Bank với AnoMod/OpenRCA2. Căn cứ chọn là miền banking và schema nguồn có root/time/ba nguồn, cùng chấp nhận bất định; không coi chưa kiểm của phương án khác là bằng chứng Bank tốt hơn. Census sau REVIEW không được kể lại như đã có lúc quyết.
+
+## WHY-14. Kiểm nội bộ LEMMA khi nguồn license NC/ND còn khác — thực hiện phạm vi hẹp Q-47
+
+- Chọn: chỉ tải bốn ZIP IT nguyên trạng, kiểm nội bộ phi thương mại, không phân phối payload gốc/phái sinh; không chọn một license thay tác giả.
+- Bằng chứng: legalcode chính thức CC BY-NC4 và BY-ND4 §2(a)(1) đều cho reproduce; NC cho adapted phi thương mại, ND cho produce/reproduce adapted nhưng không Share; §2(a)(4) cho technical modifications. Root đã đối chiếu hai trang chính thức https://creativecommons.org/licenses/by-nc/4.0/legalcode.en và https://creativecommons.org/licenses/by-nd/4.0/legalcode.en; snapshots/source report results/T-011/runs/license-terms-001/ và xac-minh-nguon-va-doc-lap.md.
+- Vì sao: mâu thuẫn vẫn ảnh hưởng quyền phân phối phái sinh/chọn license cuối, nhưng hai cách khai báo cùng cho hành động hẹp đang cần trong T003. Không suy ND cấm đọc hoặc xử lý nội bộ. Điều kiện phi thương mại áp theo nghiên cứu đề tài hiện tại, không cho triển khai thương mại.
+- Phương án khác: dừng toàn kiểm LEMMA chờ tác giả; không cần cho hành động chung được cả hai nguồn cho phép. Chọn NC chỉ vì thuận tiện hoặc PR chưa merge là không hợp lệ.
+- Giới hạn: tiêu chí1 license cuối vẫn OPEN; không xác nhận quyền của bên cấp hoặc quyền bên thứ ba; không chia sẻ substantial raw/adapted database, không gọi PR bên ngoài là quyết định tác giả. G1 và công bố dữ liệu phái sinh còn phụ thuộc việc tác giả giải nguồn.
+
+## WHY-15. Vì sao dùng bộ thư viện `py312-pin` cho các phương pháp Python 3.12 — Đã quyết (Minh duyệt 04/10/2026, T-006)
+
+- **Chọn:** RCAEval `259ea41` chế độ `[default]`, cài bằng `uv pip install --exclude-newer 2024-12-22` (ngày nộp bài RCAEval) trên Python 3.12. Bản chính: pandas 2.2.3, numpy 1.26.4, causal-learn 0.1.3.8, scikit-learn 1.6.0, scipy 1.14.1, torch 2.5.1. Cách dựng và danh sách gói: `results/T-006/moi-truong.md`, `results/T-006/runs/freeze-py312-pin.txt`.
+- **Vì sao:** ở X1 (T-006), hai bộ thư viện cho kết quả tương đương: cùng khớp mọi mốc loại A (ví dụ cơ bản BARO; `reproduce_baro` 5/5 ô), và cùng điểm ở mọi ô CIRCA torai-OB. Khi hai bộ tương đương, chọn bộ ghim theo LESSONS SL29: gần thời điểm tác giả chạy hơn, ít rủi ro lệch hành vi (pandas 3 đổi copy-on-write và kiểu chuỗi).
+- **Phương án đã xét:** `py312` (bản mới nhất ngày 03/10/2026): kết quả như nhau ở mọi phép kiểm X1, nhưng xa thời điểm công bố hơn.
+- **Ghi thẳng về luật X1:** luật trong SPEC T-006 không nói mốc loại B có tính hay không. Ở cả hai bộ, CIRCA (mốc loại B) lệch quá 0,02 ở nhiều ô. Minh làm rõ sau khi đã thấy kết quả. Kết quả không phụ thuộc cách hiểu, vì hai bộ giống nhau ở mọi ô (REVIEW T-006 R1; `results/T-006/x1-chot-moi-truong.md`).
+- **Giới hạn:** X1 không cho thấy bộ ghim "đúng hơn". Chưa kiểm với MicroRank, TraceRCA (thuộc T-007).
+- **Kết luận phụ thuộc:** mọi số BARO, N-Sigma, CIRCA, N-Sigma phát hiện của T-006; E2, E3 của T-007.
+
+## WHY-16. Cấu hình cửa sổ tham chiếu khi so MicroRank, TraceRCA với Bảng 2 bài TORAI — Đề xuất (G1) (Minh duyệt 03/10/2026, T-007; khôi phục 04/10/2026 sau khi bị mất khỏi file)
+
+- Chọn: ±600 s quanh mốc tiêm (`--length 20`) làm cấu hình tham chiếu khi so với số bài TORAI; báo kèm ±300 s (SPEC T-007).
+- Vì sao: `main.py` RCAEval đổi mặc định `--length` thành 20 từ commit `61326e5` (27/12/2024), trước bài TORAI (2026); BARO `--length 20` trùng 21/21 ô Bảng 3 bài TORAI (T-006).
+- Phương án đã xét: ±300 s theo `docs/TORAI.md` (đó là lệnh chạy chính TORAI, không phải baseline); toàn ca (±720 s), không có bằng chứng.
+- Giới hạn: bằng chứng gián tiếp với hai baseline trace; tác giả không công bố bộ đọc trace. Kết quả biến thể không dùng để chọn.
+- Kết luận phụ thuộc: kết luận "khớp" của MicroRank và số ô lệch của TraceRCA trong `results/T-007/kiem-dung-dan.md`.

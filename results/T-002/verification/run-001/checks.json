@@ -1,0 +1,93 @@
+{
+  "started_utc": "2026-10-02T13:53:53.178454+00:00",
+  "checks": [
+    {
+      "name": "full_run_complete",
+      "pass": true,
+      "detail": "35 cases; completed manifest"
+    },
+    {
+      "name": "allowed_inputs_only",
+      "pass": true,
+      "detail": "saved input paths only; no locked path opened"
+    },
+    {
+      "name": "input_file_count",
+      "pass": true,
+      "detail": "100 parquet files from allowed 35 cases"
+    },
+    {
+      "name": "inspection_script_provenance",
+      "pass": true,
+      "detail": "current script matches full-run hash"
+    },
+    {
+      "name": "parent_accounting",
+      "pass": true,
+      "detail": "sum roots/references/resolved/unresolved per case"
+    },
+    {
+      "name": "unique_trace_span_keys",
+      "pass": true,
+      "detail": "no duplicate or ambiguous key in inspected traces"
+    },
+    {
+      "name": "timestamp_field_relation",
+      "pass": true,
+      "detail": "startTime//1000 matches startTimeMillis"
+    },
+    {
+      "name": "normal_full_graph_equality",
+      "pass": true,
+      "detail": "exact node and edge sets per case, not just counts"
+    },
+    {
+      "name": "injection_within_target_windows",
+      "pass": true,
+      "detail": "32 target cases; auxiliary RE1 intentionally excluded"
+    },
+    {
+      "name": "normal_point_accounting",
+      "pass": true,
+      "detail": "normal/post rows and regular 1s samples"
+    },
+    {
+      "name": "aggregate_re2tt",
+      "pass": true,
+      "detail": "aggregate derived from per-case saved counts"
+    },
+    {
+      "name": "aggregate_re2ob",
+      "pass": true,
+      "detail": "aggregate derived from per-case saved counts"
+    },
+    {
+      "name": "aggregate_re3tt",
+      "pass": true,
+      "detail": "aggregate derived from per-case saved counts"
+    },
+    {
+      "name": "aggregate_re3ob",
+      "pass": true,
+      "detail": "aggregate derived from per-case saved counts"
+    },
+    {
+      "name": "public_counts",
+      "pass": true,
+      "detail": "public counts 90/5/6,90/5/6,30/2/4,30/4/5"
+    },
+    {
+      "name": "finite_bands",
+      "pass": true,
+      "detail": "no negative/NaN/infinite bands; no epsilon or divide-by-scale"
+    },
+    {
+      "name": "rate_denominators",
+      "pass": false,
+      "detail": "rates recomputed from saved counts/denominators"
+    }
+  ],
+  "status": "failed",
+  "error": "Traceback (most recent call last):\n  File \"D:\\RCA-flashticket\\results\\T-002\\verify_outputs.py\", line 54, in main\n    check(\"rate_denominators\", np.allclose(rates.control_exceed_rate, rates.control_exceed_rows / rates.control_valid_rows) and np.allclose(rates.post_exceed_rate, rates.post_exceed_rows / rates.post_valid_rows), \"rates recomputed from saved counts/denominators\")\n  File \"D:\\RCA-flashticket\\results\\T-002\\verify_outputs.py\", line 28, in check\n    assert condition, name\n           ^^^^^^^^^\nAssertionError: rate_denominators\n",
+  "finished_utc": "2026-10-02T13:53:53.284968+00:00"
+}

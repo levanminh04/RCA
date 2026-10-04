@@ -24,6 +24,16 @@ Bản rút gọn để đọc nhanh. Câu chuyện đầy đủ, số liệu và
 | SL17 | Viết số từ trí nhớ | Lấy số từ file kết quả |
 | SL20 | Gắn "hoàn thành" với "đồ thị phải thắng" | Kết quả trung thực (Q-04) |
 | SL23 | Đề xuất chưa kiểm nhưng nói như sự thật | Ghi "chưa kiểm", giả định, khi nào sai |
+| SL24 | Cài và đo thời gian phương pháp mà không kiểm nó chạy đúng; báo "chạy được" khi chỉ biết "không lỗi" (T-005) | Trước khi dùng số của một phương pháp: tái lập số công bố nếu có; luôn chạy phép kiểm không cần nhãn (đầu ra rỗng, trùng thứ tự cột hoặc nhánh dự phòng, chạy lại ra cùng kết quả) |
+| SL25 | Chạy lượt có thể dài mà không ghi tiến độ hay thời gian từng bước; bị dừng ở giới hạn thì không biết gì (CIRCA-PC tốn 2 giờ máy cho câu "quá 1 giờ") (T-005) | Ghi tiến độ và thời gian từng bước ngay từ lượt đầu, nhất là khi SPEC đã nêu rủi ro chạy lâu |
+| SL26 | Người soạn SPEC loại một phép kiểm cần thiết ("không đọc thứ hạng") mà không nêu hệ quả (T-005) | Khi SPEC bỏ một phép kiểm, ghi rõ kết luận nào yếu đi vì thiếu nó, để Minh quyết |
+| SL27 | Đánh giá chi phí theo từng ca, không theo tổng (BOCPD 24 phút/ca tưởng chấp nhận được, thực ra khoảng 36 giờ cho 90 ca) (T-005) | Quy mọi chi phí về tổng ngân sách (Q-40) |
+| SL28 | Tra số công bố sau khi đo (Bảng 8 bài TORAI đã có thời gian chạy) (T-005) | Tra số công bố trước khi thiết kế phép đo, dùng làm mốc so |
+| SL29 | Dựng môi trường không ghim phiên bản (pandas 3.0.6, causal-learn 0.1.4.8), lệch với lúc tác giả chạy (T-005) | Ghim phiên bản theo lock file hoặc thời điểm công bố; lệch thì ghi và kiểm ảnh hưởng |
+| SL30 | Chạy việc khác trong lúc đo (`du` song song); đặt giới hạn chạy nền quá ngắn làm lượt cài bị dừng (T-005) | Không chạy việc nặng khác khi đang đo; đặt giới hạn theo ước lượng có dư |
+| SL31 | Người làm thay mục "Bổ sung yêu cầu phản biện" của mẫu bằng danh sách kiểm riêng, kèm kết luận sẵn và câu thu hẹp phạm vi; neo người phản biện (prompt T-001 bản 4, T-005 bản 2) | Chép nguyên văn mẫu; chỉ điền thông tin trung tính (Q-44) |
+| SL32 | SPEC xếp các bước theo thứ tự đọc, không theo phụ thuộc thật: SPEC T-006 bắt mọi luồng chờ hết bước 0, làm X1 trễ và EC2 của T-007 ngồi rảnh (T-006, T-007) | Trong SPEC, ghi rõ mỗi bước cần đầu ra nào của bước nào; việc không phụ thuộc thì chạy ngay (Q-43) |
+| SL33 | SPEC kiểm đúng đắn (T-006, T-007) chỉ dùng dữ liệu cỡ nhỏ (Online Boutique, Sock Shop), bỏ dữ liệu cỡ Train Ticket công khai (`fse-tt`) dù RE2-TT là ứng viên dataset chính; người soạn SPEC không nêu hệ quả. Minh tưởng Train Ticket đã được kiểm vì T-005 có đo thời gian trên một ca RE2-TT (T-006, T-007) | Phạm vi dữ liệu của task kiểm phải phủ mọi quy mô và dataset ứng viên mà kết quả sẽ dùng; bỏ phần nào thì ghi lý do và hệ quả để Minh quyết. Báo cáo phân biệt rõ "đã đo thời gian" với "đã kiểm đúng sai" |
 
 ## Quy tắc
 
@@ -41,3 +51,4 @@ Bản rút gọn để đọc nhanh. Câu chuyện đầy đủ, số liệu và
 - **QT16 — Hỏi "dữ liệu này phân xử nổi không" trước khi đặt giả thuyết.** Nếu kết cục dễ xảy ra nhất là "không đủ bằng chứng" thì nói ngay với Minh.
 - **QT17 — Số trong tài liệu lấy từ file kết quả**, có ghi nguồn.
 - **QT18 — Góp ý của subagent hay reviewer là đầu vào, không phải lệnh.**
+- **QT19 — Triệt để (Q-41).** Mọi thứ kiểm được với chi phí hợp lý thì kiểm ngay trong task. "Chưa kiểm" chỉ khi không kiểm được trong task, kèm lý do. Kiểm triệt để mà không vừa một phiên thì tách task, không kiểm nhẹ đi.

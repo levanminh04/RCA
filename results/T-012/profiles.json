@@ -1,0 +1,532 @@
+[
+  {
+    "version": "Latest của record cũ 19513398 trả record 19522409; giữ cả hai, không ghi đè.",
+    "access": "Archive công khai tải/hash/CRC được; license scope ở mục1.",
+    "labels": "Nhãn root set/start/end tiêm thực đọc.",
+    "trace": "Parent scoped(trace_id,span_id), unique/missing/ambiguous và graph từng phase/ca đã đo.",
+    "modalities": "Parquet metric/log/trace có thật; log-ID và match trace/span tách riêng.",
+    "positions": "11 root service khác nhau ở tám ca không có invalid marker; graph/degree riêng từng ca.",
+    "faults": "Tám mã fault type ở tám ca không invalid, không đại diện 25 loại của bài.",
+    "normal": "Normal trước tiêm khoảng240s theo env; sạch/đại diện load chưa độc lập chứng minh.",
+    "counts": "Có 10 thư mục ca, 2 có .invalid rỗng (không kèm lý do); không lấy chúng vào probe. Tám ca còn lại có 11 service gốc, tám mã fault, tám ô root-set × fault, mỗi ô một lần. Không có lặp đủ để ngoại suy. Marker vắng không thay tự chứng minh SLI valid. [census](runs/fse-file-inspect-003/census.json), [từng ca/graph/parent/clock/linkage](runs/fse-file-inspect-003/cases.json), [schema](runs/fse-file-inspect-003/schemas.json).\n\n| Ca | Tập service gốc | Fault type | Invalid marker |\n|---|---|---|---|\n| ts8-ts-route-plan-service-request-delay-5dmjfm | ts-route-plan-service, ts-travel2-service | 7 | False |\n| ts3-ts-contacts-service-container-kill-262mnp | ts-contacts-service | 2 | False |\n| ts2-ts-order-service-stress-8vtw2p | ts-order-service | 28 | False |\n| ts4-ts-route-plan-service-bandwidth-z6g6ng | ts-route-plan-service, ts-travel-plan-service | 21 | False |\n| ts5-ts-order-service-corrupt-bd4p5g | ts-order-service, ts-ui-dashboard | 20 | True |\n| ts4-ts-auth-service-pod-failure-97s6xl | ts-auth-service | 1 | False |\n| ts2-ts-train-service-exception-plrfk2 | ts-train-service | 25 | False |\n| ts5-ts-route-plan-service-partition-khgj4c | ts-route-plan-service, ts-travel-plan-service | 22 | True |\n| ts3-ts-food-service-response-replace-body-skvngv | ts-food-service, ts-station-food-service | 9 | False |\n| ts0-ts-security-service-request-replace-method-j6gpxx | ts-security-service, ts-order-other-service | 12 | False |",
+    "census_reason": "Census checked in card references; no source-only release count assumption.",
+    "schema": "Actual schema/quality in updated card and referenced files.",
+    "time": "Ngữ nghĩa injection/onset/end và timezone còn OPEN.",
+    "ranking": "Có ground_truth.service dạng tập root, container/pod/metric/span theo từng ca; phải chấm tập/cấp nhãn đúng, không ép một root.",
+    "detection": "Có start/end tiêm UTC, chưa onset/recovery. Normal/abnormal đã cắt theo tiêm nên cần protocol điều kiện; chưa là phát hiện liên tục mù thời điểm.",
+    "region": "Không có bằng chứng nhãn vùng thật độc lập trong nguồn đã đọc.",
+    "trace_task": "Không thấy nhãn anomalous từng trace; tên abnormal là phase, không nhãn mọi trace.",
+    "leakage": "Tên ca/thư mục có thể mang nhãn; chưa có adapter để kiểm loại rò.",
+    "independence": "Cùng upstream TT với OpenRCA2; artifact không là corpus độc lập thứ hai.",
+    "size": "Latest artifact: 91.418.171 byte, so record cũ 96.090.000 byte. Cả hai là reviewer tar.gz rút gọn, không phải byte toàn bộ dữ liệu bài.",
+    "open": "Bài arXiv v2 và accepted paper trong artifact có thể khác; chưa mở artifact để đối chiếu nên không tự đồng nhất phiên bản/số ca.",
+    "name": "FSE fault-propagation benchmark — artifact rút gọn",
+    "identity": "Fang và cộng sự, TrainTicket; bài arXiv v2 năm 2025, artifact FSE năm 2026. ChaosMesh; OpenTelemetry, Hubble và Prometheus trong pipeline mô tả bài.",
+    "sources": [
+      {
+        "name": "paper v2",
+        "path": "runs/run-001/sources/fse-paper-v2.html"
+      },
+      {
+        "name": "latest metadata",
+        "path": "runs/run-002/sources/zenodo-19513398-latest.json"
+      }
+    ],
+    "license": "Record Apache2; internal LICENSE limits packaging/support and upstream repositories retain terms. Raw input license scope OPEN.",
+    "symptoms": "Đã probe metric raw và duration ở tám ca, ba q, reference/control; không là nhãn propagation.",
+    "inspection_stage": "file-inspected"
+  },
+  {
+    "version": "Record DOI cố định và repo commit ở manifest; không gán metadata.version=null thành tên version.",
+    "access": "Tải/hash/CRC PASS; data/code license riêng.",
+    "labels": "Tên experiment và cấu hình đích được đọc; chưa có gold runtime incident/onset/end riêng.",
+    "trace": "CSV Jaeger SN/JSON SkyWalking TT; parent unique/missing/ambiguous có actual census.",
+    "modalities": "Metric CSV, container logs, trace, API response, coverage có thật; 0 SW_CTX trong log đã đọc, không khẳng định mọi kiểu ID đều vắng.",
+    "positions": "12 faulty capture +1 baseline; target graph degree có điều kiện theo source, không root gold.",
+    "faults": "SN exporter dùng datetime.fromtimestamp: CSV time là naive local; JSON Jaeger epoch microseconds giữ nguồn gốc. Ba Code_Stop thực hiện docker stop, không seeded defect trong source code. Ba performance target host/disk/docker0; Redis target là database, không ép vào service. JSON và CSV cùng trace/span-ID set, đã kiểm mọi 13 export.",
+    "normal": "Một baseline thật mỗi hệ; normal load/reset/warmup và recovery chưa độc lập xác minh.",
+    "counts": "Thực kiểm: 13 capture/hệ =12 fault-name+1 normal-name. 2635 trace occurrences, 25577 span rows; đây không phải incident độc lập hay nhãn trace anomaly. 145555 metric rows và 3959028 log lines. Mỗi fault-family một capture, chưa proof incident/repetition từ runtime label. .DS_Store ở SN không tính ca. [file/schema/quality](runs/anomod-file-inspect-003/files.json), [parent/graph/từng capture](runs/anomod-file-inspect-003/cases.json), [target-source/capture census](runs/anomod-followup-002/captures.json). Target configs và code đọc ở collector manifest; đếm đích nguồn khác đếm root gold. Không tạo một nhãn mới chỉ để kín bảng.",
+    "census_reason": "Runtime labels missing for AnoMod; full labels/census checked elsewhere at their true unit; Bank only label-range.",
+    "schema": "Actual schema/quality in updated card and referenced files.",
+    "time": "Paper mô tả kích hoạt lỗi trước workload, dừng khi workload xong; README nói UTC. Đây chưa là kiểm timestamp file.",
+    "ranking": "CANDIDATE theo đích cấu hình tiêm, chưa có nhãn runtime root/time từng incident đóng đủ. Host/database không tự service root.",
+    "detection": "Không có injection start/end/onset riêng được ghép với từng capture; timestamp tên run không phải injection. Chưa chấm onset/F1 thời gian thật.",
+    "region": "Không có bằng chứng nhãn vùng thật độc lập trong nguồn đã đọc.",
+    "trace_task": "is_error/status là observed instrumentation, chưa gold anomalous từng trace; không gán class toàn capture.",
+    "leakage": "Experiment ID chứa fault/root; README TT hướng dẫn encode lỗi trong EXP_NAME. Cần loại khỏi đầu vào phương pháp; chỉ giữ để census/chấm.",
+    "independence": "Campaign/nhóm mới theo nguồn; stack/injector overlap Eadro/Deep và LO2, không đủ ba trục chỉ từ tên.",
+    "size": "AnoMod.zip 201.917.396 byte gồm hai hệ; chưa tách byte SocialNetwork.",
+    "open": "Paper nói ChaosMesh/ChaosBlade toàn pipeline; SN README cụ thể ChaosBlade. Dùng mô tả theo hệ, không áp một stack đồng nhất cho cả hai.",
+    "name": "AnoMod — SocialNetwork",
+    "identity": "Ping, Mazhar, Wang, Song, Mäntylä (Helsinki), MSR 2026. SocialNetwork; EvoMaster/workload, ChaosBlade và container restart theo README SN; Prometheus và Jaeger.",
+    "sources": [
+      {
+        "name": "paper",
+        "path": "runs/run-001/sources/anomod-paper-v1.html"
+      },
+      {
+        "name": "record",
+        "path": "runs/run-002/sources/zenodo-18342898-latest.json"
+      },
+      {
+        "name": "repo README",
+        "path": "runs/run-002/sources/anomod-README.md"
+      },
+      {
+        "name": "collector README",
+        "path": "runs/run-002/sources/anomod-SN_collection-scripts__README.md"
+      },
+      {
+        "name": "code license",
+        "path": "runs/run-002/sources/anomod-LICENSE"
+      }
+    ],
+    "license": "Data CC-BY-4.0 (record); code MIT (repo LICENSE).",
+    "symptoms": "Đã khảo sát duration theo service/operation, baseline reference/control/3q; outside declared target có điều kiện, không outside-root gold.",
+    "inspection_stage": "file-inspected"
+  },
+  {
+    "version": "Record DOI cố định và repo commit ở manifest; không gán metadata.version=null thành tên version.",
+    "access": "Tải/hash/CRC PASS; data/code license riêng.",
+    "labels": "Tên experiment và cấu hình đích được đọc; chưa có gold runtime incident/onset/end riêng.",
+    "trace": "CSV Jaeger SN/JSON SkyWalking TT; parent unique/missing/ambiguous có actual census.",
+    "modalities": "Metric CSV, container logs, trace, API response, coverage có thật; 0 SW_CTX trong log đã đọc, không khẳng định mọi kiểu ID đều vắng.",
+    "positions": "12 faulty capture +1 baseline; target graph degree có điều kiện theo source, không root gold.",
+    "faults": "TT SkyWalking JSON trace.summary và spans có node_id/parent_node_id gồm segment và span index, không ghép integer span_id xuyên segment. Tất cả13 metadata ghi lookback24h. Kiểm actual: không trace-ID trùng giữa các capture và không span bắt đầu trước timestamp tên run; vì vậy chưa có bằng chứng trộn lỗi từ overlap, nhưng timestamp tên vẫn không là injection/onset. Ba code scenarios là JVM return/throw tại security/order/travel theo script; lỗi database có cấu hình network-delay, không suy nhãn DB semantics từ tên.",
+    "normal": "Một baseline thật mỗi hệ; normal load/reset/warmup và recovery chưa độc lập xác minh.",
+    "counts": "Thực kiểm: 13 capture/hệ =12 fault-name+1 normal-name. 63975 trace occurrences, 115025 span rows; đây không phải incident độc lập hay nhãn trace anomaly. 4019540 metric rows và 1694538 log lines. Mỗi fault-family một capture, chưa proof incident/repetition từ runtime label. .DS_Store ở SN không tính ca. [file/schema/quality](runs/anomod-file-inspect-003/files.json), [parent/graph/từng capture](runs/anomod-file-inspect-003/cases.json), [target-source/capture census](runs/anomod-followup-002/captures.json). Target configs và code đọc ở collector manifest; đếm đích nguồn khác đếm root gold. Không tạo một nhãn mới chỉ để kín bảng.",
+    "census_reason": "Runtime labels missing for AnoMod; full labels/census checked elsewhere at their true unit; Bank only label-range.",
+    "schema": "Actual schema/quality in updated card and referenced files.",
+    "time": "Paper mô tả kích hoạt lỗi trước workload, dừng khi workload xong; README nói UTC. Đây chưa là kiểm timestamp file.",
+    "ranking": "CANDIDATE theo đích cấu hình tiêm, chưa có nhãn runtime root/time từng incident đóng đủ. Host/database không tự service root.",
+    "detection": "Không có injection start/end/onset riêng được ghép với từng capture; timestamp tên run không phải injection. Chưa chấm onset/F1 thời gian thật.",
+    "region": "Không có bằng chứng nhãn vùng thật độc lập trong nguồn đã đọc.",
+    "trace_task": "is_error/status là observed instrumentation, chưa gold anomalous từng trace; không gán class toàn capture.",
+    "leakage": "Experiment ID chứa fault/root; README TT hướng dẫn encode lỗi trong EXP_NAME. Cần loại khỏi đầu vào phương pháp; chỉ giữ để census/chấm.",
+    "independence": "Campaign/nhóm mới theo nguồn; stack/injector overlap Eadro/Deep và LO2, không đủ ba trục chỉ từ tên.",
+    "size": "AnoMod.zip 201.917.396 byte gồm hai hệ; chưa tách byte TrainTicket.",
+    "open": "Paper nói ChaosMesh/ChaosBlade toàn pipeline; SN README cụ thể ChaosBlade. Dùng mô tả theo hệ, không áp một stack đồng nhất cho cả hai.",
+    "name": "AnoMod — TrainTicket",
+    "identity": "Ping, Mazhar, Wang, Song, Mäntylä (Helsinki), MSR 2026. TrainTicket; EvoMaster/workload, ChaosMesh/ChaosBlade theo README TT; Prometheus và SkyWalking.",
+    "sources": [
+      {
+        "name": "paper",
+        "path": "runs/run-001/sources/anomod-paper-v1.html"
+      },
+      {
+        "name": "record",
+        "path": "runs/run-002/sources/zenodo-18342898-latest.json"
+      },
+      {
+        "name": "repo README",
+        "path": "runs/run-002/sources/anomod-README.md"
+      },
+      {
+        "name": "collector README",
+        "path": "runs/run-002/sources/anomod-TT_collection-scripts__T-Dataset__README.md"
+      },
+      {
+        "name": "code license",
+        "path": "runs/run-002/sources/anomod-LICENSE"
+      }
+    ],
+    "license": "Data CC-BY-4.0 (record); code MIT (repo LICENSE).",
+    "symptoms": "Đã khảo sát duration theo service/operation, baseline reference/control/3q; outside declared target có điều kiện, không outside-root gold.",
+    "inspection_stage": "file-inspected"
+  },
+  {
+    "version": "Record DOI cố định và repo commit ở manifest; không gán metadata.version=null thành tên version.",
+    "access": "FACT nguồn công khai; payload chưa tải.",
+    "labels": "Tên archive F1/F2/... là nhãn version, chưa chứng minh root/time theo incident.",
+    "trace": "Abstract công bố trace/metric/log; schema parent và nhãn trace còn OPEN.",
+    "modalities": "FACT nguồn có metric/log; chất lượng file OPEN.",
+    "positions": "OPEN: chưa đếm root theo vị trí đồ thị.",
+    "faults": "Seeded faults theo abstract; mapping F-code sang root/fault/line chưa kiểm.",
+    "normal": "Clean reference version có nguồn; tính tương ứng workload và nhãn normal mỗi trace chưa kiểm.",
+    "counts": "Record có 11 tar: 10 tên lỗi và 1 cleaned. Abstract hội nghị nói clean + 9 faulty versions. Chưa đồng nhất được hai cách đếm; không dùng tar làm incident.",
+    "census_reason": "File nhãn riêng không nằm trong metadata record đã công bố; không mở archive chứa telemetry để tìm.",
+    "schema": "Không có schema file thật trong phạm vi đã đọc.",
+    "time": "Ngữ nghĩa injection/onset/end và timezone còn OPEN.",
+    "ranking": "CANDIDATE nếu có nhãn root đúng entity; chưa xác nhận census.",
+    "detection": "OPEN: cần interval/onset/end đúng nghĩa, không suy từ tên archive.",
+    "region": "Không có bằng chứng nhãn vùng thật độc lập trong nguồn đã đọc.",
+    "trace_task": "OPEN: chưa thấy nhãn từng trace được kiểm.",
+    "leakage": "Tên ca/thư mục có thể mang nhãn; chưa có adapter để kiểm loại rò.",
+    "independence": "Nhóm SCCH khác các họ còn lại, cùng TT. Chưa xác định injector/collector hoặc quan hệ với faulty branches DeepTraLog; không suy reuse chỉ từ F-code giống.",
+    "size": "Tổng 26.920.437.760 byte / 11 tar; từng tar ở record-summary. Không tải.",
+    "open": "Chênh 9 faulty versions ở abstract so 10 tar có F-code; có thể version, scope hoặc archive split. Giữ cả hai; tác giả hoặc nhãn/source cần giải thích.",
+    "name": "TrainTicketTrace",
+    "identity": "Urbanke và Fischer, SCCH; dataset Zenodo công bố 2025, trình bày SANER 2026. TrainTicket clean/faulty versions, collector/injector cụ thể chưa khóa.",
+    "sources": [
+      {
+        "name": "record",
+        "path": "runs/run-002/sources/zenodo-17811972-latest.json"
+      },
+      {
+        "name": "conference abstract",
+        "path": "runs/run-002/sources/traintickettrace-conference.html"
+      }
+    ],
+    "license": "Data CC-BY-4.0 theo record; code license chưa thấy trong metadata đã đọc."
+  },
+  {
+    "version": "Record DOI cố định và repo commit ở manifest; không gán metadata.version=null thành tên version.",
+    "access": "Tải/checksum/CRC PASS; license record riêng nguồn Nezha không tự giải phạm vi quyền reused data.",
+    "labels": "Cùng nhãn Nezha đã census toàn: OB56/TT45,10 root/hệ.",
+    "trace": "Cùng byte trace nên reuse đúng kiểm parent T008, không cần đọc lại để tạo số mới.",
+    "modalities": "Cùng metric/log/linkage/clock T008; artifact có code không thêm dữ liệu mới.",
+    "positions": "Cùng root×fault/cell/repetition/graph T008.",
+    "faults": "Cùng fault categories Nezha; không thêm loại vì paper mới.",
+    "normal": "Construct metric trùng fault và normal trace ngắn như T008.",
+    "counts": "[hash đối chiếu mọi CSV/labels](runs/trca-reuse-001/result.json). OBScope bốn ngày: NezhaOB56/10 root/33cells, TT45/10 root/23cells; mọi source labelmatch. Đếm TRCA+Nezha thành hai bộ đánh giá sẽ double-count cùng quan sát. Hash từng path kèm source path có thật; không suy chỉ từ overall ZIP size.",
+    "census_reason": "Census checked in card references; no source-only release count assumption.",
+    "schema": "Actual schema/quality in updated card and referenced files.",
+    "time": "Ngữ nghĩa injection/onset/end và timezone còn OPEN.",
+    "ranking": "Như Nezha cùng hệ: root service record tiêm, có điều kiện clock/mapping/window.",
+    "detection": "Trace/log injection-conditioned chỉ phút tiêm,+1,+2; không chấm continuous blind F1 từ release này. Metric ngày có scope khác, cần clock/normal.",
+    "region": "Không có bằng chứng nhãn vùng thật độc lập trong nguồn đã đọc.",
+    "trace_task": "Không có nhãn anomalous từng trace thật trong labels.",
+    "leakage": "Tên ca/thư mục có thể mang nhãn; chưa có adapter để kiểm loại rò.",
+    "independence": "Không độc lập với Nezha: fullinput CSV vàlabels identical.",
+    "size": "TRCA.zip 335.076.044 byte cho cả hai hệ và code; chưa tách byte TrainTicket.",
+    "open": "Root/time/license code/provenance cần README bên trong; không dùng tiêu đề paper thay nhãn đã kiểm.",
+    "name": "Check Your Trace First (TRCA) — TrainTicket",
+    "identity": "Record anonymous, năm 2026, công bố code TRCA và dữ liệu đa nguồn TrainTicket. Tác giả/injector/collector chưa có trong record.",
+    "sources": [
+      {
+        "name": "record",
+        "path": "runs/run-002/sources/zenodo-19335897-latest.json"
+      }
+    ],
+    "license": "CC-BY-4.0 cho record gói TRCA.zip; license riêng code bên trong chưa kiểm.",
+    "symptoms": "Dùng lại probe T008 đúng hash; giới hạn window/reference không biến mất.",
+    "inspection_stage": "file-inspected"
+  },
+  {
+    "version": "Record DOI cố định và repo commit ở manifest; không gán metadata.version=null thành tên version.",
+    "access": "Tải/checksum/CRC PASS; license record riêng nguồn Nezha không tự giải phạm vi quyền reused data.",
+    "labels": "Cùng nhãn Nezha đã census toàn: OB56/TT45,10 root/hệ.",
+    "trace": "Cùng byte trace nên reuse đúng kiểm parent T008, không cần đọc lại để tạo số mới.",
+    "modalities": "Cùng metric/log/linkage/clock T008; artifact có code không thêm dữ liệu mới.",
+    "positions": "Cùng root×fault/cell/repetition/graph T008.",
+    "faults": "Cùng fault categories Nezha; không thêm loại vì paper mới.",
+    "normal": "Construct metric trùng fault và normal trace ngắn như T008.",
+    "counts": "[hash đối chiếu mọi CSV/labels](runs/trca-reuse-001/result.json). OBScope bốn ngày: NezhaOB56/10 root/33cells, TT45/10 root/23cells; mọi source labelmatch. Đếm TRCA+Nezha thành hai bộ đánh giá sẽ double-count cùng quan sát. Hash từng path kèm source path có thật; không suy chỉ từ overall ZIP size.",
+    "census_reason": "Census checked in card references; no source-only release count assumption.",
+    "schema": "Actual schema/quality in updated card and referenced files.",
+    "time": "Ngữ nghĩa injection/onset/end và timezone còn OPEN.",
+    "ranking": "Như Nezha cùng hệ: root service record tiêm, có điều kiện clock/mapping/window.",
+    "detection": "Trace/log injection-conditioned chỉ phút tiêm,+1,+2; không chấm continuous blind F1 từ release này. Metric ngày có scope khác, cần clock/normal.",
+    "region": "Không có bằng chứng nhãn vùng thật độc lập trong nguồn đã đọc.",
+    "trace_task": "Không có nhãn anomalous từng trace thật trong labels.",
+    "leakage": "Tên ca/thư mục có thể mang nhãn; chưa có adapter để kiểm loại rò.",
+    "independence": "Không độc lập với Nezha: fullinput CSV vàlabels identical.",
+    "size": "TRCA.zip 335.076.044 byte cho cả hai hệ và code; chưa tách byte OnlineBoutique.",
+    "open": "Root/time/license code/provenance cần README bên trong; không dùng tiêu đề paper thay nhãn đã kiểm.",
+    "name": "Check Your Trace First (TRCA) — OnlineBoutique",
+    "identity": "Record anonymous, năm 2026, công bố code TRCA và dữ liệu đa nguồn OnlineBoutique. Tác giả/injector/collector chưa có trong record.",
+    "sources": [
+      {
+        "name": "record",
+        "path": "runs/run-002/sources/zenodo-19335897-latest.json"
+      }
+    ],
+    "license": "CC-BY-4.0 cho record gói TRCA.zip; license riêng code bên trong chưa kiểm.",
+    "symptoms": "Dùng lại probe T008 đúng hash; giới hạn window/reference không biến mất.",
+    "inspection_stage": "file-inspected"
+  },
+  {
+    "version": "Record DOI cố định và repo commit ở manifest; không gán metadata.version=null thành tên version.",
+    "access": "FACT nguồn công khai; payload chưa tải.",
+    "labels": "README có root occurrence datetime/component/reason, record.csv và query.csv. Bản phát hành/nhãn thật chưa đọc.",
+    "trace": "Paper A.3 mô tả timestamp,cmdb_id,parent_id,span_id,trace_id,duration. Parent completeness chưa đo.",
+    "modalities": "Trace+metric, không log theo A.2; schema sample của bài không thay kiểm file.",
+    "positions": "OPEN: chưa đếm root theo vị trí đồ thị.",
+    "faults": "CPU/network/database theo A.2.",
+    "normal": "Nguồn có telemetry theo ngày; chưa chứng minh normal sạch/đủ. Bộ được lọc theo khả năng nhìn thấy root nên có selection bias.",
+    "counts": "Paper Table 1: 51 failure cases, 15 unique root components, 5 reasons. Đây là số công bố, không census query.csv hoặc record.csv.",
+    "census_reason": "Repo chỉ có dataset/README dẫn Drive; không có nhãn thật riêng trong tree ghim. Không mở Drive telemetry/Bank; census chưa làm.",
+    "schema": "CSV theo paper; root/time/reason là nhãn chấm. Giữ nguyên unit pod/node/service đến khi có mapping hợp lệ.",
+    "time": "README/paper khai báo UTC+8. Occurrence time chưa được độc lập xác nhận là injection hoặc onset quan sát; không suy thời điểm kết thúc.",
+    "ranking": "CANDIDATE chấm đúng entity OS/pod/database khi census/mapping đủ; không chấm service nếu nhãn chỉ pod.",
+    "detection": "Có occurrence time; thiếu định nghĩa onset/end độc lập. Query cho khoảng và số lỗi không tương đương detector tự phát hiện.",
+    "region": "Không có bằng chứng nhãn vùng thật độc lập trong nguồn đã đọc.",
+    "trace_task": "OPEN: chưa thấy nhãn từng trace được kiểm.",
+    "leakage": "record.csv/query.csv chứa nhãn, query synthesis biết khoảng/số lỗi. main/task_specification.json ghi các đầu vào đó. Không đưa nhãn hoặc số lỗi thật vào detector tự phát hiện.",
+    "independence": "FACT dùng lại AIOps raw, không độc lập với chính nguồn AIOps tương ứng. Nhóm/testbed khác TT/SN/OB là bằng chứng một phần; injector/collector gốc OPEN, chưa đạt đầy đủ tiêu chí9.",
+    "size": "Paper Table1 ghi 17,6 GB telemetry, không phải byte archive nén hay số byte đã tải. Google Drive có liên kết từ README nhưng chưa kiểm inventory file.",
+    "open": "Bản AIOps cụ thể, injector/collector, inventory/revision data và thời gian lỗi chưa khóa. Bảo toàn họ Bank theo quyết định root; các hệ khác không tự suy độc lập với Bank.",
+    "name": "OpenRCA — Telecom",
+    "identity": "Xu và cộng sự, ICLR 2025; dữ liệu phát sinh từ AIOps Challenge, qua downsample/đổi tên/hiệu chỉnh/lọc. root có thể OS/pod/database; trace+metric, không có log theo paper A.2.",
+    "sources": [
+      {
+        "name": "official paper",
+        "path": "runs/run-002/sources/openrca-paper.pdf"
+      },
+      {
+        "name": "README pinned",
+        "path": "runs/run-002/sources/openrca-README.md"
+      },
+      {
+        "name": "repo license",
+        "path": "runs/run-002/sources/openrca-LICENSE"
+      },
+      {
+        "name": "task schema",
+        "path": "runs/run-002/sources/openrca-main__task_specification.json"
+      }
+    ],
+    "license": "Telemetry CC BY-NC 4.0 theo paper A.1; repo code MIT. Không lấy MIT áp vào telemetry."
+  },
+  {
+    "version": "Record DOI cố định và repo commit ở manifest; không gán metadata.version=null thành tên version.",
+    "access": "Drive publicmetadata/range label truy cập được; không tải fullZIP. Data NC,codeMIT riêng.",
+    "labels": "Nhãn record thực cócomponent/time/reason; epoch/textUTC+8khớp.",
+    "trace": "Schema nguồn cóparent/span/trace, chất lượng file giữ tới G3.",
+    "modalities": "Ba modality theo nguồn; linkagequality chưa đọc.",
+    "positions": "14 root/52cells, từng root×reason×date/lặp đã census; graphpositionG3.",
+    "faults": "8 reason CPU/memory/disk/network/JVM; không nhãn lỗi mã nguồn.",
+    "normal": "Normal sạch/load/clock chưa kiểm G3.",
+    "counts": "[Metadata Drive/ZIPdirectory](runs/bank-metadata-001/summary.json), [inventory 95 member](runs/bank-metadata-001/zip-members.json), [census nhãn tái lập](runs/bank-label-reproduce-002/census.json): 136 record / 14 root / 8 reason / 9 ngày / 52 ô root×reason. Chỉ inflate Bank/record.csv 8.668 byte, size/CRC/hash PASS; không telemetry/predictions. File Bank.zip 2829139841 byte nén, 26400499433 byte logical từ central directory.\n\nLặp theo ô/ngày ởcensus; không lấy querycount thayincident.14 root đúng componentlabel, khôngnormalizepod→service tựý. Source sốcôngbố136/14/8 khớp actualnhưng khôngchứngminh quality đo.",
+    "census_reason": "Census checked in card references; no source-only release count assumption.",
+    "schema": "Actual schema/quality in updated card and referenced files.",
+    "time": "README/paper khai báo UTC+8. Occurrence time chưa được độc lập xác nhận là injection hoặc onset quan sát; không suy thời điểm kết thúc.",
+    "ranking": "Có136 label root component ở mức pod; cần entity mapping G3, không tự gọi service root.",
+    "detection": "Occurrence datetime UTC+8 khớp epoch ở136record; chưa chứng minh injection/onset/end. Query biết khoảng/số lỗi không continuous detection.",
+    "region": "Không có bằng chứng nhãn vùng thật độc lập trong nguồn đã đọc.",
+    "trace_task": "Nhãn trace anomalous chưa có bằng chứng; bảo toàn không đọc số đo.",
+    "leakage": "record.csv/query.csv chứa nhãn, query synthesis biết khoảng/số lỗi. main/task_specification.json ghi các đầu vào đó. Không đưa nhãn hoặc số lỗi thật vào detector tự phát hiện.",
+    "independence": "AIOpsreuseFACT; công cụ/collector gốcOPEN, không đủtiêu chí 9.",
+    "size": "Paper Table1 ghi 26,4 GB telemetry, không phải byte archive nén hay số byte đã tải. Google Drive có liên kết từ README nhưng chưa kiểm inventory file.",
+    "open": "Bản AIOps cụ thể, injector/collector, inventory/revision data và thời gian lỗi chưa khóa. Bảo toàn họ Bank theo quyết định root; các hệ khác không tự suy độc lập với Bank.",
+    "name": "OpenRCA — Bank",
+    "identity": "Xu và cộng sự, ICLR 2025; dữ liệu phát sinh từ AIOps Challenge, qua downsample/đổi tên/hiệu chỉnh/lọc. root mức pod; README chỉ trace ngang pod, không có vertical deployment structure.",
+    "sources": [
+      {
+        "name": "official paper",
+        "path": "runs/run-002/sources/openrca-paper.pdf"
+      },
+      {
+        "name": "README pinned",
+        "path": "runs/run-002/sources/openrca-README.md"
+      },
+      {
+        "name": "repo license",
+        "path": "runs/run-002/sources/openrca-LICENSE"
+      },
+      {
+        "name": "task schema",
+        "path": "runs/run-002/sources/openrca-main__task_specification.json"
+      }
+    ],
+    "license": "Telemetry CC BY-NC 4.0 theo paper A.1; repo code MIT. Không lấy MIT áp vào telemetry.",
+    "symptoms": "Không đọc telemetry theo quyết định bảo toàn WHY13.",
+    "inspection_stage": "metadata-and-labels-only"
+  },
+  {
+    "version": "Record DOI cố định và repo commit ở manifest; không gán metadata.version=null thành tên version.",
+    "access": "FACT nguồn công khai; payload chưa tải.",
+    "labels": "README có root occurrence datetime/component/reason, record.csv và query.csv. Bản phát hành/nhãn thật chưa đọc.",
+    "trace": "Paper A.3 mô tả timestamp,cmdb_id,parent_id,span_id,trace_id,duration. Parent completeness chưa đo.",
+    "modalities": "Metric+trace+log theo A.2; schema sample của bài không thay kiểm file.",
+    "positions": "OPEN: chưa đếm root theo vị trí đồ thị.",
+    "faults": "CPU/memory/disk/network/process theo A.2.",
+    "normal": "Nguồn có telemetry theo ngày; chưa chứng minh normal sạch/đủ. Bộ được lọc theo khả năng nhìn thấy root nên có selection bias.",
+    "counts": "Paper Table 1: 148 failure cases, 44 unique root components, 15 reasons. Đây là số công bố, không census query.csv hoặc record.csv.",
+    "census_reason": "Repo chỉ có dataset/README dẫn Drive; không có nhãn thật riêng trong tree ghim. Không mở Drive telemetry/Bank; census chưa làm.",
+    "schema": "CSV theo paper; root/time/reason là nhãn chấm. Giữ nguyên unit pod/node/service đến khi có mapping hợp lệ.",
+    "time": "README/paper khai báo UTC+8. Occurrence time chưa được độc lập xác nhận là injection hoặc onset quan sát; không suy thời điểm kết thúc.",
+    "ranking": "CANDIDATE chấm đúng entity node/pod/service khi census/mapping đủ; không chấm service nếu nhãn chỉ pod.",
+    "detection": "Có occurrence time; thiếu định nghĩa onset/end độc lập. Query cho khoảng và số lỗi không tương đương detector tự phát hiện.",
+    "region": "Không có bằng chứng nhãn vùng thật độc lập trong nguồn đã đọc.",
+    "trace_task": "OPEN: chưa thấy nhãn từng trace được kiểm.",
+    "leakage": "record.csv/query.csv chứa nhãn, query synthesis biết khoảng/số lỗi. main/task_specification.json ghi các đầu vào đó. Không đưa nhãn hoặc số lỗi thật vào detector tự phát hiện.",
+    "independence": "FACT dùng lại AIOps raw, không độc lập với chính nguồn AIOps tương ứng. Nhóm/testbed khác TT/SN/OB là bằng chứng một phần; injector/collector gốc OPEN, chưa đạt đầy đủ tiêu chí9.",
+    "size": "Paper Table1 ghi 24,5 GB telemetry, không phải byte archive nén hay số byte đã tải. Google Drive có liên kết từ README nhưng chưa kiểm inventory file.",
+    "open": "Bản AIOps cụ thể, injector/collector, inventory/revision data và thời gian lỗi chưa khóa. Bảo toàn họ Bank theo quyết định root; các hệ khác không tự suy độc lập với Bank.",
+    "name": "OpenRCA — Market",
+    "identity": "Xu và cộng sự, ICLR 2025; dữ liệu phát sinh từ AIOps Challenge, qua downsample/đổi tên/hiệu chỉnh/lọc. root node/pod/service; hai cloudbed có telemetry thu riêng.",
+    "sources": [
+      {
+        "name": "official paper",
+        "path": "runs/run-002/sources/openrca-paper.pdf"
+      },
+      {
+        "name": "README pinned",
+        "path": "runs/run-002/sources/openrca-README.md"
+      },
+      {
+        "name": "repo license",
+        "path": "runs/run-002/sources/openrca-LICENSE"
+      },
+      {
+        "name": "task schema",
+        "path": "runs/run-002/sources/openrca-main__task_specification.json"
+      }
+    ],
+    "license": "Telemetry CC BY-NC 4.0 theo paper A.1; repo code MIT. Không lấy MIT áp vào telemetry."
+  },
+  {
+    "version": "Record DOI cố định và repo commit ở manifest; không gán metadata.version=null thành tên version.",
+    "access": "OPEN: A.6 nói preview/full anonymous trong submission, public sau acceptance; không có public archive ghim trong nguồn đã đọc.",
+    "labels": "Paper có service/pod/container/function/span/metric và injection window; chưa có census release.",
+    "trace": "FACT nguồn có trace; liên kết cha–con thật còn OPEN.",
+    "modalities": "FACT nguồn có metric/log; chất lượng file OPEN.",
+    "positions": "OPEN: chưa đếm root theo vị trí đồ thị.",
+    "faults": "Application/resource/network/pod interventions theo paper; loại cụ thể theo hệ chưa census.",
+    "normal": "Theo protocol: fresh deploy/warmup/pre-injection baseline, lọc baseline bất thường; chưa kiểm file.",
+    "counts": "Paper nói 500 evaluable instances tổng ba hệ, 27 primary kinds; không gán tổng này cho riêng TrainTicket.",
+    "census_reason": "Nguồn đã đọc chưa có public release nhãn riêng; chỉ paper/submission artifact mô tả.",
+    "schema": "Theo A.2/A.4: Parquet trace/metric/log, nhãn root và graph PAVE. Schema thật chưa có payload kiểm.",
+    "time": "Paper có injection window [t0,t0+duration]; không suy onset thật.",
+    "ranking": "CANDIDATE root set theo cấp nhãn công bố; cần release/census.",
+    "detection": "CANDIDATE injection-regime nếu khoảng tiêm đủ; onset quan sát OPEN.",
+    "region": "Có graph propagation do PAVE tạo từ telemetry/quy tắc; không tự xem là nhãn vùng độc lập để chấm RQ3c.",
+    "trace_task": "OPEN: chưa thấy nhãn từng trace được kiểm.",
+    "leakage": "PAVE dùng root/injection tạo label; cần tách label/graph khỏi input phương pháp. Chọn ca qua SLI/path và loại graph trivial/cycle tạo selection bias.",
+    "independence": "TT dùng lại Fang/FSE. Cả ba hệ chung nhóm/injector/collector. OpenRCA1 khác raw AIOps; vẫn trùng một số tác giả, không đủ ba trục độc lập.",
+    "size": "OPEN: chưa có inventory public archive ghim; số instance không chuyển thành byte.",
+    "open": "Tình trạng public artifact hiện hành chưa xác minh thêm ngoài lượt tìm giới hạn; không khẳng định không tồn tại. Nhãn PAVE không mặc nhiên đáp ứng nhãn vùng độc lập MRP.",
+    "name": "OpenRCA 2.0 — TrainTicket",
+    "identity": "Fang và cộng sự, arXiv v2 năm 2026; TrainTicket; ChaosMesh, OpenTelemetry/Parquet/Prometheus. TT xây trên dữ liệu Fang/FSE; hai hệ còn lại chiến dịch mới theo paper.",
+    "sources": [
+      {
+        "name": "paper v2",
+        "path": "runs/run-001/sources/openrca2-paper-v2.html"
+      }
+    ],
+    "license": "Paper A.6 nêu data CC-BY-SA4.0, pipeline Apache2.0. Giấy phép arXiv CC BY-NC-SA của bài là phạm vi khác. Public release chưa khóa."
+  },
+  {
+    "version": "Record DOI cố định và repo commit ở manifest; không gán metadata.version=null thành tên version.",
+    "access": "OPEN: A.6 nói preview/full anonymous trong submission, public sau acceptance; không có public archive ghim trong nguồn đã đọc.",
+    "labels": "Paper có service/pod/container/function/span/metric và injection window; chưa có census release.",
+    "trace": "FACT nguồn có trace; liên kết cha–con thật còn OPEN.",
+    "modalities": "FACT nguồn có metric/log; chất lượng file OPEN.",
+    "positions": "OPEN: chưa đếm root theo vị trí đồ thị.",
+    "faults": "Application/resource/network/pod interventions theo paper; loại cụ thể theo hệ chưa census.",
+    "normal": "Theo protocol: fresh deploy/warmup/pre-injection baseline, lọc baseline bất thường; chưa kiểm file.",
+    "counts": "Paper nói 500 evaluable instances tổng ba hệ, 27 primary kinds; không gán tổng này cho riêng OpenTelemetry Demo.",
+    "census_reason": "Nguồn đã đọc chưa có public release nhãn riêng; chỉ paper/submission artifact mô tả.",
+    "schema": "Theo A.2/A.4: Parquet trace/metric/log, nhãn root và graph PAVE. Schema thật chưa có payload kiểm.",
+    "time": "Paper có injection window [t0,t0+duration]; không suy onset thật.",
+    "ranking": "CANDIDATE root set theo cấp nhãn công bố; cần release/census.",
+    "detection": "CANDIDATE injection-regime nếu khoảng tiêm đủ; onset quan sát OPEN.",
+    "region": "Có graph propagation do PAVE tạo từ telemetry/quy tắc; không tự xem là nhãn vùng độc lập để chấm RQ3c.",
+    "trace_task": "OPEN: chưa thấy nhãn từng trace được kiểm.",
+    "leakage": "PAVE dùng root/injection tạo label; cần tách label/graph khỏi input phương pháp. Chọn ca qua SLI/path và loại graph trivial/cycle tạo selection bias.",
+    "independence": "TT dùng lại Fang/FSE. Cả ba hệ chung nhóm/injector/collector. OpenRCA1 khác raw AIOps; vẫn trùng một số tác giả, không đủ ba trục độc lập.",
+    "size": "OPEN: chưa có inventory public archive ghim; số instance không chuyển thành byte.",
+    "open": "Tình trạng public artifact hiện hành chưa xác minh thêm ngoài lượt tìm giới hạn; không khẳng định không tồn tại. Nhãn PAVE không mặc nhiên đáp ứng nhãn vùng độc lập MRP.",
+    "name": "OpenRCA 2.0 — OpenTelemetry Demo",
+    "identity": "Fang và cộng sự, arXiv v2 năm 2026; OpenTelemetry Demo; ChaosMesh, OpenTelemetry/Parquet/Prometheus. TT xây trên dữ liệu Fang/FSE; hai hệ còn lại chiến dịch mới theo paper.",
+    "sources": [
+      {
+        "name": "paper v2",
+        "path": "runs/run-001/sources/openrca2-paper-v2.html"
+      }
+    ],
+    "license": "Paper A.6 nêu data CC-BY-SA4.0, pipeline Apache2.0. Giấy phép arXiv CC BY-NC-SA của bài là phạm vi khác. Public release chưa khóa."
+  },
+  {
+    "version": "Record DOI cố định và repo commit ở manifest; không gán metadata.version=null thành tên version.",
+    "access": "OPEN: A.6 nói preview/full anonymous trong submission, public sau acceptance; không có public archive ghim trong nguồn đã đọc.",
+    "labels": "Paper có service/pod/container/function/span/metric và injection window; chưa có census release.",
+    "trace": "FACT nguồn có trace; liên kết cha–con thật còn OPEN.",
+    "modalities": "FACT nguồn có metric/log; chất lượng file OPEN.",
+    "positions": "OPEN: chưa đếm root theo vị trí đồ thị.",
+    "faults": "Application/resource/network/pod interventions theo paper; loại cụ thể theo hệ chưa census.",
+    "normal": "Theo protocol: fresh deploy/warmup/pre-injection baseline, lọc baseline bất thường; chưa kiểm file.",
+    "counts": "Paper nói 500 evaluable instances tổng ba hệ, 27 primary kinds; không gán tổng này cho riêng Hotel Reservation.",
+    "census_reason": "Nguồn đã đọc chưa có public release nhãn riêng; chỉ paper/submission artifact mô tả.",
+    "schema": "Theo A.2/A.4: Parquet trace/metric/log, nhãn root và graph PAVE. Schema thật chưa có payload kiểm.",
+    "time": "Paper có injection window [t0,t0+duration]; không suy onset thật.",
+    "ranking": "CANDIDATE root set theo cấp nhãn công bố; cần release/census.",
+    "detection": "CANDIDATE injection-regime nếu khoảng tiêm đủ; onset quan sát OPEN.",
+    "region": "Có graph propagation do PAVE tạo từ telemetry/quy tắc; không tự xem là nhãn vùng độc lập để chấm RQ3c.",
+    "trace_task": "OPEN: chưa thấy nhãn từng trace được kiểm.",
+    "leakage": "PAVE dùng root/injection tạo label; cần tách label/graph khỏi input phương pháp. Chọn ca qua SLI/path và loại graph trivial/cycle tạo selection bias.",
+    "independence": "TT dùng lại Fang/FSE. Cả ba hệ chung nhóm/injector/collector. OpenRCA1 khác raw AIOps; vẫn trùng một số tác giả, không đủ ba trục độc lập.",
+    "size": "OPEN: chưa có inventory public archive ghim; số instance không chuyển thành byte.",
+    "open": "Tình trạng public artifact hiện hành chưa xác minh thêm ngoài lượt tìm giới hạn; không khẳng định không tồn tại. Nhãn PAVE không mặc nhiên đáp ứng nhãn vùng độc lập MRP.",
+    "name": "OpenRCA 2.0 — Hotel Reservation",
+    "identity": "Fang và cộng sự, arXiv v2 năm 2026; Hotel Reservation; ChaosMesh, OpenTelemetry/Parquet/Prometheus. TT xây trên dữ liệu Fang/FSE; hai hệ còn lại chiến dịch mới theo paper.",
+    "sources": [
+      {
+        "name": "paper v2",
+        "path": "runs/run-001/sources/openrca2-paper-v2.html"
+      }
+    ],
+    "license": "Paper A.6 nêu data CC-BY-SA4.0, pipeline Apache2.0. Giấy phép arXiv CC BY-NC-SA của bài là phạm vi khác. Public release chưa khóa."
+  },
+  {
+    "version": "Record DOI cố định và repo commit ở manifest; không gán metadata.version=null thành tên version.",
+    "access": "FACT nguồn công khai; payload chưa tải.",
+    "labels": "Correct/error API test labels, không phải root cause service của incident. v2 run log có start/end test theo mô tả.",
+    "trace": "v1 §4.3: mỗi trace một span, nhiều file rỗng; không đủ call graph cha–con. v2 record nói có trace CSV nhưng không chứng minh hạn chế này đã sửa.",
+    "modalities": "FACT nguồn có metric/log; chất lượng file OPEN.",
+    "positions": "OPEN: chưa đếm root theo vị trí đồ thị.",
+    "faults": "Erroneous API usage, không phải hardware/network fault injection theo paper v1.",
+    "normal": "Có correct test; error test trộn correct requests với thêm error task, nên không gán mọi event trong error test là bất thường.",
+    "counts": "Paper v1: 1.740 runs × 54 tests, gồm correct + 53 error tasks. Test API không là incident RCA độc lập.",
+    "census_reason": "Index v2 riêng 31.028.530 byte vượt dự kiến nguồn 25MB của SPEC; không mở rộng tải. Nhãn root/time incident không có chỉ từ index mô tả.",
+    "schema": "Trace CSV công bố Trace ID/Span ID/Operation Name/Start/End/Tags; v1 thiếu cha xuyên operation. JSON metrics và container logs; v2 run_log/index chứa thời gian test.",
+    "time": "Thời gian bắt đầu/kết thúc test API không tự là onset/end của sự cố hệ thống.",
+    "ranking": "Không đủ nhãn root cause service theo nguồn hiện có; đích API không thay nhãn nguyên nhân.",
+    "detection": "Có thể chấm correct/error ở đơn vị test theo protocol rõ; không mặc định chấm thời gian triệu chứng hoặc service RCA.",
+    "region": "Không có bằng chứng nhãn vùng thật độc lập trong nguồn đã đọc.",
+    "trace_task": "Không suy nhãn từng trace từ correct/error của cả test.",
+    "leakage": "Tên test và log khởi tạo chứa correctness; record v1 nêu reduce_logs.py loại dòng khởi tạo lộ nhãn. v2 shuffle/duration random giảm quy luật thứ tự, không chứng minh sạch rò.",
+    "independence": "v1/v2 cùng lineage; không là hai bộ độc lập. Một số tác giả chung AnoMod, collector Prometheus/Jaeger chung Eadro; khác miền OAuth2 không tự đủ MRP§4.",
+    "size": "v1 toàn raw lo2-data.zip 46.483.584.345 byte; sample 1.070.011.492 byte chỉ log/metric, không thay raw.",
+    "open": "v1 record nói superseded bởi v2, nhưng endpoint latest của v1 vẫn chính record cũ: v2 là hồ sơ mới, không âm thầm thay DOI. Trace improvement v2 và mapping root còn OPEN.",
+    "name": "LO2 v1",
+    "identity": "Nhóm Oulu/Helsinki (Bakhtin, Nyyssölä, Wang, Ping, Mäntylä và cộng sự), Light-OAuth2. Locust correct/error API tasks; Docker/Prometheus/Jaeger, v2 bổ sung cAdvisor.",
+    "sources": [
+      {
+        "name": "LO2 paper",
+        "path": "runs/run-001/sources/lo2-paper-v1.html"
+      },
+      {
+        "name": "record current",
+        "path": "runs/run-002/sources/zenodo-14938118-latest.json"
+      }
+    ],
+    "license": "Data CC-BY4.0; v2 record nêu code Apache2.0; license code v1 không thay bằng license data."
+  },
+  {
+    "version": "Record DOI cố định và repo commit ở manifest; không gán metadata.version=null thành tên version.",
+    "access": "FACT nguồn công khai; payload chưa tải.",
+    "labels": "Correct/error API test labels, không phải root cause service của incident. v2 run log có start/end test theo mô tả.",
+    "trace": "v1 §4.3: mỗi trace một span, nhiều file rỗng; không đủ call graph cha–con. v2 record nói có trace CSV nhưng không chứng minh hạn chế này đã sửa.",
+    "modalities": "FACT nguồn có metric/log; chất lượng file OPEN.",
+    "positions": "OPEN: chưa đếm root theo vị trí đồ thị.",
+    "faults": "Erroneous API usage, không phải hardware/network fault injection theo paper v1.",
+    "normal": "Có correct test; error test trộn correct requests với thêm error task, nên không gán mọi event trong error test là bất thường.",
+    "counts": "Record v2: 115 runs × 54 tests; chỉ là số công bố, không census index. Test API không là incident RCA độc lập.",
+    "census_reason": "Index v2 riêng 31.028.530 byte vượt dự kiến nguồn 25MB của SPEC; không mở rộng tải. Nhãn root/time incident không có chỉ từ index mô tả.",
+    "schema": "Trace CSV công bố Trace ID/Span ID/Operation Name/Start/End/Tags; v1 thiếu cha xuyên operation. JSON metrics và container logs; v2 run_log/index chứa thời gian test.",
+    "time": "Thời gian bắt đầu/kết thúc test API không tự là onset/end của sự cố hệ thống.",
+    "ranking": "Không đủ nhãn root cause service theo nguồn hiện có; đích API không thay nhãn nguyên nhân.",
+    "detection": "Có thể chấm correct/error ở đơn vị test theo protocol rõ; không mặc định chấm thời gian triệu chứng hoặc service RCA.",
+    "region": "Không có bằng chứng nhãn vùng thật độc lập trong nguồn đã đọc.",
+    "trace_task": "Không suy nhãn từng trace từ correct/error của cả test.",
+    "leakage": "Tên test và log khởi tạo chứa correctness; record v1 nêu reduce_logs.py loại dòng khởi tạo lộ nhãn. v2 shuffle/duration random giảm quy luật thứ tự, không chứng minh sạch rò.",
+    "independence": "v1/v2 cùng lineage; không là hai bộ độc lập. Một số tác giả chung AnoMod, collector Prometheus/Jaeger chung Eadro; khác miền OAuth2 không tự đủ MRP§4.",
+    "size": "v2 full LO2v2.zip 65.613.664.046 byte; index riêng 31.028.530 byte. Chưa tải; tất cả file/byte ở record-summary.",
+    "open": "v1 record nói superseded bởi v2, nhưng endpoint latest của v1 vẫn chính record cũ: v2 là hồ sơ mới, không âm thầm thay DOI. Trace improvement v2 và mapping root còn OPEN.",
+    "name": "LO2 v2",
+    "identity": "Nhóm Oulu/Helsinki (Bakhtin, Nyyssölä, Wang, Ping, Mäntylä và cộng sự), Light-OAuth2. Locust correct/error API tasks; Docker/Prometheus/Jaeger, v2 bổ sung cAdvisor.",
+    "sources": [
+      {
+        "name": "LO2 paper",
+        "path": "runs/run-001/sources/lo2-paper-v1.html"
+      },
+      {
+        "name": "record current",
+        "path": "runs/run-002/sources/zenodo-18937117-latest.json"
+      }
+    ],
+    "license": "Data CC-BY4.0; v2 record nêu code Apache2.0; license code v1 không thay bằng license data."
+  }
+]

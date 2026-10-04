@@ -1,0 +1,7 @@
+# Kế hoạch Eadro — đã thực hiện Q-47
+
+Q-47 thay quyền chờ trước đây: đã tải đúng hai ZIP (127.676.922 byte), kiểm hash/MD5, CRC toàn member, đọc mọi raw và nested. Kết quả hiện hành ở `runs/inspect-004/summary.json`, `raw-sessions.json`, `nested-inventory.json`, `independent-summary.json`, `validation.json`; thẻ hiện hành `the-dataset.md`. 19 phiên raw duy nhất (SN7/TT12), 32 representation do all archive lặp raw theo hash. Normal nested đã đọc; không PKL trong file cuối. Giữ các lượt inspect-001/002 lỗi và inspect-003 đạt nhưng chưa tách parent-row/identity; inspect-004 bổ sung phép kiểm đó.
+
+Quy trình chọn trước số đo giữ tại bản lịch sử `runs/inspect-004/inspection-plan-before-update.md`; inventory mẫu nguồn ở run-001 vẫn là snapshot, không nhầm đó với census đã đọc. Không chọn bộ nghiên cứu/dev-test. Probe metric q dùng phiên nhãn no-fault đầu theo tên metadata làm reference và các phiên no-fault còn lại làm control; TT-no-fault 20/4 được kiểm schema/giá trị nhưng không dùng làm reference/control do thiếu nhãn riêng. Bảng từng ca/kênh/q/zero-band/refn ở `symptom-metrics.json`; phép tính trực tiếp lại từ hai CSV nguồn đạt trong validation.
+
+Clock trace không tự sửa; bậc root toàn file và bậc theo native injection-window không tương đương khi clock chưa xác minh. License chưa có điều khoản rõ là thiếu bằng chứng permission, không là kết luận bất hợp pháp. Những thiếu nhãn/nguồn thật ghi trong thẻ, không còn câu chờ quyền telemetry.

@@ -31,6 +31,10 @@ Mỗi bước có lệnh kiểm.
 1. ... — kiểm bằng: ...
 2. ...
 
+## Kiểm đúng đắn
+
+Mỗi đầu ra kiểm bằng gì: số công bố để đối chiếu (nguồn, bảng), phép kiểm không cần nhãn, giá trị trung gian. Điều gì không kiểm được trong task, vì sao, và kết luận nào yếu đi.
+
 ## Tiêu chí xong
 
 Điều kiện kiểm được, không mơ hồ.
@@ -41,7 +45,7 @@ Những việc dễ lan sang nhưng nằm ngoài task.
 
 ## Chi phí ước lượng
 
-Thời gian chạy, dung lượng tải, có cần báo trước theo luật cứng 8 không.
+Thời gian chạy, dung lượng tải, có cần báo trước theo luật cứng 8 không. So với ngân sách Q-40.
 
 ## Rủi ro và điều chưa chắc
 

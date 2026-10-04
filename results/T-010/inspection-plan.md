@@ -1,0 +1,7 @@
+# Kế hoạch DeepTraLog — đã thực hiện raw/normal/graph Q-47
+
+Đã tải đúng 32 file: F01–F14, 10 normal, tám phần graph, 515.614.981 byte trên EC2 mới. Đã đọc toàn raw/normal/graph và CSV mapping; không phương pháp RCA. `runs/inspect-002` có raw/CRC; graph edge counts của lượt này bị thay bằng `runs/inspect-005` vì shape thực E×2. `runs/inspect-006/tables.json` giữ census ba bảng CSV. Lượt hỏng inspect-003/004 được giữ. Thẻ hiện hành và validation ở các đường dẫn trên.
+
+Kế hoạch trước số đo ở `runs/inspect-005/inspection-plan-before-update.md`; các bước 1–3 đã thực hiện. Điều kiện bước4 xảy ra (normal graph ID vắng raw/coverage log thiếu), root xác nhận tiếp phạm vi đã trình. Đã tải5phần all-log 213.216.632 byte trong download-003; stream toàn member/CRC run inspect-007 và coverage từng nhãn inspect-008. Tổng Deep37file/728.831.613byte; không full-unpack log ra đĩa. Raw–graph abnormal map đủ 23.334/23.334; 28.116 graph normal ID vắng raw. Raw log đếm 5.835.230, paper 7.705.050; all-log đếm đúng7.705.050paper; toàn28.116normalgraphIDvắngspanraw có trong all-log. Log presence không khôi phục span/parent vắng hoặc chứng minh normal liên tục sạch. Bổ sung này không chọn lỗi/root từ log và không tự thay resource metrics bằng span latency.
+
+Không có ground truth root service, injection/onset/region trong corpus đã kiểm; không lấp nhãn bằng tên F, IsError, hoặc message ERROR. Có label trace thật và service ID map; không lấy bậc event làm vị trí root. License chưa chứng minh đủ permission; nguồn cần làm rõ khi dùng ngoài inspection. G1 do Minh quyết.
