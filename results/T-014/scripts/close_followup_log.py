@@ -1,0 +1,8 @@
+"""Append terminal check results and retain the exact neutral review prompt last."""
+from pathlib import Path
+p=Path('D:/RCA-flashticket/tasks/T-014-ho-so-circa/LOG.md')
+s=p.read_text(encoding='utf-8');prompt='## Prompt phản biện cho Claude'+s.rsplit('## Prompt phản biện cho Claude',1)[1]
+with p.open('a',encoding='utf-8') as f:
+    f.write('\n\n## Xác nhận bàn giao sau rà cuối — 04/10/2026\n\n1. Đã làm: hai lượt PC bổ sung đã hoàn tất; báo cáo A–H và bảng tiêu chí được cập nhật theo bằng chứng mới. Không có worker PC còn chạy.\n2. File đã thay đổi: chỉ phạm vi T-014 đã liệt kê trong báo cáo/manifest và đúng dòng STATE. Các file của phiên khác được giữ nguyên.\n3. Kiểm đã chạy: verify_outputs 31/31; verify_followup 32/32; source revisions/hashes PASS; Prompt chung/G1 nguyên văn PASS. STATE updater xác nhận mọi byte ngoài dòng T-014 không đổi. Manifest đủ hai host và file ngoài repo; sẽ tạo lại sau dòng LOG này. PASS ở đây là tính toàn vẹn bằng chứng; permutation và normal negative control FAIL như báo cáo, đối chiếu laptop FAIL bốn metric.\n4. Chưa chắc/cần Minh: giao thức sinh bảng công bố và các giả định tại G/H của báo cáo. Không chọn cấu hình theo accuracy, không biến giả thuyết thành quyết định.\n5. Bước tiếp theo: Claude đọc SPEC, LOG, bao-cao-cuoi.md và toàn file set trong manifest-files.csv; kiểm bằng chứng độc lập, chỉ ghi REVIEW.md. Có thể chạy verify_outputs.py và verify_followup.py trên môi trường ghi trong moi-truong.md.\n6. Lệnh cuối kiểm nội dung: check_scope_sources.py; lệnh bàn giao cuối sẽ là manifest_files.py sau check_review_prompt.py. Trạng thái T-014: chờ phản biện (04/10/2026).\n\n')
+    f.write(prompt)
+print('Append-only LOG closed with neutral review prompt last.')

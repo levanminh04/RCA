@@ -1,0 +1,159 @@
+{
+  "scope": "T-014 audit branch cost from existing timers/logs only; no official runtime claim",
+  "unit": "seconds",
+  "timing_environment": "shared laptop; instrumentation/imports and IO vary; not official benchmark",
+  "fse_ob": {
+    "exact_total_seconds": null,
+    "recorded_nonoverlapping_blocks": [
+      {
+        "source": "results/T-014/audit/progress.log",
+        "start": "2026-10-04T08:26:14.707534",
+        "end": "2026-10-04T08:27:18.774444",
+        "seconds": 64.06691,
+        "scope": "Original two-case run including imports, two causal-learn PC graphs, original/RE RHT, isolation/repeat/parser/empty fixtures",
+        "nested_informational_pc_seconds": [
+          3.244,
+          6.412
+        ]
+      },
+      {
+        "source": "results/T-014/audit/r-pcalg.log",
+        "seconds": 4.17,
+        "scope": "Sum PC body timers2.76+1.41; startup/IO excluded"
+      },
+      {
+        "source": "results/T-014/audit/mem-pcalg.log",
+        "seconds": 150.02,
+        "scope": "Total loop timer all25 MEMcases; one existing graph reused"
+      },
+      {
+        "source": "results/T-014/audit/mem-target-summary.json#diagnostic_elapsed_scoring",
+        "seconds": 21.23399999999674,
+        "scope": "25 MEM original linear RHT scoring"
+      },
+      {
+        "source": "results/T-014/audit/mem-prior-config-summary.json#diagnostic_elapsed_scoring",
+        "seconds": 18.594000000040978,
+        "scope": "75 MEM prior configurations plus linear consistency/SVR repeat"
+      }
+    ],
+    "recorded_seconds_sum": 258.0849100000377,
+    "missing_isolated_timers": [
+      "r-comparison.log: original RHT factor scoring",
+      "pcalg-repeat.log: four R-PC repeat/column-order calls",
+      "mem-prior-scoring.log: failed first partial scoring call",
+      "Process startup, log creation, final IO/termination outside body timers"
+    ],
+    "filesystem_wall_proxy": {
+      "source": "PowerShell Get-Item CreationTimeUtc and LastWriteTimeUtc, inspected 2026-10-04",
+      "windows": [
+        {
+          "source": "results/T-014/audit/run-original.log",
+          "created_utc": "2026-10-04T01:26:14.3830579Z",
+          "last_write_utc": "2026-10-04T01:27:18.7784471Z",
+          "seconds": 64.3953892,
+          "scope": "fse-ob two cases, repeats and synthetic checks"
+        },
+        {
+          "source": "results/T-014/audit/r-pcalg.log",
+          "created_utc": "2026-10-04T01:38:21.2730630Z",
+          "last_write_utc": "2026-10-04T01:38:30.3280973Z",
+          "seconds": 9.0550343,
+          "scope": "fse-ob two R-PC graphs"
+        },
+        {
+          "source": "results/T-014/audit/r-comparison.log",
+          "created_utc": "2026-10-04T01:40:08.3562613Z",
+          "last_write_utc": "2026-10-04T01:40:15.0291823Z",
+          "seconds": 6.672921,
+          "scope": "fse-ob samegraph original RHT factors"
+        },
+        {
+          "source": "results/T-014/audit/mem-pcalg.log",
+          "created_utc": "2026-10-04T01:48:15.9341650Z",
+          "last_write_utc": "2026-10-04T01:50:49.7655625Z",
+          "seconds": 153.8313975,
+          "scope": "fse-ob 25 MEM R-PC loop; one cached graph"
+        },
+        {
+          "source": "results/T-014/audit/mem-scoring.log",
+          "created_utc": "2026-10-04T01:51:07.8230204Z",
+          "last_write_utc": "2026-10-04T01:51:36.1930436Z",
+          "seconds": 28.3700232,
+          "scope": "fse-ob 25 MEM linear RHT"
+        },
+        {
+          "source": "results/T-014/audit/pcalg-repeat.log",
+          "created_utc": "2026-10-04T01:53:01.9371400Z",
+          "last_write_utc": "2026-10-04T01:53:14.4681564Z",
+          "seconds": 12.5310164,
+          "scope": "fse-ob two R-PC repeats and column permutations"
+        },
+        {
+          "source": "results/T-014/audit/mem-prior-scoring.log",
+          "created_utc": "2026-10-04T01:55:43.7999125Z",
+          "last_write_utc": "2026-10-04T01:55:47.6517330Z",
+          "seconds": 3.8518205,
+          "scope": "failed prior scorer first case; kept"
+        },
+        {
+          "source": "results/T-014/audit/mem-prior-scoring-lan2.log",
+          "created_utc": "2026-10-04T01:57:16.3268301Z",
+          "last_write_utc": "2026-10-04T01:57:40.3092929Z",
+          "seconds": 23.9824628,
+          "scope": "fse-ob 75 SVR/DA variants, linear recompute, SVR repeat"
+        }
+      ],
+      "sum_seconds": 302.6900649,
+      "strict_runtime_bound": false,
+      "caveat": "Time between log file creation and last write approximates each process wall window. File creation can follow process start; cleanup can follow final write. It is not a measured exact sum nor a guaranteed upper bound."
+    },
+    "budget_seconds": 900,
+    "budget_assessment": "Observed process/log windows are consistent with the15-minute branch budget. Exact total is not recoverable from all old timers; no strict proof of the total is claimed."
+  },
+  "synthetic": {
+    "filesystem_wall_proxy_seconds": 36.8415169,
+    "windows": [
+      {
+        "source": "results/T-014/audit/direction.log",
+        "created_utc": "2026-10-04T01:36:37.6509909Z",
+        "last_write_utc": "2026-10-04T01:36:41.7763833Z",
+        "seconds": 4.1253924,
+        "scope": "synthetic endpoint fixture, no dataset"
+      },
+      {
+        "source": "results/T-014/audit/da-cycle.log",
+        "created_utc": "2026-10-04T02:04:32.8207378Z",
+        "last_write_utc": "2026-10-04T02:05:05.5368623Z",
+        "seconds": 32.7161245,
+        "scope": "synthetic DA/SCC six hashseed processes, no dataset"
+      }
+    ],
+    "dataset_cases": 0,
+    "strict_runtime_bound": false
+  },
+  "all_old_audit_observed_filesystem_windows_seconds": 339.53158179999997,
+  "re2_tt_additional": {
+    "source": "results/T-014/audit/architecture-original.json",
+    "case": "re2tt_ts-order-service_loss_3",
+    "config": "Original CIRCA RHT+DA same saved architecture/context and explicit reversed-parent RHT; no new graph",
+    "diagnostic_scoring_seconds": 1.3827109999838285,
+    "diagnostic_process_seconds": 4.460697399976198,
+    "estimated_before_seconds_upper": 60
+  },
+  "excluded": [
+    "R/package/tool/artifact downloads and environment setup",
+    "idle time between commands",
+    "report writing, parsing, manifests",
+    "parent branch EC2 and architecture/PC runs"
+  ],
+  "downloads": {
+    "saved_distinct_payload_bytes": 130204587,
+    "source": "results/T-014/audit/source-downloads.csv",
+    "additional_known_repeated_metadata_bytes": 971145,
+    "additional_known_repeated_metadata_source": "results/T-014/audit/r-packages-setup.log; first CRAN PACKAGES transfer before Bioconductor403, same file overwritten by retry",
+    "known_cumulative_network_bytes": 131175732,
+    "network_limit_bytes": 1000000000,
+    "not_included": "unknown HTTP response/header bytes; not claimed as exact network-layer billing"
+  }
+}

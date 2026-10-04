@@ -1,0 +1,93 @@
+{
+  "tag": "duplicate-singular",
+  "alpha": 0.05,
+  "depth_mode": "default",
+  "shape": [
+    2000,
+    5
+  ],
+  "labels": [
+    "s0_cpu",
+    "s1_cpu",
+    "s2_cpu",
+    "s3_cpu",
+    "s4_cpu"
+  ],
+  "raw_sha256": "d3e0b28e6111476fa840b0f4e15cf3a7949376782062ebf6431d65905cca8203",
+  "status": "exception",
+  "exception_type": "ValueError",
+  "exception": "Data correlation matrix is singular. Cannot run fisherz test. Please check your data.",
+  "traceback": "Traceback (most recent call last):\n  File \"D:\\RCA-ext\\envs\\py312-pin\\Lib\\site-packages\\causallearn\\utils\\cit.py\", line 162, in __call__\n    inv = np.linalg.inv(sub_corr_matrix)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\RCA-ext\\envs\\py312-pin\\Lib\\site-packages\\numpy\\linalg\\linalg.py\", line 561, in inv\n    ainv = _umath_linalg.inv(a, signature=signature, extobj=extobj)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\RCA-ext\\envs\\py312-pin\\Lib\\site-packages\\numpy\\linalg\\linalg.py\", line 112, in _raise_linalgerror_singular\n    raise LinAlgError(\"Singular matrix\")\nnumpy.linalg.LinAlgError: Singular matrix\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"D:\\RCA-flashticket\\results\\T-014\\paper\\pc_fixtures.py\", line 105, in run_pc\n    graph=pc_module.pc(data,alpha=alpha,indep_test='fisherz',stable=True,\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\RCA-ext\\envs\\py312-pin\\Lib\\site-packages\\causallearn\\search\\ConstraintBased\\PC.py\", line 46, in pc\n    return pc_alg(data=data, node_names=node_names, alpha=alpha, indep_test=indep_test, stable=stable, uc_rule=uc_rule,\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\RCA-ext\\envs\\py312-pin\\Lib\\site-packages\\causallearn\\search\\ConstraintBased\\PC.py\", line 104, in pc_alg\n    cg_1 = SkeletonDiscovery.skeleton_discovery(data, alpha, indep_test, stable,\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\RCA-flashticket\\results\\T-014\\paper\\pc_fixtures.py\", line 96, in instrumented\n    return implementation(data,alpha,RecordCI(indep_test,ci),*args,**kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\RCA-ext\\envs\\py312-pin\\Lib\\site-packages\\causallearn\\utils\\PCUtils\\SkeletonDiscovery.py\", line 101, in skeleton_discovery\n    p = cg.ci_test(x, y, S)\n        ^^^^^^^^^^^^^^^^^^^\n  File \"D:\\RCA-ext\\envs\\py312-pin\\Lib\\site-packages\\causallearn\\graph\\GraphClass.py\", line 58, in ci_test\n    return self.test(i, j, S)\n           ^^^^^^^^^^^^^^^^^^\n  File \"D:\\RCA-flashticket\\results\\T-014\\paper\\pc_fixtures.py\", line 56, in __call__\n    p = self.base(a, b, conditioning, *args)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\RCA-ext\\envs\\py312-pin\\Lib\\site-packages\\causallearn\\utils\\cit.py\", line 164, in __call__\n    raise ValueError('Data correlation matrix is singular. Cannot run fisherz test. Please check your data.')\nValueError: Data correlation matrix is singular. Cannot run fisherz test. Please check your data.\n",
+  "CI": [
+    {
+      "a": 0,
+      "b": 1,
+      "S": [],
+      "p": 0.0,
+      "p_nonfinite": false,
+      "elapsed_diagnostic": 0.0
+    },
+    {
+      "a": 0,
+      "b": 2,
+      "S": [],
+      "p": 0.0,
+      "p_nonfinite": false,
+      "elapsed_diagnostic": 0.0
+    },
+    {
+      "a": 0,
+      "b": 3,
+      "S": [],
+      "p": 0.0,
+      "p_nonfinite": false,
+      "elapsed_diagnostic": 0.0
+    },
+    {
+      "a": 0,
+      "b": 4,
+      "S": [],
+      "p": 0.0,
+      "p_nonfinite": false,
+      "elapsed_diagnostic": 0.0
+    },
+    {
+      "a": 1,
+      "b": 0,
+      "S": [],
+      "p": 0.0,
+      "p_nonfinite": false,
+      "elapsed_diagnostic": 0.0
+    },
+    {
+      "a": 1,
+      "b": 2,
+      "S": [],
+      "p": 0.0,
+      "p_nonfinite": false,
+      "elapsed_diagnostic": 0.0
+    },
+    {
+      "a": 1,
+      "b": 3,
+      "S": [],
+      "p": 0.0,
+      "p_nonfinite": false,
+      "elapsed_diagnostic": 0.0
+    },
+    {
+      "a": 1,
+      "b": 4,
+      "S": [],
+      "exception_type": "ValueError",
+      "exception": "Data correlation matrix is singular. Cannot run fisherz test. Please check your data.",
+      "elapsed_diagnostic": 0.0
+    }
+  ],
+  "CI_count": 8,
+  "max_condition_size": 0,
+  "nonfinite_p_count": 0,
+  "stdout": "",
+  "stderr": "",
+  "elapsed_diagnostic": 0.125
+}

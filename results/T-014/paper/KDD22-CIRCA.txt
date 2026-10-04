@@ -1,0 +1,1168 @@
+--- PAGE 1 ---
+Causal Inference-Based Root Cause Analysis for Online Service
+Systems with Intervention Recognition
+MingjieLi XiaohuiNie DanPei∗
+ZeyanLi WenchiZhang TsinghuaUniversity
+KanglinYin KaixinSui Beijing,China
+TsinghuaUniversity BizSeer
+Beijing,China Beijing,China
+ABSTRACT 1 INTRODUCTION
+Faultdiagnosisiscriticalinmanydomains,asfaultsmayleadto Faultdiagnosisiscriticalinmanydomains,e.g.,machinerymainte-
+safety threats or economic losses. In the field of online service nance[28],petroleumrefining[6],andcloudsystemoperations[21,
+systems,operatorsrelyonenormousmonitoringdatatodetect 30],whichisanactiveresearchtopicintheSIGKDDcommunity.In
+andmitigatefailures.Quicklyrecognizingasmallsetofrootcause thiswork,wefocusonrootcauseanalysis(RCA)inonlineservice
+indicatorsfortheunderlyingfaultcansavemuchtimeforfailure systems(OSS),suchassocialnetworks,onlineshopping,search
+mitigation.Inthispaper,weformulatetherootcauseanalysisprob- engine,etc.Weadopttheterminologyin[19],denotingafailureas
+lemasanewcausalinferencetasknamedinterventionrecognition. theundesireddeviationinservicedeliveryandafaultasthecause
+Weproposedanovelunsupervisedcausalinference-basedmethod ofthefailure.
+namedCausalInference-basedRootCauseAnalysis(CIRCA).The Withtheexpansionofsystemscaleandtheriseofmicroser-
+coreideaisasufficientconditionforamonitoringvariabletobe viceapplications,OSSaremoreandmorecomplex.Asaresult,
+arootcauseindicator,i.e.,thechangeofprobabilitydistribution operatorsrelyonmonitoringdatatounderstandwhathappensin
+conditionedontheparentsintheCausalBayesianNetwork(CBN). thesystem[2].Commonmonitoringdataincludemetrics,semi-
+Towards the application in online service systems, CIRCA con- structurallogs,andinvocationtraces.Asthemostwidelyavailable
+structsagraphamongmonitoringmetricsbasedontheknowledge data,metricsareusuallyintheformoftimeseriessampledata
+ofsystemarchitectureandasetofcausalassumptions.Thesim- constantfrequency,e.g.,onceperminute.Severalmetricsarethe
+ulationstudyillustratesthetheoreticalreliabilityofCIRCA.The measuresoftheoverallsystemhealthstatus,namedtheservice
+performanceonareal-worlddatasetfurthershowsthatCIRCAcan levelindicators(SLI),e.g.,theaverageresponsetimeofanonline
+improvetherecallofthetop-1recommendationby25%overthe service.OnceanSLIviolatesthepre-definedservicelevelobjective
+bestbaselinemethod. (i.e.,afailureoccurs),operatorswillmitigatethefailureassoonas
+possibletopreventfurtherdamage.Asasinglefaultmaypropagate
+CCSCONCEPTS inthesystem[9]withmultiplemetricsbeingabnormalduringa
+failure(namedanomalystorm[31]),RCA(recognizingasmallset
+•Softwareanditsengineering→Softwarereliability;•Com-
+ofrootcauseindicators)oftheunderlyingfaultcansavemuchtime
+putingmethodologies→Causalreasoninganddiagnostics.
+forfailuremitigation.
+Withtherisingemphasisonexplainabilityinmanydomains,
+KEYWORDS
+causalinference[27]hasattractedmuchattentionintheliterature.
+rootcauseanalysis,causalinference,interventionrecognition,on- Thoughcausalinferenceispromising,causalinference-basedRCA
+lineservicesystems islittlestudied,exceptSage[8]withcounterfactualanalysis.In
+thispaper,wenovellymapafaultinOSSasanintervention[20]in
+ACMReferenceFormat:
+causalinference.Fromthispointofview,wenameanewcausal
+MingjieLi,ZeyanLi,KanglinYin,XiaohuiNie,WenchiZhang,KaixinSui,
+inferencetaskasinterventionrecognition(IR),i.e.,findingtheun-
+andDanPei.2022.CausalInference-BasedRootCauseAnalysisforOnline
+derlyinginterventionbasedontheobservations(Definition2.1).
+ServiceSystemswithInterventionRecognition.InProceedingsofthe28th
+ACMSIGKDDConferenceonKnowledgeDiscoveryandDataMining(KDD Hence,weformulateRCAinOSSasanIRtask.
+’22),August14–18,2022,Washington,DC,USA.ACM,NewYork,NY,USA, ThefirstchallengeofthenewIRtaskisthelackofasolution.
+11pages.https://doi.org/10.1145/3534678.3539041 ThoughSage[8]conductsRCAviacounterfactualanalysis,the
+designofSageimpliesanimplicitassumption,i.e.,thereisnointer-
+ventiontothesystem.Hence,SageisnotasolutiontotheIRtask.
+∗DanPeiisthecorrespondingauthor.Email:peidan@tsinghua.edu.cn
+BasedonthedefinitionofIR,wefindthattheprobabilitydistribu-
+tionofanintervenedvariablechangesconditionedonparentsin
+theCausalBayesianNetwork(CBN).ThisInterventionRecognition
+ThisworkislicensedunderaCreativeCommonsAttribution-
+CriterionpointsoutanexplainablewaytoconductRCA.
+NonCommercialInternational4.0License.
+ThesecondchallengeistoobtaintheCBNforcausalinference
+KDD’22,August14–18,2022,Washington,DC,USA inOSS.Manyworkshavebeendoneforcausaldiscovery[10]from
+©2022Copyrightheldbytheowner/author(s).
+observationaldata.MicroHECL[15]andSage[8]utilizethecall
+ACMISBN978-1-4503-9385-0/22/08.
+https://doi.org/10.1145/3534678.3539041 graphinOSS,whichoperatorsarefamiliarwith.However,these
+
+--- PAGE 2 ---
+KDD’22,August14–18,2022,Washington,DC,USA MingjieLietal.
+1000
+100
+10
+10 100 1000
+#(log file sync)
+noisseS
+evitcA
+egarevA
+2 PROBLEMFORMULATION
+Before failure After failure
+2.1 Preliminary
+Notation.Anuppercaseletter(e.g.,𝑋)referstoavariable(metric),
+whilealowercaseletter(e.g.,𝑥)representsanassignmentofthe
+correspondingvariable.Byassignment,wemeanoneofthepossible
+values.Todistinguishvariables(values)atdifferenttimesinatime
+series,thetimestampwillbeputontheletterasasuperscript.For
+example,denoteAASasanuppercaseletter𝑌,and𝑦(𝑡)referstothe
+valueofAASattime𝑡.Denotethevaluerangeof𝑌 as𝑉𝑎𝑙(𝑌),then
+wehave𝑦(𝑡) ∈𝑉𝑎𝑙(𝑌) ={0}∪R+forthenon-negativenumeric
+Figure1:JointdistributionoftheAverageActiveSession(an
+AAS.Aboldfacedlettermeansasetofelements(variablesorvalues),
+SLIoftheOracledatabase)andthenumberoflogfilesync
+e.g.,wedenoteallthemetricsasVwhilevisanassignmentofV.
+waitingeventswithin2hours.Eachdatapointrepresents
+TheLadderofCausation.WeformulatetheproblemwithJudea
+thetwometrics’valuesatthesametimestamp.
+Pearl’s“LadderofCausation”[1].Thefirstlayerofthecausallad-
+derencodestheobservationalknowledgeL 1 (V) = 𝑃(V),where
+twoworksconsiderafewmetrics,e.g.,thelatencybetweenservices. 𝑃(V) is a joint probability distribution. Meanwhile, the second
+WeconstructtheCBNamongmetricswiththedomainknowledge layerencodestheinterventionalknowledgeL 2 (m) =𝑃m,where
+ofsystemarchitecture,combinedwithasetofintuitiveassumptions, 𝑃m (V)=𝑃(V|𝑑𝑜(m))andM⊆V.Thedo-operator𝑑𝑜(m)means
+handlingmorekindsofmetricsthanMicroHECL[15]andSage[8]. fixingvariablesMtothegivenvaluesm,alsocalledaninterven-
+Thirdly,observationalknowledgeisincomplete,indicatingthe tion[20].Sothat𝑃(V|𝑑𝑜(m))indicatestheprobabilitydistribution
+difficultyofreachinginterventionalknowledgeevenwithaperfect overVundertheinterventiontoM.Finally,thethirdlayerencodes
+CBN.Forexample,Figure1showsthejointdistributionoftheAv- thecounterfactualknowledge,reasoningaboutwhatifanother
+erageActiveSession(AAS)andthenumberoflogfilesyncwaiting situationhappenedinthepast.Forexample,itrequiresthecounter-
+eventsaroundahighAASfailureofanOracledatabaseinstance. factualknowledgetopredictthelatencywithsufficientcomputing
+Observeddatabeforethefailureareinthebottom-leftcornerof resourceswhenhighlatencyandfullCPUusageareobserved.The
+thefigure.Hence,howAASnormallydistributesismissingwhen hierarchyofthecausalladderalmostnevercollapses(namedCHT,
+“#(logfilesync)”islargerthan1,000,wherethedataafterthefail- CausalHierarchyTheorem[1]).Ifwewanttoanswerthequestion
+uredistribute.Thelackofoverlapbetweenthetwodistributions atLayeri,weneedknowledgeatLayeriorhigher[1].
+aroundthefailureblocksrecognizingintervention,ifany,inAAS. StructuralCausalModel(SCM).Wemodeltherelationsamong
+Toaddressthischallenge,wetransformdistributioncomparisonas metricsviathestructuralcausalmodel[20].AnSCMcontainsaset
+point-wisehypothesistestingviatheregressiontechnique.More- ofstructuralequationsshowninEq.(1),where𝑉𝑖 ∈VandPa(𝑉𝑖) ⊆
+over,adescendantadjustmenttechniqueisproposedtoalleviate V. Eq. (1) contains two kinds of parameters: 1) assignments of
+thebiasintroducedbyapoorunderstandingofthesystem’snormal observedvariablesPa(𝑉𝑖),namedparents(directcauses)of𝑉𝑖,and
+statusinthehypothesistesting. 2)assignmentsofunobservedvariablesU𝑖,whereU𝑖 ∩V=∅.
+WeimplementtheproposedCausalInference-basedRootCause
+Analysis(CIRCA).CIRCAoutperformsbaselinemethodsinour 𝑣𝑖 =𝑓𝑖(pa(𝑉𝑖),u𝑖) (1)
+simulationstudy,illustratingitstheoreticalreliability.Wefurther DenotethegraphencodedbytheSCMas G = (V,E),where
+evaluateCIRCAwithareal-worlddataset.CIRCAimprovesthe E={𝑉𝑗 →𝑉𝑖 |𝑉𝑗 ∈Pa(𝑉𝑖)}isthesetofdirectededges.Incontrast
+recallofthetop-1recommendationby25%overthebestbaseline toPa,Ch(𝑉𝑖) = {𝑉𝑗 |𝑉𝑖 ∈ Pa(𝑉𝑗)}representsthechildrenof𝑉𝑖.
+method,whichshowsthepracticalpotentialofourapproach.The
+Thisworkrestsonthefollowingassumptions.
+contributionsofthisworkaresummarizedasfollows.
+DAG Gisadirectedacyclicgraph(DAG)[20],followingrelated
+• Forthefirsttimeintheliterature,weformulatetheRCA
+worksinOSS[4,8,25].
+probleminOSSasanewcausalinferencetasknamedinter-
+Markovian “TheexogenousparentsetsU𝑖,U𝑗 areindepen-
+ventionrecognition(Definition2.1).Utilizingtheadvanceof dentwhenever𝑖 ≠ 𝑗”[1],i.e.,(∀𝑖 ≠ 𝑗)U𝑖 ⊥⊥ U𝑗,where⊥⊥
+causalinference,wefindapracticalcriteriontolocatethe
+meansindependent.
+rootcause(Theorem3.4).
+Faithfulness[20] Anyinterventionmakesanobservablechange,
+• WeproposeCausalInference-basedRootCauseAnalysis i.e.,𝑃(𝑉𝑖 |pa(𝑉𝑖),𝑑𝑜(𝑣𝑖))≠𝑃(𝑉𝑖 |pa(𝑉𝑖)).
+(CIRCA)forOSS.Weproposeapracticalguidelinetocon-
+UndertheDAGassumptionandtheMarkovianassumption,Gcan
+structtheCBNwiththeknowledgeofsystemarchitecture.
+betakenasaCBN[1].
+Twomoretechniques,namelyregression-basedhypothesis
+testinganddescendantadjustment,areproposedtoinfer
+2.2 RootCauseAnalysisandCausalInference
+rootcausemetricsinthegraph.
+• CIRCA is evaluated with both simulation and real-world WesetupaconceptmappingbetweentheRCAproblemandcausal
+datasets.ThesimulationstudyillustratesCIRCA’stheoreti- inference.
+calreliability,whilethereal-worlddatasetshowsCIRCA’s • AfaultinOSSismappedtoanunexpectedintervention;
+practicalvalueoverbaselinemethods. • Fault-freedatacomefromtheobservationaldistribution;
+
+--- PAGE 3 ---
+CausalInference-BasedRootCauseAnalysisforOnlineServiceSystemswithInterventionRecognition KDD’22,August14–18,2022,Washington,DC,USA
+• Faultydatacomefromaninterventionaldistribution. causalassumptionsamongthosefourkindsofmetametricsprovide
+Basedonthemappingabove,wedefineanewcausalinference thebuildingblocksofanSG.Wefurtherextendthesystemwith
+taskasinterventionrecognition(Definition2.1).WeformulateRCA thearchitectureofcomponentstoconstructagraphatthemeta
+discussedinthisworkasaninterventionrecognitiontaskinOSS. metriclevel,namedaskeleton.Finally,weplugmonitoringmetrics
+intothecorrespondingmetametrictoobtaintheSG.Algorithm1
+Definition2.1(InterventionRecognition,IR). ForagivenSCM
+summarizestheoverallprocedure.
+M,letL 1betheobservationaldistributionofMand𝑃𝑚 =𝑃(V|
+𝑑𝑜(m))betheinterventionaldistributionofacertainintervention 4.1.1 MetaMetrics. Ingeneral,aservicetakesinputandproduces
+𝑑𝑜(m).InterventionrecognitionistofindmbasedonL 1and𝑃𝑚. output.Eachrequestlastsforsometimeandconsumessomere-
+sources.Wetakethosedimensionsasfourmetametricsofaservice,
+Definition2.2(RootCause). Therootcauseistheintervenedvari-
+namedafterthefourgoldensignalsinsitereliabilityengineering[2].
+ables(M).EachelementofMisnamedarootcausevariable.1
+Traffic,Errors,andLatencymeasurethedistributionofinput,out-
+put,andprocessingtime,respectively.Weclassifyothermonitoring
+3 INTERVENTIONRECOGNITIONCRITERION
+metricsasresourceconsumption,denotedasSaturation.
+WearguethatIRshallbepositionedatthesecondlayerintheladder Weassigndirectionsfortherelationsamongthesefourmeta
+ofcausation,asshowninTheorem3.1.TheproofofTheorem3.1 metricsinFigure2(a).Asthestartofarequest,Trafficisassumed
+isprovidedinAppendixA.ThekeytotheproofisthatIRisthe tobethecauseofallthreeothermetametrics,whileErrors(the
+inversemappingofL 2undertheadoptedassumptions.Combining endofarequest)aretakenastheeffectofothers.Theedgefrom
+Theorem3.1withCHT[1],wefurtherobtainCorollary3.2and3.3. SaturationtoLatency encodesourpreferencefortheformer,as
+Theorem3.1. ForagivenSCMMwithaCBNG,theknowledge resourceconsumptionisoneofthecommonconsiderationsfor
+ofIRforMisequivalenttoL 2undertheFaithfulnessassumption. largelatencyinOSS[8].
+Corollary3.2. WeneedtheknowledgeatLayer2(interventional)
+toconductIR.
+Traffic(T) Saturation(S) Errors(E)
+Corollary3.3. TheknowledgeatLayer3(counterfactual)isnot
+necessarytoconductIR.
+Latency(L)
+Hence,weproposetotakefulladvantageoftheCBN,asthe
+CBNisaknownbridgebetweenobservationaldataandinterven- (a)Causalassumptionswithinaservice
+tionalknowledge[1].WearguethatTheorem3.4isanecessaryand
+sufficientconditionforavariabletobeintervened.TheproofofThe-
+orem3.4isprovidedinAppendixB.Basedonourconceptmapping
+WEB.T DB.T DB.E WEB.E
+betweenRCAandcausalinference,theInterventionRecognition
+Criterionisalsoacriteriontofindrootcauseindicators.
+DB.L
+WEB.S
+Theorem3.4(InterventionRecognitionCriterion). LetG
+beaCBNandPa(𝑉𝑖)betheparentsof𝑉𝑖inG.UndertheFaithfulness WEB.L
+assumption,𝑉𝑖 isintervenediff𝑉𝑖 nolongerfollowsthedistribution (b) Theskeletonofonewebservice(WEB)withitsdependentdatabase
+definedbypa(𝑉𝑖),i.e., (DB).WeplugDB’smetametricsintotheSaturationofWEB.
+𝑉𝑖 ∈M⇔𝑃m (𝑉𝑖 |pa(𝑉𝑖))≠L 1 (𝑉𝑖 |pa(𝑉𝑖))
+Figure2:Causalassumptionsamongmetametrics
+4 CAUSALINFERENCE-BASEDROOTCAUSE
+ANALYSIS
+4.1.2 SkeletonwithArchitectureExtension. AcomplexOSSsys-
+Inthissection,weproposeanovelmethodnamedCIRCA.Wefirst
+temwillinvokemultipleservicestoprocessonesinglerequest.
+presentastructuralwaytodeterminetheparentsPa(𝑉𝑖)foreach
+Meanwhile,therewillbemultiplecomponentsformonolithicOSS.
+metric𝑉𝑖 basedonsystemarchitecture.CIRCAadoptsregression-
+Basedonthearchitectureknowledgeencodedinthecallgraph,we
+basedhypothesistesting(RHT)todealwiththeincompletedistri-
+constructtheskeletonamongmetametricsofthesystemandallits
+butionoffaultydata.Toaddressthechallengeoftheincomplete
+dependentservices.Forawebservice(WEB)anditsdatabase(DB)
+distributionoffault-freedata,CIRCAadjuststheanomalyscorefor
+showninFigure2(b),wetakeDBasaresourceofWEB.Thepart
+suspiciousmetricsbasedontheirdescendantsintheCBN.
+ofWEB’sSaturationthatmeasuresDBwillbeextendedintoDB’s
+metametrics,whichinherittherelationsbetweenWEB’sSatura-
+4.1 StructuralGraphConstruction
+tionandothermetametricsofWEB.Theextensionwillbeapplied
+Weproposethestructuralgraph(SG)astheCBNforOSS.SGcom- toeachserviceinthecallgraph.Insummary,weintroducethree
+binesthesystemarchitectureknowledgewithasetofassumptions, morecausalassumptionsbetweenaserviceanditsdependentones.
+whichmaynotsuitdomainsotherthanOSS.Wefirstclassifymon-
+• Thecaller’sTrafficinfluencesthecallees’Traffic;
+itoringmetricsintofourdimensions,namedmetametrics.Several
+• Thecallees’Latencycontributestothecaller’sLatency;
+1Wealsouserootcauseindicatorandrootcausemetricaccordingtothecontext. • Thecaller’soutputiscalculatedbasedonthecallees’output.
+
+--- PAGE 4 ---
+KDD’22,August14–18,2022,Washington,DC,USA MingjieLietal.
+4.1.3 MonitoringMetricPlugging-in. Finally,weplugmonitoring Algorithm1StructuralGraphConstruction
+metricsinmetametricstoobtaintheSG.Amappingisrequiredto Require: G𝑐,thecallgraph;h:V 𝑚 →2V,themappingfrommeta
+describewhichdimensionofwhichserviceeachmonitoringmetric 𝑚
+metricsV tomonitoringmetrics
+measures.Therecanbesomemetametricsthatdonothaveany
+1: G𝑠 ←initialthestructuregraph
+monitoringmetrics.Forexample,thecommonmeasurementfor
+2: G𝑠𝑘𝑒𝑙 ←constructtheskeletonbasedonG𝑐
+memoryisjustusage(Traffic),whilethespeed(Latency)isunavail- 3: for all 𝑉𝑖 𝑚 ∈ V 𝑚 in a topological order from {𝑉𝑗 𝑚 |
+a m th b e e l
+A
+e t T a .
+l
+M
+g
+r m a
+o
+o ffi
+r
+e r
+i
+t e
+t
+c r
+h
+o i o c v
+m
+f s e . b r
+1
+, F o o o t
+d
+n h r
+e
+e e
+s
+a m
+c
+x w
+r
+a o
+i
+m
+b
+e n b
+e
+i p t
+s
+l s o e e
+t
+r ,
+h
+r in D v
+e
+g i B c
+p
+m e
+l
+a
+u
+a e c
+g
+n t c r
+g
+e d i s
+i
+c
+n
+s a c
+g
+p a d
+-
+e n a
+i
+r
+n
+t b a r e e b
+p
+q a
+r
+d u
+o
+s e e e
+c
+r . s i
+e
+v t
+s
+e
+s
+i d s
+a
+f c
+f
+r a
+t
+o
+e
+l m c
+r
+u
+s
+m l
+k
+a
+e
+t u e
+l
+l
+e
+t d i
+t
+p
+o
+b l
+n
+y e 4
+5
+:
+:
+|Pa Q
+C
+G
+𝑖
+𝑖 𝑠𝑘
+←
+← 𝑒𝑙 (
+C
+C 𝑉
+o
+o 𝑗 𝑚
+l
+l
+l
+l )
+e
+e |
+c
+c =
+t
+t
+m
+m 0}
+o
+o
+n
+n d
+i
+i o
+t
+t
+o
+o
+r
+r
+i
+i
+n
+n
+g
+g
+m
+m
+e
+e
+t
+t
+r
+r
+i
+i
+c
+c
+s
+s
+o
+o
+f
+f
+𝑉
+P
+𝑖
+a
+𝑚
+G𝑠𝑘𝑒𝑙 (𝑉𝑖 𝑚)
+construction.SGlinksmonitoringmetricsfromonemetametric 6: for𝑉𝑗 ∈h(𝑉𝑖 𝑚)do
+toitschildren(Line15).Monitoringmetricsthatarederivedfrom 7: if𝑉𝑗 ismappedtomultiplemetametricsthen
+multiplemetametricsmayintroduceself-loop.Toavoidsuchcycles, 8: C𝑖 ←C𝑖 \{𝑉𝑗}/*Preventselfloopof𝑉𝑗 */
+themonitoringmetricforthelastmetametricintopologicalorder 9: if𝑉𝑗 isvisitedforthelasttimethen
+willbetakenasthecommoneffectofothermetametrics(fromLine 10: Addedgesfromthecorrespondingmetametricsof
+6toLine14).Moreover,metametricsmeasuringthedimension
+𝑉𝑗 otherthan𝑉𝑖 𝑚 to𝑉𝑗 inG𝑠
+ofErrorswillbeaccumulatedfordescendants(Line17),asbroken 11: Q𝑖 ←Q𝑖 ∪{𝑉𝑗}/*Takeitastheproxyofothers*/
+datamaynotbevalidatedintime. 12: endif
+Duringtheprocess,anemptymetametricwillgatherthemon- 13: endif
+itoringmetricsofitsparentsforitschildren(Line20).Consider 14: endfor/*Dealwithmonitoringmetricsthatarederivedfrom
+𝑚 𝑚 multiplemetametrics*/
+ametametric(𝑉𝑖 ),oneofitsparentswithoutmonitoring(𝑉𝑗 ),
+𝑚 𝑚 𝑚 15: AddedgesfromQ𝑖 toC𝑖 inG𝑠
+andtheirstructur
+𝑚
+alequ
+𝑚
+ations(𝑓𝑖 and𝑓𝑗 ).Wecansubstitute𝑓𝑗
+16: if𝑉𝑖
+𝑚
+representsErrorsthen
+𝑉 fo 𝑗 𝑚 ru a n n o d b t s h er o v s e e d o 𝑉 f 𝑗 𝑉𝑖 𝑚 in (e 𝑓𝑖 xce , p as t𝑉 sh 𝑗 𝑚 o ) w s n ho in w E a q s .( t 2 h ) e .B p o ar th am th e e te p r a s r o en f t 𝑓 s 𝑖 𝑚 o ′ f , 17: U re p p d re a s te en C ti 𝑖 ng w m it e h ta m m o e n t i r t i o cs ri i n n g P m aG e
+𝑠
+t
+𝑘
+r
+𝑒
+i
+𝑙
+c ( s 𝑉𝑖 f 𝑚 ro ) m the Errors-
+whichisthereasonbehindLine20. 18: endif/*TransferErrors*/
+19: ifC𝑖 =∅then
+𝑣𝑖 𝑚 =𝑓𝑖 𝑚(cid:16) 𝑓𝑗 𝑚(cid:16) pa G𝑠𝑘𝑒𝑙 (𝑉𝑗 𝑚 ),u 𝑚 𝑗 (cid:17) ,pa G𝑠𝑘𝑒𝑙 (𝑉𝑖 𝑚 )\{𝑣 𝑚 𝑗 },u 𝑚 𝑖 (cid:17) 20: h(𝑉𝑖 𝑚)←Q𝑖 /*Gathermonitoringmetricsforchildren*/
+(2) 21: else
+=𝑓𝑖 𝑚′ (cid:16) pa G𝑠𝑘𝑒𝑙 (𝑉𝑗 𝑚 ),pa G𝑠𝑘𝑒𝑙 (𝑉𝑖 𝑚 )\{𝑣 𝑚 𝑗 },u 𝑚 𝑖 ,u 𝑚 𝑗 (cid:17) 22: h(𝑉𝑖 𝑚)←C𝑖
+23: endif
+24: endfor
+4.2 Regression-basedHypothesisTesting 25: return G𝑠
+Theunderstandingof𝑃misrestrictedbymitigatingthefailureas
+soonaspossible.Insteadofcomparingtwodistributionsdirectly,we
+reformulatetheInterventionRecognitionCriterionashypothesis 4.3 DescendantAdjustment
+testingwiththefollowingnullhypothesis(H0)foreachmetric𝑉𝑖. Therewillbebiasintheregressionresultsduetoapoorunderstand-
+H0 𝑉𝑖 isnotanindicatoroftherootcause,i.e., ingofL 1.Weadjusttheanomalyscoreofonemetricwiththose
+𝑉𝑖
+(𝑡)
+∼L 1
+(cid:16)
+𝑉𝑖
+(𝑡) |pa(𝑡)(𝑉𝑖) (cid:17) o
+on
+f
+e
+its
+of
+d
+i
+e
+ts
+sc
+p
+e
+a
+n
+r
+d
+e
+a
+n
+n
+ts
+ts
+i
+.
+n
+O
+th
+u
+e
+r
+C
+in
+B
+tu
+N
+it
+i
+i
+s
+o
+a
+n
+b
+i
+n
+s
+o
+t
+r
+h
+m
+a
+a
+t
+l
+w
+,w
+h
+e
+en
+pr
+b
+e
+o
+fe
+th
+rt
+a
+he
+m
+l
+e
+a
+t
+t
+r
+te
+ic
+r.
+a
+F
+n
+o
+d
+r
+example,supplementingextraresourcesisanactionablemitigation
+Weutilizetheregressiontechniquetocalculatetheexpected
+distributionL 1 (cid:16) 𝑉𝑖 (𝑡) |pa(𝑡)(𝑉𝑖) (cid:17) .Aregressionmodelistrained m fo e r t r h e o s d ou to rc r e es u to ti r l e iz t a h t e io l n ow (th la e te p n a c r y e . n H ts en o c f e l , a w te e nc a y ssi i g n n th a e h C ig B h N er ) s t c h o a r n e
+foreachvariablewithdatabeforethefaultisdetected,performing latency’sscore.
+(𝑡)
+asaproxyofthecorrespondingstructuralequation.Let𝑣¯𝑖 be WesummarizetheadjustmentinAlgorithm2.Thechildrenof
+theregressionvaluefor𝑣𝑖 (𝑡) .Assumingthattheresidualsfollow ametric𝑉𝑖 arefirstconsidered(Line3).Weexcludesomemetrics
+ani.i.d.normaldistribution𝑁(𝜇𝜖,𝑖,𝜎𝜖,𝑖),Eq.(3)measurestowhat ({𝑉𝑖 |𝑠𝑉𝑖 <3})fromtherootcauseindicators,socalledthethree-
+(𝑡) sigmaruleofthumb.Asthefailurepropagatesthroughthem,those
+extentanewdatum𝑣𝑖 deviatesfromtheexpecteddistribution,
+(𝑡) (𝑡) metricswillgatheranomalyscoresfromchildrenforthecandidate
+denotedas𝑎 .Eq.(4)furtheraggregates𝑎 foralltheavailable
+𝑉𝑖 𝑉𝑖 rootcauseintheirancestors(Line6).Finally,theanomalyscoreof
+dataduringtheabnormalperiodastheanomalyscoreof𝑉𝑖. 𝑉𝑖 (𝑠𝑉𝑖 )willincreasebythemaximumofdescendants’scoresjust
+mentioned(Line12).
+𝑎
+(𝑡)
+=
+(cid:12) (cid:12) (cid:12)
+(cid:12)
+(cid:16) 𝑣𝑖 (𝑡) −𝑣¯𝑖 (𝑡)(cid:17) −𝜇𝜖,𝑖 (cid:12) (cid:12) (cid:12)
+(cid:12) (3) 5 EXPERIMENTS
+𝑉𝑖 (cid:12) (cid:12) 𝜎𝜖,𝑖 (cid:12) (cid:12)
+(cid:12) (cid:12) Inthissection,wecomparetheperformanceofdifferentmethods.
+Wefirstconductasimulationstudytoverifytheirtheoreticalrelia-
+(𝑡)
+𝑠𝑉𝑖 =m 𝑡 ax𝑎 𝑉𝑖 (4) bility.Theeffectivenessisfurtherevaluatedonareal-worlddataset.
+
+--- PAGE 5 ---
+CausalInference-BasedRootCauseAnalysisforOnlineServiceSystemswithInterventionRecognition KDD’22,August14–18,2022,Washington,DC,USA
+Algorithm2DescendantAdjustment 5.1.3 Baselines. Eachbaselineisseparatedintotwosteps,namely
+Require: s,anomalyscoresbyEq.(4) graphconstructionandscoring.Monitoringmetricswillberanked
+1: 𝑆 ←amappingfrom𝑉𝑖 totheanomalyscores𝑆(𝑉𝑖)thatmay basedonthescorescalculatedinthefinalstep.Weclassifythe
+bethedirecteffectof𝑉𝑖 scoringstepintherecentRCAliteratureforOSSintothreegroups:
+2: for𝑉𝑖 ∈Vinatopologicalorderfrom{𝑉𝑗 | |Ch(𝑉𝑗)|=0}do DFS-based,randomwalk-based,andinvariantnetwork-based.In
+3: 𝑆(𝑉𝑖)←{𝑠𝑉𝑗 |𝑉𝑗 ∈Ch(𝑉𝑖)} eachgroup,wechoosetherepresentativeworks.Moreover,we
+4: for𝑉𝑗 ∈Ch(𝑉𝑖)do choosethegraphconstructionmethodsadoptedinthoseworksas
+5: if𝑠𝑉𝑗 <3then thebaselineonesforthefirststep.
+6: 𝑆(𝑉𝑖)←𝑆(𝑉𝑖)∪𝑆(𝑉𝑗) Inthegraphconstructionstep,thePCalgorithm[12]iswidely
+used[4, 14, 16, 25]. Wechoose Fisher’sz-transformation ofthe
+7: endif
+partialcorrelationand𝐺2testastheconditionalindependencetests
+8: endfor
+9: endfor/*Collectdirecteffects*/
+forPC,denotedasPC-gaussandPC-gsq,respectively.PCMCI[22]
+10: for𝑉𝑖 ∈Vdo adaptsPCfortimeseries,basedonwhichPCTS[17]transfersthe
+11: if𝑠𝑉𝑗 ≥3then laggedgraphintotheoneamongmonitoringmetrics.Moreover,
+12: 𝑠 𝑉 ′ 𝑖 ←𝑠𝑉𝑖 +max(𝑆(𝑉𝑖))/*Adjustbasedondescendants*/ the A s s tr f u o c r t t u h r e al s g co ra r p in h g p s r t o e p p, o D se F d S i t n ra t v h e is rs w es or th k e is a d bn en o o rm te a d l a n s o S d t e r s uc in tu t r h a e l.
+13: endif
+graph,rankingtherootsofthesub-graphviaanomalyscores[4].
+14: endfor
+15: return
+s′,theadjustedanomalyscores ItsvariantDFS-MSfurtherrankscandidatemetricsaccordingto
+correlationwiththeSLI[14].AnothervariantDFS-MH traverses
+the abnormal sub-graph until a node is not correlated with its
+AlltheexecutiondurationismeasuredonaserverwithanIntel parents[15].TheDFS-basedmethodstaketheresultofanomaly
+XeonE5-2620CPU@2.40GHz(22cores)and57GBRAM.Were- detectionasinput.Wechoosez-scoreusedin[14]andSPOT[23]
+leaseourcodeathttps://github.com/NetManAIOps/CIRCA.More usedin[17]asoptions.Theseanomalydetectionmethodsarealso
+experimentdetailsareinAppendixC. taken as baselines2, denoted as NSigma and SPOT, respectively.
+Another line of works is random walk-based methods. RW-Par
+5.1 ExperimentalSetup calculates the transition probability via partial correlation [17],
+whileRW-2isshortforthesecond-orderrandomwalkwithPearson
+5.1.1 Hyperparameters. Theshortestsamplingintervalinourreal-
+correlation[25].ENMF3constructsaninvariantnetworkbasedon
+worlddatasetisoneminute.Duetotheperformanceconsideration,
+theARXmodel,explicitlymodelingthefaultpropagation[5].CRD
+finermonitoringresolutionforeachmetricisuncommoninOSS.
+furtherextendsENMF withbrokenclusteridentification[18].
+Thus,differenttimeserieswillbepre-processedforthesamesetof
+timestampswiththesameintervalofoneminute.
+5.2 SimulationStudy
+Foreachfault,let𝑡𝑑 bethetimeafaultisdetected.Weassume
+thatRCAisinvokedat𝑡𝑑 +𝑡𝑑𝑒𝑙𝑎𝑦 tocollectnecessaryinformation, Threedatasetsaregeneratedwith50/100/500nodesand100/
+whileittakesdataintheperiod[𝑡𝑑−𝑡𝑟𝑒𝑓,𝑡𝑑+𝑡𝑑𝑒𝑙𝑎𝑦]forreference. 500/5,000edges,respectively,denotedasD 𝑆 𝑁 𝑖𝑚 where𝑁 isthe
+The data in (𝑡𝑑 +𝑡𝑑𝑒𝑙𝑎𝑦 −𝑡𝑡𝑒𝑠𝑡,𝑡𝑑 +𝑡𝑑𝑒𝑙𝑎𝑦] are treated as from numberofnodes.Foreachdataset,wegenerate10graphsand100
+𝑃mwhile[𝑡𝑑 −𝑡𝑟𝑒𝑓,𝑡𝑑 −𝑡𝑡𝑒𝑠𝑡]aretakenasfault-free.Bydefault, casespergraph.Evaluationmetricsaveragedamongthe10graphs
+we use𝑡𝑑𝑒𝑙𝑎𝑦 = 5 min,𝑡𝑟𝑒𝑓 = 120 min, and𝑡𝑡𝑒𝑠𝑡 = 10 min in willbepresented.Theparametersofbaselinemethodsareselected
+theexperiments.Theeffectsofdifferent𝑡𝑑𝑒𝑙𝑎𝑦 and𝑡𝑟𝑒𝑓 willbe toachievethebestAC@5onthefirstgraphinD 𝑆 5 𝑖 0 𝑚 .
+exploredinSection5.4.1withthereal-worlddataset.Intherest
+5.2.1 DataGeneration. WegeneratetimeseriesbasedontheVec-
+of this section, we name a fault with its corresponding data in torAuto-regressionmodel,asshowninEq.(6).x(𝑡)
+isacolumn
+[𝑡𝑑 −𝑡𝑟𝑒𝑓,𝑡𝑑 +𝑡𝑑𝑒𝑙𝑎𝑦]asacase.
+vectorofthemetricsattime𝑡.Aistheweightedadjacencymatrix
+5.1.2 EvaluationMetrics. Followingexistingworks[17,25,29],we encodingtheCBN.𝐴𝑖𝑗 ≠0meansthe𝑗-thmetricisacauseofthe
+evaluatetheperformanceofamethodthroughtherecallwiththe 𝑖-thone,where𝐴𝑖𝑗 representsthecausaleffect,e.g.,thememory
+top-kresults,denotedas𝐴𝐶@𝑘.Eq.(5)showsthedefinitionof usageperrequest.TheCBNisenforcedtobeaconnectedDAG
+𝐴𝐶@𝑘,whereF isasetoffaultsand𝑅𝑖(M)isthe𝑖-thresultrecom-
+withonlythefirstnode(SLI)havingnochildren.Theitem𝛽x(𝑡−1)
+mendedbythemethodforeachfaultM.Eq.(5)isslightlydifferent reflectstheauto-regressionnatureofthetimeseries.Thefinalitem
+fromtheevaluationmetricsinthepreviousworks[17,25,29],en-
+𝜖(𝑡)
+isGaussiannoises,representingthenaturalfluctuationdueto
+suringthat𝐴𝐶@𝑘ismonotonicallynon-decreasingwith𝑘.73%of unobservedvariables.
+developersonlyconsiderthetop-5resultsofafaultlocalization
+technique,accordingtothesurveyin[13].Asaresult,wepresent
+x(𝑡) =Ax(𝑡) +𝛽x(𝑡−1)
++𝜖
+(𝑡)
+(6)
+𝐴𝐶@𝑘for𝑘 ≤𝐾 =5.Moreover,weshowtheoverallperformance ToinjectafaultMattime𝑡,wefirstgeneratethenumberofroot
+by𝐴𝑣𝑔@𝐾 = 𝐾 1 (cid:205) 𝑘 𝐾 =1 𝐴𝐶@𝑘. In terms of efficiency, we record causemetrics|M|.|M|−1followsaPoissondistribution,asitis
+analysisdurationperfault,denotedas𝑇 intheunitofseconds.
+2Anomalydetectionandinvariantnetwork-basedmethodswillutilizeanemptygraph
+1 ∑︁ |M∩{𝑅𝑖(M) |𝑖 =1,2,···,𝑘}| withalltheavailablemonitoringmetricsbutnoedges.
+𝐴𝐶@𝑘 = (5) 3Wetake“ENMF”fromtheircodetopreventabbreviationduplicationbetweenRanking
+|F| |M|
+M∈F CausalAnomalies[5]andRootCauseAnalysis.
+
+--- PAGE 6 ---
+KDD’22,August14–18,2022,Washington,DC,USA MingjieLietal.
+rareforafaulttoaffectmanymetricsdirectly.Foreach𝑉𝑖 ∈M,the Theirperformancesharesasimilartrendwithanomalydetection
+noiseitemwillbealteredas𝑢𝑖
+(𝑡)
+=𝜖𝑖
+(𝑡)
++𝑎𝑖𝜎𝑖for2timestamps.The methods,fromweakfaultstostrongones.
+randomparameter𝑎𝑖 willmaketheSLImetricabnormalaccording
+tothethree-sigmaruleofthumb. 5.3 EmpiricalStudyonOracleDatabaseData
+Wefurtherevaluatedifferentmethodsinareal-worlddataset,de-
+5.2.2 PerformanceEvaluation. Table1summarizestheperformance
+notedas D𝑂.Thereare99casesin D𝑂.Eachcasecomesfrom
+of different methods in three simulation datasets. The scoring
+OracledatabaseswithhighAASfaultsinalargebankingsystem.
+step of each method uses the graph deduced by A directly, i.e.,
+WechoosetheparametersofbaselinemethodsforbetterAC@5.
+𝑋𝑗 ∈Pa(𝑋𝑖)⇔A𝑖𝑗 ≠0.WechoosethelinearregressionforRHT.
+Moreover,RHTcouldachievethebestperformanceintheoryif 5.3.1 Implementation. Wemanuallyextractthecallgraphinan
+itregardstheparentsasPa(𝑋𝑖 (𝑡) ) = Pa(𝑡)(𝑋𝑖)∪ (cid:110) 𝑋𝑖 (𝑡−1)(cid:111) .Such Oracledatabaseinstancefromtheofficialdocumentation5.After
+that,wemap197monitoringmetricstometametricsintheskeleton.
+implementationisdenotedasRHT-PG,wherePGrepresentsthe
+Thefinalstructuralgraphcontains2,641edges.Oracledatabase
+perfectgraph.Asthelinearrelationwiththeperfectgraphper-
+instancesmayhavedifferentsetsofmetrics.Therefore,weconstruct
+formsasthebestproxyofL 1,wedonotconsiderthedescendant
+thestructuralgraphforeachinstancewithmonitoredmetrics.
+adjustmentinthesimulationstudy.
+Inthisempiricalstudy,thegroundtruthgraphisunavailable.
+RHT-PGapproachestheidealperformance,outperformingbase-
+line methods (𝑝 < 0.001 in t-test for AC@k), which shows the Hence,wecomparegraphconstructionmethodsforeachscoring
+method,choosingthegraphwiththehighestAC@5.Meanwhile,
+theoreticalreliabilityofourmethod.Thereisagapbetweenthe
+performanceofRHTandRHT-PG,whichenlargesasthenumber
+thereisnoperfectproxyofL 1(liketheCBNandlinearrelation
+inthesimulationstudy).Asaresult,wefailtoincludetheideal
+ofnodesincreases.Thisphenomenonillustratestherestrictionof
+implementationofRHT(RHT-PG)intheexperiment.Wechoosethe
+Corollary3.2thatabrokenCBNcannotguaranteeacorrectanswer
+SupportVectorRegression(SVR)astheregressionmethodforRHT,
+toRCA.Ontheotherhand,RHT-PGisnotperfectyet,whichmay
+whichwillbediscussedinAppendixC.4.Toalleviatethebiasin
+betheresultofstatisticalerrorsintroducedinhypothesistesting
+hypothesistesting,weequipRHTwiththedescendantadjustment,
+withlimitedfaultydata.
+denotedasCIRCA.
+5.2.3 RobustnessEvaluation. Faultswiththesamestrengthmay
+5.3.2 Performance Evaluation. CIRCA achieves the best results
+havedifferenteffectsontheSLI.Yangetal.namesuchaphenome-
+comparedwithbaselinemethods,asshowninTable3.Random
+nonasthedependencyintensityincloudsystems,i.e.,“howmuch
+walk-basedmethodsachievetheirbestperformancewithPCTS
+thestatusofthecalleeserviceinfluencesthecallerservice”[26].
+whiletakingmuchtimetoconstructthegraph.Withthestruc-
+Inthissimulationstudy,wefurtherclassifyfaultsintothreetypes
+turalgraph,DFS-basedmethodsandCIRCArecommendrootcause
+basedontheirdependencyintensitieswiththeSLI.Weevaluatethe
+metricswithinseconds.
+performanceofRCAmethodsagainstfaultsofeachtypeseparately.
+Eq.(6)canbetransformedintox(𝑡) =W(𝛽x(𝑡−1)+𝜖(𝑡)),where WeremovecomponentsfromCIRCAprogressivelytoshowtheir
+contribution,summarizedinTable4.Theresultillustratesthatboth
+W = (𝐼 −A)−1.NoticethatWiswell-definedasAisgenerated
+regression-basedhypothesistestinganddescendantadjustment
+tobeaDAG,whichdoesnothavefullrank.TheelementofW
+haveapositiveeffect.Figure3comparestheproposedstructural
+meansthat𝑥𝑖 willincreasebyW𝑖𝑗 when𝑥𝑗 increasesby1.Denote
+graphwithothergraphconstructionbaselines.Weexcludeanomaly
+thestandarddeviationof𝑋𝑖 basedondatabeforefaultas𝜎ˆ𝑖.We
+detectionandinvariantnetwork-basedmethodsfromthisfigure,as
+classifyeachfaultMinthesimulateddatasetsintothreetypes:
+theycannotutilizetheCBN.EachboxinFigure3presentsthedis-
+Weak Therootcausemetricsdeviatefromthenormalstatus tributionofAC@5forascoringmethodwithdifferentparameters.
+dramaticallytomakeaslightfluctuationintheSLI(thefirst OnedatapointisthebestAC@5fromdifferentgraphconstruction
+node),i.e.,(∀𝑋𝑖 ∈M)W1𝑖𝜎ˆ𝑖/𝜎ˆ1 <1; parameterswiththesamescoringones.The3horizontallinesof
+Strong Aslightfluctuationintherootcausemetricscanchange eachboxshow25th,50th,and75thpercentile,whiletwowhiskers
+theSLIdramatically,i.e.,(∀𝑋𝑖 ∈M)W1𝑖𝜎ˆ𝑖/𝜎ˆ1 >1; extendtominimumandmaximum.Theproposedstructuralgraph
+Mixed Afaultcontainsmetricswithboththeabovetwotypes improvesAC@5forDFS-basedmethodsandCIRCA,whilePCTS
+or𝑋𝑖 withW1𝑖𝜎ˆ𝑖/𝜎ˆ1=1. fitsrandomwalk-basedmethodsbetter.
+Table2showstheresultsonD50 .TheresultsonD100 and
+𝑆𝑖𝑚 𝑆𝑖𝑚 5.3.3 CaseStudy. Figure4presentsafailure,where“logfilesync”
+D 𝑆 5 𝑖 0 𝑚 0 areomittedsincethereareonly4and5strongfaultsinthese (LFS)istherootcausemetriclabeledbythedatabaseadministrators
+twodatasets,respectively.RHTandRHT-PGachievethebestresults (DBAs).ApoorunderstandingofL 1puzzlesRCAmethods.Onthe
+nomatterthetypeoffaults,implyingthatRHTismorerobustthan onehand,DFSfailstostopatLFSandcontinuestocheck“execution
+baselinemethods.Anomalydetectionmethodshavecompetitive persecond”(EPS),missingthedesiredanswer.Nobaselinemethod
+performancewithweakfaults.Theirperformancedropsinstrong recommendsLFSinthetop-5results,exceptNSigma,ENMF,and
+faultsbecauserootcausemetricsmaybelessabnormalthanothers. CRD.Ontheotherhand,CIRCAassignsahighanomalyscorefor
+DFS-basedmethodsaresensitivetotheresultsofanomalydetection. AASafterrevisingitfrom532.4(givenbyNSigma)to480.2with
+regression.
+4RW-2isdegradedtothefirst-orderrandomwalkwithitsbestparameter,hencehaving
+theidenticalperformancetoRW-Par. 5OracleDatabaseConcepts.https://docs.oracle.com/cd/E11882_01/server.112/e40540/
+
+--- PAGE 7 ---
+CausalInference-BasedRootCauseAnalysisforOnlineServiceSystemswithInterventionRecognition KDD’22,August14–18,2022,Washington,DC,USA
+Table1:Performanceofdifferentmethodsinthesimulationstudy.Weputthestandarddeviationintheparenthesesbehind
+eachevaluationmetric.RHT-PGrepresentsRHT withtheperfectgraph.
+Scoring D50 D100 D500
+𝑆𝑖𝑚 𝑆𝑖𝑚 𝑆𝑖𝑚
+Method AC@1 AC@5 T(s) AC@1 AC@5 T(s) AC@1 AC@5 T(s)
+NSigma 0.432(0.05) 0.733(0.03) 0.306(0.00) 0.384(0.05) 0.613(0.03) 0.575(0.01) 0.376(0.04) 0.579(0.03) 2.759(0.03)
+SPOT 0.508(0.04) 0.761(0.03) 6.601(0.21) 0.451(0.04) 0.670(0.03) 17.365(1.14) 0.225(0.07) 0.509(0.07) 83.465(10.85)
+DFS 0.541(0.04) 0.682(0.05) 0.308(0.00) 0.555(0.03) 0.653(0.03) 0.579(0.01) 0.540(0.03) 0.611(0.02) 2.790(0.06)
+DFS-MS 0.515(0.03) 0.682(0.05) 0.502(0.00) 0.517(0.03) 0.652(0.03) 0.964(0.01) 0.191(0.09) 0.542(0.06) 4.665(0.06)
+DFS-MH 0.178(0.08) 0.217(0.09) 0.501(0.00) 0.272(0.05) 0.365(0.05) 0.969(0.01) 0.489(0.04) 0.605(0.03) 4.735(0.05)
+RW-Par 0.188(0.06) 0.433(0.07) 0.714(0.00) 0.136(0.05) 0.295(0.07) 1.761(0.01) 0.004(0.01) 0.017(0.02) 20.246(0.10)
+RW-24 0.188(0.06) 0.433(0.07) 0.437(0.00) 0.136(0.05) 0.295(0.07) 1.059(0.01) 0.004(0.01) 0.017(0.02) 10.141(0.11)
+ENMF 0.116(0.03) 0.278(0.04) 0.624(0.01) 0.200(0.03) 0.336(0.05) 1.865(0.03) 0.217(0.04) 0.354(0.07) 34.082(0.55)
+CRD 0.074(0.02) 0.223(0.04) 4.844(0.03) 0.013(0.01) 0.064(0.02) 6.767(0.10) 0.003(0.01) 0.011(0.01) 46.933(0.74)
+RHT 0.598(0.03) 0.880(0.02) 0.338(0.01) 0.535(0.06) 0.749(0.06) 0.658(0.01) 0.510(0.04) 0.644(0.04) 3.326(0.06)
+RHT-PG 0.615(0.02) 0.952(0.01) 0.346(0.00) 0.631(0.02) 0.930(0.01) 0.665(0.01) 0.623(0.03) 0.823(0.03) 3.310(0.07)
+Ideal 0.617(0.02) 0.999(0.00) 0.633(0.02) 0.999(0.00) 0.634(0.04) 1.000(0.00)
+Table2:RobustnessevaluationonD 𝑆 5 𝑖 0 𝑚.Faultsareclassified
+intothreetypesbasedontheirindicators’influenceonSLI.
+Scoring Weak(n=916) Mixed(n=64) Strong(n=20)
+Method AC@1 AC@5 AC@1 AC@5 AC@1 AC@5
+NSigma 0.454 0.753 0.249 0.498 0.000 0.550
+SPOT 0.534 0.783 0.293 0.503 0.000 0.550
+DFS 0.558 0.707 0.282 0.368 0.550 0.550
+DFS-MS 0.531 0.707 0.277 0.368 0.550 0.550
+DFS-MH 0.184 0.223 0.069 0.123 0.250 0.250
+RW-Par 0.194 0.445 0.142 0.300 0.050 0.300
+RW-24 0.194 0.445 0.142 0.300 0.050 0.300
+ENMF 0.111 0.269 0.124 0.321 0.300 0.550
+CRD 0.071 0.207 0.088 0.353 0.150 0.550
+RHT 0.613 0.888 0.325 0.730 0.800 1.000
+RHT-PG 0.624 0.954 0.358 0.914 1.000 1.000
+Ideal 0.627 1.000 0.358 0.995 1.000 1.000
+0.8
+0.6
+0.4
+0.2
+0.0
+DFS DFS−MS DFS−MH RW−Par RW−2 CIRCA
+Scoring Method
+5@CA
+Table3:PerformanceofdifferentmethodsonD𝑂
+Scoring Graph
+AC@1 AC@5 Avg@5 T(s)
+Method Method
+NSigma Empty 0.323 0.662 0.525 0.472
+SPOT Empty 0.152 0.419 0.296 5.027
+DFS Structural 0.187 0.313 0.271 0.483
+DFS-MS Structural 0.207 0.308 0.275 0.839
+DFS-MH Structural 0.268 0.439 0.372 0.844
+RW-Par PCTS 0.086 0.449 0.290 24.695
+RW-24 PCTS 0.086 0.449 0.290 24.559
+ENMF Empty 0.111 0.374 0.254 0.771
+CRD Empty 0.035 0.313 0.165 4.787
+CIRCA Structural 0.404 0.763 0.603 0.578
+Ideal 0.929 1.000 0.986
+Table4:ContributionofCIRCA’scomponentsonD𝑂 with
+thestructuralgraph.
+Graph Method PC−guass PC−gsq PCTS Structural
+Scoring
+AC@1 AC@3 AC@5 Avg@5 T(s)
+Method
+NSigma 0.323 0.586 0.662 0.525 0.472
+RHT 0.328 0.601 0.677 0.546 0.576
+CIRCA 0.404 0.616 0.763 0.603 0.578
+preventingmissinganswerslikeDFS-basedmethods.Moreover,
+CIRCAadjuststheanomalyscoreofLFSwiththatoftheaverage
+timeof“logfileparallelwrite”(LFPW),i.e.,𝑠
+𝐿
+′
+𝐹𝑆
+= 7028.6.This
+Figure3:AC@5fordifferentcombinationsofrankingmeth- techniquehelpsCIRCArankLFSaheadoftheothermetrics.
+odsandgraphconstructionones
+5.3.4 LessonsLearned. CIRCAoutperformsbaselinemethodson
+D𝑂,consistentwiththesimulationstudy.Table4andFigure3
+DFS-basedmethodswilldropdescendantsoncemeetinganab- further illustrate that each of the 3 proposed techniques has a
+normalmetric.Incontrast,CIRCAscoreseachmetricseparately, positiveeffect.
+
+--- PAGE 8 ---
+KDD’22,August14–18,2022,Washington,DC,USA MingjieLietal.
+LFSavgtime
+𝑠 = 4431.7
+EPS LFS AAS
+0 50 100
+𝑠 = 3.3 𝑠 =1638.8 𝑠 = 480.2
+LFPWavgtime
+0 50 100 0 50 100 0 50 100
+𝑠 = 5389.8
+0 50 100
+Figure4:PartofanOracledatabasefailure,whereLFSisthe
+rootcausemetriclabeledbytheDBAs.Beloweachmetric
+nameisthescorecalculatedbyEq.(4)andthetimeseriesat
+thesameperiod.Time(horizontalaxis)isshowninminutes.
+NSigma DFS DFS−MH RW−2 CRD
+Scoring Method
+SPOT DFS−MS RW−Par ENMF CIRCA
+0.8
+0.6
+0.4
+0.2
+0.0
+0 60 120 180 240 300
+tdelay
+5@CA
+0.8
+0.6
+0.4
+0.2
+0.0
+60 120 180 240 300
+tref
+(a) Effect of tdelay with tref =120
+5@CA
+5.4.3 Feasibility. GraphConstruction.Theconstructionofthe
+proposedstructuralgraphrequiressystemarchitectureandamap-
+pingfrommonitoringmetricstothetargetstobemonitored.The
+former is usually in the form of documentation. We argue that
+ametricisneitherinsightfulnoractionableunlessoperatorsun-
+derstanditsunderlyingmeaning.Operatorsneedtoclassifyeach
+distinctmetricsonlyoncetoobtainthemapping.Themappingcan
+besharedamongsimilarinstancesofthesametype(likeOracle
+databaseinstances).
+Scalability.AsshowninTable1,RHT’stimecostgrowsaround
+linearlywiththesizeofthedataset.Moreover,thedesignofCIRCA
+supportshorizontalscalabilitytohandlelarge-scalesystemsvia
+addingcomputingresources,aseachmetricisscoredseparately.
+Weplantotraintheregressionmodelsofflinetospeeduponline
+analysis.Matureparallelprogrammingframeworks,suchasApache
+Spark,mayfurtherhelpaccelerateCIRCA.
+6 RELATEDWORKS
+RootCauseAnalysis.Corollary3.2explainsthatgraphconstruc-
+tionisacommonstepintheRCAliteratureforonlineservicesystem
+operation.DFS-basedmethods[4,14,15]traverseabnormalsub-
+graph,whichissensitivetoanomalydetectionresults.Someworks
+adoptrandomwalk[16,17,25]orPageRank[24]toscorecandidate
+rootcauseindicators,lackingexplainability.Anotherlineofworks
+(b) Effect of tref with tdelay =300 isinvariantnetwork-basedmethods[5,18].Astheseworksadopt
+thepair-wisemannertolearntheinvariantrelations,itishardfor
+themtoreachtheknowledgeofRCA,restrictedbyCHT[1].No
+Figure5:PerformancewithvarioushyperparametersonD𝑂
+methodsaboveutilizecausalinference.Sage[8]conductscounter-
+factualanalysistolocaterootcauseswithoutaformalformulation.
+Corollary 3.3 states that counterfactual analysis is unnecessary.
+ThoughRCAisadifficulttaskrelatedtoLayer2ofthecausal Hence,wedidnotincludethismethodasabaseline.Meanwhile,
+ladder(Corollary3.2),theknowledgeofLayer1(L 1)isincomplete. CHT[1]indicatesthatitcanbehardtoconductcounterfactual
+Weillustratethenegativeeffectthroughacasestudy.Webelieve analysisevenwithaCBN.
+thatfurtheradvancementinthefuturehastohandlethisobstacle Thedefinitionofrootcauseanalysisvarieswiththescenarioin
+explicitly.Atpresent,wepreferCIRCAtopureRHTifdeployed. theliterature.Someapplicationsrequireananswerbeyondthedata,
+Meanwhile,theeffectivenessofthedescendantadjustmenthasto takingRCAasaclassificationtaskwithsupervisedlearning[28].
+beverifiedonmorereal-worlddatasets. Forhomogeneousdevicesorservices,operatorsareinterestedinthe
+commonfeatures[30].Accordingly,amulti-dimensionalrootcause
+5.4 Discussion analysisisconducted.Incontrast,wetreattheobservedprojection
+ofafaultasthedesiredanswer.TheInterventionRecognitionCri-
+5.4.1 HyperparameterSensitivity. Figure5comparesRCAmethods
+withdifferent𝑡𝑑𝑒𝑙𝑎𝑦 and𝑡𝑟𝑒𝑓.CIRCAhasstableperformancewith
+terionfurtherrelatesRCAinthisworkwithcontextualanomaly
+thesetwohyperparameters,outperformingbaselinemethods.
+detection[3],treatingparentsintheCBNasthecontextforeach
+variable.Wetakecomplexcontextualanomalydetectionmethods
+5.4.2 PerformanceofExistingMethods. RW-ParandRW-2repre- asfuturework.
+sentthescoringmethodsofMicroCause[17]andCloudRanger[25], CausalDiscovery.ThetasktoobtaintheCBNisnamedcausal
+respectively.However,RW-Par(RW-2)failstoachievetheperfor- discovery.Wereferthereaderstoarecentsurvey[10]forathorough
+manceinthecorrespondingpaper.MicroCauseutilizesmetricprior- discussion.NOTEARS[32]convertstheDAGsearchproblemfrom
+ityprovidedbyoperators,whichisunavailableforRW-Par.Onthe the discrete space into a continuous one. Following NOTEARS,
+otherhand,CloudRangerachievesitsbestresultwithasampling somerecentworksarebasedongradientdescent[11].
+intervalof5seconds.ThecoarsemonitoringfrequencyofD𝑂 may Althoughcausaldiscoveryhasitssoundtheory,theCBNdis-
+explainthepoorperformanceofRW-2. coveredfromdatadirectlyisnotexplainableforhumanoperators.
+AsstatedbyCorollary3.2,knowledgeofLayer2(suchasPa)is Incontrast,someworksobtaintheCBNbasedondomainknowl-
+necessaryforRCA.Theinvariantnetwork-basedmethodsutilize edge.MicroHECL[15]tracesthefaultalongwithtraffic,latency,
+theobservationdataonly(Layer1).Theirunsatisfyingperformance orerrorrateinthecallgraph.Meanwhile,Sage[8]constructsthe
+illustratestherestrictionofCHT[1]. CBNamonglatencyandmachinemetrics.Thestructuralgraph
+
+--- PAGE 9 ---
+CausalInference-BasedRootCauseAnalysisforOnlineServiceSystemswithInterventionRecognition KDD’22,August14–18,2022,Washington,DC,USA
+proposedinthisworkiscompatiblewiththeassumptionsinthese [9] JanosGertler.1998.FaultDetectionandDiagnosisinEngineeringSystems.Marcel
+twoworks,extendingthekindsofmetametrics. Dekker.
+[10] RuochengGuo,LuCheng,JundongLi,P.RichardHahn,andHuanLiu.2020.A
+SurveyofLearningCausalitywithData:ProblemsandMethods.ACMComput.
+7 CONCLUSIONANDFUTUREWORK Surv.53,4(jul2020),37pages.
+[11] YueHe,PengCui,ZheyanShen,RenzheXu,FuruiLiu,andYongJiang.2021.
+Rootcauseanalysis(RCA)isanessentialtaskforOSSoperations. DARING:DifferentiableCausalDiscoverywithResidualIndependence.InKDD.
+Inthiswork,weformulateRCAasanewcausalinferencetask 596–605.
+[12] MarkusKalisch,MartinMächler,DiegoColombo,MarloesH.Maathuis,andPeter
+namedinterventionrecognition,basedonwhich,wefurtherobtain
+Bühlmann.2012.CausalInferenceUsingGraphicalModelswiththeRPackage
+theInterventionRecognitionCriteriontofindtherootcause.We pcalg.JournalofStatisticalSoftware47,11(2012),1–26.
+believesuchaformulationbridgetwowell-studiedfields(RCAand [13] PavneetSinghKochhar,XinXia,DavidLo,andShanpingLi.2016.Practitioners’
+ExpectationsonAutomatedFaultLocalization.InISSTA.165–176.
+causalinference)andprovideapromisingnewdirectionforthe
+[14] JinjinLin,PengfeiChen,andZibinZheng.2018."Microscope:PinpointPerfor-
+critical-yet-hard-to-solveRCAprobleminOSS. manceIssueswithCausalGraphsinMicro-serviceEnvironments".InService-
+To apply such a criterion in OSS, we propose a novel causal OrientedComputing.3–20.
+[15] DeweiLiu,ChuanHe,XinPeng,FanLin,ChenxiZhang,ShengfangGong,Ziang
+inference-basedRCAmethod,CIRCA.CIRCAconsistsofthreetech- Li,JiayuOu,andZheshunWu.2021. MicroHECL:High-EfficientRootCause
+niques, namely structural graph construction, regression-based LocalizationinLarge-ScaleMicroserviceSystems.InICSE-SEIP.338–347.
+[16] MengMa,JingminXu,YuanWang,PengfeiChen,ZonghuaZhang,andPing
+hypothesistesting,anddescendantadjustment.Weverifythethe-
+Wang.2020.AutoMAP:DiagnoseYourMicroservice-BasedWebApplications
+oretical reliability of CIRCA in the simulation study. Moreover, Automatically.InWWW.246–258.
+CIRCAalsooutperformsbaselinemethodsinareal-worlddataset. [17] YuanMeng,ShenglinZhang,YongqianSun,RuruZhang,ZhilongHu,Yiyin
+Zhang,ChenyangJia,ZhaogangWang,andDanPei.2020.LocalizingFailure
+Inthefuture,weplantoincludefaultydataforregression.We
+RootCausesinaMicroservicethroughCausalityInference.InIWQoS.1–10.
+hopethatdiversedatacanhelpovercomethelimitedunderstanding [18] JingchaoNi,WeiCheng,KaiZhang,DongjinSong,TanYan,HaifengChen,and
+ofthesystem’snormalstatus.Thisworkrestsonasetofassump- XiangZhang.2017.RankingCausalAnomaliesbyModelingLocalPropagations
+onNetworkedSystems.InICDM.1003–1008.
+tionsthatarealapplicationmaynotsatisfy.Forexample,some [19] PaoloNotaro,JorgeCardoso,andMichaelGerndt.2021. ASurveyofAIOps
+metametricsdonothavecorrespondingmonitoringmetricsinthe MethodsforFailureManagement.ACMTrans.Intell.Syst.Technol.12,6,Article
+81(nov2021),45pages.
+skeletonweconstructfortheOracledatabase.Asaresult,theycan
+[20] JudeaPearl.2009.Causality:models,reasoning,andinference(seconded.).Cam-
+implycommonexogenousparentsofthedownstreammonitoring bridgeUniversityPress.
+metrics,violatingtheMarkovianassumption.Explicitlymodeling [21] JamiePool,EbrahimBeyrami,VishakGopal,AshkanAazami,JayantGupchup,
+JeffRowland,BinlongLi,PriteshKanani,RossCutler,andJohannesGehrke.2020.
+thesehiddenmetametricsmayimproveRCAperformance.Mean-
+Lumos:ALibraryforDiagnosingMetricRegressionsinWeb-ScaleApplications.
+while,theretrospectofanalysismistakesmayalsopointtothe InKDD.2562–2570.
+lackofmonitoring.Beyondtheanalysisframeworkinthiswork, [22] JakobRunge,PeerNowack,MarleneKretschmer,SethFlaxman,andDinoSejdi-
+novic.2019. Detectingandquantifyingcausalassociationsinlargenonlinear
+discoveries on the underlying mechanism of OSS can also help timeseriesdatasets.ScienceAdvances5,11(2019),eaau4996.
+climbtheladderofcausationfortheRCAtask. [23] AlbanSiffer,Pierre-AlainFouque,AlexandreTermier,andChristineLargouet.
+2017. AnomalyDetectioninStreamswithExtremeValueTheory.InKDD.
+1067–1075.
+ACKNOWLEDGMENTS [24] HanzhangWang,ZhengkaiWu,HuaiJiang,YichaoHuang,JiamuWang,Selcuk
+Kopru,andTaoXie.2021. Groot:AnEvent-graph-basedApproachforRoot
+WethankLiCao,ZhihanLi,andYuanMengfortheirhelpfuldis-
+CauseAnalysisinIndustrialSettings.InASE.419–429.
+cussionsonthiswork,thankXianglinLuforherdatapreparation [25] PingWang,JingminXu,MengMa,WeilanLin,DishengPan,YuanWang,and
+work,andthankXiangyangChen,DuogangWu,andXinYangfor PengfeiChen.2018.CloudRanger:RootCauseIdentificationforCloudNative
+Systems.InCCGRID.492–502.
+sharingtheirknowledgeonOracledatabases.Thisworkissup-
+[26] TianyiYang,JiachengShen,YuxinSu,XiaoLing,YongqiangYang,andMichaelR.
+portedbytheNationalKeyR&DProgramofChinaunderGrant Lyu.2021.AID:EfficientPredictionofAggregatedIntensityofDependencyin
+2019YFB1802504,andtheStateKeyProgramofNationalNatural Large-scaleCloudSystems.InASE.653–665.
+[27] LiuyiYao,ZhixuanChu,ShengLi,YaliangLi,JingGao,andAidongZhang.2021.
+ScienceofChinaunderGrant62072264. ASurveyonCausalInference.ACMTrans.Knowl.Discov.Data15,5,Article74
+(may2021),46pages.
+[28] JaehyukYiandJinkyooPark.2021.Semi-SupervisedBearingFaultDiagnosis
+REFERENCES
+withAdversarially-TrainedPhase-ConsistentNetwork.InKDD.3875–3885.
+[1] EliasBareinboim,JuanD.Correa,DuligurIbeling,andThomasIcard.2022.On [29] GuangbaYu,PengfeiChen,HongyangChen,ZijieGuan,ZichengHuang,Linxiao
+Pearl’sHierarchyandtheFoundationsofCausalInference(1ed.).Associationfor Jing,TianjunWeng,XinmengSun,andXiaoyunLi.2021.MicroRank:End-to-End
+ComputingMachinery,507–556. LatencyIssueLocalizationwithExtendedSpectrumAnalysisinMicroservice
+[2] BetsyBeyer,ChrisJones,JenniferPetoff,andNiallRichardMurphy.2016.Site Environments.InWWW.3087–3098.
+ReliabilityEngineering(firsted.).O’ReillyMedia,Inc. [30] XuZhang,ChaoDu,YifanLi,YongXu,HongyuZhang,SiQin,ZeLi,Qingwei
+[3] VarunChandola,ArindamBanerjee,andVipinKumar.2009.AnomalyDetection: Lin,YingnongDang,AndrewZhou,SaravanakumarRajmohan,andDongmei
+ASurvey.ACMComput.Surv.41,3,Article15(jul2009),58pages. Zhang.2021.HALO:Hierarchy-AwareFaultLocalizationforCloudSystems.In
+[4] P.Chen,Y.Qi,P.Zheng,andD.Hou.2014.CauseInfer:Automaticanddistributed KDD.3948–3958.
+performancediagnosiswithhierarchicalcausalitygraphinlargedistributed [31] NengwenZhao,JunjieChen,XiaoPeng,HonglinWang,XinyaWu,Yuanzong
+systems.InINFOCOM.1887–1895. Zhang,ZikaiChen,XiangzhongZheng,XiaohuiNie,GangWang,YongWu,
+[5] WeiCheng,KaiZhang,HaifengChen,GuofeiJiang,ZhengzhangChen,andWei FangZhou,WenchiZhang,KaixinSui,andDanPei.2020.Understandingand
+Wang.2016.RankingCausalAnomaliesviaTemporalandDynamicalAnalysis HandlingAlertStormforOnlineServiceSystems.InICSE-SEIP.162–171.
+onVanishingCorrelations.InKDD.805–814. [32] XunZheng,BryonAragam,PradeepKRavikumar,andEricPXing.2018.DAGs
+[6] AminDhaou,AntoineBertoncello,SébastienGourvénec,JosselinGarnier,and withNOTEARS:ContinuousOptimizationforStructureLearning.InNIPS,Vol.31.
+ErwanLePennec.2021.CausalandInterpretableRulesforTimeSeriesAnalysis. 9472–9483.
+InKDD.2764–2772.
+[7] SilveryFu,SaurabhGupta,RadhikaMittal,andSylviaRatnasamy.2021.Onthe
+UseofMLforBlackboxSystemPerformancePrediction.InNSDI.763–784.
+[8] YuGan,MingyuLiang,SundarDev,DavidLo,andChristinaDelimitrou.2021.
+Sage:PracticalandScalableML-DrivenPerformanceDebugginginMicroservices.
+InASPLOS.135–151.
+
+--- PAGE 10 ---
+KDD’22,August14–18,2022,Washington,DC,USA MingjieLietal.
+A PROOFOFTHEOREM3.1 Case1. With𝑉𝑖 ∈M,denotetheinterventionalSCMofMwith
+Wedefineidentifiableinterventionrecognition(IIR)asfollows: 𝑑𝑜(m)asM′.M′replaces𝑓𝑖 inMwith𝑣𝑖 ←𝑚𝑖 [20].Asaresult,
+othervariablescannotaffect𝑉𝑖 anylonger.Hence,𝑑𝑜(𝑣𝑖)makes
+DefinitionA.1(IdentifiableInterventionRecognition,IIR). Iden- 𝑃(𝑉𝑖 |pa(𝑉𝑖),𝑑𝑜(m))and𝑃(𝑉𝑖 |pa(𝑉𝑖),𝑑𝑜(𝑣𝑖))equivalentby
+tifiableinterventionrecognitionistofindoutasetofpotential
+interventions{m′ | L
+1
+(V|𝑑𝑜(m′)) ≡𝑃m }(i.e.,identifiableinter-
+𝑃(𝑉𝑖 |pa(𝑉𝑖),𝑑𝑜(m))=𝑃(𝑉𝑖 |𝑑𝑜(𝑣𝑖))=𝑃(𝑉𝑖 |pa(𝑉𝑖),𝑑𝑜(𝑣𝑖))
+ventions). Case2. With𝑉𝑖 ∉M,wegetM𝑖 =∅andM=M𝑃𝑎∪M𝑂𝑡ℎ𝑒𝑟 for
+theequationbelow
+WithDefinitionA.1,wehaveLemmaA.2andLemmaA.3.
+𝑃(𝑉𝑖 |pa(𝑉𝑖),𝑑𝑜(m))=𝑃(𝑉𝑖 |pa(𝑉𝑖),𝑑𝑜(m𝑃𝑎),𝑑𝑜(m𝑂𝑡ℎ𝑒𝑟))
+LemmaA.2. TheknowledgeofIIRcanbederivedfromL 2.
+SinceGisaCBN,the“Parentsdo/see”condition[1]statesthatwe
+ProofofLemmaA.2. DenoteCastheequivalenceclassesde- canreplacepa(𝑉𝑖)with𝑑𝑜(pa(𝑉𝑖)).
+finedbyL 2amongF = (cid:208) M∈2V 𝑉𝑎𝑙(M),whereF isallpossible 𝑃(𝑉𝑖 |pa(𝑉𝑖),𝑑𝑜(m))=𝑃(𝑉𝑖 |𝑑𝑜(pa(𝑉𝑖)),𝑑𝑜(m𝑂𝑡ℎ𝑒𝑟)) (8)
+interventions,includingnointervention.Foreachequivalentclass
+𝑐 ∈ C,𝑐 is a set of interventions [m] which leads to the same
+Aswealreadytake𝑑𝑜(m𝑃𝑎)asthecondition,the“Missing-link”
+distributionoverV:
+condition[1]ensuresthatwecandrop𝑑𝑜(m𝑂𝑡ℎ𝑒𝑟).
+[m] ={m′ | L
+1
+(V|𝑑𝑜(m′))≡𝑃m } 𝑃(𝑉𝑖 |pa(𝑉𝑖),𝑑𝑜(m))=𝑃(𝑉𝑖 |𝑑𝑜(pa(𝑉𝑖))) (9)
+Withthe“Parentsdo/see”condition[1]again,weobtain
+D L e 2 ′ n ( o [m te ] t ) he = d 𝑃 is m tr , i w bu h t e io re n [ o m fV ] ∈ un C de . r Fo [m ra ] n a y sL m 2 − 1, 1 m (𝑃 2 m ∈ )= F [ , m w ] e .D al e w n a o y te s 𝑃(𝑉𝑖 |pa(𝑉𝑖),𝑑𝑜(m))=𝑃(𝑉𝑖 |pa(𝑉𝑖)) (10)
+have: Combiningthetwocasesaboveprovidesthefinalconclusion. □
+𝑃m1 ≡𝑃m2 → [m1 ] = [m2 ]
+ProofofTheorem3.1. Givenaninterventionmandanyiden-
+Hence, L
+2
+′ isaone-to-onecorrespondenceandhaveitsinverse tifiableinterventionm′ providedbyIIR,𝑃(V | 𝑑𝑜(m)) ≡ 𝑃(V |
+mapping,denotedasL
+2
+−1(𝑃m )= [m]. 𝑑𝑜(m′)).Hence,𝑃(𝑉𝑖 | pa(𝑉𝑖),𝑑𝑜(m)) ≡ 𝑃(𝑉𝑖 | pa(𝑉𝑖),𝑑𝑜(m′))
+Whenaninterventionoccurs,basedon𝑃m ∈L 2 (F),L 2 −1(𝑃m ) forany𝑉𝑖 ∈ V.Noticethatthecorrespondingassignmentforan
+is the set of targets of IIR. Hence, the knowledge of IIR can be interventionisjustencodedintheinterventionaldistribution.Asa
+derivedfromL 2. □ result,(∀𝑥 ∈m,𝑥′∈m′)𝑋 =𝑋′→𝑥 =𝑥′.
+Assumethatmisdifferentfromm′,e.g., (∃𝑋 ∈ V)𝑋 ∈ M∧
+LemmaA.3. TheknowledgeofIIRencodesL 2. 𝑋 ∉M′.WithLemmaA.5,wehave𝑃(𝑋 | pa(𝑋),𝑑𝑜(𝑥)) ≡𝑃(𝑋 |
+pa(𝑋)),whichviolatestheFaithfulnessassumption.Itisthesame
+ProofofLemmaA.3. Foranyvalid𝑃m ∈L 2 (F),IIRwillpro- forthecase(∃𝑋 ∈V)𝑋 ∉M∧𝑋 ∈M′.Hence,IIRcandistinguish
+duceasetofpossibleinterventions{m′ | L
+2
+(m′) ≡𝑃m }.Hence,
+mfromotherinterventions,providingthesameanswerasIR.
+theknowledgeofIIRcanbeextendedtothemappingL−1 that
+2 AccordingtoTheoremA.4,wereachtheconclusionthatthe
+maps𝑃mtotheelementofC.Meanwhile,L 2 −1istheinversemap- knowledgeofIRisatthesecondlayerofthecausalladder. □
+pingofL
+2
+′ andL 2canbederivedfromL
+2
+′.Hence,theknowledge
+ofIIRencodesL 2. □ B PROOFOFTHEOREM3.4
+BasedonLemmaA.2andLemmaA.3,theknowledgeofIIRis
+ProofofTheorem3.4. Noticethat𝑃m (𝑉𝑖 | pa(𝑉𝑖)) = 𝑃(𝑉𝑖 |
+equivalenttoL 2.ThenwehaveTheoremA.4.
+pa(𝑉𝑖),𝑑𝑜(m)),whileL
+1
+(𝑉𝑖 |pa(𝑉𝑖))=𝑃(𝑉𝑖 |pa(𝑉𝑖)).
+Case1. With𝑉𝑖 ∈M,wegetM𝑖 ={𝑉𝑖}.UndertheFaithfulness
+TheoremA.4. TheknowledgeofIIRisatthesecondlayerofthe
+assumption,Eq.(11)musthold,whileLemmaA.5provides𝑃(𝑉𝑖 |
+causalladder.
+pa(𝑉𝑖),𝑑𝑜(m))=𝑃(𝑉𝑖 |pa(𝑉𝑖),𝑑𝑜(𝑣𝑖)).
+ForanSCMwithaCBN,wegetLemmaA.5. 𝑃(𝑉𝑖 |pa(𝑉𝑖),𝑑𝑜(𝑣𝑖))≠𝑃(𝑉𝑖 |pa(𝑉𝑖)) (11)
+LemmaA.5. ForagivenSCMMwithaCBNG,letPa(𝑉𝑖)bethe Hence,
+parentsof𝑉𝑖 inG.𝑃(𝑉𝑖 |pa(𝑉𝑖),𝑑𝑜(m))canbereducedtotheform
+𝑉𝑖 ∈M⇒𝑃m (𝑉𝑖 |pa(𝑉𝑖))≠L 1 (𝑉𝑖 |pa(𝑉𝑖))
+definedinEq.(7).
+(cid:26) 𝑃(𝑉𝑖 |pa(𝑉𝑖),𝑑𝑜(𝑣𝑖)), 𝑉𝑖 ∈M Case2. With𝑉𝑖 ∉M,LemmaA.5provides𝑃(𝑉𝑖 |pa(𝑉𝑖),𝑑𝑜(m))=
+𝑃(𝑉𝑖 |pa(𝑉𝑖),𝑑𝑜(m))= (7) 𝑃(𝑉𝑖 |pa(𝑉𝑖)).Hence,
+𝑃(𝑉𝑖 |pa(𝑉𝑖)), 𝑉𝑖 ∉M
+𝑉𝑖 ∉M⇒𝑃m (𝑉𝑖 |pa(𝑉𝑖))=L 1 (𝑉𝑖 |pa(𝑉𝑖))
+ProofofLemmaA.5. Givenavariable𝑉𝑖,theintervenedvari-
+Itscontrapositivestandsaswell,
+ablesMcanbeseparatedintothreeparts:1)M𝑃𝑎 =M∩Pa(𝑉𝑖),2)
+M𝑖 =M∩{𝑉𝑖},and3)M𝑂𝑡ℎ𝑒𝑟 =M\Pa(𝑉𝑖)\{𝑉𝑖}.Hence, 𝑃m (𝑉𝑖 |pa(𝑉𝑖))≠L 1 (𝑉𝑖 |pa(𝑉𝑖))⇒𝑉𝑖 ∈M
+• M=M𝑃𝑎∪M𝑖 ∪M𝑂𝑡ℎ𝑒𝑟, ,whichistheconversepropositionofCase1.
+• M𝑃𝑎∩M𝑖 =M𝑃𝑎∩M𝑂𝑡ℎ𝑒𝑟 =M𝑖 ∩M𝑂𝑡ℎ𝑒𝑟 =∅,and Inconclusion,𝑉𝑖 ∈ M ⇔ 𝑃m (𝑉𝑖 | pa(𝑉𝑖)) ≠ L 1 (𝑉𝑖 | pa(𝑉𝑖)).
+• thereisnoarrowfromM𝑂𝑡ℎ𝑒𝑟 to𝑉𝑖 inG. □
+
+--- PAGE 11 ---
+CausalInference-BasedRootCauseAnalysisforOnlineServiceSystemswithInterventionRecognition KDD’22,August14–18,2022,Washington,DC,USA
+C IMPLEMENTATIONDETAILS
+Server StagesofSQLProcessing
+C.1 BaselineMethods
+MostofthecodeinthisworkiswritteninPython,whileweadopt Parse HardParse Execute
+theRpackagepcalg[12]forthePCalgorithm.Weutilizeprocess-
+basedparallelprogrammingtoisolateerrorsonly.
+NSigmacalculatesmax𝑡
+|𝑣
+𝑖
+(𝑡
+𝜎
+)−
+𝑖
+𝜇𝑖|
+.Weadopttheauthors’imple-
+Scan Sort
+mentation6 for SPOT [23] while re-implementing ENMF [5] in Library Session
+Pythonbasedontheauthors’MATLABimplementation7.Theother Cache Memory
+baselinemethodsarenotpubliclyavailable.Weimplementthem
+Data
+byourunderstanding. Dictionary Result
+Cache
+Cache
+C.2 SimulationDataGeneration
+PrivateSQLArea Buffer
+We generate the simulation datasets based on the Vector Auto- (dedicatedserver) Cache
+regressionmodel,asshowninEq.(6).Followingexistingwork[11,
+32],thevalueofnon-zeroelementsintheweightedadjacentmatrix, SGA RedoLog
+𝐴𝑖𝑗,isuniformlysampledfrom (−2.0,−0.5) ∪ (0.5,2.0).Forthe Buffer
+seconditem𝛽x(𝑡−1),weset𝛽
+=0.1intheexperiment.Finally,we PGA PGA
+samplethestandarddeviationsfromanexponentialdistribution MEM
+forthezero-meanGaussiannoises𝜖(𝑡). MemoryStructures
+Thestructureof𝐴isgeneratedintwosteps,asshowninAl-
+gorithm3.Wefirstgenerateatreetoensurethatthegraphisa Figure6:PartoftheOracledatabasecallgraph
+connectedDAG.Then,theotheredgesareinsertedrandomly.
+Table5:RHTwithdifferentregressionmethodsonD𝑂
+Algorithm3GraphGenerationintheSimulationStudy
+Require: 𝑁𝑛𝑜𝑑𝑒,thenumberofnodes;𝑁𝑒𝑑𝑔𝑒,thenumberofedges Regression
+AC@1 AC@3 AC@5 Avg@5 T(s)
+Method
+1: G←(V,E),whereV={1,2,···,𝑁𝑛𝑜𝑑𝑒} Linear 0.197 0.424 0.556 0.409 0.559
+2: for𝑖 =2,···,𝑁𝑛𝑜𝑑𝑒 do SVR 0.328 0.601 0.677 0.546 0.834
+3: 𝑗 ←chooseonenodefrom{1,2,···,𝑖−1}randomly RF 0.202 0.394 0.525 0.382 22.065
+4: Addtheedge𝑖 → 𝑗 intoE MDN 0.111 0.212 0.253 0.195 694.329
+5: endfor
+6: for𝑘 =𝑁𝑛𝑜𝑑𝑒,𝑁𝑛𝑜𝑑𝑒 +1,···,𝑁𝑒𝑑𝑔𝑒 do
+7: 𝑖,𝑗 ←sample𝑖,𝑗 ∈Vrandomly,s.t.,𝑖 > 𝑗∧(𝑖 → 𝑗)∉E awaytopredictdistributionbasedonRandomForest(RF)and
+8: Addtheedge𝑖 → 𝑗 intoE MixtureDensityNetworks(MDN),respectively,insteadofasingle
+9: endfor value[7].Hence,RHTcombinedwithRForMDNcanmeasure
+10: return G thedeviationforanewdatumagainstthepredicteddistribution.
+However,thesetwomethodsperformworsethanthesimplelinear
+regressionduetoalimitedunderstandingofthenormalstatus,as
+C.3 StructuralGraphConstruction showninFigure1.Asaresult,wechooseSVRintheempirical
+study.
+Intheempiricalstudy,weconstructthestructuralgraphforthe
+Oracledatabaseinstances.Figure6showstheSQLprocessingand
+memorystructuresinthecallgraph.Figure4furthershowspartof
+thegraphamongmetrics.Wedropmetricsnotincludedinthefinal
+structuralgraph,asourknowledgefailstocoverthem.Baseline
+methodsonlyuselabeledmetricsforafaircomparison.
+C.4 RegressionMethodSelection
+Table5showsRHT’sperformancewithseveralregressionmethods.
+RHTwiththelinearregression(Linear)hasunsatisfyingperfor-
+mance, as the relations among real-world variables are seldom
+linear.SupportVectorRegression(SVR)withthesigmoidkernel,
+whichisnon-linear,improvestheperformance.Fuetal.provide
+6https://github.com/Amossys-team/SPOT
+7https://github.com/chengw07/CausalRanking

@@ -1,0 +1,7 @@
+04/10/2026, final handoff checks on Windows. Retained failure transcript.
+check_scope_sources.py:21, state-updates.jsonl read_text() without encoding:
+UnicodeDecodeError: 'charmap' codec can't decode byte 0x9d in position 732: character maps to <undefined>
+check_review_prompt.py:16, printing Vietnamese placeholder names using CP1252 stdout:
+UnicodeEncodeError: 'charmap' codec can't encode character '\u1ed1' in position 182: character maps to <undefined>
+The prompt check JSON had already been written; verify_outputs.py reported pass=true, count31.
+Correction: explicit UTF-8 for state log input, ASCII-escaped console JSON; scientific snapshots unchanged.
