@@ -1,0 +1,664 @@
+--- D:\RCA-flashticket\results\T-017\scripts\run_dev.py before
++++ D:\RCA-flashticket\results\T-017\scripts\run_dev.py
+@@ -1,6 +1,6 @@
+ """Reproducible dev-only correctness run. Every attempt and elapsed step kept.
+ 
+-The allowlist is materialized before telemetry is opened. Core does not receive
++The frozen allowlist is validated before any run is created or telemetry opened. Core does not receive
+ paths/case identifiers/root labels. Scoring starts only after result is written.
+ """
+ import argparse,csv,hashlib,json,os,sys,time,traceback
+@@ -27,9 +27,30 @@
+         for b in iter(lambda:f.read(1024*1024),b''): h.update(b)
+     return h.hexdigest()
+ 
++def load_allowlist(path=OUT/'allowlist.json'):
++    names=json.loads(path.read_text(encoding='utf-8'))
++    if (not isinstance(names,list) or len(names)!=30
++            or any(not isinstance(n,str) or not n.startswith('re2tt_')
++                   or Path(n).name!=n or '/' in n or '\\' in n for n in names)
++            or len(set(names))!=30):
++        raise RuntimeError('invalid frozen allowlist')
++    return sorted(names)
++
++
+ def guard_case(path,allowed,data_root):
+-    if path.name not in allowed or path.resolve().parent != data_root.resolve():
++    if path.name not in allowed or path.resolve() != data_root.resolve()/path.name:
+         raise RuntimeError('forbidden source case')
++
++
++def validate_cases(dirs,allowed,data_root):
++    if len(dirs)!=len(allowed) or {p.name for p in dirs}!=set(allowed):
++        raise RuntimeError('case identities differ from frozen allowlist')
++    for p in dirs:
++        guard_case(p,allowed,data_root)
++        if not p.is_dir(): raise RuntimeError('allowed case directory missing')
++        for name in ('metrics.parquet','traces.parquet','logs.parquet'):
++            source=p/name
++            if source.exists(): guard_file(source,p)
+ 
+ def guard_file(path,case):
+     if path.resolve().parent != case.resolve():
+@@ -47,12 +68,11 @@
+     ap=argparse.ArgumentParser();ap.add_argument('--run',required=True);ap.add_argument('--limit',type=int,default=30);ap.add_argument('--start-index',type=int,default=0)
+     args=ap.parse_args();run=OUT/'runs'/args.run
+     if run.exists():raise RuntimeError('never overwrite a run')
++    allowed=load_allowlist()
++    dirs=sorted((ROOT/'data/rcaeval').glob('re2tt_*'))
++    validate_cases(dirs,allowed,ROOT/'data/rcaeval')
+     run.mkdir(parents=True)
+-    dirs=sorted((ROOT/'data/rcaeval').glob('re2tt_*'))
+-    allowed={p.name for p in dirs}
+-    if len(allowed)!=30 or any(not p.is_dir() for p in dirs):raise RuntimeError('allowlist changed: inspect before running')
+-    dump(OUT/'allowlist.json',sorted(allowed))
+-    dump(run/'environment.json',{'python':sys.version,'numpy':np.__version__,'pandas':pd.__version__,'pyarrow':pyarrow.__version__,'concurrent_laptop':True,'official_timing':False,'estimated_total_minutes':45})
++    dump(run/'environment.json',{'python':sys.version,'numpy':np.__version__,'pandas':pd.__version__,'pyarrow':pyarrow.__version__,'concurrent_laptop':True,'official_timing':False,'estimated_total_minutes':3,'allowlist_sha256':sha(OUT/'allowlist.json'),'allowed_cases':allowed})
+     progress=run/'progress.jsonl'
+     def log(event,**kw):
+         row={'time_local':datetime.now(timezone(timedelta(hours=7))).isoformat(),'event':event,**kw}
+@@ -88,7 +108,7 @@
+             row['checks']['not_fallback']=result['fallback'] is False
+             row['checks']['nonempty']=bool(result['ranks'])
+             row['checks']['score_sum']=all(x['score']==x['metric']+x['trace']+x['log'] for x in result['scores'].values())
+-            row['checks']['ranking_equals_metric_column_order']=result['ranks']==list(dict.fromkeys(prepared[-1].values()))
++            row['checks']['ranking_equals_metric_column_order']=result['ranks']==list(dict.fromkeys(prepared.metric_services.values()))
+             if idx<2:
+                 again=diagnose(**inputs);dump(run/f'{p.name}-repeat.json',again)
+                 perm=dict(inputs);perm['normal_metrics']=dict(reversed(list(inputs['normal_metrics'].items())));perm['incident_metrics']=dict(reversed(list(inputs['incident_metrics'].items())));perm['metric_services']=dict(reversed(list(inputs['metric_services'].items())))
+@@ -102,7 +122,7 @@
+                 for name,df in zip(['normal_metrics','incident_metrics','normal_traces','incident_traces','incident_logs'],prepared[:5]):
+                     if df is None:df=pd.DataFrame(columns=['service','message'])
+                     df.to_csv(ex/f'{name}.csv',index=False)
+-                dump(ex/'metadata.json',{'metric_services':prepared[-1],'logs_available':prepared[4] is not None,'boundary':boundary,'half':300,'case_is_not_passed_to_core':True})
++                dump(ex/'metadata.json',{'metric_services':prepared.metric_services,'observed_services':prepared.observed_services,'logs_available':prepared.incident_logs is not None,'boundary':boundary,'half':300,'case_is_not_passed_to_core':True})
+                 sensitivity=[]
+                 variants=[('p95',Config(metric_rule='p95')),('channels',Config(metric_aggregation='channels')),('log1',Config(log_threshold=1)),('log10',Config(log_threshold=10)),('trace2',Config(trace_factor=2)),('trace4',Config(trace_factor=4))]
+                 for name,cfg in variants:
+--- D:\RCA-flashticket\src\simplerca\adapter.py before
++++ D:\RCA-flashticket\src\simplerca\adapter.py
+@@ -5,6 +5,17 @@
+ """
+ import numpy as np
+ import pandas as pd
++from typing import NamedTuple
++
++
++class PreparedInputs(NamedTuple):
++    normal_metrics: pd.DataFrame
++    incident_metrics: pd.DataFrame
++    normal_traces: pd.DataFrame
++    incident_traces: pd.DataFrame
++    incident_logs: object
++    metric_services: dict
++    observed_services: tuple
+ 
+ 
+ def canonical_service(name, aliases=None):
+@@ -57,6 +68,7 @@
+         nt=t.loc[(tt>=boundary-half)&(tt<boundary)].reset_index(drop=True)
+         at=t.loc[(tt>=boundary)&(tt<boundary+half)].reset_index(drop=True)
+     al=None
++    observed=set(mappings.values()) | set(nt['service']) | set(at['service'])
+     if logs is not None:
+         for c in ('timestamp','container_name','message'):
+             if c not in logs: raise ValueError(f'log missing {c}')
+@@ -64,18 +76,22 @@
+         lt=pd.to_numeric(logs['timestamp'],errors='raise').to_numpy()
+         if len(lt) and not 1e9<float(np.median(lt))<3e9:
+             raise ValueError('log timestamp must be second epoch')
++        # Preserve identities in either window, without passing normal messages.
++        window_names=logs.loc[(lt>=boundary-half)&(lt<boundary+half),'container_name']
++        observed.update(canonical_service(s,aliases) for s in window_names)
+         al=logs.loc[(lt>=boundary)&(lt<boundary+half),['container_name','message']].rename(columns={'container_name':'service'}).copy()
+         al['service']=al['service'].map(lambda s:canonical_service(s,aliases))
+         al['message']=al['message'].fillna('').astype(str)
+-    return nm,am,nt,at,al,mappings
++    return PreparedInputs(nm,am,nt,at,al,mappings,tuple(sorted(observed)))
+ 
+ 
+ def core_input(prepared):
+-    nm,am,nt,at,al,mappings=prepared
++    nm,am,nt,at,al,mappings,observed=prepared
+     def groups(df,column):
+         return {s:g[column].tolist() for s,g in df.groupby('service',sort=True)}
+     return {'normal_metrics':{k:nm[k].tolist() for k in mappings},
+             'incident_metrics':{k:am[k].tolist() for k in mappings},
+             'metric_services':mappings,'normal_traces':groups(nt,'duration'),
+             'incident_traces':groups(at,'duration'),
+-            'incident_logs':None if al is None else groups(al,'message')}
++            'incident_logs':None if al is None else groups(al,'message'),
++            'observed_services':observed}
+--- D:\RCA-flashticket\src\simplerca\tests\test_core.py before
++++ D:\RCA-flashticket\src\simplerca\tests\test_core.py
+@@ -4,6 +4,18 @@
+ from simplerca import Config, diagnose, score_root
+ from simplerca.adapter import canonical_service, prepare
+ import pandas as pd
++import argparse
++import importlib.util
++import io
++import json
++import sys
++from pathlib import Path
++from unittest.mock import Mock, patch
++from simplerca.adapter import core_input
++
++REPO=Path(__file__).resolve().parents[3]
++sys.path.insert(0,str(REPO/'results/T-017/scripts'))
++import run_dev
+ 
+ 
+ class KnownAnswers(unittest.TestCase):
+@@ -61,6 +73,37 @@
+     def test_modality_only_service(self):
+         r=self.run_case(incident_logs={'c':['ERROR']})
+         self.assertIn('c',r['ranks']); self.assertEqual(r['scores']['c']['score'],1)
++
++    def test_normal_only_log_identity_without_error_vote(self):
++        epoch=1700000000;pod='log-only-pod'
++        m=pd.DataFrame({'time':[epoch-2,epoch-1,epoch],'a_cpu':[1,1,2]})
++        l=pd.DataFrame({'timestamp':[epoch-3,epoch-1,epoch,epoch+3,epoch-4],
++                        'container_name':[pod,pod,'incident-only','after','before'],
++                        'message':['ERROR','FAIL EXCEPTION','ERROR','ERROR','ERROR']})
++        prepared=prepare(m,None,l,epoch,3,aliases={pod:'normal-only'})
++        r=diagnose(**core_input(prepared))
++        self.assertEqual(set(r['scores']),{'a','normal-only','incident-only'})
++        self.assertEqual(r['scores']['normal-only']['score'],0)
++        self.assertEqual(r['logs']['normal-only']['count'],0)
++        self.assertEqual(r['logs']['incident-only']['count'],1)
++        self.assertEqual(prepared.incident_logs['service'].tolist(),['incident-only'])
++
++    def test_normal_only_log_abstain_with_no_metric_channels(self):
++        epoch=1700000000;m=pd.DataFrame({'time':[epoch-1,epoch]})
++        l=pd.DataFrame({'timestamp':[epoch-1],'container_name':['only-log'],'message':['ERROR']})
++        r=diagnose(**core_input(prepare(m,None,l,epoch,3)))
++        self.assertEqual(r['ranks'],['only-log'])
++        self.assertEqual(r['status'],'abstain')
++        self.assertEqual(r['logs']['only-log']['count'],0)
++
++    def test_adapter_log_missing_and_empty_stay_distinct(self):
++        epoch=1700000000
++        m=pd.DataFrame({'time':[epoch-2,epoch-1,epoch],'a_cpu':[1,1,2]})
++        absent=diagnose(**core_input(prepare(m,None,None,epoch,3)))
++        empty=pd.DataFrame(columns=['timestamp','container_name','message'])
++        present=diagnose(**core_input(prepare(m,None,empty,epoch,3)))
++        self.assertEqual(absent['logs']['a']['status'],'unavailable')
++        self.assertEqual(present['logs']['a']['count'],0)
+ 
+     def test_missing_and_insufficient(self):
+         r=self.run_case(normal_metrics={'a_cpu':[np.nan,1],'b_cpu':[1,1,1]})
+@@ -111,4 +154,67 @@
+         with self.assertRaises(ValueError): prepare(duplicate,None,None,epoch,3)
+ 
+ 
++class FrozenCases(unittest.TestCase):
++    def setUp(self):
++        self.allowed=[f're2tt_synthetic_{i:02d}' for i in range(30)]
++        self.data_root=REPO/'data/rcaeval'
++
++    def test_manifest_unique_and_sorted(self):
++        manifest=Mock()
++        manifest.read_text.return_value=json.dumps(list(reversed(self.allowed)))
++        self.assertEqual(run_dev.load_allowlist(manifest),self.allowed)
++        for invalid in (self.allowed[:-1],self.allowed[:-1]+[self.allowed[0]],
++                        self.allowed[:-1]+['re2tt_../escape']):
++            manifest.read_text.return_value=json.dumps(invalid)
++            with self.assertRaises(RuntimeError):run_dev.load_allowlist(manifest)
++
++    def test_same_count_replacement_rejected_before_path_reads(self):
++        dirs=[self.data_root/n for n in self.allowed[:-1]+['re2tt_FORBIDDEN_SYNTHETIC']]
++        with patch.object(Path,'is_dir',side_effect=AssertionError('unexpected path probe')):
++            with self.assertRaises(RuntimeError):
++                run_dev.validate_cases(dirs,self.allowed,self.data_root)
++
++    def test_reordering_keeps_exact_identity(self):
++        dirs=[self.data_root/n for n in reversed(self.allowed)]
++        with patch.object(Path,'is_dir',return_value=True),patch.object(Path,'exists',return_value=False):
++            run_dev.validate_cases(dirs,self.allowed,self.data_root)
++
++    def test_resolve_must_keep_identity_even_inside_data_root(self):
++        p=Mock();p.name=self.allowed[0]
++        for target in (self.data_root/self.allowed[1],REPO/'outside'/self.allowed[0]):
++            p.resolve.return_value=target
++            with self.assertRaises(RuntimeError):run_dev.guard_case(p,self.allowed,self.data_root)
++        p.resolve.return_value=self.data_root.resolve()/p.name
++        run_dev.guard_case(p,self.allowed,self.data_root)
++
++    def test_main_rejects_before_writes_or_telemetry(self):
++        dirs=[self.data_root/n for n in self.allowed[:-1]+['re2tt_FORBIDDEN_SYNTHETIC']]
++        args=argparse.Namespace(run='synthetic-never-created',limit=30,start_index=0)
++        with patch.object(argparse.ArgumentParser,'parse_args',return_value=args), \
++             patch.object(run_dev,'load_allowlist',return_value=self.allowed), \
++             patch.object(Path,'glob',return_value=dirs), \
++             patch.object(Path,'exists',return_value=False), \
++             patch.object(Path,'mkdir',side_effect=AssertionError('unexpected write')), \
++             patch.object(run_dev,'sha',side_effect=AssertionError('unexpected hash')), \
++             patch.object(pd,'read_parquet',side_effect=AssertionError('unexpected telemetry')):
++            with self.assertRaises(RuntimeError):run_dev.main()
++
++    def test_artifact_filter_uses_frozen_aliases_before_returning_rows(self):
++        import pyarrow as pa
++        import pyarrow.parquet as pq
++        path=Path('D:/RCA-ext/work/T-017/sources-audit/filter_fse_artifact_results.py')
++        spec=importlib.util.spec_from_file_location('artifact_filter_regression',path)
++        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
++        with patch.object(module,'load_allowlist',return_value=self.allowed), \
++             patch.object(Path,'glob',side_effect=AssertionError('artifact must not infer permission from disk')):
++            allowed,aliases=module.artifact_aliases()
++        self.assertEqual(allowed,self.allowed)
++        sink=io.BytesIO()
++        names=[self.allowed[0],self.allowed[0].removeprefix('re2tt_'),'re2tt_FORBIDDEN_SYNTHETIC']
++        pq.write_table(pa.table({'case':names,'value':[1,2,999]}),sink)
++        selected=module.select_case_rows(sink.getvalue(),'case',aliases)
++        self.assertEqual(selected['case'].to_pylist(),names[:2])
++        self.assertEqual(selected['value'].to_pylist(),[1,2])
++
++
+ if __name__=='__main__': unittest.main()
+--- D:\RCA-flashticket\results\T-017\scripts\supplement_checks.py before
++++ D:\RCA-flashticket\results\T-017\scripts\supplement_checks.py
+@@ -1,14 +1,21 @@
+ """Final inexpensive checks, without new dataset or parameter selection."""
+-import json,re,time,sys
++import argparse,json,re,time,sys
+ from pathlib import Path
+ from datetime import datetime,timezone,timedelta
+ from unittest.mock import Mock
+ import pandas as pd
+ from simplerca import Config,diagnose
+ from simplerca.adapter import prepare,core_input
+-from run_dev import guard_case,guard_file,ROOT,OUT,WORK,dump
++from run_dev import guard_case,guard_file,load_allowlist,validate_cases,ROOT,OUT,WORK,dump
+ 
+-run=OUT/'runs/supplement-001'
++parser=argparse.ArgumentParser()
++parser.add_argument('--run',default='supplement-001')
++parser.add_argument('--baseline-run',default='run-dev-004')
++args=parser.parse_args()
++allowed=load_allowlist()
++data_root=ROOT/'data/rcaeval'
++validate_cases(sorted(data_root.glob('re2tt_*')),allowed,data_root)
++run=OUT/'runs'/args.run
+ if run.exists(): raise RuntimeError('preserve all attempts')
+ run.mkdir()
+ t0=time.perf_counter()
+@@ -17,8 +24,6 @@
+     with (run/'progress.jsonl').open('a',encoding='utf-8') as f:f.write(json.dumps(row,ensure_ascii=False)+'\n')
+     print(json.dumps(row,ensure_ascii=False),flush=True)
+ progress('start',estimated_total_seconds=60,official_timing=False)
+-allowed=json.loads((OUT/'allowlist.json').read_text())
+-data_root=ROOT/'data/rcaeval'
+ checked=[]
+ for name in allowed:
+     p=data_root/name;guard_case(p,allowed,data_root)
+@@ -29,17 +34,25 @@
+     try: guard_case(p,allowed,data_root)
+     except RuntimeError: pass
+     else: raise AssertionError('case escape accepted')
++fake_case=Mock();fake_case.name=allowed[0];fake_case.resolve.return_value=data_root/allowed[1]
++try:guard_case(fake_case,allowed,data_root)
++except RuntimeError:pass
++else:raise AssertionError('case identity changed inside data root')
++replaced=[data_root/n for n in allowed[:-1]+['re2tt_SYNTHETIC_NOT_ALLOWED']]
++try:validate_cases(replaced,allowed,data_root)
++except RuntimeError:pass
++else:raise AssertionError('same-count case replacement accepted')
+ fake=Mock();fake.resolve.return_value=WORK/'outside.parquet'
+ try:guard_file(fake,data_root/allowed[0])
+ except RuntimeError:pass
+ else:raise AssertionError('file escape accepted')
+-dump(run/'guard-check.json',{'status':'PASS','allowed_cases':len(allowed),'source_files_checked':checked,'forbidden_case_tests':2,'escaped_file_test':True,'data_opened_for_guard_tests':False})
++dump(run/'guard-check.json',{'status':'PASS','allowed_cases':len(allowed),'source_files_checked':checked,'forbidden_case_tests':2,'escaped_file_test':True,'resolved_identity_test':True,'same_count_replacement_test':True,'frozen_manifest_used':True,'data_opened_for_guard_tests':False})
+ progress('guard_complete',cases=len(allowed),files=len(checked))
+ case=allowed[1];p=data_root/case
+ boundary=int((WORK/'injection'/(case+'.txt')).read_text().strip())
+ m=pd.read_parquet(p/'metrics.parquet');t=pd.read_parquet(p/'traces.parquet',columns=['serviceName','startTime','duration']);l=pd.read_parquet(p/'logs.parquet')
+ inputs=core_input(prepare(m,t,l,boundary));baseline=diagnose(**inputs)
+-previous=json.loads((OUT/'runs/run-dev-004'/(case+'.json')).read_text())
++previous=json.loads((OUT/'runs'/args.baseline_run/(case+'.json')).read_text())
+ # Serialization turns tuples into lists, so compare JSON-normalized values.
+ assert json.loads(json.dumps(baseline))==previous
+ counts={s:sum(any(k in message.upper() for k in ('ERROR','FAIL','EXCEPTION')) for message in entries) for s,entries in inputs['incident_logs'].items()}
+@@ -51,5 +64,5 @@
+         assert row['vote']==int(counts.get(s,0)>threshold)
+     dump(run/f'log-threshold-{threshold}.json',result)
+     variants.append({'threshold':threshold,'positive_log_services':sum(v['vote'] for v in result['logs'].values()),'ranking_same_as_baseline':result['ranks']==baseline['ranks'],'scores_same_as_baseline':result['scores']==baseline['scores']})
+-dump(run/'summary.json',{'case':case,'baseline_matches_run004':True,'independent_log_count_check':'PASS','variants':variants,'elapsed_seconds_concurrent_laptop':time.perf_counter()-t0,'official_timing':False})
++dump(run/'summary.json',{'case':case,'baseline_run':args.baseline_run,'baseline_matches':True,'independent_log_count_check':'PASS','variants':variants,'elapsed_seconds_concurrent_laptop':time.perf_counter()-t0,'official_timing':False})
+ progress('complete',elapsed_s=time.perf_counter()-t0,baseline_exact=True,variants=variants)
+--- D:\RCA-flashticket\results\T-017\scripts\independent_example.py before
++++ D:\RCA-flashticket\results\T-017\scripts\independent_example.py
+@@ -82,6 +82,11 @@
+         return score_parts.setdefault(
+             service, {"metric_alerts": 0, "trace_alerts": 0, "log_alerts": 0}
+         )
++
++    # New normalized inputs retain normal-only log identities, never messages.
++    # Older snapshots omit this field and remain readable as historical inputs.
++    for service in metadata.get("observed_services", []):
++        observe(service)
+ 
+     metric_details = []
+     names = sorted(
+@@ -243,6 +248,10 @@
+     unavailable = calculate(normal, incident, empty_trace, empty_trace, empty_log, {**meta, "logs_available": False})
+     assert all(not row["available"] for row in unavailable["logs"])
+     assert unavailable["tie_groups"] == [{"score": 2, "services": ["a", "b"]}]
++    normal_only = calculate(normal, incident, nt, it, logs,
++                            {**meta, "observed_services": ["normal-only"]})
++    assert next(row for row in normal_only['services'] if row['service']=='normal-only')['score']==0
++    assert next(row for row in normal_only['logs'] if row['service']=='normal-only')['error_count']==0
+     equality = calculate(
+         pd.DataFrame({"time": [0, 1], "a_x": [-1.0, 1.0]}),
+         pd.DataFrame({"time": [2, 3], "a_x": [3.0, 4.0]}),
+@@ -273,7 +282,7 @@
+         assert "Duration am" in str(error)
+     else:
+         raise AssertionError("Duration am khong bi tu choi.")
+-    return {"status": "PASS", "checks": ["manual_metric_score", "linear_p95", "strict_metric_boundary", "strict_trace_boundary", "keyword_once_per_row", "normal_control", "column_permutation", "missing_logs", "ties", "nonfinite", "insufficient_normal", "negative_duration"]}
++    return {"status": "PASS", "checks": ["manual_metric_score", "linear_p95", "strict_metric_boundary", "strict_trace_boundary", "keyword_once_per_row", "normal_control", "column_permutation", "missing_logs", "ties", "nonfinite", "insufficient_normal", "negative_duration", "normal_only_identity_zero_score"]}
+ 
+ 
+ def main() -> None:
+--- D:\RCA-flashticket\results\T-017\kiem-dung-dan.md before
++++ D:\RCA-flashticket\results\T-017\kiem-dung-dan.md
+@@ -1,8 +1,8 @@
+ # Kiểm đúng đắn — T017
+ 
+-Các phép kiểm xác nhận từng điều kiện cụ thể, không đồng nhất “không lỗi” với “chạy đúng”. Mọi số cuối lấy run-dev-004 (`runs/final-summary.json`);001–003 giữ nguyên lịch sử và không dùng làm số cuối. Quy ước M4 **(chờ WHY, xem de-xuat-tai-lieu-chung.md)**.
++Các phép kiểm xác nhận từng điều kiện cụ thể, không đồng nhất “không lỗi” với “chạy đúng”. Số bàn giao ban đầu lấy run-dev-004 (`runs/final-summary.json`); 001–003 giữ nguyên lịch sử. Sau sửa N1/N2, lượt mới run-dev-005 khớp toàn bộ 30 diagnosis của run004; kiểm mới tại `runs/fix-n1n2-001/verification.json`. Quy ước M4 **(chờ WHY, xem de-xuat-tai-lieu-chung.md)**.
+ 
+-## Kiểm đạt
++## Kiểm đạt tại bàn giao run004
+ 
+ | Phép kiểm | Kết quả và bằng chứng |
+ |---|---|
+@@ -19,6 +19,23 @@
+ | Provenance |30mốc metadata hash khớp manifest T002,70Git blob khớp, PDF bảng2/3 xem ảnh; số công bố tra trước dev |
+ 
+ Metric name parser tách underscore cuối theo schema RCAEval; chưa hỗ trợ suffix metric có underscore tùy ý. Trace và log timestamp range guards kiểm đúng đơn vị. Duration vật lý chưa xác nhận nhưng ratio cùng nguồn không cần đổi. Kiểm guard và alias sau run004 không làm đổi computation với aliases=None; baseline ca thứ hai xác nhận điều đó.
++
++## Sửa N1/N2 đã được Minh duyệt ngày 04/10/2026
++
++N1 là lỗi khóa danh tính: guard bàn giao chỉ kiểm count và đường dẫn, chưa ngăn tập 30 ca bị thay tên. Runner nay đọc `allowlist.json` đã khóa, không ghi đè; kiểm exact-set, thư mục và file resolve trước tạo run hoặc hash/đọc telemetry. Đường dẫn resolve phải giữ chính danh tính ca, kể cả khi đích khác vẫn ở cùng data root. Bộ lọc artifact dùng cùng loader; alias chỉ bỏ prefix từ tên được phép, predicate áp trước trả dòng. Test dùng tên/đường dẫn/row tổng hợp, không mở ca ngoài quyền.
++
++N2 là lỗi hợp đồng ứng viên: adapter nay giữ định danh log trong `[t−half,t+half)`, chuẩn hóa cùng alias, truyền `observed_services`; chỉ log `[t,t+half)` được truyền message để đếm lỗi. ERROR chỉ normal không có phiếu. Thiếu modality và bảng rỗng vẫn khác nhau. `prepare` trả `PreparedInputs` gồm 5 bảng, `metric_services`, `observed_services`; runner truy cập trường bằng tên. Metadata normalized giữ observed_services để bản tính độc lập không mất service normal-only; không lưu message normal.
++
++| Kiểm sau sửa | Kết quả và nguồn |
++|---|---|
++| Tổng hợp |25/25 unittest đạt; gồm thay tên giữ count30, đổi thứ tự hợp lệ, resolve sang danh tính khác, từ chối trước mkdir/hash/read, predicate prefixed/unprefixed, normal-only ERROR/alias/boundary/log-only/None-vs-empty (`runs/fix-n1n2-001/unit-tests.txt`) |
++| Dev và nguồn |30 diagnosis khớp run004 từng JSON; mọi source hash khớp; 2041 tổng score service được kiểm lại; hai ca repeat/permutation đạt; 14 output phụ khớp (`runs/fix-n1n2-001/verification.json`) |
++| Guard thực |30 ca/89 file đúng phạm vi; phản ví dụ exact-ID/resolve đạt (`runs/supplement-002/guard-check.json`) |
++| Ví dụ độc lập |13 nhóm self-test; 2458 so count/available/float/thành phần/rank/tie/log đạt; max absolute float error 1.16415e-10, dùng relative/absolute tolerance1e−10 (`runs/fix-n1n2-001/independent-example.json`, `verification.json`) |
++| Log sensitivity |Ca thứ hai với ngưỡng0/1/10 khớp count độc lập; baseline bằng run005 (`runs/supplement-002/summary.json`) |
++| Artifact |Hai parquet có case identity vẫn trả0devrows; không telemetry hoặc giá trị ngoài allowlist (`runs/fix-n1n2-001/fse-filter-001/fse-artifact-result-filter-check.json`) |
++
++Hit1 vẫn25/30; Hit3/5 vẫn29/30; MRR=0.8911111111. Hai normal-control vẫn không đạt abstention; không đổi threshold. Run005 elapsed 46.25s; bộ lọc 1.76s. Chỉ là tiến độ khi máy dùng chung, không phải benchmark cost chính thức. Mọi lượt cũ, allowlist và REVIEW giữ nguyên. Inventory/handoff cũ là snapshot bàn giao; danh sách thay đổi và kiểm bảo toàn sau sửa nằm trong `runs/fix-n1n2-001/`.
+ 
+ ## Normal/normal: kết quả không đạt abstention trên dữ liệu thực
+ 
+--- D:\RCA-flashticket\results\T-017\tieu-chi-xong.csv before
++++ D:\RCA-flashticket\results\T-017\tieu-chi-xong.csv
+@@ -1,8 +1,8 @@
+ tieu_chi,trang_thai,bang_chung,ghi_chu
+-1,Hoàn thành,16tests;12selftests;guard/path/alias/checks,synthetic và supplement-001; normal-control thực không đạt abstention được báo
+-2,Hoàn thành,9mục hồ sơ; ví dụ độc lập2226check,ho-so-simplerca.md;vi-du-tinh-tay.md;example-comparison-v2.json
++1,Hoàn thành,25tests;13selftests;N1 exact-ID/resolve/predicate;N2 normal-only log,fix-n1n2-001/unit-tests.txt;supplement-002/guard-check.json;control thực vẫn không đạt abstention
++2,Hoàn thành,9mục hồ sơ; ví dụ độc lập2458check,ho-so-simplerca.md;fix-n1n2-001/verification.json
+ 3,Hoàn thành,PDF20/23trang;ảnhbảng2/3;Type và tỷ lệ riêng,sources/pdf-manifest.json;type-i-ii.md;CSV literal
+ 4,Hoàn thành trong giới hạn,3revision/70blob/license/Zenodo và FSEartifact,"doi-chieu-code.md;code/config sinh0,80 cònOPEN"
+-5,Hoàn thành kiểm dev,"30dev,repeat/permutation2case;normal-control báo kết quả bất lợi",run-dev-004;ca-da-chay.csv;không mở locked
++5,Hoàn thành kiểm dev,run-dev-005:30dev khớp run004;repeat/permutation2ca,fix-n1n2-001/verification.json;nguồn hash khớp;không mở locked
+ 6,Hoàn thành,"4file bắt buộc,16cột đúngprompt,11rows;nhápWHY;audit T000–012 liên quan",CSV/input_requirements.py;dinh-chinh-task-cu.md;không tái thực nghiệm mọi task
+-7,Hoàn thành khi bàn giao,inventory/LOG6ý/A–H/prompt/STATE và phạm vi,handoff-check.json;state-edit-check.json;phần chưa kiểm ởkiem-dung-dan.md
++7,Đã sửa N1/N2; chờ Minh duyệt kết quả,LOG;STATE;manifest thay đổi sau sửa;giữ inventory cũ,fix-n1n2-001/;không mở vòng review mới;OPEN khác giữ nguyên
+--- D:\RCA-flashticket\results\T-017\ho-so-simplerca.md before
++++ D:\RCA-flashticket\results\T-017\ho-so-simplerca.md
+@@ -8,7 +8,7 @@
+ 
+ SimpleRCA là heuristic (luật kinh nghiệm) xếp hạng service theo số cảnh báo metric, trace và log. Bài dùng nó để khảo sát dataset. Thuật toán không tự chứng minh nguyên nhân nhân quả, không học từ nhãn root, không cung cấp detector sự cố trực tuyến đã hiệu chỉnh.
+ 
+-Bản này nhận hai cửa sổ số đo normal và incident. Adapter biết trước mốc t từ metadata, chia `[t−300,t)` và `[t,t+300)`; lõi chỉ nhận các mảng đã chia. Đầu vào gồm metric time series (chuỗi thời gian), trace span duration theo service và thông điệp log theo service. Thiếu log vẫn chạy, nhưng không diễn giải phiếu log0 là đã quan sát không có lỗi. Service/entity chỉ xuất hiện trong một modality vẫn là ứng viên; DB giữ riêng khi chưa có alias kiến trúc. Danh sách ứng viên không suy từ nhãn bị tiêm.
++Bản này nhận hai cửa sổ số đo normal và incident. Adapter biết trước mốc t từ metadata, chia `[t−300,t)` và `[t,t+300)`; lõi chỉ nhận các mảng đã chia. Đầu vào gồm metric time series (chuỗi thời gian), trace span duration theo service và thông điệp log theo service. Thiếu log vẫn chạy, nhưng không diễn giải phiếu log0 là đã quan sát không có lỗi. Service/entity quan sát ở một trong hai cửa sổ vẫn là ứng viên, kể cả chỉ có log normal; ERROR trong normal không tạo phiếu log. Adapter truyền riêng observed_services đã chuẩn hóa; DB giữ riêng khi chưa có alias kiến trúc. Danh sách ứng viên không suy từ nhãn bị tiêm.
+ 
+ Metadata thời gian phải đúng đơn vị, ba nguồn phải có service identity (định danh) khớp hoặc alias tường minh. Minimum normal2 finite/metric,1 span/phía chỉ là điều kiện tính toán; chưa chứng minh đủ mẫu để ước lượng normal ổn định. Lõi có thể dùng một modality còn đủ dữ liệu, nhưng không coi điểm partial-modality là ngang điều kiện với đủ ba nguồn. Adapter RCAEval `prepare` vẫn yêu cầu bảng `metrics.time` để chia cửa sổ; dữ liệu thuần log/trace ở hệ khác phải cung cấp maps đã chia cho lõi hoặc adapter tương ứng, không truyền None vào bảng metrics.
+ 
+@@ -60,8 +60,8 @@
+ | Metric aggregation | events | `src/simplerca/core.py:20` |
+ | Minimum normal metric | 2 finite | `src/simplerca/core.py:21` |
+ | Std denominator | ddof0 | `src/simplerca/core.py:67` |
+-| Window | half300s mỗi phía | `src/simplerca/adapter.py:19` |
+-| Alias | giữ tên mặc định, mapping tường minh | `src/simplerca/adapter.py:10` |
++| Window | half300s mỗi phía | `src/simplerca/adapter.py:30` |
++| Alias | giữ tên mặc định, mapping tường minh | `src/simplerca/adapter.py:21` |
+ | Hòa/abstain | lexical hiển thị; tie group; allzero | `src/simplerca/core.py:103`; `src/simplerca/core.py:109` |
+ 
+ Tham số nháp WHY chưa duyệt không trở thành mặc định nghiên cứu chính thức. Cấu hình đầy đủ từng lượt ở JSON; environment ghim trong `requirements.lock`.
+@@ -109,3 +109,9 @@
+ Điểm dev: Hit@1=0.833333 (25/30), Hit@3/5=0.966667, MRR=0.891111, nguồn `runs/final-summary.json` và `diem-dev.csv`. Bảng2 công bố RE2-TT0,80 trên90ca (`so-cong-bo.csv`). **Chưa tái lập số công bố**:60ca bị khóa, không có kết quả tác giả cho30dev ở nguồn đã kiểm, code/config sinh bảng chưa xác định. Không lấy chênh số làm bằng chứng tốt hơn hay tái lập thành công.
+ 
+ Luật TypeI/II và tỷ lệ nguyên PDF nằm riêng `type-i-ii.md`/`ty-le-type-cong-bo.csv`. Nó cần nhãn injection/root và còn OPEN về threshold/aggregation; không phải output SimpleRCA, không tự tính trên dataset mới.
++
++## Cập nhật N1/N2 — 04/10/2026
++
++Minh đã duyệt sửa. Runner và bộ lọc artifact dùng manifest 30 ca cố định; runner kiểm exact-set và danh tính resolve trước tạo run/đọc nguồn. `prepare` trả NamedTuple PreparedInputs: normal_metrics, incident_metrics, normal_traces, incident_traces, incident_logs, metric_services, observed_services. Metadata ví dụ normalized giữ observed_services, không có message log normal. Cửa sổ đếm log lỗi vẫn chỉ incident; service chỉ normal có score0.
++
++Run-dev-005 khớp 30 diagnosis và toàn bộ output phụ với run004; điểm công bố trong hồ sơ không đổi. Kiểm mới 25 unittest/13 self-test/2.458 so ví dụ có chứng cứ tại `runs/fix-n1n2-001/verification.json` và `kiem-dung-dan.md`. File kết quả và inventory cũ giữ làm snapshot bàn giao; không gọi đây là tái lập full90 hoặc detector đã hiệu chỉnh.
+--- D:\RCA-flashticket\results\T-017\yeu-cau-dau-vao.csv before
++++ D:\RCA-flashticket\results\T-017\yeu-cau-dau-vao.csv
+@@ -1,12 +1,12 @@
+ phuong_phap,bien_the,vai_tro,tin_hieu_bat_buoc,tin_hieu_tuy_chon,dinh_dang_va_ten_cot_can,can_do_thi,can_moc_su_co,du_lieu_binh_thuong_toi_thieu,can_nhan_de_hoc,don_vi_xep_hang,tham_so_mac_dinh_quan_trong,phu_thuoc_do_dai_cua_so,chi_phi,duong_nhan_rui_ro,ghi_chu
+-SimpleRCA (M4 theo mô tả bài),primary events sigma log0 half300,xếp hạng ứng viên service biết trước thời điểm,ít nhất một modality khả dụng; bản đủ ba nguồn cần metric+trace+log,các modality còn lại; thiếu ghi unavailable,lõi nhận maps đã chia window; adapter RCAEval prepare bắt buộc bảng metric.time(seconds epoch) dù không có metric channel; metric service_metric; trace serviceName/startTime(microsecond epoch)/duration(cùng unit hai cửa sổ); log timestamp(seconds epoch)/container_name/message; aliases tường minh; chua_kiem: đơn vị vật lý duration,không; không dùng parentSpanID hoặc statusCode,adapter cần t chia normal/incident; từ injection chỉ hợp chế độ biết mốc; lõi không nhận t,metric >=2 finite/channel; trace >=1 duration/service; log fixed threshold không cần normal. Đây là tối thiểu toán học; chưa đủ hiệu chỉnh statistical false alerts,không nhãn root/fault; mốc là đầu vào known-incident; root chỉ chấm sau serialize,service/entity quan sát được (union); DB giữ riêng khi chưa có alias kiến trúc; tie groups; lexical chỉ hiển thị; allzero abstain,metric mean+3std0; events; P95linear trace>3x; log substr ERROR/FAIL/EXCEPTION count>0; window half300s,có; metric event-count tăng theo length/sampling/channel; P95/log count đổi theo window; không so score thô giữa dataset,chua_kiem: cost/thời gian chính thức vì laptop dùng chung; scan metric cells/log chars/span values và quantiles/grouping; chạy từng ca; paper RE2TT5.99s/case khác code/hardware,root/path/fault/Type hoặc SLI chọn theo root; injection trong self-detection; file boundary tiết lộ injection; aliases không theo root,"(chờ WHY, xem de-xuat-tai-lieu-chung.md); chưa xác định program sinh0.80; normal/normal thực có alert; không calibrated cause detector"
+-SimpleRCA (M4 theo mô tả bài),metric P95,xếp hạng ứng viên service biết trước thời điểm,ít nhất một modality khả dụng; bản đủ ba nguồn cần metric+trace+log,các modality còn lại; thiếu ghi unavailable,lõi nhận maps đã chia window; adapter RCAEval prepare bắt buộc bảng metric.time(seconds epoch) dù không có metric channel; metric service_metric; trace serviceName/startTime(microsecond epoch)/duration(cùng unit hai cửa sổ); log timestamp(seconds epoch)/container_name/message; aliases tường minh; chua_kiem: đơn vị vật lý duration,không; không dùng parentSpanID hoặc statusCode,adapter cần t chia normal/incident; từ injection chỉ hợp chế độ biết mốc; lõi không nhận t,metric >=2 finite/channel; trace >=1 duration/service; log fixed threshold không cần normal. Đây là tối thiểu toán học; chưa đủ hiệu chỉnh statistical false alerts,không nhãn root/fault; mốc là đầu vào known-incident; root chỉ chấm sau serialize,service/entity quan sát được (union); DB giữ riêng khi chưa có alias kiến trúc; tie groups; lexical chỉ hiển thị; allzero abstain,đổi metric threshold=historical P95linear; còn lại primary,có; metric event-count tăng theo length/sampling/channel; P95/log count đổi theo window; không so score thô giữa dataset,chua_kiem: cost/thời gian chính thức vì laptop dùng chung; scan metric cells/log chars/span values và quantiles/grouping; chạy từng ca; paper RE2TT5.99s/case khác code/hardware,root/path/fault/Type hoặc SLI chọn theo root; injection trong self-detection; file boundary tiết lộ injection; aliases không theo root,"(chờ WHY, xem de-xuat-tai-lieu-chung.md); chưa xác định program sinh0.80; normal/normal thực có alert; không calibrated cause detector"
+-SimpleRCA (M4 theo mô tả bài),metric channels,xếp hạng ứng viên service biết trước thời điểm,ít nhất một modality khả dụng; bản đủ ba nguồn cần metric+trace+log,các modality còn lại; thiếu ghi unavailable,lõi nhận maps đã chia window; adapter RCAEval prepare bắt buộc bảng metric.time(seconds epoch) dù không có metric channel; metric service_metric; trace serviceName/startTime(microsecond epoch)/duration(cùng unit hai cửa sổ); log timestamp(seconds epoch)/container_name/message; aliases tường minh; chua_kiem: đơn vị vật lý duration,không; không dùng parentSpanID hoặc statusCode,adapter cần t chia normal/incident; từ injection chỉ hợp chế độ biết mốc; lõi không nhận t,metric >=2 finite/channel; trace >=1 duration/service; log fixed threshold không cần normal. Đây là tối thiểu toán học; chưa đủ hiệu chỉnh statistical false alerts,không nhãn root/fault; mốc là đầu vào known-incident; root chỉ chấm sau serialize,service/entity quan sát được (union); DB giữ riêng khi chưa có alias kiến trúc; tie groups; lexical chỉ hiển thị; allzero abstain,mỗi metric có bất kỳ vượt ngưỡng chỉ1phiếu; còn lại primary,có; metric event-count tăng theo length/sampling/channel; P95/log count đổi theo window; không so score thô giữa dataset,chua_kiem: cost/thời gian chính thức vì laptop dùng chung; scan metric cells/log chars/span values và quantiles/grouping; chạy từng ca; paper RE2TT5.99s/case khác code/hardware,root/path/fault/Type hoặc SLI chọn theo root; injection trong self-detection; file boundary tiết lộ injection; aliases không theo root,"(chờ WHY, xem de-xuat-tai-lieu-chung.md); chưa xác định program sinh0.80; normal/normal thực có alert; không calibrated cause detector"
+-SimpleRCA (M4 theo mô tả bài),log threshold1,xếp hạng ứng viên service biết trước thời điểm,ít nhất một modality khả dụng; bản đủ ba nguồn cần metric+trace+log,các modality còn lại; thiếu ghi unavailable,lõi nhận maps đã chia window; adapter RCAEval prepare bắt buộc bảng metric.time(seconds epoch) dù không có metric channel; metric service_metric; trace serviceName/startTime(microsecond epoch)/duration(cùng unit hai cửa sổ); log timestamp(seconds epoch)/container_name/message; aliases tường minh; chua_kiem: đơn vị vật lý duration,không; không dùng parentSpanID hoặc statusCode,adapter cần t chia normal/incident; từ injection chỉ hợp chế độ biết mốc; lõi không nhận t,metric >=2 finite/channel; trace >=1 duration/service; log fixed threshold không cần normal. Đây là tối thiểu toán học; chưa đủ hiệu chỉnh statistical false alerts,không nhãn root/fault; mốc là đầu vào known-incident; root chỉ chấm sau serialize,service/entity quan sát được (union); DB giữ riêng khi chưa có alias kiến trúc; tie groups; lexical chỉ hiển thị; allzero abstain,log count>1; còn lại primary,có; metric event-count tăng theo length/sampling/channel; P95/log count đổi theo window; không so score thô giữa dataset,chua_kiem: cost/thời gian chính thức vì laptop dùng chung; scan metric cells/log chars/span values và quantiles/grouping; chạy từng ca; paper RE2TT5.99s/case khác code/hardware,root/path/fault/Type hoặc SLI chọn theo root; injection trong self-detection; file boundary tiết lộ injection; aliases không theo root,"(chờ WHY, xem de-xuat-tai-lieu-chung.md); chưa xác định program sinh0.80; normal/normal thực có alert; không calibrated cause detector"
+-SimpleRCA (M4 theo mô tả bài),log threshold10,xếp hạng ứng viên service biết trước thời điểm,ít nhất một modality khả dụng; bản đủ ba nguồn cần metric+trace+log,các modality còn lại; thiếu ghi unavailable,lõi nhận maps đã chia window; adapter RCAEval prepare bắt buộc bảng metric.time(seconds epoch) dù không có metric channel; metric service_metric; trace serviceName/startTime(microsecond epoch)/duration(cùng unit hai cửa sổ); log timestamp(seconds epoch)/container_name/message; aliases tường minh; chua_kiem: đơn vị vật lý duration,không; không dùng parentSpanID hoặc statusCode,adapter cần t chia normal/incident; từ injection chỉ hợp chế độ biết mốc; lõi không nhận t,metric >=2 finite/channel; trace >=1 duration/service; log fixed threshold không cần normal. Đây là tối thiểu toán học; chưa đủ hiệu chỉnh statistical false alerts,không nhãn root/fault; mốc là đầu vào known-incident; root chỉ chấm sau serialize,service/entity quan sát được (union); DB giữ riêng khi chưa có alias kiến trúc; tie groups; lexical chỉ hiển thị; allzero abstain,log count>10; còn lại primary,có; metric event-count tăng theo length/sampling/channel; P95/log count đổi theo window; không so score thô giữa dataset,chua_kiem: cost/thời gian chính thức vì laptop dùng chung; scan metric cells/log chars/span values và quantiles/grouping; chạy từng ca; paper RE2TT5.99s/case khác code/hardware,root/path/fault/Type hoặc SLI chọn theo root; injection trong self-detection; file boundary tiết lộ injection; aliases không theo root,"(chờ WHY, xem de-xuat-tai-lieu-chung.md); chưa xác định program sinh0.80; normal/normal thực có alert; không calibrated cause detector"
+-SimpleRCA (M4 theo mô tả bài),trace factor2,xếp hạng ứng viên service biết trước thời điểm,ít nhất một modality khả dụng; bản đủ ba nguồn cần metric+trace+log,các modality còn lại; thiếu ghi unavailable,lõi nhận maps đã chia window; adapter RCAEval prepare bắt buộc bảng metric.time(seconds epoch) dù không có metric channel; metric service_metric; trace serviceName/startTime(microsecond epoch)/duration(cùng unit hai cửa sổ); log timestamp(seconds epoch)/container_name/message; aliases tường minh; chua_kiem: đơn vị vật lý duration,không; không dùng parentSpanID hoặc statusCode,adapter cần t chia normal/incident; từ injection chỉ hợp chế độ biết mốc; lõi không nhận t,metric >=2 finite/channel; trace >=1 duration/service; log fixed threshold không cần normal. Đây là tối thiểu toán học; chưa đủ hiệu chỉnh statistical false alerts,không nhãn root/fault; mốc là đầu vào known-incident; root chỉ chấm sau serialize,service/entity quan sát được (union); DB giữ riêng khi chưa có alias kiến trúc; tie groups; lexical chỉ hiển thị; allzero abstain,trace P95 incident>2x normal; còn lại primary,có; metric event-count tăng theo length/sampling/channel; P95/log count đổi theo window; không so score thô giữa dataset,chua_kiem: cost/thời gian chính thức vì laptop dùng chung; scan metric cells/log chars/span values và quantiles/grouping; chạy từng ca; paper RE2TT5.99s/case khác code/hardware,root/path/fault/Type hoặc SLI chọn theo root; injection trong self-detection; file boundary tiết lộ injection; aliases không theo root,"(chờ WHY, xem de-xuat-tai-lieu-chung.md); chưa xác định program sinh0.80; normal/normal thực có alert; không calibrated cause detector"
+-SimpleRCA (M4 theo mô tả bài),trace factor4,xếp hạng ứng viên service biết trước thời điểm,ít nhất một modality khả dụng; bản đủ ba nguồn cần metric+trace+log,các modality còn lại; thiếu ghi unavailable,lõi nhận maps đã chia window; adapter RCAEval prepare bắt buộc bảng metric.time(seconds epoch) dù không có metric channel; metric service_metric; trace serviceName/startTime(microsecond epoch)/duration(cùng unit hai cửa sổ); log timestamp(seconds epoch)/container_name/message; aliases tường minh; chua_kiem: đơn vị vật lý duration,không; không dùng parentSpanID hoặc statusCode,adapter cần t chia normal/incident; từ injection chỉ hợp chế độ biết mốc; lõi không nhận t,metric >=2 finite/channel; trace >=1 duration/service; log fixed threshold không cần normal. Đây là tối thiểu toán học; chưa đủ hiệu chỉnh statistical false alerts,không nhãn root/fault; mốc là đầu vào known-incident; root chỉ chấm sau serialize,service/entity quan sát được (union); DB giữ riêng khi chưa có alias kiến trúc; tie groups; lexical chỉ hiển thị; allzero abstain,trace P95 incident>4x normal; còn lại primary,có; metric event-count tăng theo length/sampling/channel; P95/log count đổi theo window; không so score thô giữa dataset,chua_kiem: cost/thời gian chính thức vì laptop dùng chung; scan metric cells/log chars/span values và quantiles/grouping; chạy từng ca; paper RE2TT5.99s/case khác code/hardware,root/path/fault/Type hoặc SLI chọn theo root; injection trong self-detection; file boundary tiết lộ injection; aliases không theo root,"(chờ WHY, xem de-xuat-tai-lieu-chung.md); chưa xác định program sinh0.80; normal/normal thực có alert; không calibrated cause detector"
+-SimpleRCA (M4 theo mô tả bài),window half600,xếp hạng ứng viên service biết trước thời điểm,ít nhất một modality khả dụng; bản đủ ba nguồn cần metric+trace+log,các modality còn lại; thiếu ghi unavailable,lõi nhận maps đã chia window; adapter RCAEval prepare bắt buộc bảng metric.time(seconds epoch) dù không có metric channel; metric service_metric; trace serviceName/startTime(microsecond epoch)/duration(cùng unit hai cửa sổ); log timestamp(seconds epoch)/container_name/message; aliases tường minh; chua_kiem: đơn vị vật lý duration,không; không dùng parentSpanID hoặc statusCode,adapter cần t chia normal/incident; từ injection chỉ hợp chế độ biết mốc; lõi không nhận t,metric >=2 finite/channel; trace >=1 duration/service; log fixed threshold không cần normal. Đây là tối thiểu toán học; chưa đủ hiệu chỉnh statistical false alerts,không nhãn root/fault; mốc là đầu vào known-incident; root chỉ chấm sau serialize,service/entity quan sát được (union); DB giữ riêng khi chưa có alias kiến trúc; tie groups; lexical chỉ hiển thị; allzero abstain,"normal[t-600,t),incident[t,t+600); còn lại primary",có; metric event-count tăng theo length/sampling/channel; P95/log count đổi theo window; không so score thô giữa dataset,chua_kiem: cost/thời gian chính thức vì laptop dùng chung; scan metric cells/log chars/span values và quantiles/grouping; chạy từng ca; paper RE2TT5.99s/case khác code/hardware,root/path/fault/Type hoặc SLI chọn theo root; injection trong self-detection; file boundary tiết lộ injection; aliases không theo root,"(chờ WHY, xem de-xuat-tai-lieu-chung.md); chưa xác định program sinh0.80; normal/normal thực có alert; không calibrated cause detector"
+-SimpleRCA (M4 theo mô tả bài),metric rule,rule tạo alert nội bộ; không là detector streaming đã đánh giá,metric time+service_metric,không,lõi nhận maps đã chia window; adapter RCAEval prepare bắt buộc bảng metric.time(seconds epoch) dù không có metric channel; metric service_metric; trace serviceName/startTime(microsecond epoch)/duration(cùng unit hai cửa sổ); log timestamp(seconds epoch)/container_name/message; aliases tường minh; chua_kiem: đơn vị vật lý duration,không; không dùng parentSpanID hoặc statusCode,adapter cần t chia normal/incident; từ injection chỉ hợp chế độ biết mốc; lõi không nhận t,>=2 finite historical points/channel,không nhãn root/fault; mốc là đầu vào known-incident; root chỉ chấm sau serialize,alert/channel hoặc service; không riêng root ranking,mean+3std0 hoặc P95; mỗi point>threshold alert,có; metric event-count tăng theo length/sampling/channel; P95/log count đổi theo window; không so score thô giữa dataset,chua_kiem: thời gian riêng chính thức; scan dữ liệu modality và quantile nếu có,root/path/fault/Type hoặc SLI chọn theo root; injection trong self-detection; file boundary tiết lộ injection; aliases không theo root,"(chờ WHY, xem de-xuat-tai-lieu-chung.md); chưa xác định program sinh0.80; normal/normal thực có alert; không calibrated cause detector"
+-SimpleRCA (M4 theo mô tả bài),trace rule,rule tạo alert nội bộ; không là detector streaming đã đánh giá,trace service+duration hai cửa sổ,không,lõi nhận maps đã chia window; adapter RCAEval prepare bắt buộc bảng metric.time(seconds epoch) dù không có metric channel; metric service_metric; trace serviceName/startTime(microsecond epoch)/duration(cùng unit hai cửa sổ); log timestamp(seconds epoch)/container_name/message; aliases tường minh; chua_kiem: đơn vị vật lý duration,không; không dùng parentSpanID hoặc statusCode,adapter cần t chia normal/incident; từ injection chỉ hợp chế độ biết mốc; lõi không nhận t,>=1 span mỗi service mỗi cửa sổ,không nhãn root/fault; mốc là đầu vào known-incident; root chỉ chấm sau serialize,alert/channel hoặc service; không riêng root ranking,P95linear; factor3; strict>,có; metric event-count tăng theo length/sampling/channel; P95/log count đổi theo window; không so score thô giữa dataset,chua_kiem: thời gian riêng chính thức; scan dữ liệu modality và quantile nếu có,root/path/fault/Type hoặc SLI chọn theo root; injection trong self-detection; file boundary tiết lộ injection; aliases không theo root,"(chờ WHY, xem de-xuat-tai-lieu-chung.md); chưa xác định program sinh0.80; normal/normal thực có alert; không calibrated cause detector"
+-SimpleRCA (M4 theo mô tả bài),log rule,rule tạo alert nội bộ; không là detector streaming đã đánh giá,log service+message cửa sổ incident,không,lõi nhận maps đã chia window; adapter RCAEval prepare bắt buộc bảng metric.time(seconds epoch) dù không có metric channel; metric service_metric; trace serviceName/startTime(microsecond epoch)/duration(cùng unit hai cửa sổ); log timestamp(seconds epoch)/container_name/message; aliases tường minh; chua_kiem: đơn vị vật lý duration,không; không dùng parentSpanID hoặc statusCode,adapter cần t chia normal/incident; từ injection chỉ hợp chế độ biết mốc; lõi không nhận t,không cho fixed threshold; baseline không được dùng để hiệu chỉnh spike,không nhãn root/fault; mốc là đầu vào known-incident; root chỉ chấm sau serialize,alert/channel hoặc service; không riêng root ranking,ERROR/FAIL/EXCEPTION case-insensitive substring; một count/dòng; count>0,có; metric event-count tăng theo length/sampling/channel; P95/log count đổi theo window; không so score thô giữa dataset,chua_kiem: thời gian riêng chính thức; scan dữ liệu modality và quantile nếu có,root/path/fault/Type hoặc SLI chọn theo root; injection trong self-detection; file boundary tiết lộ injection; aliases không theo root,"(chờ WHY, xem de-xuat-tai-lieu-chung.md); chưa xác định program sinh0.80; normal/normal thực có alert; không calibrated cause detector"
++SimpleRCA (M4 theo mô tả bài),primary events sigma log0 half300,xếp hạng ứng viên service biết trước thời điểm,ít nhất một modality khả dụng; bản đủ ba nguồn cần metric+trace+log,các modality còn lại; thiếu ghi unavailable,lõi nhận maps đã chia window và observed_services đã chuẩn hóa; adapter RCAEval prepare bắt buộc bảng metric.time(seconds epoch) dù không có metric channel; metric service_metric; trace serviceName/startTime(microsecond epoch)/duration(cùng unit hai cửa sổ); log timestamp(seconds epoch)/container_name/message; aliases tường minh; chua_kiem: đơn vị vật lý duration,không; không dùng parentSpanID hoặc statusCode,adapter cần t chia normal/incident; từ injection chỉ hợp chế độ biết mốc; lõi không nhận t,metric >=2 finite/channel; trace >=1 duration/service; log fixed threshold không cần normal. Đây là tối thiểu toán học; chưa đủ hiệu chỉnh statistical false alerts,không nhãn root/fault; mốc là đầu vào known-incident; root chỉ chấm sau serialize,service/entity quan sát ở hai cửa sổ (union; normal-only log score0; lỗi log chỉ incident); DB giữ riêng khi chưa có alias kiến trúc; tie groups; lexical chỉ hiển thị; allzero abstain,metric mean+3std0; events; P95linear trace>3x; log substr ERROR/FAIL/EXCEPTION count>0; window half300s,có; metric event-count tăng theo length/sampling/channel; P95/log count đổi theo window; không so score thô giữa dataset,chua_kiem: cost/thời gian chính thức vì laptop dùng chung; scan metric cells/log chars/span values và quantiles/grouping; chạy từng ca; paper RE2TT5.99s/case khác code/hardware,root/path/fault/Type hoặc SLI chọn theo root; injection trong self-detection; file boundary tiết lộ injection; aliases không theo root,"(chờ WHY, xem de-xuat-tai-lieu-chung.md); chưa xác định program sinh0.80; normal/normal thực có alert; không calibrated cause detector"
++SimpleRCA (M4 theo mô tả bài),metric P95,xếp hạng ứng viên service biết trước thời điểm,ít nhất một modality khả dụng; bản đủ ba nguồn cần metric+trace+log,các modality còn lại; thiếu ghi unavailable,lõi nhận maps đã chia window và observed_services đã chuẩn hóa; adapter RCAEval prepare bắt buộc bảng metric.time(seconds epoch) dù không có metric channel; metric service_metric; trace serviceName/startTime(microsecond epoch)/duration(cùng unit hai cửa sổ); log timestamp(seconds epoch)/container_name/message; aliases tường minh; chua_kiem: đơn vị vật lý duration,không; không dùng parentSpanID hoặc statusCode,adapter cần t chia normal/incident; từ injection chỉ hợp chế độ biết mốc; lõi không nhận t,metric >=2 finite/channel; trace >=1 duration/service; log fixed threshold không cần normal. Đây là tối thiểu toán học; chưa đủ hiệu chỉnh statistical false alerts,không nhãn root/fault; mốc là đầu vào known-incident; root chỉ chấm sau serialize,service/entity quan sát ở hai cửa sổ (union; normal-only log score0; lỗi log chỉ incident); DB giữ riêng khi chưa có alias kiến trúc; tie groups; lexical chỉ hiển thị; allzero abstain,đổi metric threshold=historical P95linear; còn lại primary,có; metric event-count tăng theo length/sampling/channel; P95/log count đổi theo window; không so score thô giữa dataset,chua_kiem: cost/thời gian chính thức vì laptop dùng chung; scan metric cells/log chars/span values và quantiles/grouping; chạy từng ca; paper RE2TT5.99s/case khác code/hardware,root/path/fault/Type hoặc SLI chọn theo root; injection trong self-detection; file boundary tiết lộ injection; aliases không theo root,"(chờ WHY, xem de-xuat-tai-lieu-chung.md); chưa xác định program sinh0.80; normal/normal thực có alert; không calibrated cause detector"
++SimpleRCA (M4 theo mô tả bài),metric channels,xếp hạng ứng viên service biết trước thời điểm,ít nhất một modality khả dụng; bản đủ ba nguồn cần metric+trace+log,các modality còn lại; thiếu ghi unavailable,lõi nhận maps đã chia window và observed_services đã chuẩn hóa; adapter RCAEval prepare bắt buộc bảng metric.time(seconds epoch) dù không có metric channel; metric service_metric; trace serviceName/startTime(microsecond epoch)/duration(cùng unit hai cửa sổ); log timestamp(seconds epoch)/container_name/message; aliases tường minh; chua_kiem: đơn vị vật lý duration,không; không dùng parentSpanID hoặc statusCode,adapter cần t chia normal/incident; từ injection chỉ hợp chế độ biết mốc; lõi không nhận t,metric >=2 finite/channel; trace >=1 duration/service; log fixed threshold không cần normal. Đây là tối thiểu toán học; chưa đủ hiệu chỉnh statistical false alerts,không nhãn root/fault; mốc là đầu vào known-incident; root chỉ chấm sau serialize,service/entity quan sát ở hai cửa sổ (union; normal-only log score0; lỗi log chỉ incident); DB giữ riêng khi chưa có alias kiến trúc; tie groups; lexical chỉ hiển thị; allzero abstain,mỗi metric có bất kỳ vượt ngưỡng chỉ1phiếu; còn lại primary,có; metric event-count tăng theo length/sampling/channel; P95/log count đổi theo window; không so score thô giữa dataset,chua_kiem: cost/thời gian chính thức vì laptop dùng chung; scan metric cells/log chars/span values và quantiles/grouping; chạy từng ca; paper RE2TT5.99s/case khác code/hardware,root/path/fault/Type hoặc SLI chọn theo root; injection trong self-detection; file boundary tiết lộ injection; aliases không theo root,"(chờ WHY, xem de-xuat-tai-lieu-chung.md); chưa xác định program sinh0.80; normal/normal thực có alert; không calibrated cause detector"
++SimpleRCA (M4 theo mô tả bài),log threshold1,xếp hạng ứng viên service biết trước thời điểm,ít nhất một modality khả dụng; bản đủ ba nguồn cần metric+trace+log,các modality còn lại; thiếu ghi unavailable,lõi nhận maps đã chia window và observed_services đã chuẩn hóa; adapter RCAEval prepare bắt buộc bảng metric.time(seconds epoch) dù không có metric channel; metric service_metric; trace serviceName/startTime(microsecond epoch)/duration(cùng unit hai cửa sổ); log timestamp(seconds epoch)/container_name/message; aliases tường minh; chua_kiem: đơn vị vật lý duration,không; không dùng parentSpanID hoặc statusCode,adapter cần t chia normal/incident; từ injection chỉ hợp chế độ biết mốc; lõi không nhận t,metric >=2 finite/channel; trace >=1 duration/service; log fixed threshold không cần normal. Đây là tối thiểu toán học; chưa đủ hiệu chỉnh statistical false alerts,không nhãn root/fault; mốc là đầu vào known-incident; root chỉ chấm sau serialize,service/entity quan sát ở hai cửa sổ (union; normal-only log score0; lỗi log chỉ incident); DB giữ riêng khi chưa có alias kiến trúc; tie groups; lexical chỉ hiển thị; allzero abstain,log count>1; còn lại primary,có; metric event-count tăng theo length/sampling/channel; P95/log count đổi theo window; không so score thô giữa dataset,chua_kiem: cost/thời gian chính thức vì laptop dùng chung; scan metric cells/log chars/span values và quantiles/grouping; chạy từng ca; paper RE2TT5.99s/case khác code/hardware,root/path/fault/Type hoặc SLI chọn theo root; injection trong self-detection; file boundary tiết lộ injection; aliases không theo root,"(chờ WHY, xem de-xuat-tai-lieu-chung.md); chưa xác định program sinh0.80; normal/normal thực có alert; không calibrated cause detector"
++SimpleRCA (M4 theo mô tả bài),log threshold10,xếp hạng ứng viên service biết trước thời điểm,ít nhất một modality khả dụng; bản đủ ba nguồn cần metric+trace+log,các modality còn lại; thiếu ghi unavailable,lõi nhận maps đã chia window và observed_services đã chuẩn hóa; adapter RCAEval prepare bắt buộc bảng metric.time(seconds epoch) dù không có metric channel; metric service_metric; trace serviceName/startTime(microsecond epoch)/duration(cùng unit hai cửa sổ); log timestamp(seconds epoch)/container_name/message; aliases tường minh; chua_kiem: đơn vị vật lý duration,không; không dùng parentSpanID hoặc statusCode,adapter cần t chia normal/incident; từ injection chỉ hợp chế độ biết mốc; lõi không nhận t,metric >=2 finite/channel; trace >=1 duration/service; log fixed threshold không cần normal. Đây là tối thiểu toán học; chưa đủ hiệu chỉnh statistical false alerts,không nhãn root/fault; mốc là đầu vào known-incident; root chỉ chấm sau serialize,service/entity quan sát ở hai cửa sổ (union; normal-only log score0; lỗi log chỉ incident); DB giữ riêng khi chưa có alias kiến trúc; tie groups; lexical chỉ hiển thị; allzero abstain,log count>10; còn lại primary,có; metric event-count tăng theo length/sampling/channel; P95/log count đổi theo window; không so score thô giữa dataset,chua_kiem: cost/thời gian chính thức vì laptop dùng chung; scan metric cells/log chars/span values và quantiles/grouping; chạy từng ca; paper RE2TT5.99s/case khác code/hardware,root/path/fault/Type hoặc SLI chọn theo root; injection trong self-detection; file boundary tiết lộ injection; aliases không theo root,"(chờ WHY, xem de-xuat-tai-lieu-chung.md); chưa xác định program sinh0.80; normal/normal thực có alert; không calibrated cause detector"
++SimpleRCA (M4 theo mô tả bài),trace factor2,xếp hạng ứng viên service biết trước thời điểm,ít nhất một modality khả dụng; bản đủ ba nguồn cần metric+trace+log,các modality còn lại; thiếu ghi unavailable,lõi nhận maps đã chia window và observed_services đã chuẩn hóa; adapter RCAEval prepare bắt buộc bảng metric.time(seconds epoch) dù không có metric channel; metric service_metric; trace serviceName/startTime(microsecond epoch)/duration(cùng unit hai cửa sổ); log timestamp(seconds epoch)/container_name/message; aliases tường minh; chua_kiem: đơn vị vật lý duration,không; không dùng parentSpanID hoặc statusCode,adapter cần t chia normal/incident; từ injection chỉ hợp chế độ biết mốc; lõi không nhận t,metric >=2 finite/channel; trace >=1 duration/service; log fixed threshold không cần normal. Đây là tối thiểu toán học; chưa đủ hiệu chỉnh statistical false alerts,không nhãn root/fault; mốc là đầu vào known-incident; root chỉ chấm sau serialize,service/entity quan sát ở hai cửa sổ (union; normal-only log score0; lỗi log chỉ incident); DB giữ riêng khi chưa có alias kiến trúc; tie groups; lexical chỉ hiển thị; allzero abstain,trace P95 incident>2x normal; còn lại primary,có; metric event-count tăng theo length/sampling/channel; P95/log count đổi theo window; không so score thô giữa dataset,chua_kiem: cost/thời gian chính thức vì laptop dùng chung; scan metric cells/log chars/span values và quantiles/grouping; chạy từng ca; paper RE2TT5.99s/case khác code/hardware,root/path/fault/Type hoặc SLI chọn theo root; injection trong self-detection; file boundary tiết lộ injection; aliases không theo root,"(chờ WHY, xem de-xuat-tai-lieu-chung.md); chưa xác định program sinh0.80; normal/normal thực có alert; không calibrated cause detector"
++SimpleRCA (M4 theo mô tả bài),trace factor4,xếp hạng ứng viên service biết trước thời điểm,ít nhất một modality khả dụng; bản đủ ba nguồn cần metric+trace+log,các modality còn lại; thiếu ghi unavailable,lõi nhận maps đã chia window và observed_services đã chuẩn hóa; adapter RCAEval prepare bắt buộc bảng metric.time(seconds epoch) dù không có metric channel; metric service_metric; trace serviceName/startTime(microsecond epoch)/duration(cùng unit hai cửa sổ); log timestamp(seconds epoch)/container_name/message; aliases tường minh; chua_kiem: đơn vị vật lý duration,không; không dùng parentSpanID hoặc statusCode,adapter cần t chia normal/incident; từ injection chỉ hợp chế độ biết mốc; lõi không nhận t,metric >=2 finite/channel; trace >=1 duration/service; log fixed threshold không cần normal. Đây là tối thiểu toán học; chưa đủ hiệu chỉnh statistical false alerts,không nhãn root/fault; mốc là đầu vào known-incident; root chỉ chấm sau serialize,service/entity quan sát ở hai cửa sổ (union; normal-only log score0; lỗi log chỉ incident); DB giữ riêng khi chưa có alias kiến trúc; tie groups; lexical chỉ hiển thị; allzero abstain,trace P95 incident>4x normal; còn lại primary,có; metric event-count tăng theo length/sampling/channel; P95/log count đổi theo window; không so score thô giữa dataset,chua_kiem: cost/thời gian chính thức vì laptop dùng chung; scan metric cells/log chars/span values và quantiles/grouping; chạy từng ca; paper RE2TT5.99s/case khác code/hardware,root/path/fault/Type hoặc SLI chọn theo root; injection trong self-detection; file boundary tiết lộ injection; aliases không theo root,"(chờ WHY, xem de-xuat-tai-lieu-chung.md); chưa xác định program sinh0.80; normal/normal thực có alert; không calibrated cause detector"
++SimpleRCA (M4 theo mô tả bài),window half600,xếp hạng ứng viên service biết trước thời điểm,ít nhất một modality khả dụng; bản đủ ba nguồn cần metric+trace+log,các modality còn lại; thiếu ghi unavailable,lõi nhận maps đã chia window và observed_services đã chuẩn hóa; adapter RCAEval prepare bắt buộc bảng metric.time(seconds epoch) dù không có metric channel; metric service_metric; trace serviceName/startTime(microsecond epoch)/duration(cùng unit hai cửa sổ); log timestamp(seconds epoch)/container_name/message; aliases tường minh; chua_kiem: đơn vị vật lý duration,không; không dùng parentSpanID hoặc statusCode,adapter cần t chia normal/incident; từ injection chỉ hợp chế độ biết mốc; lõi không nhận t,metric >=2 finite/channel; trace >=1 duration/service; log fixed threshold không cần normal. Đây là tối thiểu toán học; chưa đủ hiệu chỉnh statistical false alerts,không nhãn root/fault; mốc là đầu vào known-incident; root chỉ chấm sau serialize,service/entity quan sát ở hai cửa sổ (union; normal-only log score0; lỗi log chỉ incident); DB giữ riêng khi chưa có alias kiến trúc; tie groups; lexical chỉ hiển thị; allzero abstain,"normal[t-600,t),incident[t,t+600); còn lại primary",có; metric event-count tăng theo length/sampling/channel; P95/log count đổi theo window; không so score thô giữa dataset,chua_kiem: cost/thời gian chính thức vì laptop dùng chung; scan metric cells/log chars/span values và quantiles/grouping; chạy từng ca; paper RE2TT5.99s/case khác code/hardware,root/path/fault/Type hoặc SLI chọn theo root; injection trong self-detection; file boundary tiết lộ injection; aliases không theo root,"(chờ WHY, xem de-xuat-tai-lieu-chung.md); chưa xác định program sinh0.80; normal/normal thực có alert; không calibrated cause detector"
++SimpleRCA (M4 theo mô tả bài),metric rule,rule tạo alert nội bộ; không là detector streaming đã đánh giá,metric time+service_metric,không,lõi nhận maps đã chia window và observed_services đã chuẩn hóa; adapter RCAEval prepare bắt buộc bảng metric.time(seconds epoch) dù không có metric channel; metric service_metric; trace serviceName/startTime(microsecond epoch)/duration(cùng unit hai cửa sổ); log timestamp(seconds epoch)/container_name/message; aliases tường minh; chua_kiem: đơn vị vật lý duration,không; không dùng parentSpanID hoặc statusCode,adapter cần t chia normal/incident; từ injection chỉ hợp chế độ biết mốc; lõi không nhận t,>=2 finite historical points/channel,không nhãn root/fault; mốc là đầu vào known-incident; root chỉ chấm sau serialize,alert/channel hoặc service; không riêng root ranking,mean+3std0 hoặc P95; mỗi point>threshold alert,có; metric event-count tăng theo length/sampling/channel; P95/log count đổi theo window; không so score thô giữa dataset,chua_kiem: thời gian riêng chính thức; scan dữ liệu modality và quantile nếu có,root/path/fault/Type hoặc SLI chọn theo root; injection trong self-detection; file boundary tiết lộ injection; aliases không theo root,"(chờ WHY, xem de-xuat-tai-lieu-chung.md); chưa xác định program sinh0.80; normal/normal thực có alert; không calibrated cause detector"
++SimpleRCA (M4 theo mô tả bài),trace rule,rule tạo alert nội bộ; không là detector streaming đã đánh giá,trace service+duration hai cửa sổ,không,lõi nhận maps đã chia window và observed_services đã chuẩn hóa; adapter RCAEval prepare bắt buộc bảng metric.time(seconds epoch) dù không có metric channel; metric service_metric; trace serviceName/startTime(microsecond epoch)/duration(cùng unit hai cửa sổ); log timestamp(seconds epoch)/container_name/message; aliases tường minh; chua_kiem: đơn vị vật lý duration,không; không dùng parentSpanID hoặc statusCode,adapter cần t chia normal/incident; từ injection chỉ hợp chế độ biết mốc; lõi không nhận t,>=1 span mỗi service mỗi cửa sổ,không nhãn root/fault; mốc là đầu vào known-incident; root chỉ chấm sau serialize,alert/channel hoặc service; không riêng root ranking,P95linear; factor3; strict>,có; metric event-count tăng theo length/sampling/channel; P95/log count đổi theo window; không so score thô giữa dataset,chua_kiem: thời gian riêng chính thức; scan dữ liệu modality và quantile nếu có,root/path/fault/Type hoặc SLI chọn theo root; injection trong self-detection; file boundary tiết lộ injection; aliases không theo root,"(chờ WHY, xem de-xuat-tai-lieu-chung.md); chưa xác định program sinh0.80; normal/normal thực có alert; không calibrated cause detector"
++SimpleRCA (M4 theo mô tả bài),log rule,rule tạo alert nội bộ; không là detector streaming đã đánh giá,log service+message cửa sổ incident,không,lõi nhận maps đã chia window và observed_services đã chuẩn hóa; adapter RCAEval prepare bắt buộc bảng metric.time(seconds epoch) dù không có metric channel; metric service_metric; trace serviceName/startTime(microsecond epoch)/duration(cùng unit hai cửa sổ); log timestamp(seconds epoch)/container_name/message; aliases tường minh; chua_kiem: đơn vị vật lý duration,không; không dùng parentSpanID hoặc statusCode,adapter cần t chia normal/incident; từ injection chỉ hợp chế độ biết mốc; lõi không nhận t,không cho fixed threshold; baseline không được dùng để hiệu chỉnh spike,không nhãn root/fault; mốc là đầu vào known-incident; root chỉ chấm sau serialize,alert/channel hoặc service; không riêng root ranking,ERROR/FAIL/EXCEPTION case-insensitive substring; một count/dòng; count>0,có; metric event-count tăng theo length/sampling/channel; P95/log count đổi theo window; không so score thô giữa dataset,chua_kiem: thời gian riêng chính thức; scan dữ liệu modality và quantile nếu có,root/path/fault/Type hoặc SLI chọn theo root; injection trong self-detection; file boundary tiết lộ injection; aliases không theo root,"(chờ WHY, xem de-xuat-tai-lieu-chung.md); chưa xác định program sinh0.80; normal/normal thực có alert; không calibrated cause detector"
+--- D:\RCA-flashticket\tasks\T-017-simplerca\LOG.md before
++++ D:\RCA-flashticket\tasks\T-017-simplerca\LOG.md
+@@ -155,3 +155,20 @@
+ 4. Chưa chắc/cần Minh quyết: có sửa N1/N2 theo đề xuất gomfile hay không; có nhận ba đínhchínhT001 vànháp tài liệu chung đã có hay không. Chưa kiểm exactprogrambảng2/full90/Typeclassifier/physicalduration/costchínhthức vì các lý do đã ghi, không phát sinh quyền mở dữ liệu. N1/N2 đã kiểm được, không ghi chưa kiểm.
+ 5. Bước tiếp theo chính xác: Minh đọc hai dòng N1/N2 cuối tasks/T-017-simplerca/REVIEW.md và mục đề xuất gomfile này để quyết phạm vi sửa. Sau khi có quyết định, người làm đọc lại REVIEW, SPEC và mục cuốiLOG, rồi triển khai đúng phạm vi được duyệt; không chạy handoff.py --finalize để tránh sinh lại prompt liệt kê hàng nghìn file. Chưa có lệnh triển khai được duyệt trong phiên này.
+ 6. Lệnh cuối cùng: py -3 -X utf8 - nhận script read-only kiểm hash/phạm vi/15dòng bảng, nối mục kết thúc này rồi đọc lại REVIEW/LOG để xác nhận. Không commit/push.
++
++
++## Phiên sửa N1/N2 — 04/10/2026 — Codex — laptop Windows 11 — người làm
++
++Minh duyệt: “OK CHỐT SỬA”, sau review chỉ đọc N1/N2. EXECUTE đúng đề xuất gom theo file và các bổ sung đã nêu: kiểm danh tính sau resolve, test ERROR chỉ normal, cập nhật caller/export khi đổi prepared. Bản đồ ảnh hưởng: runner và bộ lọc dùng manifest cố định; adapter giữ union hai cửa sổ, phiếu log chỉ incident; test/kiểm bổ sung và báo cáo ghi chứng cứ mới. Không đổi core, ngưỡng hoặc SPEC; không mở review mới. Phạm vi đầu ra theo SPEC. Chạy lại 30 dev bằng run-dev-005; dự kiến 1–3 phút theo run004 73,15s, không phải cost chính thức. Giữ mọi lượt cũ; snapshot trước sửa tại results/T-017/runs/fix-n1n2-001/before.json.
++
++Bước 1: sửa N1/N2 và cập nhật caller/export. prepared dùng NamedTuple có trường observed_services; giữ nguyên 5 bảng đầu, metric_services truy cập bằng tên. Bản tính độc lập nhận danh tính từ metadata, không nhận log normal message. Bộ lọc artifact dùng load_allowlist chung; có helper import-safe để kiểm predicate bằng dữ liệu tổng hợp. 25/25 unittest đạt (0,168s chưa gồm khởi động), chứng cứ fix-n1n2-001/unit-tests.txt. Hai lệnh apply_patch cho supplement không khớp do dòng trống trong ngữ cảnh; chưa thay file; đọc repr để sửa hunk, lượt sau đạt. Không có test lỗi hoặc benchmark hỏng. run-dev-005 đang chạy, lượt cũ giữ nguyên.
++
++Bước 2: run-dev-005 đủ30ca, elapsed 46.25s. Từng diagnosis/source hash/evaluation khớp run004, 14output phụ khớp; repeat/permutation2ca đạt. Ví dụ normalized mới tự tính độc lập 13self-test/2458so đạt, kể cả candidate set và log unavailable. supplement-002 giữ riêng, 30ca/89file guard và log0/1/10 đạt. Bộ lọc đã sửa chạy lại vào fix-n1n2-001/fse-filter-001,0devrows; không telemetry mới. Cập nhật kiem-dung-dan/ho-so/CSV đầu vào/tiêu chí theo nguồn kết quả, giữ mọi số và lượt cũ.
++
++**Kết thúc phiên sửa N1/N2 — 04/10/2026:**
++1. Đã làm: sửa runner/bộ lọc khóa danh tính manifest, resolve phải giữ đúng ca; adapter giữ normal-only log identity qua observed_services nhưng chỉ count incident. Cập nhật caller/export và bản tính độc lập. Minh duyệt sửa N1/N2 theo lời “OK CHỐT SỬA”; không thêm quyết định nghiên cứu hoặc thay ngưỡng/Type/split/window. Không mở vòng review mới.
++2. File thay đổi: src/simplerca/adapter.py, tests/test_core.py; results/T-017/scripts/run_dev.py, supplement_checks.py, independent_example.py; kiem-dung-dan.md, ho-so-simplerca.md, yeu-cau-dau-vao.csv, tieu-chi-xong.csv, ca-da-chay.csv (nối lượt005); LOG này và đúng dòng T017 trong STATE. Ngoài repo: sources-audit/filter_fse_artifact_results.py đã được duyệt và thư mục normalized mới example-input-run-dev-005 trong WORK. Đầu ra mới: runs/run-dev-005, supplement-002, fix-n1n2-001. Manifest file set/hash và full diff ở fix-n1n2-001; inventory/handoff cũ giữ nguyên là snapshot bàn giao. SPEC/REVIEW/core/allowlist và mọi lượt cũ không đổi.
++3. Kiểm/kết quả:25unittest đạt;13self-test độc lập;2.458so ví dụ đạt với tolerance tương đối/tuyệt đối1e-10;30primary JSON/source hashes/evaluation khớp run004,2.041 tổng score service;14output phụ khớp gồm repeat/permutation/control/sensitivity. Guard30ca/89file/exact-ID/resolve và predicate artifact tổng hợp đạt. Artifact thật0devrows. Run00546,25s; supplement3,77s; filter1,76s, chỉ tiến độ máy dùng chung. Hit1=25/30, Hit3/5=29/30, MRR0,8911111111; normal-control vẫn không đạt abstention (196/278), giữ nguyên hạn chế. Kiểm nguồn/path trước dữ liệu; không tải, không locked hoặc ca ngoài allowlist. Phép kiểm cuối xác nhận diff/phạm vi/bảo toàn theo change-manifest.json.
++4. Chưa chắc/cần Minh quyết: kết quả sửa xong chờ Minh duyệt; không tự đóng task. Exactprogram bảng2/full90/Typeclassifier/physicalduration/cost chính thức và nháp tài liệu chung vẫn OPEN như trước. Không cần thêm review. Đề xuất commit khi Minh duyệt: “Sửa allowlist và ứng viên log normal của SimpleRCA T017”; chưa commit/push. Nội dung formal docs đã nằm trong hồ sơ/kiểm đúng đắn T017; không tự duyệt WHY/DECISIONS chung.
++5. Bước tiếp theo chính xác: Minh đọc results/T-017/kiem-dung-dan.md mục Sửa N1/N2 và runs/fix-n1n2-001/verification.json, change-manifest.json; duyệt kết quả/đóng task hoặc yêu cầu chỉnh cụ thể. Muốn chạy lại dùng mã lượt mới: py -3 -B -X utf8 results/T-017/scripts/run_dev.py --run <mã-mới>, theo môi trường ghim trong moi-truong.md. Không fetch_injection (đã có đủ metadata), không handoff.py --finalize hoặc write_reports.py (các script đó sinh lại snapshot cũ).
++6. Lệnh cuối trong phiên: py -3 -B -X utf8 - kiểm complete diff, parse đầu ra, file set/hash; sau đó git status --short và git diff --check. Kiểm byte ngoài dòng T017 với phiên bản STATE đọc dưới lock. Nếu có lỗi kiểm cuối, nối LOG thêm kết quả; không xóa lượt cũ.
+--- D:\RCA-ext\work\T-017\sources-audit\filter_fse_artifact_results.py before
++++ D:\RCA-ext\work\T-017\sources-audit\filter_fse_artifact_results.py
+@@ -1,73 +1,103 @@
++import argparse
+ import hashlib
+ import io
+ import json
+ import pathlib
+ import tarfile
++import sys
++import time
+ 
+ import pyarrow.parquet as pq
+ 
+ ROOT = pathlib.Path(__file__).resolve().parent
+ REPO = pathlib.Path("D:/RCA-flashticket")
+-archive = REPO / "data/ngoai-rcaeval/T-012/fse/FSE_26_RCA_dataset_study_reviewer.tar.gz"
+-inventory = json.loads((REPO / "results/T-012/runs/fse-file-inspect-003/members.json").read_text(encoding="utf-8"))
+-allowed = sorted(x.name for x in (REPO / "data/rcaeval").glob("re2tt_*") if x.is_dir())
+-assert len(allowed) == 30
+-aliases = sorted(set(allowed + [x.removeprefix("re2tt_") for x in allowed]))
+-prefix = "FSE_26_RCA_dataset_study_artifact_clean/"
+-target_names = {
+-    prefix + "artifacts/reproduction_report/datapack.perf.parquet",
+-    prefix + "artifacts/reproduction_report/dataset.perf.parquet",
+-    prefix + "artifacts/reproduction_report/fault_types.perf.parquet",
+-    prefix + "src/raw_data/algo_perf.parquet",
+-}
+-checks = []
+-with tarfile.open(archive, "r:gz") as tar:
+-    for row in inventory:
+-        if row["name"] not in target_names:
+-            continue
+-        payload = tar.extractfile(row["name"]).read()
+-        assert hashlib.sha256(payload).hexdigest() == row["sha256"]
+-        parquet = pq.ParquetFile(io.BytesIO(payload))
+-        fields = parquet.schema_arrow.names
+-        check = {
+-            "member": row["name"], "source_sha256_matches_t012": True,
+-            "metadata_num_rows": parquet.metadata.num_rows,
+-            "schema": str(parquet.schema_arrow),
+-            "case_field": next((x for x in ["datapack", "datapack_name", "case", "case_name"] if x in fields), None),
+-            "rows_decoded_unfiltered": 0,
+-        }
+-        if "dataset" in fields:
+-            dataset_index = fields.index("dataset")
+-            dataset_stats = []
+-            for group in range(parquet.metadata.num_row_groups):
+-                stats = parquet.metadata.row_group(group).column(dataset_index).statistics
+-                dataset_stats.append({"row_group": group, "min": stats.min if stats and stats.has_min_max else None, "max": stats.max if stats and stats.has_min_max else None})
+-            check["dataset_row_group_metadata"] = dataset_stats
+-        case_field = check["case_field"]
+-        if case_field:
+-            # The predicate is passed to Arrow before decoding returned rows.
+-            # Do not print or store any unfiltered author result values.
+-            predicate = [(case_field, "in", aliases)]
+-            table = pq.read_table(io.BytesIO(payload), filters=predicate)
+-            selected_names = table[case_field].to_pylist()
+-            assert all(name in aliases for name in selected_names)
+-            check["filter"] = "case identity in exactly the 30 permitted RE2-TT dev names, with/without re2tt_ prefix"
+-            check["filtered_rows"] = table.num_rows
+-            if table.num_rows:
+-                path = ROOT / "fse-artifact-results-30dev-only.parquet"
+-                pq.write_table(table, path)
+-                check["filtered_output"] = path.name
+-        else:
+-            check["filtered_rows"] = None
+-            check["status"] = "No case identity column; aggregate schema cannot serve per-case RE2-TT comparison. Values not read."
+-        checks.append(check)
++sys.path.insert(0, str(REPO / "results/T-017/scripts"))
++from run_dev import load_allowlist
+ 
+-summary = {
+-    "archive": str(archive), "allowed_case_count": len(allowed),
+-    "checks": checks,
+-    "permitted_dev_result_rows_found": sum(x.get("filtered_rows") or 0 for x in checks),
+-    "telemetry_payloads_opened": 0,
+-    "unfiltered_result_rows_returned_or_printed": 0,
+-}
+-(ROOT / "fse-artifact-result-filter-check.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+-print(json.dumps(summary, ensure_ascii=False, indent=2))
++
++def artifact_aliases(manifest=REPO / "results/T-017/allowlist.json"):
++    allowed = load_allowlist(manifest)
++    aliases = sorted(set(allowed + [x.removeprefix("re2tt_") for x in allowed]))
++    return allowed, aliases
++
++
++def select_case_rows(payload, case_field, aliases):
++    table = pq.read_table(io.BytesIO(payload), filters=[(case_field, "in", aliases)])
++    if not all(name in aliases for name in table[case_field].to_pylist()):
++        raise RuntimeError("artifact predicate returned forbidden case")
++    return table
++
++
++def main(output_dir):
++    allowed, aliases = artifact_aliases()
++    output_dir = pathlib.Path(output_dir)
++    report = output_dir / "fse-artifact-result-filter-check.json"
++    if report.exists():
++        raise RuntimeError("never overwrite an artifact filter attempt")
++    output_dir.mkdir(parents=True, exist_ok=True)
++    started = time.perf_counter()
++    archive = REPO / "data/ngoai-rcaeval/T-012/fse/FSE_26_RCA_dataset_study_reviewer.tar.gz"
++    inventory = json.loads((REPO / "results/T-012/runs/fse-file-inspect-003/members.json").read_text(encoding="utf-8"))
++    prefix = "FSE_26_RCA_dataset_study_artifact_clean/"
++    target_names = {
++        prefix + "artifacts/reproduction_report/datapack.perf.parquet",
++        prefix + "artifacts/reproduction_report/dataset.perf.parquet",
++        prefix + "artifacts/reproduction_report/fault_types.perf.parquet",
++        prefix + "src/raw_data/algo_perf.parquet",
++    }
++    checks = []
++    with tarfile.open(archive, "r:gz") as tar:
++        for row in inventory:
++            if row["name"] not in target_names:
++                continue
++            payload = tar.extractfile(row["name"]).read()
++            assert hashlib.sha256(payload).hexdigest() == row["sha256"]
++            parquet = pq.ParquetFile(io.BytesIO(payload))
++            fields = parquet.schema_arrow.names
++            check = {
++                "member": row["name"], "source_sha256_matches_t012": True,
++                "metadata_num_rows": parquet.metadata.num_rows,
++                "schema": str(parquet.schema_arrow),
++                "case_field": next((x for x in ["datapack", "datapack_name", "case", "case_name"] if x in fields), None),
++                "rows_decoded_unfiltered": 0,
++            }
++            if "dataset" in fields:
++                dataset_index = fields.index("dataset")
++                dataset_stats = []
++                for group in range(parquet.metadata.num_row_groups):
++                    stats = parquet.metadata.row_group(group).column(dataset_index).statistics
++                    dataset_stats.append({"row_group": group, "min": stats.min if stats and stats.has_min_max else None, "max": stats.max if stats and stats.has_min_max else None})
++                check["dataset_row_group_metadata"] = dataset_stats
++            case_field = check["case_field"]
++            if case_field:
++                # The predicate is passed to Arrow before decoding returned rows.
++                # Do not print or store any unfiltered author result values.
++                table = select_case_rows(payload, case_field, aliases)
++                check["filter"] = "case identity in exactly the 30 permitted RE2-TT dev names, with/without re2tt_ prefix"
++                check["filtered_rows"] = table.num_rows
++                if table.num_rows:
++                    path = output_dir / "fse-artifact-results-30dev-only.parquet"
++                    pq.write_table(table, path)
++                    check["filtered_output"] = path.name
++            else:
++                check["filtered_rows"] = None
++                check["status"] = "No case identity column; aggregate schema cannot serve per-case RE2-TT comparison. Values not read."
++            checks.append(check)
++
++    summary = {
++        "archive": str(archive), "allowed_case_count": len(allowed),
++        "allowlist_sha256": hashlib.sha256((REPO / "results/T-017/allowlist.json").read_bytes()).hexdigest(),
++        "elapsed_seconds_concurrent_laptop": time.perf_counter()-started,
++        "checks": checks,
++        "permitted_dev_result_rows_found": sum(x.get("filtered_rows") or 0 for x in checks),
++        "telemetry_payloads_opened": 0,
++        "unfiltered_result_rows_returned_or_printed": 0,
++    }
++    report.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
++    print(json.dumps(summary, ensure_ascii=False, indent=2))
++
++
++if __name__ == "__main__":
++    parser = argparse.ArgumentParser()
++    parser.add_argument("--output-dir", required=True)
++    main(parser.parse_args().output_dir)

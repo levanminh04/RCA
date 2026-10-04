@@ -1,0 +1,152 @@
+{
+  "case": "re2ob_checkoutservice_delay_1",
+  "source": "/home/ubuntu/rca/T-015/data/re2ob_checkoutservice_delay_1/traces.parquet",
+  "source_sha256": "a86818c7ab72aa360c3d81aafd9c4dc6a4da0ef75204cbf3a0c70d07a1fd44da",
+  "snapshot": "/home/ubuntu/rca/T-015/runs/ob-block-1/re2ob_checkoutservice_delay_1.json",
+  "snapshot_sha256": "41dcc3ff9b6a3cf5fc3b0025030815bb2c7f8ad8e0d210622eae2e979dbc1989",
+  "groups": {
+    "normal": {
+      "original_audit": {
+        "missing_parent_spans": 7958,
+        "explicit_root_spans": 0,
+        "isolated_operations": [
+          "checkoutservice_Check",
+          "currencyservice_Check",
+          "emailservice_Check",
+          "frontendservice_Export",
+          "paymentservice_Check",
+          "productcatalogservice_Check",
+          "productcatalogservice_Export",
+          "recommendationservice_Check"
+        ],
+        "operation_edges": 16,
+        "traces": 7958,
+        "operations": 24
+      },
+      "corrected_audit": {
+        "missing_parent_spans": 0,
+        "explicit_root_spans": 7958,
+        "isolated_operations": [
+          "checkoutservice_Check",
+          "currencyservice_Check",
+          "emailservice_Check",
+          "frontendservice_Export",
+          "paymentservice_Check",
+          "productcatalogservice_Check",
+          "productcatalogservice_Export",
+          "recommendationservice_Check"
+        ],
+        "operation_edges": 16,
+        "traces": 7958,
+        "operations": 24
+      },
+      "missing_to_root_delta": 7958,
+      "raw_token_counts": {
+        "spans": 135661,
+        "parent_isna": 7958,
+        "added_root_token_spans": 7958,
+        "old_root_token_spans": 0
+      }
+    },
+    "anomaly": {
+      "original_audit": {
+        "missing_parent_spans": 2310,
+        "explicit_root_spans": 0,
+        "isolated_operations": [
+          "checkoutservice_Check",
+          "checkoutservice_Export",
+          "currencyservice_Check",
+          "frontendservice_Export",
+          "paymentservice_Check",
+          "productcatalogservice_Check",
+          "productcatalogservice_Export",
+          "recommendationservice_Check"
+        ],
+        "operation_edges": 29,
+        "traces": 2310,
+        "operations": 36
+      },
+      "corrected_audit": {
+        "missing_parent_spans": 0,
+        "explicit_root_spans": 2310,
+        "isolated_operations": [
+          "checkoutservice_Check",
+          "checkoutservice_Export",
+          "currencyservice_Check",
+          "frontendservice_Export",
+          "paymentservice_Check",
+          "productcatalogservice_Check",
+          "productcatalogservice_Export",
+          "recommendationservice_Check"
+        ],
+        "operation_edges": 29,
+        "traces": 2310,
+        "operations": 36
+      },
+      "missing_to_root_delta": 2310,
+      "raw_token_counts": {
+        "spans": 32478,
+        "parent_isna": 2310,
+        "added_root_token_spans": 2310,
+        "old_root_token_spans": 0
+      }
+    }
+  },
+  "checks": {
+    "normal_trace_count": true,
+    "anomaly_trace_count": true,
+    "all_trace_count": true,
+    "disjoint_groups": true,
+    "abnormal_span_count": true,
+    "before_span_count": true,
+    "after_span_count": true,
+    "no_span_id_matches_new_root_token": true
+  },
+  "all_passed": true,
+  "null_scalar_types": {
+    "pandas._libs.missing.NAType": 10268
+  },
+  "null_scalar_tokens": {
+    "<NA>": 10268
+  },
+  "parent_null_samples": [
+    {
+      "type": "pandas._libs.missing.NAType",
+      "str": "<NA>",
+      "is_None": false
+    },
+    {
+      "type": "pandas._libs.missing.NAType",
+      "str": "<NA>",
+      "is_None": false
+    },
+    {
+      "type": "pandas._libs.missing.NAType",
+      "str": "<NA>",
+      "is_None": false
+    }
+  ],
+  "pandas_dtypes": {
+    "traceID": "string",
+    "spanID": "string",
+    "parentSpanID": "string",
+    "serviceName": "string",
+    "methodName": "string",
+    "operationName": "string",
+    "startTime": "Int64",
+    "duration": "Int64"
+  },
+  "runtime": {
+    "python": "3.12.3",
+    "pandas": "2.2.3",
+    "numpy": "1.26.4",
+    "pyarrow": "18.1.0"
+  },
+  "numerical_graph_input_unchanged": true,
+  "proof": "Only <NA> root-vs-missing classification changed. No spanID equals <NA>; unresolved parent creates no edge in either version. All other graph construction steps are unchanged. Saved partition and abnormal flags match. No graph or PageRank rerun.",
+  "saved_points_untouched": true,
+  "method_not_rerun": true,
+  "reason": "c",
+  "window_spans": 339324,
+  "elapsed_observed_seconds": 1.076
+}

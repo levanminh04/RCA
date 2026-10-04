@@ -1,0 +1,531 @@
+--- D:\RCA-flashticket\results\T-017\scripts\run_dev.py (before)
++++ D:\RCA-flashticket\results\T-017\scripts\run_dev.py
+@@ -1,6 +1,6 @@
+ """Reproducible dev-only correctness run. Every attempt and elapsed step kept.
+ 
+-The allowlist is materialized before telemetry is opened. Core does not receive
++The frozen allowlist is validated before any run is created or telemetry opened. Core does not receive
+ paths/case identifiers/root labels. Scoring starts only after result is written.
+ """
+ import argparse,csv,hashlib,json,os,sys,time,traceback
+@@ -27,9 +27,30 @@
+         for b in iter(lambda:f.read(1024*1024),b''): h.update(b)
+     return h.hexdigest()
+ 
++def load_allowlist(path=OUT/'allowlist.json'):
++    names=json.loads(path.read_text(encoding='utf-8'))
++    if (not isinstance(names,list) or len(names)!=30
++            or any(not isinstance(n,str) or not n.startswith('re2tt_')
++                   or Path(n).name!=n or '/' in n or '\\' in n for n in names)
++            or len(set(names))!=30):
++        raise RuntimeError('invalid frozen allowlist')
++    return sorted(names)
++
++
+ def guard_case(path,allowed,data_root):
+-    if path.name not in allowed or path.resolve().parent != data_root.resolve():
++    if path.name not in allowed or path.resolve() != data_root.resolve()/path.name:
+         raise RuntimeError('forbidden source case')
++
++
++def validate_cases(dirs,allowed,data_root):
++    if len(dirs)!=len(allowed) or {p.name for p in dirs}!=set(allowed):
++        raise RuntimeError('case identities differ from frozen allowlist')
++    for p in dirs:
++        guard_case(p,allowed,data_root)
++        if not p.is_dir(): raise RuntimeError('allowed case directory missing')
++        for name in ('metrics.parquet','traces.parquet','logs.parquet'):
++            source=p/name
++            if source.exists(): guard_file(source,p)
+ 
+ def guard_file(path,case):
+     if path.resolve().parent != case.resolve():
+@@ -47,12 +68,11 @@
+     ap=argparse.ArgumentParser();ap.add_argument('--run',required=True);ap.add_argument('--limit',type=int,default=30);ap.add_argument('--start-index',type=int,default=0)
+     args=ap.parse_args();run=OUT/'runs'/args.run
+     if run.exists():raise RuntimeError('never overwrite a run')
++    allowed=load_allowlist()
++    dirs=sorted((ROOT/'data/rcaeval').glob('re2tt_*'))
++    validate_cases(dirs,allowed,ROOT/'data/rcaeval')
+     run.mkdir(parents=True)
+-    dirs=sorted((ROOT/'data/rcaeval').glob('re2tt_*'))
+-    allowed={p.name for p in dirs}
+-    if len(allowed)!=30 or any(not p.is_dir() for p in dirs):raise RuntimeError('allowlist changed: inspect before running')
+-    dump(OUT/'allowlist.json',sorted(allowed))
+-    dump(run/'environment.json',{'python':sys.version,'numpy':np.__version__,'pandas':pd.__version__,'pyarrow':pyarrow.__version__,'concurrent_laptop':True,'official_timing':False,'estimated_total_minutes':45})
++    dump(run/'environment.json',{'python':sys.version,'numpy':np.__version__,'pandas':pd.__version__,'pyarrow':pyarrow.__version__,'concurrent_laptop':True,'official_timing':False,'estimated_total_minutes':3,'allowlist_sha256':sha(OUT/'allowlist.json'),'allowed_cases':allowed})
+     progress=run/'progress.jsonl'
+     def log(event,**kw):
+         row={'time_local':datetime.now(timezone(timedelta(hours=7))).isoformat(),'event':event,**kw}
+@@ -88,7 +108,7 @@
+             row['checks']['not_fallback']=result['fallback'] is False
+             row['checks']['nonempty']=bool(result['ranks'])
+             row['checks']['score_sum']=all(x['score']==x['metric']+x['trace']+x['log'] for x in result['scores'].values())
+-            row['checks']['ranking_equals_metric_column_order']=result['ranks']==list(dict.fromkeys(prepared[-1].values()))
++            row['checks']['ranking_equals_metric_column_order']=result['ranks']==list(dict.fromkeys(prepared.metric_services.values()))
+             if idx<2:
+                 again=diagnose(**inputs);dump(run/f'{p.name}-repeat.json',again)
+                 perm=dict(inputs);perm['normal_metrics']=dict(reversed(list(inputs['normal_metrics'].items())));perm['incident_metrics']=dict(reversed(list(inputs['incident_metrics'].items())));perm['metric_services']=dict(reversed(list(inputs['metric_services'].items())))
+@@ -102,7 +122,7 @@
+                 for name,df in zip(['normal_metrics','incident_metrics','normal_traces','incident_traces','incident_logs'],prepared[:5]):
+                     if df is None:df=pd.DataFrame(columns=['service','message'])
+                     df.to_csv(ex/f'{name}.csv',index=False)
+-                dump(ex/'metadata.json',{'metric_services':prepared[-1],'logs_available':prepared[4] is not None,'boundary':boundary,'half':300,'case_is_not_passed_to_core':True})
++                dump(ex/'metadata.json',{'metric_services':prepared.metric_services,'observed_services':prepared.observed_services,'logs_available':prepared.incident_logs is not None,'boundary':boundary,'half':300,'case_is_not_passed_to_core':True})
+                 sensitivity=[]
+                 variants=[('p95',Config(metric_rule='p95')),('channels',Config(metric_aggregation='channels')),('log1',Config(log_threshold=1)),('log10',Config(log_threshold=10)),('trace2',Config(trace_factor=2)),('trace4',Config(trace_factor=4))]
+                 for name,cfg in variants:
+--- D:\RCA-flashticket\src\simplerca\adapter.py (before)
++++ D:\RCA-flashticket\src\simplerca\adapter.py
+@@ -5,6 +5,17 @@
+ """
+ import numpy as np
+ import pandas as pd
++from typing import NamedTuple
++
++
++class PreparedInputs(NamedTuple):
++    normal_metrics: pd.DataFrame
++    incident_metrics: pd.DataFrame
++    normal_traces: pd.DataFrame
++    incident_traces: pd.DataFrame
++    incident_logs: object
++    metric_services: dict
++    observed_services: tuple
+ 
+ 
+ def canonical_service(name, aliases=None):
+@@ -57,6 +68,7 @@
+         nt=t.loc[(tt>=boundary-half)&(tt<boundary)].reset_index(drop=True)
+         at=t.loc[(tt>=boundary)&(tt<boundary+half)].reset_index(drop=True)
+     al=None
++    observed=set(mappings.values()) | set(nt['service']) | set(at['service'])
+     if logs is not None:
+         for c in ('timestamp','container_name','message'):
+             if c not in logs: raise ValueError(f'log missing {c}')
+@@ -64,18 +76,22 @@
+         lt=pd.to_numeric(logs['timestamp'],errors='raise').to_numpy()
+         if len(lt) and not 1e9<float(np.median(lt))<3e9:
+             raise ValueError('log timestamp must be second epoch')
++        # Preserve identities in either window, without passing normal messages.
++        window_names=logs.loc[(lt>=boundary-half)&(lt<boundary+half),'container_name']
++        observed.update(canonical_service(s,aliases) for s in window_names)
+         al=logs.loc[(lt>=boundary)&(lt<boundary+half),['container_name','message']].rename(columns={'container_name':'service'}).copy()
+         al['service']=al['service'].map(lambda s:canonical_service(s,aliases))
+         al['message']=al['message'].fillna('').astype(str)
+-    return nm,am,nt,at,al,mappings
++    return PreparedInputs(nm,am,nt,at,al,mappings,tuple(sorted(observed)))
+ 
+ 
+ def core_input(prepared):
+-    nm,am,nt,at,al,mappings=prepared
++    nm,am,nt,at,al,mappings,observed=prepared
+     def groups(df,column):
+         return {s:g[column].tolist() for s,g in df.groupby('service',sort=True)}
+     return {'normal_metrics':{k:nm[k].tolist() for k in mappings},
+             'incident_metrics':{k:am[k].tolist() for k in mappings},
+             'metric_services':mappings,'normal_traces':groups(nt,'duration'),
+             'incident_traces':groups(at,'duration'),
+-            'incident_logs':None if al is None else groups(al,'message')}
++            'incident_logs':None if al is None else groups(al,'message'),
++            'observed_services':observed}
+--- D:\RCA-flashticket\src\simplerca\tests\test_core.py (before)
++++ D:\RCA-flashticket\src\simplerca\tests\test_core.py
+@@ -4,6 +4,18 @@
+ from simplerca import Config, diagnose, score_root
+ from simplerca.adapter import canonical_service, prepare
+ import pandas as pd
++import argparse
++import importlib.util
++import io
++import json
++import sys
++from pathlib import Path
++from unittest.mock import Mock, patch
++from simplerca.adapter import core_input
++
++REPO=Path(__file__).resolve().parents[3]
++sys.path.insert(0,str(REPO/'results/T-017/scripts'))
++import run_dev
+ 
+ 
+ class KnownAnswers(unittest.TestCase):
+@@ -61,6 +73,37 @@
+     def test_modality_only_service(self):
+         r=self.run_case(incident_logs={'c':['ERROR']})
+         self.assertIn('c',r['ranks']); self.assertEqual(r['scores']['c']['score'],1)
++
++    def test_normal_only_log_identity_without_error_vote(self):
++        epoch=1700000000;pod='log-only-pod'
++        m=pd.DataFrame({'time':[epoch-2,epoch-1,epoch],'a_cpu':[1,1,2]})
++        l=pd.DataFrame({'timestamp':[epoch-3,epoch-1,epoch,epoch+3,epoch-4],
++                        'container_name':[pod,pod,'incident-only','after','before'],
++                        'message':['ERROR','FAIL EXCEPTION','ERROR','ERROR','ERROR']})
++        prepared=prepare(m,None,l,epoch,3,aliases={pod:'normal-only'})
++        r=diagnose(**core_input(prepared))
++        self.assertEqual(set(r['scores']),{'a','normal-only','incident-only'})
++        self.assertEqual(r['scores']['normal-only']['score'],0)
++        self.assertEqual(r['logs']['normal-only']['count'],0)
++        self.assertEqual(r['logs']['incident-only']['count'],1)
++        self.assertEqual(prepared.incident_logs['service'].tolist(),['incident-only'])
++
++    def test_normal_only_log_abstain_with_no_metric_channels(self):
++        epoch=1700000000;m=pd.DataFrame({'time':[epoch-1,epoch]})
++        l=pd.DataFrame({'timestamp':[epoch-1],'container_name':['only-log'],'message':['ERROR']})
++        r=diagnose(**core_input(prepare(m,None,l,epoch,3)))
++        self.assertEqual(r['ranks'],['only-log'])
++        self.assertEqual(r['status'],'abstain')
++        self.assertEqual(r['logs']['only-log']['count'],0)
++
++    def test_adapter_log_missing_and_empty_stay_distinct(self):
++        epoch=1700000000
++        m=pd.DataFrame({'time':[epoch-2,epoch-1,epoch],'a_cpu':[1,1,2]})
++        absent=diagnose(**core_input(prepare(m,None,None,epoch,3)))
++        empty=pd.DataFrame(columns=['timestamp','container_name','message'])
++        present=diagnose(**core_input(prepare(m,None,empty,epoch,3)))
++        self.assertEqual(absent['logs']['a']['status'],'unavailable')
++        self.assertEqual(present['logs']['a']['count'],0)
+ 
+     def test_missing_and_insufficient(self):
+         r=self.run_case(normal_metrics={'a_cpu':[np.nan,1],'b_cpu':[1,1,1]})
+@@ -111,4 +154,67 @@
+         with self.assertRaises(ValueError): prepare(duplicate,None,None,epoch,3)
+ 
+ 
++class FrozenCases(unittest.TestCase):
++    def setUp(self):
++        self.allowed=[f're2tt_synthetic_{i:02d}' for i in range(30)]
++        self.data_root=REPO/'data/rcaeval'
++
++    def test_manifest_unique_and_sorted(self):
++        manifest=Mock()
++        manifest.read_text.return_value=json.dumps(list(reversed(self.allowed)))
++        self.assertEqual(run_dev.load_allowlist(manifest),self.allowed)
++        for invalid in (self.allowed[:-1],self.allowed[:-1]+[self.allowed[0]],
++                        self.allowed[:-1]+['re2tt_../escape']):
++            manifest.read_text.return_value=json.dumps(invalid)
++            with self.assertRaises(RuntimeError):run_dev.load_allowlist(manifest)
++
++    def test_same_count_replacement_rejected_before_path_reads(self):
++        dirs=[self.data_root/n for n in self.allowed[:-1]+['re2tt_FORBIDDEN_SYNTHETIC']]
++        with patch.object(Path,'is_dir',side_effect=AssertionError('unexpected path probe')):
++            with self.assertRaises(RuntimeError):
++                run_dev.validate_cases(dirs,self.allowed,self.data_root)
++
++    def test_reordering_keeps_exact_identity(self):
++        dirs=[self.data_root/n for n in reversed(self.allowed)]
++        with patch.object(Path,'is_dir',return_value=True),patch.object(Path,'exists',return_value=False):
++            run_dev.validate_cases(dirs,self.allowed,self.data_root)
++
++    def test_resolve_must_keep_identity_even_inside_data_root(self):
++        p=Mock();p.name=self.allowed[0]
++        for target in (self.data_root/self.allowed[1],REPO/'outside'/self.allowed[0]):
++            p.resolve.return_value=target
++            with self.assertRaises(RuntimeError):run_dev.guard_case(p,self.allowed,self.data_root)
++        p.resolve.return_value=self.data_root.resolve()/p.name
++        run_dev.guard_case(p,self.allowed,self.data_root)
++
++    def test_main_rejects_before_writes_or_telemetry(self):
++        dirs=[self.data_root/n for n in self.allowed[:-1]+['re2tt_FORBIDDEN_SYNTHETIC']]
++        args=argparse.Namespace(run='synthetic-never-created',limit=30,start_index=0)
++        with patch.object(argparse.ArgumentParser,'parse_args',return_value=args), \
++             patch.object(run_dev,'load_allowlist',return_value=self.allowed), \
++             patch.object(Path,'glob',return_value=dirs), \
++             patch.object(Path,'exists',return_value=False), \
++             patch.object(Path,'mkdir',side_effect=AssertionError('unexpected write')), \
++             patch.object(run_dev,'sha',side_effect=AssertionError('unexpected hash')), \
++             patch.object(pd,'read_parquet',side_effect=AssertionError('unexpected telemetry')):
++            with self.assertRaises(RuntimeError):run_dev.main()
++
++    def test_artifact_filter_uses_frozen_aliases_before_returning_rows(self):
++        import pyarrow as pa
++        import pyarrow.parquet as pq
++        path=Path('D:/RCA-ext/work/T-017/sources-audit/filter_fse_artifact_results.py')
++        spec=importlib.util.spec_from_file_location('artifact_filter_regression',path)
++        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
++        with patch.object(module,'load_allowlist',return_value=self.allowed), \
++             patch.object(Path,'glob',side_effect=AssertionError('artifact must not infer permission from disk')):
++            allowed,aliases=module.artifact_aliases()
++        self.assertEqual(allowed,self.allowed)
++        sink=io.BytesIO()
++        names=[self.allowed[0],self.allowed[0].removeprefix('re2tt_'),'re2tt_FORBIDDEN_SYNTHETIC']
++        pq.write_table(pa.table({'case':names,'value':[1,2,999]}),sink)
++        selected=module.select_case_rows(sink.getvalue(),'case',aliases)
++        self.assertEqual(selected['case'].to_pylist(),names[:2])
++        self.assertEqual(selected['value'].to_pylist(),[1,2])
++
++
+ if __name__=='__main__': unittest.main()
+--- D:\RCA-flashticket\results\T-017\scripts\supplement_checks.py (before)
++++ D:\RCA-flashticket\results\T-017\scripts\supplement_checks.py
+@@ -1,14 +1,21 @@
+ """Final inexpensive checks, without new dataset or parameter selection."""
+-import json,re,time,sys
++import argparse,json,re,time,sys
+ from pathlib import Path
+ from datetime import datetime,timezone,timedelta
+ from unittest.mock import Mock
+ import pandas as pd
+ from simplerca import Config,diagnose
+ from simplerca.adapter import prepare,core_input
+-from run_dev import guard_case,guard_file,ROOT,OUT,WORK,dump
++from run_dev import guard_case,guard_file,load_allowlist,validate_cases,ROOT,OUT,WORK,dump
+ 
+-run=OUT/'runs/supplement-001'
++parser=argparse.ArgumentParser()
++parser.add_argument('--run',default='supplement-001')
++parser.add_argument('--baseline-run',default='run-dev-004')
++args=parser.parse_args()
++allowed=load_allowlist()
++data_root=ROOT/'data/rcaeval'
++validate_cases(sorted(data_root.glob('re2tt_*')),allowed,data_root)
++run=OUT/'runs'/args.run
+ if run.exists(): raise RuntimeError('preserve all attempts')
+ run.mkdir()
+ t0=time.perf_counter()
+@@ -17,8 +24,6 @@
+     with (run/'progress.jsonl').open('a',encoding='utf-8') as f:f.write(json.dumps(row,ensure_ascii=False)+'\n')
+     print(json.dumps(row,ensure_ascii=False),flush=True)
+ progress('start',estimated_total_seconds=60,official_timing=False)
+-allowed=json.loads((OUT/'allowlist.json').read_text())
+-data_root=ROOT/'data/rcaeval'
+ checked=[]
+ for name in allowed:
+     p=data_root/name;guard_case(p,allowed,data_root)
+@@ -29,17 +34,25 @@
+     try: guard_case(p,allowed,data_root)
+     except RuntimeError: pass
+     else: raise AssertionError('case escape accepted')
++fake_case=Mock();fake_case.name=allowed[0];fake_case.resolve.return_value=data_root/allowed[1]
++try:guard_case(fake_case,allowed,data_root)
++except RuntimeError:pass
++else:raise AssertionError('case identity changed inside data root')
++replaced=[data_root/n for n in allowed[:-1]+['re2tt_SYNTHETIC_NOT_ALLOWED']]
++try:validate_cases(replaced,allowed,data_root)
++except RuntimeError:pass
++else:raise AssertionError('same-count case replacement accepted')
+ fake=Mock();fake.resolve.return_value=WORK/'outside.parquet'
+ try:guard_file(fake,data_root/allowed[0])
+ except RuntimeError:pass
+ else:raise AssertionError('file escape accepted')
+-dump(run/'guard-check.json',{'status':'PASS','allowed_cases':len(allowed),'source_files_checked':checked,'forbidden_case_tests':2,'escaped_file_test':True,'data_opened_for_guard_tests':False})
++dump(run/'guard-check.json',{'status':'PASS','allowed_cases':len(allowed),'source_files_checked':checked,'forbidden_case_tests':2,'escaped_file_test':True,'resolved_identity_test':True,'same_count_replacement_test':True,'frozen_manifest_used':True,'data_opened_for_guard_tests':False})
+ progress('guard_complete',cases=len(allowed),files=len(checked))
+ case=allowed[1];p=data_root/case
+ boundary=int((WORK/'injection'/(case+'.txt')).read_text().strip())
+ m=pd.read_parquet(p/'metrics.parquet');t=pd.read_parquet(p/'traces.parquet',columns=['serviceName','startTime','duration']);l=pd.read_parquet(p/'logs.parquet')
+ inputs=core_input(prepare(m,t,l,boundary));baseline=diagnose(**inputs)
+-previous=json.loads((OUT/'runs/run-dev-004'/(case+'.json')).read_text())
++previous=json.loads((OUT/'runs'/args.baseline_run/(case+'.json')).read_text())
+ # Serialization turns tuples into lists, so compare JSON-normalized values.
+ assert json.loads(json.dumps(baseline))==previous
+ counts={s:sum(any(k in message.upper() for k in ('ERROR','FAIL','EXCEPTION')) for message in entries) for s,entries in inputs['incident_logs'].items()}
+@@ -51,5 +64,5 @@
+         assert row['vote']==int(counts.get(s,0)>threshold)
+     dump(run/f'log-threshold-{threshold}.json',result)
+     variants.append({'threshold':threshold,'positive_log_services':sum(v['vote'] for v in result['logs'].values()),'ranking_same_as_baseline':result['ranks']==baseline['ranks'],'scores_same_as_baseline':result['scores']==baseline['scores']})
+-dump(run/'summary.json',{'case':case,'baseline_matches_run004':True,'independent_log_count_check':'PASS','variants':variants,'elapsed_seconds_concurrent_laptop':time.perf_counter()-t0,'official_timing':False})
++dump(run/'summary.json',{'case':case,'baseline_run':args.baseline_run,'baseline_matches':True,'independent_log_count_check':'PASS','variants':variants,'elapsed_seconds_concurrent_laptop':time.perf_counter()-t0,'official_timing':False})
+ progress('complete',elapsed_s=time.perf_counter()-t0,baseline_exact=True,variants=variants)
+--- D:\RCA-flashticket\results\T-017\scripts\independent_example.py (before)
++++ D:\RCA-flashticket\results\T-017\scripts\independent_example.py
+@@ -82,6 +82,11 @@
+         return score_parts.setdefault(
+             service, {"metric_alerts": 0, "trace_alerts": 0, "log_alerts": 0}
+         )
++
++    # New normalized inputs retain normal-only log identities, never messages.
++    # Older snapshots omit this field and remain readable as historical inputs.
++    for service in metadata.get("observed_services", []):
++        observe(service)
+ 
+     metric_details = []
+     names = sorted(
+@@ -243,6 +248,10 @@
+     unavailable = calculate(normal, incident, empty_trace, empty_trace, empty_log, {**meta, "logs_available": False})
+     assert all(not row["available"] for row in unavailable["logs"])
+     assert unavailable["tie_groups"] == [{"score": 2, "services": ["a", "b"]}]
++    normal_only = calculate(normal, incident, nt, it, logs,
++                            {**meta, "observed_services": ["normal-only"]})
++    assert next(row for row in normal_only['services'] if row['service']=='normal-only')['score']==0
++    assert next(row for row in normal_only['logs'] if row['service']=='normal-only')['error_count']==0
+     equality = calculate(
+         pd.DataFrame({"time": [0, 1], "a_x": [-1.0, 1.0]}),
+         pd.DataFrame({"time": [2, 3], "a_x": [3.0, 4.0]}),
+@@ -273,7 +282,7 @@
+         assert "Duration am" in str(error)
+     else:
+         raise AssertionError("Duration am khong bi tu choi.")
+-    return {"status": "PASS", "checks": ["manual_metric_score", "linear_p95", "strict_metric_boundary", "strict_trace_boundary", "keyword_once_per_row", "normal_control", "column_permutation", "missing_logs", "ties", "nonfinite", "insufficient_normal", "negative_duration"]}
++    return {"status": "PASS", "checks": ["manual_metric_score", "linear_p95", "strict_metric_boundary", "strict_trace_boundary", "keyword_once_per_row", "normal_control", "column_permutation", "missing_logs", "ties", "nonfinite", "insufficient_normal", "negative_duration", "normal_only_identity_zero_score"]}
+ 
+ 
+ def main() -> None:
+--- D:\RCA-ext\work\T-017\sources-audit\filter_fse_artifact_results.py (before)
++++ D:\RCA-ext\work\T-017\sources-audit\filter_fse_artifact_results.py
+@@ -1,73 +1,103 @@
++import argparse
+ import hashlib
+ import io
+ import json
+ import pathlib
+ import tarfile
++import sys
++import time
+ 
+ import pyarrow.parquet as pq
+ 
+ ROOT = pathlib.Path(__file__).resolve().parent
+ REPO = pathlib.Path("D:/RCA-flashticket")
+-archive = REPO / "data/ngoai-rcaeval/T-012/fse/FSE_26_RCA_dataset_study_reviewer.tar.gz"
+-inventory = json.loads((REPO / "results/T-012/runs/fse-file-inspect-003/members.json").read_text(encoding="utf-8"))
+-allowed = sorted(x.name for x in (REPO / "data/rcaeval").glob("re2tt_*") if x.is_dir())
+-assert len(allowed) == 30
+-aliases = sorted(set(allowed + [x.removeprefix("re2tt_") for x in allowed]))
+-prefix = "FSE_26_RCA_dataset_study_artifact_clean/"
+-target_names = {
+-    prefix + "artifacts/reproduction_report/datapack.perf.parquet",
+-    prefix + "artifacts/reproduction_report/dataset.perf.parquet",
+-    prefix + "artifacts/reproduction_report/fault_types.perf.parquet",
+-    prefix + "src/raw_data/algo_perf.parquet",
+-}
+-checks = []
+-with tarfile.open(archive, "r:gz") as tar:
+-    for row in inventory:
+-        if row["name"] not in target_names:
+-            continue
+-        payload = tar.extractfile(row["name"]).read()
+-        assert hashlib.sha256(payload).hexdigest() == row["sha256"]
+-        parquet = pq.ParquetFile(io.BytesIO(payload))
+-        fields = parquet.schema_arrow.names
+-        check = {
+-            "member": row["name"], "source_sha256_matches_t012": True,
+-            "metadata_num_rows": parquet.metadata.num_rows,
+-            "schema": str(parquet.schema_arrow),
+-            "case_field": next((x for x in ["datapack", "datapack_name", "case", "case_name"] if x in fields), None),
+-            "rows_decoded_unfiltered": 0,
+-        }
+-        if "dataset" in fields:
+-            dataset_index = fields.index("dataset")
+-            dataset_stats = []
+-            for group in range(parquet.metadata.num_row_groups):
+-                stats = parquet.metadata.row_group(group).column(dataset_index).statistics
+-                dataset_stats.append({"row_group": group, "min": stats.min if stats and stats.has_min_max else None, "max": stats.max if stats and stats.has_min_max else None})
+-            check["dataset_row_group_metadata"] = dataset_stats
+-        case_field = check["case_field"]
+-        if case_field:
+-            # The predicate is passed to Arrow before decoding returned rows.
+-            # Do not print or store any unfiltered author result values.
+-            predicate = [(case_field, "in", aliases)]
+-            table = pq.read_table(io.BytesIO(payload), filters=predicate)
+-            selected_names = table[case_field].to_pylist()
+-            assert all(name in aliases for name in selected_names)
+-            check["filter"] = "case identity in exactly the 30 permitted RE2-TT dev names, with/without re2tt_ prefix"
+-            check["filtered_rows"] = table.num_rows
+-            if table.num_rows:
+-                path = ROOT / "fse-artifact-results-30dev-only.parquet"
+-                pq.write_table(table, path)
+-                check["filtered_output"] = path.name
+-        else:
+-            check["filtered_rows"] = None
+-            check["status"] = "No case identity column; aggregate schema cannot serve per-case RE2-TT comparison. Values not read."
+-        checks.append(check)
++sys.path.insert(0, str(REPO / "results/T-017/scripts"))
++from run_dev import load_allowlist
+ 
+-summary = {
+-    "archive": str(archive), "allowed_case_count": len(allowed),
+-    "checks": checks,
+-    "permitted_dev_result_rows_found": sum(x.get("filtered_rows") or 0 for x in checks),
+-    "telemetry_payloads_opened": 0,
+-    "unfiltered_result_rows_returned_or_printed": 0,
+-}
+-(ROOT / "fse-artifact-result-filter-check.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+-print(json.dumps(summary, ensure_ascii=False, indent=2))
++
++def artifact_aliases(manifest=REPO / "results/T-017/allowlist.json"):
++    allowed = load_allowlist(manifest)
++    aliases = sorted(set(allowed + [x.removeprefix("re2tt_") for x in allowed]))
++    return allowed, aliases
++
++
++def select_case_rows(payload, case_field, aliases):
++    table = pq.read_table(io.BytesIO(payload), filters=[(case_field, "in", aliases)])
++    if not all(name in aliases for name in table[case_field].to_pylist()):
++        raise RuntimeError("artifact predicate returned forbidden case")
++    return table
++
++
++def main(output_dir):
++    allowed, aliases = artifact_aliases()
++    output_dir = pathlib.Path(output_dir)
++    report = output_dir / "fse-artifact-result-filter-check.json"
++    if report.exists():
++        raise RuntimeError("never overwrite an artifact filter attempt")
++    output_dir.mkdir(parents=True, exist_ok=True)
++    started = time.perf_counter()
++    archive = REPO / "data/ngoai-rcaeval/T-012/fse/FSE_26_RCA_dataset_study_reviewer.tar.gz"
++    inventory = json.loads((REPO / "results/T-012/runs/fse-file-inspect-003/members.json").read_text(encoding="utf-8"))
++    prefix = "FSE_26_RCA_dataset_study_artifact_clean/"
++    target_names = {
++        prefix + "artifacts/reproduction_report/datapack.perf.parquet",
++        prefix + "artifacts/reproduction_report/dataset.perf.parquet",
++        prefix + "artifacts/reproduction_report/fault_types.perf.parquet",
++        prefix + "src/raw_data/algo_perf.parquet",
++    }
++    checks = []
++    with tarfile.open(archive, "r:gz") as tar:
++        for row in inventory:
++            if row["name"] not in target_names:
++                continue
++            payload = tar.extractfile(row["name"]).read()
++            assert hashlib.sha256(payload).hexdigest() == row["sha256"]
++            parquet = pq.ParquetFile(io.BytesIO(payload))
++            fields = parquet.schema_arrow.names
++            check = {
++                "member": row["name"], "source_sha256_matches_t012": True,
++                "metadata_num_rows": parquet.metadata.num_rows,
++                "schema": str(parquet.schema_arrow),
++                "case_field": next((x for x in ["datapack", "datapack_name", "case", "case_name"] if x in fields), None),
++                "rows_decoded_unfiltered": 0,
++            }
++            if "dataset" in fields:
++                dataset_index = fields.index("dataset")
++                dataset_stats = []
++                for group in range(parquet.metadata.num_row_groups):
++                    stats = parquet.metadata.row_group(group).column(dataset_index).statistics
++                    dataset_stats.append({"row_group": group, "min": stats.min if stats and stats.has_min_max else None, "max": stats.max if stats and stats.has_min_max else None})
++                check["dataset_row_group_metadata"] = dataset_stats
++            case_field = check["case_field"]
++            if case_field:
++                # The predicate is passed to Arrow before decoding returned rows.
++                # Do not print or store any unfiltered author result values.
++                table = select_case_rows(payload, case_field, aliases)
++                check["filter"] = "case identity in exactly the 30 permitted RE2-TT dev names, with/without re2tt_ prefix"
++                check["filtered_rows"] = table.num_rows
++                if table.num_rows:
++                    path = output_dir / "fse-artifact-results-30dev-only.parquet"
++                    pq.write_table(table, path)
++                    check["filtered_output"] = path.name
++            else:
++                check["filtered_rows"] = None
++                check["status"] = "No case identity column; aggregate schema cannot serve per-case RE2-TT comparison. Values not read."
++            checks.append(check)
++
++    summary = {
++        "archive": str(archive), "allowed_case_count": len(allowed),
++        "allowlist_sha256": hashlib.sha256((REPO / "results/T-017/allowlist.json").read_bytes()).hexdigest(),
++        "elapsed_seconds_concurrent_laptop": time.perf_counter()-started,
++        "checks": checks,
++        "permitted_dev_result_rows_found": sum(x.get("filtered_rows") or 0 for x in checks),
++        "telemetry_payloads_opened": 0,
++        "unfiltered_result_rows_returned_or_printed": 0,
++    }
++    report.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
++    print(json.dumps(summary, ensure_ascii=False, indent=2))
++
++
++if __name__ == "__main__":
++    parser = argparse.ArgumentParser()
++    parser.add_argument("--output-dir", required=True)
++    main(parser.parse_args().output_dir)

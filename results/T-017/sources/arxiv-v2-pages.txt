@@ -1,0 +1,1381 @@
+=== PDF PAGE 1 ===
+Rethinking the Evaluation of Microservice RCA with a Fault
+Propagation-Aware Benchmark
+
+AOYANGFANG,SONGHAN ZHANG,YIFANYANG,HAOTONGWU,JUNJIELONGXU,XUYANG
+WANG, RUIWANG,MANYIWANG,QISHENG LU,andPINJIA HE∗,The ChineseUniversity ofHong Kong,
+Shenzhen, China
+Whilecloud-nativemicroservicearchitectureshaverevolutionizedsoftwaredevelopment,theirinherentoperationalcomplexity
+makes failure Root Cause Analysis (RCA) a critical yet challenging task. Numerous data-driven RCA models have been
+proposed to address this challenge. However, we find that the benchmarks used to evaluate these models are often too
+simpletoreflectreal-worldscenarios.Ourpreliminarystudyrevealsthatsimplerule-basedmethodscanachieveperformance
+comparable to or even surpassing state-of-the-art (SOTA) models on four widely used public benchmarks. This finding
+suggests that the oversimplification of existing benchmarks might lead to an overestimation of the performance of RCA
+methods.
+   To further investigate the oversimplification issue, we conduct a systematic analysis of popular public RCA benchmarks,
+identifyingkey limitationsin theirfaultinjection strategies,callgraph structures,and telemetry signalpatterns.Based on
+theseinsights,weproposeanautomatedframeworkforgeneratingmorechallengingandcomprehensivebenchmarksthat
+includecomplexfaultpropagationscenarios.Ournewdatasetcontains1,430validatedfailurecasesfrom9,152faultinjections,
+covering25faulttypes across6categories,dynamicworkloads,and hierarchicalground-truthlabelsthatmapfailuresfrom
+services down to code-level causes. Crucially, to ensure the failure cases are relevant to IT operations, each case is validated
+to have a discernible impact on user-facing SLIs.
+   Ourre-evaluationof11SOTAmodelsonthisnewbenchmarkshowsthattheyachievelowTop@1accuracies,averaging
+0.21, with the best-performing model reaching merely 0.37, and execution times escalating from seconds to hours. From this
+analysis, we identify three critical failure patterns common to current RCA models:scalability issues,observability blind spots,
+andmodeling bottlenecks.Based onthese findings,we provideactionableguidelines forfuture RCAresearch. Weemphasize
+the need for robust algorithms and the co-development of challenging benchmarks. To facilitate further research, we publicly
+release our benchmark generation framework, the new dataset, and our implementations of the evaluated SOTA models.
+CCS Concepts:•DoNotUseThisCode             →GeneratetheCorrectTermsforYourPaper;Generate the Correct Terms for
+Your Paper; Generate the Correct Terms for Your Paper; Generate the Correct Terms for Your Paper.
+Additional Key Words and Phrases: Do, Not, Us, This, Code, Put, the, Correct, Terms, for, Your, Paper
+ACMReferenceFormat:
+Aoyang Fang, SonghanZhang, YifanYang, Haotong Wu, JunjielongXu, XuyangWang, Rui Wang,Manyi Wang, Qisheng
+Lu, and Pinjia He. 2018. Rethinking the Evaluation of Microservice RCA with a Fault Propagation-Aware Benchmark. In
+Proceedings of Make sure to enter the correct conference title from your rights confirmation email (Conference acronym ’XX).
+ACM, New York, NY, USA,20pages.https://doi.org/XXXXXXX.XXXXXXX
+
+1   Introduction
+The widespread adoption of cloud-native microservice architectures, while enabling substantial business agility,
+has also introduced significant operational complexity. In such distributed systems, failures are not a matter
+of if, but when [14]. The complex web of service dependencies means that a single fault can trigger a cascade
+of failures, propagating rapidly throughout the system. With enterprise downtime costs estimated to exceed
+
+∗Corresponding author.
+
+Authors’ Contact Information: Aoyang Fang, aoyangfang@link.cuhk.edu.cn; Songhan Zhang, 222010549@link.cuhk.edu.cn; Yifan Yang,
+yifanyang6@link.cuhk.edu.cn;HaotongWu,haotongwu@link.cuhk.edu.cn;JunjielongXu,junjielongxu@link.cuhk.edu.cn;XuyangWang,
+xuyangwang@link.cuhk.edu.cn;RuiWang,224040299@link.cuhk.edu.cn;ManyiWang,225045034@link.cuhk.edu.cn;QishengLu,qishenglu@
+link.cuhk.edu.cn; Pinjia He, hepinjia@cuhk.edu.cn, The Chinese University of Hong Kong, Shenzhen, Shenzhen, China.
+
+Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that
+copiesarenotmadeor distributedforprofitorcommercialadvantageandthatcopies bearthisnoticeandthefullcitationon thefirstpage.
+Copyrights for components of this work owned by others than the author(s) must be honored. Abstracting with credit is permitted. To copy
+otherwise,orrepublish,topostonserversortoredistributetolists,requirespriorspecificpermissionand/orafee.Requestpermissionsfrom
+permissions@acm.org.
+Conference acronym ’XX, Woodstock, NY
+©2018 Copyright held by the owner/author(s). Publication rights licensed to ACM.
+ACM ISBN 978-1-4503-XXXX-X/2018/06
+https://doi.org/XXXXXXX.XXXXXXX
+
+
+                                                                                    , Vol. 1, No. 1, Article . Publication date: December 2018.
+
+=== PDF PAGE 2 ===
+2                                                                                                                                                                                                               Fang et al.
+
+$23,000 per minute [15], the ability to perform rapid and accurate Root Cause Analysis (RCA) has evolved from a
+technicalrequirementintoacriticalbusinessimperative.Automatingthepinpointingofafault’soriginfromvast
+andvariedtelemetrydata(metrics,logs,andtraces),whichcanreducetheMeanTimeToRecovery(MTTR),is
+therefore essential [48]. The research community has produced a variety of data-driven RCA approaches. Early
+workoftenconcentratedonasingledatamodality,suchaslogs[27,31,50],metrics[21,38],ortraces[16,17,22,
+36,37,46].Morerecently,acleartrendhasemergedtowardsmulti-modalanalysis.Theseapproachesintegrate
+heterogeneousdatasourcestoconstructamoreholisticsystemview,promisingsignificantlyenhanceddiagnostic
+precision [18,23,24,34,35,39,44,47,49,51,52].
+   Despite the apparent sophistication of these models, we find their effectiveness is often evaluated against
+benchmarks that oversimplify real-world failure scenarios. This concern is substantiated by our observation
+that simple rule-based methods can match or even surpass complex state-of-the-art (SOTA) models on four
+widely-used public benchmarks. This discrepancy prompts us to ask a fundamental question: Is the reported
+progress of SOTA algorithms a true reflection of their advanced designs, or is it an artifact of the inherent
+simplicity of the benchmarks used for their evaluation? We hypothesize that existing public benchmarks lack the
+complexity and scale required to meaningfully differentiate the capabilities of sophisticated RCA models.
+   Torigorouslyinvestigatethishypothesis,weconductasystematicempiricalstudyofpopularpublicbenchmarks,
+examiningtheirfaultinjectionstrategies,dependencygraphstructures,andtelemetrysignalpatterns.Ouranalysis
+reveals a critical limitation: in the majority of cases in existing datasets, the fault symptom of the root-cause
+servicethemostprominent.Thischaracteristicmakestherootcauseeasilyidentifiablethroughsimplecorrelation,
+obviating the need for complex causal inference that advanced models are designed to perform.
+   Motivatedbythiscleargap,weargueforthenecessityofsystematicallydesignedbenchmarksthatsignificantly
+increase the complexity and challenge for RCA algorithms (e.g., introducing more intricate fault propagation
+patterns). To this end, this paper proposes a framework that automates the generation, collection, and validation
+offailurescenariosatscale.Specifically,ourframeworkincorporatesseveralkeyinnovationsoverpriorwork.(1)
+Systematicfaultgeneration.Insteadofrelyingonasmallsetofmanuallyspecifiedinjections,ourframework
+systematicallyexploresavastfaultspacedefinedby31faulttypesacross6categoriesbylayeredrandomsampling.
+This allows for the generation of diverse and complex failure scenarios, including those that are difficult to
+orchestratemanually.(2)Impact-drivenvalidation.Acknowledgingthatnotallinjectedfaultsleadtoobservable
+issues, we introduce a pragmatic validation oracle that filters for failures causing detectable degradation in user-
+facingSLIs(e.g.,successrate,latency).Throughourimpact-drivenvalidationprocess,weidentify25faulttypes
+thatconsistentlyproduceuser-facingdegradations,ensuringthatourfinalbenchmarkcontainsonlyoperationally
+relevantfailurescenarios.Whilethisapproachintentionallyfocusesonuser-impactfulfailures,whichrepresent
+a primary concern for SREs, it provides a consistent and automatable standard for dataset quality, a feature
+absent in prior benchmarks. (3)Highly dynamic system environment. We implement our framework on
+TrainTicket [10], one of the largest open-source microservice systems, which simulates a real-world online
+ticketing platform with 50 services. To create a more complex and dynamic environment than previous static,
+low-QPS(QueriesPer Second)benchmarks, wesubjectthe systemtoa dynamic,state-machine-drivenworkload.
+Usingthisapproach,wegenerateanewbenchmarkdatasetcomprising1,430distinctvalidatedfailurecases.This
+dataset is uniquely annotated with multi-modal telemetry data and a hierarchical root cause labeling scheme.
+Unlike existing datasets that typically provide one-to-one mappings, our hierarchical labels recognize that a
+fine-grainedfailureinherentlyimpliesacoarse-grainedone.Forinstance,afunctionfailurenecessarilymeansits
+containing service is also faulty.
+   During the dataset construction process, we identify a critical phenomenon often overlooked in existing
+benchmarks:alargeportionofinjectedfaultsaresilent.Thatis,theydonotproduceanyuser-facingimpact.This
+observationhighlightsthevastnessofthepotentialfaultspaceandunderscoresthenecessityofanimpact-driven
+validationprocesstocreateabenchmarkfocusedonoperationallyrelevantproblems.Whileweinitiallydesigned
+31 fault types, our validation process revealed that only 25 consistently produced user-facing degradations.
+Althoughthissetof25faulttypesmaynotperfectlymirrorthedistributionofproductionincidents,itrepresents
+a far broader and more structured exploration of failure modes—including code-level, network, and resource
+faults—than any existing public dataset.
+   In the re-evaluation stage, we select 11 recent SOTA RCA methods spanning different data modalities and
+architecturaldesigns,includingsingle-modal(metrics,traces)andmulti-modalapproaches.Ratherthansimply
+re-running existing implementations, we systematically re-engineer these methods into a unified evaluation
+
+
+
+, Vol. 1, No. 1, Article . Publication date: December 2018.
+
+=== PDF PAGE 3 ===
+Rethinking the Evaluation of Microservice RCA with a Fault Propagation-Aware Benchmark                                                                         3
+
+framework with standardized input interfaces. Our implementation follows modern DevOps practices, con-
+tainerizing each algorithm and enabling deployment on Kubernetes clusters. This standardized approach not
+only ensures fair comparison but also establishes a foundation for the broader RCA research ecosystem, where
+future datasets adhering to our data format can be seamlessly evaluated across all implemented methods. On our
+benchmark, these methods achieve an averageTop@1accuracy of only 0.21, with the best-performing method
+reachingmerely0.37,underscoringconsiderableroomforfurtherimprovement.Furthermore,their execution
+timesincreasedsubstantiallyfrommeresecondsonexistingbenchmarksto,insomecases,severalhours,exposing
+severe scalability issues. This dramatic performance degradation reveals deep, systemic weaknesses in current
+data-driven RCA approaches. Through systematic failure mode analysis, we identify three critical patterns that
+expose fundamental limitations in existing models. (1)Scalability issues. Methods struggle with increased
+telemetryvolume,withexecutiontimesescalatingfromsecondstohours.Forexample,CausalRCA[44]requires
+over 10 minutes to process a single failure case (8 minutes of data) in our benchmark. (2)Observabilityblind
+spots. Models fail when critical services lack sufficient telemetry data, a common scenario in production where
+monitoring coverage is incomplete. (3)Modelingbottlenecks. Existing approaches rely on assumptions that
+break under complex failure conditions, such as stable request rates during incidents.
+   Based on these findings, we distill actionable guidelines for future RCA research. A critical insight concerns
+the gap between academic assumptions of complete observability and the reality of production systems with
+incompletetelemetrycoverage.Wearguethatacademicbenchmarksmustproactivelysimulatetheseimperfect
+conditions to foster the development of robust models prepared for production deployment.
+   To summarize, this paper makes the following contributions:
+    • We are the first to systematically reveal the over-simplicity of widely used public RCA benchmarks,
+       demonstrating that their perceived difficulty is an artifact of simplistic evaluation.
+    • Weintroduce a novel frameworkto synthesize a newlarge-scale, multi-modal benchmarkthat embodies
+       complex failure phenomena validated by end-user impact.
+    • Through a large-scale re-evaluation, we identify and analyze a set of critical, previously unreported failure
+       patterns in SOTA models, revealing their fragility to complex causality, observability blind spots, and
+       scalability limitations.
+    • We establish a standardized and reproducible evaluation ecosystem for RCA research by re-engineering 11
+       SOTA algorithms into a unified, containerized framework, facilitating fair and scalable evaluation.
+    • Basedonourfindings, wedistillactionableguidelinesforfutureresearchandpubliclyrelease ourentire
+       research artifact, including the benchmark, generation framework, and re-engineered models, to foster
+       community progress.
+
+2   Related Work
+2.1   Data-Driven Root Cause Analysis in Microservices
+The adoption of microservice architecture has been a paradigm shift in building scalable and resilient cloud
+applications. However, this architectural style introduces significant complexity for system maintenance. A
+single user request may traverse dozens of loosely coupled services, and a fault in one service can propagate
+unpredictably,causinga cascadeoffailures acrossthesystem. Thisdistributednature makesmanualroot cause
+analysis (RCA) a daunting and time-consuming task for engineers [48].
+   Toaddressthischallenge,thefieldhasmovedtowardsautomated,data-drivenRCA.Theseapproachesleverage
+the vast amount of monitoring data generated by modern cloud systems, which primarily includes metrics, logs,
+and traces. Initial approaches primarily relied on a single data modality, including metric-based methods [20,
+21, 25, 27, 28, 31, 41, 45], log-based methods [22, 30], and trace-based methods [43]. However, recognizing
+that a holistic system view is essential, researchers started developing methods that fuse metrics, logs, and
+traces[19,24,34,35,44,47,49].Bycorrelatinginformationacrossdifferentdatatypes,theseadvancedapproaches
+can capture more complex failure patterns, leading to substantial improvements in diagnostic performance.
+
+2.2   Studies in Root Cause Analysis for Microservices
+ArecentcomprehensivestudybyPhametal.[32]providesacriticalevaluationoftheSOTAincausalinference-
+based RCA. They benchmarked an extensive suite of causal discovery (nine) and RCA methods (twenty-one),
+concluding that no single algorithm is universally superior, and many struggle to outperform random selection,
+especiallyinlarge-scalesystems.Crucially,theirworkhighlightsafundamentalchallengethatmotivatesourown:
+
+
+                                                                               , Vol. 1, No. 1, Article . Publication date: December 2018.
+
+=== PDF PAGE 4 ===
+4                                                                                                                                                                                                               Fang et al.
+
+the performance of methods on existing synthetic datasets does not reliably predict their efficacy on real-world
+systems.Phametal.identifiedthissymptomofinconsistentevaluationresultsstemmingfromflaweddatasets.
+Our research, therefore, addresses the underlying cause by focusing on the methodological construction of a
+morefaithfulandcontrolledevaluationbenchmark.Weaimtoextendtheirworkbyprovidingamorereliable
+foundation upon which the true capabilities of RCA algorithms can be more accurately assessed.
+
+3   Preliminary Study
+Thissectionpresentsapreliminarystudydesignedtoevaluatetheinherentchallengeswithinmainstreampublic
+microservicesRCAdatasets.Theprimaryobjectiveistoscientificallyassessthe“simplicity”ofthesedatasetsand
+demonstrate a causal link between their structural and behavioral characteristics and the ostensibly superior
+performanceofSOTARCAmodels.Thefindingswillserveasafoundationaljustificationfortheneedtoconstruct
+a new, more realistic, and challenging benchmark. This study is guided by three core research questions (RQs):
+    • RQ1: What are the primary structural and runtime characteristics of failure scenarios in mainstream public
+       RCA datasets?
+    •RQ2: How does a simple heuristic method perform on these datasets compared to SOTA models?
+    •RQ3: What explains the strong performance of SimpleRCA on existing benchmarks?
+
+3.1   Study Design
+3.1.1   Datasets.Foracomprehensiveevaluation,weselectedthemostcommonlyusedandpubliclyavailable
+multimodal datasets in the microservice RCA domain. These datasets cover a range of systems, including
+TrainTicket (TT) [10], OnlineBoutique (OB) [8], SockShop (SS) [9], SocialNetwork (SN) [3], and MicroSS [5].
+    • Eadro[4]:Includestwosub-datasets,Eadro-TTandEadro-SN,designedwithaspecificfocusonnetwork
+       and resource faults.
+    • Nezha[7]: Includes two sub-datasets, Nezha-TT and Nezha-OB, representing relatively small-scale mi-
+       croservice architectures.
+    • RCAEval [33]: A benchmark suite Spanning three generations (RE1, RE2, RE3), each including three
+       system scenarios. We didn’t include RE1 because it is a unimodal dataset.
+    • AIOps-2021[2]:ThedatasetfromtheAIOpsChallengein2021,knownforitslargevolumeofobservational
+       data and various failure types.
+    •GAIA[5]: A dataset with a large number of fault samples generated from real cloud environment traffic.
+3.1.2   Heuristic Method Design (SimpleRCA).To address RQ2, we designedSimpleRCA, a heuristic method
+simulating domain experts’ intuitive troubleshooting logic. It takes multi-modal service data as input, uses
+rule-based anomaly detectors to generate alerts, and identifies the service with the most alerts as the root cause.
+Tailored rules for each data modality:
+    • Metrics:For eachservicemetric, athreshold-based detectorisused. Thethreshold isdynamicallydeter-
+       minedusingrobuststatisticalmethods,suchasthe3-sigmaruleorthe95thpercentile(P95)ofitshistorical
+       data. An alert is triggered if a metric’s current value exceeds this threshold.
+    • Traces: The P95latency for eachservice iscalculated from its traces.A detectortriggers an alertif this
+       latencyvalueisacertainmultiple(e.g.,3x)ofitsnormal-periodbaseline,indicatingasignificantperformance
+       degradation.
+    • Logs:Asimplekeyword-matchingapproachisemployed.Thetotalcountoflogentriescontainingcommon
+       errorkeywords(e.g.,ERROR,FAIL,EXCEPTION)foreachserviceistallied.Analertisgeneratedifthis
+       count crosses a predefined threshold, assuming a sudden spike in errors.
+   These rules are all basic and commonly used anomaly detection rules. SimpleRCA is not a practical RCA
+solution, but a tool to test whether existing datasets capture real-world complex fault-cause relationships.
+3.1.3   ExperimentalSetup.SOTAbaselinemodels:Weselectedthebest-performingmethodsfromtherespective
+benchmarkpapers (e.g.,Eadro, Nezha,Baro) andgeneral-purpose SOTAapproaches (e.g.,ART forAIOps-2021)
+for fair comparison.
+   Evaluationmetrics: We utilized a set of widely used evaluation metrics in the RCA domain, including:
+    •𝑇𝑜𝑝@𝐾: The proportion of correct root cause included in the top𝐾predictions.
+    •𝐴𝑣𝑔@𝐾: The average rank of the correct root cause within the top𝐾predictions.
+    •𝑀𝑅𝑅(Mean Reciprocal Rank): The average reciprocal rank for prediction accuracy.
+
+
+, Vol. 1, No. 1, Article . Publication date: December 2018.
+
+=== PDF PAGE 5 ===
+                        Rethinking the Evaluation of Microservice RCA with a Fault Propagation-Aware Benchmark                                                                         5
+
+                        Table 1.  Key Statistics of Existing RCA Benchmark Datasets. We measure scale by the number of failure cases (# Cases),
+                        services (# Svcs), total duration, and data volume (logs, traces). Complexity and dynamism are measured by the number of
+                        services covered by requests, (# Svc. by Req), Queries Per Second (QPS), max call depth (Max Depth), metric diversity (#
+                        Metrics) and metric sampling interval (Spl Interval).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                               Fig. 1. Fault type distribution of existing benchmark datasets.
+
+
+                             •Running Time: The time of model execution, evaluating the efficiency of the algorithm.
+
+                        3.2   Results and Analysis
+                        3.2.1   AnsweringRQ1:DatasetCharacteristics.WefirstanalyzedthestaticcharacteristicsofexistingRCAbench-
+                        marks to uncover their inherent structural and runtime properties. Table1summarizes the key statistics, and
+                        Fig.1shows the fault type distribution.
+                           A review of the static features reveals key limitations that simplify the RCA task.(1)Limitedfaultcases.
+                        Except GAIA, all datasets contain fewer than 200 faults (e.g., Eadro and Nezha <100, AIOps-2021 only 159). This
+                        scarcityof samplesposesa fundamentalchallenge forcomplex modelsto learnrobust andgeneralizable patterns,
+                        andthestrongperformancereportedbySOTAmethodsmaylargelyreflectoverfittingtolimitedscenariosrather
+                        than true generalization ability.(2)Simplifiedrequeststructures.Even in datasets with many services (e.g.,
+                        RE2-TTandRE3-TTwith69services),allrequestscollectivelycoveronly27services.andhasextremelyshort
+                        traces, withseven datasetsmax outat just2-3 hops. However,real-worldmicroservicesystems typicallyinvolve
+                        much deeper propagation chains and larger service graphs. These simplified structures reduce the search space
+                        andfailtocapturetheintricatedependenciesandcascadingfailuresobservedinproductionenvironments.(3)
+                        Narrowfaultspectrum.Fault typesare fewand imbalanced.Wecategorizethem intosix classes(e.g.,CPU,
+                        Code,Configuration,Disk,Memory,andNetwork)basedonthefaultdefinitions,butmostdatasetscontainonly
+                        one or two types (e.g., Eadro sub-datasets and RE3 series) or exhibit severe skew (e.g., GAIA).
+
+
+
+                                                                                                                       , Vol. 1, No. 1, Article . Publication date: December 2018.
+
+
+Dataset                System  #Cases  #Svcs  #Svc.byRequests  MaxDepth              #Logs(M)  #Metrics  SplInterval(s)  #Traces(M)  Duration   QPS
+Nezha-TT          Train-Ticket        45       46                    28             4      0.16          19                60          0.004       8.9hr   0.13
+Nezha-OB      Online-Boutique        56       10                    10             2       2.20          19                60          0.047       8.1hr   1.59
+Eadro-TT          Train-Ticket        81       27                    13             3      0.01           7                 1          0.016     17.8hr   0.25
+Eadro-SN       SocialNetwork        36       12                    12             3        0.08           7                 1          0.072       2.4hr   8.38
+AIOps-2021        E-commerce       159       18                    12             4        5.30         483                30            2.94     13.3hr  61.63
+GAIA                  MicroSS     1097       10                    10             2       14.60         949                30             3.1     31days   1.16
+RE2-TT            Train-Ticket        90       69                    27             5     21.30           8                 1            0.56       36hr   4.35
+RE3-TT            Train-Ticket        30       69                    27             3      1.60           8                 1          0.072       15hr   1.34
+RE2-OB        Online-Boutique        90       17                     7             2      15.00           8                 1           2.1M     35.7hr  16.42
+RE3-OB        Online-Boutique        30       28                     7             2       2.10           8                 1            0.28       12hr   6.51
+RE2-SS              Sock-Shop        90       16                   NA           NA         7.60           8                 1            NA       36hr    NA
+RE3-SS              Sock-Shop        30       26                   NA           NA         2.30           8                 1            NA       12hr    NA
+
+=== PDF PAGE 6 ===
+                          6                                                                                                                                                                                                               Fang et al.
+
+                                                                  Table 2. Performance Comparison of SimpleRCA and SOTA Methods.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                          3.2.2   AnsweringRQ2:Performance Comparison.To addressRQ2,we comparedSimpleRCAwith selectedSOTA
+                          models on their respective datasets (Table2). Baseline results were taken directly from the original papers to
+                          ensure faithful and reproducible comparisons.1
+                              Accuracy.SimpleRCA’s𝑇𝑜𝑝@1accuracyiscomparabletoorsurpassesSOTAmethodsonmultipledatasets.
+                          For instance, it achieves 0.93 on Nezha-TT versus Nezha’s 0.87, and 0.83 on RE3-TT and RE3-SS versus BARO’s
+                          0.50 and 0.00. Even where SOTA models slightly outperform SimpleRCA, the gap is within 0.1, except for Eadro,
+                          where the relatively high accuracy is largely due to substantial overlaps in patterns between the training and
+                          testingsets.Furthermore,theadvantageofSOTAmethodsdoesnotwidenwithrelaxed𝑇𝑜𝑝@𝐾 metrics(𝑇𝑜𝑝@3,
+                          𝑇𝑜𝑝@5), underscoring the robustness of SimpleRCA across ranking thresholds.
+                              Efficiency.SimpleRCA is orders of magnitude faster than SOTA models, except for the metric-based Baro.
+                          However,BaroisaunimodalmethodthatperformsfarworsethanSimpleRCA,withanaverageTop@1scoreon
+                          the RCAEVAL dataset that is 0.34 lower (0.24vs. 0.58). This further emphasizes that on these public benchmark
+                          datasets, SOTA models do not offer a performance advantage commensurate with their computational cost.
+
+
+
+
+
+
+
+Dataset                 Method            𝑇𝑜𝑝@1𝑇𝑜𝑝@3𝑇𝑜𝑝@5𝐴𝑣𝑔@3𝐴𝑣𝑔@5MRR        Time(s)
+
+Re2-OB                 BARO1We didnot includethe GAIAdataset inour experimentsbecause itsuffers from issuessuch asinconsistencies inground-truth annotations0.14                 0.93                 0.98                0.64                0.77          0.54      0.09
+                    SimpleRCA                  0.47               0.93               1.00               0.68               0.80 0.67                1.14
+                          (e.g., many injected faults are reflected in the logs, but only a small subset is labeled), which may introduce bias into the evaluation.0.67                 0.84                 0.89                0.77                0.81          0.76      0.87
+RE2-TT                 BAROSimpleRCA           0.80               0.87               0.93               0.84               0.87         0.85      5.99
+                          , Vol. 1, No. 1, Article . Publication date: December 2018.0.14                 0.82                 0.94                0.50                0.67          0.47      0.06
+RE2-SS                  BAROSimpleRCA          0.24               0.88               0.97               0.59               0.74 0.55                0.20
+
+RE3-OB                BAROSimpleRCAmatchesorsurpassesSOTAperformanceatfarlowercost.Despiteitssimplicity,SimpleRCA0.00                 0.90                 0.90                0.59                0.71          0.45      0.06
+ Existing RCA datasets lack realism. They feature few fault cases, simplified request structures, and highlyattainscomparableorsuperioraccuracytoSOTAmethodswhilebeingordersofmagnitudefaster,indicatingSimpleRCA0.30               0.90               0.90               0.62               0.73         0.56      0.50
+
+RE3-TT                 BAROthat most faults in existing benchmark datasets can be addressed by simple rule-based methods, making itimbalanced faulttype distributions.These limitations result inbenchmarks thathardly approximate real-0.50                 0.93                 1.00                0.77                0.86          0.72      0.26
+ world complexity, potentially overstating model effectiveness.difficult to effectively evaluate SOTA approaches.SimpleRCA0.83               1.00               1.00               0.93               0.96         0.91      1.02
+RE3-SS                  BARO                   0.00                 0.83       0.93       0.46                0.65          0.40      0.07
+                    SimpleRCA                  0.83               0.90        0.90       0.88               0.89         0.87      0.15
+Nezha-TT            Nezha                      0.87                 0.98                 0.98                  NA                  NA           NA                 NA
+                    SimpleRCA                  0.93               0.98               0.98       0.96                0.97          0.96                1.81
+
+Nezha-OB           Nezha                       0.93               0.96               0.96        NA                  NA           NA                 NA
+                    SimpleRCA                  0.91                 0.91                 0.91                0.91                0.91          0.91                5.05
+Eadro-TT             Eadro                     0.99               0.99               0.99        NA                  NA           NA                 NA
+                    SimpleRCA                  0.81                 0.83                 0.83                0.82                0.83          0.82                0.11
+Eadro-SN             Eadro                     0.97               0.99               0.99        NA                  NA           NA                 NA
+                    SimpleRCA                  0.83                 0.83                 0.83                0.83                0.83          0.83                0.60
+AIOps-2021        ART                          0.72               0.89         NA                  NA        0.87  NA                 NA
+                    SimpleRCA                  0.63                 0.82                 0.91                0.74                0.80          0.74                4.25
+
+=== PDF PAGE 7 ===
+                         Rethinking the Evaluation of Microservice RCA with a Fault Propagation-Aware Benchmark                                                                         7
+
+                         Table3. Statisticson CompletenessofObservabilityand FaultInjectionPatternClassificationofExisting Datasets.Note:#
+                         Cases: Count of cases; # Incom. Cases: Count of cases with incomplete data; R. of Incom. Cases: Rate of incomplete cases; R.
+                         of Type𝑖: Rate of cases belonging to Type𝑖(i=I,II,III).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                         Fig. 2. Case Study: CPU load faultin the Eadro dataset. Fault signaturesare concentrated only on the injected service; other
+                         services, like ts-security-service and ts-station-service, show no observable fluctuations.
+
+
+                         3.2.3   Answering RQ3: Deficiencies Analysis.Based on the fact that SimpleRCAcan achieve such superior perfor-
+                         mance on existing benchmark datasets, we hypothesize that the root cause may lie in deficiencies in the quality
+                         of fault injection and observability data within these datasets. To systematically investigate this issue, we assess
+                         the quality of existing datasets along two dimensions:(i)completenessofobservabilitydata,i.e.,whether
+                         thekeyfault-relevantsignalsaremissing,and(ii)simplicityoffaultinjectionpatterns,i.e.,whether
+                         thefaultsareoverlyeasytolocalize. Thesetwo dimensions evaluate data qualityin terms of the sufficiency
+                         of observational signals and the authenticity and complexity of fault patterns.
+                             Regarding the completeness of observability, we put forward two guiding principles. First, each fault type
+                         mustbepairedwithitscorrespondingobservabilitydata(e.g.,networkfaultsnecessitatefulltracecoverage;CPU
+                         faultsrequirerelevantmetrics).Second,fromtheperspectiveofuserexperience,injectedfaultsmustpropagateto
+                         user-facing status codesto reflect real-world disruptions. Otherwise,such faults fail to reflectrealistic scenarios,
+                         where service disruptions are inevitably observable at the user level.
+                             Toassessthesimplicityoffaultinjectionpatterns,weanalyzeservice-levelfaultsymptoms.Aserviceisdeemed
+                         toexhibit apronounced fault symptomsif fault-relevantmetrics orerror countsinlogs duringthefault period
+                         exceed apresetthreshold (e.g.,twice theaverage ofthe precedingnormal period);otherwise, itis categorizedas
+                         showing only anattenuated fault symptoms. Based on this rule, each fault case is classified into three types:
+                             (1)TypeI: Pronounced fault symptoms only in the injected service (i.e., overly localized).
+                             (2)TypeII: No pronounced fault symptoms in any service (i.e., fault under-expressed).
+                             (3)TypeIII: Stronger fault symptoms in services other than the injected one.
+                         Type I highlights overly localized fault manifestations, while Type II raises concerns about the effectiveness of
+                         faultinjection.Toillustrate,Fig.2showsthreeCPUfaultsinEadroclassifiedasTypeI.Inthesefaults,onlythe
+                         injectedserviceexhibitsabnormalCPUmetrics,whileallotherservicesmaintainflattrends,makingthefaults
+                         easily identifiable but rarely representative of real-world cascading failures.
+                             Table3showsthat0.99offaultcaseslackatleastonetypeofobservabilitydata,whileonlyfourfaultcasesin
+                         theRE2-OBdatasetmeetour”comprehensiveobservability”criterion.Intermsoffaultinjectionpatterns,TypeI
+
+
+                                                                                                                               , Vol. 1, No. 1, Article . Publication date: December 2018.
+  Dataset                    Completeness of Observability                                           Fault Injection Pattern Classification
+                  # Cases       # Incom. Cases          R. of Incom. Cases           R. of Type I        R. of Type II       R. of Type III        R. of Type I&II
+Nezha-TT                 45                               45                                   1.000.93                        0.07                         0.00                            1.00
+Nezha-OB                 56                               56                                   1.000.91                        0.09                         0.00                            1.00
+Eadro-TT                 81                               81                                   1.000.75                        0.25                         0.00                            1.00
+Eadro-SN                 36                               36                                   1.000.50                        0.44                         0.06                            0.96
+AIOps-2021              159                             159                                   1.000.63                        0.16                         0.21                            0.79
+RE2-TT                   90                               90                                   1.000.67                        0.17                         0.17                            0.83
+RE3-TT                   30                               30                                   1.000.83                        0.00                         0.17                            0.83
+RE2-OB                   90                               86                                   0.960.59                        0.28                         0.13                            0.87
+RE3-OB                   30                               30                                   1.000.30                        0.00                         0.70                            0.30
+RE2-SS                   90                               90                                   1.000.60                        0.27                         0.13                            0.87
+RE3-SS                   30                               30                                   1.000.83                        0.00                         0.17                            0.83
+All-Dataset             737                             733                                   0.990.68                        0.18                         0.14                            0.86
+
+=== PDF PAGE 8 ===
+                  8                                                                                                                                                                                                               Fang et al.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                  Fig.3. Thesix-stagepipelineforourbenchmarkdatasetconstruction,fromsystemselectiontothefinalvalidatedandlabeled
+                  failure cases.
+
+
+
+                  andTypeII togethercomprise 0.86of allcases. Theprevalenceof TypeI casesexplains whySimpleRCA achieves
+                  surprisingly strong performance-faults confined to a single service are inherently easy to localize. By contrast,
+                  the existence of Type II cases sheds light on why many algorithms fail, without any pronounced fault signals,
+                  localizationbecomesnearlyimpossible.Somedatasets(e.g.,Nezha-TT,Nezha-OB)containonlyTypeI/IIfault
+                  cases, suggesting that injected faults are either overly localized or too weak to manifest. Even in RE3-OB, where
+                  TypeIIIcasesaccountfor0.7,faultqualityremainsquestionablebecausemostarecode-levelissuescapturedin
+                  logs, and our classification rule only counts error entries in a straightforward manner.
+
+
+
+
+
+
+
+
+                  4   Dataset Construction
+                  4.1   Overview
+                  Inthissection,weintroduceoursystematicframeworkforconstructingacomprehensivebenchmarkdatasetfor
+                  rootcauseanalysis.AsillustratedinFig.3,ourframeworkoperatesasaclosed-loopprocessdesignedtogenerate
+                  a diverse and impactful set of failure scenarios. The process begins with a robustSystemFoundation(1), the
+                  Train-Ticket application,which is subjectedto dynamicworkloads fromourLoadGenerator(2). Concurrently,
+                  aController(3)orchestratesfaultinjectionsintothesystemusingastructuredFaultSpace,whichmodelsa
+                  widearrayoffailuretypes.Throughoutthisprocess,amulti-modalobservabilitypipelinecollectscomprehensive
+                  telemetry data, including metrics, logs, and traces, viaOpenTelemetry(4). Crucially, the precise parameters
+                  of each injected fault are recorded, forming the basis for ourHierarchical Ground Truth Annotation (5).
+                  Finally,aValidator(6)automaticallyassessesthecollecteddataagainstuser-impactmetrics(e.g.,successrate
+                  and latency) to filter out silent faults and categorize the anomalies. The insights from this validation provide
+                  aFeedback(7)mechanism tothe controller,enabling ahuman-in-the-loopstrategy toguide subsequentfault
+                  injectionstowardunderrepresentedandmorechallengingfailuretypes.Thisimpact-driven,iterativeapproach
+                  ensures that the resulting dataset is not only large but also diverse and relevant for evaluating modern RCA
+                  techniques.
+
+                  4.2   System Foundation and Enhancements
+                  Thequalityofamicroservicebenchmarkisfundamentallyconstrainedbyitsunderlyingapplication.Mostpublicly
+                  available systems (e.g., SockShop [9], OnlineBoutique [8], SocialNetwork [3], MicroSS [1]) are demonstrators
+                  with only about a dozen services, which is difficult to simulate the intricate dependency webs of industrial
+                  productionenvironments.To overcomethislimitation,weselected Train-Ticket[10],thelargest-to-date (asfar
+
+
+                  , Vol. 1, No. 1, Article . Publication date: December 2018.
+
+
+CurrentRCAbenchmarkssufferfromtwosystemicshortcomings:(i)incompleteobservabilitydepriving
+models of essential diagnostic signals, and (ii) oversimplified or under-expressed fault patterns making
+evaluation unreliable. These issues highlight the urgent need for future benchmarks to include diverse,
+realistic fault scenarios with richer observability signals.
+
+=== PDF PAGE 9 ===
+Rethinking the Evaluation of Microservice RCA with a Fault Propagation-Aware Benchmark                                                                         9
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fig.4. State-machine-basedworkflowgenerationmodel,thebookingrequestnodedependsthreeparameters,i.e.,passenger,
+seat, and insurance. And each of the parameter can be fetched in different ways (either from creating new one, or query
+existing one). This recursive way leads to the combinational explosion.
+
+
+asweknow)open-sourcemicroservicesystemwith50distinctservices,asourfoundation               2.Wefurtherenhanced
+this foundation in two key ways:
+    • EnhancedObservability:Wedeployed acomprehensivemonitoringstackonKubernetes[              11–13],im-
+       proving the collection of runtime metrics and network telemetry to provide a more holistic view of the
+       system’s state.
+    • System Stabilization: We identified and rectified several inherent bugs and performance bottlenecks
+       within the Train-Ticket application. For instance, we discovered that the default JVM heap size settings
+       for several services were insufficient. Under increased QPSfromour dynamic workload generator, these
+       servicesexhibitednon-deterministiclatencyspikesandinstability,contaminatingthebaselineperformance.
+       By tuning these configurations and resolving other similar issues, we established a stable system baseline,
+       which is crucial for isolating the impact of deliberately injected faults.
+
+4.3   Dynamic Workload Generation
+Previous benchmarks often use static request patterns, which fail to represent the complexity of real-world
+user interactions. To address this, we developed a dynamic load generator based on a state-machine model, as
+illustrated in Fig.4. Our generator models a user workflow as a directed graph where each node represents a
+state(arequiredparameterforarequest)andeachedgerepresentsatransition(amethodtofulfillthatstate).
+   For instance, a Booking  Request is composed of states like Passenger  Selection and Seat  Preference.
+Each state can be resolved through multiple transitions; e.g., Passenger  Selection can be done by creating
+a new user or querying an existing one. Crucially, transitions can trigger sub-workflows to fulfill prerequisite
+sub-states, creating a recursive dependency model. This nested structure leads to a combinatorial explosion
+of unique execution paths (e.g., the booking workflow has6    × 3× 2 = 36combinations), ensuring a highly
+dynamicloadthatmimicsreal-worlduser variability.Thisapproachenablesthediscoveryofdefectsthat static
+load patterns would miss. To foster reproducibility, our load generator will be made publicly available.
+
+4.4   Fault Space Modeling
+Thescopeandnatureofinjectedfaultsarecriticalforabenchmark’sabilitytochallengeRCAmodels.Weused
+ChaosMeshto implementastructuredfault spacespanning31distinctfaulttypesacross sevencategories,as
+detailedinTable4.Thislibraryincludestraditionalresourcefaultsaswellasmorechallengingtypes,suchas
+code-level faults injected via JVM agents and network faults that manipulate HTTP semantics.
+   We discretize continuous parameters (e.g., CPU cores, latency intervals) to transform the abstract fault space
+intoaconcrete,enumerablesetofexperiments.Theresultingfaultspaceexceeds10     16 possibleconfigurations,
+with fine-grained discretization to capture subtle parameter-dependent faults.
+
+
+
+2Ourversionisbuiltuponthe Nezha[6]releaseofTrain-Ticket,whichinstrumentedapplicationlogswithtraceIDs,enablingvitallog-trace
+correlation.
+
+
+                                                                                , Vol. 1, No. 1, Article . Publication date: December 2018.
+
+=== PDF PAGE 10 ===
+10                                                                                                                                                                                                             Fang et al.
+
+Table 4. The 31 Fault Types Supported in Our Benchmark, Organized by
+Category.
+
+
+Category        FaultTypes
+Resource     PodKill, PodFailure, ContainerKill, MemoryStress, CPUStress
+Network   Delay, Loss, Duplicate, Corrupt, Bandwidth, Partition
+HTTP         ReqAbort, RespAbort, ReqDelay, RespDelay,
+                 RespReplaceBody, RespPatchBody, ReqReplacePath,
+                 ReqReplaceMethod, RespReplaceCode
+Code(JVM)Latency, Return, Exception, GC, CPUStress,                                      Fig.  5. The  hierarchical  structure  of  our
+                 MemoryStress, MySQLLatency, MySQLException                              groundtruthlabels.Afaultcanbelocalized
+DNS         DNSError, DNSRandom                                                          atdifferentlevelsofgranularity,fromtheser-
+Time      TimeSkew                                                                       vice down to the specific function.
+
+
+4.5   Multi-modal Data Collection
+We employed a standard observability stack based on OpenTelemetry to collect multi-modal data, including
+Kubernetes-level metrics, trace-correlated logs, distributed traces, and L4/L7 network telemetry. All data is
+normalized into a unified schema and stored in ClickHouse for efficient querying. This standardized schema,
+publicly available in our repository, simplifies data consumption for downstream RCA algorithms.
+
+4.6   Hierarchical Ground Truth Annotation
+AprecisegroundtruthisessentialforevaluatingRCAmodels.Inourframework,thegroundtruthforeachfailure
+caseisdirectlyderivedfromthefaultinjectionparameters.Thisincludesthespecificfaulttype,itstarget(e.g.,
+service, pod), and ensuringunambiguous root cause labelseven in casesof complex, cascading failures.Previous
+studies have used different granularities for root cause labels, ranging from coarse service-level identification to
+fine-grainedfunction-levelpinpointing[39,44],however,wearguethatamorefine-grainedlabelcancontainthe
+information of coarse-grained labels, while the reverse is not true. For example, knowing that the root cause is a
+specific function failure inherently implies that the parent service is also faulty, but not vice versa.
+   Asaresult,tosupportevaluationatvaryinglevelsofdiagnosticprecision,weintroduceahierarchicallabeling
+scheme. This hierarchy is represented by a tree structure, as shown in Fig.5. Each failure case is annotated
+withasetoflabelscorrespondingtotheselevelsofgranularity:Service,Pod,Container,andwhereapplicable,
+more specific identifiers for Metrics, Spans, or Functions. This structure provides researchers with the flexibility
+to evaluate their models at different levels of precision, from coarse service-level localization to fine-grained
+function-level identification3.
+
+4.7   Impact-Driven Selection
+As discussed in preliminary study3, a significant methodological flaw in existing benchmarks is the often-
+unspokenassumptionthateveryinjectedfaultmanifestsasanobservableproblem.Inpractice,manyfaultsare
+silent ortheir effects are absorbedby system resilience mechanisms.To constructa benchmark of operationally
+relevantfailures, we implementa strict,impact-drivenselectionprocesswhere afault isincluded ifand onlyifit
+produces adiscernible anomalyat thesystem’s entrypoints,as measuredby user-facingService LevelIndicators
+(SLIs).
+   Ourautomatedvalidationlogicemploysahybridapproachtoidentifyanomalies.Forsuccessratedegradations,
+it uses Z-tests to detect statistically significant drops. For latency anomalies, it combines hard thresholds (e.g., 10
+seconds) with adaptive statistical thresholds based on historical performance patterns. This process classifies
+experimentsintotwo categories:HasAnomaly(experiments withvalidateduser-perceivableimpact) andNo
+Anomaly(filtered out from the final dataset). We acknowledge this is a trade-off that prioritizes operational
+relevanceandscalablevalidationovertheinclusionofsubtle"grayfailures,"whichwediscussfurtherinSection7.2.
+
+4.8   Fault Injection Strategy
+Giventhevastnessofthefaultspace(exceeding10          16 configurations),anexhaustiveexplorationiscomputationally
+infeasible.For theconstructionof thecurrentdataset, we adopteda stratifiedrandom samplingstrategy.Wefirst
+
+3In this study, we only use service level labels, since it is the only common granularity across all methods.
+
+
+, Vol. 1, No. 1, Article . Publication date: December 2018.
+
+=== PDF PAGE 11 ===
+Rethinking the Evaluation of Microservice RCA with a Fault Propagation-Aware Benchmark                                                                       11
+
+partitioned the entire fault space into strata based on the seven high-level fault categories defined in Table4.
+Then,weperformedrandomsamplingoffaultparameterswithineachstratum.Thisapproachensuresthatall
+major fault categories are represented in the dataset, providing a broad foundation for evaluation.
+
+5   Study Design
+Based on ourpreliminary study (Section3),which revealed theinherent simplicity ofexisting RCA benchmarks,
+thissectiondetails thedesignofourmain empiricalstudy. Theprimarygoalisto introduceandvalidateamore
+challengingbenchmark andre-evaluatethe truecapabilitiesofSOTA modelsagainstit. Thisstudyis guidedby
+two core research questions (RQs), which address the quantitative complexity of ournewbenchmark and the
+performance of existing models on it.
+
+5.1   Research Questions
+   RQ4. How does our newly constructed benchmark quantitatively differ from existing public benchmarks in terms
+of scale, diversity, and complexity?Toanswerthis,wewillfirstpresentstatisticsfromourdatasetconstruction
+processtodemonstratetheefficacyofourmethodology.Wewillthenintroduceasetofindicatorstoquantifyand
+comparekeycharacteristicsacrossbenchmarks,includingdependencygraphcomplexity,workloaddynamics,
+and the distribution of failure signatures. This analysis will substantiate our claim that the new benchmark
+represents a more diverse and challenging set of failure scenarios.
+   RQ5. How do SOTA RCA models perform on this new benchmark, and what are their primary failure modes
+when confronted with complex causality and incomplete observability?Through this question, we intend to probe
+thelimitationsofcurrentSOTAmodelsusingourvalidated,challengingbenchmark.Wehypothesizethatthe
+increasedcomplexitywillleadtoasignificantperformancedegradation.Byanalyzingthefailuremodesagainst
+specific, engineered challenges, we aim to provide clear, actionable directions for future research in the field.
+
+5.2   Evaluation Metrics
+Toevaluatemodel performanceonour new benchmark,weadopt thesameevaluationmetricsestablishedinour
+preliminarystudy(Section3),whichincludeeffectivenessmetrics(Top@K,Avg@K,MRR)andefficiencymetrics
+(Execution Time).Thesemetricstogetherprovideacomprehensiveandstandardizedviewofmodelperformance,
+enabling direct comparison between our findings on simple and complex benchmarks.
+   Additionally,to assessthe scalability characteristicsof differentapproaches, weconduct a dedicatedscalability
+experiment that evaluates execution time across varying trace volumes, ranging from 2,000 to 18,000 traces. This
+experiment specifically focuses on models that utilize trace and log data, as these data types exhibit dramatic
+volumefluctuationsinresponsetorequestpatterns,unlikemetricsdata,whichtypicallyscaleslinearlywithtime.
+The scalability analysis provides crucial insights into the practical deployment considerations of each model
+under realistic workload variations.
+
+5.3   Evaluation Setup
+Our evaluation setup is designed to provide a rigorous and reproducible assessment of RCA models.
+   Baselines.To ensure a thorough and representativecomparison, we evaluateagainst eleven recentSOTARCA
+modelsthathavebeenpublishedintop-tiersoftwareengineeringandsystemsvenues.Thesemodelswereselected
+to cover a wide spectrum of underlying techniques in the field. Specifically, our selection includes:
+    • (1)Graph-basedmodels,suchasMicroRank[             43],MicroRCA[           40],MicroHECL[             29],andMicroDig[             36],which
+       leverage service dependency graphs and random walk algorithms to pinpoint faulty services.
+    • (2) Machine learning and deep learning approaches, such asDiagFusion[                     47],Eadro[    24], andArt[        35],
+       which learn complex failure patterns from historical and multimodal data using techniques like GNNs and
+       Transformers.
+    • (3) Causal inference and statistical methods, includingShapleyiq[                    26],Nezha[            44],CausalRCA[                    42], and
+       Baro[ 31],whichaimtoidentifythecausalcontributorstoafailurethroughtechniqueslikeShapleyvalues,
+       event pattern mining, and hypothesis testing.
+   Bycomparingagainstthisdiversesetofbaselines,wecandrawmorerobustconclusionsaboutthetruestate
+of theart and its limitationswhen facing complexfailure scenarios. To ensure afair comparison, weconducteda
+systematic, best-effort hyperparameter tuning for each model to adapt it to the unique characteristics of our new,
+
+
+                                                                               , Vol. 1, No. 1, Article . Publication date: December 2018.
+
+=== PDF PAGE 12 ===
+12                                                                                                                                                                                                             Fang et al.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fig.6.  Threetypesofthedatasetscollectedanddetectedinthedatasetgenerationprocessintermsoftheinjectedfault
+types. The labels are labeled by the detector introduced in Section4.7, which detects the user-aware anomalies.
+
+
+morecomplexbenchmark,ratherthansimplyadoptingthedefaultconfigurationsprovidedintheoriginalpapers,
+which were optimized for simpler, smaller-scale datasets.
+   Dataset.Weconductourevaluationonthenewbenchmarkdatasetproposedinthispaper(detailedinSection4).
+Thisbenchmarkisdesigned tochallengeSOTAmodelsthroughitsdynamicworkloads,diversefault types,and
+complex causal propagation chains. Our dataset construction process follows a rigorous protocol: each data
+collection cycle consists of 4 minutes of normal operation data followed by 4 minutes of failure data. After each
+faultinjection,theentireserviceenvironmentisredeployedtoensurecompleteisolationandpreventinterference
+frompreviousexperiments.Beforeeachnormaldatacollectionphasebegins,thesystemundergoesa4-minute
+warm-up period to reach a stable operational state, ensuring the reliability and consistency of our baseline
+measurements. For models thatrequire training, such as Art [35], DiagFusion [47], and Eadro [24], we partition
+the dataset by fault type, allocating 80% for training and the remaining 20% for testing.
+   Environments.AllexperimentsareconductedonaserverequippedwithtwoEPYC9754CPUsand1.48TiB
+of DDR5 memory. For the dataset construction phase, we deploy a Kubernetes cluster consisting of 1 master
+node and 6 worker nodes, where each worker node is equipped with 128 CPU cores and 128GB of memory.
+For algorithm evaluation, each algorithm is executed within a controlled environment, constrained to 128 CPU
+cores and 128GB of memory. This setup guarantees that performance differences are attributable to the models’
+intrinsic capabilities rather than variations in computational resources.
+
+6   Study Results
+This section presents the results of our main empirical study, guided by the research questions established in
+Section5.WefirstanswerRQ4byquantitativelydemonstratingourbenchmark’sincreasedscaleandcomplexity
+compared to prior work. We then addressRQ5by re-evaluating eleven SOTA models on this new benchmark,
+analyzingtheirperformancedegradationandsystematicallyidentifyingthreeprimaryfailuremodesthatreveal
+systemic weaknesses in current RCA approaches. This analysis provides a foundation for the actionable insights
+discussed in Section7.
+
+6.1   RQ4: New Dataset Characteristics
+To quantitatively demonstrate the increased complexity and scale of our new benchmark, we first show the
+effectivenessofourimpact-drivendatagenerationprocessandthenconductamulti-facetedcomparativeanalysis
+againstpriorwork.Ourevaluationcentersonthreecriticaldimensionsofabenchmark’scomplexityanddiagnostic
+challenge:WorkloadIntensity,SystemInteractionCoverage, andCausalComplexity.
+6.1.1   Effectiveness of the Impact-Driven Generation Process.To construct a benchmark with genuine diagnostic
+challenges,wefilteredout inconsequentialfault injectionsthrough arigorous, impact-drivenselection process
+described in Section4.7. Fig.6presents the outcome of this process across over9,152initial fault injection
+experimentsspanning31distinctfaulttypes,fromwhichweultimatelyderivedour1,430validatedfailurecases.
+The distribution of these experiments across fault types is intentionally non-uniform, reflecting the intrinsic
+
+
+, Vol. 1, No. 1, Article . Publication date: December 2018.
+
+=== PDF PAGE 13 ===
+                  Rethinking the Evaluation of Microservice RCA with a Fault Propagation-Aware Benchmark                                                                       13
+
+                  differences in the "injection space" for each fault category. For instance, JVM-related faults encompass a vast
+                  number of code methods as potential injection targets, whereas PodKill faults are limited to the much smaller
+                  number of available pods. To preserve the uniqueness and integrity of each experiment, we did not artificially
+                  balance these counts through duplicate injections; each experiment represents a distinct fault configuration.
+
+
+
+
+
+                    Our analysisrevealsthat avast majorityof initial faultinjections(84.4%)were classified as “NoAnomaly”,
+                  failingtoproduceanyuser-perceivableimpact.Thishighfailurerateisnotrandombutstemsfromtwoorthogonal
+                  and equally critical dimensions: injection intensity and injection location.
+                    First,resource-based fault injection requires delicate calibration within a narrow effective range.
+                  ChaosMesh implements resource stress faults by spawning independent processes that compete for system
+                  resources.ForCPUStressandMemoryStressfaults,near100%ofour initialinjectionsproduced noimpactdue
+                  to intensity miscalibration. When stress levels are too low, the target application continues operating normally,
+                  rendering the injection ineffective. Conversely, when stress levels are too high, the system’s out-of-memory
+                  killerorschedulerintervenestoterminatethestressprocess,againnullifyingtheinjection.Thisnarroweffective
+                  windowmakesresource-basedfaultsparticularlychallengingtocalibrateandexplainstheirhighfailureratein
+                  producing meaningful diagnostic scenarios.
+                    Second,wheninjectionlocationispoorlychosen,evenhigh-intensityfaultsmaynevermanifest.
+                  ThisissuewasmostprominentinJVM-levelmanipulations,suchasJVMReturnandJVMCPUStress.Theprimary
+                  reasonfortheirfailurewasthatthetargetedmethodswereneverinvokedbyourworkloadgenerator,rendering
+                  the fault injection inert regardless of its configured intensity. This dual failure mode validates our premise that
+                  many existing benchmarks, which often use minimal intensities and naive location selection, fail to generate
+                  meaningful diagnostic challenges.
+                    Incontrast,ourprocessalsoidentifiedfaultsthatconsistentlyproducedclearandseverefailures.Manipulations
+                  of core HTTP semantics, such as HTTPResponseReplaceCode(98%)and         HTTPRequestAbort (100%), predictably
+                  ledto“HasAnomaly”classifications.Thisisbecausethesefaultsdirectlydisruptthefundamentalcommunication
+                  protocolsthatmicroservicesrelyon,leadingtoimmediateand obvioususer-facingerrors.Afterfilteringoutthe
+                  inconsequential injections,6fault typesare filtered out,since they never produced anyimpactful failures inour
+                  experiments.The finalbenchmark thusconsists of1,430unique faultconfigurations across25faulttypes,each
+                  validated to produce meaningful user-perceivable impacts.
+                  6.1.2   ComparativeAnalysisofBenchmarkCharacteristics.Buildingonourcuratedsetofhigh-impactfailures,
+                  we now compare our benchmark against existing datasets across three key dimensions of complexity: workload
+                  intensity, system interaction coverage, and causal complexity. Fig.7provides a summary of this comparison.
+
+                    WorkloadIntensityandDataVolume.Abenchmark’sdiagnosticchallengeisfundamentallytiedtoitsworkload
+                  intensity, which dictates thevolumeand velocity of telemetrydata generated. We measure this intensity using
+                  QueriesPerSecond(QPS),derivedfromthetotaltracesandduration.Ourbenchmarkoperatesatanaverageof
+                  16.47QPS(maxis37.6),withfluctuationsinherenttoitsdynamicrequestgeneration;wedidnotincreasethe
+                  QPSfurthertoavoidsysteminstabilitythatwouldimpactdatagenerationefficiency.Thisprocessgenerateda
+                  massivedatasetof154.7millionloglinesand11.2milliontracesover188.1hours.Thisstandsin contrastto
+                  existingbenchmarks,whoseintensityisoftenatatoylevel.Forinstance,Nezha-TT[7],Eadro-TT[4],RE2-TT
+                  andRE3-TT[33],operateatamere0.14QPS,0.25QPS,4.35QPS,and1.34QPS,respectively.Thislowintensity
+                  fails tosimulate thehigh-concurrency conditionswhere failuresoften emerge fromcomplex interactionsunder
+                  load.The largedatavolumein ourbenchmark isadirectconsequenceofthis higherworkloadintensity, making
+                  it essential for assessing the scalability and noise-resistance of data-driven RCA models.
+
+                    Breadth and Depth of System Interaction.Beyonddatavolume,abenchmark’svalueisdeterminedbyitsability
+                  toexercisethesystem’sarchitecturalcomplexity.Theabilitytotriggercomplex,cascadingfailuresdependson
+                  howthoroughlytheworkloadexploresthemicroservicearchitecture.Weassessthisusingtwokeyindicators:
+                  the service count, representing the system’s potential scale, and the service coverage rate (the proportion of
+                  services exercisedby asingle trace),representingthe interaction’sbreadth. Whilesome benchmarkslike RE2-TT,
+                  Nezha-TT,andEadro-TTspanrelativelylargesystemsbutstillexhibitshallowworkloadsandlowservicecoverage
+
+
+                                                                                               , Vol. 1, No. 1, Article . Publication date: December 2018.
+
+
+
+
+Effectivefaultinjectionrequirescarefulcalibrationofbothinjectionintensityandinjectionlocationtoavoid
+undetectable weak faults, unreachable code paths, and trivially obvious strong faults.
+
+=== PDF PAGE 14 ===
+                        14                                                                                                                                                                                                             Fang et al.
+
+
+                                                                                                      Table 5.  Algorithm performance comparison on our newly
+                                                                                                      constructedbenchmarkdataset.Thebestresultsarehigh-
+                                                                                                      lighted inbold.
+
+
+
+
+
+
+
+
+
+
+
+
+                        Fig. 7. Dataset characteristics in terms of eight key at-
+                        tributes.Ournewlyconstructedbenchmarkdemonstratesa
+                        balanced and challenging profile across all dimensions, in-
+                        cludingrequestcoveredservices,lognumbers,requestnum-
+                        bers, durations, and data-packs (distinct injected faults).
+
+
+                        rates.Incontrast,ourdynamicworkloadgeneratorachievesaservicecoveragerateof84%(42outof50services),
+                        far exceeding RE2-TT’s39%(27/69), Nezha-TT’s61%(28/46) and Eadro-TT’s48%(13/27). This high coverage
+                        ensuresthatinjectedfaultsarenot isolated butcanpropagatewidelythroughthesystem’sdependencygraph,
+                        creating complex diagnostic challenges that require a holistic system view.
+
+                           Complexity of Causal Propagation.Finally, the ultimate test of an RCA benchmark is its ability to generate
+                        failureswithlongandcomplexcausalchains.Weusethemaximumservicecalldepthasadirectproxyfora
+                        benchmark’spotentialcausalcomplexity.Adeepercallchainallowsformoreintricatefaultpropagationpathsand
+                        increasesthelikelihoodofchallengingphenomenalikesymptomdrift,wherethemostseveresymptomsmanifest
+                        fardownstreamfromtheactualrootcause.Ourdatasetachievesamaximumdepthof7(correspondingtracelength
+                        is20),creatinglongandcomplexcausalchains.Thisissubstantiallydeeperthanmostotherbenchmarks,which
+                        typicallyhavedepthsbetween2and4(e.g.,Nezha-OB:2,Eadro-TT:3).Theshallowpropagationpathsindatasets
+                        likeGAIA(Max Depthof2)meanthe rootcauseisoftencoincident withthemostobvioussymptom,making it
+                        triviallyidentifiableandthusunsuitableforevaluatingadvancedcausalinferencecapabilities.Furthermore,our
+                        curatedsetof78uniquemetrictypesprovidestherich,multi-facetedsignalsnecessaryforcomplexdiagnosis,
+                        balancebetweenthesparseinstrumentationofbenchmarkslikeEadro(7types)andthepotentiallyoverwhelming
+                        noise of GAIA (949types, most of the which are not relevant for RCA).
+
+
+
+
+
+
+                        6.2   RQ5: Performance Evaluation and Failure Mode Analysis
+                        Given the differences in characteristics observed between our benchmark and existing datasets, we first present
+                        the overall performance ofelevenSOTA RCA models on our new benchmark. From Fig.6, we see that the
+                        distribution of fault types in our benchmark is not balanced, simply inspecting the overall performance metrics
+                        can obscure important nuances in how different models handle various fault categories. We then discuss the
+                        underlying reasons for their widespread failure, moving beyond simple metrics to a qualitative and quantitative
+                        analysis of their core limitations.
+                        6.2.1   OverallPerformance.Wefirstevaluatedallmodelsonourentirebenchmarkandfoundoveralllowperfor-
+                        mance:themean𝑇𝑜𝑝@1accuracyacrossallmodelsisonly0.21,withthebest-performingmodel,MicroRCA,
+                        reaching merely0.37. Our heuristic baseline, SimpleRCA, can also achieve only0.28                   𝑇𝑜𝑝@1accuracy, further
+                        underscoringthat thecomplexfailure patternsin ourdatasetcannot becaptured bysimple rulesand demand
+                        more sophisticated approaches.
+
+
+                        , Vol. 1, No. 1, Article . Publication date: December 2018.
+Algorithm𝑇𝑜𝑝@1𝑇𝑜𝑝@3𝑇𝑜𝑝@5Avg3    Avg5    MRR    Time(s)
+                              FullDataset
+Baro                0.36         0.50         0.58       0.43     0.48     0.44          0.99
+CausalRCA       0.22         0.40         0.42       0.33     0.36     0.31       927.11
+MicroDig         0.35   0.61  0.67 0.490.560.48  19.03Our benchmark is qualitatively superior by design, creating complex diagnostic scenarios by combining
+MicroHECL      0.34         0.34         0.34       0.34     0.34     0.34         34.82
+MicroRank       0.04         0.18         0.25       0.12     0.17     0.12         36.29high-impact failures, intense workloads, deep system interactions, and rich telemetry.
+MicroRCA0.37  0.50         0.64       0.43     0.51     0.45         35.64
+Nezha              0.04         0.08         0.08       0.06     0.07     0.05         94.62
+Shapleyiq         0.22         0.36         0.52       0.29     0.37     0.31         42.74
+SimpleRCA       0.28         0.60   0.80 0.460.580.47    0.90
+                                TestSet
+DiagFusion       0.13         0.17         0.22       0.15     0.17     0.16          3.03
+Eadro              0.16         0.16         0.16       0.16     0.16     0.16         32.75
+Art                  0.04         0.08         0.10       0.06     0.07     0.06          8.10
+
+=== PDF PAGE 15 ===
+Rethinking the Evaluation of Microservice RCA with a Fault Propagation-Aware Benchmark                                                                       15
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fig. 8. The performance distribution of each algorithm in terms of fault type,𝑇𝑜𝑝@1(red), MRR(yellow),                     𝐴𝑣𝑔@5(green),
+respectively. Most of the algorithms perform poorly on the DNS failure, TimeSkew failure, CPU and Memory stress failure,
+as well as MySQL related failures.
+
+
+6.2.2   Performance Breakdown by Fault Type.To understand this performance drop, we first break down the
+resultsbyfaulttype,revealingthatmodeleffectivenessishighlydependentonthenatureofthefailure.Fig.8
+presents a detailed breakdown of𝑇𝑜𝑝@1, MRR, and      𝐴𝑣𝑔@5for each model across various fault categories. We
+choose these three metrics because𝑇𝑜𝑝@1reflects the strictest accuracy requirement, MRR provides a balanced
+viewofrankingquality,and𝐴𝑣𝑔@5offersamorestableandholisticviewofrankingqualityacrossabroaderrange
+of candidates. From the figure, we observe several important patterns: (1)Performancevariessignificantly
+acrossdifferentfaulttypes,revealingthespecificstrengthsandweaknessesofcurrentRCAmodels.
+For instance,many modelsdemonstrate highproficiency indiagnosing faultsrelated tocontainer lifecycleand
+resource stress,suchas ContainerKill,PodKill,and JVMMemoryStress.In thesescenarios, modelslikeBaro,
+SimpleRCA, and MicroRCA consistently achieve high scores (e.g., Baro’s MRR is 0.87 forContainerKill and
+0.95 for JVMMemoryStress), likely because these faults produce clear, unambiguous signals (e.g., component
+crashes, resource usage spikes) that are easily captured by telemetry data. (2)Network-relatedandsemanti-
+cally complex faults pose a significant challenge to almost all models.Performance drops sharply for
+most network faults (NetworkCorrupt, NetworkLoss, etc.) and logic-related faults (JVMReturn). For example,
+in NetworkCorrupt scenarios, even the best-performing model, Shapleyiq, only achieves an MRRof 0.40. This
+suggests thatcurrent models struggle todiagnose problems that aresubtle, manifest intermittently, or require a
+deepunderstandingofsysteminteractionsratherthanjustsimplesignalanomalies.(3)Certainfaulttypeslead
+to near-total failure across all models.For faults like         DNSRandom and TimeSkew, almost every model fails
+completely,withperformancemetricsatornearzero.Thishighlightstheexistenceof“blindspots”incurrentob-
+servability and modeling approaches, where the generated telemetry data may not contain sufficient information
+fordiagnosis.Interestingly,Shapleyiqshowsexceptionalperformanceondelay-basedfaults(HTTPRequestDelay
+and HTTPResponseDelay), achieving near-perfect scores (MRR > 0.97), indicating its specialized capability in
+handling latency-induced issues.
+6.2.3   PerformanceBreakdownbyAlgorithm.Next,weanalyzetheresultsfromtheperspectiveofalgorithmic
+families,which revealsdistinct behavioralpatternsin howdifferentapproachesrankpotential rootcauses.Fig.9
+
+
+                                                                               , Vol. 1, No. 1, Article . Publication date: December 2018.
+
+=== PDF PAGE 16 ===
+16                                                                                                                                                                                                             Fang et al.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fig. 9. Failure rate distribution of each algorithm across different fault types. The failure rate is measured at𝑇𝑜𝑝@1
+(red),   𝑇𝑜𝑝@3(yellow),and         𝑇𝑜𝑝@5(green)accuracylevels.           𝑇𝑜𝑝@1showsthehighestfailurerateduetoitsstrictaccuracy
+requirement,while𝑇𝑜𝑝@5demonstratesthelowestfailureratewithrelaxedcriteria.Whenallbarsappeargreen,itindicates
+that𝑇𝑜𝑝@5and𝑇𝑜𝑝@1achieve identical performance.
+
+
+illustrates the performance distribution of each algorithm in terms of fault type, using𝑇𝑜𝑝@1(red),         𝑇𝑜𝑝@3
+(yellow),and    𝑇𝑜𝑝@5(green)accuracy.Thisperspectiverevealsdistinctbehavioralcharacteristicsofdifferent
+algorithmic approaches. (1)Somemodelsexhibitan“all-or-nothing”diagnosticbehavior.For algorithms
+likeEadro,MicroHecl,andtosomeextentMicroDigandMicroRCA,thebarsfor𝑇𝑜𝑝@1,     𝑇𝑜𝑝@3,and     𝑇𝑜𝑝@5are
+oftenofthesameheight.Thisindicatesthatifthemodeldoesnotidentifythecorrectrootcauseasitstop-ranked
+candidate, it ishighly unlikely to find it in thesubsequentfour results. This suggests a lackof a nuanced ranking
+mechanism; the models’features either point directly to thecorrect cause or miss itentirely. (2)Othermodels
+demonstratemoreeffectiverankingcapabilities.Incontrast,modelslikeSimpleRCA,Shapleyiq, andBaro
+frequentlyshowa significantgapbetweentheir𝑇𝑜𝑝@1and     𝑇𝑜𝑝@5scores.For example,in      HTTPRequestAbort
+cases, SimpleRCA’s𝑇𝑜𝑝@1is only 0.13, but its     𝑇𝑜𝑝@5accuracy jumps to 0.93. Thispattern suggests that while
+thesemodelsmaynotalwaysplacethetruerootcauseattheverytop,theirrankinglogiciseffectiveenough
+to include it within a small set of candidates, which is valuable in practical diagnostic scenarios. (3)Model
+performanceishighlydependentonthefaultcategory.Nosinglealgorithmexcelsacrossallfaulttypes.For
+example,BaroandSimpleRCAperformexceptionallywellonlifecyclefaultslikeContainerKillandPodKill,
+butstrugglewith networkissues.Conversely,Shapleyiqdominateslatency-based faultsbutperformspoorly on
+manyothers. Thislackofa universally superiormodelunderscores thattheeffectivenessof anRCAalgorithmis
+tightlycoupledtoitsunderlyingassumptionsandthespecificcharacteristicsofthefailureitisdesignedtodetect.
+   TheperformanceofSimpleRCA,inparticular,servesasacrucialbarometerforthecomplexityofourbenchmark.
+Onournew,morechallengingbenchmark,itsperformanceprofilevalidatesourdesignintentions.Thealgorithm
+excelsonfaults likeContainerKill(MRR0.75)and JVMMemoryStress(MRR0.76)preciselybecause itsdesign
+(aggregatingsimple,threshold-basedanomalycounts)isperfectlysuitedforfailuresthatproducealargevolume
+of obvious signals (e.g., crashes, resource spikes) localized to a single component. However, its effectiveness
+plummetsonnetwork-relatedandothersubtlefaults,wheretherootcausedoesnotnecessarilygeneratethemost
+“noise”.Thisdemonstratesthatourbenchmarksuccessfullycreatescomplexscenarioswherethetrue
+causeisdecoupledfromthemostobvioussymptoms,aconditionthatinvalidatessimpleheuristic-
+basedapproaches.Therefore, SimpleRCA’s performance pattern confirms that our benchmark introduces the
+kind of diagnostic ambiguity that necessitates the more sophisticated causal reasoning SOTA models claim to
+provide.
+6.2.4   Failure Mode Distribution.To understand the root causes of this widespread performance degradation, we
+manuallyanalyzedthe262mostchallengingcaseswhereatleast10ofthe12modelsfailed(includingSimpleRCA).
+Our inductive coding process revealed three primary failure modes. Since a single case could cause different
+
+
+, Vol. 1, No. 1, Article . Publication date: December 2018.
+
+=== PDF PAGE 17 ===
+Rethinking the Evaluation of Microservice RCA with a Fault Propagation-Aware Benchmark                                                                       17
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fig.10. DistributionoffailurecausesacrossSOTARCAalgorithms                   Fig. 11. Scalability analysis of trace/log-based algo-
+infailurecases.Failuresarecategorizedintothreemaintypes:(1)ob-               rithmsunder4-coreCPUallocation.Mostmodelsex-
+servabilityblindspotswheretelemetrydataismissingorincomplete,                hibitatleastlineartimecomplexity,limitingreal-time
+(2)modelinglimitationsincapturingsystembehaviors,and(3)scala-                applicability.
+bility issues that prevent models from handling complex scenarios.
+
+
+algorithms to fail for different reasons, we allowed each case to be assigned multiple failure mode labels; the
+proportionsshowninFig.10arecalculatedfromthetotalsumoftheselabels.Thesemodesrepresentahierarchy
+of challenges, from practical viability to algorithmic soundness.
+   ThemostimmediatebarriertoadoptionisScalabilityIssues,whichrendermanySOTAmodelsimpractical
+forproductionenvironments.Withoutresourcelimit,CausalRCAandNezhaneed927.11sand94.62sonaverage
+to process our 8-minute data window (present in Table5), respectively. In our controlled scalability tests, we
+constrained all models to a realistic resource limit of 4 CPU cores. As shown in Fig.11, the execution time of
+mostmodelsincreasesatleastlinearlywithdatavolumeexceptforSimpleRCA.ThetimecostofEadroandArtis
+veryhigh,evenwith asmalldatavolume,sinceitneeds parallelismtopreparethedataformatrequiredby their
+deep learning models.
+   Beyond raw performance, even scalable models are frequently defeated byObservabilityBlindSpots, where
+necessary diagnostic signals are either absent or uninterpretable. We identified three distinct types:Signal-
+Loss Blind Spots, where models fail to interpret the cessation of telemetry (e.g., from a     PodKill fault) as a
+signal;Infrastructure-Level Blind Spots, where faults occurin unmonitored components like databases, whichwe
+deliberately included to test robustness; andSemantic-Gap Blind Spots, where contradictions between telemetry
+sources (e.g., an error log entry alongside a "success" trace status) create a paradox. These blind spots often
+compound, creating a web of contradictory signals that defeats models lacking the ability to reason under data
+uncertainty and incompleteness.
+   Ultimately, even with perfect scalability and complete observability, models fail due to inherentModeling
+Bottlenecks, where their core assumptions are invalidated by complex failure patterns. A prime example is
+frequency-based models like Nezha [44], which assume faults increase event frequency. This assumption is
+violated by faults like PodKill that cause signals to cease, leading the model to misinterpret the absence of
+events as normal operation. This highlights the most profound limitation: many models’ rigid, assumption-laden
+approaches cannot accommodate the diverse and often subtractive nature of real-world failures, revealing a
+critical gap in their core diagnostic logic.
+
+7   Discussion
+7.1   Threats to Validity
+We analyze threats to our study’s internal, external, and construct validity and our mitigation strategies.
+
+   Internal Validity.Thisconcernstheconfidenceinourcausalconclusions.Akeythreatistheconfigurationof
+baselinemodels;wemitigatedthisbyusingofficialimplementationsandprescribedsetups.Anotherthreatis
+potentialbugsinourexperimentalframework.Weaddressedthisthroughextensivetestingandafeedback-guided
+data curation process, which provided continuous end-to-end validation of our toolchain. Finally, to counter
+humanerrorinourqualitativefailureanalysis,weestablishedexplicitclassificationcriteriaandhadthreeauthors
+independently review and cross-validate the results to ensure consensus.
+
+
+                                                                                , Vol. 1, No. 1, Article . Publication date: December 2018.
+
+=== PDF PAGE 18 ===
+18                                                                                                                                                                                                             Fang et al.
+
+   External Validity.Thisrelatesto thegeneralizabilityof ourfindings.Our studyreliesona singlemicroservice
+system,Train-Ticket.Althoughitisthelargest open-sourcesystemofitskind,itsarchitecturemaynot represent
+all production environments. We mitigated this by injecting 31 diverse fault types and simulating dynamic
+workloads tocapture challengescommon tomost microservicesystems. Ourselection ofeleven SOTA models
+maynotcovertheentirerapidlyevolvingfield.However,ouranalysisfocusesonfundamentalfailuremodes(e.g.,
+Observability Blind Spots) likely shared by entire classes of models, making the findings broadly relevant.
+   Construct Validity.Thisaddresseswhetherourmetricsaccuratelymeasuretheintendedconcepts.Ourproxy
+metrics for benchmark complexity (e.g., QPS, service coverage) may not fully capture diagnostic difficulty.
+We mitigated this by complementing quantitative metrics with a qualitative, in-depth failure analysis (RQ5).
+Furthermore, standard evaluation metrics (e.g., Top@K, MRR) do not fully reflect the practical needs of an
+operator,suchastheinterpretabilityofresults.Weacknowledgethislimitationandscopeourworktoautomated
+localization accuracy, a prerequisite for adoption, noting that full utility evaluation requires human studies.
+
+7.2   Implications for Future Research
+7.2.1   Benchmark Design.Our findings call for a significant evolution in benchmark design, moving beyond
+current limitations. A primary challenge is theoracle problem, where reliance on user-facing SLIs creates
+a flawed ground truth. This approach often mislabels subtle but genuine degradations as “ineffective,” which
+unfairlypenalizesadvancedmodelsandunderestimatestheirtruediagnosticcapabilities.Toaddressthis,future
+benchmarks must broaden theirscope of failureto include critical system-level issues, such as metastable
+states,ratherthanfocusingonlyonuser-perceivableincidents.Furthermore,evaluationmustevolvebeyond
+diagnosticaccuracy. StandardmetricslikeTop@Kaccuracy areinsufficientbecause theyignorethe practical
+costsofinvestigatingrankedlists.Weadvocatefornewmetricsthat measureamodel’sdiagnosticcoherence,
+better reflecting its utility in real-world operations.
+7.2.2   Model Design.Our failure analysis reveals critical directions for the next generation of RCA models.
+The evidenceshows thata “one-size-fits-all” approachis ineffective, highlightinga clearneed forfault-aware
+algorithmdesignthat tailorsmodelstothe distinctcharacteristicsofdifferent faulttypes.Inparallel,models
+mustadopt aholisticsystemmodelingperspective.Instead offocusingon local,“loudestnoise”anomalies,
+algorithms must be able to reason about cascading effects and systemic dependencies. Finally, thescalability-
+efficiencytradeoffremains a major barrier to adoption. Future work must prioritize lightweight architectures
+that balance high precision with the near-real-time diagnostic speeds required in production environments.
+
+8   Conclusion
+Inthispaper,weexaminedtherecentprogressindata-drivenRCA,questioningwhetherperformanceonexisting
+benchmarksreflectstruecapability.OurworksuggeststhatthesuccessofmanySOTAmodelsmaybeclosely
+tied to the characteristics of current public benchmarks. We supported this by analyzing these benchmarks,
+which revealed common limitations in workload intensity, interaction coverage, and causal complexity. To
+address this gap, we developed an automated framework to generate a more comprehensive benchmark with
+dynamic workloads and a wider array of validated fault types. Our re-evaluation of 11 SOTA models on this
+new benchmark showed that they achieve lowTop@1accuracies, averaging 0.21 with the best-performing model
+reachingmerely0.37.Thisanalysishelpedusidentifythreecommonchallengesforcurrentmethods:Scalability
+Issues,Observability Blind Spots,andModeling Bottlenecks.Ourfindings suggestthatmanycurrentRCAmethods
+mayfacesignificanthurdlesincomplexproductionenvironments.Weproposethattheresearchcommunitycould
+benefit from shifting focus from purely model-centric innovation to a co-design approach that also emphasizes
+the creationof morerealistic and challengingbenchmarks.To facilitate thisdirection, wepublicly releaseour
+benchmark,generationframework,andevaluationsuite,providingafoundationforbuildingthenextgeneration
+of more robust diagnostic systems.
+
+9   Data Availability
+We promise that we will release all the code, baseline implementations, and datasets as open source.
+
+References
+ [1][n.d.]. Gaia-dataset.https://github.com/CloudWise-OpenSource/GAIA-DataSet. Accessed: 2024-09-14.
+ [2]2024. AIOps Competition Dataset.https://www.aiops.cn/gitlab/aiops-nankai/data/trace/aiops2021. Accessed: 2025-07-01.
+
+
+, Vol. 1, No. 1, Article . Publication date: December 2018.
+
+=== PDF PAGE 19 ===
+Rethinking the Evaluation of Microservice RCA with a Fault Propagation-Aware Benchmark                                                                       19
+
+
+ [3]2024. DeathStarBench.https://github.com/delimitrou/DeathStarBench/tree/master. Accessed: 2025-07-01.
+ [4]2024. Eadro Dataset.https://zenodo.org/records/7615394. Accessed: 2025-07-01.
+ [5]2024. GAIA Dataset.https://github.com/CloudWise-OpenSource/GAIA-DataSet. Accessed: 2025-07-01.
+ [6] 2024. GitHub-IntelligentDDS/Nezha:TheimplementationofmultimodalobservabilitydatarootcauseanalysisapproachNezhainFSE
+      2023.https://github.com/IntelligentDDS/Nezha. Accessed: 2024-10-27.
+ [7]2024. Nezha Dataset.https://github.com/IntelligentDDS/Nezha/tree/main. Accessed: 2025-07-01.
+ [8]2024. Online Boutique.https://github.com/GoogleCloudPlatform/microservices-demo. Accessed: 2025-07-01.
+ [9]2024. Sock Shop.https://github.com/microservices-demo/microservices-demo. Accessed: 2024-08-21.
+[10]2024. Train Ticket.https://github.com/FudanSELab/train-ticket. Accessed: 2025-07-01.
+[11]2025. Hubble.https://github.com/cilium/hubble. Accessed: 2025-07-01.
+[12] 2025. Kube-Prometheus.https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack. Accessed:
+      2025-07-01.
+[13]2025. OpenTelemetry Collector.https://opentelemetry.io/docs/collector/. Accessed: 2025-07-01.
+[14]Hajar Hameed Addeen. 2019.A dynamic fault tolerance model for microservices architecture. South Dakota State University.
+[15] CloudZero. 2025.Cloud Computing Statistics For 2025 And Beyond.  https://www.cloudzero.com/blog/cloud-computing-statistics/
+      Accessed: 2025-07-01.
+[16] RuomengDing,ChaoyunZhang,LuWang,YongXu,MinghuaMa,XiaominWu,MengZhang,QingjunChen,XinGao,XuedongGao,
+      etal.2023. TraceDiag:Adaptive,Interpretable,andEfficientRootCauseAnalysisonLarge-ScaleMicroserviceSystems.InProceedings of
+      the 31st ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering. 1762–1773.
+[17] YuGan,GuiyangLiu,XinZhang,QiZhou,JieshengWu,andJiangweiJiang.2023. Sleuth:ATrace-BasedRootCauseAnalysisSystem
+      forLarge-Scale MicroserviceswithGraphNeural Networks.InProceedings of the 28th ACM International Conference on Architectural
+      Support for Programming Languages and Operating Systems, Volume 4. 324–337.
+[18] ShenghuiGu,GuopingRong,TianRen,HeZhang,HaifengShen,YongdaYu,XianLi,JianOuyang,andChunanChen.2023. TrinityRCL:
+      Multi-Granular and Code-Level Root Cause Localization Using Multiple Types of Telemetry Data in Microservice Systems.IEEE
+      Transactions on Software Engineering49, 5 (2023), 3071–3088.
+[19] Yongqi Han, Qingfeng Du, Ying Huang, Jiaqi Wu, Fulong Tian, and Cheng He. 2024. The Potential of One-Shot Failure Root Cause
+      Analysis: Collaboration ofthe Large Language Model andSmall Classifier. InProceedings of the 39th IEEE/ACM International Conference
+      on Automated Software Engineering. 931–943.
+[20] ZilongHe,PengfeiChen,YuLuo,QiuyuYan,HongyangChen,GuangbaYu,andFangyuanLi.2022. Graphbasedincidentextractionand
+      diagnosisinlarge-scaleonlinesystems.InProceedings of the 37th IEEE/ACM International Conference on Automated Software Engineering.
+      1–13.
+[21] AzamIkram,SarthakChakraborty,SubrataMitra,ShivSaini,SaurabhBagchi,andMuratKocaoglu.2022. Rootcauseanalysisoffailures
+      in microservices through causal discovery.Advances in Neural Information Processing Systems35 (2022), 31158–31170.
+[22] XinruiJiang,YichengPan,Meng Ma,andPingWang.2023. LookDeepintotheMicroserviceSystemAnomaly throughVerySparse
+      Logs. InProceedings of the ACM Web Conference 2023. 2970–2978.
+[23] He Kong, Tong Li, Jingguo Ge, Lei Zhang, and Liangxiong Li. 2024. Enhancing fault localization in microservices systems through
+      span-level using graph convolutional networks.Automated Software Engineering31, 2 (2024), 46.
+[24] Cheryl Lee,Tianyi Yang,Zhuangbin Chen, Yuxin Su, and MichaelR Lyu. 2023. Eadro: An end-to-end troubleshootingframework for
+      microservices on multi-source data. In2023 IEEE/ACM 45th International Conference on Software Engineering (ICSE). IEEE, 1750–1762.
+[25] MingjieLi,ZeyanLi,KanglinYin,XiaohuiNie,WenchiZhang,KaixinSui,andDanPei.2022. Causalinference-basedrootcauseanalysis
+      for online service systems with intervention recognition. InProceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery
+      and Data Mining. 3230–3240.
+[26] YeLi, JianTan, BinWu, Xiao He, and FeifeiLi. 2023. Shapleyiq: Influencequantification byshapley values forperformance debugging
+      of microservices. InProceedings of the 28th ACM International Conference on Architectural Support for Programming Languages and
+      Operating Systems, Volume 4. 287–323.
+[27] Zeyan Li, Nengwen Zhao, Mingjie Li, Xianglin Lu, Lixin Wang, Dongdong Chang, Xiaohui Nie, Li Cao,Wenchi Zhang, Kaixin Sui, et al.
+      2022. Actionableandinterpretablefaultlocalizationforrecurringfailuresinonlineservicesystems.InProceedings of the 30th ACM Joint
+      European Software Engineering Conference and Symposium on the Foundations of Software Engineering. 996–1008.
+[28] Cheng-Ming Lin, Ching Chang, Wei-Yao Wang, Kuang-Da Wang, and Wen-Chih Peng. 2024. Root cause analysis in microservice using
+      neural granger causal discovery. InProceedings of the AAAI Conference on Artificial Intelligence, Vol. 38. 206–213.
+[29] Dewei Liu, Chuan He, Xin Peng, Fan Lin, Chenxi Zhang, Shengfang Gong, Ziang Li, Jiayu Ou, and Zheshun Wu. 2021. Microhecl:
+      High-efficientrootcauselocalizationinlarge-scalemicroservicesystems.In2021 IEEE/ACM 43rd International Conference on Software
+      Engineering: Software Engineering in Practice (ICSE-SEIP). IEEE, 338–347.
+[30] YichengPan,MengMa,XinruiJiang,andPingWang.2021. Faster,deeper,easier:crowdsourcingdiagnosisofmicroservicekernelfailure
+      from user space. InProceedings of the 30th ACM SIGSOFT International Symposium on Software Testing and Analysis. 646–657.
+[31] Luan Pham, Huong Ha, and Hongyu Zhang. 2024. BARO: Robust Root Cause Analysis for Microservices via Multivariate Bayesian
+      Online Change Point Detection.Proceedings of the ACM on Software Engineering1, FSE (2024), 2214–2237.
+[32] LuanPham, HuongHa,andHongyu Zhang.2024. RootCauseAnalysisfor Microservicesbasedon CausalInference:HowFarAreWe?.
+      In2024 39th IEEE/ACM International Conference on Automated Software Engineering (ASE). IEEE, 706–718.
+[33] Luan Pham, Hongyu Zhang, Huong Ha, Flora Salim, and Xiuzhen Zhang. 2025. RCAEval: A Benchmark for Root Cause Analysis of
+      Microservice Systems with Telemetry Data. InCompanion Proceedings of the ACM on Web Conference 2025. 777–780.
+[34] Yongqian Sun, Zihan Lin, Binpeng Shi, Shenglin Zhang, Shiyu Ma, Pengxiang Jin, Zhenyu Zhong, Lemeng Pan, Yicheng Guo, and
+      DanPei.2025. Interpretablefailurelocalizationformicroservicesystemsbasedongraphautoencoder.ACM Transactions on Software
+      Engineering and Methodology34, 2 (2025), 1–28.
+
+
+                                                                                                , Vol. 1, No. 1, Article . Publication date: December 2018.
+
+=== PDF PAGE 20 ===
+20                                                                                                                                                                                                             Fang et al.
+
+
+[35] Yongqian Sun, Binpeng Shi, Mingyu Mao, Minghua Ma, Sibo Xia, Shenglin Zhang, and Dan Pei. 2024. ART: A Unified Unsupervised
+      FrameworkforIncidentManagementinMicroserviceSystems.InProceedingsofthe39thIEEE/ACMInternationalConferenceonAutomated
+      Software Engineering. 1183–1194.
+[36] Lei Tao, Xianglin Lu, Shenglin Zhang, Jiaqi Luan, Yingke Li, Mingjie Li, Zeyan Li, Qingyang Yu, Hucheng Xie, Ruijie Xu, et al. 2024.
+      Diagnosingperformanceissuesforlarge-scalemicroservicesystemswithheterogeneousgraph.IEEETransactionsonServicesComputing
+      (2024).
+[37] Dongjie Wang, Zhengzhang Chen, Yanjie Fu, YanchiLiu, and HaifengChen. 2023. Incrementalcausal graph learning foronline root
+      cause analysis. InProceedings of the 29th ACM SIGKDD Conference on Knowledge Discovery and Data Mining. 2269–2278.
+[38] Dongjie Wang, Zhengzhang Chen, JingchaoNi, Liang Tong, Zheng Wang, Yanjie Fu,and Haifeng Chen. 2023. Interdependent causal
+      networks for root cause localization. InProceedings of the 29th ACM SIGKDD Conference on Knowledge Discovery and Data Mining.
+      5051–5060.
+[39] Yidan Wang,Zhouruixing Zhu, Qiuai Fu,YuchiMa, and Pinjia He. 2024. MRCA: Metric-level RootCause Analysis for Microservices via
+      Multi-Modal Data. InProceedings of the 39th IEEE/ACM International Conference on Automated Software Engineering. 1057–1068.
+[40] Li Wu, Johan Tordsson, Erik Elmroth, and Odej Kao. 2020. Microrca: Root cause localization of performance issues in microservices. In
+      NOMS 2020-2020 IEEE/IFIP Network Operations and Management Symposium. IEEE, 1–9.
+[41] ZheXie,ShenglinZhang,YitongGeng,YaoZhang,MinghuaMa,XiaohuiNie,ZhenheYao,LonglongXu,YongqianSun,WentaoLi,etal.
+      2024. Microservice Root Cause Analysis With Limited Observability Through Intervention Recognition in the Latent Space. (2024).
+[42] Ruyue Xin, Peng Chen, and Zhiming Zhao. 2023. Causalrca: Causal inference based precise fine-grained root cause localization for
+      microservice applications.Journal of Systems and Software203 (2023), 111724.
+[43] GuangbaYu,PengfeiChen,HongyangChen,ZijieGuan,ZichengHuang,LinxiaoJing,TianjunWeng,XinmengSun,andXiaoyunLi.
+      2021. Microrank:End-to-endlatencyissuelocalizationwithextendedspectrumanalysisinmicroserviceenvironments.InProceedings of
+      the Web Conference 2021. 3087–3098.
+[44] GuangbaYu,PengfeiChen,YufengLi,HongyangChen,XiaoyunLi,andZibinZheng.2023. Nezha:InterpretableFine-GrainedRoot
+      CausesAnalysisforMicroservicesonMulti-modalObservabilityData.InProceedingsofthe31stACMJointEuropeanSoftwareEngineering
+      Conference and Symposium on the Foundations of Software Engineering. 553–565.
+[45] QingyangYu,ChanghuaPei,BowenHao,MingjieLi,ZeyanLi,ShenglinZhang,XianglinLu,RuiWang,JiaqiLi,ZhenyuWu,etal.2023.
+      CMDiagnostor:An Ambiguity-Aware RootCauseLocalizationApproach BasedonCallMetric Data.InProceedings of the ACM Web
+      Conference 2023. 2937–2947.
+[46] ChenxiZhang,ZhenDong,XinPeng,BichengZhang,andMiaoChen.2024. Trace-basedMulti-DimensionalRootCauseLocalizationof
+      PerformanceIssuesinMicroserviceSystems.InProceedingsoftheIEEE/ACM46thInternationalConferenceonSoftwareEngineering.1–12.
+[47] ShenglinZhang,PengxiangJin,ZihanLin,YongqianSun,BichengZhang,SiboXia,ZhengdanLi,ZhenyuZhong,MinghuaMa,WaJin,
+      et al. 2023. Robust failure diagnosis of microservice system through multimodal data.IEEE Transactions on Services Computing16, 6
+      (2023), 3851–3864.
+[48] Shenglin Zhang, Sibo Xia, Wenzhao Fan, Binpeng Shi, Xiao Xiong, Zhenyu Zhong, Minghua Ma, Yongqian Sun, and Dan Pei. 2024.
+      Failure Diagnosis in Microservice Systems: A Comprehensive Survey and Analysis.arXiv preprint arXiv:2407.01710(2024).
+[49] ShenglinZhang,YongxinZhao,SiboXia,ShiruiWei,YongqianSun,ChenyuZhao,ShiyuMa,JunhuaKuang,BolinZhu,LemengPan,
+      et al. 2024. No More Data Silos: Unified Microservice Failure Diagnosis with Temporal Knowledge Graph.IEEE Transactions on Services
+      Computing(2024).
+[50] Shenglin Zhang, Yongxin Zhao, Xiao Xiong, Yongqian Sun, Xiaohui Nie, Jiacheng Zhang, Fenglai Wang, Xian Zheng, Yuzhi Zhang,
+      and Dan Pei. 2024. Illuminating the Gray Zone: Non-intrusive Gray Failure Localization in Server Operating Systems. InCompanion
+      Proceedings of the 32nd ACM International Conference on the Foundations of Software Engineering. 126–137.
+[51] LechengZheng, Zhengzhang Chen,Jingrui He, andHaifeng Chen.2024. MULAN:Multi-modal CausalStructure Learning andRoot
+      Cause Analysis for Microservice Systems. InProceedings of the ACM on Web Conference 2024. 4107–4116.
+[52] ZhouruixingZhu,CherylLee,XiaoyingTang,andPinjiaHe.2024. HeMiRCA:Fine-grainedrootcauseanalysisformicroserviceswith
+      heterogeneous data sources.ACM Transactions on Software Engineering and Methodology33, 8 (2024), 1–25.
+
+Received 20 February 2007; revised 12 March 2009; accepted 5 June 2009
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+, Vol. 1, No. 1, Article . Publication date: December 2018.

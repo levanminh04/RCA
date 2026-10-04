@@ -1,0 +1,262 @@
+{
+  "whitelist": [
+    "re2tt_ts-auth-service_cpu_1",
+    "re2tt_ts-route-service_mem_1",
+    "re2tt_ts-route-service_socket_1"
+  ],
+  "case_checks_pass": 3,
+  "entity_rows": 204,
+  "method_rerun": false,
+  "raw_data_opened": false,
+  "cases": [
+    {
+      "case": "re2tt_ts-auth-service_cpu_1",
+      "checks": {
+        "current_graph_services_exact": true,
+        "interservice_edges_exact": true,
+        "interservice_isolates_exact": true,
+        "operation_edge_isolates_exact": true,
+        "full_service_order_exact": true,
+        "top11_service_order_exact": true,
+        "full_candidates_equal_current_graph": true,
+        "no_ranked_service_absent_from_trace": true,
+        "no_duplicate_service_in_mapped_ranks": true,
+        "truncated_operations_at_most_11": true,
+        "inventory_entity_names_match_metric_columns": true
+      },
+      "counts": {
+        "metric_entities": 68,
+        "trace_window_services": 27,
+        "current_graph_services": 27,
+        "full_rank_services": 27,
+        "top11_operations": 11,
+        "top11_services": 4,
+        "interservice_edges": 55,
+        "operation_edges": 199
+      },
+      "absent_trace_ranked": [],
+      "without_interservice_edge": [
+        "ts-auth-service"
+      ],
+      "without_any_operation_edge": [],
+      "auth_internal_edges": [
+        [
+          "ts-auth-service_POST /api/v1/users/login",
+          "ts-auth-service_UserRepository.findByUsername"
+        ],
+        [
+          "ts-auth-service_UserRepository.findByUsername",
+          "ts-auth-service_find ts-auth-mongo.user"
+        ]
+      ],
+      "gold_after_prediction": {
+        "root_service": "ts-auth-service",
+        "rank_full": 9,
+        "rank_top11": null,
+        "coverage_ceiling_full_for_this_case": 1,
+        "coverage_ceiling_top11_for_this_case": 0
+      },
+      "census": {
+        "spans": 957209,
+        "trace_count": 5568,
+        "duplicate_trace_span_pairs": 0,
+        "spanID_reused_across_traces": 0,
+        "resolved_parent_spans": 951240,
+        "explicit_root_spans": 5567,
+        "unknown_parent_spans": 402,
+        "traces_with_multiple_explicit_roots": 0,
+        "traces_with_multiple_observed_roots_including_unknown_parent": 1,
+        "traceIDs_on_both_sides_of_boundary": 2,
+        "span_start_before_boundary_end_after": 11,
+        "interpretation": "unknown parent may mean missing instrumentation or window truncation; not a guessed original root/kind policy"
+      },
+      "io_metadata_without_metric_columns": {
+        "raw_spans": 1143435,
+        "window_spans": 957209,
+        "window_trace_count": 5568,
+        "traces_missing_spans_due_to_window": 2,
+        "spans_ending_after_window_upper": 3,
+        "io_python": "3.12.3 (main, Apr 15 2024, 18:25:56) [Clang 17.0.6 ]",
+        "io_pandas": "2.2.3",
+        "io_mode": "direct parquet in pinned environment",
+        "source": "/home/ubuntu/rca/T-015/data/re2tt_ts-auth-service_cpu_1/traces.parquet",
+        "source_sha256": "89dc1794060960e4dd47e3d4b24075bd6f5b768761fa86f51ed38c4748c8f955",
+        "incident_time_us": 1705918105000000,
+        "boundary_used_us": 1705918105000000,
+        "half_seconds": 600,
+        "scoring_input_spans": 957209,
+        "io_elapsed_observed_seconds": 1.499
+      },
+      "source_sha256": {
+        "results/T-015/runs/tt-local/auth/primary-summary.json": "25c2e02fccf599ec0b851fa17d57eeb33af6693e31d13a6b215d03dd7892387e",
+        "results/T-015/runs/tt-local/auth/example.json": "0b4b2e8768ae428180c372c5a8be4d710ca96745057823b1b6a5d82cea4027c3"
+      }
+    },
+    {
+      "case": "re2tt_ts-route-service_mem_1",
+      "checks": {
+        "current_graph_services_exact": true,
+        "interservice_edges_exact": true,
+        "interservice_isolates_exact": true,
+        "operation_edge_isolates_exact": true,
+        "full_service_order_exact": true,
+        "top11_service_order_exact": true,
+        "full_candidates_equal_current_graph": true,
+        "no_ranked_service_absent_from_trace": true,
+        "no_duplicate_service_in_mapped_ranks": true,
+        "truncated_operations_at_most_11": true,
+        "inventory_entity_names_match_metric_columns": true
+      },
+      "counts": {
+        "metric_entities": 68,
+        "trace_window_services": 27,
+        "current_graph_services": 27,
+        "full_rank_services": 27,
+        "top11_operations": 11,
+        "top11_services": 5,
+        "interservice_edges": 55,
+        "operation_edges": 199
+      },
+      "absent_trace_ranked": [],
+      "without_interservice_edge": [
+        "ts-auth-service"
+      ],
+      "without_any_operation_edge": [],
+      "auth_internal_edges": [
+        [
+          "ts-auth-service_POST /api/v1/users/login",
+          "ts-auth-service_UserRepository.findByUsername"
+        ],
+        [
+          "ts-auth-service_UserRepository.findByUsername",
+          "ts-auth-service_find ts-auth-mongo.user"
+        ]
+      ],
+      "gold_after_prediction": {
+        "root_service": "ts-route-service",
+        "rank_full": 2,
+        "rank_top11": 2,
+        "coverage_ceiling_full_for_this_case": 1,
+        "coverage_ceiling_top11_for_this_case": 1
+      },
+      "census": {
+        "spans": 572606,
+        "trace_count": 4757,
+        "duplicate_trace_span_pairs": 0,
+        "spanID_reused_across_traces": 0,
+        "resolved_parent_spans": 567849,
+        "explicit_root_spans": 4757,
+        "unknown_parent_spans": 0,
+        "traces_with_multiple_explicit_roots": 0,
+        "traces_with_multiple_observed_roots_including_unknown_parent": 0,
+        "traceIDs_on_both_sides_of_boundary": 1,
+        "span_start_before_boundary_end_after": 7,
+        "interpretation": "unknown parent may mean missing instrumentation or window truncation; not a guessed original root/kind policy"
+      },
+      "io_metadata_without_metric_columns": {
+        "raw_spans": 688564,
+        "window_spans": 572606,
+        "window_trace_count": 4757,
+        "traces_missing_spans_due_to_window": 1,
+        "spans_ending_after_window_upper": 7,
+        "io_python": "3.12.3 (main, Apr 15 2024, 18:25:56) [Clang 17.0.6 ]",
+        "io_pandas": "2.2.3",
+        "io_mode": "direct parquet in pinned environment",
+        "source": "/home/ubuntu/rca/T-015/data/re2tt_ts-route-service_mem_1/traces.parquet",
+        "source_sha256": "37289852cc0ee06646807d0d1f6ac81753e4127a95731f3dea28c6fd3018babf",
+        "incident_time_us": 1706179570000000,
+        "boundary_used_us": 1706179570000000,
+        "half_seconds": 600,
+        "scoring_input_spans": 572606,
+        "io_elapsed_observed_seconds": 0.902
+      },
+      "source_sha256": {
+        "results/T-015/runs/tt-local/re2tt_ts-route-service_mem_1/primary-summary.json": "62c91fc8b9c85dd6b970a85b20765725edc6a503ac7650d644a954561b72b3f6",
+        "results/T-015/runs/tt-local/re2tt_ts-route-service_mem_1/example.json": "ca8ade58aa2ca88170727b0a51c5b81fa932c737892041209c93271a00de1362"
+      }
+    },
+    {
+      "case": "re2tt_ts-route-service_socket_1",
+      "checks": {
+        "current_graph_services_exact": true,
+        "interservice_edges_exact": true,
+        "interservice_isolates_exact": true,
+        "operation_edge_isolates_exact": true,
+        "full_service_order_exact": true,
+        "top11_service_order_exact": true,
+        "full_candidates_equal_current_graph": true,
+        "no_ranked_service_absent_from_trace": true,
+        "no_duplicate_service_in_mapped_ranks": true,
+        "truncated_operations_at_most_11": true,
+        "inventory_entity_names_match_metric_columns": true
+      },
+      "counts": {
+        "metric_entities": 68,
+        "trace_window_services": 27,
+        "current_graph_services": 27,
+        "full_rank_services": 27,
+        "top11_operations": 11,
+        "top11_services": 5,
+        "interservice_edges": 55,
+        "operation_edges": 199
+      },
+      "absent_trace_ranked": [],
+      "without_interservice_edge": [
+        "ts-auth-service"
+      ],
+      "without_any_operation_edge": [],
+      "auth_internal_edges": [
+        [
+          "ts-auth-service_POST /api/v1/users/login",
+          "ts-auth-service_UserRepository.findByUsername"
+        ],
+        [
+          "ts-auth-service_UserRepository.findByUsername",
+          "ts-auth-service_find ts-auth-mongo.user"
+        ]
+      ],
+      "gold_after_prediction": {
+        "root_service": "ts-route-service",
+        "rank_full": 2,
+        "rank_top11": 2,
+        "coverage_ceiling_full_for_this_case": 1,
+        "coverage_ceiling_top11_for_this_case": 1
+      },
+      "census": {
+        "spans": 1282923,
+        "trace_count": 5278,
+        "duplicate_trace_span_pairs": 0,
+        "spanID_reused_across_traces": 0,
+        "resolved_parent_spans": 1276120,
+        "explicit_root_spans": 5276,
+        "unknown_parent_spans": 1527,
+        "traces_with_multiple_explicit_roots": 0,
+        "traces_with_multiple_observed_roots_including_unknown_parent": 5,
+        "traceIDs_on_both_sides_of_boundary": 2,
+        "span_start_before_boundary_end_after": 8,
+        "interpretation": "unknown parent may mean missing instrumentation or window truncation; not a guessed original root/kind policy"
+      },
+      "io_metadata_without_metric_columns": {
+        "raw_spans": 1535674,
+        "window_spans": 1282923,
+        "window_trace_count": 5278,
+        "traces_missing_spans_due_to_window": 3,
+        "spans_ending_after_window_upper": 3,
+        "io_python": "3.12.3 (main, Apr 15 2024, 18:25:56) [Clang 17.0.6 ]",
+        "io_pandas": "2.2.3",
+        "io_mode": "direct parquet in pinned environment",
+        "source": "/home/ubuntu/rca/T-015/data/re2tt_ts-route-service_socket_1/traces.parquet",
+        "source_sha256": "cafbc4e3a501cbd94a7492fb1f25d6f2de1de531fe862b3fbc4175703195d014",
+        "incident_time_us": 1705992046000000,
+        "boundary_used_us": 1705992046000000,
+        "half_seconds": 600,
+        "scoring_input_spans": 1282923,
+        "io_elapsed_observed_seconds": 1.952
+      },
+      "source_sha256": {
+        "results/T-015/runs/tt-local/re2tt_ts-route-service_socket_1/primary-summary.json": "a998048ae4d18cb387e900c42d88793833a95e405f3e60070dd50aea2e188576",
+        "results/T-015/runs/tt-local/re2tt_ts-route-service_socket_1/example.json": "4deb2165510facf34d7411fba2fe8b83c481a1a1dd7532ebf63ee6e3082f7ee7"
+      }
+    }
+  ]
+}

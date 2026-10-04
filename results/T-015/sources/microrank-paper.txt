@@ -1,0 +1,813 @@
+[PAGE 1]
+          MicroRank:End-to-EndLatencyIssueLocalizationwith
+      ExtendedSpectrumAnalysisinMicroserviceEnvironments
+
+                  Guangba Yu                                        Pengfei Chen*                                     Hongyang Chen
+             Sun Yat-sen University                             Sun Yat-sen University                              Sun Yat-sen University
+           yugb5@mail2.sysu.edu.cn                            chenpf7@mail.sysu.edu.cn                         chenhy95@mail2.sysu.edu.cn
+
+                  Zijie Guan †                                     Zicheng Huang                                         Linxiao Jing
+                      Tencent                                   Sun Yat-sen University                             Sun Yat-sen University
+            byteguan@tencent.com                           huangzch8@mail2.sysu.edu.cn                           jinglx3@mail2.sysu.edu.cn
+                Tianjun Weng                                        Xinmeng Sun                                          Xiaoyun Li
+             Sun Yat-sen University                             Sun Yat-sen University                             Sun Yat-sen University
+         wengtj3@mail2.sysu.edu.cn                          sunxm25@mail2.sysu.edu.cn                            lixy223@mail2.sysu.edu.cn
+ABSTRACT                                                                          CCSCONCEPTS
+With the advantages of flexible scalability and fast delivery, mi-                •Software and its engineering→ Cloud computing; •Gen-
+croservicehasbecomeapopularsoftwarearchitectureinthe mod-                         eralandreference→Reliability;Performance.
+ernITindustry.However,theexplosioninthenumberofservice
+instances and complex dependencies make the troubleshooting                       KEYWORDS
+extremely challenging in microservice environments. To help un-                   Microservice,end-to-endtracing,rootcauselocalization,PageRank,
+derstandandtroubleshootamicroservicesystem,theend-to-end                          spectrum analysis
+tracing technology has been widely applied to capture the execu-                  ACMReferenceFormat:
+tion path of each request. Nevertheless, the tracing data are not                 GuangbaYu,PengfeiChen*,HongyangChen,ZijieGuan†,ZichengHuang,
+fullyleveragedbycloudandapplicationproviderswhenconducting                        LinxiaoJing,TianjunWeng,XinmengSun,andXiaoyunLi.2021.MicroRank:
+latency issue localization in the microservice environment.                       End-to-End LatencyIssue Localizationwith ExtendedSpectrum Analysis
+   This paper proposes a novel system, named MicroRank, which                     in Microservice Environments. In Proceedings of the Web Conference 2021
+analyzescluesprovidedbynormalandabnormaltracestolocate                            (WWW ’21), April 19–23, 2021, Ljubljana, Slovenia.ACM, New York, NY,
+rootcausesoflatencyissues.Oncealatencyissueisdetectedbythe                        USA, 12 pages. https://doi.org/10.1145/3442381.3449905
+Anomaly Detector in MicroRank,thecauselocalizationprocedureis
+triggered. MicroRank first distinguishswhich traces areabnormal.                  1   INTRODUCTION
+Then, MicroRank’sPageRank Scorer module uses the abnormal and                     By adopting microservice architectures, modern enterprises reap
+normal trace information as its input and differentials the impor-                manybenefits,frombetterscalabilityofcomponents,higherdevel-
+tance of different traces to extended spectrum techniques . Finally,              operproductivityandsmallerprogramminglanguagerestrictions
+the spectrum techniques can calculate the ranking list based on                   [8,19,37,40].Eachserviceinthemicroservicesystemrunsasaset
+the weighted spectrum information from PageRank Scorer to lo-                     of instanceson oneor multiplemachines and communicateswith
+cate root causes more effectively. The experimental evaluations                   other microservices through message passing [40]. This leads to
+on a widely-used open-source system and a production system                       an explosion in the number of processes that application providers
+show that MicroRank achieves excellent results not only in one                    need to manage and a larger challenge of root cause localization.
+rootcause situationbut alsoin two issuesthat happenat thesame                     Theapplicationprovidershavetohandlethecomplexdistributed
+time. Moreover, MicroRank makes 6% to 22% improvement in re-                      environmenttomeetavailabilityconstraintsandstrictServiceLevel
+call in localizing root causes compared to current state-of-the-art               Objective (SLO).
+methods.                                                                             Peng et.al. [41] has divided microservice faults into four cat-
+                                                                                  egories such as configuration faults and resource faults. Most of
+* Pengfei Chen is the corresponding author.                                       themmanifestthemselvesintermsofservicelatency increaseor
+
+† Work was done while the author was a master student at Sun Yat-sen University . request time-out , thus latency is the main consideration of SLO
+                                                                                  [3,23,30].Naturally,itisnecessarytoquicklydetectanddiagnose
+                                                                                  latency issues to keep the systems running in high performance.
+This paper is published under the Creative Commons Attribution 4.0 International  Nowadays, some of the monitoring tools (e.g., Prometheus1) can
+(CC-BY 4.0) license. Authors reserve their rights to disseminate the work on theirobserve what generally happens in a microservice instance (e.g.,
+personal and corporate Web sites with the appropriate attribution.                the mean latency per minute). These metrics of a single instance
+WWW ’21, April 19–23, 2021, Ljubljana, Slovenia                                   are definitely helpful, but they tell us very little about the relations
+© 2021 IW3C2 (International World Wide Web Conference Committee), published
+under Creative Commons CC-BY 4.0 License.                                         among different instances. For example, the application operators
+ACM ISBN 978-1-4503-8312-7/21/04.                                                 1Prometheus, https://prometheus.io/
+https://doi.org/10.1145/3442381.3449905
+
+[PAGE 2]
+WWW ’21, April 19–23, 2021, Ljubljana, Slovenia                                                                                                                  Guangba Yu, et al.
+
+
+doseealatencyspikewhentherewasalatencyissueinmicroser-                               identifythelatencyissuesinmicroservicesystems.Itprimarilycom-
+vice system, but they do not have enough fine-grained context to                     prisesfourproceduresincludingAnomalyDetector,DataPreparator,
+explain the problem.                                                                 PageRank Scorer and Weighted Spectrum Ranker. Our method is
+   Therefore,theapplicationoperatorswishtohaveadetailedview                          compatiblewithtracesofmultiplewidely-usedmicroservicetrace
+of what exactly happened in microservice systems. The end-to-                        standards (e.g., OpenTracing 3, OpenCensus 4 and OpenTeleme-
+end tracing takes a request-centric view [31] in the microservice                    try 5). Once a latency issue is detected by the Anomaly Detector
+environment. It captures the detailed execution of causally-related                  in MicroRank, the cause localization procedure is triggered. Data
+operations performed by the service instances of a microservice                      Preparator firstdistinguishes whichtraces areabnormal andmind
+system,andreportsthemtotracingcollector(e.g.,Jaeger2).Then,                          the relations of service instances and traces. Then, MicroRank’s
+the tracing collector constructs the whole paths of request as a                     PageRank Scorer module uses the abnormal and normal trace infor-
+graph of events and causal edges between them, which we call a                       mation as its input and differentiates the importance of different
+"trace". When a latency issue emerged, application providers can                     tracestoextendedspectrumtechniques.Finally,the Wighted Spec-
+reasonabouthowthemicroservicesystemprocessedtherequests                              trum Ranker outputs a ranked list of potential root causes based
+by extracting information from the tracing data.                                     onthe weightedspectruminformation from PageRank Scorer.This
+   The information provided by the tracing data is rich, which                       rankedlistcandecreasetheoverallsearchspacefortheapplication
+allowsapplicationoperatorstodetectlatencyissuesatrequestlevel                        operatorssignificantly.Theresultsinawidely-usedopen-source
+andlocaterootcausesatserviceinstancelevel.However,analyzing                          systemandaproductionsystemshowthat MicroRank canlocate
+tracing datamanually is inefficientand depends heavilyon expert                      the root causes effectively and efficiently. Compared to previous
+knowledge due to the following challenges.                                           causelocalization methodssuch asCauseInfer [5] andSieve [33],
+     • Complex tracing paths. With the microservice architec-                        our approach is more effective.
+        ture, an application is decoupled into multiple loosely dis-                    Overall, the contributions of this paper are four-fold:
+        tributedfine-grainedserviceswithcomplexinteractions[19].                          •  Tothebestofourknowledge,MicroRankisthefirstapproach
+        Furthermore,eachmicroservicemayhavemultipleinstances                                 toweavethecluesprovidedbynormalandanomaloustraces
+        toserverequests,whichfurtherincreasesthecomplexityof                                 to conduct root cause localization for microservice applica-
+        trace paths. The complex structure of a microservice system                          tions.
+        makes it difficult to track the process of fault propagation at                   •  Weproposeanovelrootcauselocationapproachinmicroser-
+        service instance level.                                                              vice environmentsbased on theextended spectrum analysis.
+     • Multiple cause candidates. Because upstream services’                                 PageRank is introduced to strengthen the effectiveness of
+        performance is always dependent on downstream services,                              spectrumanalysisbyconsideringtheimportanceofdifferent
+        adownstreamserviceanomalymayresultinmultipleanom-                                    traces.
+        alies in other upstream services. It means that we need to                        •  WeinstrumenttheOpenTelemetrytracingAPIintoHipster-
+        find root causes in a huge potential cause set.                                      Shop6 microservice benchmark provided by Google Cloud.
+     • Dynamicruntimeenvironment.Amicroservice system                                        Our modifications give this benchmark7 the ability of end-
+        usually has a rapid update. New features may be continu-                             to-end tracing that it did not have before.
+        ouslyintegratedanddeployedintoeachofmicroserviceover                              •  Wedesignandimplementaprototype,namelyMicroRank,to
+        time.Inaddition,microservicesusuallyruninthedynamic                                  locaterootcausesoflatencyissuesinmicroservicesystems.
+        container-basedenvironmentwheretheirstateschangefre-                                We conduct extensive experiments based on a widely-used
+        quently, i.e., from running to stop. The anomaly detection                           open-sourcemicroservicesystemandaproductionmicroser-
+        androotcausediagnosis methodsshouldadapttothesedy-                                   vice system with 157 faults in total. Experimental results
+        namic environments with a low cost.                                                  demonstrate the effectiveness of MicroRank over state-of-
+   Over the years, many approacheshave been proposed to locate                               the-art methods.
+rootcausesinlargedistributedsystems[5,9,19,25,30,33].CauseIn-                        2   BACKGROUND
+fer[5]andSieve[33]buildcausalitygraphsofsystemcomponents,
+thentheypinpointrootcauseswiththesegraphs,buttheirmethods                            2.1   MicroserviceEnd-to-endTracing
+cannot get the exact directionof dependency between two service                      AsstatedintheDapper[32],modernInternetservicesareoftenim-
+instances.Roots[9]automaticallyidentifiestherootcausesofper-                         plementedascomplex,large-scaledistributedsystems,forexample,
+formance anomalies in web applications deployed in PaaS clouds,                      usingthepopularmicroservicearchitecturalstyle.Unlikethetradi-
+butitisnotnativelydesignedformicroservicesystems.MicroScope                          tionalhost-leveltracingtools, suchasDTrace8,end-to-endtracing
+[19]maintainsaservicedependencygraphviaPC-algorithm.How-                             isprimarilyfocusedonprofilingrequestsastheymoveacrossmany
+ever, MicroScope only considers abnormal traces and leaves out                       service instances, usually running on many different hosts. The
+the information provided by normal traces.
+   To address the drawbacks of existing work and new challenges                      3OpenTracing, https://opentracing.io/
+in microservice systems, this paper introduces a novel approach,                     4OpenCensus, https://opencensus.io/
+namedMicroRank,whichisbasedonextendedspectrumanalysisto                              5OpenTelemetry, https://opentelemetry.io
+                                                                                     6Hipster-Shop, https://github.com/GoogleCloudPlatform/microservices-demo
+                                                                                     7Hipster-shop with OpenTelemetry, https://github.com/yuxiaoba/Hipster-Shop
+2Jaeger, https://www.jaegertracing.io/                                               8DTrace, http://dtrace.org/
+
+[PAGE 3]
+Latency Issue Localization with Extended Spectrum Analysis in Microservice                  WWW ’21, April 19–23, 2021, Ljubljana, Slovenia
+
+
+
+
+
+
+
+
+
+
+
+
+        Figure1:AnexampleoftraceinHipster-Shop                                                 Figure2:ThetracecoveragetreeofFig.1
+
+
+                                                                                         • LatencyandHandlingTime.AsshowninFig.1,thetrac-
+tracing data provideslots ofinvaluable informationin understand-                           ing data comprise the end-to-end latency of each trace and
+ing system behavior,helping with debugging and reasoning about                             the processing time of each operation in one trace.
+root causes in such complex systems.                                                     • Trace Coverage Graph. Because each span in one trace
+   In the microservice scenario, programmers usually need to in-                           comprises the parent-child relationship informationand ser-
+strumentthetraceinterfacesintoeachmicroservicecode.Thetrace                                viceinstanceinformation,wecanconstructthecoveragetree
+interfacesrecordcausalityandprofilinginformationaboutthere-                                foreachtrace(e.g.,Fig.2showsthecoveragetreeofFig.1
+quest with an unique identifier (i.e., trace ID) and report them to                        ). A coverage tree is a tree where each node represents a
+the tracing collector (e.g., Jaeger) through calls to a Tracing API                        serviceinstanceoperation,andanedgefromnode𝑣𝑖 tonode
+likeOpenTelemetry.Thetracingcollectorreceivesthetracingdata,                               𝑣𝑗 indicates the calling relation. We can get the complete
+normalizes it to a common trace model representation and puts it                           trace coverage graph (i.e., the connections between service
+to the persistent storage (e.g., Elasticsearch 9).                                         instancesoperationsandthetraces)whenweaggregateall
+   BeforethebirthofOpenTelemetry,twoincompatibleopen-source                                the coverage trees together.
+projectsOpenTracingandOpenCensus,eachwithitsownstandard,                                 • Call Graph. If we remove the duplicate edges in a trace
+have dominated the microservice end-to-end tracing landscape.                              coveragegraph and shiftthe attentionto nodes, wecan get
+OpenTelemetry converges best features of bothOpenTracing and                               the call graph among different service operations.
+OpenCensusinto asinglestandard andprovidesa completesolu-                              Based on the above information, the formal description of the
+tion to solve the problem of end-to-end tracing in microservice                     latency issue locating problem in microservice systems is as fol-
+systems. This brings maturity to the OpenTelemetry standard as                      lows. Given a collection of traces in a time window, namely T =
+bothpreviousprojectswerealreadymatureandproductiontested.                           {𝑇1,···,𝑇𝑛}, where𝑇𝑖 = {𝑂𝑖1,···,𝑂𝑖𝑚}, and 𝑂𝑖𝑗 demotes one op-
+Therefore, we instrument the OpenTelemetry tracing codes into                       eration in trace 𝑖, we get the end-to-end latency of these traces,
+Hipster-Shop to provide a complete tracing view. To the best of                     namely L = {𝐿1,···,𝐿𝑛} and the coverage graph 𝐺  =  (𝑉,𝐸),
+our knowledge, it is the first complete microservice benchmark                     where𝑉 is the collection of service instance operations, namely
+equipped with OpenTelemetry.                                                       𝑂𝑖𝑗 ∈𝑉 and𝐸 isthecollectionofcallingrelations.Theproblemis
+   Fig. 1 shows a series of spans and their relationships within a                  to findout normal tracesT𝑛 ={𝑇𝑛1 ,···,𝑇𝑛𝑘 } and abnormaltraces
+trace in Hipster-Shop. As shown in Fig. 1, each span is a named                     T𝑎 = {𝑇𝑎1,···,𝑇𝑎𝑛−𝑘}. Moreover, based on T𝑛, T𝑎, and𝐺, finding
+andtimedoperationandtheyshareauniquetraceIDinthesame                                the rootcause service instancesrelated to𝑂𝑖𝑗. Ourtarget isto rank
+trace.Therootspan(likefront-vbdtx/Recv.inFig.1)isthefirstspan                       service instances directly relevant to the root cause higher than
+inatrace,whiletheotherspansarerelatedthroughparent-child                            those unrelated to it.
+relationships.Inaddition,weattachadditionalinformationlikethe
+service instancename for eachspan. Therefore, wecan locate root                     3.2   Motivation
+causes at service instance level based on the tracing information.                  TheSpectrum-basedfaultlocalization(SBFL)techniqueis oneof
+3   LATENCYISSUELOCALIZATION                                                        the mostpopular approaches usedin program debuggingbecause
+                                                                                    ofitssimplicityandefficiency[1,11,13,24].Whengivenafaulty
+In this section, we formally describethe problem of latencyissue                    program𝑃 and a set of test cases in which at least one test failed, a
+localizationatserviceinstancelevelinamicroservicesystem.Then,                       typicalSBFLapproachcollectstestcoverageinformationforeach
+we introduce the motivation of applying spectrum-based method                       program element 𝑂  ∈  𝑃 while running test cases firstly. Next
+to find root causes and its limitations.                                            variousstatistics,e.g.,tuple(𝑂𝑒𝑓,𝑂𝑒𝑝,𝑂𝑛𝑓,𝑂𝑛𝑝),canbeextracted
+                                                                                    based on the test coverage information. Here, 𝑂𝑒𝑓  denotes the
+3.1   Problemformulation                                                            number of failed test cases that cover program element 𝑂, 𝑂𝑒𝑝
+Before formulating the latency issue localization problem, we sum-                  denotesthenumberofpassedtestcasesthatcoverprogramelement
+marize the information that we can extract from tracing data.                      𝑂.𝑂𝑛𝑓  denotes the number of failed test cases that do not cover
+                                                                                    program element𝑂,𝑂𝑛𝑝 denotes the number of passed test cases
+                                                                                    that do notcover program element𝑂. Based onthe above tuples,
+9Elasticsearch, https://www.elastic.co/                                             severalriskevaluationformulae,e.g.Tarantula,havebeenproposed
+
+[PAGE 4]
+               WWW ’21, April 19–23, 2021, Ljubljana, Slovenia                                                                                                                  Guangba Yu, et al.
+
+
+
+
+
+
+
+
+
+                    Figure3:Firstlimitationinspectrum-basedmethod
+                 Table1:OriginalSpectrumandMicroRank scoreinFig.3                                      Figure4:Secondlimitationinspectrum-basedmethod
+
+                                                                                                       The second limitation of spectrum-based method. Unlike
+                                                                                                    test cases which are well-designed by testing engineers, the traces’
+                                                                                                    coverageisrelativelyunbalanced.Inotherwords,somekindsofre-
+                                                                                                    queststhatcoverthesameserviceinstancesmayappearfrequently
+                                                                                                    (like Req-3, Req-4 and Req-5 in Fig. 4 ) because the user preference
+                                                                                                    (e.g., view products many times). While some kinds of requests
+               to compute suspicious score that indicates how likely it is to be                    (likeReq-1inFig.4)mayemergeafewtimesbecauseusersaccess
+               faulty for each program element.                                                     themlessoften(e.g.,onlycheckouttheselectedproductsonce).In
+                  Given the problem of analyzing end-to-end tracing data, this                      Fig. 4, we have injected network jam for both product and currency
+               problem is similar as the software debugging. A request visits sev-                  tostimulatethescenariowheretwoerrorsoccuratthesametime.
+               eralserviceinstancesinmicroservicesystemwhileatestcasecovers                         WhenweapplytheJaccardspectrumformula(showninTable1)to
+               severalprogramentitiesinsoftwaretesting. Theserviceinstances                         Fig.4, wecanfindthatrecommend gethigher score resultthanthe
+               executed by more anomalous requests and less normal requests                         rootcause𝑐𝑢𝑟𝑟𝑒𝑛𝑐𝑦.Theseasonisthatthespectrum-basedmeth-
+               is more likely to be root cause. Hence we believe it is possible to                  ods assume that the test cases are well-designed and they would
+               applythe spectrum-basedmethod tolocatethe rootcauses inmi-                           not cover the same instances many times. This example inspires
+               croservicesystem.However,whenweapplythespectrum-based                                usthat weshouldgivemore considerationtothe kindsofrequests,
+               method directlyto findhow likelythe serviceinstance isthe root                       which appear fewer times to balance the occurrence number of
+               cause, we find some limitations of this approach.                                    different kinds of requests.
+                  The first limitation of spectrum-based method.The basic
+               spectrum-based method only focuses on how many normal and                            4   SYSTEMDESIGN
+               anomalous requests cover the service instances but ignores the                       4.1   Systemoverview
+               differencesamongdifferentrequests.Tosimplifytheexamples,we
+               considerthemicroservicesasthemicroserviceinstance’soperations                        In this paper, we proposed an extended spectrum method with
+               in this section. Figure. 3 shows part of the service dependency                      PageRank,named MicroRank,tofindserviceinstancesthatpoten-
+               graphofHipster-Shop.TheredlinesinFig.3denotetheanomalous                             tiallycontributetothelatencyissues.Toranktheserviceinstance
+               requests in systems and the green line denotes the normal request.                   autonomously,MicroRank,illustratedinFig.5,consistsoffourmod-
+               TheellipsesinFig.3representthedifferentmicroservicesandthe                           ules, namely Anomaly Detector, Data Preparator, PageRank Scorer
+               edges show dependencies between services. In this example, we                        and Weighted Spectrum Ranker.Webrieflyintroduceeachmodule
+               inject 100 ms latency for product service to simulate network jam.                   inthissubsectionandlaterexplainthemindetailinthefollowing
+               Duetothefaultpropagation,theanomalyof product propagatesto                           subsections.
+               recommend,checkout andfront,whilepayment isnormalbecauseit                              First,AnomalyDetector modulewhichispresentedinSection4.2
+               doesnot call product.In otherwords,evenifthere isonlyasingle                         continuallymonitorsthesystembycomparingtheexpectedlatency
+               anomalous service instance, the anomalous instance may lead to                       and real latency of each trace within a sliding time window (30
+               many other instances perform anomalously, which generates a                          secondsinthispaper).Ifthereallatencyofonetraceislargerthan
+               huge potential cause set. Owing to the unpredictability of fault                     itsexpectedlatency, Anomaly Detector determinesthatthesystem
+               propagation, it is non-trivial to exclude anomalous instances that                   is at an abnormal state and triggers the root causes localization
+               are caused by fault propagation manually.                                            procedure. Second, Data Preparator presented in Section 4.3 dis-
+                  When we apply the Tarantula spectrum formula [13] to Fig. 3,                      tinguishes whether the traces in that time window is abnormal or
+               we can find that recommend and product share the same result                         not and construct both the call graph and operation-trace graph
+               (detailsshowninthelefthalfofTable1).Actuallyfromtheoperator                          forthe PageRank Scorer .Third,the PageRank Scorer presentedin
+               perspective,theanomalousrequestReq-1inFig.3onlycoversfront                           Section4.4cangenerateanomalousscoresandnormalscoresfor
+               and product. In other words, the anomalous instances are either                      each operations in parallel based on the anomalous and normal
+               front or product andthe recommend wouldnotbeconsideredfirst.                         tracing information from Data Preparator . In the final Weighted
+               In addition, because the normal request Req-4 passes through the                     Spectrum Ranker presented in Section 4.5 takes the scores from
+               front, the product seems more like the anomalous instance. This                      PageRank Scorer asinputtoupdateweightedspectraandapplies
+               example inspires us that if the requests can be weighted based on                    rankingformulaetooutputanorderedlistforoperatorstoexamine.
+               their ability in localizing root causes, the spectrum-based method                   In the best case, the first service instance presented in the ranked
+               in localizing microservice root causes will be more precise.                         output of MicroRank is the exact root cause of that anomaly.
+
+
+
+
+
+
+
+
+            InitialSpectrum(Tarantula)          MicroRank(Tarantula)
+Service    𝑂𝑒𝑓   𝑂𝑒𝑝   𝑂𝑛𝑓  𝑂𝑛𝑝   score    𝑂𝑒𝑓    𝑂𝑒𝑝   𝑂𝑛𝑓    𝑂𝑛𝑝   score
+front        3    1     0     0    0.5     2.97   0.990  0.0   0.0    0.5
+checkout     1    1     2     0    0.25    0.328  0.328 0.656  0.198  0.25
+recommend    1    0     2     1     1      0.328  0.0   0.686  0.0    0.4
+product      3    0     0     1     1       3.0   0.0    0.0   0.0   0.666
+payment      0    1     3     0     0       0.0   1.32   0.0   0.0   0.333
+
+[PAGE 5]
+Latency Issue Localization with Extended Spectrum Analysis in Microservice                  WWW ’21, April 19–23, 2021, Ljubljana, Slovenia
+
+
+
+
+
+
+
+
+
+
+
+
+                                                      Figure5:TheframeworkofMicroRank
+4.2   AnomalyDetector
+Before localizingroot causes,weneed todistinguish whetherthe
+target microservice system has latency issues first. Previous ap-
+proaches(e.g.,[9,19,34,37])onanomalydetectiononlydetectSLO
+(Service Level Objective, e.g., average latency per minute) devia-
+tions of the front-end service under the condition of the mixture                     Figure6:Theanomalousoperation-tracegraphofFig.3
+of all kinds of traces. However, traces contain a variable number                  only determines whether the operations occur but ignores the rela-
+of operations and each operation has different handing time as                     tionshipsamongoperations.Onlywhentherootcauselocalization
+shown in Section 2.1. For example, trace1 covers 7 service instance                phaseistriggered,the Data Preparator modulein MicroRank will
+operations and it has low latency 20 ms, trace2 covers 40 service                  extract detailed trace information about the operations’ relation-
+instance operations and it has high latency 100 ms because it has                  ships.
+handled more tasks. Actually both trace1 and trace2 are normal                         Because the anomalous and normal traces may cover different
+traces. But the trace2 may be determined as abnormal trace by the                  setsofserviceinstances, Data Preparator firstdividesthetracesin
+methodsthatmixallkindsofrequestsbecausethesemethodsdo                              thelasttimewindowsintoanomaloustracelistandnormaltrace
+not consider trace-level details.                                                  listbasedantheEquation1.ForthetraceIDinanomaloustracelist
+   Inthisstudy,weproposeanunsupervisedandlightweighttrace-                         or normal trace list, Data Preparator queries its trace information
+level anomaly detection method, which utilizes relations between                   throughtheuniquetraceIDfrompersistentstorage.Eachtracein-
+theoperationhandlingtimeandthenumberofoperationscovered                            formationrecordstheparent-childrelationandtheserviceinstance
+by traces. First Anomaly Detector calculates the average handling                  operationsthatthetracehascovered. Data Preparator canutilize
+time 𝜇𝑜 and itsstandard deviation𝜎𝑜 of eachoperation froma pe-                     the above information to construct coverage tree of each trace. In
+riodtime(e.g.,onehour)ofnormaltracingdataoffline.Forexample,                       this paper, weidentify thetraces thathave thesame coveragetree
+{”𝑐ℎ𝑒𝑐𝑘𝑜𝑢𝑡/𝑃𝑙𝑎𝑐𝑒𝑂𝑟𝑑𝑒𝑟” :{”𝜇𝑜” : 50𝑚𝑠,”𝜎𝑜” : 20𝑚𝑠}} shows that                      asthesamekindoftrace. Data Preparator alsorecordsthenumber
+themeanhandlingtimeof chekout’s PlaceOrderoperationis50ms.                         of occurrences of each kind of trace.
+Tobespecific,wedonotneedtoupdatetheaveragehandlingtime                                 Inaddition,wecangetthecompleteanomalousornormaltrace
+and its variation unless a series of false positives have occurred.                coverage graph when we aggregate the coverage trees together.
+   When Anomaly Detector monitors traces in one short sliding                      Then, we can construct the operation-trace graph based on trace
+time windows, it only need to mine which operations and how                        coverage graph when we regard traces as part of nodes. For exam-
+manytimestheseoperationscoveredbyonetrace.Thisapproach                             ple, Fig. 3showsthe anomalous request-operation graphof Fig. 1.
+is more lightweight than the methods[41] that encode traces into                   Finally,ifweremoveduplicateedgesinthecoveragegraphandput
+fixed-lengthvectors.InspiredbythesettingofSLOinRoots[9],the                        theattentiontonodes,wecangetthereal-timecallgraphamong
+excepted latency𝐿𝑒𝑥𝑐𝑒𝑝𝑡𝑒𝑑 of one trace can be calculated as:                       different service instance operations. The anomalous and normal
+                              Õ                                                    cluesserve asthe inputof Anomalous PageRank Scorer and Normal
+                𝐿𝑒𝑥𝑐𝑒𝑝𝑡𝑒𝑑 =       𝑐𝑜𝑢𝑛𝑡𝑜 ∗(𝜇𝑜 +𝑛∗𝜎𝑜),                  (1)         PageRank Scorer, respectively.
+
+where𝑐𝑜𝑢𝑛𝑡𝑜 denotes the number of times which operation𝑜 has                       4.4   PageRankScorer
+been covered by that trace.𝑛 is used to adjust upper bound values,                 As discussed in section 3.2, if all traces are treated equally, using
+we set 𝑛 =  1.5 in this paper. If the excepted latency 𝐿𝑒𝑥𝑐𝑒𝑝𝑡𝑒𝑑                   thespectrum-basedmethodtomicroservicerootcauselocalization
+is larger than the real latency of that trace, the trace would be                  directly may lead to inferior performance. Therefore, we add an
+determinedasanomaloustrace.OnceAnomalyDetector detectsone                          additional module, named PageRank Scorer, before the Weighted
+anomalous trace, it triggers the root cause localization phase. To                 Spectrum Ranker. PageRank Scorer is composed of Normal Scorer
+avoiddetectingthesameanomalousstatemultipletimes,weflush                           andAnomalousScorer todealwiththeanomalousandnormalclues
+the detection window (5 minutes in this paper) after each trigger.                 in parallel. PageRank Scorer can calculate the weighted spectrum
+4.3   DataPreparator                                                               information for Weighted Spectrum Ranker.
+                                                                                       ThePageRankmethodisusedtogiveeachpagearelativescore
+In anomalydetection phase, MicroRank makes arough analysisof                       ofimportance byevaluatingthequalityand quantityofitslinks. If
+the tracingdata to reducethe cost .For example, Anomaly Detector                   one webpage contains a hyperlink pointing to another webpage,
+
+[PAGE 6]
+                 WWW ’21, April 19–23, 2021, Ljubljana, Slovenia                                                                                                                  Guangba Yu, et al.
+
+
+                 thereisalinkbetweenthem.Eachlinkfromonewebpagetoanother                                 example, after calculatingthe anomalous trace Req-1, Req-2, Req-3
+                 castsaso-calledvote,theweightofwhichdependsontheweight                                  inFig.3,wecangettheanomaloustransitionmatrix𝑨withavector
+                 of the webpages that link to it.                                                        [𝑓𝑟𝑜𝑛𝑡,𝑟𝑒𝑐𝑜𝑚𝑚𝑒𝑛𝑑,𝑐ℎ𝑒𝑐𝑘𝑜𝑢𝑡,𝑝𝑟𝑜𝑑𝑢𝑐𝑡,𝑟𝑒𝑞1,𝑟𝑒𝑞2,𝑟𝑒𝑞3] below:
+                     Thebasicideaofourapproachistogiveeachoperationaweight
+                 by evaluating the importance of traces that cover it based on the
+                 operation-tracegraph(e.g.,Fig6).Theimportanceoftracesisbased
+                 ontraces’ abilityinfindingroot causes.Thekeyinsights ofPageR-
+                 ank Scorer are that① if an operation covered by more anomalous
+                 traces, it should also be more likely the root cause, and② if an
+                 anomalous trace covers fewer operations the trace should be con-                           Comparedwiththecontinuouslychangingtracecoveragegraph,
+                 sidered more important because it has a smaller scope to infer real                     thecallgraphisrelativelystableunlessaprogramchangeoccurs.
+                 cause,and③ifakindoftraceappearsfewertimesthekindoftrace                                 Therefore,webelievethattheoperation-tracegraphismoreimpor-
+                 should be given more consider to prevent the diversion from the                         tant than the call graph in root cause localization. Our approach
+                 kinds of trace that occur many times.                                                   uses parameter𝜔 (0 ≤ 𝜔 ≤ 1) to tune the weight of call graph as
+                 4.4.1   PersonalisedPageRankAlgorithm. ThestandardPageR-                                below:
+                 ankisappliedtothegraphwhosenodesareallhomogeneous[26,                                                                                        .                              (6)
+                 36].Therefore,wechosePersonalisedPageRank[10]becauseitis
+                 amethodtoanalysethegraphofheterogeneousnodes(operations                                 The matrix 𝑨 can present the difference among operations and
+                 andtraces inthis paper).Givena digraph𝐺 = ⟨𝑉,𝐸⟩ thatcontains                            meet the key insight①.
+                 𝑛 nodesand𝑚 edges,and𝐸 containsadirectededge⟨𝑠,𝑡⟩ ifnode
+                 𝑠 to node𝑡. Let𝐴 be the transition matrix of𝑛 by𝑛 elements, all                         4.4.3   Preference Vector . MicroRank uses the preference vector
+                 of the𝐴𝑠𝑡 will combine into the complete𝐴. The𝐴𝑠𝑡 is defined as                         𝒖 to demonstrate the impact of trace scope and kind of traces.
+                 the probabilitythat arandom walkstarting from𝑠 terminates at𝑡,                          Preference vector 𝒖 consists of two sub-vectors: 𝒖 = 𝒖𝑇𝑜,𝒖𝑇𝑡               𝑇,
+                 whichreflectstheimportanceof𝑡 withrespectto𝑠.Thevalueof                                 where 𝒖𝑜 and 𝒖𝑡 denote the preference vector of operations and
+                 𝐴𝑠𝑡 can be calculated by:                                                               traces,respectively.Ourapproachsetsthe𝒖𝑜 as®0becausewedo
+
+                                                                                              (2)        not consider preference of operations in this module.
+                                                                                                            For the Anomalous Scorer,𝒖𝑡 is set as [𝜃1,𝜃2,...,𝜃𝑚]𝑇. Here,
+                 where𝑂(𝑠) denotes the out-neighbors of𝑠. For a given preference
+                 vector 𝒖, the personalized PageRank equation can be written as                                                                                                       (7)
+                 [10]:
+                                            𝒗 = (1−𝑑)𝑨𝒗+𝑑 ·𝒖,                               (3)             where𝑛𝑖 denotesthenumberofoperationscoveredbyanoma-
+                 where𝑑 is the damping factor (0 ≤ 𝑑 < 1), the solution 𝒗 is the                         lous trace𝑖,𝑘𝑖 denotes the number of anomalous traces of trace
+                 personalizedPageRankvector(PPV)forpreferencevector𝒖.If𝒖                                 𝑖’skind,and𝜑 (0 ≤ 𝜑 ≤ 1,default𝜑 = 0.5inthispaper)presents
+                 is the uniform distribution vector 𝒖 = [ 1𝑛,...,  1𝑛], it means that                    thetradeoff between tracescopeand tracekind.The𝑛𝑖 considers
+                 PageRank gives no preference to any pages.                                              the anomalous trace scope based on key insight② and𝑘𝑖 puts at-
+                     Theworkin[26]introducedaniterativealgorithmtogettheap-                              tention to the kind of anomalous traces based on key insight③.
+                 proximatesolutionofEquation(3).Theequationofthe𝑞thiteration                             For anomalous traces in Fig. 3, we obtain the preference vector.
+                 is defined as:                                                                          𝒖 =0,0,0,0,  821, 1342, 1342
+                                      𝒗(𝑞) =𝑑 ·𝑨𝒗(𝑞−1) +(1−𝑑)·𝒖.                       (4)                  For the Normal Scorer, we only consider the kind of traces for
+                 Each time we run the calculation, we are getting a closer estimate                      the preference vector because the trace scope does not reflect the
+                 ofthefinalvalue.Theoutcomevectordenotestherankedscoresof                                importance of normal traces. Therefore, the𝜃𝑖 is   𝑛−1𝑖Í𝑛−1𝑗  , where𝑛𝑖
+                 all nodes.                                                                              denotes the number of normal traces belong to the kind of trace𝑖.
+                 4.4.2   Transition Matrix . Given the operation-trace graph and                         4.4.4   PageRank Score. Once we determine the transition ma-
+                 callgraphinformation,thetransitionmatricesinourapproachcan                              trix 𝑨 and the preference vector 𝒖, we set the initial PPV𝒗(0) =
+                 be partitioned as:                                                                      𝒗𝑇𝑜,𝒗𝑇𝑡 𝑇. In this paper,𝒗𝑜 =       h  1               i
+                                              𝑜𝑝𝑒𝑟𝑎𝑡𝑖𝑜𝑛𝑠 𝑡𝑟𝑎𝑐𝑒𝑠                                                                   𝑁𝑜,   1𝑁𝑜,...,   1𝑁𝑜, where 𝑁𝑜 is the
+                                        𝑨=         z}|{         z}|{      ,                          (5) number of operations in the operation-trace graph. And 𝒗𝑡  =h  1i
+                                                    𝑨𝑜𝑜          𝑨𝑜𝑡                                       𝑁𝑡,   1𝑁𝑡,...,   1𝑁𝑡, where 𝑁𝑡 denotes the number of traces in the
+                                                    𝑨𝑡𝑜            0                                     operation-trace graph. Normal Scorer and Anomalous Scorer obtain
+                 where𝑨𝑜𝑜 denotes the transition matrix among operations based                           the normal PPV and anomalous PPV by following the work [39]
+                 on the call graph,𝑨𝑜𝑡 and𝑨𝑡𝑜 denote the transition matrices be-                         andtheEquation(4).ForthetracingdatainFig.3,wecangetthe
+                 tween operations and traces based on the operation-trace graph.                         anomalous PPV:
+                 PageRank Scorer canutilizethe𝑨𝑜𝑜 todifferentiatetheserviceop-
+                 erations covered by the same anomalous and normal traces. For                           𝐹 [𝑓𝑟𝑜𝑛𝑡,𝑟𝑒𝑐𝑜𝑚𝑚𝑒𝑛𝑑,𝑐ℎ𝑒𝑐𝑘𝑜𝑢𝑡,𝑝𝑟𝑜𝑑𝑢𝑐𝑡] = [0.990,0.328,0.328,1].
+
+
+
+
+
+                   0      0    0      01/2    1/3    1/3
+        𝜔 𝑨𝑜𝑜          11/3    0    0      0 0      1/3      0
+            |𝑂(𝑠)|,    𝑡 ∈ 𝑂 (𝑠)𝑨𝑜𝑡1/3    0    0      0𝑖0        0      1/3
+𝑨=𝐴𝑠𝑡 =𝜃𝑖 = 𝜑 ·   𝑛−1𝑖Í𝑛−1𝑗   +(1−𝜑) ·   𝑘−1𝐴=1/3    1    1      0Í𝑘−1𝑗  ,1/2    1/3    1/3.
+          𝑨𝑡𝑜0,              otherwise0
+                     1/3    0    0    1/3   0        0        0
+                     1/3    0    1    1/3   0        0        0
+                     1/3    1    0    1/3   0        0        0
+
+[PAGE 7]
+               Latency Issue Localization with Extended Spectrum Analysis in Microservice                  WWW ’21, April 19–23, 2021, Ljubljana, Slovenia
+
+                            Table2:Experimentdatasetsoverview                                     service frontend and product, and fewer requests to the service
+                                                                                                  checkout and payment). To be specific, the initial microservice ap-
+                                                                                                  plicationopen-sourcedbyGoogleClouddoesnothavecomplete
+                                                                                                  end-to-end tracing ability. We have given the ability to Hipster-
+                                                                                                  Shop by instrumenting Opentelemetry API for each service. We
+                                                                                                  willopen-sourcethesourcecodeofourinstrumenttoGitHubafter
+               Theresult oftheanomalousscoresindicates that product hasthe                        double-bline review.
+               highestanomalousscoreinourexample.Actually,productisindeed                            Experimental Platform. We construct a distributed testbed
+               the root cause, which proves the feasibility of our algorithm.                     thatcontains8 virtualmachines(VMs)andaElasticSearchCluster.
+                                                                                                  Each VM has a 4-core 2.40GHz CPU, 16GB memory and runs with
+               4.5   WeightedSpectrumRanker                                                       Ubuntu 18.04 OS. We guarantee that all the VMs are in the same
+               Weighted Spectrum Ranker takes the scores of both normal and                       local area network to reduce network jitters. We set up a Kuber-
+               anomaloustracesgeneratedby PageRank Scorer andthenumberof                          netes 10 clusterthatconsiststwomasternodesand6workernodes
+               anomalousandnormaltracestoconstructthespectruminformation.                         basedonVMs.ThemicroservicebenchmarkandJaegercollector
+               The spectrum information of operation𝑂 can be computed as:                         are deployed in that Kubernetes. The service instances first send
+                                                                                                  trace information to Jaeger collector, then Jaeger collector puts ag-
+                             𝑂𝑒𝑓 = 𝐹 ∗𝑁𝑒𝑓,    𝑂𝑛𝑓 = 𝐹 ∗(𝑁𝑓 −𝑁𝑒𝑓)                                  gregatedtracingdatatoaElasticSearchclustertopersistenttracing
+                             𝑂𝑒𝑝 = 𝑃 ∗𝑁𝑒𝑝,    𝑂𝑛𝑝 = 𝑃 ∗(𝑁𝑝 −𝑁𝑒𝑝)  ,              (8)              data.
+               where𝐹 and𝑃 representtheanomalousandnormalPageRankscore                               FaultInjection.MicroRank isapplicabletodetectanddiagnose
+               ofoperation𝑂, 𝑁𝑒𝑓 and 𝑁𝑒𝑝 denotethenumberofanomalousand                            anomaliesthatmanifestthemselvesaslatencydeviations.Tomimic
+               normaltracescoveredtheoperation𝑂,𝑁𝑓 and𝑁𝑝 denotethetotal                           latencyissues,weinjectfourtypesoffaultstoHipster-Shop.We
+               numberofanomalousandnormaltracesinthecurrentslidingwin-                            use Chaosblade 11, a chaos engineering models, to delay service
+               dow,respectively.Noticethattherearesomeoperationsthatdonot                         instance’snetworkpacketstostimulateNetworkJamandconsume
+               haveanomalous scoresorsomedonot havenormalscores.If the                            CPU heavily to stimulate CPU exhaustion. We utilize Strace 12,
+               operation 𝑗 has nota score, the𝐹 or𝑃 is setas 0.0001. MicroRank                    whichisadiagnostic,debuggingandinstructionaluserspaceutility
+               thenappliesspectrumrankingformulaetocomputesuspiciousness                          forLinux,todelay writeorreadsystemcallofthecorresponding
+               scoresforeachoperation.Theoperationname(e.g., front-1/Recv.)                       service instance to stimulate the IO read or write busy. Each fault
+               containstheinformationaboutwhichserviceinstanceitbelongsto.                        injection in our experiment lasts for 3 minutes. Inorder to reduce
+               Therefore,MicroRankcangivearankinglistofserviceinstancesfor                        the mutual influence of different injection operations, we make
+               applicationoperators.TherighthalfofTable1showstheweighted                          theintervalbetweeninjectionoperationsgreaterthan6minutes.
+               spectruminformationandupdatedTarantulascoresforeachservice                         According to Occam’s razor theory13, a complex situation that
+               instance in Fig. 3. According to the Table 1, MicroRank boosts the                 hasmore thattworoot causessimultaneouslyis oflowprobability.
+               Tarantulaspectrummethodandranks𝑝𝑟𝑜𝑑𝑢𝑐𝑡 asthefirst,demon-                           Therefore, we inject faults with two simultaneous root causes at
+               stratingtheeffectivenessofPageRankinlocatingmicroserviceroot                       most. Fig. 7 shows some fault injection examples and MicroRank’s
+               causes.                                                                            results in our experiment. We did 100 injection operations in all
+                                                                                                  experiments and injected 150 faults to Hipster-shop. Fig. 8(a) and
+               5   EXPERIMENTALEVALUATIONS                                                        Fig. 8(b) show the distribution of the four types of faults among
+                                                                                                  different services onA andB respectively.
+               5.1   Datasets                                                                     5.1.2   Real-world MicroserviceSystem. DatasetC isreleased
+               In the study, we used three datasets, namelyA,B andC.A and                         by 2020 AIOps Challenge Event 14. C is based on a real-world
+               B are based on a widely-used open-source microservice system                       productionmicroservicesysteminChinaMobileZhejiang.Inpar-
+               Hipster-Shop. The major difference betweenA andB is that we                        ticular,theworkloadofthesysteminCisareplicaofthereal-world
+               injectonefault eachtimeinA whiletwofaultseach timeinB.C                            workload. Note that since this event does not only focus on mi-
+               isbasedonaproductionmicroservicesysteminChinaMobile,the                            croserviceapplication,inthispaperweonlyselectedthosefaults
+               largest telecommunication company in China. Table 2 shows an                       related to microservices on May 31st, 2020. Because C does not
+               overview of our experimental datasets.                                             have the information about operations, we assume each service
+               5.1.1   Hipster-Shop Microservice System. Hipster-Shop is a                        instance has only an operation.
+               web-basede-commerceappwhereuserscanbrowseproducts,add                              5.2   Spectrumformulaeanddefinitions
+               themtothecart, andpurchasethem.Theapplicationisa widely-
+               usedmicroservicebenchmarkdesignedtoaiddemonstrationand                             To compare the difference of effectiveness among spectrum for-
+               testingofmicroservicesandcloud-nativetechnologies[18,37,38].                       mulae, we selected eight formulae in total. Table 3 presents the
+               It contains10 microservices thatare implemented indifferent pro-
+               gramming languages and intercommunicate using gRPC. In ad-                         10Kubernetes, https://kubernetes.io
+                                                                                                  11Chaosblade, https://github.com/chaosblade-io/chaosblade
+               dition, Hipster-Shop is equipped with a workload generator that                    12Strace, https://strace.io
+               simulates concurrent users of that application. The workload law                   13Occam’s razor, https://en.wikipedia.org/wiki/Occam%27s_razor
+               conforms to the real user behavior (more requests are sent to the                  14C dataset, http://iops.ai/competition_detail/?competition_id=15&flag=1
+
+
+
+
+
+
+
+
+
+DataSet    Microservice           FaultInjection         Faults   Trace
+            Benchmark                                   Number   Number
+  A        Hipster-Shop      Injectonefaulteachtime       50      8,384K
+  B        Hipster-Shop     Injectiontwofaultseachtime    100     8,244K
+  C      ProductionSystem   Injectiononefaulteachtime      7       168k
+
+[PAGE 8]
+               WWW ’21, April 19–23, 2021, Ljubljana, Slovenia                                                                                                                  Guangba Yu, et al.
+
+
+
+
+
+
+
+
+
+
+
+                                           Figure7:ExamplesoffaultinjectionandrootcauseslocalizationonHipster-Shop
+
+
+                                                                                                   Table4,Table5andTable6presenttheoverallresultsofA,B and
+                                                                                                   C ,respectively. In those tables, different columns present different
+                                                                                                   effectiveness metrics, namely Column PR represents thePageRank
+                                                                                                   Anomalous Scorer in MicroRank, Column SP represents the tradi-
+                                                                                                   tional spectrum-based techniques and Column MR represents our
+                                                                                                   MicroRank. Different rows present the spectrum formulae used.
+                                                                                                       From these tables, we have the following observations. First,
+                                                                                                   MicroRankcansignificantlyraisetheoperators’efficiencyoffinding
+                                                                                                   rootcausesnomatterinsinglefaultortwofaultssituation.Overall
+                               (a) A                                 (b) B                         𝑅@1resultsonsinglefaultdatasetsA andC arelargerthan88%.
+                       Figure8:ThedistributionoffaultsonA andB                                     𝑅@3 results on the two faults datasetB are larger than 60%. The
+                                                                                                   declineof recallinB because MicroRank shouldinclude bothtwo
+                 Table3:Spectrumformulaeemployedintheexperiment                                    faultsin thetoprankinglist. We also findthatthe probabilitythat
+                                                                                                   MicroRank locates one ofthe two faultson datasetB exceeds 90%.
+                                                                                                       Second, despite the fact that various techniques perform differ-
+                                                                                                   ently in situations with different number of root causes. In most
+                                                                                                   cases, MicroRank isable toboosttheinitial spectrum-based tech-
+                                                                                                   niques on three datasets. For instance, MicroRank that employs
+                                                                                                   RussellRao spectrum measurementenhances the𝑅@3 from 50% to
+                                                                                                   74% onthedatasetB andthe𝑅@1 from 86% to 92% onthedataset
+                                                                                                   A.
+               definitions of all formulae used in our evaluation. To be specific,                     Third, from the perspective of the spectrum formulae, Ochiai
+               we use the Ochiai, commonly used in recent studies on fault local-                  (marked in gray) is the most effectiveformulae in our experiments.
+               ization [27], as the default spectrum formula in our experiments.                   Inaddition,wediscoverthat MicroRank islessaffectedbydifferent
+                                                                                                   formulae.For instance,onA, thedifferencebetweenthe best𝑅@1
+               5.3   EvaluationMetric                                                              and the worst𝑅@1 is less than 6%.
+               To evaluate the effectiveness ofMicroRank, we employed two met-                         Finally, we find that both the MicroRank and initial spectrum-
+               rics that are usually employed by exiting studies.                                  basedmethodoutperformthePageRanktechniques.Itmeansthat
+                  RecallofTop-k(𝑹@𝒌)referstotheprobabilitythatrootcauses                           therootcausesnotalwaysgetthehighestanomalousscoreinPageR-
+               can be located within the top𝑘 service instances among all can-                     ank Anomalous Scorer. The reason isthat the microservice system
+               didates[12, 19,41].Higher𝑅@𝑘 denotesmore effectiveroot cause                        may have some normal service instances covered by each trace.
+               localization.InasurveyconductedbyKochharet.al.[16],morethan                         To be specific, we find that thePageRank Anomalous Scorer hardly
+                                                                                                   ranksthe rootcauseat Top-1 onC.When wevisualizethe traces
+               73%developersonlyconsiderTop-5rankedelements.Therefore,in                           ofC, we find that it only has a simple service dependency graph,
+               thispaperwesplittheoverallresultsinto𝑅@𝑘(𝑘 = 1,3,5) insingle                        whichcontains13serviceinstancesandithasonlyonekindoftrace.
+               causeexperimentsand𝑅@𝑘(𝑘 = 2,3,5) intwo-causesexperiments.                          Suchsimple topologyand asingle kindoftrace limitthe capability
+               Note that for𝑅@𝑘, the higher the better.                                            of PageRank. However MicroRank still performs excellently and
+                  EXAMScore referstomeasurethemeancountoffalse-positive                            not worse than the initial spectrum-based techniques even when
+               candidates that have to be excluded manually by operators before                    in a simple microservice system. For instance, on the dataset C,
+               locating all the root causes [12, 27, 35]. If the root cause is out of              eachrequestneedstoquerydatafrom𝑑𝑏_003,𝑑𝑏_007and𝑑𝑏_009.
+               Top-5,weseta defaultfalse-positivecandidates of 10forit. Note                       Hence,wheninjectingafaulttoserviceinstance𝑑𝑜𝑐𝑘𝑒𝑟_008,each
+               that for𝐸𝑆, the smaller the better.                                                 anomalous trace covers𝑑𝑏_003,𝑑𝑏_007,𝑑𝑏_009 and𝑑𝑜𝑐𝑘𝑒𝑟_008.
+               5.4   ExperimentsandResultsAnalysis                                                 The output of Top-4 anomalous ranking list of PageRank Anoma-
+                                                                                                   lousScorer is{𝑑𝑏_003,𝑑𝑏_007,𝑑𝑏_009,𝑑𝑜𝑐𝑘𝑒𝑟_008}.WhiletheTop-
+               5.4.1   MicroRank’s overall effectiveness. We present the ex-                       3 normal ranking list is {𝑑𝑏_003,𝑑𝑏_007,𝑑𝑏_009} because every
+               perimental results of MicroRank on three datasets A, B and C.                       normaltracecoversthemtoo.Therefore,theanomalousscoreof
+
+
+
+
+
+
+
+Formula         Definition          Formula           Definition
+                   𝑂2𝑒𝑓                                  𝑂𝑒𝑓
+ Dstar2          𝑂𝑒𝑝+𝑂𝑛𝑓             Ochiai     q(𝑂𝑒𝑓+𝑂𝑒𝑝)(𝑂𝑒𝑓+𝑂𝑛𝑓)
+
+Goodman       2𝑂2𝑒𝑓−𝑂𝑛𝑓−𝑂𝑒𝑝         Sørensen             2𝑂𝑒𝑓
+              2𝑂𝑒𝑓+𝑂𝑛𝑓+𝑂𝑒𝑝                          2𝑂𝑒𝑓+𝑂𝑛𝑓+𝑂𝑒𝑝
+ Jaccard           𝑂𝑒𝑓             RussellRao            𝑂𝑒𝑓
+               𝑂𝑒𝑓+𝑂𝑛𝑓+𝑂𝑒𝑝𝑂𝑒𝑓                     𝑂𝑒𝑓+𝑂𝑛𝑓+𝑂𝑒𝑝+𝑂𝑛𝑝2𝑂𝑒𝑓
+   M2       𝑂𝑒𝑓+𝑂𝑛𝑝+2𝑂𝑒𝑝+2𝑂𝑛𝑓         Dice           𝑂𝑒𝑓+𝑂𝑒𝑝+𝑂𝑛𝑓
+
+[PAGE 9]
+Latency Issue Localization with Extended Spectrum Analysis in Microservice                  WWW ’21, April 19–23, 2021, Ljubljana, Slovenia
+
+                                           Table4:LatencyissueslocalizationresultsondatasetA
+        DataSet       Formula               R@1                   R@3                   R@5                           ExamScore
+                                     PR      SP     MR      PR     SP     MR      PR     SP     MR      PR       SP     MR       IMP ∗      IMP †
+                        Dstar2        78     88      94     78     94      96     92     96      96     1.16    0.56    0.42    63.79%      25.00%
+                      Goodman         78     86      88     86     92      92     92     92      92     1.16    0.88    0.84    27.59%      4.45%
+                        Jaccard       78     86      88     86     92      92     90     92      92     1.28    0.88    0.84    34.38%      4.45%
+            A             M2          78     90      94     86     94      96     92     94      96     1.16    0.60    0.42    63.79%      30.00%
+                        Ochiai        78     88      94     86     94      96     92     96      96     1.16    0.56    0.42    63.79%      25.00%
+                       Sørensen       78     86      88     86     90      92     92     92      92     1.16    0.88    0.84    34.38%      4.45%
+                      RussellRao      78     86      92     86     92      96     92     96      96     1.28    0.64    0.44    65.63%      31.25%
+                         Dice         78     86      88     86     92      92     90     92      92     1.32    0.88    0.84    36.36%      4.45%
+                                                             ∗ denotes the improvement between PR and MR      † denotes the improvement between SP and MR
+                                           Table5:LatencyissueslocalizationresultsondatasetB
+        DataSet       Formula               R@2                   R@3                   R@5                           ExamScore
+                                     PR      SP     MR      PR     SP     MR      PR     SP     MR      PR       SP     MR       IMP ∗      IMP †
+                        Dstar2        30     52      54     36     62      68     46     70      72     2.46    1.50    1.38    43.90%      8.00%
+                      Goodman         32     56      58     38     62      66     48     76      84      2.4    1.46    1.18    39.17%      19.18%
+                        Jaccard       28     54      56     34     58      64     44     74      76     2.54    1.54    1.28    39.37%      16.88%
+            B             M2          28     50      64     34     56      72     44     64      82     2.56    1.68    1.04    59.36%      38.10%
+                        Ochiai        30     60      66     36     68      76     46     82      84     2.48    1.14    0.94    62.10%      17.54%
+                       Sørensen       30     56      58     36     62      66     46     78      84     2.48    1.38    1.20    51.61%      13.04%
+                      RussellRao      30     42      64     36     50      74     46     56      84     2.48    1.96    1.00    59.68%      48.98%
+                         Dice         26     56      58     32     62      66     44     76      84      2.6    1.40    1.16    55.38%      17.14%
+                                                             ∗ denotes the improvement between PR and MR      † denotes the improvement between SP and MR
+                                           Table6:LatencyissueslocalizationresultsondatasetC
+      DataSet       Formula               R@1                    R@3                    R@5                             ExamScore
+                                   PR      SP     MR      PR      SP     MR      PR      SP     MR      PR       SP     MR        IMP∗        IMP†
+                     Dstar2         0      85     100      0     100     100     100    100     100     3.42    0.14    0.00    100.00%      100.00%
+                    Goodman         0      85     100      0     100     100     100    100     100     3.42    0.14    0.00    100.00%      100.00%
+                     Jaccard        0      85     100      0     100     100     100    100     100     3.42    0.14    0.00    100.00%      100.00%
+          C            M2           0     100     100      0     100     100     100    100     100     3.42    0.00    0.00    100.00%       0.00%
+                     Ochiai          0     85     100      0     100     100     100    100     100     3.42    0.14    0.00    100.00%      100.00%
+                    Sørensen        0      85     100      0     100     100     100    100     100     3.42    0.14    0.00    100.00%      100.00%
+                   RussellRao       0      71     100      0      85     100     100    100     100     3.42    0.71    0.00    100.00%      100.00%
+                       Dice         0      85     100      0     100     100     100    100     100     3.42    0.14    0.00    100.00%      100.00%
+                                                               ∗ denotes the improvement between PR and MR      † denotes the improvement between SP and MR
+
+𝑑𝑏_003,𝑑𝑏_007and𝑑𝑏_009canbebalancedbytheirnormalscores
+inEquation(8)andtheanomalousscoreof𝑑𝑜𝑐𝑘𝑒𝑟_008remainsits
+effect. Thus,MicroRank can still rank𝑑𝑜𝑐𝑘𝑒𝑟_008 at first. In other
+words, our method can eliminate the interference of the service
+instances that are covered by requests every time.
+
+
+5.4.2    MicroRank’sAnomalyDetectormoduleeffectiveness.
+Figure.9presentstheanomaly detectionresultsof Anomaly Detec-
+tor in MicroRank on datasetA andB. We do not apply Anomaly                            Figure9:TheanomalydetectionresultsonA andB
+Detector to C because we do not have the complete fault list in                  becausemissing ananomalyhas moreseriousconsequences than
+that production system. The results show that Anomaly Detector                   false positives.
+performsbetteronthedatasetB thanA.Thisisbecauseinjecting
+two faults at the same time can make the anomaly more obvious.                   5.4.3   Impacts of configuration. In this section,we extend our
+The Precision results of two datasets are slightly lower than the                experiments with different configurations to investigate the in-
+Recall.Itmeansthatthenumberofmisreport(i.e.,thenormaltrace                       fluence of damping factors𝑑 in Equation(4), call graph weight𝜔
+was determined as abnormal trace) is larger than underreport (i.e.,              in Equation(6),and preference vectorweight𝜑 in Equation(7)on
+anomalywasnotdetected).Itisacceptableforapplicationoperators                     datasetA.BecausetheExamScorereflectstheoverallperformance
+
+[PAGE 10]
+WWW ’21, April 19–23, 2021, Ljubljana, Slovenia                                                                                                                  Guangba Yu, et al.
+
+
+of MicroRank, weselect theExam Score toshow the effectiveness                       thestaticservicecallgraph,namelyabi-directedgraphthenlever-
+of MicroRank in this subsection.                                                    ageGrangerCausalitytoobtainthedynamicservicedependencies
+   Dampingfactor𝑑 inEquation(4).Figure.10 presentsthe im-                           with response timemetrics. Based on thisgraph, we identify ser-
+pactsofdifferent𝑑 ontheeffectivenessofMicroRank.Inthisfigure,                       vices that contribute the most changes in the dependency graph
+the xaxis presentsvarious𝑑 values, whilethe yaxis presentsthe                       whenananomalyoccurs.TocomparewithRoots,weimplement
+ExamScore.Fromthefigure,wecanfindthatthe𝑑 doesnotimpact                             thefourrootcauseidentificationapproachesmentionedinRoots.
+the MicroRank effectivenessmuch.Forexample,foralltheformu-                          To compare with Microscope, we leverage the method presented
+lae,thelargestimprovementdifferenceamongdifferentdamping                            in Microscope to locate root causes. To compare with CauseInfer,
+factors is only 0.2. In addition, for the majority cases, when the                  we capture network packets and leverage lag correlation to find
+𝑑 increases, the Exam Score slightly increase. The reason is that                   servicedependencies.Then,weleverageaDepthFirstSearchbased
+when𝑑 increases,thetracescopeandtracekindwouldmakefewer                             traversal approach to infer root causes. To compare with AutoMap,
+contributions in localizing the faults.                                             we build causality graphs under normal and abnormal cases and
+   Callgraphweight𝜔 inEquation(6). Figure. 11 presents the                          locate root causes with a random walk approach on the graphs.
+impacts of different 𝜔 on the effectiveness of MicroRank. The x                        Figure.14showsthecomparisonresultof𝑅@1amongdifferent
+axispresentsvarious𝜔 values,whiletheyaxispresentstheExam                            RCA methods based on datasetA. From this figure, we observe
+Score. In this study,𝜔 is used tointroduce call graph to differenti-                that MicroRank achieves a better result than other RCA methods.
+ateoperationscoveredbythesameanomalousandnormaltraces.                              MicroRank achieves94%in𝑅@1,whichisatleast6%higherthan
+The figure shows that the Exam Score ofMicroRank dramatically                       other methods. MicroRank outperforms the latestwork, AutoMap,
+decrease at the very beginning, but then remain stable later. We                    by 6%higherin𝑅@1withalowercost.Comparedwith NetMedic,
+thinkthereasontobethatwhen𝜔 is0, MicroRank onlyuseonly                              we have over 16% improvement in𝑅@1. Fig. 15 compares the per-
+the trace coverage information and cannotdifferentiate operations                   formance of different RCA algorithms based on datasetB. We can
+with the same trace coverage, hence the Exam Score is relatively                    observethat MicroRank outperformsotheralgorithmsondataset
+low.                                                                                B. We argue that the reasons why MicroRank achieves the best
+   Preferencevectorweight𝜑inEquation(7).Figure.12presents                           performance are two-fold.
+the impacts of different𝜑 on the effectiveness ofMicroRank. The x                        •  MicroRank leveragesthedetailedend-to-endtracingdatato
+axis presentsvarious𝜑 values, whilethe yaxis presentsthe Exam                               constructtheservicecallgraphwhichismuchmoreaccurate
+Score. Inthis study,𝜑 isused tobalance theimportance between                                than statistic-based approaches like Fchain [25], NetMedic
+tracescopeandtracekind.ThefigureshowsthatthelinesofExam                                     [15], Sieve [33], CauseInfer [5], and AutoMap[22].
+Score are concave. They dramatically decrease at the very begin-                         •  MicroRank weave thecluesprovided bynormal andabnor-
+ning, and gradually increase in the end. We found the reason to                             maltracestopinpointrootcauseserviceinstances,whichis
+bethat when𝜑 is1, thepreferencevectoronly considersthetrace                                 better than those approaches using abnormal traces exclu-
+scope. However,when𝜑 equals 0, the preference vectoronly takes                              sively like Roots [9] and Microscope[19].
+accountoftheinformationabouttracekind.Consideringonlythe
+trace scope or kind of trace can result in a lower accuracy.                        5.5   Discussion
+5.4.4   Impact oftrace number. Figure.13showshowthenum-                                Table7:Overheadstatisticsonbenchmarkexperiment.
+ber of traces in one sliding window impacts the effectiveness of                               SystemModule                      Overhead
+MicroRank.Thexaxispresentsvariousthenumberoftracesinthe                                       Instrumented client    2%± 1% CPU utilization(Single core)
+sliding window, while the y axis presents the Exam Score. From                                 Anomaly Detector      8%± 4% CPU utilization(Single core)
+the Fig. 13, we can see that Exam Score dramatically decrease at                                Data Preparator     60%± 5% CPU utilization(Single core)
+                                                                                               PageRank Scorer      20%± 5% CPU utilization(Single core)
+theverybeginning,butthenslowlydecreaseafter thenumberof                                        Spectrum Scorer       2%± 1% CPU utilization(Single core)
+tracesislargerthan 100.Thisobservationsays,ourapproachdoes                                     Anomaly Detector       0.8 second (Single physical node)
+notrequirelotoftracestolocalizerootcauses.Oursystemisable                                       Data Preparator       1.5 second (Single physical node)
+                                                                                               PageRank Scorer        5.5 second (Single physical node)
+to locate the root causes in the case of losing partial tracing data.                          Spectrum Scorer        0.1 seconds (Single physical node)
+5.4.5   Comparisonswithstate-of-artmethods. Tovalidatethe                           Overhead.Table7showstheoverheadofMicroRank.TheAnomaly
+effectiveness of MicroRank, we compare it with several state-of-                    Detctor takes about 8% CPU utilization and 0.8 second to count the
+the-art root cause analysis (RCA) methods including FChain [25],                    operationnumberanddistinguishwhetherthetracesareabnormal.
+NetMedic[15],Sieve[33],CauseInfer[5],Roots[9],Microscope[19]                        Whentherootcauseanalysisistriggered, Data Preparator needs
+and AutoMap[22]. Tocompare with FChain,we firstidentify the                         about60%CPUutilizationand1.5secondstominethedetailedtrace
+abnormal changes in the latency data of each service, then infer                    information. Given the large volume of tracing data in production
+root causes along the service dependency graph with the meth-                       systems, the Data Preparator module can be accelerated by the
+ods proposed by FChain. To compare with NetMedic, we leverage                       MapReduceparadigm.Then,MicroRankcomputesPageRankscores
+NetMedic’sstatecorrelationapproachtoestimateservicedepen-                           and a spectrum score, which consumes 20% CPU utilization in
+dencies. Then we use the method presented by NetMedic to locate                     total.Theprocessconsumesapproximately5.5secondstocalculate
+rootcauses.TocomparewithSieve,weadoptSysdig 15 toobtain                             PageRank scores and 0.1 second to compute the final score.
+                                                                                       Limitation. First, MicroRank focuses on the latency issues lo-
+15Sysdig, https://sysdig.com/opensource/                                            calization,soitcannotlocalizefaultsthatwouldnotcauserequest
+
+[PAGE 11]
+Latency Issue Localization with Extended Spectrum Analysis in Microservice                  WWW ’21, April 19–23, 2021, Ljubljana, Slovenia
+
+
+
+
+
+
+
+
+
+
+
+         Figure10: Impactof𝑑 onExamScore                 Figure11: Impactof𝜔 onExamScore                 Figure12: Impactof𝜑 onExamScore
+
+                                                                                   networksockets toobtainnetwork dependencyandbuilds thede-
+                                                                                   pendencygraphwithnetworkinformation.ForRCA,Microscope
+                                                                                   finds root cause candidates by comparing the similarity between
+                                                                                   SLOmetricsandtheabnormalservices.Thiscategoryofworkenjoy
+                                                                                   thebenefitthatthesourcecodedoesn’tneedtobeinstrumented,yet
+                                                                                   theyarenotabletoprovidefine-graineddataforanalysiscompared
+                                                                                   to trace based work.
+                                                                                      MachineLearningBasedWork.Themachinelearningbased
+                                                                                   methods including classification, relevancy analysis and etc. Liu
+      Figure13:ImpactoftracenumberonExamScore                                      et.al., [20] proposed an approach with a spatial-temporal feature
+                                                                                   extraction scheme built on the concept of symbolic dynamics to
+latency deviations. Second, MicroRank relies on the quality of trac-               discovercausalinteractions.ThenaRestrictedBoltzmannMachine
+ing data. Our system is able to locate root causes in the case of                  (RBM) isused todetect anomaliesand theroot causesare obtained
+losing some tracing data,but for the platform that losing too many                 by analyzinganomaly propagation. Liuet.al., [21] alsointroduced
+tracingdata,theaccuracywillbeaffectedinescapably.Moreover,                         a sequential state switching model based on RBM and artificial
+instrumenting tracing codes causes additional overhead, but the                    anomalyassociationbasedondeepneuralnetworkstopinpointthe
+tracingdata canbe utilizednot only by MicroRank butalso other                      root causes. Li et.al., [17] applied a dynamic latent variable model
+auxiliary procedures like the predictive anomaly module. In ad-                    anddynamic timewarping based causalityanalysis tolocateroot
+dition, our approach is a reactive approach. That means it takes                   causes.Comparedtoourwork,themachinelearningbasedmethods
+actions only after a latency issue occurs, which is later than the                 need more data to adapt to the dynamic microservice systems.
+proactive methods.                                                                 7   CONCLUSIONANDFUTUREWORK
+6   RELATEDWORK                                                                    This paper designs and implements, MicroRank, a novel system
+TracingBasedWork. Some existingstudies providedvarious so-                         to locate root causes that lead to latency issues in microservice
+lutions on end-to-end tracing [2, 4, 7, 14]. They proposed tracing                 environments.MicroRankextractsservicelatencyfromtracingdata
+systems to instructthe source code, collect tracing data,and find                  then conducts the anomaly detection procedure. By combining
+outtherequestswiththelongresponsetime.Asitisdescribedin                            PageRank and spectrum analysis, the service instances that lead
+Section3.2,these systemsdidnotfullyleveragethetracing datato                       to latency issues are ranked with high scores. The experimental
+locate theroot causes. Effortson analyzingtracing datamainly fell                  evaluationsinawidely-usedopen-sourcesystemandaproduction
+intopinpointingperformanceproblemsbycomparingrequestflows                          system show that MicroRank can localize root causes accurately,
+[6, 29]. Pip [28] leverages developer-provided, component-based                    which outperforms some state-of-the-art approaches. Moreover,
+expectation of the architecture and latency behavior to compare                    MicroRank is relatively lightweight and can scale out readily in
+withactualbehaviorobservedinend-to-endtraces.However,Pip                           large-scalemicroservicesystems.Aspartoffutureworks,weplan
+excessivelyreliesondevelopers’specification,whichdoesnotwork                       to conduct experiments in benchmarks with more services and
+well in a dynamic micorservice environment.                                        more complex dependencies.
+   DependencyGraphBasedWork.Approachesinthiscategory                               8   ACKNOWLEDGE
+alwaysbuildadependency graphofnodesindistributedsystems
+indicating the relationship of each node before diagnosing or ana-                 The research is supported by the Key-Area Research and Develop-
+lyzing. Besides, these works commonly utilize monitoring metrics                   mentProgramofGuangdongProvince(No.2020B010165002),the
+to detect the anomaly and build causality graphs with different                    National Natural Science Foundation of China ( No. 61802448, No.
+approaches, then diagnosing problems with the combination of                       U1811462), the Basic and Applied Basic Research of Guangzhou
+metrics and dependency graph. CauseInfer [5] constructs a two-                     (No. 202002030328), and the Natural Science Foundation of Guang-
+layered hierarchicalcausality graph of thedistributed system and                   dongProvince(No.2019A1515012229).Thecorrespondingauthor
+infers the root causes of performance problems along the graph                     is Pengfei Chen.
+by statistical methods. Sieve [33] infers performance metric de-                   REFERENCES
+pendencies between distributed components in the system with                        [1]  RuiAbreu,PeterZoeteweij,andArjanJCVanGemund.2007. Ontheaccuracyof
+the Granger Causality test. Microscope [19] intercepts system calls                    spectrum-based fault localization. In Testing: Academic and Industrial Conference
+
+[PAGE 12]
+WWW ’21, April 19–23, 2021, Ljubljana, Slovenia                                                                                                                  Guangba Yu, et al.
+
+
+
+
+
+
+
+
+
+
+        Figure14:𝑅@1resultsamongdifferentRCAmethodsonA                                                       Figure15:𝑅@2resultsamongdifferentRCAmethodsonB
+
+      Practice and Research Techniques-MUTATION. IEEE, 89–98.                                                [22]  Meng Ma, Jingmin Xu, Yuan Wang, Pengfei Chen, Zonghua Zhang, and Ping
+ [2]  Paul Barham, Austin Donnelly, Rebecca Isaacs, and Richard Mortier. 2004. Using                               Wang. 2020.  AutoMAP: diagnose your microservice-based web applications
+      magpie for request extraction and workload modelling. In 6th Symposium on                                    automatically. In The Web Conference 2020. ACM / IW3C2, 246–258.
+      Operating System Design and Implementation. USENIX Association, 259–272.                               [23]  Anton Michlmayr, Florian Rosenberg, Philipp Leitner, and Schahram Dustdar.
+ [3]  Salman Abdul Baset. 2012.   Cloud SLAs: present and future.   ACM SIGOPS                                     2009. Comprehensive qos monitoring of web services and event-based sla viola-
+      Operation Systems Review 46, 2 (2012), 57–66.                                                                tiondetection.In Proceedings of the 4th international workshop on middleware for
+ [4]  MikeY.Chen,AnthonyJ.Accardi,EmreKiciman,DavidA.Patterson,Armando                                             service oriented computing. 1–6.
+      Fox, and Eric A. Brewer. 2004. Path-based failure and evolution management.                            [24]  LeeNaish,HuaJieLee,andKotagiriRamamohanarao.2011. Amodelforspectra-
+      In 1st Symposium on Networked Systems Design and Implementation. USENIX,                                     basedsoftwarediagnosis. ACMTransactionsonSoftwareEngineeringandMethod-
+      309–322.                                                                                                     ology 20, 3 (2011), 11:1–11:32.
+ [5]  PengfeiChen,YongQi,PengfeiZheng,andDiHou.2014. CauseInfer:automatic                                    [25]  HiepNguyen,ZhimingShen,YongminTan,andXiaohuiGu.2013. Fchain:toward
+      and distributed performance diagnosis with hierarchical causality graph in large                             black-box online fault localization for cloud systems. In IEEE 33rd International
+      distributed systems. In 2014 Conference on Computer Communications. IEEE,                                    Conference on Distributed Computing Systems. 21–30.
+      1887–1895.                                                                                             [26]  Lawrence Page, Sergey Brin, Rajeev Motwani, and Terry Winograd. 1999. The
+ [6]  Francois Doray andMichel Dagenais. 2017. Diagnosing performance variations                                   PageRank citation ranking: Bringing order to the web. Technical Report. Stanford
+      by comparing multi-Level execution traces.  IEEE Transactions on Parallel &                                  InfoLab.
+      Distributed Systems 28, 2 (2017), 462–474.                                                             [27]  SpencerPearsonandJoséCamposetc.2017. Evaluatingandimprovingfaultlocal-
+ [7]  Rodrigo Fonseca, George Porter, Randy H Katz, Scott Shenker, and Ion Stoica.                                 ization.InProceedingsofthe39thInternationalConferenceonSoftwareEngineering.
+      2007. X-trace: A pervasive network tracing framework. In Proceedings of the 4th                              IEEE / ACM, 609–620.
+      USENIX conference on Networked systems design & implementation. 20–20.                                 [28]  PatrickReynolds,CharlesEdwinKillian,JanetLWiener,JeffreyCMogul,MehulA
+ [8]  YuGan,YanqiZhang,andDailunChengetal.2019. Anopen-Sourcebenchmark                                             Shah, and Amin Vahdat. 2006.  Pip: detecting the unexpected in distributed
+      suite for microservices and their hardware-software implications for cloud &                                 systems.. In NSDI, Vol. 6. 9–9.
+      edgesystems.In Proceedings of the 24th International Conference on Architectural                       [29]  Raja R. Sambasivan, Alice X. Zheng, Michael De Rosa, Elie Krevat, Spencer
+      Support for Programming Languages and Operating Systems. 3–18.                                               Whitman, Michael Stroucken, William Wang, Lianghong Xu, and Gregory R.
+ [9]  Hiranya Jayathilaka, Chandra Krintz, and Rich Wolski. 2017. Performance moni-                                Ganger. 2011.  Diagnosing performance changes by comparing request flows.
+      toringand rootcause analysisforcloud-hostedwebapplications. In Proceedings                                   In Proceedings of the 8th USENIX Conference on Networked Systems Design and
+      of the 26th International Conference on World Wide Web. 469–478.                                             Implementation. 43–56.
+[10]  GlenJehandJenniferWidom.2003. Scalingpersonalizedwebsearch.In Proceed-                                 [30]  Huasong Shan and Yuan Chen etc. 2019.  Diagnosis: unsupervised and real-
+      ings of the Twelfth International World Wide Web Conference. ACM, 271–279.                                   time Diagnosis of small-window long-tail latency in large-scale microservice
+[11]  Jiajun Jiang, Ran Wang, Yingfei Xiong, Xiangping Chen, and Lu Zhang. 2019.                                   platforms. In The World Wide Web Conference. ACM, 3215–3222.
+      Combining spectrum-based fault localizationand statistical debugging:an em-                            [31]Yuri Shkuro. 2019.        Mastring Distributed Tracing. Packt.
+      pirical study. In 34th IEEE/ACM International Conference on Automated Software                         [32]  BenjaminH Sigelmanandet al.Barroso.2010. Dapper,a large-scaledistributed
+      Engineering. IEEE / ACM, 502–514.                                                                            systems tracing infrastructure. (2010).
+[12]  Jiajun Jiang, Ran Wang, Yingfei Xiong, Xiangping Chen, and Lu Zhang. 2019.                             [33]  Jörg  Thalheim,  Antonio  Rodrigues,  Istemi  Ekin  Akkus,  Pramod  Bhatotia,
+      Combining spectrum-based fault localizationand statistical debugging:an em-                                  Ruichuan Chen, Bimal Viswanath, Lei Jiao, and Christof Fetzer. 2017.  Sieve:
+      pirical study. In 34th IEEE/ACM International Conference on Automated Software                               actionableinsightsfrommonitoredmetricsindistributedsystems.InProceedings
+      Engineering. 502–514.                                                                                        of the 18th ACM/IFIP/USENIX Middleware Conference. 14–27.
+[13]  JamesA.Jones,MaryJeanHarrold,andJohnT.Stasko.2002. Visualizationoftest                                 [34]  PingWang,JingminXu,MengMa,WeilanLin,DishengPan,YuanWang,and
+      information to assist fault localization. In Proceedings of the 24th International                           PengfeiChen.2018. Cloudranger:rootcauseidentificationforcloudnativesys-
+      Conference on Software Engineering. ACM, 467–477.                                                            tems. In Proceedings of the 18th cloud-hosted IEEE/ACM International Symposium
+[14]  Jonathan Kaldor, Jonathan Mace, Michał Bejda, Edison Gao, Wiktor Kuropatwa,                                  on Cluster, Cloud and Grid Computing. 492–502.
+      JoeO’Neill,KianWinOng,BillSchaller,PingjiaShan,BrendanViscomi,etal.2017.                               [35]  W. Eric Wong, Tingting Wei, Yu Qi, and Lei Zhao. 2008.   A crosstab-based
+      Canopy:anend-to-endperformancetracingandanalysissystem.In Proceedings                                        statistical method for effective fault localization. InFirst International Conference
+      of the 26th ACM Symposium on Operating Systems Principles. 34–50.                                            on Software Testing, Verification, and Validation. IEEE, 42–51.
+[15]  Srikanth Kandula, Ratul Mahajan, and et al. Verkaik. 2009. Detailed diagnosis                          [36]  Wenpu Xing and Ali A. Ghorbani. 2004.   Weighted PageRank algorithm. In
+      inenterprise networks. ACM SIGCOMM Computer Communication Review 39,4                                        2nd Annual Conference on Communication Networks and Services Research. IEEE
+      (2009), 243–254.                                                                                             Computer Society, 305–314.
+[16]  Pavneet Singh Kochhar, Xin Xia, David Lo, and Shanping Li. 2016. Practitioners’                        [37]  Guangba Yu, Pengfei Chen, and Zibin Zheng. 2019.  Microscaler: automatic
+      expectations on automated fault localization. In Proceedings of the 25th Interna-                            scalingformicroserviceswithanonlinelearningApproach.InIEEEInternational
+      tional Symposium on Software Testing and Analysis. ACM, 165–176.                                             Conference on Web Services. IEEE, 68–75.
+[17]  GangLi,TaoYuan,SJoeQin,andTianyouChai.2015. Dynamictimewarping                                         [38]  Guangba Yu, Pengfei Chen,and Zibin Zheng.2020. Microscaler: cost-effective
+      basedcausalityanalysisforroot-causediagnosisofnonstationaryfaultprocesses.                                   scaling for microservice applications in the cloud with an online learning Ap-
+      IFAC-PapersOnLine 48, 8 (2015), 1288–1293.                                                                   proach. IEEE Transactions on Cloud Computing (2020).  https://doi.org/10.1109/
+[18]  Xing Li, Yan Chen, and Zhiqiang Lin. 2019. Towards automated inter-service                                   TCC.2020.2985352
+      authorizationformicroserviceapplications.InProceedingsoftheACMSIGCOMM                                  [39]  MengshiZhang, XiaLi, LingmingZhang,and SarfrazKhurshid. 2017. Boosting
+      2019 Conference Posters and Demos. ACM, 3–5.                                                                 spectrum-basedfaultlocalizationusingPageRank.InProceedingsofthe26thACM
+[19]  Jinjin Lin, Pengfei Chen, and Zibin Zheng. 2018. Microscope: pinpoint perfor-                                SIGSOFT International Symposium on Software Testing and Analysis. 261–272.
+      mance issues withcausal graphs in micro-serviceenvironments. In 16th Interna-                          [40]  Hao Zhou and Ming Chen etc. 2018.   Overload control for scaling WeChat
+      tional Conference on Service-Oriented Computing. Springer, 3–20.                                             microservices.In Proceedings of the ACM Symposium on Cloud Computing.ACM,
+[20]  Chao Liu, Sambuddha Ghosal, Zhanhong Jiang, and Soumik Sarkar. 2016. An                                      149–161.
+      unsupervisedspatiotemporalgraphicalmodelingapproachtoanomalydetection                                  [41]  Xiang Zhou, Xin Peng, and Tao Xie. 2019.  Latent error prediction and fault
+      indistributedCPS. In ACM/IEEE 7th International Conference on Cyber-Physical                                 localizationformicroserviceapplicationsbylearningfromsystemtracelogs.In
+      Systems. 1–10.                                                                                               ProceedingsoftheACMJointMeetingonEuropeanSoftwareEngineeringConference
+[21]  Chao Liu, Kin Gwn Lore, and Soumik Sarkar. 2017.  Data-driven root-cause                                     and Symposium on the Foundations of Software Engineering. ACM, 683–694.
+      analysis for distributed system anomalies. In IEEE 56th Annual Conference on
+      Decision and Control. 5745–5750.

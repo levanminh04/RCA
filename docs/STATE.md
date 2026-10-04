@@ -24,6 +24,11 @@ Cập nhật: 02/10/2026. Không quá một trang. Chi tiết từng task nằm 
 | T-012 | Khảo sát dataset 2025–2026 | P2 | Codex | Claude | Xong (04/10) | `tasks/T-012-khao-sat-dataset-2025-2026/` |
 | T-014 | Hồ sơ CIRCA PC và kiến trúc | P1 | Codex | Claude | Xong (04/10/2026), chưa commit | `tasks/T-014-ho-so-circa/` |
 | T-013 | Hồ sơ BARO và bộ phát hiện | P1 | Codex | Claude | Xong (04/10/2026); Minh duyệt sau sửa R1 và N1–N3 | `tasks/T-013-ho-so-baro/` |
+| T-015 | Hồ sơ MicroRank, TraceRCA và detector trace | P1 | Codex | Claude | Xong (04/10/2026), chưa commit | `tasks/T-015-ho-so-microrank/` |
+| T-019 | Thẻ Sock Shop RCAEval | P2 | Codex | Claude | Xong (04/10/2026), chưa commit | `tasks/T-019-the-sock-shop/` |
+| T-016 | Hồ sơ TORAI, lõi RCD và biến thể RCD | P1 | Claude | Codex | Xong (04/10), chưa commit (Minh dặn). Đã áp WHY-19, WHY-20, SL36, K1 C.5/C.8, Q-57; đính chính T-001/T-005/T-006 (D1–D6) | `tasks/T-016-ho-so-torai/` |
+| T-017 | Hồ sơ SimpleRCA M4 và luật Type I/II | P1 | Codex | Claude | Xong (04/10/2026), chưa commit; Q-55 | `tasks/T-017-simplerca/` |
+| T-018 | Hồ sơ GDN và đọc DecompRCA | P1 | Claude | Codex | Xong (04/10/2026), chưa commit; Q-56, WHY-18. E2 chuyển G1 | `tasks/T-018-ho-so-gdn-decomprca/` |
 
 ## Task đang mở
 

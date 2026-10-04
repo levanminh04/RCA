@@ -1,0 +1,604 @@
+{
+  "scope": "Read current summary documents and source scripts only. No raw telemetry or per-case result artifact used for conclusions. T-002 statements about RE2-TT use only already approved 30 dev scope.",
+  "created_utc": "2026-10-04",
+  "audit_question": "Contradictions affecting MicroRank/TraceRCA input schema, candidate coverage or graph interpretation",
+  "confirmed_corrections": [],
+  "tasks": [
+    {
+      "task": "T-002",
+      "status": "no_proven_contradiction_in_checked_documents_and_scripts",
+      "evidence": [
+        {
+          "file": "results/T-002/the-rcaeval.md",
+          "sha256": "0ab54c6c2ca60e9830d32e81cd4fadec1bf7f9b2f933b313e371d3ef1e35b70e",
+          "lines": [
+            {
+              "line": 59,
+              "text": "| ts-auth-service | (0, 0) ở 30/30 ca |"
+            },
+            {
+              "line": 73,
+              "text": "| ts-auth-service | (0, 0) ở 6/6 ca |"
+            },
+            {
+              "line": 98,
+              "text": "Trace có 11 trường: `time`, `traceID`, `spanID`, `serviceName`, `methodName`, `operationName`, `parentSpanID`, `startTimeMillis`, `startTime`, `duration`, `statusCode`. Kiểu từng file ở schemas.json. `startTime // 1000 == startTimeMillis` trên phần đã kiểm; quy đổi startTimeMillis/1000 khớp epoch metric/log. Đơn vị duration còn OPEN; không dùng duration để xếp hạng. Không có span kind hay thuộc tính resource/db/messaging đủ dựng cạnh có kiểu."
+            },
+            {
+              "line": 232,
+              "text": "Trace có 11 trường: `time`, `traceID`, `spanID`, `serviceName`, `methodName`, `operationName`, `parentSpanID`, `startTimeMillis`, `startTime`, `duration`, `statusCode`. Kiểu từng file ở schemas.json. `startTime // 1000 == startTimeMillis` trên phần đã kiểm; quy đổi startTimeMillis/1000 khớp epoch metric/log. Đơn vị duration còn OPEN; không dùng duration để xếp hạng. Không có span kind hay thuộc tính resource/db/messaging đủ dựng cạnh có kiểu."
+            },
+            {
+              "line": 350,
+              "text": "| ts-auth-service | (0, 0) ở 1/1 ca |"
+            },
+            {
+              "line": 363,
+              "text": "Trace có 11 trường: `time`, `traceID`, `spanID`, `serviceName`, `methodName`, `operationName`, `parentSpanID`, `startTimeMillis`, `startTime`, `duration`, `statusCode`. Kiểu từng file ở schemas.json. `startTime // 1000 == startTimeMillis` trên phần đã kiểm; quy đổi startTimeMillis/1000 khớp epoch metric/log. Đơn vị duration còn OPEN; không dùng duration để xếp hạng. Không có span kind hay thuộc tính resource/db/messaging đủ dựng cạnh có kiểu."
+            }
+          ]
+        },
+        {
+          "file": "results/T-002/inspect_local.py",
+          "sha256": "d1b8fe8bc1d1300463fbbceb26eee83d049ca7517627557d13c1daac478db185",
+          "lines": [
+            {
+              "line": 93,
+              "text": "        nodes = sorted(child_service.loc[mask].dropna().unique().tolist())"
+            },
+            {
+              "line": 94,
+              "text": "        edge_mask = mask & unambiguous & parent_service.notna() & child_service.notna() & parent_service.ne(child_service)"
+            },
+            {
+              "line": 115,
+              "text": "        \"typed_span_kind_column\": any(c.lower() in (\"spankind\", \"span_kind\", \"kind\") for c in names),"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "task": "T-003",
+      "status": "no_proven_contradiction_in_checked_documents_and_scripts",
+      "evidence": [
+        {
+          "file": "results/T-003/the-dataset-ngoai-rcaeval.md",
+          "sha256": "7aa64f05640b9eedffa4bc5d90abb3d6f8a6686b94cd21c92cf2bc9cbe489d7c",
+          "lines": [
+            {
+              "line": 11,
+              "text": "| [DeepTraLog TT](../T-010/the-dataset.md) | Toàn 14 F/10 normal/8 graph/5 all-log: 37 file tải | Đọc toàn inventory không nghĩa đủ span raw cho mọi graph ID |"
+            },
+            {
+              "line": 19,
+              "text": "[Bảng đối chiếu](bang-tieu-chi.md) giữ đủ chín tiêu chí cho mọi biến thể. Public/download khác permission; injection khác onset; trace call graph khác TEG/sơ đồ kiến trúc. Chi phí không thành điểm phân xử. RCAEval dẫn [T-002](../T-002/the-rcaeval.md), không sửa hoặc tự giải REVIEW của T-002. Sock Shop thuộc T-002/P2; không tự thêm raw vào gói. G1 vẫn phải trả lời vì sao dùng/không dùng Sock Shop và LEMMA theo MRP."
+            },
+            {
+              "line": 25,
+              "text": "| Nezha OB | 56 record tiêm,10 root,33 ô | Minute-file quanh injection±60s, hai clock; không onset |"
+            },
+            {
+              "line": 28,
+              "text": "| Eadro TT | 81 record,27 root,81 ô; mỗi ô1 lần | Paper162; graph whole-file không là graph interval tiêm |"
+            },
+            {
+              "line": 41,
+              "text": "Deep12.303.544 span raw; parent theo storage case20 thiếu/36.980 nhiều dòng. Graph E×2 được sửa ở inspect-005, không dùng số cạnh sai inspect-002. All-log7.705.050 dòng;130.920/132.485 graph ID có log. **28.116 normal graph ID vắng span raw đều có all-log**, nhưng log không khôi phục parent/span;1.565 graph ID không có log. [Coverage](../T-010/runs/inspect-008/per-label-coverage.json). TEG không thay service graph; resource metric riêng không thấy trong distribution kiểm."
+            },
+            {
+              "line": 49,
+              "text": "Eadro normal thực đã đọc, nhưng warm-up/load/recovery chưa được tên no-fault chứng minh; clock trace/log/metric còn lệch. Deep normal graph↔raw thiếu một phần lineage. LEMMA PR thiếu timeline normal/injection đáng tin; Cloud24h trước bug theo PPTX đã có502 trước lỗi, chỉ là reference timeline, không healthy GT. JSON Cloud lệch6h so PPTX UTCZ. Không tự dịch clock/chữa nhãn/nối phiên. Injection, narrative failure time, onset và recovery khác nhau."
+            },
+            {
+              "line": 66,
+              "text": "[Ma trận task](task-cham-duoc.md) ghi nhãn/unit/phạm vi/limit. Nezha/Eadro ranking service có điều kiện clock/mapping/protocol; Deep nhãn trace thật nhưng thiếu root/time/region; LEMMA ranking CANDIDATE theo entity mẫu; T-012 đã kiểm ba archive; label-level quyết khả năng chấm. Root/bậc graph/IsError/attention/exceedance không tự là nhãn vùng. Injection-delay không onset-delay thật."
+            },
+            {
+              "line": 70,
+              "text": "Tên ca/path/nhãn tiêm/PPTX/error_trace_type chỉ census/chấm hoặc ngân sách học G1. Không chọn SLI/operation theo root. Eadro align/shuffle có nguy cơ overlap; LEMMA case-dependent selector chưa adapter an toàn. Raw/processed/export cùng trace không là quan sát độc lập."
+            },
+            {
+              "line": 83,
+              "text": "| Clock/alias/timeline | Nguồn đồng hồ/mapping; Codex ghi, Minh quyếtprotocol | Ranking/time/graph đúng ca |"
+            },
+            {
+              "line": 84,
+              "text": "| Deep normal span/embedding loader | Chủ nguồn giải lineage; log không tạo span | So raw↔graph/loader nguyên trạng |"
+            },
+            {
+              "line": 85,
+              "text": "| LEMMA PR KPI/normal, storage/pod unit | Preprocessing/labels, không sửa payload | Ranking/probe/graph |"
+            }
+          ]
+        },
+        {
+          "file": "results/T-003/task-cham-duoc.md",
+          "sha256": "c30a99ddf4a8fb62e3835b09199d34cdf8c35122af6adc5967397229709e8191",
+          "lines": [
+            {
+              "line": 5,
+              "text": "| Biến thể/phạm vi | Ranking root | Phát hiện thời gian | Vùng ảnh hưởng | Bất thường từng trace |"
+            },
+            {
+              "line": 7,
+              "text": "| Nezha OB toànCSV approved | 56record/10service/33ô; CANDIDATE sau clock/mapping/protocol | Trace/log chỉ cửa sổ tiêm,+1,+2; thiếu negative coverage, không continuous blind F1 riêng corpus. Metric ngày: clock/normal/protocol OPEN. | Chưa nhãn; Duration exceed khôngthay label | Chưa nhãn trực tiếp |"
+            },
+            {
+              "line": 11,
+              "text": "| Deep graph/toàn raw/all-logtải | Release chưa root gold per instance; catalog gợi ý F5/F12, cần ghép branch/instance và WHY trước chấm | Graph không injection/onset/end, khôngsuy từID | TEG/attention khôngregionGT | 132.485label nhấtquán, P/R/F1trace cócăn cứ;28.116normalID thiếu span raw, logkhôngthayspan |"
+            },
+            {
+              "line": 20,
+              "text": "| Biến thể | Ranking | Phát hiện thời gian | Trace anomaly | Vùng |"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "task": "T-008",
+      "status": "no_proven_contradiction_in_checked_documents_and_scripts",
+      "evidence": [
+        {
+          "file": "results/T-008/the-dataset.md",
+          "sha256": "85fbe24f468ebbe48b8f8a68b7a7ad9e51549684c0fd84b901143170e5f3f0dc",
+          "lines": [
+            {
+              "line": 46,
+              "text": "Parent counts (đơn vị hàng span theo file): `{'root_sentinel': 82273, 'unique_resolved_within_file': 3580468}`. Mẫu số không-root 3580468; resolved duy nhất 3580468, ambiguous 0. 0 khóa span trùng theo file. Boundary file/lấy mẫu có thể giải thích missing, không tự gọi lỗi tracing. [SQL kiểm độc lập](runs/independent-check-001/result.json) đối chiếu first/last trace mỗi phase/date, toàn bộ census do file-audit thực hiện."
+            },
+            {
+              "line": 65,
+              "text": "Đã kiểm toàn trace normal/fault theo pod+operation, raw Duration (đối chiếu [units](runs/units-001/result.json) với End−Start, đơn vị µs), chronological first half normal reference/second half control, median absolute deviations q=.95/.99/.995; root ghép sau đo. [Kết quả/từng ca/kênh/q/control](runs/trace-symptoms-002/result.json). Không OR qua operation/kênh hoặc gọi exceedance là propagation. Ref n thấp nhất 9, cao nhất 1423; tail có ít mẫu phải đọc n/control ngay cùng số, các span không là quan sát độc lập."
+            },
+            {
+              "line": 67,
+              "text": "Hai clock có thể phân bổ span khác ca. Interval đến lần tiêm kế tiếp chỉ là cửa sổ mô tả; interval cuối đến hết file không là fault duration. Operation/pod không có normal reference được đếm missing, không zero-score. Thay đổi load, mix operations, lỗi trước chưa recovery và capture boundaries đều có thể gây/che exceedance ngoài root. Vì vậy kết quả hỗ trợ khảo sát thô trên scope, không chứng minh vùng ảnh hưởng hoặc tiêu chí7 đạt mọi ca."
+            },
+            {
+              "line": 75,
+              "text": "| Vùng ảnh hưởng | Không có nhãn vùng thật đã xác minh; chỉ mô tả vùng nghi ngờ/chứa root khi task sau định nghĩa. |"
+            },
+            {
+              "line": 80,
+              "text": "[Kiểm độc lập toàn 101 record](runs/sampling-leakage-001/result.json): trên cả bốn ngày, trace/log/traceid rca_data có đúng các file phút [phút nhãn tiêm, +1, +2], không có các minute-file giữa các lần tiêm. Tổng mỗi modality là 303 = 3×101. Construct chỉ có một trace-file mỗi ngày. Đây là điều kiện chọn khi thu/xuất dữ liệu, không chỉ là cách T008 chọn mẫu. Tên file và việc file tồn tại mang thông tin suy từ nhãn; đổi tên không khôi phục negative coverage bị thiếu. Trace/log phù hợp chấm ranking có điều kiện biết trước cửa sổ, chưa hỗ trợ benchmark tự phát hiện liên tục không biết trước thời điểm từ corpus này riêng lẻ. Không gọi thiếu file là healthy sample hoặc gán trace trong cửa sổ là anomalous."
+            },
+            {
+              "line": 139,
+              "text": "Parent counts (đơn vị hàng span theo file): `{'root_sentinel': 7209, 'unique_resolved_within_file': 510024, 'ambiguous_within_file': 270}`. Mẫu số không-root 510294; resolved duy nhất 510024, ambiguous 270. 136 khóa span trùng theo file. Boundary file/lấy mẫu có thể giải thích missing, không tự gọi lỗi tracing. [SQL kiểm độc lập](runs/independent-check-001/result.json) đối chiếu first/last trace mỗi phase/date, toàn bộ census do file-audit thực hiện."
+            },
+            {
+              "line": 158,
+              "text": "Đã kiểm toàn trace normal/fault theo pod+operation, raw Duration (đối chiếu [units](runs/units-001/result.json) với End−Start, đơn vị µs), chronological first half normal reference/second half control, median absolute deviations q=.95/.99/.995; root ghép sau đo. [Kết quả/từng ca/kênh/q/control](runs/trace-symptoms-002/result.json). Không OR qua operation/kênh hoặc gọi exceedance là propagation. Ref n thấp nhất 2, cao nhất 101; tail có ít mẫu phải đọc n/control ngay cùng số, các span không là quan sát độc lập."
+            },
+            {
+              "line": 160,
+              "text": "Hai clock có thể phân bổ span khác ca. Interval đến lần tiêm kế tiếp chỉ là cửa sổ mô tả; interval cuối đến hết file không là fault duration. Operation/pod không có normal reference được đếm missing, không zero-score. Thay đổi load, mix operations, lỗi trước chưa recovery và capture boundaries đều có thể gây/che exceedance ngoài root. Vì vậy kết quả hỗ trợ khảo sát thô trên scope, không chứng minh vùng ảnh hưởng hoặc tiêu chí7 đạt mọi ca."
+            },
+            {
+              "line": 168,
+              "text": "| Vùng ảnh hưởng | Không có nhãn vùng thật đã xác minh; chỉ mô tả vùng nghi ngờ/chứa root khi task sau định nghĩa. |"
+            },
+            {
+              "line": 173,
+              "text": "[Kiểm độc lập toàn 101 record](runs/sampling-leakage-001/result.json): trên cả bốn ngày, trace/log/traceid rca_data có đúng các file phút [phút nhãn tiêm, +1, +2], không có các minute-file giữa các lần tiêm. Tổng mỗi modality là 303 = 3×101. Construct chỉ có một trace-file mỗi ngày. Đây là điều kiện chọn khi thu/xuất dữ liệu, không chỉ là cách T008 chọn mẫu. Tên file và việc file tồn tại mang thông tin suy từ nhãn; đổi tên không khôi phục negative coverage bị thiếu. Trace/log phù hợp chấm ranking có điều kiện biết trước cửa sổ, chưa hỗ trợ benchmark tự phát hiện liên tục không biết trước thời điểm từ corpus này riêng lẻ. Không gọi thiếu file là healthy sample hoặc gán trace trong cửa sổ là anomalous."
+            }
+          ]
+        },
+        {
+          "file": "results/T-008/scripts/inspect_files.py",
+          "sha256": "ffd12ef3cc149f7d049fb69ac22a4a2827dc44fa80c8017a7921c6998a9e832e",
+          "lines": [
+            {
+              "line": 35,
+              "text": "                    if pid in ['root','','0','0000000000000000',None]:parent['root_sentinel']+=1;continue"
+            },
+            {
+              "line": 36,
+              "text": "                    matches=spans.get((tid,pid),[])"
+            },
+            {
+              "line": 38,
+              "text": "                    elif len(matches)>1:parent['ambiguous_within_file']+=1"
+            },
+            {
+              "line": 40,
+              "text": "                        parent['unique_resolved_within_file']+=1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "task": "T-009",
+      "status": "no_proven_contradiction_in_checked_documents_and_scripts",
+      "evidence": [
+        {
+          "file": "results/T-009/the-dataset.md",
+          "sha256": "c6f990cfe4f307504a320137f178204b1e796b22afdb48b57722ef20a5545328",
+          "lines": [
+            {
+              "line": 81,
+              "text": "Hướng cạnh parent service→child service, bỏ self-edge, union trong toàn file raw sau gộp span trùng nội dung. [Bậc đủ mọi ca/ô](runs/inspect-004/root-degree-whole-file.json). Đây là graph file; không tự gọi graph đúng khoảng tiêm. Root vắng không được gọi cô lập. SN `nginx-thrift`→`nginx-web-server` vẫn là alias CANDIDATE; không dùng thay root đã xác minh."
+            },
+            {
+              "line": 85,
+              "text": "FACT toàn 7 phiên raw duy nhất: 1438191 dòng span, 25469 trace-ID cộng theo phiên (không khẳng định ID độc lập liên phiên). Jaeger: traceID/spanID/processes.serviceName/startTime/duration (microsecond theo schema và độ lớn)/tags/references CHILD_OF. Tổng 87853 span không có CHILD_OF; 1350338 reference cần cha. Khóa `(traceID,spanID)` trong phiên: 2909 tìm một dòng cha, 2682 thiếu, 1344747 nhiều dòng. Khi gộp bản span **giống hệt nội dung và service**, 1347656 reference tìm một identity; 0 xung đột. 1189801 dòng trùng khóa; 0 khóa có nội dung xung đột. Hai mẫu số/tỷ lệ không bị trộn. Trùng có thể do export nhiều trace lặp, không tự là mất dữ liệu."
+            },
+            {
+              "line": 93,
+              "text": "Normal nested đã được đọc. SN có ba phiên faults=[]; TT có hai nhãn faults=[] lớp ngoài và thêm raw trong TT-no-fault.txz ngày 20/4 không có label riêng: phần thứ ba là CANDIDATE normal theo tổ chức release. Normal thứ ba này không vào phép probe khi thiếu nhãn riêng. Nhãn start/duration/end là khoảng tiêm, không ground truth onset/recovery."
+            },
+            {
+              "line": 95,
+              "text": "Trace có timestamp lịch sử và lệch biểu kiến so metric/nhãn/log. Raw SN nhiều span nằm khoảng 8 giờ sau metric; TT cũng có trace từ thời gian trước phiên. [Khoảng thời gian từng nguồn](runs/inspect-004/raw-sessions.json) giữ số gốc; chưa có nguồn xác nhận timezone/cách export. Không dịch 8 giờ để làm graph hoặc claim trace/log đồng bộ. Graph theo injection ở root-positions vì vậy không được diễn giải bậc 0 là cô lập."
+            },
+            {
+              "line": 268,
+              "text": "Hướng cạnh parent service→child service, bỏ self-edge, union trong toàn file raw sau gộp span trùng nội dung. [Bậc đủ mọi ca/ô](runs/inspect-004/root-degree-whole-file.json). Đây là graph file; không tự gọi graph đúng khoảng tiêm. Root vắng không được gọi cô lập. SN `nginx-thrift`→`nginx-web-server` vẫn là alias CANDIDATE; không dùng thay root đã xác minh."
+            },
+            {
+              "line": 272,
+              "text": "FACT toàn 12 phiên raw duy nhất: 290941 dòng span, 11995 trace-ID cộng theo phiên (không khẳng định ID độc lập liên phiên). Jaeger: traceID/spanID/processes.serviceName/startTime/duration (microsecond theo schema và độ lớn)/tags/references CHILD_OF. Tổng 26754 span không có CHILD_OF; 264187 reference cần cha. Khóa `(traceID,spanID)` trong phiên: 1224 tìm một dòng cha, 3196 thiếu, 259767 nhiều dòng. Khi gộp bản span **giống hệt nội dung và service**, 258247 reference tìm một identity; 2744 xung đột. 219347 dòng trùng khóa; 1243 khóa có nội dung xung đột. Hai mẫu số/tỷ lệ không bị trộn. Trùng có thể do export nhiều trace lặp, không tự là mất dữ liệu."
+            },
+            {
+              "line": 280,
+              "text": "Normal nested đã được đọc. SN có ba phiên faults=[]; TT có hai nhãn faults=[] lớp ngoài và thêm raw trong TT-no-fault.txz ngày 20/4 không có label riêng: phần thứ ba là CANDIDATE normal theo tổ chức release. Normal thứ ba này không vào phép probe khi thiếu nhãn riêng. Nhãn start/duration/end là khoảng tiêm, không ground truth onset/recovery."
+            },
+            {
+              "line": 282,
+              "text": "Trace có timestamp lịch sử và lệch biểu kiến so metric/nhãn/log. Raw SN nhiều span nằm khoảng 8 giờ sau metric; TT cũng có trace từ thời gian trước phiên. [Khoảng thời gian từng nguồn](runs/inspect-004/raw-sessions.json) giữ số gốc; chưa có nguồn xác nhận timezone/cách export. Không dịch 8 giờ để làm graph hoặc claim trace/log đồng bộ. Graph theo injection ở root-positions vì vậy không được diễn giải bậc 0 là cô lập."
+            }
+          ]
+        },
+        {
+          "file": "results/T-009/scripts/inspect_files.py",
+          "sha256": "a4eb2088a100d00fa8763ed8ebdd7ed83526c048b5f3a8149414ec1871a83aed",
+          "lines": [
+            {
+              "line": 48,
+              "text": "            parent=[r for r in s.get('references',[]) if r.get('refType')=='CHILD_OF']"
+            },
+            {
+              "line": 49,
+              "text": "            if not parent:counts['root_no_CHILD_OF']+=1"
+            },
+            {
+              "line": 57,
+              "text": "        if k is None:counts['parent_missing']+=1"
+            },
+            {
+              "line": 58,
+              "text": "        elif k[0]!=1:counts['parent_ambiguous']+=1"
+            },
+            {
+              "line": 63,
+              "text": "            counts['parent_unique_identity']+=1"
+            },
+            {
+              "line": 66,
+              "text": "    assert counts['parent_references']==counts['parent_unique']+counts['parent_missing']+counts['parent_ambiguous']"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "task": "T-010",
+      "status": "no_proven_contradiction_in_checked_documents_and_scripts",
+      "evidence": [
+        {
+          "file": "results/T-010/the-dataset.md",
+          "sha256": "cf6f829e65fc796beffd0b7b137455bde7e43c3362d324c4918b2a8c53eee4f6",
+          "lines": [
+            {
+              "line": 27,
+              "text": "Paper công bố 132.485 trace, 23.334 abnormal trace, 7.705.050 log, 73 fault instances/14 fault cases. Graph thực đếm đúng 132.485 trace-ID duy nhất, 109.151 normal và 23.334 abnormal, không ID trùng hoặc nhãn thiếu/xung đột; 70 `error_trace_type` khác normal. Raw có 83 thư mục storage được inspector đếm, 83 có span; không coi folder, fault branch và trace là cùng đơn vị incident. Root×fault×lần lặp không có nhãn service-ground-truth nên không tạo census giả."
+            },
+            {
+              "line": 104,
+              "text": "Raw graph service dựng từ parent service→child service, bỏ self-edge, tại từng storage case; [toàn bảng cạnh từng ca](runs/inspect-002/raw-cases.json). Service ID map trong id_service.csv có 35 entity khớp tập raw. Graph xử lý là TEG event graph (đồ thị sự kiện), không coi 27.288.193 event node hay bậc event là vị trí root service. Nhãn root service không được thấy trong các file được duyệt nên không có bảng bậc root thật."
+            },
+            {
+              "line": 110,
+              "text": "Tổng span 12.303.544; sentinel/root theo file: 106310; parent cần resolve 12197234. Khóa `(TraceId,SpanId)` trong storage case: 12160234 tìm một dòng cha, 20 thiếu, 36980 nhiều dòng. Đây là strict-row resolution; span ID trùng giữ riêng trong từng ca, không coi row duplicate là parent mất. Tỷ lệ cộng tử/mẫu, không trung bình tỷ lệ từng ca. File/time bị cắt, instrumentation hoặc dòng export trùng cũng giải thích thiếu/ambiguous."
+            },
+            {
+              "line": 114,
+              "text": "Graph: cả tám JSONS đúng sáu trường trace_id/trace_bool/error_trace_type/node_info/edge_index/edge_attr. edge_index **E×2**, 29855076 cạnh, 27288193 event node; 0 endpoint sai/edge-attr length mismatch. trace_bool True→normal (code y=0), False→abnormal; type/label nhất quán với error_trace_type. Ba CSV graph: id_service 35 dòng, id_url+temp 1.513, id_url+type 1.878; first-ID duy nhất, không trường rỗng hoặc width sai. Loader còn đòi embedding_id_url+type.csv, file này không có trong ZIP graph kiểm; chưa chạy loader/baseline, không gọi distribution này chạy được nguyên trạng."
+            },
+            {
+              "line": 137,
+              "text": "OPEN do **release được kiểm không có ground truth root service và resource metric riêng**, không do còn chờ quyền đọc. Span latency/log level đã kiểm trong toàn phạm vi; không thể gọi service “ngoài root” có căn cứ. Trace_bool/error_trace_type là nhãn trace, không root; log ERROR có thể symptom chứ không nguyên nhân. Không tạo root/region từ regex hoặc coi nhiều service trong trace là propagation. Có nguồn catalog để khảo sát khả năng bổ sung nhãn; chưa có bằng chứng đủ ghép thành root gold từng instance."
+            },
+            {
+              "line": 139,
+              "text": "Nguồn bổ sung sau R4: [catalog ghim và đối chiếu mã](runs/catalog-review-001/catalog.json), [README](runs/catalog-review-001/fault-catalog-README.md). F5 ghi Basic-Info-Service, F12 ghi Order-Service; F1/F11/F13 liên quan tương tác, F3 cấu hình JVM/Docker, F4 SSL nhiều service. Đây là gợi ý vị trí ở mức kiểu lỗi, không phải nhãn root cho mọi instance. Bài nói một kiểu có nhiều instance ở các service khác nhau. Release graph còn có F23/F24/F25, không có trong catalog hiện đọc; F-code và branch/revision/instance chưa được ghép đủ. Khả năng bổ sung nhãn ranking **một phần, có điều kiện**, chưa là gold để chấm hoặc chạy probe ngoài-root. Cần diff đúng faulty branch và mapping từng instance; nếu suy nhãn phải trình WHY trước dùng, không tự gán ở task này."
+            },
+            {
+              "line": 146,
+              "text": "| Ranking root | Release không có root gold per instance. Catalog có gợi ý cho một phần kiểu lỗi; chấm có điều kiện sau xác minh branch/instance và WHY, hiện MRR/Hit@k OPEN. |"
+            },
+            {
+              "line": 164,
+              "text": "Nguồn bổ sung sau R4: [catalog ghim và đối chiếu mã](runs/catalog-review-001/catalog.json), [README](runs/catalog-review-001/fault-catalog-README.md). F5 ghi Basic-Info-Service, F12 ghi Order-Service; F1/F11/F13 liên quan tương tác, F3 cấu hình JVM/Docker, F4 SSL nhiều service. Đây là gợi ý vị trí ở mức kiểu lỗi, không phải nhãn root cho mọi instance. Bài nói một kiểu có nhiều instance ở các service khác nhau. Release graph còn có F23/F24/F25, không có trong catalog hiện đọc; F-code và branch/revision/instance chưa được ghép đủ. Khả năng bổ sung nhãn ranking **một phần, có điều kiện**, chưa là gold để chấm hoặc chạy probe ngoài-root. Cần diff đúng faulty branch và mapping từng instance; nếu suy nhãn phải trình WHY trước dùng, không tự gán ở task này."
+            }
+          ]
+        },
+        {
+          "file": "results/T-010/scripts/inspect_deep.py",
+          "sha256": "ea333ee3f616c3e38a9dd799f57ed1f4f8a2aaaec9a840fa40f622ef43017791",
+          "lines": [
+            {
+              "line": 36,
+              "text": "                elif match[0]!=1:counts['parent_ambiguous']+=1"
+            },
+            {
+              "line": 38,
+              "text": "                    counts['parent_unique']+=1"
+            },
+            {
+              "line": 58,
+              "text": "            row=dict(archive=str(f.relative_to(a.data)),case_directory=group,span_rows=span_rows,unique_span_keys=len(keys),duplicate_span_rows=duplicate_rows,null_id_rows=null,trace_ids=len(traces),headers=headers,services=dict(services),span_types=dict(types),is_error_values=dict(errors),time_min_ms=min(times) if times else None,time_max_ms=max(times) if times else None,invalid_time_rows=badtime,parent=dict(counts),service_edges=[dict(parent=k[0],child=k[1],count=v) for k,v in sorted(edges.items())],logs=logs,root_label_verified=False,injection_onset_verified=False)"
+            },
+            {
+              "line": 61,
+              "text": "            assert counts['parent_unique']+counts['parent_missing']+counts['parent_ambiguous']==counts['parent_required']"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "task": "T-011",
+      "status": "no_proven_contradiction_in_checked_documents_and_scripts",
+      "evidence": [
+        {
+          "file": "results/T-011/the-dataset.md",
+          "sha256": "76aef7eab0b81103bafa24dabae3cadc325c21bd2bedf881bc7d598bba54b9d5",
+          "lines": [
+            {
+              "line": 9,
+              "text": "LEMMA-RCA, Zheng và cộng sự; [paper v4](https://arxiv.org/html/2406.05375v4), [code tác giả](https://github.com/lemma-rca/rca_baselines), [Original](https://huggingface.co/datasets/Lemma-RCA-NEC/Product_Review_Original), [Preprocessed](https://huggingface.co/datasets/Lemma-RCA-NEC/Product_Review_Preprocessed). Revision khóa tại [manifest](runs/source-final-001/manifest.json). Original/Preprocessed chung lineage. License NC/ND chính xác còn OPEN; kiểm nội bộ phi thương mại theo WHY-14 không cấp quyền chia sẻ payload phái sinh. Đã kiểm toàn bộ member hai ZIP metric/log ngày 20211203; các ngày khác và Original chỉ metadata."
+            },
+            {
+              "line": 17,
+              "text": "| 3. Trace cha–con | ZIP mẫu không có span table; parent/degree Original OPEN. |"
+            },
+            {
+              "line": 19,
+              "text": "| 5. Root/vị trí | Có mapping entity; không có trace graph để đo bậc root. |"
+            },
+            {
+              "line": 27,
+              "text": "README gọi root MongoDB-v1. PPTX mô tả nguyên nhân external NFS đầy đĩa, nối MongoDB rồi ảnh hưởng ratings. Giữ riêng entity nhãn benchmark và nguyên nhân vận hành ngoài cluster; chưa thay pod bằng storage hoặc ngược lại. Một ngày mẫu không là census root×fault×repetition toàn release. Nguồn có 4 PR/6 Cloud date token; không coi chúng là incident count. Sơ đồ PPTX không thay trace graph. Bậc root và confound vị trí–loại lỗi vẫn OPEN."
+            },
+            {
+              "line": 33,
+              "text": "Metric có 224 tên entity; structured log có 1177 tên file; giao chính xác 160; log-feature NPY có 132 entity. Ba tập giữ riêng. p2n có 302 pod→node, không là graph gọi dịch vụ. Không cột trace/span ID trong CSV; ID trong payload và khả năng ghép parent chưa có hợp đồng được xác minh. Không suy Original thiếu trace."
+            },
+            {
+              "line": 37,
+              "text": "KPI CSV dùng epoch microsecond, NPY dùng epoch giây và log UTC. Mốc injection/normal/recovery của ngày mẫu chưa xác minh; không lấy một phần đầu tùy ý làm normal. Ví dụ Jaeger trong PPTX có ngày khác, không là span thật của mẫu. Cadence là FACT file, tách khỏi lịch nguồn. Injection, narrative failure time và recovery là ba loại thông tin khác; không tự sửa clock/nhãn."
+            },
+            {
+              "line": 45,
+              "text": "Ranking root là CANDIDATE theo đúng đơn vị nhãn sau chốt mapping. PR cần giữ khác biệt pod MongoDB và storage cause. Time detection cần giao thức và interval nhãn phù hợp, không gọi onset đã verified. Không nhãn vùng/trace thật để chấm segmentation hoặc trace anomaly. Không RCA/baseline/training chạy trong task."
+            },
+            {
+              "line": 63,
+              "text": "LEMMA-RCA, Zheng và cộng sự; [paper v4](https://arxiv.org/html/2406.05375v4), [code tác giả](https://github.com/lemma-rca/rca_baselines), [Original](https://huggingface.co/datasets/Lemma-RCA-NEC/Cloud_Computing_Original), [Preprocessed](https://huggingface.co/datasets/Lemma-RCA-NEC/Cloud_Computing_Preprocessed). Revision khóa tại [manifest](runs/source-final-001/manifest.json). Original/Preprocessed chung lineage. License NC/ND chính xác còn OPEN; kiểm nội bộ phi thương mại theo WHY-14 không cấp quyền chia sẻ payload phái sinh. Đã kiểm toàn bộ member hai ZIP metric/log ngày 20240124; các ngày khác và Original chỉ metadata."
+            },
+            {
+              "line": 71,
+              "text": "| 3. Trace cha–con | ZIP mẫu không có span table; parent/degree Original OPEN. |"
+            },
+            {
+              "line": 73,
+              "text": "| 5. Root/vị trí | Có mapping entity; không có trace graph để đo bậc root. |"
+            },
+            {
+              "line": 81,
+              "text": "PPTX xác định AP instance i-078923fb30cac1ede, bug lúc 03:10Z và failure time 03:10:51Z ngày 24/01/2024. Đây là nhãn theo tác giả, không phải onset đã kiểm độc lập. Epoch JSON riêng lệch sáu giờ. Một ngày mẫu không là census root×fault×repetition toàn release. Nguồn có 4 PR/6 Cloud date token; không coi chúng là incident count. Sơ đồ PPTX không thay trace graph. Bậc root và confound vị trí–loại lỗi vẫn OPEN."
+            },
+            {
+              "line": 87,
+              "text": "Metric có 15 tên entity; structured log có 15 tên file; giao chính xác 15; log-feature NPY có 15 entity. Ba tập giữ riêng. Root instance có trong cả metric/log. Không cột trace/span ID trong CSV; ID trong payload và khả năng ghép parent chưa có hợp đồng được xác minh. Không suy Original thiếu trace."
+            },
+            {
+              "line": 99,
+              "text": "Ranking root là CANDIDATE theo đúng đơn vị nhãn sau chốt mapping. Cloud có label instance trực tiếp. Time detection cần giao thức và interval nhãn phù hợp, không gọi onset đã verified. Không nhãn vùng/trace thật để chấm segmentation hoặc trace anomaly. Không RCA/baseline/training chạy trong task."
+            }
+          ]
+        },
+        {
+          "file": "results/T-011/kiem-file.md",
+          "sha256": "baf6c90509e8ec9a0e041aa34bceacf0ff141d0558c59927bbcc0903a54399bc",
+          "lines": [
+            {
+              "line": 3,
+              "text": "**Đã kiểm toàn bộ member trong đúng hai ngày mẫu; chưa kiểm Original hoặc các ngày còn lại.** Không RCA, detector, training hoặc chia dữ liệu. LEMMA không phải bộ bảo toàn; không mở Bank/locked. Giấy phép cuối còn OPEN, việc kiểm nội bộ phi thương mại theo WHY-14 không là quyền chia sẻ payload gốc/phái sinh."
+            },
+            {
+              "line": 22,
+              "text": "Nối tên chính xác theo [validation linkage](runs/validate-003/validation.json), phân biệt metric, log CSV và log feature NPY; filename cung cấp entity provenance, không chứng minh body có ID service. Cloud đủ 15 metric entity/15 structured log filename, giao 15. PR số thực lưu trong file-inspection-summary.json; mapping p2n có 302 pod→node nhưng không là graph gọi dịch vụ. Raw→processed và pod→service selector mọi ngày vẫn OPEN."
+            },
+            {
+              "line": 24,
+              "text": "Không ZIP mẫu nào chứa bảng span/parent; CSV log không có cột trace/span ID. Không tính unique-parent/graph degree từ processed log hoặc sơ đồ kiến trúc. ID có thể nằm trong payload nhưng không có hợp đồng span/parent để ghép được xác minh; không kết luận Original thiếu trace hoặc root cô lập."
+            },
+            {
+              "line": 30,
+              "text": "PR PPTX mô tả external NFS disk full, địa chỉ192.168.57.153, nối MongoDB-v1, rồi ảnh hưởng ratings. README gọi root MongoDB-v1; phải phân biệt entity nhãn benchmark và nguyên nhân vận hành ngoài cluster. Mẫu có mapping pod MongoDB, nhưng không suy NFS hiện diện trong metric/trace hoặc chấm pod thay storage mà chưa chốt đơn vị. PPTX có ví dụ Jaeger ngày khác; không đếm chúng thành span thật ngày20211203. Mốc tiêm/normal/recovery đáng tin cho PR vẫn OPEN."
+            },
+            {
+              "line": 58,
+              "text": "Co-occurrence ngoài root có thể do workload chung, nhiễu, threshold zero, recovery chưa biết, hoặc preprocessing. Không xem vượt band là nhãn ảnh hưởng/lan truyền thật. Nhãn vùng và bất thường từng trace vẫn thiếu; RQ3c hoặc đánh giá graph cần nguồn bổ sung."
+            },
+            {
+              "line": 64,
+              "text": "Tự phản biện: (1) parse object có thực thi payload không — không, reader whitelist/inert và hostileselfcheck; (2) CRC đạt là chất lượng schema đạt không — không, lỗi parser giữ riêng; (3) metric/NPY log entity có bị trộn không — đã sửa, validate-003 là bản đúng; (4) một ngày là census release không — không; (5) PR KPI mismatch có thể do parser không — Cloud toàn bộ so khớp, PR vẫn cần nguồn riêng; (6) normal24h nguồn có sạch không — chưa; (7) metadata Cloud ratings có làm log payload thuộcPR không — chưa chứng minh. Không dùng dữ liệu này kết luận graph thắng/thua."
+            }
+          ]
+        },
+        {
+          "file": "results/T-011/scripts/build_file_report.py",
+          "sha256": "f39fb4d17fd88dd22075a0c82ffa3cba6c1b31291d536d0fb11b075be97f618e",
+          "lines": [
+            {
+              "line": 68,
+              "text": "Nối tên chính xác theo [validation linkage](runs/validate-003/validation.json), phân biệt metric, log CSV và log feature NPY; filename cung cấp entity provenance, không chứng minh body có ID service. Cloud đủ 15 metric entity/15 structured log filename, giao 15. PR số thực lưu trong file-inspection-summary.json; mapping p2n có 302 pod→node nhưng không là graph gọi dịch vụ. Raw→processed và pod→service selector mọi ngày vẫn OPEN."
+            },
+            {
+              "line": 70,
+              "text": "Không ZIP mẫu nào chứa bảng span/parent; CSV log không có cột trace/span ID. Không tính unique-parent/graph degree từ processed log hoặc sơ đồ kiến trúc. ID có thể nằm trong payload nhưng không có hợp đồng span/parent để ghép được xác minh; không kết luận Original thiếu trace hoặc root cô lập."
+            },
+            {
+              "line": 92,
+              "text": "Co-occurrence ngoài root có thể do workload chung, nhiễu, threshold zero, recovery chưa biết, hoặc preprocessing. Không xem vượt band là nhãn ảnh hưởng/lan truyền thật. Nhãn vùng và bất thường từng trace vẫn thiếu; RQ3c hoặc đánh giá graph cần nguồn bổ sung."
+            },
+            {
+              "line": 98,
+              "text": "Tự phản biện: (1) parse object có thực thi payload không — không, reader whitelist/inert và hostileselfcheck; (2) CRC đạt là chất lượng schema đạt không — không, lỗi parser giữ riêng; (3) metric/NPY log entity có bị trộn không — đã sửa, validate-003 là bản đúng; (4) một ngày là census release không — không; (5) PR KPI mismatch có thể do parser không — Cloud toàn bộ so khớp, PR vẫn cần nguồn riêng; (6) normal24h nguồn có sạch không — chưa; (7) metadata Cloud ratings có làm log payload thuộcPR không — chưa chứng minh. Không dùng dữ liệu này kết luận graph thắng/thua."
+            },
+            {
+              "line": 131,
+              "text": "| 5. Root/vị trí | Có mapping entity; không có trace graph để đo bậc root. |"
+            },
+            {
+              "line": 139,
+              "text": "{label} Một ngày mẫu không là census root×fault×repetition toàn release. Nguồn có 4 PR/6 Cloud date token; không coi chúng là incident count. Sơ đồ PPTX không thay trace graph. Bậc root và confound vị trí–loại lỗi vẫn OPEN."
+            },
+            {
+              "line": 145,
+              "text": "Metric có {len(l['metric_entities'])} tên entity; structured log có {len(l['log_entities'])} tên file; giao chính xác {len(l['exact_overlap'])}; log-feature NPY có {len(l['log_feature_entities'])} entity. Ba tập giữ riêng. {'Root instance có trong cả metric/log.' if cloud else 'p2n có 302 pod→node, không là graph gọi dịch vụ.'} Không cột trace/span ID trong CSV; ID trong payload và khả năng ghép parent chưa có hợp đồng được xác minh. Không suy Original thiếu trace."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "task": "T-012",
+      "status": "no_proven_contradiction_in_checked_documents_and_scripts",
+      "evidence": [
+        {
+          "file": "results/T-012/the-dataset.md",
+          "sha256": "923228264966e9092d6390869eca7f64b19ebb29b02e16e755658fbc660fad3e",
+          "lines": [
+            {
+              "line": 27,
+              "text": "Có 10 thư mục ca, 2 có .invalid rỗng (không kèm lý do); không lấy chúng vào probe. Tám ca còn lại có 11 service gốc, tám mã fault, tám ô root-set × fault, mỗi ô một lần. Không có lặp đủ để ngoại suy. Marker vắng không thay tự chứng minh SLI valid. [census](runs/fse-file-inspect-003/census.json), [từng ca/graph/parent/clock/linkage](runs/fse-file-inspect-003/cases.json), [schema](runs/fse-file-inspect-003/schemas.json)."
+            },
+            {
+              "line": 44,
+              "text": "Toàn 113 Parquet đã đọc, schema/count từng file ở [census](runs/fse-file-inspect-003/census.json), [từng ca/graph/parent/clock/linkage](runs/fse-file-inspect-003/cases.json), [schema](runs/fse-file-inspect-003/schemas.json); input chính normal/abnormal trace, metric, log, còn sum/histogram/conclusion tách riêng. conclusion/causal_graph là kết quả suy từ dữ liệu, không nhãn vùng độc lập. Trace time timestamp ns UTC được giữ exact integer ns khi đọc; duration giữ đơn vị raw (chưa chứng minh physical unit). Metric series giữ đủ tag/entity, NaN/constant/duplicate/cadence/gap theo từng series; step ở đơn vị timestamp gốc ns. Graph là call graph từ parent unique, không đủ message/data edges."
+            },
+            {
+              "line": 61,
+              "text": "| Trace anomaly | Không thấy nhãn anomalous từng trace; tên abnormal là phase, không nhãn mọi trace. |"
+            },
+            {
+              "line": 69,
+              "text": "Tải 91418171 byte; logical member 339482164 byte, 3519 entries. Streaming không ghi đầy đủ cây ra đĩa. [census](runs/fse-file-inspect-003/census.json), [từng ca/graph/parent/clock/linkage](runs/fse-file-inspect-003/cases.json), [schema](runs/fse-file-inspect-003/schemas.json); [archive CRC/size/time](runs/fse-file-inspect-003/archive.json), [thời gian semantic](runs/fse-file-inspect-003/validation.json). Python3.12 + pyarrow23.0.1 isolated data/ngoai-rcaeval/T-012/python-packages; script inspect_review_archives.py --kind fse --archive <archive> --run <mới>. Lượt thiếu tzdata/conversion ns được giữ; lần3 đọc exact int ns thành công."
+            },
+            {
+              "line": 73,
+              "text": "OPEN: license raw scope cần chủ nguồn; lý do hai .invalid thiếu cần nguồn; duration physical unit, onset/recovery, đủ graph message/data và quality toàn corpus chưa có. Chỉ đã kiểm trọn artifact reduced; không tải hay ngoại suy toàn dataset trong bài. Không còn gọi ba archive nhỏ là chờ quyền."
+            },
+            {
+              "line": 97,
+              "text": "Thực kiểm: 13 capture/hệ =12 fault-name+1 normal-name. 2635 trace occurrences, 25577 span rows; đây không phải incident độc lập hay nhãn trace anomaly. 145555 metric rows và 3959028 log lines. Mỗi fault-family một capture, chưa proof incident/repetition từ runtime label. .DS_Store ở SN không tính ca. [file/schema/quality](runs/anomod-file-inspect-003/files.json), [parent/graph/từng capture](runs/anomod-file-inspect-003/cases.json), [target-source/capture census](runs/anomod-followup-002/captures.json). Target configs và code đọc ở collector manifest; đếm đích nguồn khác đếm root gold. Không tạo một nhãn mới chỉ để kín bảng."
+            },
+            {
+              "line": 111,
+              "text": "[Duration bands](runs/anomod-followup-002/descriptive-bands.json), q=.95/.99/.995, theo từng service×operation; unit SNµs/TTms theo schema, entity không có baseline giữ missing. Median/band/control/tử-mẫu giữ riêng; đích cấu hình gắn sau đo, ngoài đích chỉ có điều kiện với target-level service, host/DB để null. Chưa thể gọi các số đó ngoài-root hoặc vùng ảnh hưởng thật vì thiếu runtime gold. Thay tải/operation mix, collector/errorcode và cut-window đều có thể giải thích vượt band. Không OR/causality."
+            },
+            {
+              "line": 149,
+              "text": "| 6 | TT SkyWalking JSON trace.summary và spans có node_id/parent_node_id gồm segment và span index, không ghép integer span_id xuyên segment. Tất cả13 metadata ghi lookback24h. Kiểm actual: không trace-ID trùng giữa các capture và không span bắt đầu trước timestamp tên run; vì vậy chưa có bằng chứng trộn lỗi từ overlap, nhưng timestamp tên vẫn không là injection/onset. Ba code scenarios là JVM return/throw tại security/order/travel theo script; lỗi database có cấu hình network-delay, không suy nhãn DB semantics từ tên. |"
+            },
+            {
+              "line": 156,
+              "text": "Thực kiểm: 13 capture/hệ =12 fault-name+1 normal-name. 63975 trace occurrences, 115025 span rows; đây không phải incident độc lập hay nhãn trace anomaly. 4019540 metric rows và 1694538 log lines. Mỗi fault-family một capture, chưa proof incident/repetition từ runtime label. .DS_Store ở SN không tính ca. [file/schema/quality](runs/anomod-file-inspect-003/files.json), [parent/graph/từng capture](runs/anomod-file-inspect-003/cases.json), [target-source/capture census](runs/anomod-followup-002/captures.json). Target configs và code đọc ở collector manifest; đếm đích nguồn khác đếm root gold. Không tạo một nhãn mới chỉ để kín bảng."
+            },
+            {
+              "line": 160,
+              "text": "TT SkyWalking JSON trace.summary và spans có node_id/parent_node_id gồm segment và span index, không ghép integer span_id xuyên segment. Tất cả13 metadata ghi lookback24h. Kiểm actual: không trace-ID trùng giữa các capture và không span bắt đầu trước timestamp tên run; vì vậy chưa có bằng chứng trộn lỗi từ overlap, nhưng timestamp tên vẫn không là injection/onset. Ba code scenarios là JVM return/throw tại security/order/travel theo script; lỗi database có cấu hình network-delay, không suy nhãn DB semantics từ tên."
+            },
+            {
+              "line": 170,
+              "text": "[Duration bands](runs/anomod-followup-002/descriptive-bands.json), q=.95/.99/.995, theo từng service×operation; unit SNµs/TTms theo schema, entity không có baseline giữ missing. Median/band/control/tử-mẫu giữ riêng; đích cấu hình gắn sau đo, ngoài đích chỉ có điều kiện với target-level service, host/DB để null. Chưa thể gọi các số đó ngoài-root hoặc vùng ảnh hưởng thật vì thiếu runtime gold. Thay tải/operation mix, collector/errorcode và cut-window đều có thể giải thích vượt band. Không OR/causality."
+            },
+            {
+              "line": 295,
+              "text": "| 3 | Cùng byte trace nên reuse đúng kiểm parent T008, không cần đọc lại để tạo số mới. |"
+            },
+            {
+              "line": 326,
+              "text": "| Trace anomaly | Không có nhãn anomalous từng trace thật trong labels. |"
+            },
+            {
+              "line": 352,
+              "text": "| 3 | Cùng byte trace nên reuse đúng kiểm parent T008, không cần đọc lại để tạo số mới. |"
+            },
+            {
+              "line": 383,
+              "text": "| Trace anomaly | Không có nhãn anomalous từng trace thật trong labels. |"
+            },
+            {
+              "line": 429,
+              "text": "Root × fault × repetition/date: **OPEN — chưa có census nhãn riêng của đúng artifact**. Repo chỉ có dataset/README dẫn Drive; không có nhãn thật riêng trong tree ghim. Không mở Drive telemetry/Bank; census chưa làm. Không lấy archive, số trace, số query hoặc số test API thay số incident RCA."
+            },
+            {
+              "line": 604,
+              "text": "Root × fault × repetition/date: **OPEN — chưa có census nhãn riêng của đúng artifact**. Repo chỉ có dataset/README dẫn Drive; không có nhãn thật riêng trong tree ghim. Không mở Drive telemetry/Bank; census chưa làm. Không lấy archive, số trace, số query hoặc số test API thay số incident RCA."
+            },
+            {
+              "line": 964,
+              "text": "Root × fault × repetition/date: **OPEN — chưa có census nhãn riêng của đúng artifact**. Index v2 riêng 31.028.530 byte vượt dự kiến nguồn 25 MB của SPEC; không mở rộng tải. Nhãn root/time incident không có chỉ từ index mô tả. Không lấy archive, số trace, số query hoặc số test API thay số incident RCA."
+            },
+            {
+              "line": 993,
+              "text": "| Bất thường trace | Không suy nhãn từng trace từ correct/error của cả test. |"
+            },
+            {
+              "line": 1054,
+              "text": "Root × fault × repetition/date: **OPEN — chưa có census nhãn riêng của đúng artifact**. Index v2 riêng 31.028.530 byte vượt dự kiến nguồn 25 MB của SPEC; không mở rộng tải. Nhãn root/time incident không có chỉ từ index mô tả. Không lấy archive, số trace, số query hoặc số test API thay số incident RCA."
+            },
+            {
+              "line": 1083,
+              "text": "| Bất thường trace | Không suy nhãn từng trace từ correct/error của cả test. |"
+            }
+          ]
+        },
+        {
+          "file": "results/T-012/scripts/inspect_review_archives.py",
+          "sha256": "3d59e9e240b46dd00a94c2893e244f7973729ec25eaa4c9f3a8b7f0bf193f058",
+          "lines": [
+            {
+              "line": 16,
+              "text": "    counts=collections.Counter();edges=set();nodes={r['entity'] for r in rows}"
+            },
+            {
+              "line": 19,
+              "text": "        parents=keys.get((r['trace'],r['parent']),[])"
+            },
+            {
+              "line": 124,
+              "text": "            traces=raw['traces'];spans=[dict(trace=t.get('trace_id') or s.get('trace_id'),span=s['node_id'],parent=s.get('parent_node_id'),entity=s['service_code']) for t in traces for s in t['spans']];d['trace']=graph(spans,[]);d['collector_metadata']=raw.get('metadata');times=[s['start_timestamp_ms'] for t in traces for s in t['spans']];d['trace_time_min']=min(times,default=None);d['trace_time_max']=max(times,default=None);d['_pairs']={(x['trace'],x['span']) for x in spans};d['_traceids']={x['trace'] for x in spans};files.append(dict(path=n,traces=len(traces),rows=len(spans),schema=list(traces[0]['spans'][0]) if traces and traces[0]['spans'] else []))"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "search_scope_incident": "Initial rg search was too broad and traversed result JSON/HTML. Stopped and restricted to md/py; those artifact contents are not evidence for this audit.",
+  "interpretation_notes": [
+    "T-002 graph includes observed service nodes even when it has no interservice edge (inspect_local.py93-96). This agrees with observed isolated services being possible MicroRank candidates; it does not prove a method includes every service.",
+    "T-002 full trace schema has11 fields; RCAEval adapter selects8. Span kind remains absent. Changed new T-015 detector profile wording to avoid confusing selected columns with full schema; no old file changed.",
+    "T-002 duration-unit OPEN is a limit of that earlier audit, not a contradicted fact. Method code divides duration by1000; actual physical unit still must be preserved by adapters.",
+    "T-008/T-009/T-010/T-011/T-012 trace/root/graph statements explicitly preserve missing, ambiguous, absent-schema or unlabeled limits; no claim that canonical MicroRank original can run those formats unchanged was found.",
+    "Document and code concordance does not revalidate all original counts, raw clocks, schema or graph correctness. Those are out of this lightweight old-task audit; no conclusion about all T-000–T-012 is made."
+  ]
+}

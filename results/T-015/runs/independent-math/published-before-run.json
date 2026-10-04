@@ -1,0 +1,33 @@
+{
+  "recorded_on": "2026-10-04",
+  "status": "FACT: read from author PDF before T-015 method runs; not reproduced on author datasets",
+  "source_pdf": "C:/Users/84583/AppData/Local/Temp/claude/D--RCA-flashticket/faa9e437-da55-49ba-b763-6e8484c8c9a6/scratchpad/ext/MicroRank/WWW2021_MicroRank.pdf",
+  "source_text": "results/T-015/sources/microrank-paper.txt",
+  "paper_title": "MicroRank: End-to-End Latency Issue Localization with Extended Spectrum Analysis in Microservice Environments",
+  "venue": "WWW 2021",
+  "doi": "10.1145/3442381.3449905",
+  "dstar2": {
+    "dataset_A_table4_page9": {"MR_R1_percent": 94, "MR_R3_percent": 96, "MR_R5_percent": 96, "MR_ExamScore": 0.42},
+    "dataset_B_table5_page9": {"MR_R2_percent": 54, "MR_R3_percent": 68, "MR_R5_percent": 72, "MR_ExamScore": 1.38},
+    "dataset_C_table6_page9": {"MR_R1_percent": 100, "MR_R3_percent": 100, "MR_R5_percent": 100, "MR_ExamScore": 0.0}
+  },
+  "table7_page10_module_time_seconds": {
+    "Anomaly_Detector": 0.8,
+    "Data_Preparator": 1.5,
+    "PageRank_Scorer": 5.5,
+    "Spectrum_Scorer": 0.1
+  },
+  "reported_platform_section5_1_1": "8 VMs, each 4-core 2.40GHz CPU, 16GB RAM, Ubuntu18.04; overhead table refers to a single physical node",
+  "interpretation_limits": [
+    "A/B are authors' instrumented Hipster-Shop with one/two root causes, C is AIOps2020 production; none is RE2-OB or RE2-TT.",
+    "R@k has author definition; author times are not directly comparable to shared EC2 m7i-flex.large.",
+    "Full reproduction of authors' scores is unavailable within allowed datasets; code mechanics can be independently recomputed."
+  ],
+  "visually_checked": ["page6: equations2-7 and matrix", "page9: tables4-6"],
+  "code_vs_paper_to_report": [
+    "Paper eq7 additive mixture of inverse trace scope and inverse trace kind; code pagerank.py139-140 reciprocal expression differs.",
+    "Paper eq3 and eq4 swap damping convention; code follows eq4 before separate max-normalization.",
+    "Paper eq1 n=1.5; system detector matches, trace partition uses n=1 plus50ms.",
+    "Paper eq8 missing-side PageRank set0.0001; code spectrum cells set1e-7 and normal-only ep=(1+P)*count."
+  ]
+}

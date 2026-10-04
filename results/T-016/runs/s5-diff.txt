@@ -1,0 +1,39 @@
+0a1,6
+> # T-016: bản sửa TORAI. Chép nguyên văn RCAEval/e2e/torai.py ở RCAEval 259ea4167160256a74ad30004aa3d96a998c846e
+> # (giấy phép MIT, tác giả Luan Pham và cộng sự), chỉ đổi đúng hai chỗ, đánh dấu "T-016 sửa":
+> #   (A) bỏ lần giảm mẫu metric thứ hai trong _rcd_multimodal (dòng 29 bản gốc);
+> #   (B) ghép metric với logts theo vị trí trong từng nửa normal/anomal, thay cho concat theo chỉ số (dòng 47-48 bản gốc).
+> # Hai cờ sua_giam_mau, sua_ghep (mặc định True) để chạy biến thể chỉ (A). Đặt cả hai False thì giống hệt bản gốc.
+> # Mọi hàm khác (preprocess, run_multi_phase, ...) vẫn import từ RCAEval, không chép.
+22c28,29
+< def _rcd_multimodal(data, inject_time, dataset=None, gamma=5, localized=True, bins=5, verbose=False, **kwargs):
+---
+> def _rcd_multimodal(data, inject_time, dataset=None, gamma=5, localized=True, bins=5, verbose=False,
+>                     sua_giam_mau=True, sua_ghep=True, **kwargs):
+29c36,39
+<     metric = metric.iloc[::15, :]
+---
+>     # T-016 sửa (A): torai() đã giảm mẫu metric còn 15 s (dòng 81 bản gốc) và truyền metric đã giảm vào đây
+>     # (dòng 295 bản gốc); bản gốc giảm thêm một lần nữa ở đây (dòng 29), còn một điểm mỗi 225 s.
+>     if not sua_giam_mau:
+>         metric = metric.iloc[::15, :]
+46a57,67
+>     if sua_ghep:
+>         # T-016 sửa (B): metric giữ chỉ số dòng gốc (0, 15, 30, ...), logts có chỉ số 0..n-1, nên concat(axis=1)
+>         # của bản gốc ghép sai dòng và thêm dòng giả (điền 0 ở dưới). Ghép theo vị trí trong từng nửa:
+>         # nửa normal giữ các dòng sát mốc (tail), nửa anomal giữ các dòng đầu (head), như main.py cắt cửa sổ.
+>         n_n = min(len(normal_data), len(normal_logts))
+>         n_a = min(len(anomal_data), len(anomal_logts))
+>         normal_data = normal_data.tail(n_n).reset_index(drop=True)
+>         normal_logts = normal_logts.tail(n_n).reset_index(drop=True)
+>         anomal_data = anomal_data.head(n_a).reset_index(drop=True)
+>         anomal_logts = anomal_logts.head(n_a).reset_index(drop=True)
+> 
+69c90,91
+< def torai(data, inject_time=None, dataset=None, num_loop=None, sli=None, anomalies=None, normalize=True, addup=False, borda=False, service=None, fault_type=None, case=None, rank=None, **kwargs):
+---
+> def torai(data, inject_time=None, dataset=None, num_loop=None, sli=None, anomalies=None, normalize=True, addup=False, borda=False, service=None, fault_type=None, case=None, rank=None,
+>           sua_giam_mau=True, sua_ghep=True, **kwargs):
+320a343,344
+>             sua_giam_mau=sua_giam_mau,
+>             sua_ghep=sua_ghep,

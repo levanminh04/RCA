@@ -1,0 +1,1393 @@
+====================================================================================================
+TÀI LIỆU ho-so-gdn.md
+
+--- main.py:44-45  (D:\RCA-ext\src\GDN\main.py)
+   44|         train_orig = pd.read_csv(f'./data/{dataset}/train.csv', sep=',', index_col=0)
+   45|         test_orig = pd.read_csv(f'./data/{dataset}/test.csv', sep=',', index_col=0)
+
+--- util/net_struct.py:4-10  (D:\RCA-ext\src\GDN\util/net_struct.py)
+    4| def get_feature_map(dataset):
+    5|     feature_file = open(f'./data/{dataset}/list.txt', 'r')
+    6|     feature_list = []
+    7|     for ft in feature_file:
+    8|         feature_list.append(ft.strip())
+    9| 
+   10|     return feature_list
+
+--- main.py:49-50  (D:\RCA-ext\src\GDN\main.py)
+   49|         if 'attack' in train.columns:
+   50|             train = train.drop(columns=['attack'])
+
+--- main.py:156-156  (D:\RCA-ext\src\GDN\main.py)
+  156|         test_labels = np_test_result[2, :, 0].tolist()
+
+--- evaluate.py:118-124  (D:\RCA-ext\src\GDN\evaluate.py)
+  118|     pre = precision_score(gt_labels, pred_labels)
+  119|     rec = recall_score(gt_labels, pred_labels)
+  120| 
+  121|     f1 = f1_score(gt_labels, pred_labels)
+  122| 
+  123| 
+  124|     auc_score = roc_auc_score(gt_labels, total_topk_err_scores)
+
+--- util/preprocess.py:67-83  (D:\RCA-ext\src\GDN\util/preprocess.py)
+   67| def construct_data(data, feature_map, labels=0):
+   68|     res = []
+   69| 
+   70|     for feature in feature_map:
+   71|         if feature in data.columns:
+   72|             res.append(data.loc[:, feature].values.tolist())
+   73|         else:
+   74|             print(feature, 'not exist in data')
+   75|     # append labels as last
+   76|     sample_n = len(res[0])
+   77| 
+   78|     if type(labels) == int:
+   79|         res.append([labels]*sample_n)
+   80|     elif len(labels) == sample_n:
+   81|         res.append(labels)
+   82| 
+   83|     return res
+
+--- util/preprocess.py:74-74  (D:\RCA-ext\src\GDN\util/preprocess.py)
+   74|             print(feature, 'not exist in data')
+
+--- scripts/process_swat.py:8-14  (D:\RCA-ext\src\GDN\scripts/process_swat.py)
+    8| def norm(train, test):
+    9| 
+   10|     normalizer = MinMaxScaler(feature_range=(0, 1)).fit(train) # scale training data to [0,1] range
+   11|     train_ret = normalizer.transform(train)
+   12|     test_ret = normalizer.transform(test)
+   13| 
+   14|     return train_ret, test_ret
+
+--- scripts/process_swat.py:77-77  (D:\RCA-ext\src\GDN\scripts/process_swat.py)
+   77|     d_train_x, d_train_labels = downsample(train.values, train_labels, 10)
+
+--- scripts/process_swat.py:86-86  (D:\RCA-ext\src\GDN\scripts/process_swat.py)
+   86|     train_df = train_df.iloc[2160:]
+
+--- scripts/process_swat.py:50-50  (D:\RCA-ext\src\GDN\scripts/process_swat.py)
+   50|     test = test.fillna(test.mean())
+
+--- datasets/TimeDataset.py:44-49  (D:\RCA-ext\src\GDN\datasets/TimeDataset.py)
+   44|         rang = range(slide_win, total_time_len, slide_stride) if is_train else range(slide_win, total_time_len)
+   45|         
+   46|         for i in rang:
+   47| 
+   48|             ft = data[:, i-slide_win:i]
+   49|             tar = data[:, i]
+
+--- TimeDataset.py:44-44  (D:\RCA-ext\src\GDN\datasets\TimeDataset.py)
+   44|         rang = range(slide_win, total_time_len, slide_stride) if is_train else range(slide_win, total_time_len)
+
+--- models/GDN.py:95-95  (D:\RCA-ext\src\GDN\models/GDN.py)
+   95|         self.embedding = nn.Embedding(node_num, embed_dim)
+
+--- GDN.py:150-157  (D:\RCA-ext\src\GDN\models\GDN.py)
+  150|             cos_ji_mat = torch.matmul(weights, weights.T)
+  151|             normed_mat = torch.matmul(weights.norm(dim=-1).view(-1,1), weights.norm(dim=-1).view(1,-1))
+  152|             cos_ji_mat = cos_ji_mat / normed_mat
+  153| 
+  154|             dim = weights.shape[-1]
+  155|             topk_num = self.topk
+  156| 
+  157|             topk_indices_ji = torch.topk(cos_ji_mat, topk_num, dim=-1)[1]
+
+--- GDN.py:161-163  (D:\RCA-ext\src\GDN\models\GDN.py)
+  161|             gated_i = torch.arange(0, node_num).T.unsqueeze(1).repeat(1, topk_num).flatten().to(device).unsqueeze(0)
+  162|             gated_j = topk_indices_ji.flatten().unsqueeze(0)
+  163|             gated_edge_index = torch.cat((gated_j, gated_i), dim=0)
+
+--- GDN.py:145-145  (D:\RCA-ext\src\GDN\models\GDN.py)
+  145|             weights_arr = all_embeddings.detach().clone()
+
+--- models/graph_layer.py:13-13  (D:\RCA-ext\src\GDN\models/graph_layer.py)
+   13|                  negative_slope=0.2, dropout=0, bias=True, inter_dim=-1,**kwargs):
+
+--- graph_layer.py:110-110  (D:\RCA-ext\src\GDN\models\graph_layer.py)
+  110|         alpha = softmax(alpha, edge_index_i, size_i)
+
+--- graph_layer.py:25-25  (D:\RCA-ext\src\GDN\models\graph_layer.py)
+   25|         self.lin = Linear(in_channels, heads * out_channels, bias=False)
+
+--- graph_layer.py:27-30  (D:\RCA-ext\src\GDN\models\graph_layer.py)
+   27|         self.att_i = Parameter(torch.Tensor(1, heads, out_channels))
+   28|         self.att_j = Parameter(torch.Tensor(1, heads, out_channels))
+   29|         self.att_em_i = Parameter(torch.Tensor(1, heads, out_channels))
+   30|         self.att_em_j = Parameter(torch.Tensor(1, heads, out_channels))
+
+--- graph_layer.py:61-62  (D:\RCA-ext\src\GDN\models\graph_layer.py)
+   61|         edge_index, _ = remove_self_loops(edge_index)
+   62|         edge_index, _ = add_self_loops(edge_index,
+
+--- graph_layer.py:73-74  (D:\RCA-ext\src\GDN\models\graph_layer.py)
+   73|         if self.bias is not None:
+   74|             out = out + self.bias
+
+--- GDN.py:77-79  (D:\RCA-ext\src\GDN\models\GDN.py)
+   77|         out = self.bn(out)
+   78|         
+   79|         return self.relu(out)
+
+--- GDN.py:176-176  (D:\RCA-ext\src\GDN\models\GDN.py)
+  176|         out = torch.mul(x, self.embedding(indexes))
+
+--- GDN.py:179-179  (D:\RCA-ext\src\GDN\models\GDN.py)
+  179|         out = F.relu(self.bn_outlayer_in(out))
+
+--- GDN.py:114-114  (D:\RCA-ext\src\GDN\models\GDN.py)
+  114|         self.dp = nn.Dropout(0.2)
+
+--- GDN.py:183-183  (D:\RCA-ext\src\GDN\models\GDN.py)
+  183|         out = self.out_layer(out)
+
+--- GDN.py:27-56  (D:\RCA-ext\src\GDN\models\GDN.py)
+   27| class OutLayer(nn.Module):
+   28|     def __init__(self, in_num, node_num, layer_num, inter_num = 512):
+   29|         super(OutLayer, self).__init__()
+   30| 
+   31|         modules = []
+   32| 
+   33|         for i in range(layer_num):
+   34|             # last layer, output shape:1
+   35|             if i == layer_num-1:
+   36|                 modules.append(nn.Linear( in_num if layer_num == 1 else inter_num, 1))
+   37|             else:
+   38|                 layer_in_num = in_num if i == 0 else inter_num
+   39|                 modules.append(nn.Linear( layer_in_num, inter_num ))
+   40|                 modules.append(nn.BatchNorm1d(inter_num))
+   41|                 modules.append(nn.ReLU())
+   42| 
+   43|         self.mlp = nn.ModuleList(modules)
+   44| 
+   45|     def forward(self, x):
+   46|         out = x
+   47| 
+   48|         for mod in self.mlp:
+   49|             if isinstance(mod, nn.BatchNorm1d):
+   50|                 out = out.permute(0,2,1)
+   51|                 out = mod(out)
+
+--- train.py:20-21  (D:\RCA-ext\src\GDN\train.py)
+   20| def loss_func(y_pred, y_true):
+   21|     loss = F.mse_loss(y_pred, y_true, reduction='mean')
+
+--- train.py:31-31  (D:\RCA-ext\src\GDN\train.py)
+   31|     optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=config['decay'])
+
+--- main.py:128-148  (D:\RCA-ext\src\GDN\main.py)
+  128|     def get_loaders(self, train_dataset, seed, batch, val_ratio=0.1):
+  129|         dataset_len = int(len(train_dataset))
+  130|         train_use_len = int(dataset_len * (1 - val_ratio))
+  131|         val_use_len = int(dataset_len * val_ratio)
+  132|         val_start_index = random.randrange(train_use_len)
+  133|         indices = torch.arange(dataset_len)
+  134| 
+  135|         train_sub_indices = torch.cat([indices[:val_start_index], indices[val_start_index+val_use_len:]])
+  136|         train_subset = Subset(train_dataset, train_sub_indices)
+  137| 
+  138|         val_sub_indices = indices[val_start_index:val_start_index+val_use_len]
+  139|         val_subset = Subset(train_dataset, val_sub_indices)
+  140| 
+  141| 
+  142|         train_dataloader = DataLoader(train_subset, batch_size=batch,
+  143|                                 shuffle=True)
+  144| 
+  145|         val_dataloader = DataLoader(val_subset, batch_size=batch,
+  146|                                 shuffle=False)
+  147| 
+  148|         return train_dataloader, val_dataloader
+
+--- train.py:93-96  (D:\RCA-ext\src\GDN\train.py)
+   93|             if val_loss < min_loss:
+   94|                 torch.save(model.state_dict(), save_path)
+   95| 
+   96|                 min_loss = val_loss
+
+--- train.py:49-49  (D:\RCA-ext\src\GDN\train.py)
+   49|     early_stop_win = 15
+
+--- train.py:27-112  (D:\RCA-ext\src\GDN\train.py)
+   27| def train(model = None, save_path = '', config={},  train_dataloader=None, val_dataloader=None, feature_map={}, test_dataloader=None, test_dataset=None, dataset
+   28| 
+   29|     seed = config['seed']
+   30| 
+   31|     optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=config['decay'])
+   32| 
+   33|     now = time.time()
+   34|     
+   35|     train_loss_list = []
+   36|     cmp_loss_list = []
+   37| 
+   38|     device = get_device()
+   39| 
+   40| 
+   41|     acu_loss = 0
+   42|     min_loss = 1e+8
+   43|     min_f1 = 0
+   44|     min_pre = 0
+   45|     best_prec = 0
+   46| 
+   47|     i = 0
+   48|     epoch = config['epoch']
+   49|     early_stop_win = 15
+   50| 
+   51|     model.train()
+
+--- evaluate.py:48-60  (D:\RCA-ext\src\GDN\evaluate.py)
+   48| def get_err_scores(test_res, val_res):
+   49|     test_predict, test_gt = test_res
+   50|     val_predict, val_gt = val_res
+   51| 
+   52|     n_err_mid, n_err_iqr = get_err_median_and_iqr(test_predict, test_gt)
+   53| 
+   54|     test_delta = np.abs(np.subtract(
+   55|                         np.array(test_predict).astype(np.float64), 
+   56|                         np.array(test_gt).astype(np.float64)
+   57|                     ))
+   58|     epsilon=1e-2
+   59| 
+   60|     err_scores = (test_delta - n_err_mid) / ( np.abs(n_err_iqr) +epsilon)
+
+--- util/data.py:75-82  (D:\RCA-ext\src\GDN\util/data.py)
+   75| def get_err_median_and_iqr(predicted, groundtruth):
+   76| 
+   77|     np_arr = np.abs(np.subtract(np.array(predicted), np.array(groundtruth)))
+   78| 
+   79|     err_median = np.median(np_arr)
+   80|     err_iqr = iqr(np_arr)
+   81| 
+   82|     return err_median, err_iqr
+
+--- evaluate.py:49-52  (D:\RCA-ext\src\GDN\evaluate.py)
+   49|     test_predict, test_gt = test_res
+   50|     val_predict, val_gt = val_res
+   51| 
+   52|     n_err_mid, n_err_iqr = get_err_median_and_iqr(test_predict, test_gt)
+
+--- evaluate.py:62-65  (D:\RCA-ext\src\GDN\evaluate.py)
+   62|     smoothed_err_scores = np.zeros(err_scores.shape)
+   63|     before_num = 3
+   64|     for i in range(before_num, len(err_scores)):
+   65|         smoothed_err_scores[i] = np.mean(err_scores[i-before_num:i+1])
+
+--- evaluate.py:102-107  (D:\RCA-ext\src\GDN\evaluate.py)
+  102|     topk_indices = np.argpartition(total_err_scores, range(total_features-topk-1, total_features), axis=0)[-topk:]
+  103| 
+  104|     total_topk_err_scores = []
+  105|     topk_err_score_map=[]
+  106| 
+  107|     total_topk_err_scores = np.sum(np.take_along_axis(total_err_scores, topk_indices, axis=0), axis=0)
+
+--- evaluate.py:21-21  (D:\RCA-ext\src\GDN\evaluate.py)
+   21|         normal_dist = get_err_scores(val_re_list, val_re_list)
+
+--- evaluate.py:112-112  (D:\RCA-ext\src\GDN\evaluate.py)
+  112|     pred_labels[total_topk_err_scores > thresold] = 1
+
+--- main.py:216-216  (D:\RCA-ext\src\GDN\main.py)
+  216|     parser.add_argument('-report', help='best / val', type = str, default='best')
+
+--- evaluate.py:129-158  (D:\RCA-ext\src\GDN\evaluate.py)
+  129| def get_best_performance_data(total_err_scores, gt_labels, topk=1):
+  130| 
+  131|     total_features = total_err_scores.shape[0]
+  132| 
+  133|     # topk_indices = np.argpartition(total_err_scores, range(total_features-1-topk, total_features-1), axis=0)[-topk-1:-1]
+  134|     topk_indices = np.argpartition(total_err_scores, range(total_features-topk-1, total_features), axis=0)[-topk:]
+  135| 
+  136|     total_topk_err_scores = []
+  137|     topk_err_score_map=[]
+  138| 
+  139|     total_topk_err_scores = np.sum(np.take_along_axis(total_err_scores, topk_indices, axis=0), axis=0)
+  140| 
+  141|     final_topk_fmeas ,thresolds = eval_scores(total_topk_err_scores, gt_labels, 400, return_thresold=True)
+  142| 
+  143|     th_i = final_topk_fmeas.index(max(final_topk_fmeas))
+  144|     thresold = thresolds[th_i]
+  145| 
+  146|     pred_labels = np.zeros(len(total_topk_err_scores))
+  147|     pred_labels[total_topk_err_scores > thresold] = 1
+  148| 
+  149|     for i in range(len(pred_labels)):
+  150|         pred_labels[i] = int(pred_labels[i])
+  151|         gt_labels[i] = int(gt_labels[i])
+  152| 
+  153|     pre = precision_score(gt_labels, pred_labels)
+
+--- util/data.py:28-47  (D:\RCA-ext\src\GDN\util/data.py)
+   28| def eval_scores(scores, true_scores, th_steps, return_thresold=False):
+   29|     padding_list = [0]*(len(true_scores) - len(scores))
+   30|     # print(padding_list)
+   31| 
+   32|     if len(padding_list) > 0:
+   33|         scores = padding_list + scores
+   34| 
+   35|     scores_sorted = rankdata(scores, method='ordinal')
+   36|     th_steps = th_steps
+   37|     # th_steps = 500
+   38|     th_vals = np.array(range(th_steps)) * 1.0 / th_steps
+   39|     fmeas = [None] * th_steps
+   40|     thresholds = [None] * th_steps
+   41|     for i in range(th_steps):
+   42|         cur_pred = scores_sorted > th_vals[i] * len(scores)
+   43| 
+   44|         fmeas[i] = f1_score(true_scores, cur_pred)
+   45| 
+   46|         score_index = scores_sorted.tolist().index(int(th_vals[i] * len(scores)+1))
+   47|         thresholds[i] = scores[score_index]
+
+--- run.sh:4-4  (D:\RCA-ext\src\GDN\run.sh)
+    4| seed=5
+
+--- main.py:209-209  (D:\RCA-ext\src\GDN\main.py)
+  209|     parser.add_argument('-random_seed', help='random seed', type = int, default=0)
+
+--- run.sh:5-5  (D:\RCA-ext\src\GDN\run.sh)
+    5| BATCH_SIZE=32
+
+--- main.py:201-201  (D:\RCA-ext\src\GDN\main.py)
+  201|     parser.add_argument('-batch', help='batch size', type = int, default=128)
+
+--- run.sh:6-6  (D:\RCA-ext\src\GDN\run.sh)
+    6| SLIDE_WIN=5
+
+--- main.py:203-203  (D:\RCA-ext\src\GDN\main.py)
+  203|     parser.add_argument('-slide_win', help='slide_win', type = int, default=15)
+
+--- run.sh:7-7  (D:\RCA-ext\src\GDN\run.sh)
+    7| dim=64
+
+--- main.py:204-204  (D:\RCA-ext\src\GDN\main.py)
+  204|     parser.add_argument('-dim', help='dimension', type = int, default=64)
+
+--- run.sh:8-8  (D:\RCA-ext\src\GDN\run.sh)
+    8| out_layer_num=1
+
+--- main.py:211-211  (D:\RCA-ext\src\GDN\main.py)
+  211|     parser.add_argument('-out_layer_num', help='outlayer num', type = int, default=1)
+
+--- run.sh:9-9  (D:\RCA-ext\src\GDN\run.sh)
+    9| SLIDE_STRIDE=1
+
+--- main.py:205-205  (D:\RCA-ext\src\GDN\main.py)
+  205|     parser.add_argument('-slide_stride', help='slide_stride', type = int, default=5)
+
+--- run.sh:10-10  (D:\RCA-ext\src\GDN\run.sh)
+   10| topk=5
+
+--- main.py:215-215  (D:\RCA-ext\src\GDN\main.py)
+  215|     parser.add_argument('-topk', help='topk num', type = int, default=20)
+
+--- run.sh:11-11  (D:\RCA-ext\src\GDN\run.sh)
+   11| out_layer_inter_dim=128
+
+--- main.py:212-212  (D:\RCA-ext\src\GDN\main.py)
+  212|     parser.add_argument('-out_layer_inter_dim', help='out_layer_inter_dim', type = int, default=256)
+
+--- GDN.py:33-36  (D:\RCA-ext\src\GDN\models\GDN.py)
+   33|         for i in range(layer_num):
+   34|             # last layer, output shape:1
+   35|             if i == layer_num-1:
+   36|                 modules.append(nn.Linear( in_num if layer_num == 1 else inter_num, 1))
+
+--- run.sh:12-12  (D:\RCA-ext\src\GDN\run.sh)
+   12| val_ratio=0.2
+
+--- main.py:214-214  (D:\RCA-ext\src\GDN\main.py)
+  214|     parser.add_argument('-val_ratio', help='val ratio', type = float, default=0.1)
+
+--- run.sh:13-13  (D:\RCA-ext\src\GDN\run.sh)
+   13| decay=0
+
+--- main.py:213-213  (D:\RCA-ext\src\GDN\main.py)
+  213|     parser.add_argument('-decay', help='decay', type = float, default=0)
+
+--- run.sh:19-19  (D:\RCA-ext\src\GDN\run.sh)
+   19| EPOCH=30
+
+--- main.py:202-202  (D:\RCA-ext\src\GDN\main.py)
+  202|     parser.add_argument('-epoch', help='train epoch', type = int, default=100)
+
+--- run.sh:20-20  (D:\RCA-ext\src\GDN\run.sh)
+   20| report='best'
+
+--- evaluate.py:58-58  (D:\RCA-ext\src\GDN\evaluate.py)
+   58|     epsilon=1e-2
+
+--- evaluate.py:63-65  (D:\RCA-ext\src\GDN\evaluate.py)
+   63|     before_num = 3
+   64|     for i in range(before_num, len(err_scores)):
+   65|         smoothed_err_scores[i] = np.mean(err_scores[i-before_num:i+1])
+
+--- evaluate.py:52-52  (D:\RCA-ext\src\GDN\evaluate.py)
+   52|     n_err_mid, n_err_iqr = get_err_median_and_iqr(test_predict, test_gt)
+
+--- evaluate.py:141-144  (D:\RCA-ext\src\GDN\evaluate.py)
+  141|     final_topk_fmeas ,thresolds = eval_scores(total_topk_err_scores, gt_labels, 400, return_thresold=True)
+  142| 
+  143|     th_i = final_topk_fmeas.index(max(final_topk_fmeas))
+  144|     thresold = thresolds[th_i]
+
+--- main.py:52-58  (D:\RCA-ext\src\GDN\main.py)
+   52|         feature_map = get_feature_map(dataset)
+   53|         fc_struc = get_fc_graph_struc(dataset)
+   54| 
+   55|         set_device(env_config['device'])
+   56|         self.device = get_device()
+   57| 
+   58|         fc_edge_index = build_loc_net(fc_struc, list(train.columns), feature_map=feature_map)
+
+--- GDN.py:134-166  (D:\RCA-ext\src\GDN\models\GDN.py)
+  134|         for i, edge_index in enumerate(edge_index_sets):
+  135|             edge_num = edge_index.shape[1]
+  136|             cache_edge_index = self.cache_edge_index_sets[i]
+  137| 
+  138|             if cache_edge_index is None or cache_edge_index.shape[1] != edge_num*batch_num:
+  139|                 self.cache_edge_index_sets[i] = get_batch_edge_index(edge_index, batch_num, node_num).to(device)
+  140|             
+  141|             batch_edge_index = self.cache_edge_index_sets[i]
+  142|             
+  143|             all_embeddings = self.embedding(torch.arange(node_num).to(device))
+  144| 
+  145|             weights_arr = all_embeddings.detach().clone()
+  146|             all_embeddings = all_embeddings.repeat(batch_num, 1)
+  147| 
+  148|             weights = weights_arr.view(node_num, -1)
+  149| 
+  150|             cos_ji_mat = torch.matmul(weights, weights.T)
+  151|             normed_mat = torch.matmul(weights.norm(dim=-1).view(-1,1), weights.norm(dim=-1).view(1,-1))
+  152|             cos_ji_mat = cos_ji_mat / normed_mat
+  153| 
+  154|             dim = weights.shape[-1]
+  155|             topk_num = self.topk
+  156| 
+  157|             topk_indices_ji = torch.topk(cos_ji_mat, topk_num, dim=-1)[1]
+  158| 
+
+--- util/net_struct.py:30-30  (D:\RCA-ext\src\GDN\util/net_struct.py)
+   30| def get_prior_graph_struc(dataset):
+
+--- train.py:89-103  (D:\RCA-ext\src\GDN\train.py)
+   89|         if val_dataloader is not None:
+   90| 
+   91|             val_loss, val_result = test(model, val_dataloader)
+   92| 
+   93|             if val_loss < min_loss:
+   94|                 torch.save(model.state_dict(), save_path)
+   95| 
+   96|                 min_loss = val_loss
+   97|                 stop_improve_count = 0
+   98|             else:
+   99|                 stop_improve_count += 1
+  100| 
+  101| 
+  102|             if stop_improve_count >= early_stop_win:
+  103|                 break
+
+--- results/T-005/scripts/chuan_bi_dau_vao.py:122-122  (D:\RCA-flashticket\results/T-005/scripts/chuan_bi_dau_vao.py)
+  122|     feats = [c for c in test.columns if c != "time" and all(c in t.columns for t in trains)]
+
+--- results/T-008/the-dataset.md:22-22  (D:\RCA-flashticket\results/T-008/the-dataset.md)
+   22| | 8. Normal | Trace construct có cửa sổ ngắn; resource metric construct trùng fault ở nhiều file. Strict mask không đủ train/control. |
+
+--- results/T-008/the-dataset.md:54-61  (D:\RCA-flashticket\results/T-008/the-dataset.md)
+   54| ### Dữ liệu bình thường
+   55| 
+   56| README gọi construct_data fault-free, nhưng toàn họ có 122 path normal/fault khớp SHA256, gồm resource metric. Do đó không dùng cả construct metric để học clean
+   57| 
+   58| - `online-boutique/construct_data/2022-08-22/trace/03_51_trace.csv`: 23842 span rows, start 1661140219.1492414, end 1661140279.9039414; không tự mở rộng phút ng
+   59| - `online-boutique/construct_data/2022-08-23/trace/17_00_trace.csv`: 22969 span rows, start 1661273967.9919088, end 1661274028.1889231; không tự mở rộng phút ng
+   60| 
+   61| Metric strict trace bounds không đủ chia ≥2 điểm reference và ≥2 control trên các ngày. [symptoms-003](runs/symptoms-003/result.json) đã kiểm và không sinh cali
+
+--- results/T-009/the-dataset.md:20-20  (D:\RCA-flashticket\results/T-009/the-dataset.md)
+   20| | 8. Normal | Có normal riêng và metric thực; warm-up/load cleanliness không được bảo đảm bởi tên. |
+
+--- results/T-009/the-dataset.md:91-93  (D:\RCA-flashticket\results/T-009/the-dataset.md)
+   91| ## 5. Bình thường và mốc thời gian
+   92| 
+   93| Normal nested đã được đọc. SN có ba phiên faults=[]; TT có hai nhãn faults=[] lớp ngoài và thêm raw trong TT-no-fault.txz ngày 20/4 không có label riêng: phần t
+
+--- results/T-010/the-dataset.md:18-18  (D:\RCA-flashticket\results/T-010/the-dataset.md)
+   18| | 4. Metric/log | Log thực có ID ghép; resource metric riêng không có trong tree/raw/graph đã kiểm. Latency span không thay resource metric. |
+
+--- results/T-010/the-dataset.md:116-122  (D:\RCA-flashticket\results/T-010/the-dataset.md)
+  116| ## 5. Bình thường và mốc thời gian
+  117| 
+  118| 10 ZIP normal chứa 9.999.974 dòng span, 81.037 trace-ID duy nhất. Khoảng min/max là phạm vi xuất file, không duration normal liên tục hay lượng label injection.
+  119| 
+  120| | Normal storage | Dòng span | Min epoch ms | Max epoch ms |
+  121| |---|---|---|---|
+  122| | F02-04-normal | 677580 | 1629255748323 | 1629256353532 |
+
+--- results/T-011/the-dataset.md:22-22  (D:\RCA-flashticket\results/T-011/the-dataset.md)
+   22| | 8. Normal học ngưỡng | OPEN, không dùng phần đầu tùy ý. |
+
+--- results/T-011/the-dataset.md:37-41  (D:\RCA-flashticket\results/T-011/the-dataset.md)
+   37| KPI CSV dùng epoch microsecond, NPY dùng epoch giây và log UTC. Mốc injection/normal/recovery của ngày mẫu chưa xác minh; không lấy một phần đầu tùy ý làm norma
+   38| 
+   39| ## 6. Mô tả thô triệu chứng ngoài root
+   40| 
+   41| Chưa có normal/mốc lỗi được xác minh và KPI provenance còn khác. Không tính band bằng một phần thời gian chọn tùy ý. Chất lượng toàn mẫu đã kiểm; cần nguồn mốc 
+
+--- results/T-011/the-dataset.md:76-76  (D:\RCA-flashticket\results/T-011/the-dataset.md)
+   76| | 8. Normal học ngưỡng | Có timeline 24 h trước lỗi, chưa nhãn healthy. |
+
+--- results/T-011/the-dataset.md:89-89  (D:\RCA-flashticket\results/T-011/the-dataset.md)
+   89| ## 5. Normal và thời gian
+
+--- results/T-012/the-dataset.md:22-22  (D:\RCA-flashticket\results/T-012/the-dataset.md)
+   22| | 8 | Normal trước tiêm khoảng240s theo env; sạch/đại diện load chưa độc lập chứng minh. |
+
+--- results/T-012/the-dataset.md:46-48  (D:\RCA-flashticket\results/T-012/the-dataset.md)
+   46| ## 5. Dữ liệu bình thường và mốc thời gian
+   47| 
+   48| env.json có NORMAL_START/END, ABNORMAL_START/END epoch-second; injection start/end ISO UTC. Không sửa payload hoặc biến mốc tiêm thành onset. Trace normal khoản
+
+--- results/T-012/the-dataset.md:92-92  (D:\RCA-flashticket\results/T-012/the-dataset.md)
+   92| | 8 | Một baseline thật mỗi hệ; normal load/reset/warmup và recovery chưa độc lập xác minh. |
+
+--- results/T-012/the-dataset.md:105-107  (D:\RCA-flashticket\results/T-012/the-dataset.md)
+  105| ## 5. Dữ liệu bình thường và mốc thời gian
+  106| 
+  107| Baseline `Normal_Baseline_20251103_220228` có 205 trace; first-half chronological reference/second-half control. Tên normal và reset code không chứng minh sạch/
+
+---------------------------------------- dòng văn bản PDF gdn.txt
+
+[PDF dòng 154-169]
+  154| In this paper, our training data consists of sensor (i.e. mul-
+  155| 
+  156| tivariate time series) data from N sensors over Ttrain time
+  157| 
+  158| ticks: the sensor data is denoted strain =                             s(tr1a)in, � � �  ,  s(Ttrain  )  ,
+  159| 
+  160| train
+  161| 
+  162| which is used to train our approach. In each time tick t, the                                               3.4 Graph Structure Learning
+  163| 
+  164| sensor values s(trta)in  RN form an N dimensional vector rep-                                               A major goal of our framework is to learn the relati
+  165| resenting the values of our N sensors. Following the usual                                                  between sensors in the form of a graph structure. To
+  166| we will use a directed graph, whose nodes represent sen-
+  167| unsupervised anomaly detection formulation, the training                                                    sors, and whose edges represent dependency relations
+  168| between them. An edge from one sensor to another indicates
+  169| data is assumed to consist of only normal data.                                                             that the first sensor is used for modelling the beha
+
+[PDF dòng 181-186]
+  181| The output of our algorithm is a set of Ttest binary labels                                              different parts have minimal interaction).
+  182| indicating whether each test time tick is an anomaly or not,
+  183| This prior information can be flexibly represented as a set
+  184| i.e. a(t)  {0, 1}, where a(t) = 1 indicates that time t is                                                  of candidate relations Ci for each sensor i, i.e. th
+  185| it could be dependent on:
+  186| anomalous.
+
+[PDF dòng 455-457]
+  455| 4.8 RQ4. Localizing Anomalies                                    find closely related sensors; 3) its predictions of expected
+  456| behavior of each sensor allows us to understand how anoma-
+  457| How well can our model help users to localize and under-         lies deviate from expectations.
+
+[PDF dòng 339-345]
+  339| Table 1 summarises the statistics of the two datasets. In or-
+  340| der to speed up training, the original data samples are down-     datasets are unbalanced, which justifies the choice of these
+  341| sampled to one measurement every 10 seconds by taking the
+  342| median values. The resulting label is the most common label       metrics, which are suitable for unbalanced data. To detect
+  343| during the 10 seconds. Since the systems took 5-6 hours to
+  344| reach stabilization when first turned on (Goh et al. 2016),       anomalies, we use the maximum anomaly score over the val-
+  345| we eliminate the first 2160 samples for both datasets.
+
+[PDF dòng 342-343]
+  342| median values. The resulting label is the most common label       metrics, which are suitable for unbalanced data. To detect
+  343| during the 10 seconds. Since the systems took 5-6 hours to
+
+[PDF dòng 235-242]
+  235| Thus, at time t, we define our model input x(t)  RN�w
+  236| based on a sliding window of size w over the historical time    3.6 Graph Deviation Scoring
+  237| series data (whether training or testing data):
+  238| 
+  239| x(t) := s(t-w), s(t-w+1), � � � , s(t-1)    (4)                 Given the learned relationships, we want to detect and ex-
+  240| plain anomalies which deviate from these relationships.
+  241| The target output that our model needs to predict is the sen-   To do this, our model computes individual anomalousness
+  242| sor data at the current time tick, i.e. s(t).                   scores for each sensor, and also combines them into a sin-
+
+[PDF dòng 137-143]
+  137| X2                                        Attention-Based Features              Forecast           Hence, we do this by introducing an embedding vector
+  138| X3                                                                                                          for each sensor, representing its characteristics:
+  139| 
+  140| Z1                                                                    vi  Rd, for i  {1, 2, � � � , N }
+  141| ...
+  142| These embeddings are initialized randomly and then trained
+  143| 4. Graph Deviation Scoring                                         Z2                                       along with the rest of the model.
+
+[PDF dòng 194-200]
+  194| 1. Sensor Embedding: uses embedding vectors to capture                                                      didates, we compute the similarity between node i's 
+  195| the unique characteristics of each sensor;                                                               ding vector, and the embeddings of its candidates j  Ci
+  196| 
+  197| 2. Graph Structure Learning: learns a graph structure rep-                                                  eji =   vi vj   for j  Ci        (2)
+  198| resenting dependence relationships between sensors;                                                             vi � vj
+  199| 
+  200| 3. Graph Attention-Based Forecasting: forecasts future                                                      Aji = 1{j  TopK({eki : k  Ci})}  (3)
+
+[PDF dòng 188-191]
+  188| 3.2 Overview                                                                                                Ci  {1, 2, � � � , N } \ {i}     (1)
+  189| 
+  190| Our GDN method aims to learn relationships between sen-                                                     In the case without prior information, the candidate
+  191| sors as a graph, and then identifies and explains deviations                                                of sensor i is simply all sensors, other than itself
+
+[PDF dòng 268-268]
+  268| gi(t) = vi  Wxi(t)                          (6)                 t, we aggregate over sensors using the max function (we use
+
+[PDF dòng 270-270]
+  270| (i, j) = LeakyReLU a gi(t)  gj(t)          (7)                 subset of sensors, or even a single sensor) :
+
+[PDF dòng 272-274]
+  272| i,j =  exp ( (i, j))                                            A (t) = max ai (t)                            (13)
+  273| ,      (8)
+  274| kN (i){i} exp ( (i, k))                                              i
+
+[PDF dòng 255-257]
+  255| z(it) = ReLU i,iWx(it) +          i,j Wx(jt) , (5)              To prevent the deviations arising from any one sensor from
+  256| being overly dominant over the other sensors, we perform a
+  257| jN (i)                                robust normalization of the error values of each sensor:
+
+[PDF dòng 217-224]
+  217| For each z(it), we element-wise multiply (denoted ) it with
+  218| 3.5 Graph Attention-Based Forecasting                           the corresponding time series embedding vi, and use the re-
+  219| sults across all nodes as the input of stacked fully-connected
+  220| In order to provide useful explanations for anomalies, we
+  221| would like our model to tell us:                                layers with output dimensionality N , to predict the vector of
+  222| sensor values at time step t, i.e. s(t):
+  223| � Which sensors are deviating from normal behavior?
+  224| ^s(t) = f v1  z1(t), � � � , vN  z(Nt)        (9)
+
+[PDF dòng 230-234]
+  230| easily identify the sensors which deviate greatly from their    mization:
+  231| expected behavior. Moreover, the user can compare the ex-
+  232| pected and observed behavior of each sensor, to understand          1       Ttrain                         2
+  233| why the model regards a sensor as anomalous.                                                               2
+  234| LMSE = Ttrain - w t=w+1      ^s(t) - s(t)     (10)
+
+[PDF dòng 251-251]
+  251| node i's aggregated representation zi as follows:               Erri (t) = |si(t) - ^s(it)|                   (11)
+
+[PDF dòng 259-263]
+  259| where x(it)  Rw is node i's input feature, N (i) =              ai  (t)  =  Erri  (t)        -  �i ,          (12)
+  260| {j | Aji > 0} is the set of neighbors of node i obtained from                     i
+  261| the learned adjacency matrix A, W  Rd�w is a trainable
+  262| where �i and i are the median and inter-quartile range
+  263| weight matrix which applies a shared linear transformation      (IQR2) across time ticks of the Erri (t) values respectively.
+
+[PDF dòng 268-274]
+  268| gi(t) = vi  Wxi(t)                          (6)                 t, we aggregate over sensors using the max function (we use
+  269| max as it is plausible for anomalies to affect only a small
+  270| (i, j) = LeakyReLU a gi(t)  gj(t)          (7)                 subset of sensors, or even a single sensor) :
+  271| 
+  272| i,j =  exp ( (i, j))                                            A (t) = max ai (t)                            (13)
+  273| ,      (8)
+  274| kN (i){i} exp ( (i, k))                                              i
+
+[PDF dòng 279-284]
+  279| To dampen abrupt changes in values are often not per-          Datasets #Features #Train #Test Anomalies
+  280| fectly predicted and result in sharp spikes in error values
+  281| even when this behavior is normal, similar with (Hundman              SWaT           51        47515 44986 11.97%
+  282| et al. 2018b), we use a simple moving average(SMA) to gen-            WADI
+  283| erate the smoothed scores As (t).                                                    127 118795 17275 5.99%
+  284| 
+
+[PDF dòng 286-291]
+  286| exceeds a fixed threshold. While different approaches could
+  287| be employed to set the threshold such as extreme value the-       4.2 Baselines
+  288| ory (Siffer et al. 2017), to avoid introducing additional hy-
+  289| perparameters, we use in our experiments a simple approach        We compare the performance of our proposed method with
+  290| of setting the threshold as the max of As(t) over the valida-     five popular anomaly detection methods, including:
+  291| tion data.
+
+[PDF dòng 145-148]
+  145| Similarity between these embeddings vi indicates simi-
+  146| Observation                           Prediction                                                            larity of behaviors: hence, sensors with similar emb
+  147| values should have a high tendency to be related to one an-
+  148| Figure 1: Overview of our proposed framework.                                                   other. In our model, these embeddings will be used in two
+
+[PDF dòng 176-181]
+  176| We design a flexible framework which can be applied ei-
+  177| s(te1s)t ,  �  �  �  ,  s(Ttest )  .                                                                        ther to 1) the usual case where we have no prior inf
+  178| about the graph structure, or 2) the case where we have some
+  179| test                                                                               prior information about which edges are plausible (e.g. the
+  180| sensor system may be divided into parts, where sensors in
+  181| The output of our algorithm is a set of Ttest binary labels                                              different parts have minimal interaction).
+
+[PDF dòng 10-10]
+   10| Given high-dimensional time series data (e.g., sensor data),
+
+[PDF dòng 385-386]
+  385| sponding to their difference in input dimensionality. We set    Figure 2: A t-SNE plot of the sensor embeddings of our
+  386| the sliding window size w as 5 for both datasets.               trained model on the WADI dataset. Node colors denote
+
+[PDF dòng 382-384]
+  382| early stopping with patience of 10. We use embedding vec-                                                                                                       
+  383| tors with length of 128(64), k with 30(15) and hidden lay-                                                                                                      
+  384| ers of 128(64) neurons for the WADI (SWaT) dataset, corre-
+
+[PDF dòng 220-221]
+  220| In order to provide useful explanations for anomalies, we
+  221| would like our model to tell us:                                layers with output dimensionality N , to predict the vector of
+
+[PDF dòng 383-383]
+  383| tors with length of 128(64), k with 30(15) and hidden lay-                                                                                                      
+
+[PDF dòng 383-384]
+  383| tors with length of 128(64), k with 30(15) and hidden lay-                                                                                                      
+  384| ers of 128(64) neurons for the WADI (SWaT) dataset, corre-
+
+[PDF dòng 381-381]
+  381| (0.9, 0.99). We train models for up to 50 epochs and use                                                                                                        
+
+[PDF dòng 381-382]
+  381| (0.9, 0.99). We train models for up to 50 epochs and use                                                                                                        
+  382| early stopping with patience of 10. We use embedding vec-                                                                                                       
+
+[PDF dòng 380-381]
+  380| Adam optimizer with learning rate 1 � 10-3 and (1, 2) =                                                                                                        2
+  381| (0.9, 0.99). We train models for up to 50 epochs and use                                                                                                        
+
+[PDF dòng 217-221]
+  217| For each z(it), we element-wise multiply (denoted ) it with
+  218| 3.5 Graph Attention-Based Forecasting                           the corresponding time series embedding vi, and use the re-
+  219| sults across all nodes as the input of stacked fully-connected
+  220| In order to provide useful explanations for anomalies, we
+  221| would like our model to tell us:                                layers with output dimensionality N , to predict the vector of
+
+[PDF dòng 268-284]
+  268| gi(t) = vi  Wxi(t)                          (6)                 t, we aggregate over sensors using the max function (we use
+  269| max as it is plausible for anomalies to affect only a small
+  270| (i, j) = LeakyReLU a gi(t)  gj(t)          (7)                 subset of sensors, or even a single sensor) :
+  271| 
+  272| i,j =  exp ( (i, j))                                            A (t) = max ai (t)                            (13)
+  273| ,      (8)
+  274| kN (i){i} exp ( (i, k))                                              i
+  275| 
+  276| where  denotes concatenation; thus gi(t) concatenates the           2IQR is defined as the difference between the 1st and 3rd quar-
+  277| sensor embedding vi and the corresponding transformed           tiles of a distribution or set of values, and is a robust measure of the
+  278| distribution's spread.
+  279| To dampen abrupt changes in values are often not per-          Datasets #Features #Train #Test Anomalies
+  280| fectly predicted and result in sharp spikes in error values
+  281| even when this behavior is normal, similar with (Hundman              SWaT           51        47515 44986 11.97%
+  282| et al. 2018b), we use a simple moving average(SMA) to gen-            WADI
+  283| erate the smoothed scores As (t).                                                    127 118795 17275 5.99%
+  284| 
+
+[PDF dòng 176-184]
+  176| We design a flexible framework which can be applied ei-
+  177| s(te1s)t ,  �  �  �  ,  s(Ttest )  .                                                                        ther to 1) the usual case where we have no prior inf
+  178| about the graph structure, or 2) the case where we have some
+  179| test                                                                               prior information about which edges are plausible (e.g. the
+  180| sensor system may be divided into parts, where sensors in
+  181| The output of our algorithm is a set of Ttest binary labels                                              different parts have minimal interaction).
+  182| indicating whether each test time tick is an anomaly or not,
+  183| This prior information can be flexibly represented as a set
+  184| i.e. a(t)  {0, 1}, where a(t) = 1 indicates that time t is                                                  of candidate relations Ci for each sensor i, i.e. th
+
+[PDF dòng 167-169]
+  167| unsupervised anomaly detection formulation, the training                                                    sors, and whose edges represent dependency relations
+  168| between them. An edge from one sensor to another indicates
+  169| data is assumed to consist of only normal data.                                                             that the first sensor is used for modelling the beha
+
+[PDF dòng 343-345]
+  343| during the 10 seconds. Since the systems took 5-6 hours to
+  344| reach stabilization when first turned on (Goh et al. 2016),       anomalies, we use the maximum anomaly score over the val-
+  345| we eliminate the first 2160 samples for both datasets.
+
+[PDF dòng 268-270]
+  268| gi(t) = vi  Wxi(t)                          (6)                 t, we aggregate over sensors using the max function (we use
+  269| max as it is plausible for anomalies to affect only a small
+  270| (i, j) = LeakyReLU a gi(t)  gj(t)          (7)                 subset of sensors, or even a single sensor) :
+
+[PDF dòng 466-470]
+  466| readings are within the normal range of this sensor, so de-      baselines in accuracy, provides an interpretable model, and
+  467| tecting this anomaly is nontrivial.                              helps users to localize and understand anomalies. Future
+  468| work can consider additional architectures and online train-
+  469| During this attack period, GDN identifies                     ing methods, to further improve the practicality of the ap-
+  470| 1 MV 001 STATUS as the deviating sensor with the                 proach.
+
+[PDF dòng 1-1]
+    1| Graph Neural Network-Based Anomaly Detection in Multivariate Time Series
+
+[PDF dòng 17-17]
+   17| datasets; however, existing methods do not explicitly learn     et al. 2003), distance-based methods (Angiulli and Pizzuti
+
+[PDF dòng 13-13]
+   13| way that captures complex inter-sensor relationships, and de-   ture of anomalies, the anomaly detection problem is typi-
+
+[PDF dòng 437-451]
+  437| ture representations to reflect the localized sensors' behavior     GDN indicates (in red circles) the sensors with highest at-
+  438| similarity. Moreover, we observe a group of sensors forming      tention weights to the deviating sensor. Indeed, these neigh-
+  439| a localized cluster, shown in the dashed circled region. In-     bors are closely related sensors: the 1 FIT 001 PV neigh-
+  440| specting the data, we find that these sensors measure similar    bor is normally highly correlated with 1 MV 001 STATUS,
+  441| indicators in water tanks that perform similar functions in      as the latter shows the valve status for a valve which con-
+  442| the WADI water distribution network, explaining the simi-        trols the flow measured by the former. However, the at-
+  443| larity between these sensors.                                    tack caused a deviation from this relationship, as the at-
+  444| tack gave false readings only to 1 FIT 001 PV. GDN fur-
+  445| Interpretability via Graph Edges and Attention Weights           ther allows understanding of this anomaly by comparing the
+  446| Edges in our learned graph provide interpretability by in-       predicted and observed sensor values in Figure 3 (right):
+  447| dicating which sensors are related to one another. More-         for 1 MV 001 STATUS, our model predicted an increase (as
+  448| over, the attention weights further indicate the importance of   1 FIT 001 PV increased, and our model has learned that the
+  449| each of a node's neighbors in modelling the node's behav-        sensors increase together). Due to the attack, however, no
+  450| ior. Figure 3 (left) shows an example of this learned graph on   change was observed in 1 MV 001 STATUS, leading to a
+  451| the WADI dataset. The following subsection further shows a       large error which was detected as an anomaly by GDN.
+
+[PDF dòng 105-105]
+  105| classification models (Scho�lkopf et al. 2001), detector en-   during this aggregation. Related variants have shown suc-
+
+[PDF dòng 720-720]
+
+[PDF dòng 339-342]
+  339| Table 1 summarises the statistics of the two datasets. In or-
+  340| der to speed up training, the original data samples are down-     datasets are unbalanced, which justifies the choice of these
+  341| sampled to one measurement every 10 seconds by taking the
+  342| median values. The resulting label is the most common label       metrics, which are suitable for unbalanced data. To detect
+
+[PDF dòng 279-283]
+  279| To dampen abrupt changes in values are often not per-          Datasets #Features #Train #Test Anomalies
+  280| fectly predicted and result in sharp spikes in error values
+  281| even when this behavior is normal, similar with (Hundman              SWaT           51        47515 44986 11.97%
+  282| et al. 2018b), we use a simple moving average(SMA) to gen-            WADI
+  283| erate the smoothed scores As (t).                                                    127 118795 17275 5.99%
+====================================================================================================
+TÀI LIỆU decomprca.md
+
+--- method/experiments/controlled_pools.py:61-107  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method/experiments/controlled_pools.py)
+   61| def gt_inject_candidate(scenario, service_level, mag: dict) -> str | None:
+   62|     """The column to insert: the highest-phi_mag ground-truth representative."""
+   63|     cols = set(scenario.data.columns)
+   64|     if service_level:
+   65|         svcs = gt_services(scenario.ground_truth_causes)
+   66|         members = [c for c in cols if service_of(c) in svcs]
+   67|     else:
+   68|         members = [t for t in scenario.ground_truth_causes if t in cols]
+   69|     if not members:
+   70|         return None
+   71|     return max(members, key=lambda m: mag.get(m, float("-inf")))
+   72| 
+   73| 
+   74| def build_pools(scenario, service_level):
+   75|     """Return ``{config: {pool, injected, injected_gt, injected_pos}}``, or
+   76|     None when the cause has no column in the scenario data."""
+   77|     mag = dict(score_metrics(scenario))
+   78|     all_cols = list(scenario.data.columns)
+   79|     rng = seeded_rng(scenario.scenario_id)
+   80| 
+   81|     inject = gt_inject_candidate(scenario, service_level, mag)
+   82|     if inject is None:
+   83|         return None
+   84| 
+   85|     out = {}
+
+--- method/datasets/rcaeval_dataset.py:28-28  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method/datasets/rcaeval_dataset.py)
+   28| SUITES = ["RE1-OB", "RE1-SS", "RE1-TT"]
+
+--- rcaeval_dataset.py:40-41  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method\datasets\rcaeval_dataset.py)
+   40| BASELINE_SECONDS = 600    # RCAEval default --length 20 takes up to 600 rows per side; RE1 has ~360-480
+   41| POST_SECONDS     = 600    # same
+
+--- rcaeval_dataset.py:208-221  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method\datasets\rcaeval_dataset.py)
+  208|             raw_pre  = df[df["time"] < inject_time].tail(self.baseline_seconds).copy()
+  209|             raw_post = df[df["time"] >= inject_time].head(self.post_seconds).copy()
+  210|             raw_df = pd.concat([raw_pre, raw_post], ignore_index=True)
+  211|             raw_df = raw_df.replace([np.inf, -np.inf], np.nan).ffill().fillna(0)
+  212| 
+  213|             pre  = df[df["time"] < inject_time].copy()
+  214|             post = df[df["time"] >= inject_time].copy()
+  215| 
+  216|             if pre.empty or post.empty:
+  217|                 continue
+  218| 
+  219|             # Clip to configured windows before preprocessing
+  220|             base_win  = pre.tail(self.baseline_seconds)
+  221|             fault_win = post.head(self.post_seconds)
+
+--- rcaeval_dataset.py:45-74  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method\datasets\rcaeval_dataset.py)
+   45| def _preprocess_rcaeval(df: pd.DataFrame) -> pd.DataFrame:
+   46|     """Replicate the preprocessing used by the ASE'24 RCAEval main-ase.py.
+   47| 
+   48|     We intentionally do NOT strip ``_latency-50`` or rename
+   49|     ``_latency-90`` -> ``_latency`` — those transformations are applied
+   50|     by the newer ``main.py`` and cause Baro to score 0.57 on Sock Shop
+   51|     (vs. 0.95 published). Keeping raw per-quantile latency columns
+   52|     reproduces the paper's published numbers exactly.
+   53| 
+   54|     Steps (in order):
+   55|       1. Drop the 'time' column if present
+   56|       2. Drop constant columns  (preprocess() -> drop_constant)
+   57|       3. Convert memory columns bytes -> MB  (preprocess() -> convert_mem_mb)
+   58|     """
+   59|     df = df.copy()
+   60| 
+   61|     # 1. drop time column
+   62|     for tcol in ("time", "Time", "time.1"):
+   63|         if tcol in df.columns:
+   64|             df = df.drop(columns=[tcol])
+   65| 
+   66|     # 2. drop constant columns
+   67|     df = df.loc[:, (df != df.iloc[0]).any()]
+   68| 
+   69|     # 3. convert memory bytes -> MB
+
+--- main-ase.py:166-168  (RCAEval@fb8f20a:main-ase.py)
+  166|     if args.length is None:
+  167|         args.length = 10
+  168|     data_length = args.length * 60 // 2
+
+--- rcaeval_dataset.py:48-52  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method\datasets\rcaeval_dataset.py)
+   48|     We intentionally do NOT strip ``_latency-50`` or rename
+   49|     ``_latency-90`` -> ``_latency`` — those transformations are applied
+   50|     by the newer ``main.py`` and cause Baro to score 0.57 on Sock Shop
+   51|     (vs. 0.95 published). Keeping raw per-quantile latency columns
+   52|     reproduces the paper's published numbers exactly.
+
+--- results/T-006/cham/bang-so-sanh.md:283-305  (D:\RCA-flashticket\results/T-006/cham/bang-so-sanh.md)
+  283| ## baro (RCAEval), fse-ss, --length 10 (mặc định RCAEval tới 27/12/2024; Minh duyệt phiên 2) — mốc B: Bảng 3 bài BARO, RobustScorer[t_inject]
+  284| 
+  285| Khối: `l4-baro-fse-ss-len10-lan1`, `l4-baro-fse-ss-len10-lan2`. Tất định (số ca giống hệt lần 1): [(2, 100, 100)]. Dự phòng (trùng thứ tự cột): [0, 0]. Khớp `ma
+  286| 
+  287| | lỗi | AC@1 mình | AC@3 mình | Avg@5 mình | mốc Avg@5 | lệch | Avg@5 các lần |
+  288| |---|---|---|---|---|---|---|
+  289| | cpu | 0.920 | 1.000 | 0.984 | 0.980 | +0.004 | 0.984, 0.984 |
+  290| | mem | 0.880 | 1.000 | 0.976 | 0.980 | -0.004 | 0.976, 0.976 |
+  291| | delay | 0.920 | 1.000 | 0.984 | 0.980 | +0.004 | 0.984, 0.984 |
+  292| | loss | 0.640 | 0.960 | 0.864 | 0.860 | +0.004 | 0.864, 0.864 |
+  293| | AVERAGE | 0.840 | 0.990 | 0.952 | 0.950 | +0.002 | 0.952, 0.952 |
+  294| 
+  295| ## baro (RCAEval), fse-ss, --length 20 (mặc định hiện tại; chạy ở phiên 1) — mốc B: Bảng 3 bài BARO, RobustScorer[t_inject]
+  296| 
+  297| Khối: `l4-baro-fse-ss-lan1`, `l4-baro-fse-ss-lan2`. Tất định (số ca giống hệt lần 1): [(2, 100, 100)]. Dự phòng (trùng thứ tự cột): [0, 0]. Khớp `main.py`: [Non
+  298| 
+  299| | lỗi | AC@1 mình | AC@3 mình | Avg@5 mình | mốc Avg@5 | lệch | Avg@5 các lần |
+  300| |---|---|---|---|---|---|---|
+  301| | cpu | 0.920 | 1.000 | 0.984 | 0.980 | +0.004 | 0.984, 0.984 |
+  302| | mem | 0.920 | 1.000 | 0.984 | 0.980 | +0.004 | 0.984, 0.984 |
+  303| | delay | 0.920 | 1.000 | 0.984 | 0.980 | +0.004 | 0.984, 0.984 |
+  304| | loss | 0.640 | 0.960 | 0.888 | 0.860 | +0.028 | 0.888, 0.888 |
+  305| | AVERAGE | 0.850 | 0.990 | 0.960 | 0.950 | +0.010 | 0.960, 0.960 |
+
+--- method/evaluation/metrics.py:10-19  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method/evaluation/metrics.py)
+   10| By construction, top@k = Retrieval@K x Rerank@k, so
+   11|   retrieval failure = 1 - Retrieval@K
+   12|   reranking failure = Retrieval@K - top@k
+   13| 
+   14| Retrieval@K and Rerank@k apply to any method that outputs a ranking: by default
+   15| C is the first K items of the method's final ranking, so Retrieval@K = top@K and
+   16| Rerank@k = top@k / top@K. For a method with an explicit candidate set of its
+   17| own (e.g. the nodes kept by a learned causal graph), pass it as
+   18| `candidates_list`; a hit then requires the cause to be both among the first k
+   19| and inside that set, so the identity always holds.
+
+--- method/evaluation/metrics.py:71-75  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method/evaluation/metrics.py)
+   71| def _hit_in_candidates(y_true, y_pred, cutoff, n_candidates, candidates):
+   72|     """Cause ranked among the first `cutoff` items AND inside the candidate set."""
+   73|     head = y_pred[:cutoff]
+   74|     pool = candidates if candidates is not None else y_pred[:n_candidates]
+   75|     return int(any(t in head and t in pool for t in y_true))
+
+--- method/evaluation/metrics.py:120-147  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method/evaluation/metrics.py)
+  120| def decompose(
+  121|     y_true_list: list[list[str]],
+  122|     y_pred_list: list[list[str]],
+  123|     cutoff: int,
+  124|     n_candidates: int,
+  125|     candidates_list: list[list[str]] | None = None,
+  126| ) -> dict[str, float]:
+  127|     """Full retrieval–reranking decomposition.
+  128| 
+  129|     `cutoff` is k (the ranking cutoff of top@k and Rerank@k); `n_candidates`
+  130|     is K (the candidate-set size of Retrieval@K), with cutoff <= n_candidates.
+  131|     """
+  132|     cands = _check(y_true_list, y_pred_list, candidates_list, cutoff, n_candidates)
+  133|     if not y_true_list:
+  134|         nan = float("nan")
+  135|         return {f"top@{cutoff}": nan, f"Retrieval@{n_candidates}": nan,
+  136|                 f"Rerank@{cutoff}": nan, "retrieval_failure": nan, "reranking_failure": nan}
+  137|     top = float(np.mean([_hit_in_candidates(t, p, cutoff, n_candidates, c)
+  138|                          for t, p, c in zip(y_true_list, y_pred_list, cands)]))
+  139|     ret = retrieval_at_k(y_true_list, y_pred_list, n_candidates, candidates_list)
+  140|     return {
+  141|         f"top@{cutoff}": top,
+  142|         f"Retrieval@{n_candidates}": ret,
+  143|         f"Rerank@{cutoff}": rerank_at_k(y_true_list, y_pred_list, cutoff, n_candidates,
+  144|                                         candidates_list),
+
+--- method/runners/compute_retrieval_recall_cumulative.py:56-74  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method/runners/compute_retrieval_recall_cumulative.py)
+   56| def _service_of(metric: str) -> str:
+   57|     return metric.split("_")[0].replace("-db", "")
+   58| 
+   59| 
+   60| def _service_truth(truth: str) -> str:
+   61|     return "_".join(truth.split("_")[:-1])
+   62| 
+   63| 
+   64| def _hit(truth_list, candidate_list, *, service_level: bool) -> int:
+   65|     if service_level:
+   66|         cand_svcs = []
+   67|         seen = set()
+   68|         for c in candidate_list:
+   69|             s = _service_of(c)
+   70|             if s not in seen:
+   71|                 cand_svcs.append(s); seen.add(s)
+   72|         truth_svcs = [_service_truth(t) for t in truth_list]
+   73|         return int(any(t in cand_svcs for t in truth_svcs))
+   74|     return int(any(t in candidate_list for t in truth_list))
+
+--- method/runners/compute_retrieval_recall_cumulative.py:135-137  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method/runners/compute_retrieval_recall_cumulative.py)
+  135|         ("RE1-OB", re1ob, True),  # service-level (RCAEval ASE'24 protocol)
+  136|         ("RE1-SS", re1ss, True),
+  137|         ("RE1-TT", re1tt, True),
+
+--- RCAEval/benchmark/evaluation.py:178-184  (D:\RCA-ext\src\RCAEval\RCAEval/benchmark/evaluation.py)
+  178|     def retrieval_service(self, budget: int = None) -> float:
+  179|         """
+  180|         Retrieval@K on the coarse-grained (service-level) ranking.
+  181|         """
+  182|         if budget is None:
+  183|             return self._anywhere_service / self.num if self._ranks else None
+  184|         return self.accuracy_service(budget)
+
+--- main.py:460-467  (D:\RCA-ext\src\RCAEval\main.py)
+  460| def print_decomposition(evaluator, depth, suffix=""):
+  461|     """Print Retrieval@K and Rerank@1 on the service-level ranking, where K is a
+  462|     retrieval depth ("all" for the whole returned ranking), not the candidate
+  463|     pool size behind --report-chance."""
+  464|     budget = None if depth == "all" else depth
+  465|     rerank = evaluator.rerank_service(1, budget)
+  466|     print(f"Retrieval@{depth}{suffix}:".ljust(12), round(evaluator.retrieval_service(budget), 2))
+  467|     print(f"Rerank@1{suffix}:".ljust(12), "n/a (no answer within the first K)" if rerank is None else round(rerank, 2))
+
+--- method/algorithms/rca/candidate_selection.py:18-43  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method/algorithms/rca/candidate_selection.py)
+   18| def score_metrics(scenario: FaultScenario) -> list[tuple[str, float]]:
+   19|     """Score each metric by max RobustScaler z-score (fault vs baseline).
+   20| 
+   21|     Returns list of (metric_name, score) sorted descending.
+   22|     """
+   23|     data = scenario.data.ffill().fillna(0)
+   24|     diag = int(scenario.diagnosis_time)
+   25|     normal = data.iloc[:diag]
+   26|     anomal = data.iloc[diag:]
+   27| 
+   28|     if normal.empty or anomal.empty:
+   29|         return [(c, 0.0) for c in data.columns]
+   30| 
+   31|     scores = []
+   32|     for col in data.columns:
+   33|         a = normal[col].to_numpy(dtype=float).reshape(-1, 1)
+   34|         b = anomal[col].to_numpy(dtype=float).reshape(-1, 1)
+   35|         try:
+   36|             scaler = RobustScaler().fit(a)
+   37|             zscores = scaler.transform(b)[:, 0]
+   38|             scores.append((col, float(np.max(zscores))))
+   39|         except Exception:
+   40|             scores.append((col, 0.0))
+   41| 
+   42|     scores.sort(key=lambda x: x[1], reverse=True)
+
+--- method/algorithms/rca/candidate_selection.py:46-77  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method/algorithms/rca/candidate_selection.py)
+   46| def detect_state_changes(
+   47|     normal: pd.DataFrame, anomal: pd.DataFrame, tol: float = 0.01,
+   48| ) -> list[tuple[str, int]]:
+   49|     """Find metrics that flipped between two discrete states (binary/ternary).
+   50| 
+   51|     Returns list of (metric, first_change_row) for metrics where:
+   52|       - The baseline has ≤5 unique values (discrete signal)
+   53|       - The fault window has a different dominant value
+   54|     """
+   55|     changes = []
+   56|     for col in anomal.columns:
+   57|         if col not in normal.columns:
+   58|             continue
+   59|         n_unique_base = normal[col].nunique()
+   60|         n_unique_fault = anomal[col].nunique()
+   61|         if n_unique_base > 5 and n_unique_fault > 5: # only consider discrete signals with nunique values ≤ 5
+   62|             continue
+   63| 
+   64|         base_mode = normal[col].mode().iloc[0] if not normal[col].mode().empty else None
+   65|         if base_mode is None:
+   66|             continue
+   67| 
+   68|         fault_mode = anomal[col].mode().iloc[0] if not anomal[col].mode().empty else None
+   69|         if fault_mode is None or abs(fault_mode - base_mode) < tol:
+   70|             continue
+
+--- method/algorithms/rca/candidate_selection.py:80-109  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method/algorithms/rca/candidate_selection.py)
+   80| def detect_earliest_onset(
+   81|     normal: pd.DataFrame, anomal: pd.DataFrame, z_low: float = 1.5,
+   82| ) -> list[tuple[str, int]]:
+   83|     """Find metrics with early anomaly onset even at a low z-threshold.
+   84| 
+   85|     Returns list of (metric, first_onset_row) sorted by onset time.
+   86|     """
+   87|     b_mean = normal.mean()
+   88|     b_std = normal.std()
+   89| 
+   90|     onsets = []
+   91|     for col in anomal.columns:
+   92|         if col not in normal.columns:
+   93|             continue
+   94|         std_val = b_std.get(col, 0.0)
+   95|         if pd.isna(std_val) or std_val == 0:
+   96|             bval = b_mean.get(col, 0.0)
+   97|             if pd.isna(bval):
+   98|                 continue
+   99|             changed = anomal[col][(anomal[col] - bval).abs() > 1e-4]
+  100|             if not changed.empty:
+  101|                 onsets.append((col, int(changed.index[0])))
+  102|         else:
+  103|             z = ((anomal[col] - b_mean[col]) / std_val).abs()
+  104|             exceeds = z[z >= z_low]
+
+--- method/algorithms/rca/candidate_selection.py:112-125  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method/algorithms/rca/candidate_selection.py)
+  112| def _split_k_three(k: int) -> tuple[int, int, int]:
+  113|     """Allocate K across three signals: mag ≥ ons ≥ stc, sum=K.
+  114| 
+  115|     Convention: floor(K/3) base, distribute remainder mag→ons→stc.
+  116|       K=5  → 2 mag + 2 ons + 1 stc
+  117|       K=10 → 4 mag + 3 ons + 3 stc
+  118|       K=15 → 5 mag + 5 ons + 5 stc
+  119|     """
+  120|     base = k // 3
+  121|     rem = k % 3
+  122|     k_mag = base + (1 if rem >= 1 else 0)
+  123|     k_ons = base + (1 if rem >= 2 else 0)
+  124|     k_stc = base
+  125|     return k_mag, k_ons, k_stc
+
+--- method/runners/run_llm_balanced.py:265-273  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method/runners/run_llm_balanced.py)
+  265|     p.add_argument("--model", default="openai/gpt-oss-120b")
+  266|     p.add_argument("--context", choices=["none", "light", "all"], default="all",
+  267|                    help="Domain-knowledge level. 'all' runs both none and light.")
+  268|     p.add_argument("--workers", type=int, default=8,
+  269|                    help="Concurrent LLM calls per DK level. Default 8.")
+  270|     p.add_argument("--n-runs", type=int, default=3,
+  271|                    help="Number of independent runs per (DK level, scenario).")
+  272|     p.add_argument("--run-idx", type=int, default=0)
+  273|     p.add_argument("--temperature", type=float, default=1.0)
+
+--- method/runners/_common.py:270-270  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method/runners/_common.py)
+  270|         kw = dict(temperature=temperature, max_tokens=4096)
+
+--- method/algorithms/rca/rcd.py:5-5  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method/algorithms/rca/rcd.py)
+    5| from pyrca.analyzers.rcd import RCD, RCDConfig
+
+--- epsilon_diagnosis.py:5-5  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method\algorithms\rca\epsilon_diagnosis.py)
+    5| from pyrca.analyzers.epsilon_diagnosis import EpsilonDiagnosis, EpsilonDiagnosisConfig
+
+--- circa.py:22-28  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method\algorithms\rca\circa.py)
+   22| from circa.alg.ci import DAScorer, RHTScorer
+   23| from circa.alg.ci.anm import ANMRegressor
+   24| from circa.alg.common import Model
+   25| from circa.graph.common import StaticGraphFactory
+   26| from circa.model.case import CaseData
+   27| from circa.model.data_loader import MemoryDataLoader
+   28| from circa.model.graph import MemoryGraph, Node
+
+--- baro.py:19-28  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method\algorithms\rca\baro.py)
+   19| def _rcaeval_baro(raw_df, inject_time: int, dataset_name: str) -> list[str]:
+   20|     """Call the original RCAEval baro() function directly for exact parity."""
+   21|     import sys
+   22|     from pathlib import Path
+   23|     rcaeval_root = Path(__file__).resolve().parents[3] / "RCAEval"
+   24|     if str(rcaeval_root) not in sys.path:
+   25|         sys.path.insert(0, str(rcaeval_root))
+   26|     from RCAEval.e2e.baro import baro
+   27|     result = baro(raw_df, inject_time=inject_time, dataset=dataset_name)
+   28|     return result["ranks"]
+
+--- method/algorithms/cd/per_scenario.py:58-58  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method/algorithms/cd/per_scenario.py)
+   58| def drop_near_constant(df: pd.DataFrame, threshold: float = 0.95) -> pd.DataFrame:
+
+--- method/algorithms/cd/per_scenario.py:76-76  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method/algorithms/cd/per_scenario.py)
+   76|     df = drop_near_constant(df)
+
+--- method/algorithms/cd/per_scenario.py:165-165  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method/algorithms/cd/per_scenario.py)
+  165|     cleaned = _drop_collinear(cleaned)
+
+--- method/algorithms/cd/per_scenario.py:184-184  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method/algorithms/cd/per_scenario.py)
+  184| def _drop_collinear(df: pd.DataFrame, abs_corr_threshold: float = 0.9999) -> pd.DataFrame:
+
+--- method/experiments/tdet_sensitivity.py:42-43  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method/experiments/tdet_sensitivity.py)
+   42| CPS_DELTAS = [-15, -5, 0, 5, 15]        # minutes
+   43| RCA_DELTAS = [-2, -1, 0, 1, 2]          # minutes
+
+--- main.py:320-330  (D:\RCA-ext\src\RCAEval\main.py)
+  320|     num_node = len(data.columns) - 1
+  321| 
+  322|     # candidate counts for --report-chance, taken after the same preprocessing the
+  323|     # methods apply below (drop_time + drop_constant, dk_select_useful stays False),
+  324|     # so the floor is over the set the method actually ranked
+  325|     _pre_cols = preprocess(data.copy(), dataset=args.dataset, dk_select_useful=False).columns
+  326|     n_candidates_map[basename(rp)] = {
+  327|         "service": len({c.split("_")[0].replace("-db", "") for c in _pre_cols if c != "time"}),
+  328|         "metric": len([c for c in _pre_cols if c != "time"]),
+  329|     }
+  330| 
+
+--- compute_retrieval_recall_cumulative.py:56-57  (D:\RCA-ext\work\T-018\nguon\DecompRCA\method\runners\compute_retrieval_recall_cumulative.py)
+   56| def _service_of(metric: str) -> str:
+   57|     return metric.split("_")[0].replace("-db", "")
+
+---------------------------------------- dòng văn bản PDF decomprca.txt
+
+[PDF dòng 143-143]
+  143| the rest. Two structural obstacles make this entanglement particularly costly on industrial telemetry.
+
+[PDF dòng 4-9]
+    4| Hada Melino Muhammad1 Luan Pham1 Laure Barri�re2
+    5| Sachin Shetty2 Leonardo Pulga2 Flora D. Salim1
+    6| 1University of New South Wales 2Baker Hughes
+    7| 
+    8| {hada_melino.muhammad, luan.pham, flora.salim}@unsw.edu.au
+    9| {laure.barriere, sachin.shetty, leonardo.pulga}@bakerhughes.com
+
+[PDF dòng 58-70]
+   58| Every RCA pipeline has, at least implicitly, two stages: a retriever that produces a candidate set C and
+   59| a reranker that orders C. The fraction of true causes inside C, which we call Retrieval@K for a set of
+   60| size K, is a hard ceiling on any downstream ranker, since no reranker can recover a candidate it was
+   61| never shown, yet existing evaluation collapses both stages into a single score, making it impossible to
+   62| determine which stage is responsible for failure. In propagating-fault systems, deviation magnitude
+   63| alone is insufficient for retrieval since the root cause is suppressed beneath downstream effects, and
+   64| the recency assumption fails because anomaly detection fires on detected deviations rather than
+   65| true fault onset. Structure-based methods [10�12] face a further obstacle: ranking on their learned
+   66| causal graphs is unreliable, whether the graphs are learned on short fault windows, on retrieved pools
+   67| guaranteed to contain the cause, or on multi-day normal corpora (Section 7 and Appendix J), and
+   68| expert-specified graphs are rarely available in practice [11]. The result is a literature where a method
+   69| that never retrieves the true cause and one that retrieves but mis-ranks it appear identical under any
+   70| rank-based metric, yet require categorically different fixes.
+
+[PDF dòng 427-431]
+  427| failure. Both apply to any method that outputs a ranking: take C to be the first K items of its
+  428| 
+  429| final ranking, so Retrieval@K = top@K and Rerank@k = top@k / top@K. For a two-stage
+  430| 
+  431| pipeline whose reranker only reorders the retrieved set, this C is exactly the retrieved set. We use
+
+[PDF dòng 366-373]
+  366| We evaluate on four operational benchmarks spanning two distinct domains. RCAEval [5] is a
+  367| microservice benchmark with three suites, Online Boutique (RE1-OB), Sock Shop (RE1-SS), and
+  368| Train Ticket (RE1-TT), each with n=125 scenarios and evaluated at the service level. WADI [1]
+  369| (n=14), SWaT [2] (n=36), and HVAC [4] (n=48) are industrial control benchmarks covering water
+  370| distribution, water treatment, and building management respectively, evaluated at the metric level. The
+  371| four datasets differ in system scale, fault type, sampling rate, and ground-truth granularity, providing a
+  372| diverse testbed for evaluating retrieval and reranking across direct-fault and propagating-fault regimes.
+  373| Full dataset details are provided in Appendix B.
+
+[PDF dòng 323-360]
+  323| 5 A Two-Stage Remedy: Retrieval Then Reranking
+  324| 
+  325| The decomposition makes the two failure modes independently addressable. We instantiate a two-
+  326| stage pipeline (Figure 1) as a validation instrument: closing each gap requires categorically different
+  327| interventions, and progress on one does not substitute for the other.
+  328| 
+  329| 5.1 Stage 1: Multi-Signal Retrieval
+  330| 
+  331| Retrieval produces a candidate set C of at most K sensors that maximizes 1[m  C]. Magnitude
+  332| alone is insufficient when downstream sensors are rank-displaced above the cause, so we combine
+  333| three complementary signals, each targeting a distinct fault regime (Section 7).
+  334| 
+  335| Deviation magnitude mag: normalized shift of each sensor from its baseline window. Effective
+  336| when the cause produces the largest amplitude change (direct faults).
+  337| 
+  338| Earliest onset ons: each sensor's first-deviation timestamp within the fault window, earliest first.
+  339| Recovers the precedence signal of Section 4.1 when amplitude at the source is suppressed (HVAC-
+  340| style gradual drifts).
+  341| 
+  342| Discrete state-change stc: whether a discrete-valued sensor leaves its baseline mode, ranked by
+  343| when it first does. Targets binary actuator or mode-switch faults whose signature is a discrete event
+  344| rather than a continuous shift (SWaT-style abrupt transitions).
+  345| 
+  346| The budget K is split evenly across the signals unless noted, and the deduplicated union forms C
+  347| (|C|  K). These three signals are illustrative, not a fixed prescription: each targets a regime we
+  348| observed in our benchmarks, and a system that surfaces faults through a different signature (e.g.,
+  349| spectral shifts, correlation breaks) would warrant adding the corresponding scorer.
+  350| 
+  351| 5.2 Stage 2: LLM Reranking
+  352| 
+  353| Given C, the reranker answers a different question: which candidate is most likely the true cause?
+  354| For each si  C we build an evidence record (deviation magnitude, time of first onset, baseline and
+  355| fault-window means with absolute and relative shift), pass all records in a single prompt to an LLM,
+  356| and read off the returned permutation . An optional domain-knowledge document D describing
+  357| system architecture and propagation pathways is injected into the system prompt; unlike graph-based
+  358| methods, the reranker accepts D in informal natural language without requiring formalization as a
+  359| causal graph. The pipeline is unsupervised, uses no labeled fault traces, and runs a single configuration
+  360| across all datasets (Appendix A).
+
+[PDF dòng 979-981]
+  979| tdet, and the ground-truth root-cause metric(s). tdet is the labeled attack start (WADI, SWaT), the
+  980| injection time (RCAEval), or the first occupied row of the fault day (HVAC). Every method scores
+  981| the same baseline and fault windows, split at tdet.
+
+[PDF dòng 540-556]
+  540| On industrial CPS, no graph-based method beats the best statistical baseline. CIRCA, PageRank,
+  541| and RandomWalk over per-scenario PC/FCI graphs all achieve top@1  0.214 across the three CPS
+  542| benchmarks (best graph row 0.214 on WADI, tying BARO; 0.111 on SWaT and 0.104 on HVAC,
+  543| below BARO's 0.194 and -Diagnosis's 0.146). The decomposition explains why: per-scenario graph
+  544| construction drops the ground-truth cause in some scenarios (its near-constant and collinearity filters
+  545| remove it in 1/14 WADI, 2/36 SWaT, and 12/48 HVAC scenarios; retrieval failure), and graph-based
+  546| scoring (whether unweighted centrality or CIRCA's regression-based hypothesis test) correlates
+  547| poorly with the manipulated sensor on the surviving pool (reranking failure). Both failure modes
+  548| compound, leaving graph-based methods no better than the best statistical baseline despite their
+  549| additional structural machinery. Nor is it a matter of graph size or window length: graphs fitted on
+  550| 15-node pools that provably contain the cause still do not clearly beat the best statistical baseline on
+  551| CPS (best graph row 0.231 vs. BARO 0.308 on WADI, 0.083 vs. RCD 0.188 on HVAC, and 0.200,
+  552| tying BARO, on SWaT) while lifting CIRCA on microservices (RE1-OB 0.576  0.720), and global
+  553| graphs learned from multi-day normal-operation corpora do not help either (top@1  0.214 on CPS,
+  554| no better than per-scenario graphs). Their residual failure is reranking-dominated: the cause is in the
+  555| learned graph in 0.71 (WADI) and 0.86 (SWaT) of scenarios but ranked first in at most 0.214 and
+  556| 0.083 (Appendix J).
+
+[PDF dòng 1274-1278]
+ 1274| seeded random draw of K-1 non-cause sensors plus the cause) was also run as a stress test. Under
+ 1275| it a baseline beats the LLM in three cells: RE1-TT by 2.7 pp (BARO 0.912 vs. 0.885); SWaT by
+ 1276| 3.8 pp (CIRCA-FCI, 0.400 vs. 0.362, also above BARO's 0.286, the one setup where a graph method
+ 1277| beats the best statistical baseline); and RE1-SS by 18.4 pp, where the draw strips the culprit service's
+ 1278| corroborating resource metrics so only an orphaned latency symptom remains, which we attribute to
+
+[PDF dòng 633-637]
+  633| as it did for domain knowledge. Nevertheless, these findings come with limitations: the propagating-
+  634| fault benchmarks are small and cover only water and building systems, the CPS gains assume a
+  635| detection timestamp accurate to better than 5 minutes, the retriever's settings were fixed on the same
+  636| benchmarks, the domain-knowledge document is not yet ingested adaptively, and the LLM reranker is
+  637| nondeterministic. In deployment, faster diagnosis can shorten incidents in safety-critical infrastructure
+
+[PDF dòng 52-52]
+   52| 40th Conference on Neural Information Processing Systems (NeurIPS 2026). Track on Evaluations and Datasets.
+
+[PDF dòng 583-605]
+  583| Table 4: Retrieval-controlled top@1 (true cause present in every pool). BB = best of nine baselines
+  584| on identical pools;  = best LLM column minus BB, in pp. WADI/SWaT n=13/35 (causes outside
+  585| the evaluated sensor set cannot be pinned). Full grids in Appendix G.
+  586| 
+  587| Retriever pool (K=15)                   All candidates
+  588| 
+  589| Group BB LLM (no DK) LLM (with DK)  BB LLM (no DK)
+  590| 
+  591| WADI    0.308  0.410�0.044  0.436�0.089  +12.8  0.231  0.385�0.077     +15.4
+  592| SWaT    0.200  0.229�0.029  0.267�0.017  +6.7   0.200  0.210�0.017     +1.0
+  593| HVAC    0.188  0.188�0.055  0.326�0.012  +13.9  0.146  0.299�0.032     +15.3
+  594| RE1-OB  0.784  0.883�0.005  0.891�0.012  +10.7  0.784  0.896�0.014     +11.2
+  595| RE1-SS  0.856  0.859�0.009  0.928�0.000  +7.2   0.856  0.877�0.005     +2.1
+  596| RE1-TT  0.560  0.688�0.024  0.741�0.009  +18.1  0.560  0.795�0.020     +23.5
+  597| 
+  598| Mean 0.483     0.543        0.598        +11.6 0.463   0.577           +11.4
+  599| 
+  600| cause is placed). With domain knowledge, which no baseline can consume, it leads the best same-pool
+  601| baseline on every benchmark, by +6.7 to +18.1 pp (Table 4, ). The all-candidates column, run
+  602| without DK like the baselines, varies only the pool size, and its effect is dataset-dependent: on
+  603| WADI and SWaT the LLM gets worse than at K=15 (WADI 0.410  0.385, SWaT 0.229  0.210;
+  604| plausibly as structured distractors), while on HVAC and the microservices it is benign to helpful
+  605| (HVAC 0.188  0.299, RE1-OB 0.883  0.896, RE1-TT 0.688  0.795).
+
+[PDF dòng 104-105]
+  104| � A design implication. Anomaly detection and RCA must be co-designed: the anomaly detector
+  105| determines the retrieval substrate, and misalignment caps accuracy regardless of reranker quality.
+
+[PDF dòng 472-472]
+  472| RE1-TT (n=125) 0.560       0.91    0.653�0.024 0.09  0.26       0.72
+
+[PDF dòng 4-4]
+    4| Hada Melino Muhammad1 Luan Pham1 Laure Barri�re2

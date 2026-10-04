@@ -28,7 +28,7 @@ Task này không trả lời câu hỏi nghiên cứu nào và không chọn dat
 | N-Sigma (RCA) | B: Bảng 3 bài BARO, N-Sigma[t_inject] | **Khớp** với `--length 10`; lệch với `--length 20` (đã tìm ra nguyên nhân) | ≤ 0,004 mỗi ô với `--length 10`; DELAY lệch −0,26 với `--length 20` |
 | CIRCA-PC | B: Bảng 2, 3 bài TORAI; Bảng 3 bài BARO | **Lệch ở mức ô** (loại B), chưa tìm ra đủ nguyên nhân | với cửa sổ 20 (cấu hình bổ sung; ứng viên cấu hình bài TORAI, chưa xác nhận), AVERAGE lệch −0,010 (OB), +0,018 (SS), nhưng có ô lệch tới ±0,08; trên fse AVERAGE lệch +0,064 / −0,028, có ô tới +0,148 |
 | RCD | A: `docs/SETUP.md` (RE1-OB); B: Bảng 2, 3 bài TORAI | **Khớp mốc A** theo tiêu chí AVERAGE (mốc là 1 lần chạy, không có ô AVERAGE nên so với trung bình 5 ô; 3/5 ô mốc nằm ngoài khoảng 3 lần của tôi); mốc B: khớp ở SS, lệch ở OB (cấu hình SPEC); chưa tìm ra nguyên nhân | RE1-OB AVERAGE +0,009 (cửa sổ 10, ×3); torai-OB −0,063, torai-SS −0,037 (cửa sổ 10); torai-SS +0,094 (cửa sổ 20) |
-| TORAI | A: `docs/TORAI.md` (OB); B: Bảng 2, 3 bài TORAI | **Khớp** | AVERAGE Avg@5 lệch +0,003 (A), −0,017 (B, OB), +0,011 (B, SS) |
+| TORAI | A: `docs/TORAI.md` (OB); B: Bảng 2, 3 bài TORAI | **Khớp số công bố** (xem T-016: lõi nhân quả gần như không đóng góp ở cấu hình này) | AVERAGE Avg@5 lệch +0,003 (A), −0,017 (B, OB), +0,011 (B, SS) |
 | N-Sigma phát hiện | B: Bảng 2 bài BARO | **OB: biến thể full khớp, biến thể w300 (chép đúng `reproduce_bocpd`) lệch nhỏ; SS lệch** (chưa tìm ra nguyên nhân) | OB full P −0,019, F1 −0,015; OB w300 P −0,025, F1 −0,020; SS P −0,039, F1 −0,035 |
 | GDN | C: không có số mốc | **Không có mốc**; chạy ổn định | loss giảm, hai lần giống hệt, điểm hữu hạn |
 
@@ -53,7 +53,7 @@ Minh duyệt (03/10/2026, LOG phiên 2) chạy thêm cấu hình cửa sổ củ
 - **BARO, N-Sigma:** giải thích toàn bộ phần lệch, mọi ô khớp ≤ 0,006 (mục 3, 4).
 - **CIRCA trên torai:** giải thích phần lớn ở AVERAGE, nhưng không giải thích hết từng ô (mục 5).
 - **CIRCA trên fse:** không giải thích được (mục 5).
-- **RCD:** chưa phân xử được. Ở torai-SS (đủ 90 ca), cả cửa sổ 10 lẫn 20 đều không tái lập được số của bài, nhưng ảnh hưởng của cửa sổ nói chung chưa loại được. Ở torai-OB, cửa sổ 20 chưa đủ ca (mục 6).
+- **RCD:** chưa phân xử được. Ở torai-SS (đủ 90 ca), cả cửa sổ 10 lẫn 20 đều không tái lập được số của bài, nhưng ảnh hưởng của cửa sổ nói chung chưa loại được. Ở torai-OB, cửa sổ 20 đủ 90 ca (T-016) cho 0,742 so với 0,74 của bài; nhưng torai-SS không khớp ở cả hai cửa sổ, nên vẫn chưa phân xử được cửa sổ của bài cho RCD.
 
 Đây là lựa chọn có ảnh hưởng lớn: đổi cửa sổ làm một ô N-Sigma đổi 0,26, và làm AVERAGE của RCD đổi 0,13.
 
@@ -226,7 +226,7 @@ Lệnh `main.py --method rcd`; nguồn `cham/bang-so-sanh.md`, `cham/rcd-torai-o
 | RE1-OB, `--length 10` (cửa sổ lúc tác giả ghi mốc), ×3, `py38-rcdlock` | A: `docs/SETUP.md` (1 lần), trung bình 5 ô 0,61 | 0,619 (+0,009); 0,616 / 0,626 / 0,614 | DISK 0,757 so với 0,68 (+0,077); CPU 0,869 so với 0,94 (−0,071; các lần 0,808–0,920); LOSS các lần 0,400–0,600 |
 | RE1-OB, `--length 20` (mặc định hiện tại; SPEC), ×1, `py38-rcdlock` | như trên | 0,634 (+0,024) | MEM 0,824 so với 0,67 (+0,154) |
 | torai-OB, `--length 10` (SPEC), ×3, `py38-rcd` | B: Bảng 2 bài TORAI, Metric, A5 AVG 0,74 | 0,677 (**−0,063**); 0,658 / 0,702 / 0,671 | MEM 0,578 so với 0,81 (−0,232; các lần 0,547–0,600); DISK các lần 0,640–0,840 |
-| torai-OB, `--length 20` (cấu hình bổ sung Minh duyệt), ×3 | như trên | **không so được với bài**: mỗi lần bị dừng ở 3 giờ (Q-40) với 46/90 ca | chỉ so ghép cặp trên 46 ca chung (checkoutservice 18, currencyservice 18, emailservice 10; theo lỗi CPU 9, DELAY 9, DISK 9, LOSS 7, MEM 6, SOCKET 6): AVERAGE 0,857 so với 0,758 của `--length 10` cùng ca (+0,099) |
+| torai-OB, `--length 20` (cấu hình bổ sung Minh duyệt), ×3 | như trên | **không so được với bài**: mỗi lần bị dừng ở 3 giờ (Q-40) với 46/90 ca. T-016 chạy đủ 90 ca trên EC2 (1 lần, seed 0): 0,742 (+0,002); 46 ca chung 0,865 so với 0,857 (TB 3 lần ở đây) (`results/T-016/diem-mo-t006.md`) | chỉ so ghép cặp trên 46 ca chung (checkoutservice 18, currencyservice 18, emailservice 10; theo lỗi CPU 9, DELAY 9, DISK 9, LOSS 7, MEM 6, SOCKET 6): AVERAGE 0,857 so với 0,758 của `--length 10` cùng ca (+0,099) |
 | torai-SS, `--length 10` (SPEC), ×3 | B: Bảng 3 bài TORAI, Metric, A5 AVG 0,57 | 0,533 (−0,037); 0,540 / 0,518 / 0,542 | DELAY 0,462 so với 0,64 (−0,178); DISK −0,166 |
 | torai-SS, `--length 20` (cấu hình bổ sung Minh duyệt), ×3 | như trên | 0,664 (**+0,094**); 0,649 / 0,656 / 0,687 | MEM 0,618 so với 0,36 (+0,258); CPU +0,236 |
 
@@ -245,7 +245,7 @@ Nguyên nhân khả thi của lệch trên torai (Q-33):
   - Môi trường: `py38-rcd` và `py38-rcdlock` cùng bản causal-learn, numpy, pandas, scikit-learn, scipy, và cùng 2 file vá RCD dùng (`moi-truong.md`). Chưa chạy cùng khối bằng hai môi trường; chi phí ~1 giờ mỗi khối.
   - Ngẫu nhiên: bài TORAI lấy trung bình 5 lần ("we repeat each experiment five times and report the average results", §4.2); seed chưa xác định. Ba lượt của task cho khoảng giữa các lần tới 0,20 ở một ô và 0,044 ở AVERAGE (torai-OB cửa sổ 10). Con số đó chỉ mô tả biến thiên quan sát được, không phải giới hạn của phân phối, nên chưa phân xử được phần lệch do ngẫu nhiên.
   - Một cấu hình khác của tác giả mà bài không ghi.
-  - Windows thay vì Linux.
+  - Windows thay vì Linux: đã loại cho TORAI và RCD ở T-016 (cùng seed, thứ hạng giống hệt; `results/T-016/diem-mo-t006.md`).
 
 ## 7. TORAI
 
@@ -261,6 +261,7 @@ Nguyên nhân khả thi của lệch trên torai (Q-33):
 - Ba lần trên torai-OB cho cùng điểm. Thứ hạng giống hệt lần 1 ở 86/90 và 84/90 ca (RCD bên trong TORAI dùng `np.random` không đặt seed).
 - Ba lần trên torai-SS cho AVERAGE 0,949 / 0,951 / 0,953.
 - 0 rỗng, 0 Traceback. `cham.py` khớp `main.py` mọi ô.
+- Khớp ở đây là khớp số công bố, chưa phải chạy đúng phương pháp. T-016 đo trên cùng cấu hình: lõi RCD không nhận cột metric nào (lỗi giảm mẫu hai lần) và 176/184 cụm (OB), 171/173 (SS) rơi nhánh dự phòng về thứ tự mức nghiêm trọng (`results/T-016/giam-mau-hai-lan.md`).
 
 ## 8. N-Sigma phát hiện
 
@@ -302,7 +303,7 @@ Chỗ xử lý vì Windows: `get_save_path` đặt tên file có `|` và `:`. T�
 - **GDN không có số mốc.** Hệ quả: chỉ biết GDN chạy ổn định, không biết nó cho kết quả đúng như bài.
 - **N-Sigma phát hiện:** không biết cấu hình tác giả dùng cho `nsigma.json`. Hệ quả: lệch ở SS chưa giải thích được.
 - **Cách chạy BOCPD và N-Sigma phát hiện** của tác giả đưa mốc tiêm vào đầu vào (cắt cửa sổ quanh mốc tiêm, hoặc biên file đối xứng). Dùng được để tái lập, không dùng cho chế độ tự phát hiện ở P3 (luật cứng 6).
-- **Windows thay vì Linux** cho RCD, CIRCA: chưa so trên cùng máy Linux.
+- **Windows thay vì Linux** cho RCD, CIRCA: chưa so trên cùng máy Linux (đã kiểm cho RCD, TORAI ở T-016: cùng seed, thứ hạng giống hệt; CIRCA chưa).
 - **RCD torai-OB với cửa sổ 20 chỉ có 46/90 ca.** Mỗi lần bị dừng ở 3 giờ (Q-40, Minh quyết giữ ngân sách). Hệ quả: chưa có số RCD torai-OB đủ 90 ca ở cấu hình của bài, chỉ có so sánh trên 46 ca chung.
 - **Cấu hình CIRCA của bài BARO** (có thể là repo CIRCA gốc với `pcalg` của R): chưa dựng. Hệ quả: lệch của CIRCA trên fse chưa giải thích.
 
@@ -310,7 +311,7 @@ Chỗ xử lý vì Windows: `get_save_path` đặt tên file có `|` và `:`. T�
 
 1. **Độ dài cửa sổ cho P3. Minh quyết (04/10/2026): chưa chốt; chốt trong task tổng hợp G1, cùng với chọn dataset, chia dev/test và cách dùng nhãn.** Theo lời Minh: hiện chưa đủ căn cứ để chọn một con số cụ thể; 10 và 20 phút chỉ là các cấu hình đã dùng để kiểm tái lập. Số liệu liên quan: lựa chọn này làm đổi kết quả nhiều (một ô N-Sigma đổi 0,26; AVERAGE RCD đổi 0,13). Cửa sổ 10 tái lập được RobustScorer[t_inject], N-Sigma[t_inject] của bài BARO và là cấu hình lúc ghi mốc `SETUP.md`; cửa sổ 20 tái lập được dòng BARO của bài TORAI (các baseline khác chưa xác nhận); TORAI dùng 10 theo `docs/TORAI.md`.
 2. **T-007.** Mốc MicroRank, TraceRCA của T-007 (dòng Trace Bảng 2 bài TORAI) nhiều khả năng chạy với cửa sổ 20, trong khi T-007 dùng 10. Minh quyết có cho T-007 kiểm thêm không. **Minh quyết (04/10/2026): T-007 không kiểm thêm cửa sổ 20.**
-3. **RCD torai-OB cửa sổ 20 chưa đủ ca.** Nếu cần số đủ 90 ca, có thể chạy riêng khi máy rảnh. Ước lượng chưa kiểm: 1,5–3 giờ mỗi khối nếu chạy một mình.
+3. **RCD torai-OB cửa sổ 20 chưa đủ ca.** Nếu cần số đủ 90 ca, có thể chạy riêng khi máy rảnh. Ước lượng chưa kiểm: 1,5–3 giờ mỗi khối nếu chạy một mình. Đã làm ở T-016: 90/90 ca trên EC2 trong 5 624 s, Avg@5 0,742 (`results/T-016/diem-mo-t006.md`).
 4. **CIRCA lệch ở mức ô, và trên fse.** Có hai hướng: (a) chấp nhận là lệch loại B, kèm các nguyên nhân khả thi ở mục 5; (b) dựng CIRCA gốc của NetManAIOps (cần cài R và `pcalg`) để kiểm giả thuyết bài BARO dùng code gốc. Chi phí của (b) chưa ước lượng.
 5. **Chạy lại trên Linux.** SPEC ghi: nếu một mục lệch, đề xuất chạy lại mục đó trên EC2 trong T-007. Hai mục ứng viên là RCD torai-OB và CIRCA. Minh quyết.
 6. **N-Sigma phát hiện, SS lệch 0,04.** Chính file `nsigma.json` của tác giả cũng không ra số Bảng 2 cho SS. Đề xuất: chấp nhận, ghi là lệch chưa giải thích.

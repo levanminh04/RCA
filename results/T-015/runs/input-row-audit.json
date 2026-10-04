@@ -1,0 +1,31 @@
+{
+  "unchanged_six_rows_exact": true,
+  "header_exact": true,
+  "original_row_only_changed": true,
+  "new_original": [
+    "TraceRCA",
+    "gốc b9087c7",
+    "khai phá trace/điểm nghi ngờ",
+    "invocation source-target, trace_id, latency, http_status; cache reference và feature được chọn",
+    "ENABLE_ALL_FEATURES=True mới thêm CPU/RAM/I/O/network; mặc định False",
+    "pickle DataFrame từ run_invo_encoding.py: source target start_timestamp end_timestamp trace_label trace_id latency http_status trace_start_timestamp trace_end_timestamp; detector thêm predict; chua_kiem: đơn vị raw latency/timestamp vì nhánh False giữ raw và module data.trainticket.download không có trong clone",
+    "không graph propagation ở main enable_PRFL=False; tập source-target và chiều gọi tham gia điểm",
+    "window/history do caller chọn; core không đọc inject_time",
+    "cache mean/std từng source-target-feature; std dân số có sàn .1; cache thiếu tự học từ current; chua_kiem: số mẫu/history tối thiểu tác giả bảo đảm",
+    "core không học nhãn root; builder prepare_model còn đòi NPZ trace labels cho RF/MLP baseline không dùng ở core localization",
+    "service source/target; pattern singleton; không phải operation/interface",
+    "threshold=1σ hai phía; support=.1; không ngưỡng min_confidence tường minh; k=100 mức điểm; PRFL=False; loại gateway; main noise=0 vẫn hạ cờ ngẫu nhiên1% trong trace abnormal với seed2021",
+    "có: distribution/support/mining phụ thuộc window",
+    "chua_kiem: pipeline gốc chưa chạy trên RE2; schema upstream/module download thiếu; nhánh tạo model còn phụ thuộc thư viện cũ; đã đọc code đúng revision",
+    "selection root/path; lịch sử chọn theo inject; trace labels đi vào builder RF/MLP phụ; core không lấy root_cause/fault_type để tính điểm",
+    "default FEATURE_NAMES latency/http_status; encoder bỏ source=target; cache thiếu đổi nghĩa reference; xem tracerca-rcaeval.md §5,9; khác harmonic mean RCAEval và Jaccard/mining gốc; DC01 trong dinh-chinh-task-cu.md"
+  ],
+  "sources": [
+    "TraceRCA/run_invo_encoding.py:31-99",
+    "TraceRCA/trainticket_config.py:1-13",
+    "TraceRCA/run_anomaly_detection_invo.py:38-60,116-118",
+    "TraceRCA/run_anomaly_detection_prepare_model.py:15-35,52-59",
+    "TraceRCA/run_localization_association_rule_mining_20210516.py:23-34,41-74,127-145,357-377"
+  ],
+  "upstream_download_module_missing": true
+}

@@ -1,0 +1,76 @@
+"""T-018: ghi results/T-018/yeu-cau-dau-vao.csv (16 cột theo prompt Đợt 1). Nội dung lấy từ ho-so-gdn.md, decomprca.md.
+Chạy: py -3 tao_yeu_cau_dau_vao.py
+"""
+import csv
+
+COT = ["phuong_phap", "bien_the", "vai_tro", "tin_hieu_bat_buoc", "tin_hieu_tuy_chon", "dinh_dang_va_ten_cot_can",
+       "can_do_thi", "can_moc_su_co", "du_lieu_binh_thuong_toi_thieu", "can_nhan_de_hoc", "don_vi_xep_hang",
+       "tham_so_mac_dinh_quan_trong", "phu_thuoc_do_dai_cua_so", "chi_phi", "duong_nhan_rui_ro", "ghi_chu"]
+
+GDN_CHUNG = dict(
+    phuong_phap="GDN (d-ailin/GDN@9853899)",
+    vai_tro="bộ phát hiện bất thường mức tick (Q-30); không xếp hạng nguyên nhân",
+    tin_hieu_bat_buoc="metric đa biến, mọi cột cùng nhịp tick",
+    tin_hieu_tuy_chon="không (không dùng trace, log)",
+    dinh_dang_va_ten_cot_can="./data/<ds>/train.csv, test.csv (cột đầu là chỉ số, mỗi cột một metric; test.csv bắt buộc cột attack), list.txt (tên cột, cố định tập nút). Thiếu một tên ở test thì code chỉ in cảnh báo rồi lệch nút (util/preprocess.py:74). RE2-TT: giao 30 ca dev 317 cột, hợp 354",
+    can_do_thi="không cần đầu vào đồ thị; tự học đồ thị tương quan top-k từ embedding (GDN.py:150-163). Code không nhận đồ thị trước (ho-so mục 5 dòng 10)",
+    can_nhan_de_hoc="không cần nhãn lỗi; cần đoạn chắc là bình thường (với RCAEval: cắt bằng mốc tiêm của ca học = nhãn dev dùng để học, ho-so G8)",
+    don_vi_xep_hang="không xếp hạng; đầu ra là cờ bất thường mỗi tick và điểm lệch từng metric",
+    tham_so_mac_dinh_quan_trong="run.sh: seed 5, batch 32, w=5, dim 64, topk 5 (kể cả chính nút), out_layer_num 1, val_ratio 0.2, epoch 30, patience 15 (train.py:49), Adam lr 1e-3, epsilon 0.01, làm trơn 4 tick",
+    phu_thuoc_do_dai_cua_so="có: w=5 tick; 170/317 cột RE2-TT có đoạn lặp trung vị >= 5 s nên cửa sổ 5 s thường chỉ 1–2 giá trị (ho-so 9.3); độ nhạy theo w chua_kiem: thuộc P3",
+)
+
+ROWS = [
+    dict(GDN_CHUNG, bien_the="code mặc định (run.sh, report='best')",
+         can_moc_su_co="không khi chạy; nhưng chọn ngưỡng bằng nhãn test",
+         du_lieu_binh_thuong_toi_thieu="như biến thể report='val'",
+         chi_phi="học 30 epoch trên 3600 dòng × 333 cột: 1029 s khi máy rảnh (T-005); 59 phút cho 29 epoch khi máy bận (T-018 R1, bị dừng ở giới hạn 1 giờ); 720 dòng: 6–17 phút; chấm 1 ca + 19 đoạn 12 phút: 6–15 phút (runs/*.log). Không đo chính thức (máy chạy việc khác)",
+         duong_nhan_rui_ro="G1 nhãn test chọn ngưỡng (evaluate.py:129-158); G2 chuẩn hóa bằng thống kê cả tập test; G4 mốc tiêm ở giữa file RCAEval",
+         ghi_chu="Không dùng cho P3. F1 theo cách này là cận trên (T-006: 0,878 trên MSL)"),
+    dict(GDN_CHUNG, bien_the="code, report='val' (ngưỡng như bài)",
+         can_moc_su_co="không",
+         du_lieu_binh_thuong_toi_thieu="bài: 47 515 tick (SWaT) / 118 795 (WADI) ở 10 s. RE2-TT: không đủ ở 1 ca (720 tick: 23,6–30,7 % tick bình thường giữ ngoài bị báo động, 4 lượt) ở 5 ca (3600 tick: 10,3–11,2 %, 3 lượt); 10 ca (7200 tick): 4,95 %, 1 lượt; ho-so 9.4",
+         chi_phi="như trên",
+         duong_nhan_rui_ro="G2, G3 (ngưỡng và điểm test ở hai thang khác nhau), G4, G7 nếu bộ cột lấy theo ca test",
+         ghi_chu="Đúng câu chữ của bài về ngưỡng nhưng vẫn dùng dữ liệu test tương lai khi chuẩn hóa điểm"),
+    dict(GDN_CHUNG, bien_the="đề xuất chế độ b (bộ cột cố định, chuẩn hóa và ngưỡng từ tập kiểm định; ho-so 8.2)",
+         can_moc_su_co="không với ca được chấm",
+         du_lieu_binh_thuong_toi_thieu="chua_kiem: số ca tối thiểu chưa xác định (10 ca vẫn 45 % tick bình thường giữ ngoài bị báo động với biến thể b); với RE2-TT tỷ lệ ô bình thường mới nằm ngoài khoảng học: 23 % (1 ca), 4,9 % (5 ca), 0,6 % (10 ca) (runs/b6-lech-phan-bo.json); cần xử lý cột hằng và lệch mức trước",
+         chi_phi="như trên; chấm theo luồng nhẹ (T-005: 11,7 s cho 1436 cửa sổ)",
+         duong_nhan_rui_ro="G8 nhãn dev dùng để lấy đoạn học (phải khai ở G1); đoạn khởi động đầu luồng trên RCAEval dựa vào cách cắt file (G4)",
+         ghi_chu="Chờ WHY (de-xuat E1). Chưa có cách xử lý lệch mức thì biến thể b báo động 99,6 % (1 ca) / 93,7–99,6 % (5 ca) tick bình thường giữ ngoài; phải giải quyết tiền xử lý trước khi dùng"),
+    dict(phuong_phap="DecompRCA — bộ truy hồi đa tín hiệu (đã đọc, không chạy)", bien_the="K=15 chia 5+5+5 (mag/ons/stc)",
+         vai_tro="tạo tập ứng viên (K metric) cho bước xếp lại",
+         tin_hieu_bat_buoc="metric đa biến", tin_hieu_tuy_chon="không",
+         dinh_dang_va_ten_cot_can="bảng metric rộng, cột {service}_{metric}; cửa sổ nền và cửa sổ lỗi tách tại t_det",
+         can_do_thi="không", can_moc_su_co="có: t_det (RCAEval: mốc tiêm)",
+         du_lieu_binh_thuong_toi_thieu="cửa sổ nền của chính ca: 360–600 dòng 1 s ở RE1",
+         can_nhan_de_hoc="không", don_vi_xep_hang="metric; chấm quy về service (bỏ -db)",
+         tham_so_mac_dinh_quan_trong="K=15; z_low 1,5; rời rạc khi <= 5 giá trị; tol 1e-2 (candidate_selection.py)",
+         phu_thuoc_do_dai_cua_so="có (cửa sổ nền/lỗi quanh t_det); RCAEval lệch t_det ±2 phút đổi Retrieval@15 <= 3,2 điểm % theo bài",
+         chi_phi="rẻ (thống kê từng cột)",
+         duong_nhan_rui_ro="t_det = mốc tiêm (chế độ a); tham số chỉnh trên chính benchmark (tác giả tự nêu)",
+         ghi_chu="decomprca.md mục 1, K10. Không thuộc danh sách P1"),
+    dict(phuong_phap="DecompRCA — bộ xếp lại LLM (đã đọc, không chạy)", bien_the="gpt-oss-120b, T=1, 3 lượt; có/không tài liệu DK",
+         vai_tro="xếp hạng tập ứng viên",
+         tin_hieu_bat_buoc="bản ghi bằng chứng từng ứng viên (z-score, độ trễ khởi phát, trung bình trước/sau)",
+         tin_hieu_tuy_chon="tài liệu mô tả hệ thống (DK)",
+         dinh_dang_va_ten_cot_can="danh sách K ứng viên dạng văn bản; tên metric có nghĩa giúp ích (bảng 14 của bài)",
+         can_do_thi="không (DK có thể mô tả đường gọi bằng lời)", can_moc_su_co="có (qua bộ truy hồi)",
+         du_lieu_binh_thuong_toi_thieu="như bộ truy hồi", can_nhan_de_hoc="không",
+         don_vi_xep_hang="metric, chấm quy về service",
+         tham_so_mac_dinh_quan_trong="max_tokens 4096, không seed (run_llm_balanced.py:265-273; _common.py:270)",
+         phu_thuoc_do_dai_cua_so="gián tiếp qua bộ truy hồi",
+         chi_phi="khoảng 0,8k token vào + 1,2k token ra mỗi ca (+2k nếu có DK), 3–4 s mỗi lần gọi (bài phụ lục H); cần API trả phí",
+         duong_nhan_rui_ro="DK Train Ticket nêu đủ 5 service gốc của RE1-TT trong sơ đồ đường chính (decomprca.md K13; chưa kết luận là rò)",
+         ghi_chu="Không tất định; phản hồi LLM không được phát hành nên không tái lập được không cần API"),
+]
+
+with open(r"D:\RCA-flashticket\results\T-018\yeu-cau-dau-vao.csv", "w", newline="", encoding="utf-8") as f:
+    w = csv.DictWriter(f, fieldnames=COT)
+    w.writeheader()
+    for r in ROWS:
+        assert set(r) == set(COT), set(COT) ^ set(r)
+        assert all(str(v).strip() for v in r.values())
+        w.writerow(r)
+print(len(ROWS), "dòng")

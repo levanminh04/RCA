@@ -108,7 +108,7 @@ Kiểm: `pip check` sạch; import `torch`, `torch_geometric` và các module c�
 | Dữ liệu | Nguồn | Kích thước | Kiểm | Nơi để |
 |---|---|---|---|---|
 | `torai-data.zip` | Figshare article 31925976, file 63402423, `https://ndownloader.figshare.com/files/63402423` | 91 262 227 B | MD5 khớp `supplied_md5` của Figshare (`runs/04-tai-torai-zip.log`) | `D:\RCA-ext\dl\` |
-| Một ca giải nén từ zip trên | `torai-TT/ts-route-service_socket/1/` (5 file) | khoảng 6,4 MB | chỉ giải nén đúng thư mục này (`runs/05-liet-ke-zip.log`) | `D:\RCA-ext\data\` |
+| Một ca giải nén từ zip trên | `torai-TT/ts-route-service_socket/1/` (5 file) | khoảng 6,4 MB | chỉ giải nén đúng thư mục này (`runs/05-liet-ke-zip.log`); trùng ca dev `re2tt_ts-route-service_socket_1` đã được chứng minh ở T-016 (`results/T-016/runs/s0-cung-ca.json`) | `D:\RCA-ext\data\` |
 | `inject_time.txt` của 6 ca RCAEval | HF `phamquiluan/RCAEval`, revision `afeacb11bcc94dadfd1c8f483ee4377b2b8b614e`, đường dẫn `<ca>/inject_time.txt` | 10 B mỗi file | git blob oid khớp HF (file nhỏ không qua LFS nên HF không công bố SHA-256) (`runs/08-tai-inject-time.log`) | `D:\RCA-ext\dl\rcaeval-inject\` |
 
 Zip TORAI chứa cả các ca đang khóa. Chỉ đọc danh sách tên mục để tìm đúng ca; không giải nén và không đọc ca khác.

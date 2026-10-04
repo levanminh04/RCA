@@ -365,3 +365,8 @@ Hiểu là duyệt các mục trong "Thứ tự tôi đề xuất" của lượt
 ## Ghi chú 04/10/2026 — Claude (phiên điều phối G1)
 
 - Minh: "Duyệt Q-52–54". Đã ghi nguyên văn ba dòng Q-52, Q-53, Q-54 ở mục "Đề xuất dòng ghi docs/DECISIONS.md" phía trên vào `docs/DECISIONS.md`. Cập nhật dòng T-006 trong STATE.
+
+## Ghi chú 04/10/2026 — Claude (phiên T-016), Minh duyệt
+
+- Đính chính (T-016, `results/T-016/dinh-chinh-task-cu.md` D2): câu "(bài TORAI nói metric lấy lại mẫu 15 s)" ở ghi chú chuyển từ T-005 không đúng: bài không nêu chu kỳ; 15 s có ở `RCAEval/docs/TORAI.md` và chú thích `torai.py:80`.
+- T-016 đã sửa `results/T-006/kiem-dung-dan.md` theo D3–D5 (Minh duyệt 04/10): mục 1 dòng TORAI, mục 2.1, mục 6 (dòng torai-OB cửa sổ 20, nguyên nhân Windows/Linux), cuối mục 7, mục 10, mục 11.3.
