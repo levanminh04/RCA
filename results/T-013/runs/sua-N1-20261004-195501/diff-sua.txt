@@ -1,0 +1,637 @@
+--- truoc-kiem_co_che.py
++++ results/T-013/scripts/kiem_co_che.py
+@@ -69,6 +69,26 @@
+     for c in d:
+         if c.endswith('_mem'):d[c]=d[c]/1e6
+     return d
++def independent_standard_params(x):
++    """Two-pass corrected population variance and near-constant scale.
++
++    Reimplement the pinned StandardScaler arithmetic without calling its
++    fitting/variance helpers. Count non-NaN samples, retain float64, then use
++    the theoretical variance-error bound documented by sklearn 1.6.0.
++    """
++    x=np.asarray(x,dtype=np.float64)
++    count=np.count_nonzero(~np.isnan(x))
++    if count==0:
++        return np.nan,np.nan,np.nan
++    center=np.nansum(x)/count
++    residual=x-center
++    correction=np.nansum(residual)
++    variance=(np.nansum(residual*residual)-correction*correction/count)/count
++    eps=np.finfo(np.float64).eps
++    constant=variance <= count*eps*variance+(count*center*eps)**2
++    scale=1. if constant else np.sqrt(variance)
++    return center,variance,scale
++
+ def independent_rank(d,inj,scorer,kind='re',dataset='re2-tt',cut=None):
+     a,b=(d[d.time<inj],d[d.time>=inj]) if cut is None else (d.head(cut),d.tail(len(d)-cut))
+     a=indep_pre(a.copy(),kind,dataset); b=indep_pre(b.copy(),kind,dataset)
+@@ -80,9 +100,9 @@
+             # sklearn RobustScaler _handle_zeros_in_scale(array) uses 10*eps.
+             scale_eff=1. if scale<10*np.finfo(np.float64).eps else scale
+         else:
+-            q25,q50,q75=np.nanpercentile(x,[25,50,75]); center=np.nanmean(x); scale=np.sqrt(np.nanvar(x,ddof=0)); scale_eff=1. if scale==0 else scale
++            q25,q50,q75=np.nanpercentile(x,[25,50,75]); center,variance,scale_eff=independent_standard_params(x); scale=np.sqrt(variance)
+         z=(y-center)/scale_eff; score=max(z)
+-        rows.append({'metric':c,'n_normal':len(x),'n_post':len(y),'q25':q25,'median':q50,'q75':q75,'mean':np.nanmean(x),'std_ddof0':np.sqrt(np.nanvar(x,ddof=0)),'scale_raw':scale,'scale_effective':scale_eff,'max_post':np.nanmax(y),'min_post':np.nanmin(y),'score':score,'max_abs_score':np.nanmax(np.abs(z))})
++        rows.append({'metric':c,'n_normal':len(x),'n_post':len(y),'q25':q25,'median':q50,'q75':q75,'mean':np.nanmean(x),'std_ddof0':np.sqrt(np.nanvar(x,ddof=0)) if scorer=='robust' else scale,'scale_raw':scale,'scale_effective':scale_eff,'max_post':np.nanmax(y),'min_post':np.nanmin(y),'score':score,'max_abs_score':np.nanmax(np.abs(z))})
+     ranks=[r['metric'] for r in sorted(rows,key=lambda r:r['score'],reverse=True)]
+     return rows,ranks
+ def official_rank(d,inj,scorer,kind='re',dataset='re2-tt',cut=None):
+--- truoc-kiem_ban_giao.py
++++ results/T-013/scripts/kiem_ban_giao.py
+@@ -1,7 +1,9 @@
+ """Read and verify every owned output and neutral reviewer prompt."""
+-import json,csv,ast,subprocess,hashlib,sys,re
++import json,csv,ast,subprocess,hashlib,sys,re,math
++from collections import defaultdict
+ from pathlib import Path
+ ROOT=Path('D:/RCA-flashticket');OUT=ROOT/'results/T-013';TASK=ROOT/'tasks/T-013-ho-so-baro'
++FIX=OUT/'runs/sua-N1-20261004-195501'
+ def no_constant(v):raise ValueError('Nonstandard JSON constant '+v)
+ files=sorted(OUT.rglob('*')); files=[p for p in files if p.is_file()]
+ issues=[];parse_counts={'json':0,'csv':0,'python':0,'npz':0,'markdown':0};verified=[]
+@@ -17,7 +19,7 @@
+         with p.open(encoding='utf-8-sig',newline='') as f:
+             rows=list(csv.reader(f)); assert rows and all(len(r)==len(rows[0]) for r in rows)
+         parse_counts['csv']+=1
+-        if p.name.endswith('-metric.csv'):
++        if p.name.endswith('-metric.csv') and 'official_score' in rows[0]:
+             import math
+             h=rows[0];si=h.index('score');oi=h.index('official_score')
+             for r in rows[1:]:
+@@ -40,7 +42,57 @@
+ s=json.loads((OUT/'kiem-tra.json').read_text(encoding='utf-8'));assert s['status']=='complete'
+ selected={r['case'] for r in s['selection']['selected']}
+ with (OUT/'ca-da-chay.csv').open(encoding='utf-8-sig',newline='') as f:ledger=list(csv.DictReader(f))
+-assert all(r['ca'] in selected|{'synthetic'} and r['ly_do'] in {'a','b','c'} for r in ledger)
++with (OUT/'trung-gian/cua-so-delay-variants.csv').open(encoding='utf-8-sig',newline='') as f:variants=list(csv.DictReader(f))
++assert len(variants)==100 and len({r['case'] for r in variants})==25
++delay_cases={'fse-ob/'+r['case'].rsplit('_',1)[0]+'/'+r['case'].rsplit('_',1)[1] for r in variants}
++assert all(r['ca'] in selected|delay_cases|{'synthetic'} and r['ly_do'] in {'a','b','c'} for r in ledger)
++for r in ledger:
++    if r['ca'] in delay_cases:
++        assert r['phuong_phap']=='N-Sigma independent window algebra'
++        assert Path(r['file_nguon'])==Path('D:/RCA-ext/data')/r['ca']/'simple_data.csv'
++focused=json.loads((FIX/'ket-qua.json').read_text(encoding='utf-8'))
++assert focused['status']=='pass' and len(focused['checks'])==19
++assert focused['real_metric_points_checked']==1316
++assert all(c['status']=='pass' for c in focused['checks'])
++window=json.loads((OUT/'trung-gian/cua-so-delay-summary.json').read_text(encoding='utf-8'))
++assert window['cases']==25 and window['all_endpoint_metric_ranks_exact'] and window['all_endpoint_service_ranks_exact']
++assert window['all_repeat_permutation_checks_pass']
++assert abs(window['baseline_effect_shapley_average']+window['post_effect_shapley_average']+.256)<1e-10
++assert len(window['candidate_change_cases'])==4
++R1=Path(window['run_dir'])
++for manifest_path,groups in [(R1/'manifest.json',['sources','output_files']),(FIX/'manifest.json',['tested_sources','test_outputs'])]:
++    metadata=json.loads(manifest_path.read_text(encoding='utf-8'))
++    for group in groups:
++        for entry in metadata[group]:
++            assert hashlib.sha256(Path(entry['path']).read_bytes()).hexdigest()==entry['sha256'],entry['path']
++with (R1/'per-metric.csv').open(encoding='utf-8-sig',newline='') as f:metric_rows=list(csv.DictReader(f))
++groups=defaultdict(list)
++for row in metric_rows:
++    if row['candidate']=='False':
++        assert not row['score'] and (row['normal_constant']=='True' or row['post_constant']=='True')
++        continue
++    mean,scale,maximum,score=(float(row[k]) for k in ['mean','scale_effective','max_post','score'])
++    assert abs((maximum-mean)/scale-score)<=1e-10*max(1.,abs(score))
++    var=float(row['variance_ddof0_corrected']);bound=float(row['constant_bound'])
++    assert (row['near_constant']=='True')==(var<=bound)
++    assert scale==(1. if var<=bound else math.sqrt(var))
++    groups[row['case'],row['variant']].append(row)
++rankings=json.loads((R1/'rankings.json').read_text(encoding='utf-8'))
++assert len(groups)==100
++for (case,variant),rows_by_metric in groups.items():
++    ranks=[r['metric'] for r in sorted(rows_by_metric,key=lambda r:float(r['score']),reverse=True)]
++    assert ranks==rankings[case][variant]['metric_ranks']
++    services=list(dict.fromkeys(r.split('_')[0].replace('-db','') for r in ranks))
++    assert services==rankings[case][variant]['service_ranks']
++    if variant in {'N300-A300','N360-A361'}:
++        folder='l4-nsigma-fse-ob-len10-lan1' if variant=='N300-A300' else 'l4-nsigma-fse-ob-lan1'
++        saved=Path('D:/RCA-ext/work/T-006')/folder/'output/results'/(case+'.json')
++        assert ranks==json.loads(saved.read_text(encoding='utf-8'))['0']
++with (R1/'per-case.csv').open(encoding='utf-8-sig',newline='') as f:case_rows=list(csv.DictReader(f))
++assert len(case_rows)==25
++assert abs(sum(float(r['delta_Avg5_L20_minus_L10']) for r in case_rows)/25+.256)<1e-10
++for r in case_rows:
++    assert abs(float(r['baseline_effect_shapley'])+float(r['post_effect_shapley'])-float(r['delta_Avg5_L20_minus_L10']))<1e-10
+ old=json.loads((OUT/'trung-gian/cua-so-cu.json').read_text(encoding='utf-8'));assert abs(old['difference']-.256)<1e-10
+ sources={}
+ for name,expected in [('baro','e35f4ec'),('RCAEval','259ea41')]:
+@@ -57,7 +109,10 @@
+     assert g1 in actual
+     inventory=json.loads((OUT/'danh-sach-file.json').read_text(encoding='utf-8'))
+     assert set(inventory['result_outputs'])==set(verified)
+-    all_paths=inventory['task_outputs']+inventory['result_outputs']+inventory['external_outputs']
++    # The review prompt is a frozen historical artifact. Verify it against the
++    # inventory at that handoff, then verify the correction supplement below.
++    historical_inventory=json.loads((FIX/'truoc-danh-sach-file.json').read_text(encoding='utf-8'))
++    all_paths=historical_inventory['task_outputs']+historical_inventory['result_outputs']+historical_inventory['external_outputs']
+     file_list='\n'+'\n'.join('- '+p for p in all_paths)
+     expected=common.replace('<T-xxx>','T-013').replace('<T-xxx-tên>','T-013-ho-so-baro')
+     expected=expected.replace('<danh sách>',file_list).replace('<commit gốc>','93f13d4c4a966428177e2acc287d96bc89303e92')
+@@ -70,10 +125,28 @@
+     corrected=log.split('**Khối task đúng nguyên văn, thay cho bản trích dư ở đầu LOG:**',1)[1]
+     assert task_block in corrected
+     state=(ROOT/'docs/STATE.md').read_text(encoding='utf-8-sig')
+-    assert '| T-013 | Hồ sơ BARO và bộ phát hiện | P1 | Codex | Claude | chờ phản biện (04/10/2026) | `tasks/T-013-ho-so-baro/` |' in state
++    assert '| T-013 | Hồ sơ BARO và bộ phát hiện | P1 | Codex | Claude | Đã sửa R1 và N1–N3, kiểm đạt (04/10/2026); chờ Minh duyệt đóng task | `tasks/T-013-ho-so-baro/` |' in state
+     assert json.loads((OUT/'trung-gian/kiem-adapter.json').read_text(encoding='utf-8'))['status']=='pass'
++response=(TASK/'REVIEW.md').read_bytes().split('## Phản hồi của người làm (người làm điền sau)'.encode('utf-8'))[0]
++assert hashlib.sha256(response).hexdigest()=='27ff525c10c00da3a4a7492b31084fc4712045d31257c1bafa88b053dedf0283'
++assert (TASK/'LOG.md').read_bytes().startswith((FIX/'truoc-LOG.md').read_bytes())
++state_change=json.loads((FIX/'chot-ban-giao.json').read_text(encoding='utf-8'))
++state_bytes=(ROOT/'docs/STATE.md').read_bytes()
++other_state=b''.join(line for line in state_bytes.splitlines(keepends=True) if not line.startswith(b'| T-013 |'))
++assert hashlib.sha256(other_state).hexdigest()==state_change['state_other_bytes_sha256_after']
++assert state_change['state_other_bytes_sha256_before']==state_change['state_other_bytes_sha256_after']
++before=json.loads((FIX/'manifest.json').read_text(encoding='utf-8'))['before_hashes']
++allowed_changes={'ca-da-chay.csv','cua-so-va-che-do-b.md','danh-sach-file.json','de-xuat-tai-lieu-chung.md','doi-chieu-tieu-chi.md','ho-so-bocpd.md','ho-so-nsigma-phat-hien.md','kiem-ban-giao.json','kiem-tra.json','scripts/kiem_co_che.py','scripts/kiem_ban_giao.py'}
++historical_count=0
++for path in historical_inventory['result_outputs']:
++    relative=path.removeprefix('results/T-013/')
++    if relative not in allowed_changes:
++        assert hashlib.sha256((ROOT/path).read_bytes()).hexdigest()==before[path],path
++        historical_count+=1
++for snapshot,original in [('truoc-ca-da-chay.csv','ca-da-chay.csv'),('truoc-kiem-tra.json','kiem-tra.json'),('truoc-kiem_co_che.py','scripts/kiem_co_che.py'),('truoc-danh-sach-file.json','danh-sach-file.json'),('truoc-kiem_ban_giao.py','scripts/kiem_ban_giao.py')]:
++    assert hashlib.sha256((FIX/snapshot).read_bytes()).hexdigest()==before['results/T-013/'+original]
+ diff=subprocess.check_output(['git','diff','--check','--','docs/STATE.md','tasks/T-013-ho-so-baro','results/T-013'],cwd=ROOT,text=True)
+ assert not diff
+-result={'status':'pass','result_files_read':len(files),'parse_counts':parse_counts,'checks_in_mechanism_summary':len(s['checks']),'input_csv_columns':len(header),'input_csv_rows':len(rows)-1,'ledger_rows':len(ledger),'method_cases':sorted(selected),'code_sources_unchanged':sources,'scope':'only T013 authored paths and exactly one own STATE row; unrelated concurrent changes not claimed as ours','git_diff_check':'pass','handoff_prompt_verbatim_and_inventory_complete':'## Prompt phản biện cho Claude' in log,'issues':issues}
++result={'status':'pass','result_files_read':len(files),'parse_counts':parse_counts,'checks_in_mechanism_summary':len(s['checks']),'focused_fix_checks':len(focused['checks']),'real_metric_points_rechecked':focused['real_metric_points_checked'],'R1_endpoints_checked':50,'R1_variants_checked':100,'R1_candidate_scores_recomputed':sum(map(len,groups.values())),'input_csv_columns':len(header),'input_csv_rows':len(rows)-1,'ledger_rows':len(ledger),'method_cases':sorted(selected),'arithmetic_cases_reused':sorted(delay_cases),'historical_files_unchanged':historical_count,'reviewer_body_unchanged':True,'log_append_only':True,'STATE_only_own_row_changed':True,'code_sources_unchanged':sources,'scope':'only T013 authored paths and exactly one own STATE row; unrelated concurrent changes not claimed as ours','git_diff_check':'pass','handoff_prompt_verbatim_and_inventory_complete':'## Prompt phản biện cho Claude' in log,'issues':issues}
+ (OUT/'kiem-ban-giao.json').write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')
+ print(json.dumps(result,ensure_ascii=False))
+--- truoc-ho-so-bocpd.md
++++ results/T-013/ho-so-bocpd.md
+@@ -20,7 +20,7 @@
+ q_t(r)=\tilde q_t(r)/\sum_u\tilde q_t(u).
+ \]
+ 
+-Với hazard hằng và tổng hữu hạn, \(q_t(0)=0.02\). Không thể coi riêng hàng 0 này là anomaly score biến thiên. Code quyết định bằng mode của run length.
++Với hazard hằng và tổng mass (khối xác suất trước chuẩn hóa) **dương và hữu hạn**, \(q_t(0)=0.02\). Nếu mật độ bị underflow (nhỏ đến mức máy tính lưu thành 0), tổng có thể bằng 0 dù hữu hạn; phép chia ở `_bocpd.py:220` khi đó cho NaN và không còn suy được đẳng thức trên. Không thể coi riêng hàng 0 này là anomaly score biến thiên. Code quyết định bằng mode của run length.
+ 
+ Likelihood đa biến Student-t dùng \(m=\nu-d+1\), location \(\mu\), scale \(\Sigma=(\kappa+1)S^{-1}/(\kappa m)\):
+ 
+--- truoc-ho-so-nsigma-phat-hien.md
++++ results/T-013/ho-so-nsigma-phat-hien.md
+@@ -16,7 +16,7 @@
+ a_{j,i}=\mathbf1\{|x_{j,i}-\mu_{j,i}|>3s_{j,i}\}.
+ \]
+ 
+-Mean/std bỏ qua NaN; \(n\) là số mẫu hữu hạn thích hợp của pandas. Đây là sample std (ddof=1), khác population std (ddof=0) ở N-Sigma RCA. Dữ liệu sự cố đã quan sát cũng đi vào nền bước sau; không phải chỉ học từ đoạn normal cố định.
++Mean/std bỏ qua NaN; \(n\) là số mẫu không NaN. Công thức trên cần các giá trị hữu hạn: pandas vẫn đếm `inf`, không tự loại nó; mean có thể thành `inf` và std thành NaN. Khi đó phép so sánh không còn cho cảnh báo có nghĩa. Đây là sample std (ddof=1), khác population std (ddof=0) ở N-Sigma RCA. Dữ liệu sự cố đã quan sát cũng đi vào nền bước sau; không phải chỉ học từ đoạn normal cố định.
+ 
+ Vòng ngoài theo cột rồi vòng trong theo thời gian. Vì vậy list trả về **không sắp thời gian và không bỏ trùng**. Hợp timestamp tương đương OR cảnh báo của các metric, nhưng `anomalies[0]` không nhất thiết sớm nhất. T-006 runner thêm `sorted(set(...))` tại `scripts/nsigma_phat_hien.py:64`; đó không là hành vi raw của hàm tác giả. Khi nối với scorer còn phải đổi timestamp sang index hợp lệ.
+ 
+--- truoc-doi-chieu-tieu-chi.md
++++ results/T-013/doi-chieu-tieu-chi.md
+@@ -4,13 +4,21 @@
+ |---|---|---|
+ | 1. Hồ sơ 9 mục, defaults/công thức/so hai code | Ba ho-so-*.md; source refs; checks falling/dict/defaultdataset | Đủ; bài và code tách rõ |
+ | 2. Hai ca rule trước rank; từng score; mốc A | chon-ca.json; mọi *metric.csv/ranks.json; OB-README-A-cut243; T006-moc-A-reused | Sai số normalized0 ở hai ca; top 5README khớp. Nhãn root nối sau rank |
+-| 3. Detector và edge cases | posterior NPZ, detailJSON, nsigma CSV/hits, kiem-tra.json | Posterior sai số ≤2.23e-16; Nslist khớp. Không coi sentinel/NaN/[] hoặc false alarms làPASS nghiệp vụ |
+-| 4. Window và 3 leak paths | cua-so-cu.json, service-rank-ca.csv, cua-so-va-che-do-b.md | ChênhDELAY0.256; không chốtL; phân biệt hồi cứu/online |
+-| 5. CSV/file bắt buộc | yeu-cau-dau-vao.csv 16 cột; ca-da-chay; dinh-chinh; de-xuat | Đủ; các ca thật chỉ hai ca đã chọn; baselineIQR audit không chạy phương pháp toàn tập |
+-| 6. LOG/prompt/STATE | LOG append-only, mở phiên HEAD/ủyquyền/khối task; common+G1 trích nguyên văn; dòng T-013 | Bàn giao reviewer Claude; không sửa task cũ/common ngoài 1 dòng |
++| 3. Detector và edge cases | posterior NPZ, detailJSON, nsigma CSV/hits, kiem-tra.json; runs/sua-N1-20261004-195501/ket-qua.json | Posterior sai số ≤2.23e-16; Nslist khớp. Sửa helper gần hằng, kiểm 8 synthetic và 1.316 điểm thật; câu điều kiện pandas/BOCPD đã sửa. Sentinel/NaN/[] và false alarms không là PASS nghiệp vụ |
++| 4. Window và 3 leak paths | cua-so-cu.json; trung-gian/cua-so-delay-ca.csv, -metric.csv, -variants.csv, -summary.json; cua-so-va-che-do-b.md §1–3 | Đã sửa R1: đủ 25 DELAY × 4 phối hợp, 50 endpoint khớp từng metric/service rank, 100 kiểm lặp/đảo cột giữ điểm. Phân bổ hai thứ tự: nền −0,240, hậu −0,016; bao gồm đổi candidate, không là nhân quả hoặc lựa chọn L |
++| 5. CSV/file bắt buộc | yeu-cau-dau-vao.csv 16 cột; ca-da-chay; dinh-chinh; de-xuat | Đủ. Hai ca gốc vẫn là ví dụ chạy code tác giả; bổ sung số học 25 DELAY đã chạy T-006 để sửa R1, không benchmark mới. Mọi run được giữ |
++| 6. LOG/prompt/STATE | LOG append-only, mở phiên HEAD/ủyquyền/khối task; common+G1 lịch sử trích nguyên văn; bảng phản hồi REVIEW; dòng T-013 | Đã thực hiện sửa theo Minh 04/10/2026; chờ Minh duyệt đóng task. Không sửa thân REVIEW, task cũ hoặc nguồn chung ngoài đúng dòng STATE |
+ | 7. Kiểm diff/file set/parse | scripts/kiem_ban_giao.py, kiem-ban-giao.json, danh-sach-file.json | Kiểm trước/sau bàn giao; source/env cũ giữ nguyên |
+ 
+ Các phương pháp tất định đã kiểm lặp lại. Đảo cột giữ score, nhưng tie giữ thứ tự cột nên ranks có thể khác; N-Sigma detector list cũng khác dù multiset giữ nguyên. Hai prefix BOCPD chỉ có sentinel ngoài range; normal-normal ranker vẫn cho danh sách. Đây là kết quả **không đạt kỳ vọng hành vi** của các invariant ban đầu, đã tìm cơ chế, không sửa criterion để ép đạt.
++
++## Kiểm sau sửa phản biện — 04/10/2026
++
++- **N1:** phản ví dụ gần hằng trước sửa cho điểm 5,057563; helper sửa và StandardScaler ghim cùng cho 18, scale hiệu dụng 1. Tám cấu hình hai ca × hai cửa sổ × BR/RE khớp cả 1.316 điểm chính thức, sai số normalized 0; so điểm lịch sử sai số lớn nhất 2,35e-16, mọi thứ hạng giữ nguyên. Nguồn: `runs/sua-N1-20261004-195501/ket-qua.json` và tám CSV/ranks cùng run. Không ghi đè điểm lịch sử.
++- **N2/N3:** pandas count 3 nhưng chỉ 2 giá trị hữu hạn trong phản ví dụ; BOCPD core có mass 0 và posterior NaN, còn mass dương cho (0,02; 0,98). Hai câu đã bổ sung đúng điều kiện. Đây là kiểm xác nhận giới hạn, không gọi NaN là đầu ra hợp lệ hoặc suy wrapper cũng lỗi.
++- **R1:** bốn Avg@5 là 0,936 / 0,712 / 0,936 / 0,680; tổng đóng góp 25 ca bằng −0,256. Bốn ca đổi tập candidate. Trung gian từng metric và ba ca diễn giải ở §1 đã nối số với cơ chế; mẫu top memory không được gọi là nguyên nhân lỗi. Lựa chọn hạch toán hai thứ tự chờ WHY trong nháp nguồn chung.
++
++19 phép kiểm tập trung N1–N3 đạt. R1 có 50 endpoint và 100 phối hợp đạt các kiểm số học, lặp lại và đảo cột. Các kết quả này hoàn tất sửa đã duyệt; không thay các giới hạn dưới đây và không tự đóng task.
+ 
+ ## Chưa kiểm thực sự và hệ quả
+ 
+--- truoc-kiem-tra.json
++++ results/T-013/kiem-tra.json
+@@ -2036,6 +2036,257 @@
+           ]
+         }
+       }
++    },
++    {
++      "check": "N1-original-counterexample-fixed",
++      "status": "pass",
++      "old_score": 5.057563382541147,
++      "new_score": 18.0,
++      "official_score": 18.0,
++      "scale": 1.0
++    },
++    {
++      "check": "N1-params-reported-near-constant",
++      "status": "pass",
++      "mean": 1.0000000000000004e+16,
++      "variance": 11.666666666666666,
++      "raw_std": 3.415650255319866,
++      "scale": 1.0,
++      "official_mean": 1.0000000000000004e+16,
++      "official_variance": 11.666666666666666,
++      "official_scale": 1.0,
++      "max_normalized_transform_error": 0.0
++    },
++    {
++      "check": "N1-params-ordinary",
++      "status": "pass",
++      "mean": 2.5,
++      "variance": 2.9166666666666665,
++      "raw_std": 1.707825127659933,
++      "scale": 1.707825127659933,
++      "official_mean": 2.5,
++      "official_variance": 2.9166666666666665,
++      "official_scale": 1.707825127659933,
++      "max_normalized_transform_error": 0.0
++    },
++    {
++      "check": "N1-params-exact-constant",
++      "status": "pass",
++      "mean": 7.0,
++      "variance": 0.0,
++      "raw_std": 0.0,
++      "scale": 1.0,
++      "official_mean": 7.0,
++      "official_variance": 0.0,
++      "official_scale": 1.0,
++      "max_normalized_transform_error": 0.0
++    },
++    {
++      "check": "N1-params-above-near-constant-bound",
++      "status": "pass",
++      "mean": 1.000000000000032e+16,
++      "variance": 47786.666666666664,
++      "raw_std": 218.60161634047142,
++      "scale": 218.60161634047142,
++      "official_mean": 1.000000000000032e+16,
++      "official_variance": 47786.666666666664,
++      "official_scale": 218.60161634047142,
++      "max_normalized_transform_error": 0.0
++    },
++    {
++      "check": "N1-params-tiny-centered-scale",
++      "status": "pass",
++      "mean": 0.0,
++      "variance": 4.6666666666666655e-40,
++      "raw_std": 2.1602468994692865e-20,
++      "scale": 2.1602468994692865e-20,
++      "official_mean": 0.0,
++      "official_variance": 4.6666666666666655e-40,
++      "official_scale": 2.1602468994692865e-20,
++      "max_normalized_transform_error": 0.0
++    },
++    {
++      "check": "N1-params-missing-samples",
++      "status": "pass",
++      "mean": 3.0,
++      "variance": 2.5,
++      "raw_std": 1.5811388300841898,
++      "scale": 1.5811388300841898,
++      "official_mean": 3.0,
++      "official_variance": 2.5,
++      "official_scale": 1.5811388300841898,
++      "max_normalized_transform_error": 0.0
++    },
++    {
++      "check": "N1-params-missing-near-constant",
++      "status": "pass",
++      "mean": 1.0000000000000004e+16,
++      "variance": 8.0,
++      "raw_std": 2.8284271247461903,
++      "scale": 1.0,
++      "official_mean": 1.0000000000000004e+16,
++      "official_variance": 8.0,
++      "official_scale": 1.0,
++      "max_normalized_transform_error": 0.0
++    },
++    {
++      "check": "N1-params-small-variance-large-offset",
++      "status": "pass",
++      "mean": 1000000000000.0095,
++      "variance": 3.321856260299682e-05,
++      "raw_std": 0.005763554684653978,
++      "scale": 0.005763554684653978,
++      "official_mean": 1000000000000.0095,
++      "official_variance": 3.321856260299682e-05,
++      "official_scale": 0.005763554684653978,
++      "max_normalized_transform_error": 0.0
++    },
++    {
++      "check": "N1-real-TT-L10-standard-re",
++      "status": "pass",
++      "n_metrics": 283,
++      "rank_equals_official_and_historical": true,
++      "max_normalized_score_error": 0.0,
++      "max_normalized_historical_error": 2.1501800962769875e-16,
++      "repeat_equal": true,
++      "permutation_scores_equal": true,
++      "permutation_ranks_equal": true
++    },
++    {
++      "check": "N1-real-TT-L10-standard-br",
++      "status": "pass",
++      "n_metrics": 283,
++      "rank_equals_official_and_historical": true,
++      "max_normalized_score_error": 0.0,
++      "max_normalized_historical_error": 2.1501800962769875e-16,
++      "repeat_equal": true,
++      "permutation_scores_equal": true,
++      "permutation_ranks_equal": true
++    },
++    {
++      "check": "N1-real-TT-L20-standard-re",
++      "status": "pass",
++      "n_metrics": 287,
++      "rank_equals_official_and_historical": true,
++      "max_normalized_score_error": 0.0,
++      "max_normalized_historical_error": 2.3460690227582234e-16,
++      "repeat_equal": true,
++      "permutation_scores_equal": true,
++      "permutation_ranks_equal": true
++    },
++    {
++      "check": "N1-real-TT-L20-standard-br",
++      "status": "pass",
++      "n_metrics": 287,
++      "rank_equals_official_and_historical": true,
++      "max_normalized_score_error": 0.0,
++      "max_normalized_historical_error": 2.3460690227582234e-16,
++      "repeat_equal": true,
++      "permutation_scores_equal": true,
++      "permutation_ranks_equal": true
++    },
++    {
++      "check": "N1-real-OB-L10-standard-re",
++      "status": "pass",
++      "n_metrics": 44,
++      "rank_equals_official_and_historical": true,
++      "max_normalized_score_error": 0.0,
++      "max_normalized_historical_error": 1.2342494316025544e-16,
++      "repeat_equal": true,
++      "permutation_scores_equal": true,
++      "permutation_ranks_equal": true
++    },
++    {
++      "check": "N1-real-OB-L10-standard-br",
++      "status": "pass",
++      "n_metrics": 44,
++      "rank_equals_official_and_historical": true,
++      "max_normalized_score_error": 0.0,
++      "max_normalized_historical_error": 1.2342494316025544e-16,
++      "repeat_equal": true,
++      "permutation_scores_equal": true,
++      "permutation_ranks_equal": true
++    },
++    {
++      "check": "N1-real-OB-L20-standard-re",
++      "status": "pass",
++      "n_metrics": 44,
++      "rank_equals_official_and_historical": true,
++      "max_normalized_score_error": 0.0,
++      "max_normalized_historical_error": 2.2085112595050873e-16,
++      "repeat_equal": true,
++      "permutation_scores_equal": true,
++      "permutation_ranks_equal": true
++    },
++    {
++      "check": "N1-real-OB-L20-standard-br",
++      "status": "pass",
++      "n_metrics": 44,
++      "rank_equals_official_and_historical": true,
++      "max_normalized_score_error": 0.0,
++      "max_normalized_historical_error": 2.2085112595050873e-16,
++      "repeat_equal": true,
++      "permutation_scores_equal": true,
++      "permutation_ranks_equal": true
++    },
++    {
++      "check": "N2-pandas-non-NaN-not-finite",
++      "status": "pass",
++      "count": 3,
++      "finite_count": 2,
++      "mean": "Infinity",
++      "std": "NaN"
++    },
++    {
++      "check": "N3-positive-mass-condition",
++      "status": "pass",
++      "zero_mass": 0.0,
++      "zero_mass_posterior": [
++        "NaN",
++        "NaN"
++      ],
++      "positive_mass_posterior": [
++        0.020000000000000004,
++        0.9800000000000001
++      ],
++      "scope": "core only; not wrapper normalization"
++    },
++    {
++      "check": "R1-50-endpoint-ranks",
++      "status": "pass",
++      "metric_exact": true,
++      "service_exact": true,
++      "source": "D:\\RCA-flashticket\\results\\T-013\\runs\\sua-R1-20261004-195903\\checks.json"
++    },
++    {
++      "check": "R1-100-repeat-and-permutation",
++      "status": "pass",
++      "scope": "scores invariant; ties follow column order",
++      "source": "D:\\RCA-flashticket\\results\\T-013\\runs\\sua-R1-20261004-195903\\checks.json"
++    },
++    {
++      "check": "R1-four-Avg5-and-contribution-sum",
++      "status": "pass",
++      "Avg5": {
++        "N300-A300": 0.9359999999999999,
++        "N360-A300": 0.7120000000000001,
++        "N300-A361": 0.9359999999999999,
++        "N360-A361": 0.68
++      },
++      "delta": -0.256,
++      "baseline_effect": -0.24,
++      "post_effect": -0.016
++    },
++    {
++      "check": "R1-candidate-changes",
++      "status": "pass",
++      "cases": [
++        "cartservice_delay_4",
++        "currencyservice_delay_1",
++        "currencyservice_delay_5",
++        "productcatalogservice_delay_3"
++      ],
++      "source": "D:\\RCA-flashticket\\results\\T-013\\trung-gian\\cua-so-delay-metric.csv"
+     }
+   ],
+   "selection": {
+@@ -2088,5 +2339,22 @@
+   "all_inputs_scoped": true,
+   "no_locked_data": true,
+   "resumed_after_failure": "uv venv has no pip; method results reused; metadata frozen via uv",
+-  "final_audit_additions": "inf, raw-IQR1, constant step, stationary detector, prior density, service mapping"
+-}+  "final_audit_additions": "inf, raw-IQR1, constant step, stationary detector, prior density, service mapping",
++  "approved_corrections": {
++    "authorization": "04/10/2026 — Minh: sửa lại các lỗi trên, test cẩn thận",
++    "findings": [
++      "R1",
++      "N1",
++      "N2",
++      "N3"
++    ],
++    "runs": [
++      "D:\\RCA-flashticket\\results\\T-013\\runs\\sua-R1-20261004-195903",
++      "D:\\RCA-flashticket\\results\\T-013\\runs\\sua-N1-20261004-195501"
++    ],
++    "historical_checks_preserved": 131,
++    "new_checks": 23,
++    "scope": "R1 reuses 25 old DELAY cases for algebra; N1 rechecks two original examples; no full dataset benchmark",
++    "pending": "WHY arithmetic attribution convention and Minh task closure"
++  }
++}
+--- truoc-ca-da-chay.csv
++++ results/T-013/ca-da-chay.csv
+@@ -65,3 +65,121 @@
+ re2tt_ts-auth-service_delay_3,D:\RCA-flashticket\data\rcaeval\re2tt_ts-auth-service_delay_3\metrics.parquet,N-Sigma detector,explicit same-input repeat prefix120,a
+ fse-ob/cartservice_cpu/1,D:\RCA-ext\data\fse-ob\cartservice_cpu\1\simple_data.csv,N-Sigma detector,explicit same-input repeat full,a
+ synthetic,generated,BR RobustScorer,degenerate IQR unit conversion,b
++synthetic,generated,N-Sigma independent + pinned StandardScaler,reported-near-constant,c
++synthetic,generated,N-Sigma independent + pinned StandardScaler,ordinary,c
++synthetic,generated,N-Sigma independent + pinned StandardScaler,exact-constant,c
++synthetic,generated,N-Sigma independent + pinned StandardScaler,above-near-constant-bound,c
++synthetic,generated,N-Sigma independent + pinned StandardScaler,tiny-centered-scale,c
++synthetic,generated,N-Sigma independent + pinned StandardScaler,missing-samples,c
++synthetic,generated,N-Sigma independent + pinned StandardScaler,missing-near-constant,c
++synthetic,generated,N-Sigma independent + pinned StandardScaler,small-variance-large-offset,c
++re2tt_ts-auth-service_delay_3,D:\RCA-flashticket\data\rcaeval\re2tt_ts-auth-service_delay_3\metrics.parquet,re N-Sigma RCA,verify corrected helper TT-L10-standard-re,c
++re2tt_ts-auth-service_delay_3,D:\RCA-flashticket\data\rcaeval\re2tt_ts-auth-service_delay_3\metrics.parquet,br N-Sigma RCA,verify corrected helper TT-L10-standard-br,c
++re2tt_ts-auth-service_delay_3,D:\RCA-flashticket\data\rcaeval\re2tt_ts-auth-service_delay_3\metrics.parquet,re N-Sigma RCA,verify corrected helper TT-L20-standard-re,c
++re2tt_ts-auth-service_delay_3,D:\RCA-flashticket\data\rcaeval\re2tt_ts-auth-service_delay_3\metrics.parquet,br N-Sigma RCA,verify corrected helper TT-L20-standard-br,c
++fse-ob/cartservice_cpu/1,D:\RCA-ext\data\fse-ob\cartservice_cpu\1\simple_data.csv,re N-Sigma RCA,verify corrected helper OB-L10-standard-re,c
++fse-ob/cartservice_cpu/1,D:\RCA-ext\data\fse-ob\cartservice_cpu\1\simple_data.csv,br N-Sigma RCA,verify corrected helper OB-L10-standard-br,c
++fse-ob/cartservice_cpu/1,D:\RCA-ext\data\fse-ob\cartservice_cpu\1\simple_data.csv,re N-Sigma RCA,verify corrected helper OB-L20-standard-re,c
++fse-ob/cartservice_cpu/1,D:\RCA-ext\data\fse-ob\cartservice_cpu\1\simple_data.csv,br N-Sigma RCA,verify corrected helper OB-L20-standard-br,c
++synthetic,generated,pandas N-Sigma formula,N2 nonfinite interpretation,c
++synthetic,generated,BOCPD core,N3 zero versus positive mass,c
++fse-ob/cartservice_delay/1,D:\RCA-ext\data\fse-ob\cartservice_delay\1\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/cartservice_delay/1,D:\RCA-ext\data\fse-ob\cartservice_delay\1\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/cartservice_delay/1,D:\RCA-ext\data\fse-ob\cartservice_delay\1\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/cartservice_delay/1,D:\RCA-ext\data\fse-ob\cartservice_delay\1\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/cartservice_delay/2,D:\RCA-ext\data\fse-ob\cartservice_delay\2\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/cartservice_delay/2,D:\RCA-ext\data\fse-ob\cartservice_delay\2\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/cartservice_delay/2,D:\RCA-ext\data\fse-ob\cartservice_delay\2\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/cartservice_delay/2,D:\RCA-ext\data\fse-ob\cartservice_delay\2\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/cartservice_delay/3,D:\RCA-ext\data\fse-ob\cartservice_delay\3\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/cartservice_delay/3,D:\RCA-ext\data\fse-ob\cartservice_delay\3\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/cartservice_delay/3,D:\RCA-ext\data\fse-ob\cartservice_delay\3\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/cartservice_delay/3,D:\RCA-ext\data\fse-ob\cartservice_delay\3\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/cartservice_delay/4,D:\RCA-ext\data\fse-ob\cartservice_delay\4\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/cartservice_delay/4,D:\RCA-ext\data\fse-ob\cartservice_delay\4\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/cartservice_delay/4,D:\RCA-ext\data\fse-ob\cartservice_delay\4\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/cartservice_delay/4,D:\RCA-ext\data\fse-ob\cartservice_delay\4\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/cartservice_delay/5,D:\RCA-ext\data\fse-ob\cartservice_delay\5\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/cartservice_delay/5,D:\RCA-ext\data\fse-ob\cartservice_delay\5\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/cartservice_delay/5,D:\RCA-ext\data\fse-ob\cartservice_delay\5\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/cartservice_delay/5,D:\RCA-ext\data\fse-ob\cartservice_delay\5\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/checkoutservice_delay/1,D:\RCA-ext\data\fse-ob\checkoutservice_delay\1\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/checkoutservice_delay/1,D:\RCA-ext\data\fse-ob\checkoutservice_delay\1\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/checkoutservice_delay/1,D:\RCA-ext\data\fse-ob\checkoutservice_delay\1\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/checkoutservice_delay/1,D:\RCA-ext\data\fse-ob\checkoutservice_delay\1\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/checkoutservice_delay/2,D:\RCA-ext\data\fse-ob\checkoutservice_delay\2\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/checkoutservice_delay/2,D:\RCA-ext\data\fse-ob\checkoutservice_delay\2\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/checkoutservice_delay/2,D:\RCA-ext\data\fse-ob\checkoutservice_delay\2\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/checkoutservice_delay/2,D:\RCA-ext\data\fse-ob\checkoutservice_delay\2\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/checkoutservice_delay/3,D:\RCA-ext\data\fse-ob\checkoutservice_delay\3\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/checkoutservice_delay/3,D:\RCA-ext\data\fse-ob\checkoutservice_delay\3\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/checkoutservice_delay/3,D:\RCA-ext\data\fse-ob\checkoutservice_delay\3\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/checkoutservice_delay/3,D:\RCA-ext\data\fse-ob\checkoutservice_delay\3\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/checkoutservice_delay/4,D:\RCA-ext\data\fse-ob\checkoutservice_delay\4\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/checkoutservice_delay/4,D:\RCA-ext\data\fse-ob\checkoutservice_delay\4\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/checkoutservice_delay/4,D:\RCA-ext\data\fse-ob\checkoutservice_delay\4\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/checkoutservice_delay/4,D:\RCA-ext\data\fse-ob\checkoutservice_delay\4\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/checkoutservice_delay/5,D:\RCA-ext\data\fse-ob\checkoutservice_delay\5\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/checkoutservice_delay/5,D:\RCA-ext\data\fse-ob\checkoutservice_delay\5\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/checkoutservice_delay/5,D:\RCA-ext\data\fse-ob\checkoutservice_delay\5\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/checkoutservice_delay/5,D:\RCA-ext\data\fse-ob\checkoutservice_delay\5\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/currencyservice_delay/1,D:\RCA-ext\data\fse-ob\currencyservice_delay\1\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/currencyservice_delay/1,D:\RCA-ext\data\fse-ob\currencyservice_delay\1\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/currencyservice_delay/1,D:\RCA-ext\data\fse-ob\currencyservice_delay\1\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/currencyservice_delay/1,D:\RCA-ext\data\fse-ob\currencyservice_delay\1\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/currencyservice_delay/2,D:\RCA-ext\data\fse-ob\currencyservice_delay\2\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/currencyservice_delay/2,D:\RCA-ext\data\fse-ob\currencyservice_delay\2\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/currencyservice_delay/2,D:\RCA-ext\data\fse-ob\currencyservice_delay\2\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/currencyservice_delay/2,D:\RCA-ext\data\fse-ob\currencyservice_delay\2\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/currencyservice_delay/3,D:\RCA-ext\data\fse-ob\currencyservice_delay\3\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/currencyservice_delay/3,D:\RCA-ext\data\fse-ob\currencyservice_delay\3\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/currencyservice_delay/3,D:\RCA-ext\data\fse-ob\currencyservice_delay\3\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/currencyservice_delay/3,D:\RCA-ext\data\fse-ob\currencyservice_delay\3\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/currencyservice_delay/4,D:\RCA-ext\data\fse-ob\currencyservice_delay\4\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/currencyservice_delay/4,D:\RCA-ext\data\fse-ob\currencyservice_delay\4\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/currencyservice_delay/4,D:\RCA-ext\data\fse-ob\currencyservice_delay\4\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/currencyservice_delay/4,D:\RCA-ext\data\fse-ob\currencyservice_delay\4\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/currencyservice_delay/5,D:\RCA-ext\data\fse-ob\currencyservice_delay\5\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/currencyservice_delay/5,D:\RCA-ext\data\fse-ob\currencyservice_delay\5\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/currencyservice_delay/5,D:\RCA-ext\data\fse-ob\currencyservice_delay\5\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/currencyservice_delay/5,D:\RCA-ext\data\fse-ob\currencyservice_delay\5\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/paymentservice_delay/1,D:\RCA-ext\data\fse-ob\paymentservice_delay\1\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/paymentservice_delay/1,D:\RCA-ext\data\fse-ob\paymentservice_delay\1\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/paymentservice_delay/1,D:\RCA-ext\data\fse-ob\paymentservice_delay\1\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/paymentservice_delay/1,D:\RCA-ext\data\fse-ob\paymentservice_delay\1\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/paymentservice_delay/2,D:\RCA-ext\data\fse-ob\paymentservice_delay\2\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/paymentservice_delay/2,D:\RCA-ext\data\fse-ob\paymentservice_delay\2\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/paymentservice_delay/2,D:\RCA-ext\data\fse-ob\paymentservice_delay\2\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/paymentservice_delay/2,D:\RCA-ext\data\fse-ob\paymentservice_delay\2\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/paymentservice_delay/3,D:\RCA-ext\data\fse-ob\paymentservice_delay\3\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/paymentservice_delay/3,D:\RCA-ext\data\fse-ob\paymentservice_delay\3\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/paymentservice_delay/3,D:\RCA-ext\data\fse-ob\paymentservice_delay\3\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/paymentservice_delay/3,D:\RCA-ext\data\fse-ob\paymentservice_delay\3\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/paymentservice_delay/4,D:\RCA-ext\data\fse-ob\paymentservice_delay\4\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/paymentservice_delay/4,D:\RCA-ext\data\fse-ob\paymentservice_delay\4\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/paymentservice_delay/4,D:\RCA-ext\data\fse-ob\paymentservice_delay\4\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/paymentservice_delay/4,D:\RCA-ext\data\fse-ob\paymentservice_delay\4\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/paymentservice_delay/5,D:\RCA-ext\data\fse-ob\paymentservice_delay\5\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/paymentservice_delay/5,D:\RCA-ext\data\fse-ob\paymentservice_delay\5\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/paymentservice_delay/5,D:\RCA-ext\data\fse-ob\paymentservice_delay\5\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/paymentservice_delay/5,D:\RCA-ext\data\fse-ob\paymentservice_delay\5\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/productcatalogservice_delay/1,D:\RCA-ext\data\fse-ob\productcatalogservice_delay\1\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/productcatalogservice_delay/1,D:\RCA-ext\data\fse-ob\productcatalogservice_delay\1\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/productcatalogservice_delay/1,D:\RCA-ext\data\fse-ob\productcatalogservice_delay\1\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/productcatalogservice_delay/1,D:\RCA-ext\data\fse-ob\productcatalogservice_delay\1\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/productcatalogservice_delay/2,D:\RCA-ext\data\fse-ob\productcatalogservice_delay\2\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/productcatalogservice_delay/2,D:\RCA-ext\data\fse-ob\productcatalogservice_delay\2\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/productcatalogservice_delay/2,D:\RCA-ext\data\fse-ob\productcatalogservice_delay\2\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/productcatalogservice_delay/2,D:\RCA-ext\data\fse-ob\productcatalogservice_delay\2\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/productcatalogservice_delay/3,D:\RCA-ext\data\fse-ob\productcatalogservice_delay\3\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/productcatalogservice_delay/3,D:\RCA-ext\data\fse-ob\productcatalogservice_delay\3\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/productcatalogservice_delay/3,D:\RCA-ext\data\fse-ob\productcatalogservice_delay\3\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/productcatalogservice_delay/3,D:\RCA-ext\data\fse-ob\productcatalogservice_delay\3\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/productcatalogservice_delay/4,D:\RCA-ext\data\fse-ob\productcatalogservice_delay\4\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/productcatalogservice_delay/4,D:\RCA-ext\data\fse-ob\productcatalogservice_delay\4\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/productcatalogservice_delay/4,D:\RCA-ext\data\fse-ob\productcatalogservice_delay\4\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/productcatalogservice_delay/4,D:\RCA-ext\data\fse-ob\productcatalogservice_delay\4\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/productcatalogservice_delay/5,D:\RCA-ext\data\fse-ob\productcatalogservice_delay\5\simple_data.csv,N-Sigma independent window algebra,R1 N300-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,c
++fse-ob/productcatalogservice_delay/5,D:\RCA-ext\data\fse-ob\productcatalogservice_delay\5\simple_data.csv,N-Sigma independent window algebra,R1 N360-A300; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/productcatalogservice_delay/5,D:\RCA-ext\data\fse-ob\productcatalogservice_delay\5\simple_data.csv,N-Sigma independent window algebra,R1 N300-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,b
++fse-ob/productcatalogservice_delay/5,D:\RCA-ext\data\fse-ob\productcatalogservice_delay\5\simple_data.csv,N-Sigma independent window algebra,R1 N360-A361; independent + repeat + column permutation; run sua-R1-20261004-195903,c
+--- truoc-REVIEW.md
++++ REVIEW.md
+@@ -61,7 +61,7 @@
+ 
+ | Điểm | Ý kiến người làm: đúng / sai / chưa kiểm được | Lý do | Minh quyết |
+ |---|---|---|---|
+-| R1 | Đúng — CHẶN | Đã tự đọc 50 JSON DELAY T-006, gộp service đúng main.py:560–572 và tính Avg@5 theo evaluation.py:102–108: 0,936→0,680; 15/25 đổi hạng, 13 tụt/2 lên; 9/13 ca tụt có top metric L20 là _mem. Ba ca reviewer nêu đều khớp. Hai ví dụ T-013 thuộc TT và OB CPU không giải thích cơ chế riêng của ô DELAY; tiêu chí 4 chưa đạt đủ. Kiểm số học currencyservice_delay_4 từ CSV thô: thêm 60 dòng nền làm hạng 1→5, thêm 61 dòng hậu làm 5→6; 44 candidate giữ nguyên; hai thứ hạng endpoint khớp JSON T-006. Pattern _mem không là bằng chứng nhân quả. Đề xuất sửa đúng ô DELAY bằng đầu ra cũ + mean/std/max/candidate, rồi cập nhật cua-so-va-che-do-b.md và doi-chieu-tieu-chi.md; không chốt cửa sổ. Chưa sửa, chờ Minh. |  |
+-| N1 | Đúng (tự tìm S1) — KHÔNG CHẶN số hiện có | scripts/kiem_co_che.py:83/85 dùng sqrt(nanvar) và scale==0 cho nhánh standard, thiếu variance bù sai số và constant bound của sklearn (_data.py:73–83,1030–1038). Synthetic a_cpu=1e16+2*time, time0..11, cut6: helper scale3,559026/score5,057563, StandardScaler ghim scale1/score18. Hồ sơ BARO đã mô tả gần hằng đúng tại dòng48. Tám cấu hình ca thật khớp mọi score/rank đã lưu; lỗi nằm ở helper khi chuyển sang dữ liệu gần hằng, không bác các số hiện hành. Đề xuất sửa helper và thêm phản ví dụ sau khi Minh duyệt. |  |
+-| N2 | Đúng (tự tìm S2) — KHÔNG CHẶN | ho-so-nsigma-phat-hien.md:19 nói n là số mẫu hữu hạn; pandas thực tế đếm mẫu không NaN, còn inf vẫn được đếm. Kiểm [1,2,inf,NaN]: count3, finite2, meaninf, stdNaN. Cần đổi câu thành số mẫu không NaN, kèm điều kiện giá trị hữu hạn và inf không tự loại. Không ảnh hưởng ví dụ hữu hạn đã lưu. Chưa sửa. |  |
+-| N3 | Đúng (tự tìm S3) — KHÔNG CHẶN | ho-so-bocpd.md:23 cần tổng mass dương hữu hạn để suy q_t(0)=0,02. Core synthetic T1,d100,x=10000 có predictive0, tổng0 hữu hạn nhưng posteriorNaN do chia0 (_bocpd.py:220). Hồ sơ đã nêu underflow ở mục6; chỉ cần thêm điều kiện dương tại công thức. Đây là kiểm core, không suy wrapper min–max cũng lỗi trên cùng input. Chưa sửa. |  |
++| R1 | Đúng — lỗi CHẶN đã sửa theo Minh | Trước sửa hồ sơ không giải thích đúng ô DELAY. Đã bổ sung đủ 25 ca × 4 phối hợp nền/hậu; 50 endpoint khớp từng metric và service rank T-006, 100 phối hợp kiểm lặp/đảo cột giữ điểm. Avg@5 là 0,936/0,712/0,936/0,680; trung bình hai thứ tự phân bổ nền −0,240, hậu −0,016, bao gồm bốn ca đổi candidate. §1 có trung gian từng metric, ba ca cụ thể và giới hạn nhân quả; tiêu chí 4 đã cập nhật. Không chốt L. Nguồn: results/T-013/trung-gian/cua-so-delay-summary.json và run sua-R1-20261004-195903. | Minh duyệt sửa 04/10/2026: “sửa lại các lỗi trên, test cẩn thận”. Chưa duyệt đóng task. |
++| N1 | Đúng (tự tìm S1) — đã sửa helper | Thiếu variance bù sai số/near-constant bound đã sửa trong scripts/kiem_co_che.py. Phản ví dụ điểm cũ 5,057563 nay 18, khớp StandardScaler ghim, scale hiệu dụng 1. Tám synthetic và tám cấu hình hai ca gốc khớp 1.316 điểm chính thức (normalized error 0); so điểm lịch sử sai số ≤2,35e-16, mọi rank giữ nguyên. Kiểm lặp/đảo cột đạt; output cũ giữ nguyên. Nguồn: runs/sua-N1-20261004-195501/ket-qua.json. | Minh duyệt sửa 04/10/2026: “sửa lại các lỗi trên, test cẩn thận”. Chưa duyệt đóng task. |
++| N2 | Đúng (tự tìm S2) — đã sửa mô tả | Hồ sơ N-Sigma phát hiện đã ghi n là số mẫu không NaN, công thức cần giá trị hữu hạn, inf không tự loại. Phản ví dụ pandas count 3/finite 2, mean Infinity/std NaN được giữ trong checks; không ảnh hưởng ví dụ hữu hạn cũ. | Minh duyệt sửa 04/10/2026: “sửa lại các lỗi trên, test cẩn thận”. Chưa duyệt đóng task. |
++| N3 | Đúng (tự tìm S3) — đã sửa điều kiện | Hồ sơ BOCPD đã thêm tổng mass dương và hữu hạn để suy q_t(0)=0,02. Kiểm core mass 0/posterior NaN và mass dương/posterior (0,02;0,98) xác nhận điều kiện; không suy wrapper min–max lỗi trên cùng input. Không sửa code tác giả. | Minh duyệt sửa 04/10/2026: “sửa lại các lỗi trên, test cẩn thận”. Chưa duyệt đóng task. |
