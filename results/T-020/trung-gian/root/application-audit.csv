@@ -1,0 +1,790 @@
+nguon,muc,trang_thai,dich,doi_chieu,van_ban_cu_moi_va_ly_do
+results/T-013/dinh-chinh-task-cu.md:5,"## D1. K1 mô tả công thức bài như thể cùng code, và đơn vị chấm detector",chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## D1. K1 mô tả công thức bài như thể cùng code, và đơn vị chấm detector
+
+- Task/nguồn: T-000/K1 `docs/knowledge/K1-phuong-phap-rca.md:189,191`.
+- Vấn đề: công thức hai phía của bài chưa phân biệt max có dấu DataFrame/nhánh dict; đơn vị chấm gọi samples không đúng artifact case-level.
+- Bằng chứng: BR `root_cause_analysis.py:213–230,312–315`; RE `baro.py:49–52`; BR `reproducibility.py:168–181`. Phản ví dụ đã chạy: `dict-vs-dataframe-*`, `edge-falling` trong `kiem-tra.json`. DataFrame có thể điểm âm; dict có thể 0 với một giảm lớn.
+- Kết luận ảnh hưởng: hiểu cơ chế, lỗi giảm tín hiệu, ý nghĩa P/R/F1; không có bằng chứng phải đổi số FSE cũ.
+- Đã triển khai T-013: hồ sơ tách ba công thức, script độc lập so official, chấm lại artifact bằng counts.
+- Cũ→mới: thêm sau công thức K1: “Đây là công thức bài; hai DataFrame implementation dùng max có dấu; nhánh dict khác quantile và dùng abs(max−median).” Đổi đơn vị detector thành “artifact đếm theo ca, một ca có thể góp cả TP và FP; chưa phải window-level P/R/F1”. Nháp nguyên văn trong `de-xuat-tai-lieu-chung.md`.
+"
+results/T-013/dinh-chinh-task-cu.md:14,"## D2. T-006 suy IQR=0 chỉ từ scale=1: kết luận đúng, chứng minh thiếu",chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## D2. T-006 suy IQR=0 chỉ từ scale=1: kết luận đúng, chứng minh thiếu
+
+- File:dòng: `results/T-006/scripts/soi_baro_redis.py:38–39`; `kiem-dung-dan.md:132`.
+- Sai gì: cờ IQR = 0 dùng `scaler.scale_==1`; scale = 1 cũng xảy ra với IQR thật bằng 1 hoặc IQR rất nhỏ.
+- Bằng chứng: sklearn ghim `_data.py:111,1660–1661`; synthetic IQR = 0; T-013 tính **IQR thô** trên 90 baseline torai-OB, không chạy benchmark/scorer toàn tập. CSV `trung-gian/T006-redis-IQR-raw.csv`, summary:90/90 IQR thật bằng 0,90/90 không hằng.
+- Kết luận ảnh hưởng: số78/90 redis đứng đầu của T-006 không bị bác; lý do IQR = 0 được bổ sung bằng chứng trực tiếp. Không gọi đây là số kết quả cũ sai.
+- Đã triển khai: script `kiem_ket_qua_cu.py` tính q25/q75/IQR và phân biệt scale hiệu dụng, giữ kết quả cũ.
+- Cũ→mới: “Trong đoạn trước mốc tiêm, kênh này có IQR=0” → “T-013 tính trực tiếp q25/q75 trên baseline 300 dòng của90 ca: IQR thô redis_diskio bằng 0 ở90/90 ca; scale = 1 riêng nó không chứng minh IQR = 0. Các số đứng đầu/điểm vẫn lấy từ lượt T-006.”
+"
+results/T-013/dinh-chinh-task-cu.md:23,## D3. T-007 khớp tác giả nhưng có sentinel ngoài dữ liệu,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## D3. T-007 khớp tác giả nhưng có sentinel ngoài dữ liệu
+
+- File:dòng: `results/T-007/kiem-dung-dan.md:21,227–231`; BR `_bocpd.py:196,225`, `utility.py:212`.
+- Vấn đề: cần giới hạn cách hiểu “chạy đúng”: code không ghi mode cuối và dùng maxes[T]=0 còn sót, có thể phát sinh điểm T ngoài chuỗi. Tái lập code có lỗi vẫn có thể khớp100/100.
+- Bằng chứng: `edge-no-change`, hai prefix 120 thật và `T007-sentinel-audit` trong `kiem-tra.json`; artifact chỉ đọc100 ca fse-ob.99/100 có điểm 600; không ca nào chỉ có sentinel hoặc lấy nó làm điểm đầu. Bỏ riêng sentinel vẫn TP=100/FP=31 và P/R/F1 như cũ. Không nói Recall = 1 tập OB do sentinel.
+- Đã triển khai: cài recurrence độc lập, lưu posterior/last-mode/cps và chấm lại counts sau loại riêng điểm ngoài range trong T-013; không sửa code tác giả, không benchmark mới.
+- Cũ→mới: thêm “Khớp đầu ra tác giả ở100/100 ca. T-013 phát hiện điểm cuối600 ngoài window 600 ở99/100 ca do maxes cuối chưa gán; loại riêng điểm này không đổi P/R/F1 của tập OB. Tái lập này không chứng minh extraction heuristic không lỗi.”
+"
+results/T-013/dinh-chinh-task-cu.md:31,## D4. T-006: Recall = 1 không là bảo đảm của mọi dữ liệu,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## D4. T-006: Recall = 1 không là bảo đảm của mọi dữ liệu
+
+- File:dòng: `results/T-006/kiem-dung-dan.md:83,286`.
+- Vấn đề: câu “TP tính cho mọi ca có cảnh báo, do đó R luôn bằng 1” thiếu điều kiện mọi ca thực tế có cảnh báo. Nếu có ca rỗng, FN tăng hoặc runner tác giả crash tại cps[0].
+- Bằng chứng: `edge-nsigma-start-100`, `edge-bocpd-all-constant`, `edge-bocpd-only-time` trả[]; source BR `reproducibility.py:168–173`. Counts cũ thật vẫn có alarm ở mọi ca.
+- Kết luận ảnh hưởng: không đổi số T-006; sửa diễn giải độ đo, không suy Recall là tính chất detector.
+- Đã triển khai: synthetic normal/short/constant và chấm lại artifact trong T-013.
+- Cũ→mới: “R luôn bằng1” → “R = 1 trong các tập đã chạy vì mọi ca đều có ít nhất một cảnh báo; luật chấm không bảo đảm điều này trên dữ liệu khác. TP/FP có thể cùng đến từ một ca, nên số này không phải window-level P/R/F1.”
+"
+results/T-013/dinh-chinh-task-cu.md:40,## D5. T-001 cần tách bộ nhớ ma trận với chi phí toàn detector,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## D5. T-001 cần tách bộ nhớ ma trận với chi phí toàn detector
+
+- File:dòng: `results/T-001/danh-sach-phuong-phap.md:276`.
+- Vấn đề: mô tả window24 phút “nhẹ” có thể bị đọc thành toàn phương pháp nhẹ; R chỉ là một phần memory, runtime phụ thuộc d.
+- Bằng chứng: T-005 `runs/ket-qua-do.jsonl:17` method1440.133s cho600 điểm; full1441 bị dừng sau 1 giờ. T-013 tính R riêng và tổng evaluations ở `trung-gian/chi-phi-va-sentinel.json`.
+- Kết luận ảnh hưởng: tổng ngân sách Q-40/khả thi; không bác ma trận R vốn nhỏ.
+- Cũ→mới: “cửa sổ24 phút…nhẹ” → “R riêng cho T=1441 dùng15.864 MiB, còn states covariance O(Td²) và runtime O(T²d³) trong implementation; cần tính tổng ca, không suy detector nhẹ từ R.”
+"
+results/T-013/dinh-chinh-task-cu.md:48,## Không nâng thành lỗi,không áp dụng / giữ phạm vi,xem đoạn nguyên văn nguồn,Không là đề xuất sửa đang mở; nội dung lịch sử/phạm vi được giữ.,"## Không nâng thành lỗi
+
+T-006 mốc A reproduce_baro dùng điểm detector lưu sẵn; file đã phân biệt mốc/tái lập, nên T-013 bổ sung phạm vi tại chỗ dùng, không khẳng định số tái lập cũ sai. BR/RE N-Sigma cùng lõi scoring trong cấu hình FSE đã dùng; khác preprocess ở default không tự bác sự tương đương của các lượt FSE cũ. Chênh 0.26 là làm tròn của 0.256, không là lỗi số liệu. Không có vấn đề mới có bằng chứng ở T-002/T-003/T-008–012 trong phần trực tiếp liên quan T-013; các OPEN license/onset/dataset split vẫn OPEN, không biến thành lỗi."
+results/T-013/de-xuat-tai-lieu-chung.md:5,## 1. DECISIONS — ghi quyền thực hiện task,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 1. DECISIONS — ghi quyền thực hiện task
+
+- File đích: `docs/DECISIONS.md`.
+- Cũ: chưa có dòng ủy quyền T-013.
+- Mới đề xuất, mã do người cập nhật chọn sau khi đọc lại file: “04/10/2026 — Minh ủy quyền Codex tự viết và tự duyệt SPEC T-013 theo prompt Đợt 1 rồi triển khai ngay; người phản biện Claude. Phạm vi ghi chỉ task T-013, results T-013, work T-013 ngoài repo và một dòng STATE; không thay quyết định cửa sổ P3/dataset/protocol G1.”
+- Lý do: quyền đang ở prompt/LOG cần bền trong nguồn chung; kết luận phụ thuộc: phạm vi thực hiện T-013, không phải quyết định khoa học mới.
+"
+results/T-013/de-xuat-tai-lieu-chung.md:12,"## 2. WHY — cách kiểm cơ chế T-013 (đề xuất, chưa quyết G1)",chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 2. WHY — cách kiểm cơ chế T-013 (đề xuất, chưa quyết G1)
+
+- File đích: `docs/WHY.md`.
+- Cũ: chưa có mục về lựa chọn ví dụ/cách ghi hòa và ba implementation BARO.
+- Mới đề xuất:
+
+“Chọn ví dụ T-013 theo rule khóa trong SPEC: TT có metrics.parquet lớn nhất trong 30 ca dev, OB khớp hash mẫu README nếu có; không chọn bằng rank/root. Vì sao: kiểm quy mô TT và nối mốc A mà không chọn kết quả đẹp. Phương án khác: ca nhỏ nhất tiết kiệm thời gian nhưng không kiểm quy mô; chọn ca sai/đúng sau rank chỉ hợp phân tích P4. Điểm tính lại độc lập rồi mới nối nhãn. Code authors được giữ nguyên cả signed max, quantile dict và tie theo cột; đó là đối tượng mô tả/tái lập, không phê duyệt chúng cho protocol P3. Kết luận phụ thuộc: các ví dụ trong T-013, không hiệu quả toàn tập. Source: SPEC T-013, chon-ca.json và kiem-tra.json.”
+
+- Lý do: lựa chọn quan trọng chưa có WHY; kết quả tại chỗ ghi chờ WHY. Không tự chốt cửa sổ hay mapping G1.
+"
+results/T-013/de-xuat-tai-lieu-chung.md:22,## 3. K1 — phân biệt bài với code và đơn vị độ đo,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 3. K1 — phân biệt bài với code và đơn vị độ đo
+
+- File đích: `docs/knowledge/K1-phuong-phap-rca.md`, sau công thức §C.4 và dòng độ đo.
+- Cũ: công thức bài RobustScorer và mô tả detector trên samples.
+- Mới đề xuất:
+
+“Công thức trên là của bài. Ở revision BR e35f4ec và RE259ea41, DataFrame scorer dùng max z có dấu; BR dict dùng quantile theo chỉ số và abs(max−median), không tương đương hai phía. N-Sigma RCA cũng max có dấu/ddof=0; detector N-Sigma abs/ddof=1 và lịch sử mở rộng. Artifact detector BARO đếm theo ca: có alarm là TP, alarm đầu trước injection thêm FP; một ca có thể vừa TP vừa FP. Không dùng số này như P/R/F1 theo window của MRP. T-013 so độc lập từng điểm/posterior và ghi khác biệt bài/code; xem ho-so-baro, ho-so-bocpd, ho-so-nsigma-phat-hien.”
+
+- Lý do/kết luận phụ thuộc: hiểu cơ chế và điều kiện chuyển dataset, không tự đổi benchmark cũ.
+"
+results/T-013/de-xuat-tai-lieu-chung.md:32,## 4. Task cũ — sửa diễn giải tối thiểu,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 4. Task cũ — sửa diễn giải tối thiểu
+
+- File đích: năm vị trí D1–D5 trong `dinh-chinh-task-cu.md`; văn bản cũ→mới nguyên văn ở từng mục đó.
+- Lý do: bổ sung chứng minh IQR thô, sentinel, điều kiện Recall = 1, tổng chi phí. Số tái lập cũ chưa có bằng chứng cần đổi. Kết luận phụ thuộc: hiểu đúng mốc/tính đúng/chế độ (b)/khả thi.
+- Không đề xuất sửa source tác giả hoặc áp dụng bản sửa index vào benchmark trước G1; ảnh hưởng bản sửa detector đầy đủ còn ngoài task.
+"
+results/T-013/de-xuat-tai-lieu-chung.md:38,## 5. G1 — các lựa chọn vẫn OPEN,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 5. G1 — các lựa chọn vẫn OPEN
+
+- File đích: hồ sơ tổng hợp G1 khi Minh chốt; chưa sửa MRP/WHY để cam kết trước.
+- Cũ: Q-54 giữ cửa sổ P3 OPEN.
+- Mới đề xuất khi có quyết định: ghi rõ row count/cadence, protocol(a)/(b), (b) hồi cứu hay (b) online, rule hòa, mapping metric→service và cách xử lý datapoints ngoài range. Căn cứ có ở `cua-so-va-che-do-b.md`, ví dụ từng ca và chi phí tổng. T-013 không đề xuất con số cửa sổ cụ thể.
+- Lý do/kết luận phụ thuộc: khả năng chấm RQ3a và so RCA trên cùng điều kiện; không thêm cổng hay cơ chế kiểm soát mới.
+"
+results/T-013/de-xuat-tai-lieu-chung.md:45,"## 6. WHY — phân bổ tác động biên DELAY khi sửa R1 (nháp, chờ Minh)",chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 6. WHY — phân bổ tác động biên DELAY khi sửa R1 (nháp, chờ Minh)
+
+- File đích: `docs/WHY.md`; chưa ghi nguồn chung.
+- Chọn gì: trình bày cả hai thứ tự thêm nền/thêm hậu và lấy trung bình hai thứ tự nếu cần một phân bổ cộng được, không ưu tiên thứ tự. Đây là quy ước số học của phân tích R1, không chọn cửa sổ hoặc nguyên nhân vật lý.
+- Vì sao: có tương tác. Nền rồi hậu cho −0,224/−0,032; hậu rồi nền cho 0/−0,256. Chỉ dùng một thứ tự sẽ gán phần tương tác tùy thứ tự. Trung bình cho nền −0,240, hậu −0,016 và tổng −0,256.
+- Phương án đã xét: giữ riêng hai thứ tự (đã công bố để người đọc kiểm); chỉ dùng nền trước; chỉ dùng hậu trước; chia tác động std/mean/candidate thành các thành phần riêng (chưa kiểm, không đủ phép can thiệp độc lập ở run này). Không gọi phần nền là tác động thuần std.
+- Bằng chứng: `results/T-013/trung-gian/cua-so-delay-ca.csv`, `cua-so-delay-variants.csv`, `cua-so-delay-summary.json`; 25 ca × 4 phối hợp, 50 endpoint khớp rank cũ; công thức và ba ca cụ thể ở `cua-so-va-che-do-b.md` §1. Bốn ca có candidate thêm, đã tính cùng pipeline vào tác động biên.
+- Kết luận phụ thuộc: chỉ hai số phân bổ trung bình. Bốn Avg@5, rank/score từng ca, chênh 0,256 và tương tác không phụ thuộc việc Minh duyệt quy ước này. Gai nền/hậu là tải, lỗi hay quan sát vẫn chưa kiểm; số liệu không phân xử nhân quả.
+"
+results/T-013/de-xuat-tai-lieu-chung.md:54,## 7. DECISIONS — quyền sửa sau phản biện (nháp),chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 7. DECISIONS — quyền sửa sau phản biện (nháp)
+
+- File đích: `docs/DECISIONS.md`; chưa ghi nguồn chung.
+- Mới đề xuất: “04/10/2026 — Minh yêu cầu ‘sửa lại các lỗi trên, test cẩn thận’: duyệt sửa R1 và N1–N3 của T-013 theo đề xuất đã ghi trong LOG phiên 2. Chưa duyệt đóng task, chọn cửa sổ, commit hoặc push.”
+- Lý do: lưu quyền thực hiện qua phiên; bằng chứng lời Minh đã ghi trong LOG phiên 3 và bảng phản hồi REVIEW. Không là quyết định khoa học mới."
+results/T-014/dinh-chinh-task-cu.md:6,### N1 — T-001 diễn đạt sai xử lý tên cột,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"### N1 — T-001 diễn đạt sai xử lý tên cột
+
+- File: `results/T-001/danh-sach-phuong-phap.md:60`.
+- Cũ: `tên cột dạng service_metric, cột khác dạng bị bỏ im lặng`.
+- Sai gì: tên không có dấu `_` không bị bỏ; `rht.py:308` truy cập token thứ hai rồi ném `IndexError`. Wrapper có thể trả thứ tự cột. Tên có nhiều dấu `_` bị cắt hai token, tạo đường chập nút/bỏ dữ liệu khác.
+- Bằng chứng: `synthetic.json` ghi lỗi `IndexError: list index out of range` khi gọi `rht()` trực tiếp với cột `cpu`. Code `e2e/__init__.py:22–35` thể hiện nhánh dự phòng.
+- Ảnh hưởng: yêu cầu định dạng đầu vào và phép kiểm nhánh dự phòng. Không suy thành lỗi điểm T-006 vì hai ca vừa chạy dùng tên tương thích.
+- Đã triển khai: fixture trên scorer chính thức; lưu lỗi thật. Không sửa T-001.
+- Đề xuất mới: `tên cột phải tách được đúng service_metric; cột không có '_' làm hàm lỗi và wrapper có thể trả thứ tự cột. Tên có nhiều '_' bị cắt hai token, có thể chập nút hoặc thiếu dữ liệu; adapter phải kiểm tính tương thích trước gọi.`
+"
+results/T-014/dinh-chinh-task-cu.md:16,### N2 — T-006 nói rộng hơn phạm vi kiểm hashseed,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"### N2 — T-006 nói rộng hơn phạm vi kiểm hashseed
+
+- File: `results/T-006/kiem-dung-dan.md:186,216`.
+- Cũ: `Thứ tự nút do hash: không đổi top 5` và `top 5 giữ nguyên ở 6 seed, nên Avg@5 không đổi`.
+- Sai gì: script `results/T-006/scripts/soi_circa_hashseed.py:khac[:4]` chỉ kiểm bốn ca trong 15 ca có ranking khác. Log `runs/25-soi-circa-hashseed.log` xác nhận bốn ca. Hai lượt chính thức trên 90 ca có cùng điểm từng ô, nhưng đó là bằng chứng khác, không chứng minh mọi seed giữ top5 ở cả 90 ca.
+- Ảnh hưởng: phạm vi kết luận tính tất định; không làm thay đổi các số đã chấm của hai lượt chính thức.
+- Đã triển khai: kiểm script và log thật; tái lập điểm không nhãn trên hai ca ở §1. Không đổi seed hay benchmark thêm cả dataset.
+- Đề xuất mới: `Ở bốn ca được kiểm với sáu hashseed, top5 giữ nguyên. Hai lượt chính thức trên 90 ca cho cùng điểm từng ô. Chưa kiểm mọi hashseed trên tất cả ca; không suy kết quả bốn ca thành bảo đảm tất định toàn dataset.`
+"
+results/T-014/dinh-chinh-task-cu.md:25,### N3 — T-001/T-006 thiếu thông tin tập ứng viên thật của CIRCA-PC,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"### N3 — T-001/T-006 thiếu thông tin tập ứng viên thật của CIRCA-PC
+
+- Nơi cần bổ sung: `results/T-001/danh-sach-phuong-phap.md:60`, `results/T-006/kiem-dung-dan.md:160–168`.
+- Thiếu gì: mô tả không cho biết metric PC cô lập bị loại khỏi candidate, đồ thị rỗng có thể trả ranking rỗng dù không có exception. Không khẳng định các con số T-006 sai chỉ vì thiếu mô tả.
+- Bằng chứng và triển khai: §1–2 và ba fixture/JSON. Tại CPU/1 và MEM/1, candidate cũ đúng là subset sau loại cô lập.
+- Ảnh hưởng: đơn vị/tập xếp hạng và kết luận đầu vào. Khi đổi nguồn đồ thị cần báo cả số metric vào PC, node graph và metric scored; không coi graph khác là chỉ đổi parents nếu candidate cũng khác.
+- Đề xuất bổ sung nguyên văn: `CIRCA-PC RCAEval chỉ thêm cạnh khi dựng MemoryGraph; metric không có cạnh PC không được chấm. PC rỗng có thể cho ranking rỗng mà không ném lỗi. Tập metric sau preprocess và tập ứng viên được chấm có thể khác nhau; lưu cả hai để diễn giải kết quả.`
+"
+results/T-014/dinh-chinh-task-cu.md:33,### N4 — Các hồ sơ cũ thiếu lỗi đảo chiều cạnh PC có hướng,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"### N4 — Các hồ sơ cũ thiếu lỗi đảo chiều cạnh PC có hướng
+
+- File: `results/T-001/danh-sach-phuong-phap.md:60`; `results/T-006/kiem-dung-dan.md:160–166` mô tả PC+RHT nhưng không báo ngữ nghĩa chiều bị đổi.
+- Sai/thiếu gì: `rht.py:318–343` rồi `graph.reverse()` làm cạnh GeneralGraph a→b thành b→a. Do RHT hồi quy trên parents, đây là đổi mô hình chấm điểm, không chỉ đổi cách hiển thị graph.
+- Bằng chứng: `check_direction.py`, `direction.json`; actual GeneralGraph ma trận[-1,1], actual graph nhận cạnh ngược. Trên MEM/1, cấu hình sửa chiều nhưng giữ node làm hạng service2→1 (`r-comparison-summary.json`).
+- Ảnh hưởng: mô tả code khác bài và khả năng diễn giải cha/con; không sửa số T-006 và không gọi lỗi này là nguyên nhân đủ của ô0,148.
+- Đã triển khai: fixture actual API; so graph/scorer không nhãn trên hai ca; target MEM25 thêm nguồn graph R gốc, lưu mọi variant. Không sửa file task cũ.
+- Đề xuất thêm: `Đường chuyển adjacency của rht đảo chiều cạnh PC đã có hướng so với GeneralGraph của causal-learn. RHT thật dùng parents của graph sau đảo chiều. Tách lỗi ngữ nghĩa này khỏi việc cạnh vô hướng thành hai chiều và khỏi sai khác backend PC; chưa quy toàn bộ chênh số công bố cho nó.`
+"
+results/T-014/dinh-chinh-task-cu.md:42,### N5 — “Chỉ khác graph/DA” là mô tả thiếu cấu hình paper,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"### N5 — “Chỉ khác graph/DA” là mô tả thiếu cấu hình paper
+
+- File: `results/T-001/danh-sach-phuong-phap.md:60` (`khác bài ở hai thành phần: đồ thị và DA`); `results/T-005/do-kha-thi.md:61` (`chỉ khác bước dựng đồ thị`).
+- Thiếu gì: default lớp RHT là linear, nhưng prior-work real/Oracle config của CIRCA dùng SVR(sigmoid); structural canonical còn dùng DA. Khi gọi biến thể “như bài gốc”, không được suy chỉ thay graph mà các thành phần còn lại tương đương.
+- Bằng chứng: config whitelist cuối artifact ở `source/updated-config/params-oracle-run.json`; factory pin `models.py:580–586,630`; lớp default `alg/ci/anm.py:18–20`. Nguồn bài/hồ sơ riêng của T-014 xác định SVR+DA trên real/Oracle. Artifact cập nhật khác revision pin, nên giữ ranh giới nguồn.
+- Ảnh hưởng: yêu cầu đầu vào, lựa chọn RHT/RHT+DA và diễn giải so hai biến thể; không phủ nhận có thể dựng một adaptation kiến trúc dùng chung linearRHT nếu ghi rõ đó là lựa chọn của task.
+- Đã triển khai: cùng25Rgraph kiểm riêng linear/SVR/DA, lưu từng điểm/params/rank; không chọn từ điểm. So samegraph hai ca đã xác nhận scorer linear gốc và RE khớp.
+- Đề xuất đoạn mới: `CIRCA-PC RCAEval dùng causal-learn và linear RHT, không DA. Bản structural theo real/Oracle prior work dùng SVR(sigmoid)+DA(threshold3); đổi graph đơn thuần tạo adaptation dùng chung scorer nhưng chưa phải cùng cấu hình paper. Hồ sơ cần ghi thêm cửa sổ, xử lý node cô lập và ngữ nghĩa chiều cạnh.`
+
+"
+results/T-014/dinh-chinh-task-cu.md:52,## Làm rõ K1 của T-000,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## Làm rõ K1 của T-000
+
+Xem paper/dinh-chinh-k1-threshold.md: paper thật có concept loại dưới3; implementation giữ mọi scored metric. Đây là tách phạm vi paper/code, không phủ nhận nguồn câu cũ. Đoạn cũ→mới nguyên văn và kết luận phụ thuộc đã được đưa vào de-xuat-tai-lieu-chung.md.
+
+Bổ sung bằng chứng N3/N4 khi tiếp tục T014: kiểm75lượt scorer mới trên25Rgraphcached, độc lậpđếm100config. Giữ/bỏisolate đềuAvg5=.864 theochiềugốc và.896 khiđảochiều. N4 là lỗi ngữ nghĩa đã có ảnh hưởng thực; N3 là lỗi mấtứngviên nhưng chưa giải thíchaggregate ôMEM này. Không suy riêngbackend hoặc bỏisolate giải thích hết.148. Evidence: audit/graph-factor-summary.json vàgraph-factor-verification.json; cácđềxuấtsửa taskcũ giữ nguyên, chỉ bổ sung giới hạn kết luận này."
+results/T-014/de-xuat-tai-lieu-chung.md:5,## 1. docs/DECISIONS.md — ghi ủy quyền,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 1. docs/DECISIONS.md — ghi ủy quyền
+
+Cũ: chưa có dòng T-014 Đợt 1.
+
+Mới (chèn dòng, mã do Minh/phiên tổng hợp cấp để tránh đụng phiên khác):
+
+`| Q-<mã kế tiếp> | 04/10 | Minh ủy quyền Codex tự viết và tự duyệt SPEC rồi triển khai T-014 theo prompt Đợt 1; người phản biện Claude. Ngoại lệ tự duyệt chỉ cho T-014; phạm vi ghi, dữ liệu và ngân sách giữ theo prompt. | tasks/T-014-ho-so-circa/SPEC.md và LOG.md; chưa duyệt đóng task hay cấu hình P3. |`
+
+Lý do: quyết định phiên phải ở nguồn sự thật, nhưng prompt cấm người làm ghi DECISIONS. Kết luận phụ thuộc: tính hợp lệ của SPEC/phạm vi triển khai, không phải độ đúng của số liệu.
+"
+results/T-014/de-xuat-tai-lieu-chung.md:15,## 2. docs/WHY.md — scorer CIRCA tham chiếu,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 2. docs/WHY.md — scorer CIRCA tham chiếu
+
+Cũ: chưa có mục chọn RHT hay RHT+DA của Q-38.
+
+Mới:
+
+`## WHY-<mã kế tiếp>. CIRCA scorer tham chiếu cho hai nguồn đồ thị — Đề xuất, chờ G1`
+
+`- Chọn cho hồ sơ/kiểm T-014: RHT-only với LinearRegression và CaseData 1s của RCAEval là cấu hình tham chiếu chung; RHT+DA(threshold3) chạy riêng để kiểm cơ chế. Không chốt cấu hình P3.`
+
+`- Vì sao: bản CIRCA-PC mà RCAEval/T-006 thực thi chỉ gọi RHT. Giữ cùng scorer và cửa sổ phục vụ đối chiếu hai cấu hình PC/kiến trúc với bản RCAEval. Đó là lý do chọn RHT-only cho biến thể kiến trúc tham chiếu; chưa cô lập tác động của nguồn đồ thị vì còn khác ứng viên, parent sets và chiều cạnh. Không chọn theo accuracy. Bài CIRCA đầy đủ dùng RHT+DA; thực nghiệm Oracle dùng SVR(sigmoid). Hai bản tham chiếu không được gọi là bản đầy đủ của bài.`
+
+`- Phương án đã xét: (1) cấu hình tham chiếu chung linear RHT theo RCAEval; (2) mỗi nguồn theo prior work riêng: PC dùng linear RHT của RCAEval, kiến trúc dùng SVR(sigmoid)+RHT+DA của bài; (3) dùng SVR+RHT+DA cho cả hai nguồn. Phương án2 có căn cứ bài và cơ chế nâng điểm ancestor cho kiến trúc, nhưng khi so hai nhánh sẽ đổi cả mô hình/scorer. Phương án3 đổi mô hình/scorer của PC. PC cyclic làm DA không có cùng bảo đảm DAG; lý do này không loại DA trên metric graph kiến trúc đã cố định là DAG. RHT+DA với hồi quy tuyến tính đã kiểm ở hai nhánh; bản empirical SVR+RHT+DA kiến trúc đầy đủ chưa kiểm. Chưa chọn cấu hình P3.`
+
+`- Bằng chứng: paper/cong-bo-circa.csv; hai hồ sơ T-014; snapshot và independent comparisons. Fixture DA trong SCC cho thấy có thể phụ thuộc thứ tự duyệt. Không suy điểm cao của một biến thể thành lý do chọn.`
+
+`- Kết luận phụ thuộc: diễn giải ví dụ và yêu cầu đầu vào G1. Chênh PC/kiến trúc còn bị ảnh hưởng bởi candidate coverage, graph density, mapping và việc PC học cả đoạn fault; không chứng minh RQ3d. Ví dụ giữ272 ứng viên kiến trúc so với270 PC,156 so với30 metric không cha; native coverage kiến trúc chỉ124. Ngữ nghĩa chiều cạnh cũng khác. Metric output DAG30/30 không chứng minh call/meta graph thỏa giả định DAG:24/30 cyclic và cạnh thay đổi theo seed. Nguồn: runs/regression-route-summary.json; graphs/aggregate.json; hai hồ sơ.`
+"
+results/T-014/de-xuat-tai-lieu-chung.md:33,## 3. docs/WHY.md — mapping và coverage CIRCA kiến trúc,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 3. docs/WHY.md — mapping và coverage CIRCA kiến trúc
+
+Cũ: Q-38 giao mapping riêng schema, chưa có mục WHY cho rule/coverage thực thi.
+
+Mới:
+
+`## WHY-<mã kế tiếp>. Adapter CIRCA kiến trúc cho schema RCAEval — Đề xuất, chờ G1`
+
+`- Mapping theo ý nghĩa suffix: workload→Traffic; cpu/mem/socket/diskio→Saturation; latency/quantile→Latency; error→Errors. Cột lạ hoặc thiếu service đánh dấu, không đoán từ nhãn. Đây là adapter của schema RCAEval, không là mapping phổ quát cho mọi hệ.`
+
+`- Call graph: resolve parent bằng (traceID,spanID), cả hai span trước mốc, nối caller→callee; không suy cạnh thiếu từ service nhãn. Luật meta và empty-meta forwarding gọi đúng code CIRCA theo cấu hình tests/alg/sgraph/index.yml.`
+
+`- Adapter giữ mapped isolated metric như ứng viên không cha, không thêm cạnh. Đối chứng coverage gốc giữ riêng. Vì sao: nguồn trace không có một service không đồng nghĩa metric service đó không tồn tại; mất metric im lặng làm tập ứng viên đổi. Phương án gốc StructuralGraph.visit bỏ metric không có cạnh đã được kiểm và báo riêng; không coi candidate extension là thay đổi thuần nguồn graph.`
+
+`- Bằng chứng: graphs/summary.csv và từng graph report; builder-fixtures.json; example-architecture và example-architecture-original-coverage. Sự thiếu trace có thể do instrumentation, tải/reference hoặc parent resolve; không phải bằng chứng độc lập nhân quả.`
+
+`- Kết luận phụ thuộc: khả năng áp dụng đầu vào, candidate universe và ví dụ. Không khẳng định retention cải thiện accuracy; không chốt dùng adapter retention ở P3 trước Minh duyệt.`
+
+Nối vào mục WHY mapping/coverage ở trên (nguyên văn đề xuất):
+
+`- Call trace trước mốc nhưng graph chấm dùng mappings từ cột sau preprocessing600điểm gồm sau mốc; dropconstant và empty-meta forwarding vì vậy có thể mang thông tin incident telemetry. Giữ protocol metric của RCAEval để soi scorer/graph trong tái lập; chưa chọn protocol healthy-only/online choP3. Phương án xác định schema chỉ từ normal cần chốt timing/data availability trướcbenchmark, không chữa sau xemaccuracy. Kết luận phụ thuộc: phạmvi graphpre-mốc, nhãn/boundary và candidateuniverse; khônggọi adaptation là graph hoàn toàn độc lậpincident.`
+"
+results/T-014/de-xuat-tai-lieu-chung.md:55,## 4. docs/STATE.md — phần prose cũ,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 4. docs/STATE.md — phần prose cũ
+
+Cũ: `**T-001** và **T-002**, chạy song song, mỗi task một phiên.` trong Task đang mở; bảng ghi hai task Xong.
+
+Mới đề xuất: `Task đang mở được xác định theo cột Trạng thái của Mục lục task. Chi tiết và vai trò từng task ở SPEC/LOG của task đó.`
+
+Lý do: hai nguồn trong cùng file lệch, dễ giao sai task. Chưa sửa vì chỉ được sửa dòng T-014. Minh/phiên tổng hợp quyết nội dung đúng với tất cả phiên hiện hành. Kết luận phụ thuộc: routing phiên, không số khoa học.
+"
+results/T-014/de-xuat-tai-lieu-chung.md:63,## 5. Tài liệu khoa học chung sau review,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 5. Tài liệu khoa học chung sau review
+
+Các đính chính nguyên văn cho T-001/T-006 và khác biệt PC directed edge ở dinh-chinh-task-cu.md. Không tự sửa bản đã phản biện. MRP/K1 nếu đưa vào hồ sơ tổng hợp cần phân biệt RHT-only linear1s của RCAEval với empirical CIRCA SVR+DA1min, metric candidates bị bỏ và phép kiểm normal-normal thất bại. Số phải lấy từ các file T-014 được dẫn; không dùng timing laptop tranh tải làm số chính thức. Đây là nội dung cần đưa vào tài liệu, không đề xuất thêm cổng/quy trình.
+"
+results/T-014/de-xuat-tai-lieu-chung.md:67,## 6. docs/knowledge/K1-phuong-phap-rca.md — tách paper và implementation,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 6. docs/knowledge/K1-phuong-phap-rca.md — tách paper và implementation
+
+File đích: K1 §C.6, dòng Detector/score.
+
+
+Đoạn cũ, nguyên văn K1 dòng206:
+
+> - **Detector/score.** **NO SEPARATE ANOMALY DETECTOR**. Mỗi metric regression theo graph parents trên reference window; residual giả định Gaussian, chuẩn hóa và lấy maximum trong test interval. Cutoff cố định `3` lọc candidate. Graph trực tiếp quyết định parent set nên đổi graph có thể đổi score.
+
+Đoạn mới đề xuất, nguyên văn:
+
+> - **Detector/score.** **NO SEPARATE ANOMALY DETECTOR**. Mỗi metric regression theo graph parents trên reference window; residual giả định Gaussian i.i.d., chuẩn hóa và lấy maximum trong test interval. Paper §4.3 gọi các metric score dưới `3` là không thuộc root-cause indicators. Trong code CIRCA, cấu hình RHT+DA dùng ngưỡng `3` để quyết node nào nhận thêm child score và node nào truyền descendant evidence; code vẫn xếp mọi scored metric, không lọc output bằng ngưỡng này. RHT-only không có cutoff `3`. Ngưỡng này không phải incident detector. Graph trực tiếp quyết định parent set nên đổi graph có thể đổi score.
+
+Lý do: câu cũ có thể được hiểu rằng code trả một candidate set đã lọc3 hoặc dùng3 để phát hiện incident. Hai cách hiểu đó không khớp code. Cách hiểu câu cũ chỉ mô tả abnormal-candidate concept của paper có nguồn, nên cần phân biệt phạm vi thay vì phủ nhận paper.
+
+Kết luận phụ thuộc: universe dùng để đánh giá metric/service; ý nghĩa control normal/normal; yêu cầu có external detector khi triển khai; số nodes được giữ ở RHT/DA; không coi top1 từ ranker luôn là một incident/root có nghĩa. Không suy rằng score<3 chứng minh vô can: θ là heuristic của DA, không bảo đảm nhân quả trên mọi dữ liệu.
+
+
+File đích: K1 §C.6, chèn sau Giới hạn tác giả (cũ: chưa có kiểm implementation T-014).
+
+Mới đề xuất:
+
+`- **Kiểm implementation P1 (T-014).** Trên30ca dev RE2-TT, graph gọi/meta có24ca cyclic, dù native visit trả metric DAG cho30ca. Rebuild với seed0/1 thay cạnh của24ca cyclic; không suy DAG đầu ra thành giả định DAG đầu vào đã đúng. Trên ca chọn trước theo số cột nhỏ nhất, RHT architecture khớp script độc lập từng điểm; control train/test/trace hoàn toàn trước mốc vẫn có60/270metric≥3. Điều này chỉ là kiểm P1 của một ca, không ước lượng false-positive toàn dataset; không gọi top1 normal là root có ý nghĩa. Nguồn: results/T-014/graphs/aggregate.json, runs/builder-hashseed-1.json, paper/compare-example-architecture/comparison.json, runs/normal-sanity-explained.json.`
+
+Lý do: bằng chứng điều kiện chạy phải được phân biệt với tính hợp lệ khoa học. Nguyên nhân khác còn có trace thiếu, call cycle thật, thứ tự SCC, mapping, proxy regression và normal reference không phủ regime. Kết luận phụ thuộc: điều kiện áp dụng architecture và phép kiểm G1; không tự sửa graph hay thêm detector.
+"
+results/T-014/de-xuat-tai-lieu-chung.md:93,## 7. docs/DECISIONS.md — máy EC2 thay thế do Minh cung cấp (ghi nhận trước lượt chạy tiếp),chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 7. docs/DECISIONS.md — máy EC2 thay thế do Minh cung cấp (ghi nhận trước lượt chạy tiếp)
+
+Cũ: chưa có ghi nhận EC2 thứ hai cho T-014.
+
+Mục này giữ ghi nhận lịch sử tại thời điểm chỉ kiểm SSH, trước lệnh Minh chạy tiếp. Trạng thái hiện hành và cách báo ngân sách ở §8; hai lượt PC trên máy thứ hai đã hoàn tất.
+
+Mới đề xuất (mã do Minh/phiên tổng hợp cấp):
+
+`| Q-<mã kế tiếp> | 04/10 | Minh cung cấp EC2 thứ hai 3.26.62.217, key2.pem, yêu cầu kiểm SSH và cho chuyển sang máy này nếu cần EC2. Kiểm SSH thành công; không hiểu chỉ dẫn chuyển máy thành ngoại lệ ngân sách Q-40. | results/T-014/runs/ssh-ec2-2.json; tại thời điểm chỉ kiểm SSH chưa chạy method trên máy thứ hai. |`
+
+Lý do: ghi rõ ủy quyền thay máy mà không tự tăng ngân sách. Kết luận phụ thuộc: khả năng kết nối/đầu vào môi trường và quyền chuyển máy; không phải runtime hay điểm phương pháp. Ước lượng trước chỉ dẫn chạy tiếp khi đó: lượt PC mới khoảng30phút, accounting đã10746.553/10800giây tính cả chờ; ngoại lệ Q-40 chưa có quyết định riêng. Đây là tình trạng trước lượt mới, không phải đề nghị chạy còn chờ. Không reset theo máy/task; kết quả cuối ở §8.
+"
+results/T-014/de-xuat-tai-lieu-chung.md:105,## 8. docs/DECISIONS.md — yêu cầu tiếp tục T-014 và phân biệt cách tính ngân sách,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 8. docs/DECISIONS.md — yêu cầu tiếp tục T-014 và phân biệt cách tính ngân sách
+
+Cũ: máy thứhai mới được kiểmSSH; accounting cũ tính4171.455squeuekhông cóworker vào budget.
+
+Mới đề xuất nguyên văn (mã do Minh/phiên tổng hợp cấp):
+
+`| Q-<mã kế tiếp> | 04/10 | Minh yêu cầu: “vậy dùng ec2 chạy lại và hoàn thành toàn bộ task”; sau phản hồi REVIEW, Minh: “duyệt, sửa toàn bộ”. Đã chạy tiếp permutation và normal-PC trên EC2 thứ hai. Codex từng loại queue khỏi phép tính ngân sách; đây là cách triển khai của người làm, không phải bằng chứng Minh duyệt đổi định nghĩa Q-40. Worker đã ghi9335,006s, cộng dự phòng900s là10235,006s. Cộng queue4171,455s, các khối chạy/chờ đã ghi13506,461s, vượt10800s theo cách cộng này; cộng cả dự phòng là14406,461s, không phải thời gian thực đo. Ngoại lệ Q-40 cho lượt tiếp tục chưa có quyết định riêng. | results/T-014/runs/followup-cost.json; tasks/T-014-ho-so-circa/LOG.md; Q-40 hiện hành. |`
+
+Lý do: lưu đúng lời Minh và phân biệt lời ấy với diễn giải của người làm. Chỉ dẫn chạy tiếp và duyệt sửa báo cáo có thật; chưa có chứng cứ trong repo rằng Minh duyệt riêng việc đổi ngân sách trước lượt chạy. Q-40 vẫn nói ba giờ chờ thực tế, không đặt lại theo máy/task. Tổng các khối đã ghi vượt ba giờ; tiny checks chưa có timer đủ và900s là khoản dự trù, không thay thời gian thực đo. Kết luận phụ thuộc: báo cáo chi phí và xử lý sai lệch/ngoại lệ Q-40; không ảnh hưởng phép tính khoa học đã kiểm. Không cam kết kiểm mới ngoài phạm vi hoặc dùng cách tính này làm quy tắc chung.
+"
+results/T-014/de-xuat-tai-lieu-chung.md:115,## 9. K1 §C.6 — giới hạn của PC stable và phép kiểm đổi cột,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 9. K1 §C.6 — giới hạn của PC stable và phép kiểm đổi cột
+
+Cũ: chưa có kết quả học lại PC sau khi đảo cột ở quy môTrain Ticket.
+
+Mới đề xuất nguyên văn:
+`- **PC stable không đồng nghĩa toàn bộ pipeline bất biến theo cột.** T014 kiểm lại một ca dev273cột: skeleton giữ nguyên,667cặp endpoint và258/270điểm đổi; lần chạy đồng thời đổihost/compiler nên chưa tách riêng mọi nguyênnhân. Fixture cùngmáy chỉđổi nodeorder, giữ separating sets, xác nhận cơchế uc_priority=2 ưu tiên collider đãđịnhhướng theo thứtự duyệt. stable=True chỉ áp dụng skeleton removal. Không gọi cachedscorer permutation PASS là bằngchứng discovery invariant. Nguồn: results/T-014/runs/ec2-2-permuted/comparison.json; paper/orientation-order-fixture.json.`
+
+Lý do: cho người tổnghợpG1 biết cột/time/window/version làđiều kiện thựcthi, không chỉ fileđầu vào. Kết luận phụthuộc: tính táilập/robustness của PC và quy tắc đóngbăng cấu hình P3. Không chọn thứtự/uc_priority từ accuracy, không kếtluận mọi667cạnh đổi chỉdo thứtự."
+results/T-015/dinh-chinh-task-cu.md:3,## DC-01 — T-001: tên hàm 3sigma không phải multiplier mặc định 3,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## DC-01 — T-001: tên hàm 3sigma không phải multiplier mặc định 3
+
+- **Task/file:** T-001, `results/T-001/danh-sach-phuong-phap.md:88` (dòng TraceRCA gốc).
+- **Sai gì:** gọi detector gốc ""3σ"" mà không kiểm tham số thực. `run_anomaly_detection_invo.py:14` default threshold=1.0; `:59` so abs(empirical−mean)>threshold·std; CLI `:72` default1; Makefile `:23 SIGMA=1`.
+- **Bằng chứng:** đúng revision nguồn trong manifest-inputs; AST hàm gốc trên reference μ=10, σ=1, empirical=[12,10] cho [1,0] ở threshold1, [0,0] ở threshold3; `runs/tracerca-audit/toy-extra/toy-checks.json`, trường `original_tracerca_named_3sigma_default_threshold1`.
+- **Kết luận ảnh hưởng:** default TraceRCA gốc, so detector gốc với luật một phía μ+3σ RCAEval. Không đổi số ranking RCAEval T-007.
+- **Đã triển khai:** kiểm độc lập/toy nạp AST, hồ sơ sửa tên và ngưỡng trong T-015; không sửa T-001.
+- **Đề xuất cũ → mới:** ""phát hiện 3σ trên các đặc trưng đã chọn"" → ""phát hiện độ lệch hai phía trên đặc trưng theo reference; hàm tên 3sigma nhưng multiplier mặc định 1 (Makefile SIGMA=1); khác luật span μ+3σ của RCAEval"".
+- **Nguyên nhân khả thi khác đã xét:** CLI có thể truyền3 ở một lượt riêng; không có bằng chứng đó là đường mặc định Makefile nên không gándefault3. Không suy số bài từ một multiplier chưa biết.
+"
+results/T-015/dinh-chinh-task-cu.md:13,## DC-02 — T-000/K1 và tài liệu chung: cần phân biệt PageRank với quan hệ học self-time,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## DC-02 — T-000/K1 và tài liệu chung: cần phân biệt PageRank với quan hệ học self-time
+
+- **Task/file:** nội dung nền T-000: `docs/knowledge/K1-phuong-phap-rca.md:32,49–51,180,299–303`; `docs/MRP.md` §2.3; `docs/WHY.md` WHY-02.
+- **Vấn đề:** ""PageRank không quyết định bất thường"" đúng. Nhưng câu mở rộng thành ""đồ thị/quan hệ không tham gia phát hiện"" bỏ quan hệ cha–con của code gốc khi học SLO self-time.
+- **Bằng chứng:** `MicroRank/preprocess_data.py:191–192,218–219` trừ duration con khỏi cha; code nguồn revision đúng và hồ sơ T-015 đọc PDF. PageRank chỉ chạy sau partition không phủ nhận quan hệ đã đi vào μ/σ.
+- **Kết luận ảnh hưởng:** cách phân loại thông tin graph và biên đối chứng bỏ graph, không thay số RCAEval T-007 vì detector span đó không có self-time.
+- **Đã triển khai:** bảng bước giữ/khác và hồ sơ detector phân biệt hai đường; kiểm công thức gốc đúng; nháp sửa chính xác ở de-xuat-tai-lieu-chung.md §4.
+- **Đề xuất cũ → mới:** câu tuyệt đối về ""graph không tham gia detection"" → ""PageRank không quyết định nhãn; quan hệ cha–con tham gia tiền xử lý SLO self-time của gốc, luật span RCAEval không có bước đó"".
+- **Phản bác đã xét:** nếu ""graph"" chỉ gọi ma trận operation–trace của ranker thì câu có phạm vi đúng. Vì vậy sửa phạm vi diễn giải, không gọi toàn lập luận thiết kế P6 sai.
+"
+results/T-015/dinh-chinh-task-cu.md:23,## Các điểm T-007 đã được sửa trong nguồn cũ,không áp dụng / giữ phạm vi,xem đoạn nguyên văn nguồn,Không là đề xuất sửa đang mở; nội dung lịch sử/phạm vi được giữ.,"## Các điểm T-007 đã được sửa trong nguồn cũ
+
+R2/R4 đã có trong báo cáo hiện hành: hai sai lệch và trần coverage của những thứ hạng đã quan sát. T-015 kiểm tiếp tác động, không trình lại chúng như lỗi mới chưa sửa. NaN/sắp xếp được T-007 báo đúng và tái dựng trong T-015; lỗi nằm ở code RCAEval, không phải lỗi số chấm T-007. Lệnh EC2 thiếu mkdir ở REVIEW R1 đã được sửa trong moi-truong-ec2.md.
+"
+results/T-015/dinh-chinh-task-cu.md:27,## Phạm vi đọc task cũ,không áp dụng / giữ phạm vi,xem đoạn nguyên văn nguồn,Không là đề xuất sửa đang mở; nội dung lịch sử/phạm vi được giữ.,"## Phạm vi đọc task cũ
+
+Đối chiếu nguồn nền/MRP/quyết định, danh sách phương pháp, thẻ/input matrix và REVIEW liên quan T-000–T-012 trong phạm vi hồ sơ trace. Không đọc raw/dự đoán ngoài danh sách ca cho phép, không chạy RCA trên dataset P2 mới và không mở dữ liệu khóa. Không coi việc thẻ chưa chọn dataset/clock/license còn OPEN là lỗi cần tự sửa.
+
+
+
+T-004 chưa triển khai: không có thư mục task/kết quả ở lần rà cuối, STATE cũng ghi như vậy (`runs/t004-availability-audit.json`). Không có kết quả T-004 để tái kiểm. Audit các task cũ chỉ bao phủ nhận định liên quan đầu vào/cơ chế trace; không chứng nhận lại toàn bộ phương pháp và mọi số của T-000–T-012. K1 Ochiai/66% phù hợp bài, đã kiểm nên không báo thành lỗi chỉ vì code đang dùng Dstar2."
+results/T-015/de-xuat-tai-lieu-chung.md:5,## 1. docs/DECISIONS.md — thêm các xác nhận trong phiên,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 1. docs/DECISIONS.md — thêm các xác nhận trong phiên
+
+**Đoạn cũ:** chưa có dòng về ủy quyền T-015/vai trò/biến thể.
+
+**Đoạn mới (mã do Minh cấp khi ghi):**
+
+- 04/10/2026 — Minh ủy quyền tự viết và tự duyệt SPEC T-015 theo prompt Đợt 1, rồi triển khai trong phạm vi được ghi. Đây chỉ là ngoại lệ bước duyệt SPEC cho T-015.
+- 04/10/2026 — Minh: ""Đồng ý: Codex làm, Claude phản biện"" cho T-015.
+- 04/10/2026 — Minh: ""Đồng ý phương án 1, kèm điều kiện: (a) Đặt tên rõ ràng: \""MicroRank-RCAEval sửa đầu vào\"", không gọi là MicroRank gốc. Hồ sơ có bảng: bước nào giữ theo bài, bước nào khác bài, vì sao. (b) Ghi lý do chọn vào SPEC/LOG TRƯỚC khi chạy so với T-007. Lý do chọn dựa trên cơ chế (sửa hai lỗi, đúng ngữ nghĩa code gốc), không dựa trên điểm. Báo cáo nói rõ bản này không có số công bố để tái lập; độ tin cậy dựa trên ví dụ tính tay và phép so từng ca với T-007. (c) Trong giới hạn task, đọc code gốc để đánh giá phương án 3: suy span kind, root và tên pod từ dữ liệu (không dùng nhãn), rồi chạy code gốc kèm bộ phát hiện gốc. Chỉ đánh giá khả thi và chi phí, chưa cần cài. Ghi kết quả vào hồ sơ để G1 quyết. Giữ kết quả bản RCAEval của T-007 làm mốc đối chiếu.""
+
+**Vì sao:** lưu quyền và điều kiện để phiên sau không suy từ chat. **Phụ thuộc:** phạm vi kiểm T-015; không chốt baseline P3 hay cửa sổ.
+"
+results/T-015/de-xuat-tai-lieu-chung.md:17,"## 2. docs/WHY.md — nháp lựa chọn biến thể MicroRank, đề xuất G1",chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 2. docs/WHY.md — nháp lựa chọn biến thể MicroRank, đề xuất G1
+
+**Đoạn cũ:** chưa có lý do riêng cho cách sửa MicroRank ở P3.
+
+**Đoạn mới:**
+"
+results/T-015/de-xuat-tai-lieu-chung.md:23,### Vì sao đề xuất MicroRank-RCAEval sửa đầu vào cho giao thức span hiện có — Đề xuất (G1),chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"### Vì sao đề xuất MicroRank-RCAEval sửa đầu vào cho giao thức span hiện có — Đề xuất (G1)
+
+- **Chọn đề xuất:** MicroRank-RCAEval sửa đầu vào, giữ detector span μ+3σ RCAEval; chia trace bất thường khi có ít nhất một span vượt ngưỡng, bình thường là phần bù; cùng hai nhóm trace dùng để dựng graph và số đếm; tích lũy cạnh operation-operation. Giữ nguyên PageRank và spectrum MIT gốc. Lý do này đã ghi SPEC/LOG trước chạy so T-007.
+- **Vì sao:** sửa hai lỗi đã kiểm trên code và khôi phục tính nhất quán của spectrum: graph không được chứa trace ngoài tập được đếm. Không cần dựng span.kind/pod không có trong dữ liệu. Đây là lựa chọn theo cơ chế và điều kiện đầu vào, không theo bản có điểm cao hơn.
+- **Đã xét:** (1) RCAEval nguyên trạng — giữ làm mốc T-007, có lỗi graph/count/NaN không được xem là xác nhận MicroRank gốc; (2) full MicroRank gốc qua adapter — cần kind, root frontend-server, self-time bình thường và pod instance; (3) suy các trường này bằng dữ liệu không nhãn — chỉ đánh giá khả thi/chi phí trong hồ sơ, chưa cài, không tự suy pod thật từ service. (4) Giữ normal graph và số đếm từ baseline trước mốc. Muốn nhất quán cả hai phía còn phải đếm toàn current theo anomaly graph, hoặc lọc anomaly graph chỉ còn trace có span bị cờ rồi đếm cùng tập. Phương án đầu bỏ vai trò3σ trong partition của spectrum; phương án sau là biến thể pre/post, cần quy tắc trace ngang mốc. Chỉ sửa normal_list_len không hết nf âm (RCAEval microrank.py:683–684,697). Các phương án pre/post lệch ngữ nghĩa code gốc chia hai nhóm trong cùng cửa sổ current; vì vậy T-015 chọn phần bù trong current theo cơ chế và quyền Minh, không theo Hit@k. Không chạy các phương án đối lập sau khi nhìn điểm.
+- **Bằng chứng:** source đúng revision trong manifest; toy graph so AST gốc; công thức detector gốc so AST; ví dụ độc lập mọi điểm; so từng ca T-007. Biến thể sửa đầu vào **không có số công bố riêng để tái lập**; mốc công bố gốc và số RCAEval không được gán cho biến thể này.
+- **Giới hạn:** giữ span3σ có ddof=1/round2/inclusive duration, khác self-time ddof=0/round4 và trace threshold gốc. Hoán vị dòng/seed đã kiểm trong T-015; không bảo đảm detector ít báo giả. Trần ứng viên phụ thuộc trace và cắt top11. Full-score/service mapping là output kiểm, cách dùng cho MRR/NDCG ở P3 chờ G1. Luật ít nhất một span tạo nhiều cơ hội flag ở trace dài; ba ca TT có trung vị normal/anomaly5/179 span. Đây là tương quan đã kiểm, chưa chứng minh nguyên nhân duy nhất hoặc Dstar2 trực tiếp đo độ dài. Control khác độ dài baseline nên không so tỷ lệ để đo hiệu quả. Chẩn đoán cùng snapshotauth25/26/50/100/101 cho thấy nhạy số vòng và chưa hội tụ; giữ25 để khớp code. Nguồn: runs/review-response/trace-length-stats.csv và iteration-probe.json. Không khái quát3/30dev thành cả30.
+- **Kết luận phụ thuộc:** tên baseline, input assumptions, khả năng tái lập và giải thích chênh với T-007. Không cho kết luận riêng về lợi ích PageRank hoặc đồ thị, vì hai bên khác grouping/graph/count. Nghĩa nhóm bình thường đã đổi: trace current không có span bị cờ, khác tập baseline trước sự cố. Baseline trước mốc chỉ học μ/σ trong biến thể này. Tương quan độ dài và độ nhạy25vòng hạn chế cách đọc thứ hạng, không làm nó thành bằng chứng causal root.
+"
+results/T-015/de-xuat-tai-lieu-chung.md:32,"## 3. docs/WHY.md — nháp sửa sắp xếp TraceRCA RCAEval, đề xuất G1",chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 3. docs/WHY.md — nháp sửa sắp xếp TraceRCA RCAEval, đề xuất G1
+
+**Đoạn cũ:** chưa có quy tắc adapter cho NaN/tie.
+
+**Đoạn mới:**
+"
+results/T-015/de-xuat-tai-lieu-chung.md:38,### Vì sao lọc giá trị không hữu hạn trước khi sắp TraceRCA RCAEval — Đề xuất (G1),chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"### Vì sao lọc giá trị không hữu hạn trước khi sắp TraceRCA RCAEval — Đề xuất (G1)
+
+- Chọn đề xuất: giữ support/confidence/điểm hữu hạn; tách zero-support/NaN thành trạng thái không có bằng chứng, trước sort; sắp giảm dần theo điểm hữu hạn và phá hòa bằng khóa operation canonical. Không tự gán điểm cho service vắng trace.
+- Vì sao: NaN không có quan hệ thứ tự toàn phần; sort rồi lọc không bảo đảm giảm dần và làm thứ hạng phụ thuộc thứ tự span. Thay tie bằng canonical là quy ước bổ sung, phải công khai riêng với sửa NaN.
+- Đã xét: giữ raw chỉ để tái dựng số T-007; gán 0 cho zero-support sẽ giữ ứng viên nhiều hơn nhưng là quyết định khác về tập ứng viên; không chọn vì điểm tốt hơn. Trường hợp tổng abnormal=0 trả no-evidence, không coi danh sách tùy ý là nguyên nhân.
+- Bằng chứng: runs/tracerca-audit; tái dựng 90 ca raw, kiểm independent span/point/TT/seed/hoán vị. So raw và canonical là tác động kết hợp NaN+tie, không quy tất cả cho một lỗi.
+- Phụ thuộc: thứ hạng TraceRCA P3 và service mapping; không thay bộ phát hiện hoặc biến thể thành TraceRCA gốc.
+"
+results/T-015/de-xuat-tai-lieu-chung.md:46,"## 4. K1, MRP, WHY-02 — làm rõ quan hệ tham gia detector gốc",chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 4. K1, MRP, WHY-02 — làm rõ quan hệ tham gia detector gốc
+
+**File đích:** `docs/knowledge/K1-phuong-phap-rca.md` §3/§4/§C.3/§D.3; `docs/MRP.md` §2.3; `docs/WHY.md` WHY-02.
+
+**Đoạn cũ:** các câu hiểu rằng đồ thị/quan hệ không tham gia bất kỳ phần phát hiện nào của MicroRank.
+
+**Đoạn mới:** ""PageRank trong MicroRank dùng sau khi chia trace và không quyết định nhãn bất thường. Nhưng code MicroRank gốc dùng quan hệ span cha–con để trừ duration con khỏi duration cha khi học SLO tự xử lý. Vì vậy quan hệ có tham gia tiền xử lý thống kê của detector gốc; luật span μ+3σ của RCAEval không có bước đó. Không suy từ việc PageRank chạy sau rằng mọi đặc trưng phát hiện đều không dùng cấu trúc.""
+
+**Vì sao:** code `preprocess_data.py:191–192,218–219`, hồ sơ T-015 và PDF; phân biệt graph ranker với thông tin quan hệ dùng trong baseline. **Phụ thuộc:** phân loại vai trò graph, biên đối chứng không đồ thị ở P7; không tự thay kiến trúc P6.
+"
+results/T-015/de-xuat-tai-lieu-chung.md:56,## 5. T-001 — ngưỡng TraceRCA gốc,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 5. T-001 — ngưỡng TraceRCA gốc
+
+**File đích:** `results/T-001/danh-sach-phuong-phap.md:88`.
+
+**Đoạn cũ:** ""phát hiện 3σ trên các đặc trưng đã chọn"".
+
+**Đoạn mới:** ""phát hiện độ lệch hai phía theo reference trên các đặc trưng đã chọn; hàm tên `anomaly_detection_3sigma` nhưng multiplier mặc định là 1 (`run_anomaly_detection_invo.py:14,59,72`; `Makefile:23 SIGMA=1`). Không đồng nhất với luật span μ+3σ một phía của RCAEval.""
+
+**Vì sao:** đã tái kiểm AST gốc với toy 2σ: bị flag ở default1, không bị flag ở3; `runs/tracerca-audit/toy-extra/toy-checks.json`. **Phụ thuộc:** hồ sơ detector và khác biệt TraceRCA gốc/RCAEval; không đổi kết quả RCAEval T-007.
+"
+results/T-015/de-xuat-tai-lieu-chung.md:66,## 6. STATE — việc dọn EC2 đã làm,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 6. STATE — việc dọn EC2 đã làm
+
+**File đích:** dòng T-007 và câu EC2 đã Stop trong `docs/STATE.md`, chỉ khi Minh cho sửa file chung.
+
+**Đoạn cũ:** ""Việc dọn còn lại: xóa ~/.sudo_as_admin_successful khi bật lại EC2 của T-007"".
+
+**Đoạn mới:** ""Đã dọn ~/.sudo_as_admin_successful trong T-015 ngày 04/10/2026; lệnh rm chạy đúng một lần, test xác nhận không còn. EC2 đã kết nối lại với địa chỉ mới theo prompt Đợt 1.""
+
+**Vì sao:** tránh phiên khác chạy rm lại từ trạng thái cũ. **Phụ thuộc:** trạng thái vận hành; không ảnh hưởng số khoa học. T-015 chưa sửa các dòng chung này.
+
+"
+results/T-015/de-xuat-tai-lieu-chung.md:77,## 7. DECISIONS — EC2 thứ hai theo Minh,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 7. DECISIONS — EC2 thứ hai theo Minh
+
+**Đoạn cũ:** chưa có chỉ đạo trong phiênT015. **Đoạn mới:** 04/10/2026 — Minh: ""chuyển sang 3.26.62.217 , file key2.pem, ssh xem được không""; ""nếu thiếu ram thì chuyển lê ec2 nhé, 3.26.62.217 là ec2 thứ 2"". T015 được dùng máy hai, mọi ghi mới trong~/rca/T-015/. **Vì sao:** lưu chỉ đạo vận hành, không suy quyền chạy nhiều worker. **Phụ thuộc:** môi trường và nguồn dữ liệu, không chốt protocolP3.
+"
+results/T-015/de-xuat-tai-lieu-chung.md:81,## 8. WHY — bản sao span và guard conflict,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 8. WHY — bản sao span và guard conflict
+
+**Đoạn cũ:** chưa có policy bản sao. **Đoạn mới:** Giữ mỗi row exact-copy trong SLO/detector RCAEval và pr_trace; lookup cha theo(traceID,spanID) giữ một identity. Chỉ chấp nhận ID trùng nếu8measurement columns cùng nội dung; conflicting identity báo lỗi. Vì sao: graph gốc overwrite lookup nhưng append occurrence mỗi row; không dedup để tự thay prior. Đã xét reject mọi duplicate (bỏ hai ca hợp lệ về quan sát), dedup toànrow (thay detector/prior), last-wins conflict (tùy thứ tự); không chọn theo điểm. SLO full-original duyệt dict unique spans, khác SLO RCAEval đang giữ của biến thể. Bằng chứng: diagnosis48/99exactkeys,0conflict, toy AST graph, hai rerun độc lập. Phụ thuộc: giao thức input và2ca so OB; không suy exporter tạo duplicate vì nguyên nhân gì. Đây là đề xuất G1, không quyết định P3.
+
+"
+results/T-015/de-xuat-tai-lieu-chung.md:86,## 9. Cụ thể hóa nguyên văn đoạn cũ cho đề xuất §4,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 9. Cụ thể hóa nguyên văn đoạn cũ cho đề xuất §4
+
+**File đích:** docs/MRP.md §2.3.
+
+**Đoạn cũ:** ""K1 §D.3 ghi một phản ví dụ quan trọng: MicroRCA và MicroRank chỉ dùng PageRank **sau khi** đã phát hiện bất thường cục bộ, nên đồ thị không tham gia việc phát hiện. Nếu chỉ làm theo nghĩa rộng, cô hỏi ""đồ thị phát hiện bất thường ở đâu?"" sẽ không trả lời được.""
+
+**Đoạn mới:** ""K1 §D.3 phân biệt PageRank với detector: PageRank của MicroRCA/MicroRank chạy sau khi đã phân loại bất thường. Riêng code MicroRank gốc còn dùng quan hệ span cha–con khi học SLO self-time; vì vậy PageRank không quyết định nhãn, nhưng không thể suy mọi thông tin quan hệ đều vắng khỏi tiền xử lý detector. Luật span của bản RCAEval không có bước self-time này. Phần P6 vẫn cần chỉ rõ loại đồ thị nào tham gia trực tiếp vào điểm bất thường.""
+
+**File đích:** docs/WHY.md WHY-02, chỉ thay câu sau trong dòng Vì sao.
+
+**Đoạn cũ:** ""Trong MicroRCA và MicroRank, PageRank chỉ chạy sau khi đã phát hiện bất thường cục bộ, tức đồ thị không tham gia việc phát hiện (K1 §D.3).""
+
+**Đoạn mới:** ""Trong MicroRCA và MicroRank, PageRank chạy sau detector. Riêng code MicroRank gốc dùng quan hệ cha–con khi học SLO self-time; do đó câu kết luận không có quan hệ tham gia phát hiện chỉ đúng khi nói riêng đồ thị PageRank, không đúng cho mọi tiền xử lý có cấu trúc.""
+
+**File đích:** docs/knowledge/K1-phuong-phap-rca.md §C.3, dòng Detector.
+
+**Đoạn cũ:** ""- **Detector.** Từ normal window, paper ước lượng `μ_o, σ_o`, đặt operation SLO `μ_o+1.5σ_o`, rồi cộng SLO theo số operation trong trace để tạo expected trace latency. Trace thực vượt expected bị xem là abnormal. Cửa sổ online 30 giây; khi trigger, thu thêm khoảng 5 phút trace.""
+
+**Đoạn mới:** ""- **Detector.** Bài dùng normal history của handling time để học μ_o,σ_o và dự báo latency theo số operation. Code gốc tính handling time bằng duration cha trừ duration con quan sát được; quan hệ cha–con tham gia bước học SLO. System alarm dùng μ+1.5σ và hơn8trace; partition RCA dùng μ+σ+50ms. Bài dùng cửa sổ30s; code detector60s và RCA−5/+55s. PageRank chạy sau partition và không tự quyết định nhãn bất thường.""
+
+**Vì sao/phụ thuộc cho ba sửa:** đã kiểm nguồn cha–con và hai luật gốc trong T015; sửa phạm vi lập luận về graph, không tự quyết thiết kế P6. Các câu K1 chỉ nói riêng PageRank có phạm vi đúng, nên không đề xuất đổi chúng thành lời khẳng định PageRank phát hiện bất thường.
+
+**Không đính chính thành lỗi:** K1 ghi Ochiai mặc định và R@2≈66% là đúng cho thực nghiệm bài MicroRank. Code revision T015 gọi Dstar2, có R@2=54% trong dòng khác của bảng bài. Hồ sơ T015 đã tách hai nguồn; không sửa số66 thành54 một cách máy móc.
+
+"
+results/T-015/de-xuat-tai-lieu-chung.md:111,## 10. docs/DECISIONS.md — Minh duyệt sửa sau REVIEW T-015,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 10. docs/DECISIONS.md — Minh duyệt sửa sau REVIEW T-015
+
+**Đoạn cũ:** chưa có quyết định sửa sau phản biện T-015.
+
+**Đoạn mới (mã do Minh cấp khi ghi):** 04/10/2026 — Minh: “duyệt sửa theo đề xuất”, áp dụng danh sách “Đề xuất sửa gom theo file” trong LOG phiên2 cho R1–R3/N1–N7. Sửa hồ sơ/bảng đầu vào, guard thời gian hữu hạn và kiểm/bàn giao; giữ luật3σ, code PageRank/spectrum gốc,25vòng/top11. Không có chỉ đạo mở rộng thêm27TT hoặc chốtP3; phạm vi thực nghiệm vẫn3/30dev.
+
+**Vì sao:** lưu quyền đúng phạm vi; không suy quyền mới từ góp ý reviewer. **Phụ thuộc:** phiên3 sửa đã duyệt, không chốt baseline P3 hoặc chuyển task thành xong. T-015 chỉ viết nháp, không ghi DECISIONS thật.
+
+"
+results/T-015/de-xuat-tai-lieu-chung.md:120,## 11. docs/DECISIONS.md — Minh chốt T-015 sau sửa phản biện,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## 11. docs/DECISIONS.md — Minh chốt T-015 sau sửa phản biện
+
+**Đoạn cũ:** chưa có quyết định đóng T-015 sau sửa phản biện.
+
+**Đoạn mới (mã do Minh cấp khi ghi):** 04/10/2026 — Minh: “chốt”. Minh duyệt kết quả T-015 sau sửa R1–R3/N1–N7 và đóng task. Phạm vi kiểm Train Ticket là3/30dev với phần27ca chưa kiểm đã nêu. Các đề xuất baseline, cửa sổ, tập ứng viên và adapter choG1/P3 vẫn chờ quyết định riêng. Không có chỉ đạo commit/push hoặc ghi các nháp vào tài liệu chung.
+
+**Vì sao:** lưu quyết định kết thúc task, giữ đúng phạm vi lời Minh. **Phụ thuộc:** trạng thái Xong của T-015; không tự chốt giao thức G1/P3. T-015 chỉ viết nháp, không ghi DECISIONS thật."
+results/T-016/dinh-chinh-task-cu.md:7,## D1 — T-001: mô tả sai hậu quả của giảm mẫu hai lần (mức: sai),đã áp biến thể,docs/WHY.md WHY19/20; DECISIONS Q57; LESSONS SL36; K1 C5/C8; T001/T005/T006,"Q57 duyệt ghi và sửa; mã tạm WHY18/19,SL35,Q56 đổi để tránh trùng. Trạng thái tiêu đề WHY vẫn Đề xuất G1; không suy thành duyệt G1.","## D1 — T-001: mô tả sai hậu quả của giảm mẫu hai lần (mức: sai)
+
+- **Ở đâu:** `results/T-001/danh-sach-phuong-phap.md:112` (mục 3a, dòng 9, TORAI).
+- **Sai gì:** ""Với `--length 10` … lõi RCD chỉ nhận khoảng 3 dòng metric, phần lớn ô bị điền 0."" Thực tế: sau lần giảm thứ hai, nửa lỗi chỉ còn 1 dòng, nên mọi cột metric bị bỏ vì hằng; lõi RCD nhận **0 cột metric**, chỉ có cột log trên 21 + 21 dòng, mỗi nửa có 1 dòng giả toàn 0 do ghép theo chỉ số.
+- **Bằng chứng:** `runs/s4-soi-dau-vao-OB-len10.jsonl` (90/90 ca: 2 + 1 dòng, 0 cột sống sót); giá trị trung gian lượt chính thức `cham/s7-tong-hop.json` (184/184 cụm OB: 0 cột metric, 21 + 21 dòng); ví dụ tay `vi-du-tinh-tay.md` mục 4. T-005 đã ghi đúng (`results/T-005/do-kha-thi.md:42`).
+- **Kết luận bị ảnh hưởng:** chỉ phần mô tả cơ chế; danh sách phương pháp không đổi.
+- **Đã làm:** `giam-mau-hai-lan.md`.
+- **Đề xuất sửa** (`danh-sach-phuong-phap.md:112`): ""lõi RCD chỉ nhận khoảng 3 dòng metric, phần lớn ô bị điền 0."" → ""nửa lỗi chỉ còn 1 dòng metric nên mọi cột metric bị bỏ vì hằng; lõi RCD chỉ nhận cột log, mỗi nửa thêm 1 dòng giả toàn 0 do ghép theo chỉ số (đã kiểm ở T-016, `results/T-016/giam-mau-hai-lan.md`)."" Đồng thời đổi ""**Chưa kiểm bằng chạy, suy từ code:**"" thành ""**Đã kiểm ở T-016:**"".
+"
+results/T-016/dinh-chinh-task-cu.md:16,## D2 — T-006 LOG: gán cho bài TORAI một câu bài không có (mức: sai),đã áp biến thể,docs/WHY.md WHY19/20; DECISIONS Q57; LESSONS SL36; K1 C5/C8; T001/T005/T006,"Q57 duyệt ghi và sửa; mã tạm WHY18/19,SL35,Q56 đổi để tránh trùng. Trạng thái tiêu đề WHY vẫn Đề xuất G1; không suy thành duyệt G1.","## D2 — T-006 LOG: gán cho bài TORAI một câu bài không có (mức: sai)
+
+- **Ở đâu:** `tasks/T-006-kiem-dung-dan-laptop/LOG.md:334` (ghi chú chuyển từ T-005, REVIEW T-005 R1): ""(bài TORAI nói metric lấy lại mẫu 15 s)"". Câu này cũng được chép vào prompt của T-016.
+- **Sai gì:** văn bản bài TORAI (`arXiv 2604.13522v1`, bản HTML) không nêu chu kỳ 15 s ở đâu; §3.1 chỉ nói đếm mẫu log theo thời gian. Chu kỳ 15 s chỉ có trong `RCAEval/docs/TORAI.md` (mục Data Format) và chú thích `torai.py:80`.
+- **Bằng chứng:** tìm ""15 s"", ""15-second"", ""second"", ""resampl"", ""interval"", ""sampling"" trong văn bản bài (LOG T-016 08:35); chỉ thấy ""requests per minute"" ở §3.1.
+- **Kết luận bị ảnh hưởng:** lập luận ""lỗi hay chủ ý"" không được dựa vào bài; T-016 dựa vào tài liệu RCAEval và code (`giam-mau-hai-lan.md` mục 4).
+- **Đề xuất:** LOG chỉ ghi thêm, nên thêm vào cuối `tasks/T-006-kiem-dung-dan-laptop/LOG.md` một ghi chú: ""Đính chính 04/10 (T-016): câu '(bài TORAI nói metric lấy lại mẫu 15 s)' ở ghi chú chuyển từ T-005 không đúng: bài không nêu chu kỳ; 15 s có ở `RCAEval/docs/TORAI.md` và chú thích `torai.py:80`.""
+"
+results/T-016/dinh-chinh-task-cu.md:24,"## D3 — T-006: ""TORAI khớp"" thiếu phép kiểm nhánh dự phòng bên trong (mức: thiếu)",đã áp biến thể,docs/WHY.md WHY19/20; DECISIONS Q57; LESSONS SL36; K1 C5/C8; T001/T005/T006,"Q57 duyệt ghi và sửa; mã tạm WHY18/19,SL35,Q56 đổi để tránh trùng. Trạng thái tiêu đề WHY vẫn Đề xuất G1; không suy thành duyệt G1.","## D3 — T-006: ""TORAI khớp"" thiếu phép kiểm nhánh dự phòng bên trong (mức: thiếu)
+
+- **Ở đâu:** `results/T-006/kiem-dung-dan.md:31` (mục 1, dòng TORAI) và `:252` (mục 7, ""Kết luận: khớp."").
+- **Thiếu gì:** T-006 kiểm ""đầu ra rỗng, trùng thứ tự cột, lỗi"" cho TORAI, nhưng không kiểm nhánh dự phòng **bên trong** `torai()` (`torai.py:330-334`) và không soi đầu vào của bước nhân quả. Ở đúng cấu hình T-006 chạy (cửa sổ 10), 176/184 cụm OB và 171/173 cụm SS rơi nhánh dự phòng; 0 cột metric vào RCD; thứ hạng cuối trùng thứ hạng ""chỉ mức nghiêm trọng"" ở 86/90 ca OB, 88/90 SS. ""Khớp"" đúng về số, nhưng không cho biết TORAI chạy đúng phương pháp của bài (SL24: khớp số ≠ đúng).
+- **Bằng chứng:** `cham/s7-tong-hop.json`, `giam-mau-hai-lan.md` mục 5; điểm bản gốc seed 0–4 = 0,913 (OB), trùng T-006.
+- **Kết luận bị ảnh hưởng:** câu ""TORAI khớp"" trong T-006 mục 1, 7 nếu được dùng làm căn cứ ""TORAI đã kiểm đúng đắn"" ở G1.
+- **Đã làm:** đo tỉ lệ nhánh dự phòng mọi cấu hình; bản sửa (`src/torai/`); `kiem-khong-nhan.md` mục 4b.
+- **Đề xuất sửa** (`kiem-dung-dan.md`, cuối mục 7, thêm một gạch đầu dòng): ""- Khớp ở đây là khớp số công bố, chưa phải chạy đúng phương pháp. T-016 đo trên cùng cấu hình: lõi RCD không nhận cột metric nào (lỗi giảm mẫu hai lần) và 176/184 cụm (OB), 171/173 (SS) rơi nhánh dự phòng về thứ tự mức nghiêm trọng (`results/T-016/giam-mau-hai-lan.md`)."" Và ở mục 1 dòng TORAI, cột Kết luận: ""**Khớp**"" → ""**Khớp số công bố** (xem T-016: lõi nhân quả gần như không đóng góp ở cấu hình này)"".
+"
+results/T-016/dinh-chinh-task-cu.md:33,"## D4 — T-006: RCD torai-OB cửa sổ 20 chỉ 46/90 ca (mức: cập nhật, điểm mở 11.3)",đã áp biến thể,docs/WHY.md WHY19/20; DECISIONS Q57; LESSONS SL36; K1 C5/C8; T001/T005/T006,"Q57 duyệt ghi và sửa; mã tạm WHY18/19,SL35,Q56 đổi để tránh trùng. Trạng thái tiêu đề WHY vẫn Đề xuất G1; không suy thành duyệt G1.","## D4 — T-006: RCD torai-OB cửa sổ 20 chỉ 46/90 ca (mức: cập nhật, điểm mở 11.3)
+
+- **Ở đâu:** `results/T-006/kiem-dung-dan.md:229` (mục 6, dòng torai-OB cửa sổ 20), `:56` (mục 2.1, ""RCD: chưa phân xử được""), `:313` (mục 11.3).
+- **Nay có số:** EC2, 1 lần, seed 0, đủ 90/90 ca trong 5 624 s: AVERAGE Avg@5 **0,742** (Bảng 2: 0,74), AC@1 0,644, AC@3 0,778. 46 ca chung: EC2 0,865, T-006 3 lần 0,839/0,896/0,835. 44 ca T-006 chưa chạy: 0,614. Tức 46 ca của T-006 không đại diện (T-006 đã cảnh báo đúng).
+- **Bằng chứng:** `cham/s11-rcd-ob-len20.json`, `runs/s11-rcd-ob-len20-so-t006.txt`.
+- **Kết luận bị ảnh hưởng:** mục 2.1 ""RCD: chưa phân xử được"": nay ở OB, cửa sổ 20 tái lập AVERAGE của bài (lệch +0,002, nhưng MEM lệch −0,197, DISK +0,110); ở SS, cả 10 (0,533) và 20 (0,664) vẫn không tái lập 0,57. Bằng chứng về cửa sổ của bài cho RCD vì vậy vẫn mâu thuẫn giữa hai dataset.
+- **Đề xuất sửa:**
+  - `:229`, cột 3–4: ""**không so được với bài**: mỗi lần bị dừng ở 3 giờ (Q-40) với 46/90 ca"" → giữ nguyên, thêm: ""T-016 chạy đủ 90 ca trên EC2 (1 lần, seed 0): 0,742 (+0,002); 46 ca chung 0,865 so với 0,857 (TB 3 lần ở đây) (`results/T-016/diem-mo-t006.md`).""
+  - `:56`: ""Ở torai-OB, cửa sổ 20 chưa đủ ca (mục 6)."" → ""Ở torai-OB, cửa sổ 20 đủ 90 ca (T-016) cho 0,742 so với 0,74 của bài; nhưng torai-SS không khớp ở cả hai cửa sổ, nên vẫn chưa phân xử được cửa sổ của bài cho RCD.""
+  - `:313` (11.3): thêm ""Đã làm ở T-016 (`results/T-016/diem-mo-t006.md`).""
+"
+results/T-016/dinh-chinh-task-cu.md:44,"## D5 — T-006: ""Windows thay vì Linux"" là nguyên nhân khả thi chưa kiểm (mức: cập nhật, điểm mở 11.5)",đã áp biến thể,docs/WHY.md WHY19/20; DECISIONS Q57; LESSONS SL36; K1 C5/C8; T001/T005/T006,"Q57 duyệt ghi và sửa; mã tạm WHY18/19,SL35,Q56 đổi để tránh trùng. Trạng thái tiêu đề WHY vẫn Đề xuất G1; không suy thành duyệt G1.","## D5 — T-006: ""Windows thay vì Linux"" là nguyên nhân khả thi chưa kiểm (mức: cập nhật, điểm mở 11.5)
+
+- **Ở đâu:** `results/T-006/kiem-dung-dan.md:248` (mục 6, nguyên nhân chưa kiểm), `:305` (mục 10), `:313-316` (mục 11.5).
+- **Nay có số:** cùng seed, TORAI gốc, sửa × OB, SS cửa sổ 10: Linux và Windows cho thứ hạng giống hệt 90/90 ca mỗi cặp; RCD torai-SS cửa sổ 10: cũng giống hệt 90/90 ca (`diem-mo-t006.md` mục 2). 34 gói được nạp cùng phiên bản trên hai máy.
+- **Kết luận bị ảnh hưởng:** ""Windows thay vì Linux"" không còn là nguyên nhân khả thi cho phần lệch của TORAI (và của RCD). CIRCA thuộc T-014, không kiểm ở đây.
+- **Đề xuất sửa:** `:248` ""- Windows thay vì Linux."" → ""- Windows thay vì Linux: đã loại cho TORAI và RCD ở T-016 (cùng seed, thứ hạng giống hệt; `results/T-016/diem-mo-t006.md`).""; `:305` thêm ""(đã kiểm cho RCD, TORAI ở T-016; CIRCA chưa)"".
+"
+results/T-016/dinh-chinh-task-cu.md:51,"## D6 — T-005: dùng ca `torai-TT` mà chưa chứng minh trùng ca dev (mức: thiếu, không đổi kết quả)",đã áp biến thể,docs/WHY.md WHY19/20; DECISIONS Q57; LESSONS SL36; K1 C5/C8; T001/T005/T006,"Q57 duyệt ghi và sửa; mã tạm WHY18/19,SL35,Q56 đổi để tránh trùng. Trạng thái tiêu đề WHY vẫn Đề xuất G1; không suy thành duyệt G1.","## D6 — T-005: dùng ca `torai-TT` mà chưa chứng minh trùng ca dev (mức: thiếu, không đổi kết quả)
+
+- **Ở đâu:** `tasks/T-005-do-kha-thi/LOG.md:37`, `results/T-005/moi-truong.md:111` — giải nén và chạy TORAI trên `torai-TT/ts-route-service_socket/1`, ghi là ca có trong `data/`, nhưng không có bằng chứng trùng với `re2tt_ts-route-service_socket_1` (zip `torai-TT` có cả ca test).
+- **Bằng chứng nay:** trùng hệt (`runs/s0-cung-ca.json`: mốc tiêm = đầu file + 720 s; 540 375 ô, 0 ô lệch quá ngưỡng làm tròn). Không có rò dữ liệu test.
+- **Kết luận bị ảnh hưởng:** không.
+- **Đề xuất:** thêm một dòng vào `results/T-005/moi-truong.md` sau dòng 111: ""Trùng ca dev `re2tt_ts-route-service_socket_1` đã được chứng minh ở T-016 (`results/T-016/runs/s0-cung-ca.json`).""
+"
+results/T-016/dinh-chinh-task-cu.md:58,## Không thấy vấn đề,không áp dụng / giữ phạm vi,xem đoạn nguyên văn nguồn,Không là đề xuất sửa đang mở; nội dung lịch sử/phạm vi được giữ.,"## Không thấy vấn đề
+
+Đã rà và không thấy sai trong phạm vi TORAI/RCD: T-001 mục 4 (đường nhãn: `torai` không đọc `service`, `fault_type`, `case`), mục 3a dòng 4 (RCD), mục 8.1 (bảng biến thể RCD); T-005 dòng TORAI (`do-kha-thi.md:42`, đúng về giảm mẫu); T-006 mục 2.4 (không đọc `sli`), mục 6 (RCD không bọc `@rca`, không seed), mục 7 (số TORAI 0,913 / 0,951 trùng lượt có seed ở T-016). T-002, T-003, T-007–T-012 không có khẳng định về TORAI/RCD cần kiểm ở đây."
+results/T-016/de-xuat-tai-lieu-chung.md:7,## W1 — `docs/WHY.md`: thêm mục bản TORAI dùng cho P3,đã áp biến thể,docs/WHY.md WHY19/20; DECISIONS Q57; LESSONS SL36; K1 C5/C8; T001/T005/T006,"Q57 duyệt ghi và sửa; mã tạm WHY18/19,SL35,Q56 đổi để tránh trùng. Trạng thái tiêu đề WHY vẫn Đề xuất G1; không suy thành duyệt G1.","## W1 — `docs/WHY.md`: thêm mục bản TORAI dùng cho P3
+
+- **File đích:** `docs/WHY.md`, thêm vào cuối file.
+- **Đoạn cũ:** (không có).
+- **Đoạn mới:**
+
+```markdown"
+results/T-016/de-xuat-tai-lieu-chung.md:14,## WHY-18. Bản TORAI dùng cho P3: bản sửa hai chỗ trong `src/torai/` — Đề xuất (G1) (T-016),đã áp biến thể,docs/WHY.md WHY19/20; DECISIONS Q57; LESSONS SL36; K1 C5/C8; T001/T005/T006,"Q57 duyệt ghi và sửa; mã tạm WHY18/19,SL35,Q56 đổi để tránh trùng. Trạng thái tiêu đề WHY vẫn Đề xuất G1; không suy thành duyệt G1.","## WHY-18. Bản TORAI dùng cho P3: bản sửa hai chỗ trong `src/torai/` — Đề xuất (G1) (T-016)
+
+- **Chọn:** TORAI chính ở P3 là `src/torai/torai_sua.py`: code RCAEval `259ea41` chép nguyên văn, chỉ sửa (A) bỏ lần giảm mẫu metric thứ hai trong `_rcd_multimodal` (`torai.py:29`) và (B) ghép metric với logts theo vị trí trong từng nửa thay cho `concat` theo chỉ số (`torai.py:47-48`). Bản gốc chạy kèm trên torai-OB làm mốc tái lập. Đặt seed theo ca, ít nhất 3 seed. Mỗi lượt báo tỉ lệ cụm rơi nhánh dự phòng và điểm SeverityScorer không cụm.
+- **Vì sao:** ở lệnh chính thức (`--length 10`), bản gốc đưa 0 cột metric vào bước nhân quả ở mọi ca OB, SS, TT dev đã thử, trái với bài §3.4 (CausalRanker phân tích chuỗi metric và log). Bản sửa đưa metric vào bước nhân quả như bài mô tả mà không đổi bước nào khác. Nó là bản cài RCAEval đã sửa hai lỗi, chưa tương đương TORAI của bài: gán cụm cứng, bỏ trace trong RCD, trọng số nguồn khác và nhánh dự phòng vẫn còn (`ho-so-torai.md` C4–C7). Lỗi nhiều khả năng do chuyển code: chú thích `torai.py:80` mô tả một lần giảm; `mmnsigma` giảm một lần; `mmrcd` ghép theo thời gian (`results/T-016/giam-mau-hai-lan.md` mục 4).
+- **Phương án đã xét:**
+  - Bản gốc nguyên trạng: tái lập số công bố, nhưng là ""TORAI không có metric trong bước nhân quả""; hạn chế thấy ở P4 có thể chỉ là hệ quả của lỗi.
+  - Bản sửa ghép theo thời gian (`merge_asof` như `mmrcd`): cần tự chọn quy tắc làm tròn giữa lưới metric (theo mốc tiêm) và lưới log (theo đầu file, lệch 0–14 s); bài không nêu. Chưa kiểm.
+  - Sửa thêm (đưa trace vào RCD, GMM gán mềm, bỏ nhánh dự phòng): là thay đổi phương pháp, không phải sửa lỗi; không làm.
+- **Bằng chứng:** `results/T-016/giam-mau-hai-lan.md` mục 3, 5; trung bình 5 seed, Avg@5 bản gốc / bản sửa: OB cửa sổ 10 0,913 / 0,909; OB 20 0,926 / 0,928; SS 10 0,952 / 0,955; SS 20 0,941 / 0,940; TT dev 10 0,880 / 0,880. Hai bản cho cùng điểm trong dao động giữa seed, vì phần lớn cụm rơi nhánh dự phòng ở cả hai (OB cửa sổ 10: 176/184 và 166/184 cụm).
+- **Giới hạn:** chọn bản sửa không làm điểm tốt hơn; chỉ sửa hai lỗi đầu vào của bước nhân quả. Kết luận P3, P4 dựa trên bản này nói về bản cài RCAEval đã sửa; quy hạn chế cho TORAI theo bài vẫn OPEN ở các khác biệt C4–C7. Cửa sổ P3 chưa chốt (Q-54). Cách ghép (B) theo vị trí là một cách hiểu ý tác giả (chưa kiểm cách khác).
+- **Kết luận phụ thuộc:** mọi số TORAI ở P3; mọi nhận định ở P4 về bước CausalRanker của TORAI.
+```
+
+- **Lý do:** luật cứng 3 (lựa chọn quan trọng phải có WHY trước khi dùng trong kết quả).
+- **Kết luận phụ thuộc:** như trong đoạn.
+"
+results/T-016/de-xuat-tai-lieu-chung.md:30,## W2 — `docs/WHY.md`: seed và số lần chạy cho phương pháp có ngẫu nhiên,đã áp biến thể,docs/WHY.md WHY19/20; DECISIONS Q57; LESSONS SL36; K1 C5/C8; T001/T005/T006,"Q57 duyệt ghi và sửa; mã tạm WHY18/19,SL35,Q56 đổi để tránh trùng. Trạng thái tiêu đề WHY vẫn Đề xuất G1; không suy thành duyệt G1.","## W2 — `docs/WHY.md`: seed và số lần chạy cho phương pháp có ngẫu nhiên
+
+- **File đích:** `docs/WHY.md`, sau W1.
+- **Đoạn mới:**
+
+```markdown"
+results/T-016/de-xuat-tai-lieu-chung.md:36,"## WHY-19. Đặt seed theo ca và số lần chạy cho TORAI, RCD — Đề xuất (G1) (T-016)",đã áp biến thể,docs/WHY.md WHY19/20; DECISIONS Q57; LESSONS SL36; K1 C5/C8; T001/T005/T006,"Q57 duyệt ghi và sửa; mã tạm WHY18/19,SL35,Q56 đổi để tránh trùng. Trạng thái tiêu đề WHY vẫn Đề xuất G1; không suy thành duyệt G1.","## WHY-19. Đặt seed theo ca và số lần chạy cho TORAI, RCD — Đề xuất (G1) (T-016)
+
+- **Chọn:** gọi `np.random.seed(s)` ngay trước mỗi lời gọi phương pháp cho từng ca; TORAI ít nhất 3 seed; RCD số seed tối đa vừa ngân sách Q-40 của dataset đó, tối thiểu 1, và ghi rõ số seed (RCD torai-OB cửa sổ 20 tốn 1,56 giờ/seed, TT khoảng 74 phút/seed, nên 5 seed vượt Q-40); báo trung bình và khoảng; phân tích từng ca dùng mọi seed.
+- **Vì sao:** RCAEval không đặt seed (`rcd.py:458`; `torai()` không có tham số seed), nên một lượt `main.py` không lặp lại được. Với seed đặt theo ca, TORAI tất định: cùng seed hai lần, khác `PYTHONHASHSEED`, Linux và Windows đều cho thứ hạng giống hệt 90/90 ca (`results/T-016/ngau-nhien.md` mục 3). Giữa các seed, TORAI đổi thứ hạng ở tới 24/90 ca, top-1 tới 9/90 ca, dù sd Avg@5 ≤ 0,004 (mục 4); RCD dao động lớn hơn nhiều (T-006: 2–6/90 ca trùng thứ hạng giữa các lần).
+- **Phương án đã xét:** không đặt seed như RCAEval (không tái lập được); seed 420 cố định như RCD gốc (tái lập được nhưng che dao động); trung bình 5 lần như bài (§4.2) mà không ghi seed (không tái lập được).
+- **Kết luận phụ thuộc:** số TORAI, RCD ở P3; phân tích từng ca ở P4.
+```
+"
+results/T-016/de-xuat-tai-lieu-chung.md:44,## L1 — `docs/LESSONS.md`: khớp số công bố không chứng minh phương pháp chạy đúng,đã áp biến thể,docs/WHY.md WHY19/20; DECISIONS Q57; LESSONS SL36; K1 C5/C8; T001/T005/T006,"Q57 duyệt ghi và sửa; mã tạm WHY18/19,SL35,Q56 đổi để tránh trùng. Trạng thái tiêu đề WHY vẫn Đề xuất G1; không suy thành duyệt G1.","## L1 — `docs/LESSONS.md`: khớp số công bố không chứng minh phương pháp chạy đúng
+
+- **File đích:** `docs/LESSONS.md`, bảng ""Sai lầm không được lặp lại"", thêm dòng sau SL34 (SL34 do T-017 ghi).
+- **Đoạn mới:**
+
+```markdown
+| SL35 | Kết luận ""TORAI khớp"" chỉ dựa vào điểm cuối khớp số công bố (T-006). Ở đúng cấu hình đó, bước nhân quả không nhận cột metric nào do lỗi giảm mẫu hai lần, và 176/184 cụm rơi nhánh dự phòng về thứ tự mức nghiêm trọng; số vẫn khớp dù bản cài đang kiểm có lỗi; chưa xác minh code hay lượt chạy nào tạo số công bố (T-016) | Trước khi gọi một phương pháp là ""kiểm đúng đắn"": soi đầu vào thật của từng thành phần (số cột, số dòng), đếm số lần rơi nhánh dự phòng bên trong, và so điểm với một bản bỏ thành phần đó (ví dụ chỉ SeverityScorer) |
+```
+
+- **Lý do:** cùng loại với SL24 nhưng ở mức thành phần bên trong phương pháp; T-006 có phép kiểm ""nhánh dự phòng"" của wrapper `@rca` nhưng không có của nhánh dự phòng riêng của TORAI.
+- **Kết luận phụ thuộc:** cách viết SPEC kiểm đúng đắn của các task P1/P3 sau.
+"
+results/T-016/de-xuat-tai-lieu-chung.md:56,"## L2 — rút lại (sửa theo tự soát N3, REVIEW T-016)",không áp dụng / giữ phạm vi,xem đoạn nguyên văn nguồn,Không là đề xuất sửa đang mở; nội dung lịch sử/phạm vi được giữ.,"## L2 — rút lại (sửa theo tự soát N3, REVIEW T-016)
+
+Không đề xuất dòng LESSONS thứ hai (nháp cũ ""viện dẫn bài phải ghi mục""): nội dung đã nằm trong QT17 và SL17 (số và khẳng định phải có nguồn). Đính chính câu sai cụ thể nằm ở `dinh-chinh-task-cu.md` mục D2.
+"
+results/T-016/de-xuat-tai-lieu-chung.md:60,## K1 — `docs/knowledge/K1-phuong-phap-rca.md` mục C.8 (TORAI) và C.5 (RCD),đã áp biến thể,docs/WHY.md WHY19/20; DECISIONS Q57; LESSONS SL36; K1 C5/C8; T001/T005/T006,"Q57 duyệt ghi và sửa; mã tạm WHY18/19,SL35,Q56 đổi để tránh trùng. Trạng thái tiêu đề WHY vẫn Đề xuất G1; không suy thành duyệt G1.","## K1 — `docs/knowledge/K1-phuong-phap-rca.md` mục C.8 (TORAI) và C.5 (RCD)
+
+- **File đích:** `docs/knowledge/K1-phuong-phap-rca.md:224` (C.8, gạch ""Graph/ranker"") và `:198` (C.5, gạch ""Graph/ranker"").
+- **Đoạn cũ (C.8):** ""Trong cluster, Ψ-PC học causal DAG trên time-series nodes; CausalRanker xếp bằng conditional-independence score.""
+- **Đoạn mới (C.8):** ""Trong cluster, bản cài RCAEval chạy lõi RCD (Ψ-PC **cục bộ**: chỉ học cạnh nối F-node, không học DAG đầy đủ) trên chuỗi metric và mẫu log, xếp theo p-value của phép kiểm với F-node; nếu RCD không xếp đủ service của cụm thì lùi về thứ tự mức nghiêm trọng (`torai.py:330-334`). Ở lệnh chính thức, bước này không nhận metric (lỗi giảm mẫu hai lần) và đa số cụm rơi nhánh lùi (T-016, `results/T-016/giam-mau-hai-lan.md`).""
+- **Đoạn cũ (C.5):** ""alpha empirical (`0.01` local start; code thử trong khoảng `0.001–0.1`).""
+- **Đoạn mới (C.5):** ""α bắt đầu 0,01 ở pha 1 và 0,001 ở pha 2, tăng 0,1 mỗi vòng tới < 1 cho tới khi đủ hàng xóm F (`rcd.py:23-25, 189, 302`); khoảng 0,001–0,1 là khoảng tác giả đã thử cho α khởi đầu (chú thích `rcd.py:296-301`).""
+- **Lý do:** K1 tự ghi ""chưa kiểm lại""; MRP §11 yêu cầu P1 kiểm lại khẳng định quan trọng trên code gốc. Hai câu trên sai hoặc thiếu so với code.
+- **Kết luận phụ thuộc:** cách trình bày TORAI, RCD trong báo cáo cho cô (phần ""đồ thị dùng ở đâu"").
+"
+results/T-016/de-xuat-tai-lieu-chung.md:70,## D1 — `docs/DECISIONS.md`: ghi ủy quyền tự duyệt SPEC,đã áp biến thể,docs/WHY.md WHY19/20; DECISIONS Q57; LESSONS SL36; K1 C5/C8; T001/T005/T006,"Q57 duyệt ghi và sửa; mã tạm WHY18/19,SL35,Q56 đổi để tránh trùng. Trạng thái tiêu đề WHY vẫn Đề xuất G1; không suy thành duyệt G1.","## D1 — `docs/DECISIONS.md`: ghi ủy quyền tự duyệt SPEC
+
+- **File đích:** `docs/DECISIONS.md`, thêm dòng cuối bảng.
+- **Đoạn mới:** `| Q-56 | 04/10 | Minh ủy quyền người làm T-016 tự viết SPEC rồi triển khai ngay, không dừng chờ duyệt; chỉ áp dụng cho task này (prompt Đợt 1 ngày 04/10/2026). Mọi luật khác của AGENTS giữ nguyên. | AGENTS mục 5 bước 2; tasks/T-016-ho-so-torai/LOG.md |`
+- **Lý do:** AGENTS mục 4: quyết định của Minh trong chat phải vào DECISIONS. Nếu prompt Đợt 1 áp dụng chung cho nhiều task, Minh có thể muốn ghi một dòng chung thay vì dòng riêng.
+"
+results/T-016/de-xuat-tai-lieu-chung.md:76,"## R1 — rút lại (sửa theo tự soát N3, REVIEW T-016)",không áp dụng / giữ phạm vi,xem đoạn nguyên văn nguồn,Không là đề xuất sửa đang mở; nội dung lịch sử/phạm vi được giữ.,"## R1 — rút lại (sửa theo tự soát N3, REVIEW T-016)
+
+Không cần sửa `data/README.md`: file đó mô tả thư mục `data/`, còn 30 ca TT nằm ở `D:\RCA-ext\work\T-016\data\`; nguồn, cách kiểm và lệnh dựng lại đã ghi ở `results/T-016/moi-truong.md` mục 4 (cùng cách T-006 ghi dữ liệu torai).
+"
+results/T-016/de-xuat-tai-lieu-chung.md:80,## Không đề xuất,không áp dụng / giữ phạm vi,xem đoạn nguyên văn nguồn,Không là đề xuất sửa đang mở; nội dung lịch sử/phạm vi được giữ.,"## Không đề xuất
+
+- MRP, AGENTS, review-prompt: không cần sửa.
+- STATE: chỉ dòng T-016 (đã ghi theo phạm vi)."
+results/T-017/dinh-chinh-task-cu.md:7,## D1 — T001: mô tả nhánh orig nhầm đường chạy mặc định,đã áp biến thể,docs/WHY.md WHY17; DECISIONS Q55; LESSONS SL34; results/T-001,Q55 ghi rõ phạm vi quyền và thêm chứng cứ N1/N2; WHY bỏ phương án chép điểm; danh sách chưa đổi P3.,"## D1 — T001: mô tả nhánh orig nhầm đường chạy mặc định
+
+- **Ở đâu:** `results/T-001/danh-sach-phuong-phap.md:106` (dòng SimpleRCA §3a), `:138` (L4).
+- **Sai gì:** gán 6sigma/weight100/50/20 và DataAdapter đọc nhãn cho nhánh orig mà không phân biệt lớp SimpleRCA riêng với CLI mặc định. Các dòng code được dẫn có thật, nhưng CLI orig không gọi lớp đó.
+- **Bằng chứng:** snapshot orig `main.py:5–11` import SimpleRCA nhưng registry['simplerca'] là NezhaRCA; `run.py:24` import NezhaRCA; `src/simplerca/nezha_rca.py:434–441` gọi NezhaDataAdapter, `nezha_adapter.py:26–58` đọc sáu parquet. SHA Git blob mọi snapshot được kiểm trong `sources/git-blob-verification.json`; đường đầy đủ/revision trong `sources/download-manifest.json`. Lớp riêng `src/simplerca/main.py:452–459` vẫn gọi DataAdapter; L4 tồn tại ở đường này, không phủ nhận.
+- **Ảnh hưởng:** hồ sơ code và đường nhãn orig; M4 vẫn hợp lý vì cả hai đường code đều khác §3.1.2. Chưa biết tác giả dùng CLI hay lớp riêng/revision khác sinh bảng2; không suy từ registry hiện tại rằng lớp riêng chưa từng được chạy.
+- **Đã triển khai:** snapshot đúng revision, kiểm blob, AST syntax (chỉ chứng minh parse không lỗi), sơ đồ gọi và luật từng modality trong `doi-chieu-code.md`. Không chạy code không license hoặc chép vào bản cài. Đây là sửa bằng chứng/lập luận, không có số task cũ cần chạy lại.
+- **Đề xuất cũ → mới:** thay phần “(1) nhánh mặc định orig: ngưỡng metric6σ... trọng số100/50/20” bằng “(1) CLI orig đăng ký NezhaRCA: metric CPU/mem max>1,19P95 normal và>80; trace P90 tuyệt đối>100ms; các danh sách top5 cộng phiếu theo hạng5-i, metric weight1,2. Lớp SimpleRCA riêng không được CLI đăng ký vẫn có metric6σ và weight100/50/20; đó là đường code khác.” Thay L4 bằng “DataAdapter của lớp SimpleRCA riêng, không phải adapter CLI orig: đọc fault_type nhưng hàm không dùng; fault_start/end chia cửa sổ.”
+"
+results/T-017/dinh-chinh-task-cu.md:16,## D2 — T001: luật Type bị khái quát thành chỉ đếm log,đã áp biến thể,docs/WHY.md WHY17; DECISIONS Q55; LESSONS SL34; results/T-001,Q55 ghi rõ phạm vi quyền và thêm chứng cứ N1/N2; WHY bỏ phương án chép điểm; danh sách chưa đổi P3.,"## D2 — T001: luật Type bị khái quát thành chỉ đếm log
+
+- **Ở đâu:** `results/T-001/danh-sach-phuong-phap.md:188`, hàng nhận định Type trong §7.
+- **Sai gì:** câu “bài tự nói luật chỉ đếm dòng lỗi” gán một hạn chế riêng RE3-OB cho toàn bộ luật.
+- **Bằng chứng:** PDF FSE §3.2.3 trang8 xét metric liên quan lỗi **hoặc** error counts log; trang9 chỉ nhận xét RE3-OB dùng error entries. arXivv2 giữ cùng nội dung. Text/hash/ảnh trong nguồn T017, bảng3 đối chiếu độc lập.
+- **Ảnh hưởng:** G1 có thể hiểu sai tín hiệu đầu vào luật và nghĩa tỷ lệ0,86. Không làm đổi nguyên số công bố hoặc quyết định M4.
+- **Đã triển khai:** `type-i-ii.md`, `ty-le-type-cong-bo.csv`, script đối chiếu PDF, mô tả nhãn và OPEN đủ. Không phân loại Type trên dataset mới.
+- **Đề xuất cũ → mới:** “Tỷ lệ Type do luật riêng của tác giả, xét metric liên quan lỗi hoặc số log lỗi so với ngưỡng. Riêng nhận xét RE3-OB, tác giả nói chỉ đếm error entries; không khái quát điều này sang mọi dataset. Tỷ lệ này không do SimpleRCA. Điểm bản cài lại còn phụ thuộc lựa chọn nhóm và chế độ biết trước thời điểm.”
+"
+results/T-017/dinh-chinh-task-cu.md:25,## D3 — T001: mô tả khác biệt RE3-SS còn thiếu nhánh tiền xử lý,đã áp biến thể,docs/WHY.md WHY17; DECISIONS Q55; LESSONS SL34; results/T-001,Q55 ghi rõ phạm vi quyền và thêm chứng cứ N1/N2; WHY bỏ phương án chép điểm; danh sách chưa đổi P3.,"## D3 — T001: mô tả khác biệt RE3-SS còn thiếu nhánh tiền xử lý
+
+- **Ở đâu:** `results/T-001/danh-sach-phuong-phap.md:106`, mô tả rcaeval_re3_ss chỉ nêu cờ dk_select_useful.
+- **Thiếu gì:** ngoài cờ, điều kiện nhánh dataset ở time_series thay đổi; cùng tên RE3-SS đi vào chuỗi tiền xử lý khác. Không coi việc “không liệt kê hết” là lỗi quyết định M4, nhưng cần hồ sơ đủ để reviewer đánh giá code khác bài.
+- **Bằng chứng:** `rcaeval/src/simplerca/time_series.py:101` dùng endswith('ss'); `rcaeval_re3_ss/.../time_series.py:101` dùng endswith('sock-shop'); đoạn103–110 drop_constant/convertmem/drop_extra/drop_near_constant/select_useful. Filter chọn CPU/mem std>1, lat50 std×1000>10 tại67–86. Diff hai snapshot được kiểm, không chạy toàn RE3-SS vì ngoài data allowlist của T017.
+- **Ảnh hưởng:** khác biệt số nếu ai dùng code branch làm phép tái lập RE3-SS; không đổi kết luận M4.
+- **Đã triển khai:** đối chiếu code trong hồ sơ nguồn và manifest. Không sửa file cũ, không chạy dữ liệu mới.
+- **Đề xuất cũ → mới:** thêm sau câu bật dk_select_useful “Ngoài cờ, time_series.py đổi kiểm hậu tố ss thành sock-shop, làm tên rcaeval_re3_ss đi qua chuỗi lọc khác. Đây là cấu hình dataset riêng, không được mô tả trong bài.”
+"
+results/T-017/dinh-chinh-task-cu.md:34,## Các điểm đã kiểm nhưng không gọi là lỗi mới,không áp dụng / giữ phạm vi,xem đoạn nguyên văn nguồn,Không là đề xuất sửa đang mở; nội dung lịch sử/phạm vi được giữ.,"## Các điểm đã kiểm nhưng không gọi là lỗi mới
+
+- T005 chưa cài SimpleRCA; không có số SimpleRCA ở T005–T007 để dùng lại. T002 duration vật lý OPEN; ratio P95 không cần đổi đơn vị. Chú thích micro giây ở T005 không đủ làm chứng cứ đơn vị, nên T017 không dùng nó.
+- Mâu thuẫn Eadro-SN I&II0,96 là trong PDF, đã giữ nguyên và ghi ở type-i-ii.md; không sửa số của task cũ.
+- Không thấy lỗi mới có bằng chứng trong phần còn lại liên quan T017. Phần không liên quan của T000–T012 không được tái thực nghiệm."
+results/T-017/de-xuat-tai-lieu-chung.md:7,## 1. docs/DECISIONS.md — thêm sau dòng cuối,đã áp biến thể,docs/WHY.md WHY17; DECISIONS Q55; LESSONS SL34; results/T-001,Q55 ghi rõ phạm vi quyền và thêm chứng cứ N1/N2; WHY bỏ phương án chép điểm; danh sách chưa đổi P3.,"## 1. docs/DECISIONS.md — thêm sau dòng cuối
+
+**Cũ → mới:** chưa có dòng → “04/10/2026 — Minh ủy quyền tự duyệt SPEC theo prompt Đợt 1 ngày 04/10/2026 cho T-017 SimpleRCA; chỉ ghi task/kết quả/src/simplerca/work T017 và dòng STATE; không mở locked, không commit/push.” Mã Q do Minh quyết, không tự cấp trong file chung.
+
+**Vì sao:** lưu quyền và giới hạn ngoài chat. **Phụ thuộc:** provenance SPEC, không phải duyệt tham số phương pháp hay số kết quả.
+"
+results/T-017/de-xuat-tai-lieu-chung.md:13,## 2. docs/WHY.md — đề xuất thêm mục “Các quy ước M4 SimpleRCA của T-017”,đã áp biến thể,docs/WHY.md WHY17; DECISIONS Q55; LESSONS SL34; results/T-001,Q55 ghi rõ phạm vi quyền và thêm chứng cứ N1/N2; WHY bỏ phương án chép điểm; danh sách chưa đổi P3.,"## 2. docs/WHY.md — đề xuất thêm mục “Các quy ước M4 SimpleRCA của T-017”
+
+**Cũ → mới:** chưa có mục → nguyên văn nháp dưới. Trạng thái Đề xuất (G1), chưa cấp WHY-number để tránh xung đột các phiên khác.
+
+> Chọn một bản cài độc lập của mô tả §3.1.2, đặt tên “SimpleRCA (M4, quy ước T-017)”. Vì sao: ba entrypoint tác giả và lớp SimpleRCA riêng đều dùng luật khác bài; việc gọi tên giống nhau không định danh được code sinh bảng 2. Phương án đã xét: chạy nguyên code nhánh rcaeval, dùng lớp SimpleRCA riêng, hoặc chép điểm công bố; các phương án đó không thực hiện yêu cầu Q37/Q38 cài theo bài. Bằng chứng: doi-chieu-code.md, manifest ba revision và PDF FSE trang5. Kết luận phụ thuộc: mọi số T017 chỉ nói về bản M4 này, chưa tái lập đúng chương trình tác giả.
+
+> Metric mặc định dùng mean+3std với ddof0 và upper tail strictly >. Vì sao: bài nêu 3sigma hoặc P95 mà không khóa lựa chọn; 3sigma cho một công thức xác định và không dùng nhãn. Đây không phải thống kê robust trước ngoại lệ dù bài dùng từ robust. Phương án khác P95 đã chạy trên ca ví dụ; không chọn cấu hình theo accuracy. Không lấy trị tuyệt đối vì bài nói exceeds; điểm giảm không tạo alert. Bằng chứng: SPEC khóa trước dev, core.py, unit-tests và sensitivity. Kết luận phụ thuộc: số cảnh báo và thứ hạng M4; chuyển sang P95 hoặc two-sided tạo biến thể khác.
+
+> Một giá trị metric vượt ngưỡng là một alert; cộng tất cả điểm trong cửa sổ (events). Trace và log mỗi modality một phiếu/service. Vì sao: diễn giải trực tiếp “current value” và “number of alerts” của bài, không thêm trọng số riêng. Phương án khác mỗi metric một phiếu (channels) cũng phù hợp một cách đọc của bài; đã kiểm riêng. Bài không định nghĩa đơn vị alert hay cách tổng hợp qua thời gian, nên chưa xác nhận events là cách tác giả chạy. Bằng chứng: hai cấu hình trong sensitivity và công thức hồ sơ. Kết luận phụ thuộc: score tăng theo số cột/tần suất/độ dài; không so score thô giữa các dataset. Alert count lớn có thể do persistence hoặc nhiều kênh tương quan, không chỉ do nguyên nhân mạnh.
+
+> Trace dùng P95 tuyến tính/service trong từng cửa sổ, một phiếu nếu P95 incident>3P95 normal. Vì sao: đúng mức service và ví dụ3x của bài; không dùng cây span, parent-child hay đồ thị. Phương án khác factor2/4 đã kiểm nhưng không chọn winner. Không đổi đơn vị duration khi lấy ratio vì cùng nguồn/cùng đơn vị; unit vật lý của parquet vẫn OPEN ở T002. Bằng chứng: example score/quantile độc lập và source §3.1.2. Kết luận phụ thuộc: bản này chấm span durations gộp theo service, chưa định danh service latency end-to-end của tác giả khi nhiều operation/span nội bộ.
+
+> Log dùng substring ERROR/FAIL/EXCEPTION không phân biệt hoa thường, một count/dòng, một phiếu nếu count>0. Vì sao: 0 là ngưỡng tối thiểu tường minh để kiểm rule; bài không công bố ngưỡng. Đây không bảo đảm “sudden spike” hay false-positive đã hiệu chỉnh. Phương án khác count>1/>10 đã kiểm tổng hợp; trên ca ví dụ thiếu log nên kiểm dữ liệu thực đó không phân xử được log threshold. Kiểm thêm ca thứ hai theo allowlist, có log: ngưỡng0/1/10 cùng một entity nhận phiếu và score/ranking không đổi; count được tính lại độc lập. Bằng chứng: known-answer tests; ca cpu1 thiếu log được giữ; runs/supplement-001/summary.json. Kết luận phụ thuộc: thứ hạng M4 có thể tăng do log lỗi nền, từ ghép như failure, hoặc quy mô lưu log; kiểm một ca không xác nhận calibration; G1 cần chốt dùng quy ước nào nếu đưa vào P3.
+
+> Cửa sổ ±300s và so riêng ±600s trên ca ví dụ; mốc tiêm chỉ đưa vào adapter biết trước thời điểm. Vì sao: tái dùng cấu hình kiểm T005, không tự chốt độ dài P3 theo Q54. Phương án khác toàn ca hoặc onset tự phát hiện cần giao thức khác; không giả định có detector SimpleRCA vận hành. Bằng chứng: injection-manifest kiểm lại hash nguồn T002, run progress, sensitivity. Kết luận phụ thuộc: số T017 thuộc known-incident mode; không dùng để đo tự phát hiện/độ trễ onset.
+
+> Ứng viên là union service quan sát được trong hai cửa sổ; giữ tên mặc định, chỉ alias tường minh từ schema. Vì sao: root có thể chỉ hiện ở một modality; lọc theo root hoặc danh sách service bị tiêm là rò nhãn. Regex pod từng làm nhầm tên database, đã bỏ bằng regression test và rerun004. Phương án khác giao ba modality bỏ mất ứng viên có dữ liệu thiếu; suy tên bằng regex không được chứng minh trên schema. Kết luận phụ thuộc: thứ hạng và denominator service; absent root sau chấm không được lén thêm vào phương pháp.
+
+> Missing channel ghi unavailable; log bảng rỗng là0; normal metric≥2 finite, trace≥1 span/phía; bỏ NaN/inf có counters, không ffill hoặc floor. Vì sao: không chế tạo quan sát và không đưa dữ liệu tương lai backward vào baseline. Phương án ffill hoặc floor làm đổi count/threshold ở constant/missing. Bằng chứng: test missing/std0/negative-duration và counters run004. Kết luận phụ thuộc: min points chỉ là điều kiện tính toán, không bảo đảm ngưỡng ổn định thống kê.
+
+> Tie groups giữ đúng score; thứ tự lexical chỉ hiển thị; chấm fractional Hit và expected reciprocal rank trong nhóm hòa, kèm bounds. Allzero abstain. Vì sao: không biến thứ tự cột/tên thành chứng cứ root. Phương án optimistic hoặc pessimistic báo bounds nhưng không dùng chọn cấu hình; paper không nêu tie treatment. Bằng chứng: synthetic ties, output và evaluation separate sau serialize. Kết luận phụ thuộc: không so điểm tie-aware của nhóm trực tiếp với paper khi paper chưa rõ cách xử lý hòa.
+
+**Lý do ghi nháp:** task không được sửa WHY chung. **Kết luận phụ thuộc:** mọi kết quả M4 ghi “chờ WHY” ở hồ sơ và kiểm đúng đắn. Minh có thể duyệt hoặc chọn quy ước khác ở G1; lúc đó phải chạy lại trên phạm vi đã chia hợp lệ.
+"
+results/T-017/de-xuat-tai-lieu-chung.md:37,## 3. docs/LESSONS.md — đề xuất bổ sung sự cố adapter T017,đã áp biến thể,docs/WHY.md WHY17; DECISIONS Q55; LESSONS SL34; results/T-001,Q55 ghi rõ phạm vi quyền và thêm chứng cứ N1/N2; WHY bỏ phương án chép điểm; danh sách chưa đổi P3.,"## 3. docs/LESSONS.md — đề xuất bổ sung sự cố adapter T017
+
+**Cũ → mới:** chưa có mục → “T017: regex suy pod từ tên làm gộp nhầm database hợp lệ (ts-assurance-mongo→ts). Kiểm tên bằng dữ liệu/schema, dùng alias tường minh; kiểm điểm trung gian và giữ/rerun mọi lượt bị ảnh hưởng.”
+
+**Vì sao:** lỗi đã có bằng chứng và đã sửa, không phải nguy cơ giả định. **Phụ thuộc:** cách dựng adapter các dataset khác; không thay luật repo hay thêm cổng.
+"
+results/T-017/de-xuat-tai-lieu-chung.md:43,"## 4. Chưa đề xuất chọn dataset, split, detector hoặc đồ thị",không áp dụng / giữ phạm vi,xem đoạn nguyên văn nguồn,Không là đề xuất sửa đang mở; nội dung lịch sử/phạm vi được giữ.,"## 4. Chưa đề xuất chọn dataset, split, detector hoặc đồ thị
+
+Không có. Type I/II là luật mô tả của tác giả, dùng nhãn injection/root/fault; chưa đủ đặc tả để tự tính đúng tỷ lệ. Số30dev không quyết định G1."
+results/T-018/dinh-chinh-task-cu.md:7,## D1. T-002 — thẻ RCAEval thiếu một đường rò nhãn: bộ cột của từng ca,đã áp biến thể,WHY18; MRP P2; K1 C11; LESSONS SL35; T002/T001,"Q56: E1 chỉ lý do chẩn đoán chưa cấu hình P3; E5 thu gọn, D1/D2/D4 được áp.","## D1. T-002 — thẻ RCAEval thiếu một đường rò nhãn: bộ cột của từng ca
+
+- **File:** `results/T-002/the-rcaeval.md:158-160` (mục 8 ""Rò nhãn và thông tin phục vụ G1"", thẻ RE2-TT; cùng nội dung ở các thẻ khác dòng 288–290, 421–423, 512–514).
+- **Sai gì:** mục 8 liệt kê ba đường rò: tên thư mục, `inject_time`, biên file. Thiếu đường thứ tư: **tập cột có mặt trong file metric của một ca** tương quan với service gốc và với triệu chứng. Đây là thiếu sót, không phải câu sai.
+- **Bằng chứng** (`results/T-018/cot-re2tt/cot-khong-du-30-ca.csv`, `scripts/dem_cot.py`; đếm trên 30 ca dev, so với nhãn sau khi đếm xong):
+  - 12 cột latency/workload của contacts, preserve, preserve-other, seat, security, user vắng ở **đúng 4 ca**, cả 4 có service gốc `ts-order-service` (order_disk_2, order_disk_3, order_loss_2, order_loss_3). 26 ca còn lại đều có.
+  - 23 cột `*_error` chỉ có ở 2–20 ca. Sự có mặt trùng một phần với service gốc: `ts-train-service_error` có ở 6 ca, 4 ca có gốc train-service; `ts-travel-service_error` có ở cả 6 ca travel-service. Cột error chỉ xuất hiện khi có lỗi được ghi trong file, kể cả sau mốc tiêm, nên sự có mặt của nó là thông tin của tương lai và của triệu chứng.
+- **Nguyên nhân khả thi khác (Q-33):** 4 ca order có thể thuộc một đợt thu khác mà bộ tạo tải không gọi luồng đặt vé; khi đó đây là khác biệt tải theo đợt, trùng với service gốc do cách xếp lịch tiêm. Dù nguyên nhân nào, với một phương pháp hay adapter dựng bộ cột theo từng ca, bộ cột mang thông tin tương quan với nhãn.
+- **Kết luận bị ảnh hưởng:** tính đầy đủ của mục 8 thẻ RCAEval; giao thức P3 (MRP §6 mục 8 ""không đưa nhãn vào phương pháp, kể cả đầu vào suy ra từ chúng""). Với RCA chạy từng ca (BARO, N-Sigma) bộ cột là của chính ca đó và không học xuyên ca, nên rủi ro thấp hơn; với phương pháp học xuyên ca (GDN, phương pháp có giám sát) rủi ro trực tiếp.
+- **Đã triển khai trong T-018:** đếm và ghi số; GDN dùng bộ cột cố định L\* (giao 30 ca dev) để không phụ thuộc bộ cột của ca được chấm; mục 9.1 của `ho-so-gdn.md`.
+- **Đề xuất sửa** (thêm vào cuối đoạn dòng 160): ""Đường rò thứ tư: tập cột metric khác nhau giữa các ca và tương quan với service gốc (12 cột latency/workload chỉ vắng ở 4 ca có gốc ts-order-service; cột `*_error` chỉ có khi có lỗi được ghi). Phương pháp học xuyên ca phải dùng bộ cột cố định chốt từ dữ liệu học. Nguồn: `results/T-018/cot-re2tt/cot-khong-du-30-ca.csv`.""
+"
+results/T-018/dinh-chinh-task-cu.md:19,"## D2. T-001 — câu ""chưa kiểm bảng của bài dùng chế độ nào"" nay đã kiểm được một phần",đã áp biến thể,WHY18; MRP P2; K1 C11; LESSONS SL35; T002/T001,"Q56: E1 chỉ lý do chẩn đoán chưa cấu hình P3; E5 thu gọn, D1/D2/D4 được áp.","## D2. T-001 — câu ""chưa kiểm bảng của bài dùng chế độ nào"" nay đã kiểm được một phần
+
+- **File:** `results/T-001/danh-sach-phuong-phap.md:191` (mục 7) và `:91` (mục 2).
+- **Sai gì:** dòng 191 nêu nguyên nhân khả thi khác cho ""GDN F1 0,81 trên SWaT"" là ""chế độ mặc định chọn ngưỡng trên nhãn test (L8). Chưa kiểm bảng của bài dùng chế độ nào"". Bài ghi rõ ngưỡng là max điểm trên tập kiểm định (bài GDN, dòng 286–291 và 341–350 của `gdn.txt`), tức tương ứng `report='val'`. Nhưng ở cả hai chế độ, code chuẩn hóa điểm bằng trung vị/IQR của toàn tập test (`evaluate.py:52`). Dòng 91 viết ""Chế độ `val` ... khớp bài"": đúng về ngưỡng, nhưng thiếu ý ngưỡng tính trên thang của tập kiểm định còn điểm test trên thang của tập test (`evaluate.py:21` so với `:20`, `:52`).
+- **Bằng chứng:** `results/T-018/ho-so-gdn.md` mục 2 (B8, B10), mục 5 dòng 4 và 7, mục 8.1 (G1–G3).
+- **Kết luận bị ảnh hưởng:** mục 7 của T-001 (nguyên nhân khả thi khác cho số công bố). Danh sách phương pháp không đổi.
+- **Đã triển khai trong T-018:** biến thể R-chuẩn-hóa-b (trung vị/IQR từ tập kiểm định) được tính song song với code ở mọi lượt (`scripts/tinh_tay_gdn.py`, `scripts/phan_tich_gdn.py`).
+- **Đề xuất sửa:**
+  - dòng 191, cột 2: ""Chế độ mặc định chọn ngưỡng trên nhãn test (L8). Chưa kiểm bảng của bài dùng chế độ nào."" → ""Bài ghi ngưỡng = max điểm trên tập kiểm định (tương ứng `report='val'`; bài dòng 286–291, 341–350), nhưng code chuẩn hóa điểm test bằng trung vị/IQR của cả tập test ở mọi chế độ (L8), và không có log hay dữ liệu để biết bảng sinh từ chế độ nào (T-018, `ho-so-gdn.md` mục 8.1).""
+  - dòng 91: thêm sau ""khớp bài"": ""về cách đặt ngưỡng; điểm kiểm định chuẩn hóa bằng thống kê của chính tập kiểm định, điểm test bằng thống kê của tập test (`GD:evaluate.py:20-21, 52`).""
+"
+results/T-018/dinh-chinh-task-cu.md:30,"## D3. T-005 — dữ liệu GDN dùng bộ cột có cột của ca test, và chuẩn hóa min-max đưa cột hằng sang đơn vị thô",không áp dụng,xem đoạn nguyên văn nguồn,Q56 không áp E6 và D3; giữ cảnh báo tái dùng script timing cho P3 riêng.,"## D3. T-005 — dữ liệu GDN dùng bộ cột có cột của ca test, và chuẩn hóa min-max đưa cột hằng sang đơn vị thô
+
+- **File:** `results/T-005/scripts/chuan_bi_dau_vao.py:122` (bộ cột = giao 5 ca học **và ca test**), `:125-128` (khoảng 0 thay bằng 1); `results/T-005/do-kha-thi.md:51` (""333 cột"").
+- **Sai gì:** không sai với mục đích của T-005 (đo thời gian). Nhưng nếu dùng lại script này cho P3: (1) bộ cột phụ thuộc ca được chấm (siêu dữ liệu test, `ho-so-gdn.md` G7); (2) cột hằng trong tập học được chia cho 1, nên ở dữ liệu mới cột đó mang nguyên đơn vị thô.
+- **Bằng chứng:** dựng lại dữ liệu bằng script độc lập ra **trùng từng byte** với file của T-005 (`runs/b3-chuan-bi.json`, SHA-256). Với bộ cột L\*, giá trị lớn nhất sau chuẩn hóa ở 19 đoạn bình thường giữ ngoài: 6,0·10^8 khi học trên 1 ca, 7717 khi học trên 5 ca (cùng file). Ảnh hưởng tới điểm GDN: trên 19 đoạn bình thường giữ ngoài, mô hình học bằng đúng dữ liệu của T-005 (R1, trọng số trùng T-005) báo động ở 11,2 % số tick theo cách chuẩn hóa của code và 93,7 % nếu chuẩn hóa điểm theo tập kiểm định (`runs/b6b7-phan-tich.json`; `ho-so-gdn.md` mục 9.2, 9.4).
+- **Kết luận bị ảnh hưởng:** không kết luận nào của T-005 (thời gian chạy không phụ thuộc giá trị). Ảnh hưởng nếu P3 dùng lại `chuan_bi_dau_vao.py`.
+- **Đã triển khai trong T-018:** L\* cố định; đo hệ quả của cột hằng (mục 9.2 hồ sơ).
+- **Đề xuất sửa:** thêm một dòng ghi chú dưới bảng 2b của `do-kha-thi.md`: ""Dữ liệu GDN ở đây chỉ để đo thời gian: bộ 333 cột có dùng cột của ca test, và cột hằng trong tập học bị chia cho 1. Không dùng lại cho chấm điểm; xem T-018 `ho-so-gdn.md` mục 8–9.""
+"
+results/T-018/dinh-chinh-task-cu.md:39,## D4. T-001 — ghi chú về cài đặt baseline của DecompRCA,đã áp biến thể,WHY18; MRP P2; K1 C11; LESSONS SL35; T002/T001,"Q56: E1 chỉ lý do chẩn đoán chưa cấu hình P3; E5 thu gọn, D1/D2/D4 được áp.","## D4. T-001 — ghi chú về cài đặt baseline của DecompRCA
+
+- **File:** `results/T-001/danh-sach-phuong-phap.md:163-179` (mục 6, cột DecompRCA) và `:186` (mục 7).
+- **Sai gì:** bảng đánh dấu DecompRCA dùng RCD và CIRCA, đúng. Nhưng RCD (và ε-Diagnosis) của DecompRCA là bản PyRCA, CIRCA là bản gốc NetManAIOps có thêm DA, không phải bản RCAEval (`decomprca.md` K12). Dòng 186 giải thích tần suất ""có thể vì chúng sẵn trong RCAEval""; với DecompRCA giải thích này chỉ đúng cho BARO.
+- **Bằng chứng:** `DecompRCA/method/algorithms/rca/rcd.py:5`, `epsilon_diagnosis.py:5`, `circa.py:22-28`; PDF DecompRCA dòng 1050–1084.
+- **Kết luận bị ảnh hưởng:** không đổi danh sách. Ảnh hưởng nếu ai dùng số RCD/CIRCA của DecompRCA làm mốc tái lập cho bản RCAEval.
+- **Đã triển khai trong T-018:** ghi ở `decomprca.md` mục 3 (K12), mục 4 ý 5.
+- **Đề xuất sửa:** thêm vào chú thích dưới bảng mục 6 (sau dòng 179): ""DecompRCA dùng RCD, ε-Diagnosis của PyRCA và CIRCA gốc (RHT + DA), không phải bản RCAEval; chỉ BARO chạy qua RCAEval (T-018, `decomprca.md` K12)."""
+results/T-018/de-xuat-tai-lieu-chung.md:5,## E1. `docs/WHY.md` — thêm mục: cách chạy GDN ở chế độ b,đã áp biến thể,WHY18; MRP P2; K1 C11; LESSONS SL35; T002/T001,"Q56: E1 chỉ lý do chẩn đoán chưa cấu hình P3; E5 thu gọn, D1/D2/D4 được áp.","## E1. `docs/WHY.md` — thêm mục: cách chạy GDN ở chế độ b
+
+- **Đoạn cũ:** không có.
+- **Đoạn mới:**
+
+```markdown"
+results/T-018/de-xuat-tai-lieu-chung.md:11,"## WHY-17. Lý do của phép chẩn đoán GDN ở T-018 (bộ cột cố định, điền cột thiếu, chuẩn hóa và ngưỡng từ tập kiểm định) — Đề xuất (G1); không phải cấu hình P3",đã áp biến thể,WHY18; MRP P2; K1 C11; LESSONS SL35; T002/T001,"Q56: E1 chỉ lý do chẩn đoán chưa cấu hình P3; E5 thu gọn, D1/D2/D4 được áp.","## WHY-17. Lý do của phép chẩn đoán GDN ở T-018 (bộ cột cố định, điền cột thiếu, chuẩn hóa và ngưỡng từ tập kiểm định) — Đề xuất (G1); không phải cấu hình P3
+
+- **Trạng thái:** ứng viên, **chưa đạt**: trên dữ liệu bình thường giữ ngoài, cách này vẫn báo động sai 45–100 % số tick (`results/T-018/ho-so-gdn.md` mục 9.4). Mục này chỉ ghi lý do của các lựa chọn đã dùng trong phép chẩn đoán T-018; cấu hình GDN cho P3 chốt sau, khi đã xử lý lệch mức (REVIEW R6).
+- **Đã dùng trong T-018:** (1) bộ cột chốt từ siêu dữ liệu dev trước khi thấy ca được chấm; ca thiếu cột thì điền trung vị tập học và ghi số cột đã điền; (2) dữ liệu học là đoạn bình thường không thuộc ca được chấm (với RCAEval: đoạn trước mốc tiêm của các ca dev, tức nhãn dev dùng để học); (3) cột hằng trong tập học xử lý trước khi chuẩn hóa, không để chia cho 1; (4) học theo `run.sh` của GDN, epoch chọn theo val loss như code; (5) trung vị/IQR để chuẩn hóa điểm lệch lấy từ tập kiểm định, giữ cố định; (6) ngưỡng = max điểm đã làm trơn trên tập kiểm định (`report='val'`); (7) chấm theo luồng trên toàn file, không dùng mốc tiêm của ca được chấm.
+- **Vì sao:** code gốc chọn ngưỡng theo nhãn test khi `report='best'` (mặc định) và ở mọi chế độ chuẩn hóa điểm test bằng trung vị/IQR của chính tập test, tức dùng dữ liệu tương lai; với file RCAEval, mốc tiêm nằm đúng giữa file nên thống kê cả file mang thông tin về vị trí sự cố. Bộ cột của RE2-TT khác nhau giữa các ca và tương quan với service gốc. Cột hằng trong tập học bị chia cho 1 nên ở dữ liệu mới mang đơn vị thô.
+- **Phương án đã xét:** dùng nguyên code (`report='val'`): giữ G2–G4 của hồ sơ; bộ cột theo giao ca học và ca test như T-005: phụ thuộc ca được chấm.
+- **Bằng chứng:** `results/T-018/ho-so-gdn.md` mục 7–9; `results/T-018/runs/b6b7-phan-tich.json`.
+- **Chưa kiểm:** cách xử lý cột hằng tốt nhất và mức ảnh hưởng tới P/R/F1 (việc của P3).
+- **Kết luận phụ thuộc:** mọi số phát hiện của GDN ở P3 chế độ b.
+```
+
+- **Lý do:** hồ sơ dùng biến thể ""chuẩn hóa từ tập kiểm định"" và bộ cột L\* trong kết quả chẩn đoán (mục 7–9); MRP P3 chế độ b cần một cách chạy không dùng nhãn.
+- **Kết luận phụ thuộc:** `ho-so-gdn.md` mục 8.2, 9.1, 9.2; bảng ""bình thường vs bình thường"".
+"
+results/T-018/de-xuat-tai-lieu-chung.md:25,## E2. `docs/WHY.md` — thêm mục: báo Retrieval@K và Rerank@1 ở P3,chờ Minh duyệt G1,D6,Q56 chuyển E2 G1; chưa có WHY về Retrieval service K5/10.,"## E2. `docs/WHY.md` — thêm mục: báo Retrieval@K và Rerank@1 ở P3
+
+- **Đoạn cũ:** không có.
+- **Đoạn mới:**
+
+```markdown"
+results/T-018/de-xuat-tai-lieu-chung.md:31,"## WHY-18. Vì sao báo Retrieval@K và Rerank@1 (K tính theo service) cùng MRR, Hit@k — Đề xuất (G1, dùng ở P3)",chờ Minh duyệt G1,D6,Q56 chuyển E2 G1; chưa có WHY về Retrieval service K5/10.,"## WHY-18. Vì sao báo Retrieval@K và Rerank@1 (K tính theo service) cùng MRR, Hit@k — Đề xuất (G1, dùng ở P3)
+
+- **Chọn:** với mọi phương pháp RCA, báo thêm Retrieval@K (nguyên nhân gốc nằm trong K service đầu của thứ hạng mức service) và Rerank@1 = Hit@1 / Retrieval@K, với K ∈ {5, 10}; dùng `Evaluator.retrieval_service` và `rerank_service` của RCAEval `259ea41`.
+- **Vì sao:** Hit@k gộp hai kiểu hỏng khác nhau: không tìm ra nguyên nhân, và tìm ra nhưng xếp sai. Phép tách cho P4 biết nên tìm cơ chế ở bước nào (bài DecompRCA, NeurIPS 2026 E&D). Tính được từ thứ hạng đã có, không tốn chạy thêm.
+- **Phương án đã xét:** dùng định nghĩa ở Bảng 1 của DecompRCA (K metric, trúng nếu bất kỳ metric nào của service gốc nằm trong K): với hệ ít service, bộ chọn ngẫu nhiên 15 metric đã trúng 0,82–0,90 (RE1-OB, RE1-SS), nên mức trần chủ yếu do cấu trúc.
+- **Bằng chứng:** `results/T-018/decomprca.md` mục 3 (K7–K9), mục 4; `results/T-018/runs/b9-retrieval-ngau-nhien.json`.
+- **Kết luận phụ thuộc:** phân loại hạn chế ở P4 (lỗi truy hồi hay lỗi xếp lại).
+```
+
+- **Lý do:** đề xuất P3 ý 1 của `decomprca.md`.
+- **Kết luận phụ thuộc:** `decomprca.md` mục 4, 5.
+"
+results/T-018/de-xuat-tai-lieu-chung.md:43,"## E3. `docs/MRP.md` — P2, ý ""Kiểm rò nhãn"": thêm đường rò qua bộ cột",đã áp biến thể,WHY18; MRP P2; K1 C11; LESSONS SL35; T002/T001,"Q56: E1 chỉ lý do chẩn đoán chưa cấu hình P3; E5 thu gọn, D1/D2/D4 được áp.","## E3. `docs/MRP.md` — P2, ý ""Kiểm rò nhãn"": thêm đường rò qua bộ cột
+
+- **Đoạn cũ** (dòng 151, câu cuối): ""Nếu một baseline cần biết trước vị trí triệu chứng thì ghi rõ đầu vào đó và nguồn hợp lệ.""
+- **Đoạn mới:** ""Nếu một baseline cần biết trước vị trí triệu chứng thì ghi rõ đầu vào đó và nguồn hợp lệ. Kiểm cả bộ cột: ở RE2-TT, tập cột metric khác nhau giữa các ca và tương quan với service gốc (T-018); phương pháp học xuyên ca phải dùng bộ cột cố định chốt từ dữ liệu học.""
+- **Lý do:** `dinh-chinh-task-cu.md` D1.
+- **Kết luận phụ thuộc:** giao thức P3, mọi phương pháp học xuyên ca.
+"
+results/T-018/de-xuat-tai-lieu-chung.md:50,## E4. `docs/knowledge/K1-phuong-phap-rca.md` — §C.11 GDN,đã áp biến thể,WHY18; MRP P2; K1 C11; LESSONS SL35; T002/T001,"Q56: E1 chỉ lý do chẩn đoán chưa cấu hình P3; E5 thu gọn, D1/D2/D4 được áp.","## E4. `docs/knowledge/K1-phuong-phap-rca.md` — §C.11 GDN
+
+- **Đoạn cũ** (dòng 250): ""directed edge được học bằng top-k cosine similarity giữa sensor embeddings, có thể giới hạn candidate relations bằng prior.""
+- **Đoạn mới:** ""directed edge được học bằng top-k cosine similarity giữa sensor embeddings. Bài cho phép giới hạn candidate relations bằng prior, nhưng code `d-ailin/GDN@9853899` không cài (forward luôn tính top-k trên mọi nút); top-k của code gồm cả chính nút nên mỗi nút có k − 1 láng giềng khác nó (T-018, `results/T-018/ho-so-gdn.md` mục 5).""
+- **Lý do:** K1 là kiến thức nền ""chưa kiểm lại""; điểm này đã kiểm trên code.
+- **Kết luận phụ thuộc:** mọi ý tưởng ""đưa đồ thị gọi vào GDN"" ở P6 (WHY-10): phải sửa code, không chỉ đổi cấu hình.
+"
+results/T-018/de-xuat-tai-lieu-chung.md:57,## E5. `docs/LESSONS.md` — thêm một sai lầm,đã áp biến thể,WHY18; MRP P2; K1 C11; LESSONS SL35; T002/T001,"Q56: E1 chỉ lý do chẩn đoán chưa cấu hình P3; E5 thu gọn, D1/D2/D4 được áp.","## E5. `docs/LESSONS.md` — thêm một sai lầm
+
+- **Đoạn cũ:** không có (sau dòng SL33 của bảng).
+- **Đoạn mới:**
+
+```markdown
+| SL34 | Viết câu phổ quát (""30 ca đều có `inject_time.txt`"") sau khi chỉ nhìn một thư mục; ghi giờ vào LOG theo ước đoán thay vì đọc đồng hồ (T-018, đã đính chính trong LOG) | Câu ""mọi/đều"" phải có lệnh đếm trên đủ đối tượng; giờ trong LOG lấy bằng `date` |
+```
+
+- **Lý do:** lỗi của chính T-018, đã tự phát hiện và đính chính (LOG dòng 09:10 và đính chính giờ).
+- **Kết luận phụ thuộc:** không.
+"
+results/T-018/de-xuat-tai-lieu-chung.md:69,"## E6. `docs/MRP.md` — P1, dòng 143 (không bắt buộc)",không áp dụng,xem đoạn nguyên văn nguồn,Q56 không áp E6 và D3; giữ cảnh báo tái dùng script timing cho P3 riêng.,"## E6. `docs/MRP.md` — P1, dòng 143 (không bắt buộc)
+
+- **Đoạn cũ:** ""\""Where Root Cause Analysis Fails: A Retrieval-Reranking Decomposition\"" (RCAEval ghi là NeurIPS 2026 Evaluations and Datasets).""
+- **Đoạn mới:** ""\""Where Root Cause Analysis Fails: A Retrieval-Reranking Decomposition\"" (arXiv 2609.36686, NeurIPS 2026 Evaluations and Datasets; đã đọc ở T-018).""
+- **Lý do:** đã xác nhận nơi đăng trên PDF và trang arXiv.
+- **Kết luận phụ thuộc:** không.
+
+Không đề xuất gì cho `AGENTS.md`, `CLAUDE.md`, `docs/DECISIONS.md` (không có quyết định nào của Minh trong phiên), `docs/reference/`, `docs/review-prompt.md`, `data/README.md`, `requirements.txt`.
+
+Ghi chú cho `data/README.md` (không phải đề xuất sửa, để Minh biết): `inject_time.txt` của 30 ca dev đã tải về `D:\RCA-ext\work\T-018\nguon\rcaeval-inject\` (ngoài `data/`), kiểm oid HF 30/30. Nếu muốn đưa vào `data/rcaeval/`, cần một đề xuất riêng."
+results/T-019/dinh-chinh-task-cu.md:5,## D1 — T-003: điều hướng Sock Shop chưa khớp phạm vi T-002,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## D1 — T-003: điều hướng Sock Shop chưa khớp phạm vi T-002
+
+- **Task/file:dòng:** `results/T-003/the-dataset-ngoai-rcaeval.md:19`.
+- **Cũ:** “Sock Shop thuộc T-002/P2; không tự thêm raw vào gói.”
+- **Sai gì:** T-002 không viết thẻ SS. `tasks/T-002-the-dataset-rcaeval/SPEC.md:10` chỉ giao bốn thẻ TT/OB; `results/T-002/the-rcaeval.md:560` nói rõ hai mẫu SS được kiểm schema nhưng không viết thẻ SS/RE1 ngoài SPEC. Dẫn người đọc về T-002 để tìm hồ sơ SS toàn release có thể khiến tưởng phần G1 này đã hoàn tất.
+- **Bằng chứng và phản bác:** T-003 vẫn nhắc G1 phải trả lời Sock Shop. T-002 có schema hai mẫu SS, nên referral không hoàn toàn vô căn cứ. Đây là lỗi điều hướng/phạm vi, không phải sai số census hoặc bằng chứng T-002 bỏ việc đã được duyệt.
+- **Kết luận ảnh hưởng:** mức đủ hồ sơ để G1 trả lời dùng/không dùng SS. Không ảnh hưởng số TT/OB của T-002.
+- **Đã triển khai T-019:** thẻ riêng đủ 10 mục/9 tiêu chí; census toàn release; file thực và nhãn; sổ ca; nguồn kiến trúc tĩnh với giới hạn.
+- **Đề xuất mới nguyên văn:** “T-002 chỉ kiểm hai mẫu Sock Shop ngoài bốn thẻ chính. Thẻ riêng Sock Shop và census toàn release nằm ở T-019. Gói T-003 không thêm raw Sock Shop.”
+- **Mức:** không chặn T-019; Minh duyệt trước khi sửa file cũ.
+"
+results/T-019/dinh-chinh-task-cu.md:16,## Phần kiểm mới không phải lỗi của task cũ,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## Phần kiểm mới không phải lỗi của task cũ
+
+1. Bảng nguồn HF đã snapshot tại `results/T-002/public-metadata/run-002/sources/hf-README.md:41` ghi RE3-SS F1–F5; prose dòng52 giới hạn F5 ở OB. GitHub README và census toàn SS chỉ F1–F4. Đây là lệch nguồn, không sửa snapshot. T-002 không có thẻ SS nên không quy thành sai số thẻ T-002. T-019 đã giữ hai lời nguồn và đếm thật trong thẻ/census; nếu mở rộng `public-sources.md:61`, đề xuất thêm: “Bảng HF cũng ghi F1–F5 cho RE3-SS, nhưng GitHub README và tree ghim chỉ có F1–F4. Census chi tiết nằm ở results/T-019/.”
+2. T-002 nói có tám `root_cause.txt` tại SS và chưa đọc chi tiết; số file đúng. T-019 kiểm thấy chỉ bảy nội dung khác nhau, một nhãn `front-end_f2_2` lặp nhãn ca trước và nằm ngoài cửa sổ own log. Đã triển khai `sources-audit/label-audit.json`, `inspection/root-cause-labels.json` và giới hạn chấm tại thẻ. Chưa có task cũ khẳng định tám nhãn hợp lệ để đính chính.
+3. `results/T-006/kiem-dung-dan.md:66` nói local RE1-SS chứa100ca fse-ss+25disk: đã kiểm cả raw/simple/hash và đúng. `results/T-007/kiem-dung-dan.md:41` về90ca RE2-OB đúng trong phạm vi đã kiểm; T-019 bổ sung metric-content. Không đính chính hai câu này. Năm cặp CSV→HF có khác dòng thiếu timestamp không phủ định byte-identity giữa các file local.
+"
+results/T-019/dinh-chinh-task-cu.md:22,## Phạm vi audit,không áp dụng / giữ phạm vi,xem đoạn nguyên văn nguồn,Không là đề xuất sửa đang mở; nội dung lịch sử/phạm vi được giữ.,"## Phạm vi audit
+
+Quét77file SPEC/LOG/REVIEW/báo cáo T-000–T-012 để định vị nhận định liên quan; đọc sâu T-002, T-003 và phần lineage/biên T-006/T-007. Chi tiết ở `sources-audit/prior-task-relevance-scan.json`, `source-report.md` và `lineage/report.md`. Không chạy RCA hoặc tái lập mọi phương pháp/dataset cũ. Không tìm thấy lỗi đáng kể khác trong các nhận định SS/lineage được kiểm; không suy rằng toàn task cũ đúng."
+results/T-019/de-xuat-tai-lieu-chung.md:5,"## docs/DECISIONS.md — ghi ủy quyền, mã để Minh/phiên được duyệt điền",chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## docs/DECISIONS.md — ghi ủy quyền, mã để Minh/phiên được duyệt điền
+
+> Ngày04/10/2026, Minh ủy quyền Codex tự viết và tự duyệt SPEC rồi triển khai task T-019 theo prompt Đợt1. Phạm vi: thẻ Sock Shop RE2-SS/RE3-SS và RE1-SS ngắn, census toàn release, kiểm file/sổ ca và nháp tài liệu trong phạm vi task; tải tối đa1GB, không RCA/detector, không chọn/chia dataset, không commit/push. Người phản biện là Claude. Nguồn nguyên văn khối task và ủy quyền: tasks/T-019-the-sock-shop/LOG.md.
+"
+results/T-019/de-xuat-tai-lieu-chung.md:9,## data/README.md — sửa câu khái quát sai và thêm mục dựng T-019,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## data/README.md — sửa câu khái quát sai và thêm mục dựng T-019
+
+Cũ: “Mỗi ca có `metrics.parquet`, `traces.parquet`, `logs.parquet` (riêng một ca RE2-TT không có log). Vài ca mẫu có thêm `inject_time.txt`.”
+
+Mới nguyên văn:
+
+> Modalities tùy biến thể và ca. RE1-SS có metric và injection, không có log/trace. RE2-SS và RE3-SS có metric/log/injection, không có trace tại revision ghim. RE2-TT có một ca thiếu log. Danh sách file cụ thể phải lấy từ inventory của đúng revision; không suy mọi ca có đủ ba nguồn tín hiệu.
+
+Mục bổ sung nguyên văn:
+
+> **T-019 — Sock Shop và đối chiếu lineage (04/10/2026).** `data/T-019/` giữ245ca RE1/2/3-SS,618file có tổng149.245.189byte. Nguồn Hugging Face RCAEval và revision nằm trong `results/T-019/download-plan.json`; SHA256 LFS hoặc git-blobSHA1 của từng file được kiểm sau tải trong `acquisition/manifest.json` và `inspection/hash-recheck.json`. Bảy file mẫu được tái dùng sau hash; byte mạng SS146.929.723. `D:/RCA-ext/work/T-019/lineage/re2ob/` có180file chỉmetric/injection RE2-OB,14.215.893byte, để so nội dung với nguồn fse/torai; không có trace/log OB tải cho task này. Manifest đầy đủ ở `results/T-019/lineage/download-manifest.json` và `outside-files.csv`. Dữ liệu ngoài git, không phải lựa chọn test/dev ở G1.
+>
+> Dựng lại SS từ repo root: `py -3 -X utf8 -B results/T-019/acquire.py plan`, rồi ghi kế hoạch vào LOG theo phạm vi được duyệt, `py -3 -X utf8 -B results/T-019/acquire.py acquire --run acquisition-replay-001`. Tên run phải mới; giữ bản cũ, không ghi đè. Script tái dùng từng cache file chỉ sau size/hash. `tai-lap.md` mô tả reader/môi trường và lineage. Không đọc data/locked hoặc repo RCA lưu trữ.
+"
+results/T-019/de-xuat-tai-lieu-chung.md:23,"## Hồ sơ G1/P2 — bổ sung kết quả, không quyết chọn/chia",triển khai tại T020,01/02/03/06 và D2/D3,Chỉ hợp nhất kết quả; không thay tài liệu chung.,"## Hồ sơ G1/P2 — bổ sung kết quả, không quyết chọn/chia
+
+> Sock Shop RCAEval đã có thẻ riêng tại `results/T-019/the-sock-shop.md`. RE2-SS90ca/5root/30ô; RE3-SS30ca/3root/9ô; toàn release SS không có trace. Có graph kiến trúc công bố để đối chiếu tĩnh, chưa pin deployment RCAEval nên bậc root runtime còn OPEN. RE3 có8file chỉ báo log,7nội dung unique; nhãn front-end_f2_2 ngoài cửa sổ chính ca và không khớp own log. Không dùng chúng như8nhãn code-line/onset độc lập. File metric toàn120ca RE2/3-SS căn tiêm±720s, là đường lộ mốc dù bỏ tên ca và file nhãn.
+>
+> G1 phải xét sổ `so-ca-da-nhin.csv`: toàn90RE2-SS đã qua RCA T006 ở torai-SS;100RE1-SS non-disk đã qua fse-ss;25disk RE1-SS chưa có evidence RCA trực tiếp trong archives đã kiểm, T006 chỉ census và T019 đã đọc số đo. Toàn90RE2-OB đã qua T007; fse/torai đổi tên không tạo dữ liệu test chưa nhìn. Cách chọn dataset, kịch bản graph tĩnh, chia theo ô và ngân sách nhãn vẫn do Minh quyết tại G1.
+"
+results/T-019/de-xuat-tai-lieu-chung.md:29,## Task cũ,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## Task cũ
+
+Đề xuất điều hướng T-003 và bổ sung phạm vi nguồn T-002 nằm nguyên văn trong `dinh-chinh-task-cu.md`. Không sửa snapshot nguồn hoặc nhãn gốc.
+"
+results/T-019/de-xuat-tai-lieu-chung.md:33,## WHY/LESSONS/AGENTS/MRP,chờ Minh duyệt,xem đoạn nguyên văn nguồn,Chưa thấy mục áp dụng tương ứng trong nguồn chung hiện hành.,"## WHY/LESSONS/AGENTS/MRP
+
+Không có lựa chọn dataset, phương pháp, giao thức hay luật mới cần tự ghi trong các file này. Nếu G1 chọn kịch bản đồ thị kiến trúc cho SS, lý do/đối lập/bằng chứng/kết luận phụ thuộc phải được ghi WHY sau Minh duyệt; T-019 chỉ cung cấp thẻ, không viết trước kết luận chọn."

@@ -323,7 +323,7 @@ Khung bốn tầng, lấy từ câu chữ của DT18 ("ánh xạ lên đồ th�
 | G5 | P8 | Lớp giải thích | Không bắt buộc |
 | G6 | P10 | Kết quả FlashTicket và demo | Có |
 
-**Mốc:** Minh muốn có kết quả phương pháp đồ thị (tới G4) sớm nhất có thể, trước 20/10/2026. Hướng đi đúng được ưu tiên hơn tốc độ. Quyển đồ án nộp 30/12/2026 (Q-23).
+**Mốc:** G2 trong khoảng 15–18/10/2026; kết quả phương pháp đồ thị (tới G4) cuối tháng 11/2026 (Q-70; thay mốc 20/10 của Q-02). Hướng đi đúng được ưu tiên hơn tốc độ. Quyển đồ án nộp 30/12/2026 (Q-23).
 
 ## 8. Khung báo cáo tiến độ cho cô
 

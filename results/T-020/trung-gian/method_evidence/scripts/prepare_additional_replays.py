@@ -1,0 +1,24 @@
+from pathlib import Path
+import ast,json,hashlib
+R=Path('D:/RCA-flashticket');O=R/'results/T-020/trung-gian/method_evidence';S=O/'scripts';audit=json.loads((O/'runs/all-replay-copy-audit.json').read_text(encoding='utf-8'))
+def cp(src,dst,changes):
+    p=R/src;s=p.read_text(encoding='utf-8-sig');a=ast.parse(s)
+    for old,new in changes:assert old in s;s=s.replace(old,new)
+    ast.parse(s);q=S/dst;q.write_text(s,encoding='utf-8');audit.append({'source':str(p),'source_sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'copy':str(q),'source_read_whole':True,'changes':[x[0] for x in changes],'arithmetics_changed':False,'write_guard':'interpreter audit hook + -B'})
+cp('results/T-014/paper/independent_window.py','circa_window_copy.py',[('from independent_scores import compare_numeric','from circa_independent_copy import compare_numeric'),('    args = parser.parse_args()',"    args = parser.parse_args()\n    assert args.mode=='example-architecture'\n    assert args.task_root.resolve()==Path('D:/RCA-flashticket/results/T-014').resolve()\n")])
+cp('results/T-014/scripts/check_graph_independent.py','circa_graph_copy.py',[("(root/'runs/independent-graph-comparison.json').write_text",f"Path('{O.as_posix()}/runs/circa-graph-independent-001.json').write_text")])
+cp('results/T-015/scripts/independent_inputs.py','microrank_inputs_copy.py',[('    a=ap.parse_args()',"    a=ap.parse_args()\n    assert a.input_parquet.resolve()==Path('D:/RCA-flashticket/data/rcaeval/re2tt_ts-auth-service_cpu_1/traces.parquet').resolve()\n    assert a.half_seconds==600\n")])
+cp('results/T-017/scripts/compare_example.py','simplerca_compare_copy.py',[("out/'runs/independent-example-v2.json'",f"Path('{O.as_posix()}/runs/simplerca-arithmetic-001.json')"),("(out/'runs/example-comparison-v2.json').write_text",f"Path('{O.as_posix()}/runs/simplerca-comparison-001.json').write_text")])
+cp('results/T-018/scripts/phan_tich_gdn.py','gdn_analysis_copy.py',[(r'OUT = r"D:\RCA-flashticket\results\T-018\runs\b6b7-phan-tich.json"',f'OUT = r"{O.as_posix()}/runs/gdn-analysis-001.json"')])
+(O/'runs/all-replay-copy-audit.json').write_text(json.dumps(audit,ensure_ascii=False,indent=2),encoding='utf-8')
+driver=(S/'run_all_replays.py').read_text(encoding='utf-8');tree=ast.parse(driver);node=next(x for x in tree.body if isinstance(x,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='jobs' for t in x.targets));start=driver.index(ast.get_source_segment(driver,node));end=start+len(ast.get_source_segment(driver,node))
+jobs=[
+('T-014','CIRCA raw-to-snapshot independent window','circa_window_copy.py',['--task-root',str(R/'results/T-014'),'--mode','example-architecture','--out',str(O/'runs/circa-window-001')],'existing selected TX2 raw metric; exact old inventory case','c','same selected TX2 raw→array comparison, no new graph/scorer call'),
+('T-014','CIRCA saved graph independent projection','circa_graph_copy.py',[],'results/T-014/graphs/re2tt_*.json','c','same saved graph identities/edges; DAG proof only,24cyclic kept unverified'),
+('T-015','MicroRank independent input split/graph','microrank_inputs_copy.py',['--input-parquet',str(R/'data/rcaeval/re2tt_ts-auth-service_cpu_1/traces.parquet'),'--inject-file',str(R/'data/rcaeval/re2tt_ts-auth-service_cpu_1/inject_time.txt'),'--snapshot',str(R/'results/T-015/runs/tt-local/auth/example.json'),'--out',str(O/'runs/microrank-inputs-001')],'data/rcaeval/re2tt_ts-auth-service_cpu_1/traces.parquet; prior auth example snapshot','c','exact prior selected TX2 case/window, no author function; independently rebuild partition and scoped graph'),
+('T-017','SimpleRCA comparison every intermediate','simplerca_compare_copy.py',['--run','run-dev-005'],'old run-dev-005 auth1 + new independent same input result','c','saved quantities only; compare every metric,trace,service vote/rank'),
+('T-018','GDN existing sevenrun heldout array algebra','gdn_analysis_copy.py',['l1-lstar-n1-seed5','l2-lstar-n1-seed1','l3-lstar-n1-seed2','l4-lstar-n1-hoanvi-seed5','l5-lstar-n5-seed5','l6-lstar-n5-seed1','l7-lstar-n10-seed5'],'D:/RCA-ext/work/T-018/gdn/runs/l*/ saved pred/gt arrays','c','existing arrays only; no training/author function, fixed prior normalization recipes')]
+new='jobs='+repr([(task,name,'D:/RCA-ext/envs/py312-pin/Scripts/python.exe',script,args,source,reason,why) for task,name,script,args,source,reason,why in jobs])
+driver=driver[:start]+new+driver[end:];driver=driver.replace('records=[];t0=time.monotonic()',"old=json.loads((O/'runs/all-replays.json').read_text(encoding='utf-8'));records=old['records'];prior=old['elapsed_seconds'];t0=time.monotonic()")
+driver=driver.replace('enumerate(jobs,1)','enumerate(jobs,9)').replace("elapsed_seconds':time.monotonic()-t0","elapsed_seconds':prior+time.monotonic()-t0")
+(S/'run_additional_replays.py').write_text(driver,encoding='utf-8');print('five additional copied replays prepared')

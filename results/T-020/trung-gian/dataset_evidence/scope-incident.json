@@ -1,0 +1,20 @@
+{
+  "status": "FACT scope incident; reported to root, root reported to Minh",
+  "file": "results/T-010/runs/schema-samples.json",
+  "discovered_utc_upper_bound": "2026-10-04T14:44:05.474827+00:00",
+  "actual_read_timestamp": "OPEN: exec output lacks per-call UTC; incident occurred before discovery timestamp, after usage interruption",
+  "bytes_from_input_freeze_without_reread": 483528,
+  "sha256_from_input_freeze_without_reread": "0d75a9c0b1aad0d98e3d134c18842fef3bae512c2a903202902f3a24251b10f7",
+  "actions": [
+    "build_provenance.py initial 37-row and 40-row executions loaded whole saved JSON through source(); input hash output also read file bytes",
+    "exec_command Python json.loads inspection printed type/list and str(first-entry) truncated to 900 characters; output included header and saved raw span rows"
+  ],
+  "exact_command_relevant": "py -3 -X utf8 -c 'import json,pathlib; ps=[...,\"results/T-010/runs/schema-samples.json\"]; [(print(p,type(a).__name__,list(a)[:9] if isinstance(a,dict) else str(a[:1])[:900])) for p in ps for a in [json.loads(pathlib.Path(p).read_text())]]'",
+  "read_scope": "Saved result file containing mixed schema and telemetry samples; no data/ path was opened, no new case was measured/run",
+  "printed_payload_extent": "At most900 characters of the first entry (Python representation), including a header and partial saved measurement rows. Exact line count OPEN; no reread to count",
+  "read_count": "At least3 whole JSON text reads plus2 byte reads for provenance hash; no further read for audit",
+  "tx_effect": "DeepTraLog corpus already TX1 in existing ledger; no TX0 corpus opened. Root to judge task scope impact. Existing TX1 does not authorize reading raw payload",
+  "use_in_outputs": "Not used in numeric recompute, sampling choice, dataset recommendation, or method execution. Earlier descriptive schema citation removed",
+  "correction": "Use inspect-002/raw-cases.json headers/aggregate metadata; block exact mixed file path in both text-read helpers",
+  "limits": "Cannot truthfully claim no raw saved payload was seen anywhere in this evidence task. Only current reproducible build avoids known mixed payload"
+}

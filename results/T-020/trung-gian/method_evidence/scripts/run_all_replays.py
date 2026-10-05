@@ -1,0 +1,29 @@
+"""Sequential independently computed repeats with <5min subprocess cap and guards."""
+from pathlib import Path
+import csv,json,subprocess,time,os,hashlib
+R=Path('D:/RCA-flashticket');O=R/'results/T-020/trung-gian/method_evidence';S=O/'scripts'
+p312='D:/RCA-ext/envs/py312-pin/Scripts/python.exe';p38='D:/RCA-ext/envs/py38-rcdlock/Scripts/python.exe';pgdn='D:/RCA-ext/envs/py38-gdn/Scripts/python.exe'
+jobs=[
+('T-013','R1 arithmetic fourwindows25existingcases',p312,'t013_window_copy.py',[],'D:/RCA-ext/data/fse-ob/*_delay/[1-5]/simple_data.csv; exact prior25 cases selected by existing P10 filenames','c','same previous25 endpoints; no official method invocation'),
+('T-014','CIRCA snapshot independent RHT/DA',p312,'circa_independent_copy.py',[str(R/'results/T-014/runs/example-architecture/snapshot.json'),'--out',str(O/'runs/circa-arithmetic-001')],'results/T-014/runs/example-architecture/snapshot.json','c','saved TX2 arrays/parents fixed; no new graph fit'),
+('T-015','MicroRank fixture independent math',p312,'microrank_independent_copy.py',[str(R/'results/T-015/runs/independent-math/toy-connected/input.json'),'--output',str(O/'runs/microrank-fixture-002')],'results/T-015/runs/independent-math/toy-connected/input.json','b','repeat published calculation fixture; no telemetry'),
+('T-016','TORAI logts saved cell totals',p312,'torai_s9_copy.py',[],'results/T-016/runs/s9/so-sanh-lan1.json; so-sanh-lan2.json','c','saved matched cell counts; no Drain or method call'),
+('T-016','TORAI full independent goc',p38,'torai_full_independent_copy.py',['--ca','D:/RCA-ext/data/torai-OB/checkoutservice_cpu/1','--dataset','torai-ob','--length','10','--seed','0','--bien-the','goc','--meta','D:/RCA-ext/work/T-016/s12-ct-torai/seed0/meta.jsonl','--ket-qua','D:/RCA-ext/work/T-016/s12-ct-torai/seed0/checkoutservice_cpu_1.json','--ra',str(O/'runs/torai-full-goc-001.json')],'D:/RCA-ext/data/torai-OB/checkoutservice_cpu/1','c','exact prior S12 TX2 case/window/seed; AST-extracted input function, no author function'),
+('T-016','TORAI full independent sua',p38,'torai_full_independent_copy.py',['--ca','D:/RCA-ext/data/torai-OB/checkoutservice_cpu/1','--dataset','torai-ob','--length','10','--seed','0','--bien-the','sua','--meta','D:/RCA-ext/work/T-016/s12-ct-torai_sua/seed0/meta.jsonl','--ket-qua','D:/RCA-ext/work/T-016/s12-ct-torai_sua/seed0/checkoutservice_cpu_1.json','--ra',str(O/'runs/torai-full-sua-001.json')],'D:/RCA-ext/data/torai-OB/checkoutservice_cpu/1','c','exact prior S12 TX2 case/window/seed; independent causal arithmetic and GMM library only'),
+('T-017','SimpleRCA normalized independent math',p312,'simplerca_independent_copy.py',['--self-test','--input-dir','D:/RCA-ext/work/T-017/example-input-run-dev-005','--out',str(O/'runs/simplerca-arithmetic-001.json')],'D:/RCA-ext/work/T-017/example-input-run-dev-005','c','same prior normalized selected TX2 case; no raw or label read'),
+('T-018','GDN NumPy fixed checkpoint calculation',pgdn,'gdn_independent_copy.py',['--run','r1s-re2tt5-cham','--data','re2tt5','--model','D:/RCA-ext/work/T-018/gdn/runs/r1-re2tt5-seed5/model.pt'],'D:/RCA-ext/work/T-018/gdn/data/re2tt5/{train,test}.csv; existing model.pt; r1s saved arrays','c','same prior TX2 normalized matrices/model; no training or GDN author function')]
+records=[];t0=time.monotonic()
+def status():return subprocess.check_output(['git','-C',str(R),'status','--short'],text=True)
+env=dict(os.environ);env.update(PYTHONDONTWRITEBYTECODE='1',OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1')
+for index,(task,name,python,script,args,source,reason,why) in enumerate(jobs,1):
+    stem=f'{index:02d}-{task.lower()}';before=status();start=time.monotonic();cmd=[python,'-B','-X','utf8',str(S/'guarded_runner.py'),str(S/script),*args]
+    try:
+        p=subprocess.run(cmd,cwd=str(R),env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,encoding='utf-8',timeout=280);code=p.returncode;stdout=p.stdout;stderr=p.stderr;state='EXECUTED' if code==0 else 'FAILED'
+    except subprocess.TimeoutExpired as exc:code=None;stdout=exc.stdout or b'';stderr=exc.stderr or b'';state='TIMEOUT';stdout=stdout.decode('utf-8',errors='replace') if isinstance(stdout,bytes) else stdout;stderr=stderr.decode('utf-8',errors='replace') if isinstance(stderr,bytes) else stderr
+    after=status();(O/f'runs/replay-{stem}-stdout.txt').write_text(stdout,encoding='utf-8');(O/f'runs/replay-{stem}-stderr.txt').write_text(stderr,encoding='utf-8')
+    rec={'task':task,'name':name,'copy':str(S/script),'command':cmd,'source':source,'reason_b_c':reason,'purpose':why,'elapsed_seconds':time.monotonic()-start,'exit_code':code,'status':state,'git_status_before':before,'git_status_after':after,'git_status_equal':before==after,'guard':'all filesystem writes restricted by Python audit hook; bytecode disabled','stdout':f'runs/replay-{stem}-stdout.txt','stderr':f'runs/replay-{stem}-stderr.txt','method_cost':False};records.append(rec)
+    (O/'runs/all-replays.json').write_text(json.dumps({'records':records,'elapsed_seconds':time.monotonic()-t0,'total_public_download_bytes':0,'no_EC2_access':True,'no_new_cases':True},ensure_ascii=False,indent=2),encoding='utf-8')
+    print(json.dumps({'task':task,'name':name,'status':state,'elapsed_seconds':rec['elapsed_seconds'],'git_status_equal':before==after},ensure_ascii=False),flush=True)
+with (O/'ca-da-chay.csv').open('w',encoding='utf-8-sig',newline='') as f:
+    fields=['task','name','source','reason_b_c','purpose','elapsed_seconds','exit_code','status','guard','stdout','stderr'];w=csv.DictWriter(f,fields,extrasaction='ignore');w.writeheader();w.writerows(records)
+print(json.dumps({'runs':len(records),'elapsed_seconds':time.monotonic()-t0,'executed':sum(x['status']=='EXECUTED' for x in records),'failed':sum(x['status']!='EXECUTED' for x in records)}),flush=True)
