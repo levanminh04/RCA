@@ -1,0 +1,122 @@
+{
+ "mo_ta": "T-025 kiểm: tính lại độc lập, không dùng `src/p3/danh_gia.py`, rồi so với đầu ra evaluator TỪNG CA\n(SPEC, Kiểm đúng đắn; Minh duyệt 07/10/2026 \"duyệt a, b\"). Viết lại ở phiên 2 (G1): bản cũ chỉ tính 2 + 2 ca.\n\nPhạm vi: cả 30 ca, mọi bộ phát hiện (BOCPD, N-Sigma chính, N-Sigma đối chứng) và mọi biến thể ranker (BARO, CIRCA\nRHT+DA, CIRCA RHT-only, TORAI B 3 seed) × 2 bộ phát hiện có lượt RCA.\n- Phát hiện (§7.4): vòng lặp trên 24 cửa sổ đủ 60 điểm; cửa sổ được chấm khi chỉ số đầu ≥ chỉ số bắt đầu đánh giá;\n  nhãn dương khi đầu cửa sổ ≥ t_tiêm. Báo động sai, giây bình thường được đánh giá, độ trễ, phát hiện theo ca.\n  Thông báo (§7.5): dựng lại từ báo động với thời gian trơ 300 s.\n- RCA: hạng root lấy từ bản ghi. Không phải TORAI: nhóm hòa = mọi phần tử `entity_ranking` có khóa bằng khóa của root.\n  TORAI: liệt kê mọi hoán vị của dãy khối liền nhau cùng điểm với khối chứa root (§8.4), trong khối giữ thứ tự nhóm,\n  root đều trong nhóm hòa của nó. E[Hit@k], E[RR]; TORAI trung bình 3 seed. Thành công chung = độ đo × [t̂ ≥ t_tiêm].\n- CIRCA: ca có nút `rht_score` > 1e10 (WHY-36), so danh sách ca vượt.\nKhông khớp ở bất kỳ ca nào → ghi vào `khong_khop`, mã thoát 1.\n\npython tinh_tay.py <ban-ghi-dua-vao-cham.json> <thư mục ra của evaluator> [nhan_tep=<tệp nhãn>]",
+ "danh_sach": "../ban-ghi-dua-vao-cham.json",
+ "evaluator": "..\\cham",
+ "nhan": "results/T-022/nhan-dev.json",
+ "so_phep_so": 2317,
+ "so_khong_khop": 0,
+ "khong_khop": [],
+ "tinh_lai": {
+  "phat_hien": {
+   "bocpd": {
+    "phat_hien": 30,
+    "bao_dong_dau_dung": 3,
+    "sai": 143,
+    "giay": 21570,
+    "bao_dong_sai_moi_gio": 23.866481223922115
+   },
+   "nsigma": {
+    "phat_hien": 30,
+    "bao_dong_dau_dung": 0,
+    "sai": 6033,
+    "giay": 18600,
+    "bao_dong_sai_moi_gio": 1167.6774193548388
+   },
+   "nsigma_doi_chung": {
+    "phat_hien": 30,
+    "bao_dong_dau_dung": 0,
+    "sai": 18409,
+    "giay": 18600,
+    "bao_dong_sai_moi_gio": 3563.032258064516
+   }
+  },
+  "rca": {
+   "baro:native[bocpd]": {
+    "thanh_cong_chung_tren_30": {
+     "hit@1": 0.06666666666666667,
+     "hit@3": 0.06666666666666667,
+     "hit@5": 0.1
+    },
+    "ca_vuot_1e10": null
+   },
+   "circa:ols+rht[bocpd]": {
+    "thanh_cong_chung_tren_30": {
+     "hit@1": 0.0,
+     "hit@3": 0.0,
+     "hit@5": 0.0
+    },
+    "ca_vuot_1e10": [
+     "dev-03d4910932",
+     "dev-16870e660c",
+     "dev-3ae0a6c15a",
+     "dev-4e68956051",
+     "dev-a5cabe5fa7",
+     "dev-a915aa2424",
+     "dev-b8bd0abf60",
+     "dev-de89e2f9e9"
+    ]
+   },
+   "circa:ols+rht_da[bocpd]": {
+    "thanh_cong_chung_tren_30": {
+     "hit@1": 0.0,
+     "hit@3": 0.03333333333333333,
+     "hit@5": 0.03333333333333333
+    },
+    "ca_vuot_1e10": [
+     "dev-03d4910932",
+     "dev-16870e660c",
+     "dev-3ae0a6c15a",
+     "dev-4e68956051",
+     "dev-a5cabe5fa7",
+     "dev-a915aa2424",
+     "dev-b8bd0abf60",
+     "dev-de89e2f9e9"
+    ]
+   },
+   "torai_B[bocpd]": {
+    "thanh_cong_chung_tren_30": {
+     "hit@1": 0.0,
+     "hit@3": 0.0,
+     "hit@5": 0.06666666666666667
+    },
+    "ca_vuot_1e10": null
+   },
+   "baro:native[nsigma]": {
+    "thanh_cong_chung_tren_30": {
+     "hit@1": 0.0,
+     "hit@3": 0.0,
+     "hit@5": 0.0
+    },
+    "ca_vuot_1e10": null
+   },
+   "circa:ols+rht[nsigma]": {
+    "thanh_cong_chung_tren_30": {
+     "hit@1": 0.0,
+     "hit@3": 0.0,
+     "hit@5": 0.0
+    },
+    "ca_vuot_1e10": [
+     "dev-8017c6dc70"
+    ]
+   },
+   "circa:ols+rht_da[nsigma]": {
+    "thanh_cong_chung_tren_30": {
+     "hit@1": 0.0,
+     "hit@3": 0.0,
+     "hit@5": 0.0
+    },
+    "ca_vuot_1e10": [
+     "dev-8017c6dc70"
+    ]
+   },
+   "torai_B[nsigma]": {
+    "thanh_cong_chung_tren_30": {
+     "hit@1": 0.0,
+     "hit@3": 0.0,
+     "hit@5": 0.0
+    },
+    "ca_vuot_1e10": null
+   }
+  }
+ }
+}
