@@ -1,0 +1,2417 @@
+# T-024 — Chấm tầng 1 chế độ (a) trên RE2-TT dev
+
+Báo cáo cho RQ1 và DT18-NV3: xếp root ở mức thực thể trên ca dev, theo giao thức V2 và cấu hình đã khóa ở T-031. Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Số chấm và khoảng lấy từ `results/T-024/cham-a.json`; thống kê root thuộc nhánh RCD và đối chiếu thứ tự TraceRCA đếm từ bản ghi đã chốt, nguồn ghi cạnh nhận định. Danh sách bản ghi đã chốt trước evaluator: `results/T-024/ban-ghi-dua-vao-cham.json`. Hash và mã nguồn nằm trong manifest; báo cáo không thay cấu hình đã khóa.
+
+## Phạm vi và cách đọc
+
+- `dev30`: 30 ca, 10 ô; nguồn `results/T-024/cham-a.json` → `cohorts.dev30`.
+- `dev19`: 19 ca, 9 ô; nguồn `results/T-024/cham-a.json` → `cohorts.dev19`.
+
+Nhóm 19 loại đúng các ca CIRCA RHT vượt 1e10 đã chốt không dùng nhãn ở T-031 (Q-82, WHY-36). Cùng 19 ca được dùng cho mọi phương pháp. Nhóm này chọn theo đầu ra CIRCA trên cửa sổ A, không phải mẫu ngẫu nhiên; không chứng minh các ca còn lại không có điểm lạ khác.
+Các ca bị loại đã được T-031 xác nhận lỗi làm tròn: sai số dự đoán gần 0 nhưng phép chuẩn hóa vẫn chia cho số rất nhỏ, làm điểm RHT phình lớn; bước DA dùng điểm đó kéo nút cha lên đầu. Nguồn giải thích: `docs/WHY.md` → WHY-36; `results/T-031/chan-doan-diem-lon.json`. Bảng 30 ca giữ ảnh hưởng lỗi này; bảng 19 ca cho phép xem kết quả khi loại các ca đó.
+
+Hit@1 trên nhóm loại 11 ca → nhóm giữ 19 ca: BARO: 10/11 → 11/19; SimpleRCA M4: 9/11 → 16/19; TraceRCA lọc hữu hạn: 8/11 → 13/19; MicroRank xếp đầy đủ: 0/11 → 2/19; CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3: 3/11 → 13/19; TORAI sửa, nguồn B: 10/11 → 16/19. Nguồn: `results/T-024/cham-a.json` → `cohorts.dev19.excluded_case_ids/case_ids`, `methods.<id>.per_case.<ca>.hit@1`. Đây là số mô tả từng phương pháp, không xác định ca dễ hay khó chung cho mọi phương pháp hoặc mọi độ đo.
+Thành phần ca cũng đổi: MicroRank xếp đầy đủ: 3 ca ERROR bị loại, 1 ca ERROR giữ lại; TraceRCA lọc hữu hạn: 3 ca ERROR bị loại, 1 ca ERROR giữ lại. Ô bị loại toàn bộ: `ts-train-service|cpu` (3 ca). Nguồn: `results/T-024/cham-a.json` → `methods.<id>.per_case.<ca>.status/label.cell`, `cohorts.dev19`.
+Mọi số và khoảng dev19 chỉ mô tả 19 ca/9 ô giữ lại theo đầu ra CIRCA. Việc bỏ 11 ca đổi cả thành phần ca và số ERROR của phương pháp khác; hướng thay đổi phụ thuộc phương pháp và độ đo. Đây không phải phép sửa CIRCA trên cùng ca. Các cặp có hoặc không có CIRCA chỉ được diễn giải trong nhóm ca này; chưa suy sang toàn 30 ca hay test. Nguồn: `results/T-024/cham-a.json` → `cohorts.dev19`, `methods.<id>.per_case`.
+
+Ca loại khỏi phép so 19: dev-03d4910932, dev-3ae0a6c15a, dev-4e68956051, dev-4f8a844308, dev-7f1b6b071d, dev-98bc73c499, dev-a505ab3f65, dev-a5cabe5fa7, dev-b8bd0abf60, dev-ba831dbeb8, dev-f9a8e05ed7. Nguồn: `results/T-024/cham-a.json` → `cohorts.dev19.excluded_case_ids`; `results/T-031/kiem-11-ca-hashseed.json`.
+
+Sáu dòng chính: BARO, SimpleRCA, MicroRank full, TraceRCA, CIRCA OLS+RHT+DA, TORAI B. Dòng phụ giữ CIRCA RHT-only/SVR, TORAI A và MicroRank top11. TORAI A dùng bin tác giả lệch lưới và ngưỡng tracets_lat trên toàn file; chỉ có kết quả sau cuối file, khác khả năng có kết quả lúc t+300 của dòng chính.
+
+## Bảng gộp và bất định
+
+### Bảng chính — dev30
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đếm theo ca ở từng dòng. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Phương pháp | Ca | Trạng thái | Hit@1 | Hit@3 | Hit@5 | MRR | NDCG@5 | Avg@5 | Retrieval@5 | Retrieval@10 | Rerank@1 K=5 | Rerank@1 K=10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BARO (chính) | 30 | OK: 30 | 0.7000 [0.7000; 0.7000] | 0.8000 [0.8000; 0.8000] | 0.8667 [0.8667; 0.8667] | 0.7682 [0.7682; 0.7682] | 0.7874 [0.7874; 0.7874] | 0.8000 [0.8000; 0.8000] | 0.8667 [0.8667; 0.8667] | 0.8667 [0.8667; 0.8667] | 0.8077 | 0.8077 |
+| SimpleRCA M4 (chính) | 30 | OK: 30 | 0.8333 [0.8333; 0.8333] | 0.9667 [0.9667; 0.9667] | 0.9667 [0.9667; 0.9667] | 0.8911 [0.8911; 0.8911] | 0.9087 [0.9087; 0.9087] | 0.9267 [0.9267; 0.9267] | 0.9667 [0.9667; 0.9667] | 0.9667 [0.9667; 0.9667] | 0.8621 | 0.8621 |
+| MicroRank xếp đầy đủ (chính) | 30 | ERROR: 4; OK: 26 | 0.0667 [0.0667; 0.0667] | 0.4333 [0.4333; 0.4333] | 0.4333 [0.4333; 0.4333] | 0.2565 [0.2565; 0.2565] | 0.2675 [0.2675; 0.2675] | 0.3133 [0.3133; 0.3133] | 0.4333 [0.4333; 0.4333] | 0.7000 [0.7000; 0.7000] | 0.1538 | 0.0952 |
+| TraceRCA lọc hữu hạn (chính) | 30 | ERROR: 4; OK: 26 | 0.7000 [0.7000; 0.7000] | 0.8000 [0.8000; 0.8000] | 0.8333 [0.8333; 0.8333] | 0.7565 [0.7565; 0.7565] | 0.7731 [0.7731; 0.7731] | 0.7867 [0.7867; 0.7867] | 0.8333 [0.8333; 0.8333] | 0.8667 [0.8667; 0.8667] | 0.8400 | 0.8077 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 (chính) | 30 | OK: 30 | 0.5333 [0.5333; 0.5333] | 0.6000 [0.6000; 0.6000] | 0.9000 [0.9000; 0.9000] | 0.6406 [0.6406; 0.6406] | 0.7002 [0.7002; 0.7002] | 0.7000 [0.7000; 0.7000] | 0.9000 [0.9000; 0.9000] | 0.9000 [0.9000; 0.9000] | 0.5926 | 0.5926 |
+| TORAI sửa, nguồn B (chính) | 30 | OK: 30 | 0.8667 [0.8667; 0.8667] | 1.0000 [1.0000; 1.0000] | 1.0000 [1.0000; 1.0000] | 0.9167 [0.9167; 0.9167] | 0.9377 [0.9377; 0.9377] | 0.9533 [0.9533; 0.9533] | 1.0000 [1.0000; 1.0000] | 1.0000 [1.0000; 1.0000] | 0.8667 | 0.8667 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 (phụ) | 30 | OK: 30 | 0.4000 [0.4000; 0.4000] | 0.7667 [0.7667; 0.7667] | 0.8667 [0.8667; 0.8667] | 0.5975 [0.5975; 0.5975] | 0.6555 [0.6555; 0.6555] | 0.7000 [0.7000; 0.7000] | 0.8667 [0.8667; 0.8667] | 0.9667 [0.9667; 0.9667] | 0.4615 | 0.4138 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ (phụ) | 30 | OK: 30 | 0.7000 [0.7000; 0.7000] | 0.8000 [0.8000; 0.8000] | 0.9000 [0.9000; 0.9000] | 0.7744 [0.7744; 0.7744] | 0.8018 [0.8018; 0.8018] | 0.8133 [0.8133; 0.8133] | 0.9000 [0.9000; 0.9000] | 0.9000 [0.9000; 0.9000] | 0.7778 | 0.7778 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ (phụ) | 30 | OK: 30 | 0.4000 [0.4000; 0.4000] | 0.7667 [0.7667; 0.7667] | 0.8000 [0.8000; 0.8000] | 0.6033 [0.6033; 0.6033] | 0.6413 [0.6413; 0.6413] | 0.7000 [0.7000; 0.7000] | 0.8000 [0.8000; 0.8000] | 0.9000 [0.9000; 0.9000] | 0.5000 | 0.4444 |
+| TORAI sửa, nguồn A (hồi cứu) (phụ) | 30 | OK: 30 | 0.7000 [0.7000; 0.7000] | 0.9333 [0.9333; 0.9333] | 0.9333 [0.9333; 0.9333] | 0.8196 [0.8196; 0.8196] | 0.8429 [0.8429; 0.8429] | 0.8800 [0.8800; 0.8800] | 0.9333 [0.9333; 0.9333] | 1.0000 [1.0000; 1.0000] | 0.7500 | 0.7000 |
+| MicroRank top11 (phụ) | 30 | ERROR: 4; OK: 26 | 0.0667 [0.0667; 0.0667] | 0.4333 [0.4333; 0.4333] | 0.4333 [0.4333; 0.4333] | 0.2111 [0.2111; 0.2111] | 0.2675 [0.2675; 0.2675] | 0.3133 [0.3133; 0.3133] | 0.4333 [0.4333; 0.4333] | 0.4333 [0.4333; 0.4333] | 0.1538 | 0.1538 |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.<id>.summaries.dev30.main`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Mỗi ô độ đo đơn điệu ghi kỳ vọng **[cận bi quan; cận lạc quan]**. Cận mô tả ảnh hưởng của hòa, không phải khoảng tin cậy. Rerank là tỉ số gộp và chỉ có giá trị chính. Retrieval@5 bằng Hit@5 với một root.
+
+### RCAEval riêng — dev30
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đếm theo ca ở từng dòng. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Phương pháp | Seed | Trạng thái | AC@1 | AC@3 | AC@5 | Avg@5 | Retrieval 5 | Retrieval 10 | Rerank 1/5 | Rerank 1/10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BARO (chính) | trung bình seed | OK: 30 | 0.7000 | 0.8000 | 0.8667 | 0.8000 | 0.8667 | 0.8667 | 0.8077 | 0.8077 |
+| SimpleRCA M4 (chính) | trung bình seed | OK: 30 | 0.8333 | 0.9667 | 0.9667 | 0.9267 | 0.9667 | 0.9667 | 0.8621 | 0.8621 |
+| MicroRank xếp đầy đủ (chính) | trung bình seed | ERROR: 4; OK: 26 | 0.0667 | 0.4333 | 0.4333 | 0.3133 | 0.4333 | 0.7000 | 0.1538 | 0.0952 |
+| TraceRCA lọc hữu hạn (chính) | trung bình seed | ERROR: 4; OK: 26 | 0.7000 | 0.8000 | 0.8333 | 0.7867 | 0.8333 | 0.8667 | 0.8400 | 0.8077 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 (chính) | trung bình seed | OK: 30 | 0.5333 | 0.6000 | 0.9000 | 0.7000 | 0.9000 | 0.9000 | 0.5926 | 0.5926 |
+| TORAI sửa, nguồn B (chính) | trung bình seed | OK: 30 | 0.8667 | 1.0000 | 1.0000 | 0.9533 | 1.0000 | 1.0000 | 0.8667 | 0.8667 |
+| TORAI sửa, nguồn B | seed 0 | OK: 30 | 0.8667 | 1.0000 | 1.0000 | 0.9533 | 1.0000 | 1.0000 | 0.8667 | 0.8667 |
+| TORAI sửa, nguồn B | seed 1 | OK: 30 | 0.8667 | 1.0000 | 1.0000 | 0.9533 | 1.0000 | 1.0000 | 0.8667 | 0.8667 |
+| TORAI sửa, nguồn B | seed 2 | OK: 30 | 0.8667 | 1.0000 | 1.0000 | 0.9533 | 1.0000 | 1.0000 | 0.8667 | 0.8667 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 (phụ) | trung bình seed | OK: 30 | 0.4000 | 0.7667 | 0.8667 | 0.7000 | 0.8667 | 0.9667 | 0.4615 | 0.4138 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ (phụ) | trung bình seed | OK: 30 | 0.7000 | 0.8000 | 0.9000 | 0.8133 | 0.9000 | 0.9000 | 0.7778 | 0.7778 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ (phụ) | trung bình seed | OK: 30 | 0.4000 | 0.7667 | 0.8000 | 0.7000 | 0.8000 | 0.9000 | 0.5000 | 0.4444 |
+| TORAI sửa, nguồn A (hồi cứu) (phụ) | trung bình seed | OK: 30 | 0.7000 | 0.9333 | 0.9333 | 0.8800 | 0.9333 | 1.0000 | 0.7500 | 0.7000 |
+| TORAI sửa, nguồn A (hồi cứu) | seed 0 | OK: 30 | 0.7000 | 0.9333 | 0.9333 | 0.8800 | 0.9333 | 1.0000 | 0.7500 | 0.7000 |
+| TORAI sửa, nguồn A (hồi cứu) | seed 1 | OK: 30 | 0.7000 | 0.9333 | 0.9333 | 0.8800 | 0.9333 | 1.0000 | 0.7500 | 0.7000 |
+| TORAI sửa, nguồn A (hồi cứu) | seed 2 | OK: 30 | 0.7000 | 0.9333 | 0.9333 | 0.8800 | 0.9333 | 1.0000 | 0.7500 | 0.7000 |
+| MicroRank top11 (phụ) | trung bình seed | ERROR: 4; OK: 26 | 0.0667 | 0.4333 | 0.4333 | 0.3133 | 0.4333 | 0.4333 | 0.1538 | 0.1538 |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.<id>.summaries.dev30.rcaeval`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Bảng giữ thứ tự đầu ra của bản triển khai đang đánh giá, bỏ trùng thực thể, `Evaluator(max_k=10)`. Khi có hòa, bảng này chỉ để đối chiếu cách báo của RCAEval; kết luận dùng bảng chính. TORAI trung bình AC và Retrieval theo seed rồi tính lại tỉ số Rerank cho dòng gộp; quy tắc giữ thứ tự đầu ra vẫn có thể khác bảng chính khi có hòa.
+Riêng TraceRCA, thứ tự trong bảng là danh sách `ji` hữu hạn do adapter sắp lại theo WHY-32, không phải thứ tự hàm RCAEval trả về. Trên toàn dev30, hai thứ tự khác ở 26/26 lượt OK, hạng root sau bỏ trùng service khác ở 9/26 lượt; nếu dùng thứ tự hàm trả về và vẫn giữ ERROR ở mẫu số, AC@1 là 16/30 = 0.5333. Số này chỉ mô tả tác động của thứ tự, không thay số chính và không chứng minh thứ tự chứa NaN của hàm là đúng. 26/26 lượt OK có NaN, nên phép đối chiếu thứ tự khi không NaN ở giao thức §6.4 không áp dụng được lượt OK nào trong cohort này. Nguồn: `results/T-024/ban-ghi-dua-vao-cham.json` → bản ghi TraceRCA `ranking_native`, `extra.ranks_chinh_thuc`, `diagnostics.key_check`; root và mẫu số từ `results/T-024/cham-a.json` → `methods.tracerca.per_case.<ca>.label.root`, `cohorts.dev30`. Bảng này áp dụng công thức RCAEval cho bản TraceRCA lọc hữu hạn; không được coi là kết quả nguyên trạng của code TraceRCA trong RCAEval.
+
+### Mức ngẫu nhiên trên O và U — dev30
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đếm theo ca ở từng dòng. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Phương pháp | Trạng thái | \|O\| TB | Root thuộc O | Root được trả | O_hit@1 | O_hit@3 | O_hit@5 | O_hit@10 | U_hit@1 | U_hit@3 | U_hit@5 | U_hit@10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BARO | OK: 30 | 68.0000 | 1.0000 | 1.0000 | 0.0147 | 0.0441 | 0.0735 | 0.1471 | 0.0147 | 0.0441 | 0.0735 | 0.1471 |
+| SimpleRCA M4 | OK: 30 | 68.0333 | 1.0000 | 1.0000 | 0.0147 | 0.0441 | 0.0735 | 0.1470 | 0.0147 | 0.0441 | 0.0735 | 0.1471 |
+| MicroRank xếp đầy đủ | ERROR: 4; OK: 26 | 25.6000 | 1.0000 | 0.8667 | 0.0396 | 0.1189 | 0.1981 | 0.3963 | 0.0147 | 0.0441 | 0.0735 | 0.1471 |
+| TraceRCA lọc hữu hạn | ERROR: 4; OK: 26 | 25.6000 | 1.0000 | 0.8667 | 0.0396 | 0.1189 | 0.1981 | 0.3963 | 0.0147 | 0.0441 | 0.0735 | 0.1471 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 30 | 68.0000 | 1.0000 | 1.0000 | 0.0147 | 0.0441 | 0.0735 | 0.1471 | 0.0147 | 0.0441 | 0.0735 | 0.1471 |
+| TORAI sửa, nguồn B | OK: 30 | 68.0000 | 1.0000 | 1.0000 | 0.0147 | 0.0441 | 0.0735 | 0.1471 | 0.0147 | 0.0441 | 0.0735 | 0.1471 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | OK: 30 | 68.0000 | 1.0000 | 1.0000 | 0.0147 | 0.0441 | 0.0735 | 0.1471 | 0.0147 | 0.0441 | 0.0735 | 0.1471 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | OK: 30 | 68.0000 | 1.0000 | 1.0000 | 0.0147 | 0.0441 | 0.0735 | 0.1471 | 0.0147 | 0.0441 | 0.0735 | 0.1471 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | OK: 30 | 68.0000 | 1.0000 | 1.0000 | 0.0147 | 0.0441 | 0.0735 | 0.1471 | 0.0147 | 0.0441 | 0.0735 | 0.1471 |
+| TORAI sửa, nguồn A (hồi cứu) | OK: 30 | 68.0000 | 1.0000 | 1.0000 | 0.0147 | 0.0441 | 0.0735 | 0.1471 | 0.0147 | 0.0441 | 0.0735 | 0.1471 |
+| MicroRank top11 | ERROR: 4; OK: 26 | 25.6000 | 1.0000 | 0.4333 | 0.0396 | 0.1189 | 0.1981 | 0.3963 | 0.0147 | 0.0441 | 0.0735 | 0.1471 |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.<id>.summaries.dev30.random`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+O là tập quan sát riêng của phương pháp; U là inventory và tập chấm. Nếu root thuộc O, kỳ vọng ngẫu nhiên Hit@k là `min(k, |O|)/|O|`; root vắng thì bằng 0. Mức ngẫu nhiên O mô tả tập ứng viên, kể cả ở ca phương pháp lỗi; nó không thay số RCA của ca lỗi.
+
+### Bootstrap theo ô, khoảng phân vị 95% — dev30
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đếm theo ca ở từng dòng. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Phương pháp | Trạng thái | Hit@1 | Hit@3 | Hit@5 | MRR | NDCG@5 | Avg@5 | Retrieval@10 | Rerank@1 K=5 | Rerank@1 K=10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BARO | OK: 30 | [0.4667; 0.9000] | [0.6333; 0.9333] | [0.6667; 1.0000] | [0.5779; 0.9333] | [0.5977; 0.9497] | [0.6133; 0.9600] | [0.6667; 1.0000] | [0.6250; 0.9615] | [0.6250; 0.9615] |
+| SimpleRCA M4 | OK: 30 | [0.6667; 1.0000] | [0.9000; 1.0000] | [0.9000; 1.0000] | [0.7744; 1.0000] | [0.8175; 1.0000] | [0.8467; 1.0000] | [0.9000; 1.0000] | [0.6667; 1.0000] | [0.6667; 1.0000] |
+| MicroRank xếp đầy đủ | ERROR: 4; OK: 26 | [0.0000; 0.2000] | [0.2000; 0.6667] | [0.2000; 0.6667] | [0.1568; 0.3774] | [0.1175; 0.4167] | [0.1467; 0.4735] | [0.5000; 0.8667] | [0.0000; 0.5000] | [0.0000; 0.2727] |
+| TraceRCA lọc hữu hạn | ERROR: 4; OK: 26 | [0.5000; 0.8667] | [0.6667; 0.9333] | [0.7333; 0.9333] | [0.6091; 0.8833] | [0.6351; 0.8964] | [0.6533; 0.9133] | [0.7667; 0.9667] | [0.6522; 1.0000] | [0.5769; 1.0000] |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 30 | [0.3000; 0.7333] | [0.3667; 0.8333] | [0.7667; 1.0000] | [0.4567; 0.8106] | [0.5343; 0.8454] | [0.5267; 0.8533] | [0.7667; 1.0000] | [0.3667; 0.7931] | [0.3667; 0.7931] |
+| TORAI sửa, nguồn B | OK: 30 | [0.7000; 1.0000] | [1.0000; 1.0000] | [1.0000; 1.0000] | [0.8167; 1.0000] | [0.8631; 1.0000] | [0.8933; 1.0000] | [1.0000; 1.0000] | [0.7000; 1.0000] | [0.7000; 1.0000] |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | OK: 30 | [0.2000; 0.6000] | [0.5333; 0.9333] | [0.6667; 1.0000] | [0.4276; 0.7594] | [0.4759; 0.8140] | [0.5133; 0.8667] | [0.9000; 1.0000] | [0.2500; 0.6429] | [0.2069; 0.6207] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | OK: 30 | [0.4667; 0.9000] | [0.6000; 0.9667] | [0.7667; 1.0000] | [0.5904; 0.9250] | [0.6236; 0.9431] | [0.6333; 0.9533] | [0.7667; 1.0000] | [0.5926; 0.9286] | [0.5926; 0.9286] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | OK: 30 | [0.1667; 0.6333] | [0.5000; 1.0000] | [0.5667; 1.0000] | [0.4065; 0.7833] | [0.4282; 0.8278] | [0.4733; 0.8933] | [0.7667; 1.0000] | [0.2273; 0.7500] | [0.1923; 0.6800] |
+| TORAI sửa, nguồn A (hồi cứu) | OK: 30 | [0.4333; 0.9333] | [0.8000; 1.0000] | [0.8000; 1.0000] | [0.6421; 0.9667] | [0.6639; 0.9754] | [0.7200; 0.9867] | [1.0000; 1.0000] | [0.5000; 0.9643] | [0.4333; 0.9333] |
+| MicroRank top11 | ERROR: 4; OK: 26 | [0.0000; 0.2000] | [0.2000; 0.6667] | [0.2000; 0.6667] | [0.0889; 0.3444] | [0.1175; 0.4167] | [0.1467; 0.4735] | [0.2000; 0.6667] | [0.0000; 0.5000] | [0.0000; 0.5000] |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `bootstrap.dev30.phuong_phap`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+B = 10000, seed = 20261005, số ô = 10. Lấy lại ô có hoàn lại; mỗi ô mang toàn bộ ca còn trong cohort. Dùng cùng mẫu cho mọi phương pháp; Rerank tính lại trên từng mẫu và đếm mẫu N/A. Ít ô làm khoảng có thể hẹp hơn thực. Với TORAI, trung bình từng ca qua seed trước bootstrap.
+
+### Hiệu từng cặp trên cùng mẫu bootstrap — dev30
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: BARO: OK: 30; SimpleRCA M4: OK: 30; MicroRank xếp đầy đủ: ERROR: 4; OK: 26; TraceRCA lọc hữu hạn: ERROR: 4; OK: 26; CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3: OK: 30; TORAI sửa, nguồn B: OK: 30; CIRCA kiến trúc, OLS+RHT-only, cấu hình P3: OK: 30; CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ: OK: 30; CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ: OK: 30; TORAI sửa, nguồn A (hồi cứu): OK: 30; MicroRank top11: ERROR: 4; OK: 26. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Cặp (trái − phải) | Hit@1 | Hit@3 | Hit@5 | MRR | NDCG@5 | Avg@5 | Retrieval@10 | Rerank@1 K=5 | Rerank@1 K=10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BARO − CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | [-0.1000; 0.4333] | [-0.1000; 0.5000] | [-0.2000; 0.1000] | [-0.0741; 0.3433] | [-0.0941; 0.2644] | [-0.0933; 0.2867] | [-0.2000; 0.1000] | [-0.0855; 0.5175] | [-0.0855; 0.5175] |
+| BARO − CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | [0.0667; 0.5333] | [-0.0667; 0.1333] | [0.0000; 0.0000] | [0.0288; 0.3111] | [0.0246; 0.2370] | [0.0067; 0.1800] | [-0.2333; 0.0000] | [0.0769; 0.6250] | [0.1281; 0.6615] |
+| BARO − CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | [-0.1667; 0.1333] | [-0.1667; 0.1667] | [-0.1000; 0.0000] | [-0.1181; 0.0845] | [-0.1015; 0.0592] | [-0.1000; 0.0667] | [-0.1000; 0.0000] | [-0.1786; 0.2043] | [-0.1786; 0.2043] |
+| BARO − CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | [0.0000; 0.6000] | [-0.0667; 0.1333] | [0.0000; 0.1667] | [-0.0101; 0.3211] | [0.0069; 0.2712] | [-0.0067; 0.1933] | [-0.1000; 0.0000] | [-0.0598; 0.6672] | [0.0000; 0.7000] |
+| BARO − MicroRank xếp đầy đủ | [0.3000; 0.9000] | [0.1333; 0.5667] | [0.1667; 0.7000] | [0.2491; 0.7038] | [0.2623; 0.7213] | [0.2333; 0.6933] | [-0.0333; 0.3333] | [0.1545; 0.9583] | [0.4022; 0.9583] |
+| BARO − MicroRank top11 | [0.3000; 0.9000] | [0.1333; 0.5667] | [0.1667; 0.7000] | [0.2925; 0.7556] | [0.2623; 0.7213] | [0.2333; 0.6933] | [0.1667; 0.7000] | [0.1545; 0.9583] | [0.1545; 0.9583] |
+| BARO − SimpleRCA M4 | [-0.4000; 0.1333] | [-0.3333; 0.0000] | [-0.3000; 0.0667] | [-0.3258; 0.0593] | [-0.3190; 0.0500] | [-0.3133; 0.0333] | [-0.3000; 0.0667] | [-0.3083; 0.2250] | [-0.3083; 0.2250] |
+| BARO − TORAI sửa, nguồn A (hồi cứu) | [-0.1000; 0.1000] | [-0.3000; 0.0000] | [-0.2000; 0.0000] | [-0.1236; 0.0037] | [-0.1462; 0.0056] | [-0.1933; -0.0067] | [-0.3333; 0.0000] | [-0.0769; 0.2083] | [-0.0429; 0.2545] |
+| BARO − TORAI sửa, nguồn B | [-0.3667; 0.0000] | [-0.3667; -0.0667] | [-0.3333; 0.0000] | [-0.3352; -0.0028] | [-0.3380; -0.0028] | [-0.3400; -0.0067] | [-0.3333; 0.0000] | [-0.2000; 0.0564] | [-0.2000; 0.0564] |
+| BARO − TraceRCA lọc hữu hạn | [-0.3333; 0.3000] | [-0.2000; 0.2000] | [-0.1667; 0.2000] | [-0.2468; 0.2421] | [-0.2336; 0.2369] | [-0.2200; 0.2268] | [-0.2000; 0.1667] | [-0.2917; 0.2015] | [-0.2844; 0.2632] |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 − CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | [0.0000; 0.3000] | [-0.4667; 0.1000] | [-0.1000; 0.2000] | [-0.0897; 0.2006] | [-0.0868; 0.2133] | [-0.1667; 0.1933] | [-0.1667; 0.0000] | [0.0333; 0.2461] | [0.0505; 0.3333] |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 − CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | [-0.4333; 0.0667] | [-0.4333; 0.0000] | [-0.1000; 0.1000] | [-0.3312; 0.0443] | [-0.2616; 0.0533] | [-0.2800; 0.0400] | [-0.1000; 0.1000] | [-0.4591; 0.0562] | [-0.4591; 0.0562] |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 − CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | [-0.0333; 0.3000] | [-0.5000; 0.2000] | [-0.0667; 0.3333] | [-0.1244; 0.2264] | [-0.1155; 0.2733] | [-0.2067; 0.2467] | [-0.1000; 0.1000] | [-0.0182; 0.2200] | [0.0172; 0.2993] |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 − MicroRank xếp đầy đủ | [0.1333; 0.7333] | [-0.2667; 0.6000] | [0.2000; 0.7333] | [0.0926; 0.6324] | [0.1351; 0.6987] | [0.0733; 0.6867] | [-0.0667; 0.4667] | [0.0379; 0.7640] | [0.1759; 0.7667] |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 − MicroRank top11 | [0.1333; 0.7333] | [-0.2667; 0.6000] | [0.2000; 0.7333] | [0.1234; 0.6995] | [0.1351; 0.6987] | [0.0733; 0.6867] | [0.2000; 0.7333] | [0.0379; 0.7640] | [0.0379; 0.7640] |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 − SimpleRCA M4 | [-0.5667; -0.0333] | [-0.6333; -0.1000] | [-0.2333; 0.0667] | [-0.4755; -0.0444] | [-0.4108; -0.0239] | [-0.4333; -0.0333] | [-0.2333; 0.0667] | [-0.5385; -0.0345] | [-0.5385; -0.0345] |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 − TORAI sửa, nguồn A (hồi cứu) | [-0.4667; 0.1333] | [-0.5667; -0.1333] | [-0.1000; 0.0000] | [-0.3713; -0.0040] | [-0.2847; -0.0188] | [-0.3200; -0.0600] | [-0.2333; 0.0000] | [-0.5000; 0.2057] | [-0.4529; 0.2500] |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 − TORAI sửa, nguồn B | [-0.6333; -0.0667] | [-0.6333; -0.1667] | [-0.2333; 0.0000] | [-0.5039; -0.0711] | [-0.4277; -0.0715] | [-0.4467; -0.0867] | [-0.2333; 0.0000] | [-0.5738; 0.0167] | [-0.5738; 0.0167] |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 − TraceRCA lọc hữu hạn | [-0.5000; 0.1333] | [-0.5333; 0.1000] | [-0.1333; 0.2667] | [-0.3914; 0.1411] | [-0.3247; 0.1600] | [-0.3400; 0.1533] | [-0.1667; 0.2000] | [-0.5752; 0.0720] | [-0.5655; 0.1262] |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 − CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | [-0.5000; -0.1333] | [-0.1667; 0.1000] | [-0.1000; 0.0000] | [-0.2890; -0.0693] | [-0.2372; -0.0581] | [-0.2000; -0.0267] | [0.0000; 0.1667] | [-0.5417; -0.1182] | [-0.5703; -0.1667] |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 − CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | [-0.1000; 0.1000] | [-0.1000; 0.1000] | [0.0000; 0.1667] | [-0.0560; 0.0399] | [-0.0360; 0.0671] | [-0.0467; 0.0600] | [0.0000; 0.1667] | [-0.1818; 0.0929] | [-0.1443; 0.0880] |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 − MicroRank xếp đầy đủ | [0.0333; 0.6000] | [0.0333; 0.6000] | [0.1667; 0.7000] | [0.0898; 0.5553] | [0.1211; 0.6245] | [0.1200; 0.6267] | [0.0667; 0.4667] | [-0.1000; 0.6154] | [-0.0016; 0.6000] |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 − MicroRank top11 | [0.0333; 0.6000] | [0.0333; 0.6000] | [0.1667; 0.7000] | [0.1184; 0.6192] | [0.1211; 0.6245] | [0.1200; 0.6267] | [0.3000; 0.8000] | [-0.1000; 0.6154] | [-0.1693; 0.6000] |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 − SimpleRCA M4 | [-0.6667; -0.2333] | [-0.4333; 0.0000] | [-0.3000; 0.0667] | [-0.4597; -0.1572] | [-0.4250; -0.1113] | [-0.4067; -0.0800] | [-0.1000; 0.1000] | [-0.6333; -0.1936] | [-0.6638; -0.2599] |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 − TORAI sửa, nguồn A (hồi cứu) | [-0.5667; -0.0333] | [-0.3000; -0.0333] | [-0.2000; 0.0000] | [-0.3693; -0.0575] | [-0.3249; -0.0487] | [-0.3200; -0.0600] | [-0.1000; 0.0000] | [-0.5714; 0.0260] | [-0.5598; 0.0000] |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 − TORAI sửa, nguồn B | [-0.7000; -0.2000] | [-0.4667; -0.0667] | [-0.3333; 0.0000] | [-0.5103; -0.1261] | [-0.4746; -0.1045] | [-0.4533; -0.0733] | [-0.1000; 0.0000] | [-0.6590; -0.1595] | [-0.6920; -0.2000] |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 − TraceRCA lọc hữu hạn | [-0.6000; -0.0333] | [-0.3000; 0.1667] | [-0.1667; 0.2000] | [-0.3802; 0.0400] | [-0.3397; 0.0786] | [-0.3067; 0.1000] | [-0.0333; 0.2333] | [-0.6699; -0.0979] | [-0.7090; -0.0800] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ − CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | [0.1000; 0.5667] | [-0.1333; 0.2333] | [0.0000; 0.2667] | [0.0493; 0.3048] | [0.0482; 0.2845] | [0.0000; 0.2400] | [0.0000; 0.0000] | [-0.0073; 0.5804] | [0.1000; 0.6071] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ − MicroRank xếp đầy đủ | [0.3000; 0.9000] | [0.0333; 0.7000] | [0.2000; 0.7333] | [0.2430; 0.7204] | [0.2551; 0.7525] | [0.2200; 0.7400] | [-0.0333; 0.4000] | [0.1600; 0.9000] | [0.3665; 0.9000] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ − MicroRank top11 | [0.3000; 0.9000] | [0.0333; 0.7000] | [0.2000; 0.7333] | [0.2779; 0.7811] | [0.2551; 0.7525] | [0.2200; 0.7400] | [0.2000; 0.7333] | [0.1600; 0.9000] | [0.1600; 0.9000] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ − SimpleRCA M4 | [-0.3667; 0.0667] | [-0.4000; 0.0333] | [-0.2333; 0.0667] | [-0.3054; 0.0144] | [-0.2890; 0.0259] | [-0.3067; 0.0333] | [-0.2333; 0.0667] | [-0.2926; 0.0929] | [-0.2926; 0.0929] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ − TORAI sửa, nguồn A (hồi cứu) | [-0.2000; 0.2667] | [-0.2333; -0.0333] | [-0.1000; 0.0000] | [-0.1535; 0.0980] | [-0.1331; 0.0705] | [-0.1533; 0.0200] | [-0.2333; 0.0000] | [-0.1905; 0.3077] | [-0.1548; 0.3493] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ − TORAI sửa, nguồn B | [-0.4000; 0.1000] | [-0.4000; -0.0333] | [-0.2333; 0.0000] | [-0.3513; 0.0475] | [-0.3297; 0.0290] | [-0.3333; 0.0200] | [-0.2333; 0.0000] | [-0.2805; 0.1238] | [-0.2805; 0.1238] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ − TraceRCA lọc hữu hạn | [-0.2667; 0.2000] | [-0.2667; 0.2333] | [-0.1333; 0.2333] | [-0.2193; 0.2037] | [-0.2003; 0.2100] | [-0.2067; 0.2200] | [-0.1333; 0.2000] | [-0.2593; 0.1186] | [-0.2482; 0.1609] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ − MicroRank xếp đầy đủ | [0.0000; 0.6333] | [0.0333; 0.6000] | [0.1333; 0.6333] | [0.0771; 0.5849] | [0.0959; 0.6306] | [0.1133; 0.6400] | [-0.0333; 0.4000] | [-0.0714; 0.7083] | [0.0000; 0.6408] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ − MicroRank top11 | [0.0000; 0.6333] | [0.0333; 0.6000] | [0.1333; 0.6333] | [0.1095; 0.6483] | [0.0959; 0.6306] | [0.1133; 0.6400] | [0.2000; 0.7333] | [-0.0714; 0.7083] | [-0.1250; 0.6333] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ − SimpleRCA M4 | [-0.7000; -0.2000] | [-0.5000; 0.0000] | [-0.4000; 0.0000] | [-0.4762; -0.1222] | [-0.4561; -0.1020] | [-0.4400; -0.0533] | [-0.2333; 0.0667] | [-0.6667; -0.0757] | [-0.6882; -0.1835] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ − TORAI sửa, nguồn A (hồi cứu) | [-0.6333; 0.0667] | [-0.3667; 0.0000] | [-0.3667; 0.0000] | [-0.3886; -0.0163] | [-0.3769; -0.0262] | [-0.3667; -0.0333] | [-0.2333; 0.0000] | [-0.6267; 0.1843] | [-0.6128; 0.1348] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ − TORAI sửa, nguồn B | [-0.7667; -0.1333] | [-0.5000; 0.0000] | [-0.4333; 0.0000] | [-0.5318; -0.0839] | [-0.5153; -0.0861] | [-0.4867; -0.0467] | [-0.2333; 0.0000] | [-0.7074; -0.0080] | [-0.7303; -0.0933] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ − TraceRCA lọc hữu hạn | [-0.6000; 0.0000] | [-0.3333; 0.2000] | [-0.2667; 0.1667] | [-0.3862; 0.0529] | [-0.3646; 0.0662] | [-0.3268; 0.1200] | [-0.1333; 0.2000] | [-0.6957; 0.0000] | [-0.7084; -0.0383] |
+| MicroRank xếp đầy đủ − MicroRank top11 | [0.0000; 0.0000] | [0.0000; 0.0000] | [0.0000; 0.0000] | [0.0172; 0.0748] | [0.0000; 0.0000] | [0.0000; 0.0000] | [0.0667; 0.5000] | [0.0000; 0.0000] | [-0.2676; 0.0000] |
+| MicroRank xếp đầy đủ − SimpleRCA M4 | [-0.9333; -0.5667] | [-0.7333; -0.3333] | [-0.7333; -0.3333] | [-0.7422; -0.5229] | [-0.7782; -0.5123] | [-0.7667; -0.4733] | [-0.4667; -0.1000] | [-1.0000; -0.3518] | [-1.0000; -0.5241] |
+| MicroRank xếp đầy đủ − TORAI sửa, nguồn A (hồi cứu) | [-0.9333; -0.2667] | [-0.8000; -0.2000] | [-0.8000; -0.2000] | [-0.7381; -0.3071] | [-0.7667; -0.3052] | [-0.7800; -0.2933] | [-0.5000; -0.1333] | [-0.9333; -0.0615] | [-0.9333; -0.1979] |
+| MicroRank xếp đầy đủ − TORAI sửa, nguồn B | [-0.9667; -0.6333] | [-0.8000; -0.3333] | [-0.8000; -0.3333] | [-0.7509; -0.5568] | [-0.7869; -0.5571] | [-0.7800; -0.5067] | [-0.5000; -0.1333] | [-0.9667; -0.3178] | [-0.9667; -0.5692] |
+| MicroRank xếp đầy đủ − TraceRCA lọc hữu hạn | [-0.8000; -0.4667] | [-0.6000; -0.1333] | [-0.6333; -0.1667] | [-0.6377; -0.3655] | [-0.6731; -0.3587] | [-0.6667; -0.3000] | [-0.3000; -0.0333] | [-0.9565; -0.3067] | [-0.9565; -0.4684] |
+| MicroRank top11 − SimpleRCA M4 | [-0.9333; -0.5667] | [-0.7333; -0.3333] | [-0.7333; -0.3333] | [-0.8067; -0.5522] | [-0.7782; -0.5123] | [-0.7667; -0.4733] | [-0.7333; -0.3333] | [-1.0000; -0.3518] | [-1.0000; -0.3518] |
+| MicroRank top11 − TORAI sửa, nguồn A (hồi cứu) | [-0.9333; -0.2667] | [-0.8000; -0.2000] | [-0.8000; -0.2000] | [-0.7889; -0.3476] | [-0.7667; -0.3052] | [-0.7800; -0.2933] | [-0.8000; -0.3333] | [-0.9333; -0.0615] | [-0.9333; 0.0333] |
+| MicroRank top11 − TORAI sửa, nguồn B | [-0.9667; -0.6333] | [-0.8000; -0.3333] | [-0.8000; -0.3333] | [-0.8056; -0.6000] | [-0.7869; -0.5571] | [-0.7800; -0.5067] | [-0.8000; -0.3333] | [-0.9667; -0.3178] | [-0.9667; -0.3178] |
+| MicroRank top11 − TraceRCA lọc hữu hạn | [-0.8000; -0.4667] | [-0.6000; -0.1333] | [-0.6333; -0.1667] | [-0.7000; -0.4028] | [-0.6731; -0.3587] | [-0.6667; -0.3000] | [-0.7000; -0.1667] | [-0.9565; -0.3067] | [-0.9565; -0.2538] |
+| SimpleRCA M4 − TORAI sửa, nguồn A (hồi cứu) | [-0.1333; 0.4333] | [-0.1000; 0.2000] | [-0.1000; 0.2000] | [-0.1089; 0.2805] | [-0.1000; 0.2687] | [-0.1000; 0.2335] | [-0.1000; 0.0000] | [-0.1333; 0.3952] | [-0.1239; 0.4644] |
+| SimpleRCA M4 − TORAI sửa, nguồn B | [-0.2333; 0.1667] | [-0.1000; 0.0000] | [-0.1000; 0.0000] | [-0.1478; 0.1022] | [-0.1246; 0.0710] | [-0.1000; 0.0533] | [-0.1000; 0.0000] | [-0.2092; 0.2000] | [-0.2092; 0.2000] |
+| SimpleRCA M4 − TraceRCA lọc hữu hạn | [-0.0667; 0.3333] | [0.0667; 0.2667] | [0.0333; 0.2333] | [0.0278; 0.2457] | [0.0536; 0.2272] | [0.0600; 0.2267] | [-0.0333; 0.2333] | [-0.2287; 0.2859] | [-0.2267; 0.3545] |
+| TORAI sửa, nguồn A (hồi cứu) − TORAI sửa, nguồn B | [-0.3667; 0.0000] | [-0.2000; 0.0000] | [-0.2000; 0.0000] | [-0.2635; 0.0056] | [-0.2659; 0.0052] | [-0.2400; 0.0267] | [0.0000; 0.0000] | [-0.2667; 0.0000] | [-0.3667; 0.0000] |
+| TORAI sửa, nguồn A (hồi cứu) − TraceRCA lọc hữu hạn | [-0.3667; 0.3333] | [-0.1000; 0.3333] | [-0.1000; 0.2667] | [-0.1978; 0.2972] | [-0.1825; 0.2900] | [-0.1467; 0.3000] | [0.0333; 0.2333] | [-0.4200; 0.1905] | [-0.4667; 0.2333] |
+| TORAI sửa, nguồn B − TraceRCA lọc hữu hạn | [-0.0667; 0.3667] | [0.0667; 0.3333] | [0.0667; 0.2667] | [-0.0122; 0.3093] | [0.0123; 0.3010] | [0.0267; 0.3002] | [0.0333; 0.2333] | [-0.1926; 0.2267] | [-0.1889; 0.2846] |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `bootstrap.dev30.hieu`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Khoảng chứa 0 chưa cho thấy khác biệt tách khỏi 0 theo phép bootstrap này. Mọi khoảng ở đây là khoảng từng cặp; chưa hiệu chỉnh việc xét nhiều cặp. Không dùng thứ tự trung bình để tuyên bố phương pháp tốt nhất.
+
+### TORAI sửa, nguồn B: độ nhạy seed — dev30
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đếm theo ca ở từng dòng. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Seed | Trạng thái | Hit@1 | Hit@3 | Hit@5 | MRR | NDCG@5 | Avg@5 | Retrieval@5 | Retrieval@10 | Rerank@1 K=5 | Rerank@1 K=10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| seed 0 | OK: 30 | 0.8667 | 1.0000 | 1.0000 | 0.9167 | 0.9377 | 0.9533 | 1.0000 | 1.0000 | 0.8667 | 0.8667 |
+| seed 1 | OK: 30 | 0.8667 | 1.0000 | 1.0000 | 0.9167 | 0.9377 | 0.9533 | 1.0000 | 1.0000 | 0.8667 | 0.8667 |
+| seed 2 | OK: 30 | 0.8667 | 1.0000 | 1.0000 | 0.9167 | 0.9377 | 0.9533 | 1.0000 | 1.0000 | 0.8667 | 0.8667 |
+| khoảng min–max giữa seed | OK: 30 | [0.8667; 0.8667] | [1.0000; 1.0000] | [1.0000; 1.0000] | [0.9167; 0.9167] | [0.9377; 0.9377] | [0.9533; 0.9533] | [1.0000; 1.0000] | [1.0000; 1.0000] | [0.8667; 0.8667] | [0.8667; 0.8667] |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.torai_B.seed_range.dev30`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Khoảng giữa seed là biến thiên qua các seed đã khóa, không phải khoảng bootstrap. Dòng chính trung bình Hit theo seed ở từng ca rồi tính Rerank từ tổng Hit; không trung bình các tỉ số Rerank làm số chính.
+
+### TORAI sửa, nguồn A (hồi cứu): độ nhạy seed — dev30
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đếm theo ca ở từng dòng. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Seed | Trạng thái | Hit@1 | Hit@3 | Hit@5 | MRR | NDCG@5 | Avg@5 | Retrieval@5 | Retrieval@10 | Rerank@1 K=5 | Rerank@1 K=10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| seed 0 | OK: 30 | 0.7000 | 0.9333 | 0.9333 | 0.8196 | 0.8429 | 0.8800 | 0.9333 | 1.0000 | 0.7500 | 0.7000 |
+| seed 1 | OK: 30 | 0.7000 | 0.9333 | 0.9333 | 0.8196 | 0.8429 | 0.8800 | 0.9333 | 1.0000 | 0.7500 | 0.7000 |
+| seed 2 | OK: 30 | 0.7000 | 0.9333 | 0.9333 | 0.8196 | 0.8429 | 0.8800 | 0.9333 | 1.0000 | 0.7500 | 0.7000 |
+| khoảng min–max giữa seed | OK: 30 | [0.7000; 0.7000] | [0.9333; 0.9333] | [0.9333; 0.9333] | [0.8196; 0.8196] | [0.8429; 0.8429] | [0.8800; 0.8800] | [0.9333; 0.9333] | [1.0000; 1.0000] | [0.7500; 0.7500] | [0.7000; 0.7000] |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.torai_A.seed_range.dev30`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Khoảng giữa seed là biến thiên qua các seed đã khóa, không phải khoảng bootstrap. Dòng chính trung bình Hit theo seed ở từng ca rồi tính Rerank từ tổng Hit; không trung bình các tỉ số Rerank làm số chính.
+
+Mọi số và khoảng dev19 chỉ mô tả 19 ca/9 ô giữ lại theo đầu ra CIRCA. Việc bỏ 11 ca đổi cả thành phần ca và số ERROR của phương pháp khác; hướng thay đổi phụ thuộc phương pháp và độ đo. Đây không phải phép sửa CIRCA trên cùng ca. Các cặp có hoặc không có CIRCA chỉ được diễn giải trong nhóm ca này; chưa suy sang toàn 30 ca hay test. Nguồn: `results/T-024/cham-a.json` → `cohorts.dev19`, `methods.<id>.per_case`.
+
+### Bảng chính — dev19
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đếm theo ca ở từng dòng. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Phương pháp | Ca | Trạng thái | Hit@1 | Hit@3 | Hit@5 | MRR | NDCG@5 | Avg@5 | Retrieval@5 | Retrieval@10 | Rerank@1 K=5 | Rerank@1 K=10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BARO (chính) | 19 | OK: 19 | 0.5789 [0.5789; 0.5789] | 0.7368 [0.7368; 0.7368] | 0.8421 [0.8421; 0.8421] | 0.6833 [0.6833; 0.6833] | 0.7170 [0.7170; 0.7170] | 0.7368 [0.7368; 0.7368] | 0.8421 [0.8421; 0.8421] | 0.8421 [0.8421; 0.8421] | 0.6875 | 0.6875 |
+| SimpleRCA M4 (chính) | 19 | OK: 19 | 0.8421 [0.8421; 0.8421] | 0.9474 [0.9474; 0.9474] | 0.9474 [0.9474; 0.9474] | 0.8895 [0.8895; 0.8895] | 0.9016 [0.9016; 0.9016] | 0.9158 [0.9158; 0.9158] | 0.9474 [0.9474; 0.9474] | 0.9474 [0.9474; 0.9474] | 0.8889 | 0.8889 |
+| MicroRank xếp đầy đủ (chính) | 19 | ERROR: 1; OK: 18 | 0.1053 [0.1053; 0.1053] | 0.3158 [0.3158; 0.3158] | 0.3158 [0.3158; 0.3158] | 0.2599 [0.2599; 0.2599] | 0.2243 [0.2243; 0.2243] | 0.2526 [0.2526; 0.2526] | 0.3158 [0.3158; 0.3158] | 0.7368 [0.7368; 0.7368] | 0.3333 | 0.1429 |
+| TraceRCA lọc hữu hạn (chính) | 19 | ERROR: 1; OK: 18 | 0.6842 [0.6842; 0.6842] | 0.8421 [0.8421; 0.8421] | 0.8947 [0.8947; 0.8947] | 0.7734 [0.7734; 0.7734] | 0.7996 [0.7996; 0.7996] | 0.8211 [0.8211; 0.8211] | 0.8947 [0.8947; 0.8947] | 0.9474 [0.9474; 0.9474] | 0.7647 | 0.7222 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 (chính) | 19 | OK: 19 | 0.6842 [0.6842; 0.6842] | 0.7895 [0.7895; 0.7895] | 0.8421 [0.8421; 0.8421] | 0.7483 [0.7483; 0.7483] | 0.7664 [0.7664; 0.7664] | 0.7789 [0.7789; 0.7789] | 0.8421 [0.8421; 0.8421] | 0.8421 [0.8421; 0.8421] | 0.8125 | 0.8125 |
+| TORAI sửa, nguồn B (chính) | 19 | OK: 19 | 0.8421 [0.8421; 0.8421] | 1.0000 [1.0000; 1.0000] | 1.0000 [1.0000; 1.0000] | 0.8947 [0.8947; 0.8947] | 0.9211 [0.9211; 0.9211] | 0.9368 [0.9368; 0.9368] | 1.0000 [1.0000; 1.0000] | 1.0000 [1.0000; 1.0000] | 0.8421 | 0.8421 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 (phụ) | 19 | OK: 19 | 0.6316 [0.6316; 0.6316] | 0.7895 [0.7895; 0.7895] | 0.8947 [0.8947; 0.8947] | 0.7232 [0.7232; 0.7232] | 0.7604 [0.7604; 0.7604] | 0.7684 [0.7684; 0.7684] | 0.8947 [0.8947; 0.8947] | 0.9474 [0.9474; 0.9474] | 0.7059 | 0.6667 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ (phụ) | 19 | OK: 19 | 0.6842 [0.6842; 0.6842] | 0.7895 [0.7895; 0.7895] | 0.8421 [0.8421; 0.8421] | 0.7578 [0.7578; 0.7578] | 0.7733 [0.7733; 0.7733] | 0.7895 [0.7895; 0.7895] | 0.8421 [0.8421; 0.8421] | 0.8421 [0.8421; 0.8421] | 0.8125 | 0.8125 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ (phụ) | 19 | OK: 19 | 0.6316 [0.6316; 0.6316] | 0.7368 [0.7368; 0.7368] | 0.7895 [0.7895; 0.7895] | 0.7023 [0.7023; 0.7023] | 0.7138 [0.7138; 0.7138] | 0.7263 [0.7263; 0.7263] | 0.7895 [0.7895; 0.7895] | 0.8421 [0.8421; 0.8421] | 0.8000 | 0.7500 |
+| TORAI sửa, nguồn A (hồi cứu) (phụ) | 19 | OK: 19 | 0.5789 [0.5789; 0.5789] | 0.8947 [0.8947; 0.8947] | 0.8947 [0.8947; 0.8947] | 0.7414 [0.7414; 0.7414] | 0.7713 [0.7713; 0.7713] | 0.8211 [0.8211; 0.8211] | 0.8947 [0.8947; 0.8947] | 1.0000 [1.0000; 1.0000] | 0.6471 | 0.5789 |
+| MicroRank top11 (phụ) | 19 | ERROR: 1; OK: 18 | 0.1053 [0.1053; 0.1053] | 0.3158 [0.3158; 0.3158] | 0.3158 [0.3158; 0.3158] | 0.1930 [0.1930; 0.1930] | 0.2243 [0.2243; 0.2243] | 0.2526 [0.2526; 0.2526] | 0.3158 [0.3158; 0.3158] | 0.3158 [0.3158; 0.3158] | 0.3333 | 0.3333 |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.<id>.summaries.dev19.main`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Mỗi ô độ đo đơn điệu ghi kỳ vọng **[cận bi quan; cận lạc quan]**. Cận mô tả ảnh hưởng của hòa, không phải khoảng tin cậy. Rerank là tỉ số gộp và chỉ có giá trị chính. Retrieval@5 bằng Hit@5 với một root.
+
+### RCAEval riêng — dev19
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đếm theo ca ở từng dòng. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Phương pháp | Seed | Trạng thái | AC@1 | AC@3 | AC@5 | Avg@5 | Retrieval 5 | Retrieval 10 | Rerank 1/5 | Rerank 1/10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BARO (chính) | trung bình seed | OK: 19 | 0.5789 | 0.7368 | 0.8421 | 0.7368 | 0.8421 | 0.8421 | 0.6875 | 0.6875 |
+| SimpleRCA M4 (chính) | trung bình seed | OK: 19 | 0.8421 | 0.9474 | 0.9474 | 0.9158 | 0.9474 | 0.9474 | 0.8889 | 0.8889 |
+| MicroRank xếp đầy đủ (chính) | trung bình seed | ERROR: 1; OK: 18 | 0.1053 | 0.3158 | 0.3158 | 0.2526 | 0.3158 | 0.7368 | 0.3333 | 0.1429 |
+| TraceRCA lọc hữu hạn (chính) | trung bình seed | ERROR: 1; OK: 18 | 0.6842 | 0.8421 | 0.8947 | 0.8211 | 0.8947 | 0.9474 | 0.7647 | 0.7222 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 (chính) | trung bình seed | OK: 19 | 0.6842 | 0.7895 | 0.8421 | 0.7789 | 0.8421 | 0.8421 | 0.8125 | 0.8125 |
+| TORAI sửa, nguồn B (chính) | trung bình seed | OK: 19 | 0.8421 | 1.0000 | 1.0000 | 0.9368 | 1.0000 | 1.0000 | 0.8421 | 0.8421 |
+| TORAI sửa, nguồn B | seed 0 | OK: 19 | 0.8421 | 1.0000 | 1.0000 | 0.9368 | 1.0000 | 1.0000 | 0.8421 | 0.8421 |
+| TORAI sửa, nguồn B | seed 1 | OK: 19 | 0.8421 | 1.0000 | 1.0000 | 0.9368 | 1.0000 | 1.0000 | 0.8421 | 0.8421 |
+| TORAI sửa, nguồn B | seed 2 | OK: 19 | 0.8421 | 1.0000 | 1.0000 | 0.9368 | 1.0000 | 1.0000 | 0.8421 | 0.8421 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 (phụ) | trung bình seed | OK: 19 | 0.6316 | 0.7895 | 0.8947 | 0.7684 | 0.8947 | 0.9474 | 0.7059 | 0.6667 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ (phụ) | trung bình seed | OK: 19 | 0.6842 | 0.7895 | 0.8421 | 0.7895 | 0.8421 | 0.8421 | 0.8125 | 0.8125 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ (phụ) | trung bình seed | OK: 19 | 0.6316 | 0.7368 | 0.7895 | 0.7263 | 0.7895 | 0.8421 | 0.8000 | 0.7500 |
+| TORAI sửa, nguồn A (hồi cứu) (phụ) | trung bình seed | OK: 19 | 0.5789 | 0.8947 | 0.8947 | 0.8211 | 0.8947 | 1.0000 | 0.6471 | 0.5789 |
+| TORAI sửa, nguồn A (hồi cứu) | seed 0 | OK: 19 | 0.5789 | 0.8947 | 0.8947 | 0.8211 | 0.8947 | 1.0000 | 0.6471 | 0.5789 |
+| TORAI sửa, nguồn A (hồi cứu) | seed 1 | OK: 19 | 0.5789 | 0.8947 | 0.8947 | 0.8211 | 0.8947 | 1.0000 | 0.6471 | 0.5789 |
+| TORAI sửa, nguồn A (hồi cứu) | seed 2 | OK: 19 | 0.5789 | 0.8947 | 0.8947 | 0.8211 | 0.8947 | 1.0000 | 0.6471 | 0.5789 |
+| MicroRank top11 (phụ) | trung bình seed | ERROR: 1; OK: 18 | 0.1053 | 0.3158 | 0.3158 | 0.2526 | 0.3158 | 0.3158 | 0.3333 | 0.3333 |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.<id>.summaries.dev19.rcaeval`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Bảng giữ thứ tự đầu ra của bản triển khai đang đánh giá, bỏ trùng thực thể, `Evaluator(max_k=10)`. Khi có hòa, bảng này chỉ để đối chiếu cách báo của RCAEval; kết luận dùng bảng chính. TORAI trung bình AC và Retrieval theo seed rồi tính lại tỉ số Rerank cho dòng gộp; quy tắc giữ thứ tự đầu ra vẫn có thể khác bảng chính khi có hòa.
+Riêng TraceRCA, thứ tự trong bảng là danh sách `ji` hữu hạn do adapter sắp lại theo WHY-32, không phải thứ tự hàm RCAEval trả về. Trên toàn dev30, hai thứ tự khác ở 26/26 lượt OK, hạng root sau bỏ trùng service khác ở 9/26 lượt; nếu dùng thứ tự hàm trả về và vẫn giữ ERROR ở mẫu số, AC@1 là 16/30 = 0.5333. Số này chỉ mô tả tác động của thứ tự, không thay số chính và không chứng minh thứ tự chứa NaN của hàm là đúng. 26/26 lượt OK có NaN, nên phép đối chiếu thứ tự khi không NaN ở giao thức §6.4 không áp dụng được lượt OK nào trong cohort này. Nguồn: `results/T-024/ban-ghi-dua-vao-cham.json` → bản ghi TraceRCA `ranking_native`, `extra.ranks_chinh_thuc`, `diagnostics.key_check`; root và mẫu số từ `results/T-024/cham-a.json` → `methods.tracerca.per_case.<ca>.label.root`, `cohorts.dev30`. Bảng này áp dụng công thức RCAEval cho bản TraceRCA lọc hữu hạn; không được coi là kết quả nguyên trạng của code TraceRCA trong RCAEval.
+
+### Mức ngẫu nhiên trên O và U — dev19
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đếm theo ca ở từng dòng. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Phương pháp | Trạng thái | \|O\| TB | Root thuộc O | Root được trả | O_hit@1 | O_hit@3 | O_hit@5 | O_hit@10 | U_hit@1 | U_hit@3 | U_hit@5 | U_hit@10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BARO | OK: 19 | 68.0000 | 1.0000 | 1.0000 | 0.0147 | 0.0441 | 0.0735 | 0.1471 | 0.0147 | 0.0441 | 0.0735 | 0.1471 |
+| SimpleRCA M4 | OK: 19 | 68.0526 | 1.0000 | 1.0000 | 0.0147 | 0.0441 | 0.0735 | 0.1469 | 0.0147 | 0.0441 | 0.0735 | 0.1471 |
+| MicroRank xếp đầy đủ | ERROR: 1; OK: 18 | 25.1579 | 1.0000 | 0.9474 | 0.0404 | 0.1213 | 0.2022 | 0.4045 | 0.0147 | 0.0441 | 0.0735 | 0.1471 |
+| TraceRCA lọc hữu hạn | ERROR: 1; OK: 18 | 25.1579 | 1.0000 | 0.9474 | 0.0404 | 0.1213 | 0.2022 | 0.4045 | 0.0147 | 0.0441 | 0.0735 | 0.1471 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 19 | 68.0000 | 1.0000 | 1.0000 | 0.0147 | 0.0441 | 0.0735 | 0.1471 | 0.0147 | 0.0441 | 0.0735 | 0.1471 |
+| TORAI sửa, nguồn B | OK: 19 | 68.0000 | 1.0000 | 1.0000 | 0.0147 | 0.0441 | 0.0735 | 0.1471 | 0.0147 | 0.0441 | 0.0735 | 0.1471 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | OK: 19 | 68.0000 | 1.0000 | 1.0000 | 0.0147 | 0.0441 | 0.0735 | 0.1471 | 0.0147 | 0.0441 | 0.0735 | 0.1471 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | OK: 19 | 68.0000 | 1.0000 | 1.0000 | 0.0147 | 0.0441 | 0.0735 | 0.1471 | 0.0147 | 0.0441 | 0.0735 | 0.1471 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | OK: 19 | 68.0000 | 1.0000 | 1.0000 | 0.0147 | 0.0441 | 0.0735 | 0.1471 | 0.0147 | 0.0441 | 0.0735 | 0.1471 |
+| TORAI sửa, nguồn A (hồi cứu) | OK: 19 | 68.0000 | 1.0000 | 1.0000 | 0.0147 | 0.0441 | 0.0735 | 0.1471 | 0.0147 | 0.0441 | 0.0735 | 0.1471 |
+| MicroRank top11 | ERROR: 1; OK: 18 | 25.1579 | 1.0000 | 0.3158 | 0.0404 | 0.1213 | 0.2022 | 0.4045 | 0.0147 | 0.0441 | 0.0735 | 0.1471 |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.<id>.summaries.dev19.random`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+O là tập quan sát riêng của phương pháp; U là inventory và tập chấm. Nếu root thuộc O, kỳ vọng ngẫu nhiên Hit@k là `min(k, |O|)/|O|`; root vắng thì bằng 0. Mức ngẫu nhiên O mô tả tập ứng viên, kể cả ở ca phương pháp lỗi; nó không thay số RCA của ca lỗi.
+
+### Bootstrap theo ô, khoảng phân vị 95% — dev19
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đếm theo ca ở từng dòng. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Phương pháp | Trạng thái | Hit@1 | Hit@3 | Hit@5 | MRR | NDCG@5 | Avg@5 | Retrieval@10 | Rerank@1 K=5 | Rerank@1 K=10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BARO | OK: 19 | [0.3330; 0.8462] | [0.5455; 0.9334] | [0.6111; 1.0000] | [0.4587; 0.8947] | [0.4841; 0.9162] | [0.5111; 0.9294] | [0.6111; 1.0000] | [0.4667; 0.9167] | [0.4667; 0.9167] |
+| SimpleRCA M4 | OK: 19 | [0.6250; 1.0000] | [0.8500; 1.0000] | [0.8500; 1.0000] | [0.7489; 1.0000] | [0.7781; 1.0000] | [0.8000; 1.0000] | [0.8500; 1.0000] | [0.6667; 1.0000] | [0.6667; 1.0000] |
+| MicroRank xếp đầy đủ | ERROR: 1; OK: 18 | [0.0000; 0.3000] | [0.1053; 0.5882] | [0.1053; 0.5882] | [0.1383; 0.4384] | [0.0628; 0.4375] | [0.0778; 0.4800] | [0.5556; 0.8947] | [0.0000; 0.7500] (N/A: 7) | [0.0000; 0.3750] |
+| TraceRCA lọc hữu hạn | ERROR: 1; OK: 18 | [0.4167; 0.9375] | [0.6316; 1.0000] | [0.7500; 1.0000] | [0.5570; 0.9643] | [0.6012; 0.9736] | [0.6190; 0.9857] | [0.8235; 1.0000] | [0.5263; 1.0000] | [0.4444; 1.0000] |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 19 | [0.4118; 0.9334] | [0.5000; 1.0000] | [0.6500; 1.0000] | [0.5056; 0.9524] | [0.5341; 0.9631] | [0.5385; 0.9750] | [0.6500; 1.0000] | [0.5833; 1.0000] | [0.5833; 1.0000] |
+| TORAI sửa, nguồn B | OK: 19 | [0.6471; 1.0000] | [1.0000; 1.0000] | [1.0000; 1.0000] | [0.7647; 1.0000] | [0.8235; 1.0000] | [0.8588; 1.0000] | [1.0000; 1.0000] | [0.6471; 1.0000] | [0.6471; 1.0000] |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | OK: 19 | [0.3529; 0.9091] | [0.5000; 1.0000] | [0.7000; 1.0000] | [0.4833; 0.9487] | [0.5269; 0.9615] | [0.5273; 0.9750] | [0.8500; 1.0000] | [0.4667; 0.9333] | [0.4118; 0.9091] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | OK: 19 | [0.3808; 1.0000] | [0.4706; 1.0000] | [0.6111; 1.0000] | [0.4920; 1.0000] | [0.5106; 1.0000] | [0.5176; 1.0000] | [0.6111; 1.0000] | [0.5455; 1.0000] | [0.5455; 1.0000] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | OK: 19 | [0.3125; 0.9091] | [0.4375; 1.0000] | [0.5714; 1.0000] | [0.4256; 0.9444] | [0.4479; 0.9500] | [0.4632; 0.9546] | [0.6111; 1.0000] | [0.5000; 1.0000] | [0.4545; 1.0000] |
+| TORAI sửa, nguồn A (hồi cứu) | OK: 19 | [0.2666; 0.9091] | [0.7000; 1.0000] | [0.7000; 1.0000] | [0.5159; 0.9545] | [0.5470; 0.9664] | [0.6000; 0.9818] | [1.0000; 1.0000] | [0.3333; 0.9333] | [0.2666; 0.9091] |
+| MicroRank top11 | ERROR: 1; OK: 18 | [0.0000; 0.3000] | [0.1053; 0.5882] | [0.1053; 0.5882] | [0.0455; 0.3986] | [0.0628; 0.4375] | [0.0778; 0.4800] | [0.1053; 0.5882] | [0.0000; 0.7500] (N/A: 7) | [0.0000; 0.7500] (N/A: 7) |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `bootstrap.dev19.phuong_phap`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+B = 10000, seed = 20261005, số ô = 9. Lấy lại ô có hoàn lại; mỗi ô mang toàn bộ ca còn trong cohort. Dùng cùng mẫu cho mọi phương pháp; Rerank tính lại trên từng mẫu và đếm mẫu N/A. Ít ô làm khoảng có thể hẹp hơn thực. Với TORAI, trung bình từng ca qua seed trước bootstrap.
+
+### Hiệu từng cặp trên cùng mẫu bootstrap — dev19
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: BARO: OK: 19; SimpleRCA M4: OK: 19; MicroRank xếp đầy đủ: ERROR: 1; OK: 18; TraceRCA lọc hữu hạn: ERROR: 1; OK: 18; CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3: OK: 19; TORAI sửa, nguồn B: OK: 19; CIRCA kiến trúc, OLS+RHT-only, cấu hình P3: OK: 19; CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ: OK: 19; CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ: OK: 19; TORAI sửa, nguồn A (hồi cứu): OK: 19; MicroRank top11: ERROR: 1; OK: 18. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Cặp (trái − phải) | Hit@1 | Hit@3 | Hit@5 | MRR | NDCG@5 | Avg@5 | Retrieval@10 | Rerank@1 K=5 | Rerank@1 K=10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BARO − CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | [-0.2381; 0.0000] | [-0.2500; 0.1111] | [-0.1875; 0.1364] | [-0.1372; -0.0062] | [-0.1353; 0.0056] | [-0.1467; 0.0286] | [-0.1875; 0.1364] | [-0.3571; 0.1190] | [-0.3571; 0.1190] |
+| BARO − CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | [-0.2273; 0.1176] | [-0.2500; 0.1111] | [-0.2000; 0.0000] | [-0.1624; 0.0774] | [-0.1549; 0.0551] | [-0.1571; 0.0706] | [-0.2667; 0.0000] | [-0.2273; 0.2059] | [-0.2000; 0.2437] |
+| BARO − CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | [-0.3529; 0.1111] | [-0.2105; 0.1176] | [0.0000; 0.0000] | [-0.2143; 0.0339] | [-0.1592; 0.0227] | [-0.1368; 0.0143] | [0.0000; 0.0000] | [-0.4091; 0.1333] | [-0.4091; 0.1333] |
+| BARO − CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | [-0.3182; 0.2143] | [-0.1429; 0.1429] | [0.0000; 0.1500] | [-0.1871; 0.1396] | [-0.1384; 0.1506] | [-0.1111; 0.1294] | [0.0000; 0.0000] | [-0.3786; 0.2084] | [-0.3636; 0.2667] |
+| BARO − MicroRank xếp đầy đủ | [0.0500; 0.8422] | [0.0625; 0.6842] | [0.1053; 0.8571] | [0.0489; 0.7030] | [0.0937; 0.7787] | [0.0875; 0.7700] | [-0.2000; 0.3500] | [-0.2167; 0.9000] (N/A: 7) | [0.1667; 0.9000] |
+| BARO − MicroRank top11 | [0.0500; 0.8422] | [0.0625; 0.6842] | [0.1053; 0.8571] | [0.0968; 0.7817] | [0.0937; 0.7787] | [0.0875; 0.7700] | [0.1053; 0.8571] | [-0.2167; 0.9000] (N/A: 7) | [-0.2167; 0.9000] (N/A: 7) |
+| BARO − SimpleRCA M4 | [-0.5714; 0.0714] | [-0.4211; 0.0000] | [-0.3684; 0.1053] | [-0.4581; 0.0418] | [-0.4410; 0.0479] | [-0.4333; 0.0421] | [-0.3684; 0.1053] | [-0.4706; 0.1524] | [-0.4706; 0.1524] |
+| BARO − TORAI sửa, nguồn A (hồi cứu) | [-0.1667; 0.1429] | [-0.3158; 0.0000] | [-0.2000; 0.0000] | [-0.1498; 0.0117] | [-0.1595; 0.0089] | [-0.2000; -0.0174] | [-0.3889; 0.0000] | [-0.1538; 0.2154] | [-0.1053; 0.2671] |
+| BARO − TORAI sửa, nguồn B | [-0.5833; 0.0000] | [-0.4545; -0.0666] | [-0.3889; 0.0000] | [-0.4834; -0.0088] | [-0.4727; -0.0077] | [-0.4556; -0.0167] | [-0.3889; 0.0000] | [-0.3819; 0.0000] | [-0.3819; 0.0000] |
+| BARO − TraceRCA lọc hữu hạn | [-0.5556; 0.3158] | [-0.3889; 0.1667] | [-0.3333; 0.1907] | [-0.4442; 0.2350] | [-0.4244; 0.2269] | [-0.4133; 0.2118] | [-0.3571; 0.1176] | [-0.4556; 0.2857] | [-0.4524; 0.3421] |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 − CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | [0.0000; 0.1500] | [-0.1500; 0.1429] | [-0.1579; 0.0000] | [-0.0650; 0.1381] | [-0.0946; 0.1063] | [-0.1200; 0.1429] | [-0.2174; 0.0000] | [0.0000; 0.2105] | [0.0000; 0.2381] |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 − CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | [-0.1500; 0.1429] | [-0.1364; 0.1875] | [-0.1364; 0.1875] | [-0.1280; 0.0882] | [-0.1316; 0.1154] | [-0.1333; 0.1200] | [-0.1364; 0.1875] | [-0.2000; 0.1433] | [-0.2000; 0.1433] |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 − CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | [-0.1111; 0.2503] | [-0.1176; 0.2500] | [-0.1176; 0.2500] | [-0.1015; 0.2075] | [-0.1111; 0.2269] | [-0.1130; 0.2316] | [-0.1364; 0.1875] | [-0.1667; 0.2157] | [-0.1410; 0.2667] |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 − MicroRank xếp đầy đủ | [0.1111; 0.9334] | [0.0000; 0.8182] | [0.1500; 0.8182] | [0.0857; 0.7592] | [0.1331; 0.8214] | [0.1125; 0.8190] | [-0.2174; 0.4375] | [-0.1250; 1.0000] (N/A: 7) | [0.2456; 1.0000] |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 − MicroRank top11 | [0.1111; 0.9334] | [0.0000; 0.8182] | [0.1500; 0.8182] | [0.1361; 0.8367] | [0.1331; 0.8214] | [0.1125; 0.8190] | [0.1500; 0.8182] | [-0.1250; 1.0000] (N/A: 7) | [-0.1250; 1.0000] (N/A: 7) |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 − SimpleRCA M4 | [-0.4545; 0.1429] | [-0.4762; 0.1176] | [-0.3333; 0.1176] | [-0.4158; 0.1104] | [-0.4044; 0.1087] | [-0.4111; 0.1143] | [-0.3333; 0.1176] | [-0.2863; 0.1538] | [-0.2863; 0.1538] |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 − TORAI sửa, nguồn A (hồi cứu) | [0.0000; 0.3158] | [-0.2174; 0.0000] | [-0.1579; 0.0000] | [-0.0542; 0.0767] | [-0.0286; 0.0126] | [-0.0857; 0.0000] | [-0.3500; 0.0000] | [0.0000; 0.4889] | [0.0000; 0.5167] |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 − TORAI sửa, nguồn B | [-0.5000; 0.1111] | [-0.5000; 0.0000] | [-0.3500; 0.0000] | [-0.4376; 0.0515] | [-0.4149; 0.0131] | [-0.4200; 0.0111] | [-0.3500; 0.0000] | [-0.3333; 0.2434] | [-0.3333; 0.2434] |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 − TraceRCA lọc hữu hạn | [-0.4444; 0.4000] | [-0.4400; 0.3182] | [-0.3158; 0.2105] | [-0.4029; 0.3216] | [-0.3895; 0.2984] | [-0.4000; 0.2941] | [-0.3333; 0.1333] | [-0.2917; 0.3158] | [-0.2746; 0.3775] |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 − CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | [-0.1579; 0.0000] | [-0.1364; 0.1875] | [0.0000; 0.2000] | [-0.0983; 0.0383] | [-0.0741; 0.0808] | [-0.1143; 0.1000] | [0.0000; 0.2667] | [-0.2667; 0.0000] | [-0.3000; 0.0000] |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 − CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | [-0.1364; 0.1875] | [0.0000; 0.2000] | [0.0000; 0.2667] | [-0.0540; 0.1256] | [-0.0304; 0.1541] | [-0.0118; 0.1429] | [0.0000; 0.2667] | [-0.2708; 0.1469] | [-0.2667; 0.1364] |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 − MicroRank xếp đầy đủ | [0.0833; 0.9091] | [0.0000; 0.8235] | [0.1667; 0.8947] | [0.0688; 0.7514] | [0.1287; 0.8188] | [0.1000; 0.8105] | [0.0000; 0.4375] | [-0.2381; 0.9091] (N/A: 7) | [0.0681; 0.9091] |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 − MicroRank top11 | [0.0833; 0.9091] | [0.0000; 0.8235] | [0.1667; 0.8947] | [0.1232; 0.8250] | [0.1287; 0.8188] | [0.1000; 0.8105] | [0.2999; 0.8947] | [-0.2381; 0.9091] (N/A: 7) | [-0.3137; 0.9091] (N/A: 7) |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 − SimpleRCA M4 | [-0.5000; 0.1176] | [-0.4500; 0.0000] | [-0.2857; 0.1364] | [-0.4187; 0.0667] | [-0.3920; 0.0581] | [-0.4000; 0.0400] | [-0.1364; 0.1429] | [-0.4286; 0.1119] | [-0.5000; 0.0910] |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 − TORAI sửa, nguồn A (hồi cứu) | [-0.1365; 0.3000] | [-0.2174; 0.0000] | [0.0000; 0.0000] | [-0.1556; 0.1327] | [-0.1158; 0.1007] | [-0.1667; 0.0444] | [-0.1500; 0.0000] | [-0.1538; 0.3333] | [-0.1250; 0.3261] |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 − TORAI sửa, nguồn B | [-0.5500; 0.0769] | [-0.5000; 0.0000] | [-0.3000; 0.0000] | [-0.4566; 0.0708] | [-0.4320; 0.0533] | [-0.4348; 0.0500] | [-0.1500; 0.0000] | [-0.4125; 0.0871] | [-0.4833; 0.0810] |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 − TraceRCA lọc hữu hạn | [-0.4667; 0.3125] | [-0.4091; 0.2308] | [-0.2632; 0.2308] | [-0.3829; 0.2284] | [-0.3626; 0.2298] | [-0.3692; 0.2091] | [-0.1364; 0.1667] | [-0.3684; 0.2218] | [-0.4303; 0.2619] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ − CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | [0.0000; 0.2000] | [0.0000; 0.1500] | [0.0000; 0.1500] | [0.0000; 0.1401] | [0.0000; 0.1475] | [0.0000; 0.1667] | [0.0000; 0.0000] | [-0.1134; 0.2308] | [0.0000; 0.2500] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ − MicroRank xếp đầy đủ | [0.1000; 1.0000] | [0.0000; 0.8571] | [0.1053; 0.8571] | [0.0744; 0.7924] | [0.1153; 0.8528] | [0.0875; 0.8522] | [-0.2000; 0.3500] | [-0.1373; 1.0000] (N/A: 7) | [0.2403; 1.0000] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ − MicroRank top11 | [0.1000; 1.0000] | [0.0000; 0.8571] | [0.1053; 0.8571] | [0.1226; 0.8730] | [0.1153; 0.8528] | [0.0875; 0.8522] | [0.1053; 0.8571] | [-0.1373; 1.0000] (N/A: 7) | [-0.1373; 1.0000] (N/A: 7) |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ − SimpleRCA M4 | [-0.4706; 0.1429] | [-0.5000; 0.1053] | [-0.3684; 0.1053] | [-0.4097; 0.0912] | [-0.4039; 0.0804] | [-0.4235; 0.0960] | [-0.3684; 0.1053] | [-0.3663; 0.2667] | [-0.3663; 0.2667] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ − TORAI sửa, nguồn A (hồi cứu) | [-0.1365; 0.4500] | [-0.2667; 0.0000] | [-0.2000; 0.0000] | [-0.1235; 0.2009] | [-0.1385; 0.1444] | [-0.1733; 0.0667] | [-0.3889; 0.0000] | [-0.1307; 0.5556] | [-0.0792; 0.5882] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ − TORAI sửa, nguồn B | [-0.5455; 0.2174] | [-0.5294; 0.0000] | [-0.3889; 0.0000] | [-0.4693; 0.1451] | [-0.4583; 0.1000] | [-0.4556; 0.0842] | [-0.3889; 0.0000] | [-0.3342; 0.2667] | [-0.3342; 0.2667] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ − TraceRCA lọc hữu hạn | [-0.4118; 0.3182] | [-0.4667; 0.3043] | [-0.3333; 0.1907] | [-0.3864; 0.2778] | [-0.3847; 0.2623] | [-0.4000; 0.2750] | [-0.3571; 0.1176] | [-0.2262; 0.2596] | [-0.1925; 0.2941] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ − MicroRank xếp đầy đủ | [0.0476; 0.9091] | [-0.0526; 0.7727] | [0.0769; 0.7727] | [0.0156; 0.7643] | [0.0646; 0.8119] | [0.0500; 0.8000] | [-0.2000; 0.3500] | [-0.1349; 1.0000] (N/A: 7) | [0.1471; 1.0000] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ − MicroRank top11 | [0.0476; 0.9091] | [-0.0526; 0.7727] | [0.0769; 0.7727] | [0.0667; 0.8413] | [0.0646; 0.8119] | [0.0500; 0.8000] | [0.1053; 0.8571] | [-0.1349; 1.0000] (N/A: 7) | [-0.2000; 1.0000] (N/A: 7) |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ − SimpleRCA M4 | [-0.5294; 0.1053] | [-0.5294; 0.0000] | [-0.3889; 0.0000] | [-0.4628; 0.0463] | [-0.4493; 0.0218] | [-0.4583; 0.0143] | [-0.3684; 0.1053] | [-0.4000; 0.2077] | [-0.4667; 0.1948] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ − TORAI sửa, nguồn A (hồi cứu) | [-0.2500; 0.4092] | [-0.3158; 0.0000] | [-0.2667; 0.0000] | [-0.2323; 0.1728] | [-0.2433; 0.1212] | [-0.2667; 0.0455] | [-0.3889; 0.0000] | [-0.1945; 0.5231] | [-0.2000; 0.5397] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ − TORAI sửa, nguồn B | [-0.6190; 0.1667] | [-0.5625; 0.0000] | [-0.4286; 0.0000] | [-0.5262; 0.1014] | [-0.5126; 0.0558] | [-0.5067; 0.0421] | [-0.3889; 0.0000] | [-0.4060; 0.2500] | [-0.4501; 0.2302] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ − TraceRCA lọc hữu hạn | [-0.5000; 0.2857] | [-0.4737; 0.1905] | [-0.3571; 0.1176] | [-0.4310; 0.2096] | [-0.4231; 0.1795] | [-0.4300; 0.1684] | [-0.3571; 0.1176] | [-0.3421; 0.2895] | [-0.3333; 0.2632] |
+| MicroRank xếp đầy đủ − MicroRank top11 | [0.0000; 0.0000] | [0.0000; 0.0000] | [0.0000; 0.0000] | [0.0306; 0.0945] | [0.0000; 0.0000] | [0.0000; 0.0000] | [0.1250; 0.6522] | [0.0000; 0.0000] (N/A: 7) | [-0.5238; 0.0000] (N/A: 7) |
+| MicroRank xếp đầy đủ − SimpleRCA M4 | [-0.9444; -0.5000] | [-0.8333; -0.4000] | [-0.8333; -0.4000] | [-0.7815; -0.4408] | [-0.8509; -0.4643] | [-0.8445; -0.4455] | [-0.4118; -0.0526] | [-1.0000; -0.1421] (N/A: 7) | [-1.0000; -0.4485] |
+| MicroRank xếp đầy đủ − TORAI sửa, nguồn A (hồi cứu) | [-0.9091; 0.0000] | [-0.8947; -0.1667] | [-0.8947; -0.1667] | [-0.7564; -0.1160] | [-0.8250; -0.1492] | [-0.8476; -0.1600] | [-0.4444; -0.1053] | [-0.9091; 0.3333] (N/A: 7) | [-0.9091; 0.0392] |
+| MicroRank xếp đầy đủ − TORAI sửa, nguồn B | [-1.0000; -0.5417] | [-0.8947; -0.4118] | [-0.8947; -0.4118] | [-0.7828; -0.4874] | [-0.8435; -0.5318] | [-0.8381; -0.5000] | [-0.4444; -0.1053] | [-1.0000; -0.0500] (N/A: 7) | [-1.0000; -0.5000] |
+| MicroRank xếp đầy đủ − TraceRCA lọc hữu hạn | [-0.8421; -0.3333] | [-0.7826; -0.2500] | [-0.8095; -0.2941] | [-0.7209; -0.3206] | [-0.7946; -0.3632] | [-0.8000; -0.3304] | [-0.3889; -0.0556] | [-0.8947; 0.0130] (N/A: 7) | [-0.8947; -0.3092] |
+| MicroRank top11 − SimpleRCA M4 | [-0.9444; -0.5000] | [-0.8333; -0.4000] | [-0.8333; -0.4000] | [-0.8667; -0.4809] | [-0.8509; -0.4643] | [-0.8445; -0.4455] | [-0.8333; -0.4000] | [-1.0000; -0.1421] (N/A: 7) | [-1.0000; -0.1421] (N/A: 7) |
+| MicroRank top11 − TORAI sửa, nguồn A (hồi cứu) | [-0.9091; 0.0000] | [-0.8947; -0.1667] | [-0.8947; -0.1667] | [-0.8333; -0.1633] | [-0.8250; -0.1492] | [-0.8476; -0.1600] | [-0.8947; -0.4118] | [-0.9091; 0.3333] (N/A: 7) | [-0.9091; 0.4286] (N/A: 7) |
+| MicroRank top11 − TORAI sửa, nguồn B | [-1.0000; -0.5417] | [-0.8947; -0.4118] | [-0.8947; -0.4118] | [-0.8583; -0.5417] | [-0.8435; -0.5318] | [-0.8381; -0.5000] | [-0.8947; -0.4118] | [-1.0000; -0.0500] (N/A: 7) | [-1.0000; -0.0500] (N/A: 7) |
+| MicroRank top11 − TraceRCA lọc hữu hạn | [-0.8421; -0.3333] | [-0.7826; -0.2500] | [-0.8095; -0.2941] | [-0.8029; -0.3758] | [-0.7946; -0.3632] | [-0.8000; -0.3304] | [-0.8696; -0.3125] | [-0.8947; 0.0130] (N/A: 7) | [-0.8947; 0.0703] (N/A: 7) |
+| SimpleRCA M4 − TORAI sửa, nguồn A (hồi cứu) | [-0.1252; 0.6250] | [-0.1364; 0.2857] | [-0.1364; 0.2857] | [-0.1178; 0.4114] | [-0.1190; 0.3963] | [-0.1333; 0.3545] | [-0.1500; 0.0000] | [-0.1090; 0.5816] | [-0.0833; 0.6447] |
+| SimpleRCA M4 − TORAI sửa, nguồn B | [-0.2857; 0.2500] | [-0.1500; 0.0000] | [-0.1500; 0.0000] | [-0.1824; 0.1591] | [-0.1599; 0.1136] | [-0.1368; 0.0917] | [-0.1500; 0.0000] | [-0.2708; 0.2917] | [-0.2708; 0.2917] |
+| SimpleRCA M4 − TraceRCA lọc hữu hạn | [-0.1667; 0.4000] | [0.0000; 0.2500] | [0.0000; 0.1765] | [-0.0938; 0.2847] | [-0.0625; 0.2465] | [-0.0471; 0.2316] | [-0.1429; 0.1667] | [-0.2179; 0.4180] | [-0.2143; 0.4967] |
+| TORAI sửa, nguồn A (hồi cứu) − TORAI sửa, nguồn B | [-0.5556; 0.0000] | [-0.3000; 0.0000] | [-0.3000; 0.0000] | [-0.3985; 0.0093] | [-0.4033; 0.0081] | [-0.3684; 0.0364] | [0.0000; 0.0000] | [-0.4389; 0.0000] | [-0.5556; 0.0000] |
+| TORAI sửa, nguồn A (hồi cứu) − TraceRCA lọc hữu hạn | [-0.6250; 0.3889] | [-0.2500; 0.3500] | [-0.2632; 0.2308] | [-0.4021; 0.3216] | [-0.3804; 0.3000] | [-0.3300; 0.3084] | [0.0000; 0.1765] | [-0.5918; 0.3000] | [-0.6434; 0.3458] |
+| TORAI sửa, nguồn B − TraceRCA lọc hữu hạn | [-0.2000; 0.4444] | [0.0000; 0.3684] | [0.0000; 0.2500] | [-0.1275; 0.3434] | [-0.0906; 0.3240] | [-0.0778; 0.3158] | [0.0000; 0.1765] | [-0.2389; 0.3434] | [-0.2331; 0.4091] |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `bootstrap.dev19.hieu`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Khoảng chứa 0 chưa cho thấy khác biệt tách khỏi 0 theo phép bootstrap này. Mọi khoảng ở đây là khoảng từng cặp; chưa hiệu chỉnh việc xét nhiều cặp. Không dùng thứ tự trung bình để tuyên bố phương pháp tốt nhất.
+Mọi số và khoảng dev19 chỉ mô tả 19 ca/9 ô giữ lại theo đầu ra CIRCA. Việc bỏ 11 ca đổi cả thành phần ca và số ERROR của phương pháp khác; hướng thay đổi phụ thuộc phương pháp và độ đo. Đây không phải phép sửa CIRCA trên cùng ca. Các cặp có hoặc không có CIRCA chỉ được diễn giải trong nhóm ca này; chưa suy sang toàn 30 ca hay test. Nguồn: `results/T-024/cham-a.json` → `cohorts.dev19`, `methods.<id>.per_case`.
+
+### TORAI sửa, nguồn B: độ nhạy seed — dev19
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đếm theo ca ở từng dòng. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Seed | Trạng thái | Hit@1 | Hit@3 | Hit@5 | MRR | NDCG@5 | Avg@5 | Retrieval@5 | Retrieval@10 | Rerank@1 K=5 | Rerank@1 K=10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| seed 0 | OK: 19 | 0.8421 | 1.0000 | 1.0000 | 0.8947 | 0.9211 | 0.9368 | 1.0000 | 1.0000 | 0.8421 | 0.8421 |
+| seed 1 | OK: 19 | 0.8421 | 1.0000 | 1.0000 | 0.8947 | 0.9211 | 0.9368 | 1.0000 | 1.0000 | 0.8421 | 0.8421 |
+| seed 2 | OK: 19 | 0.8421 | 1.0000 | 1.0000 | 0.8947 | 0.9211 | 0.9368 | 1.0000 | 1.0000 | 0.8421 | 0.8421 |
+| khoảng min–max giữa seed | OK: 19 | [0.8421; 0.8421] | [1.0000; 1.0000] | [1.0000; 1.0000] | [0.8947; 0.8947] | [0.9211; 0.9211] | [0.9368; 0.9368] | [1.0000; 1.0000] | [1.0000; 1.0000] | [0.8421; 0.8421] | [0.8421; 0.8421] |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.torai_B.seed_range.dev19`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Khoảng giữa seed là biến thiên qua các seed đã khóa, không phải khoảng bootstrap. Dòng chính trung bình Hit theo seed ở từng ca rồi tính Rerank từ tổng Hit; không trung bình các tỉ số Rerank làm số chính.
+
+### TORAI sửa, nguồn A (hồi cứu): độ nhạy seed — dev19
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đếm theo ca ở từng dòng. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Seed | Trạng thái | Hit@1 | Hit@3 | Hit@5 | MRR | NDCG@5 | Avg@5 | Retrieval@5 | Retrieval@10 | Rerank@1 K=5 | Rerank@1 K=10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| seed 0 | OK: 19 | 0.5789 | 0.8947 | 0.8947 | 0.7414 | 0.7713 | 0.8211 | 0.8947 | 1.0000 | 0.6471 | 0.5789 |
+| seed 1 | OK: 19 | 0.5789 | 0.8947 | 0.8947 | 0.7414 | 0.7713 | 0.8211 | 0.8947 | 1.0000 | 0.6471 | 0.5789 |
+| seed 2 | OK: 19 | 0.5789 | 0.8947 | 0.8947 | 0.7414 | 0.7713 | 0.8211 | 0.8947 | 1.0000 | 0.6471 | 0.5789 |
+| khoảng min–max giữa seed | OK: 19 | [0.5789; 0.5789] | [0.8947; 0.8947] | [0.8947; 0.8947] | [0.7414; 0.7414] | [0.7713; 0.7713] | [0.8211; 0.8211] | [0.8947; 0.8947] | [1.0000; 1.0000] | [0.6471; 0.6471] | [0.5789; 0.5789] |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.torai_A.seed_range.dev19`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Khoảng giữa seed là biến thiên qua các seed đã khóa, không phải khoảng bootstrap. Dòng chính trung bình Hit theo seed ở từng ca rồi tính Rerank từ tổng Hit; không trung bình các tỉ số Rerank làm số chính.
+
+## Phân tầng
+
+### Chia theo loại lỗi — dev30
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đếm theo ca ở từng dòng. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Phương pháp | Nhóm | Ca | Trạng thái | Hit@1 | Hit@3 | Hit@5 | MRR | NDCG@5 | Avg@5 | Retrieval@5 | Retrieval@10 | Rerank@1 K=5 | Rerank@1 K=10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BARO | cpu | 6 | OK: 6 | 0.6667 | 0.8333 | 1.0000 | 0.7917 | 0.8436 | 0.8667 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| BARO | delay | 6 | OK: 6 | 0.5000 | 0.6667 | 0.6667 | 0.5748 | 0.5833 | 0.6000 | 0.6667 | 0.6667 | 0.7500 | 0.7500 |
+| BARO | disk | 6 | OK: 6 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| BARO | loss | 6 | OK: 6 | 0.5000 | 0.5000 | 0.6667 | 0.5578 | 0.5718 | 0.5667 | 0.6667 | 0.6667 | 0.7500 | 0.7500 |
+| BARO | mem | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| BARO | socket | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | cpu | 6 | OK: 6 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | delay | 6 | OK: 6 | 0.6667 | 1.0000 | 1.0000 | 0.8056 | 0.8552 | 0.9000 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| SimpleRCA M4 | disk | 6 | OK: 6 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | loss | 6 | OK: 6 | 0.5000 | 0.8333 | 0.8333 | 0.6500 | 0.6885 | 0.7333 | 0.8333 | 0.8333 | 0.6000 | 0.6000 |
+| SimpleRCA M4 | mem | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | socket | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| MicroRank xếp đầy đủ | cpu | 6 | OK: 6 | 0.0000 | 0.5000 | 0.5000 | 0.2204 | 0.2500 | 0.3000 | 0.5000 | 1.0000 | 0.0000 | 0.0000 |
+| MicroRank xếp đầy đủ | delay | 6 | ERROR: 1; OK: 5 | 0.3333 | 0.6667 | 0.6667 | 0.4611 | 0.5000 | 0.5333 | 0.6667 | 0.8333 | 0.5000 | 0.4000 |
+| MicroRank xếp đầy đủ | disk | 6 | OK: 6 | 0.0000 | 0.3333 | 0.3333 | 0.1861 | 0.1667 | 0.2000 | 0.3333 | 0.6667 | 0.0000 | 0.0000 |
+| MicroRank xếp đầy đủ | loss | 6 | ERROR: 1; OK: 5 | 0.0000 | 0.0000 | 0.0000 | 0.0817 | 0.0000 | 0.0000 | 0.0000 | 0.3333 | N/A | 0.0000 |
+| MicroRank xếp đầy đủ | mem | 3 | ERROR: 1; OK: 2 | 0.0000 | 0.6667 | 0.6667 | 0.3333 | 0.4206 | 0.5333 | 0.6667 | 0.6667 | 0.0000 | 0.0000 |
+| MicroRank xếp đầy đủ | socket | 3 | ERROR: 1; OK: 2 | 0.0000 | 0.6667 | 0.6667 | 0.3333 | 0.4206 | 0.5333 | 0.6667 | 0.6667 | 0.0000 | 0.0000 |
+| TraceRCA lọc hữu hạn | cpu | 6 | OK: 6 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TraceRCA lọc hữu hạn | delay | 6 | ERROR: 1; OK: 5 | 0.8333 | 0.8333 | 0.8333 | 0.8333 | 0.8333 | 0.8333 | 0.8333 | 0.8333 | 1.0000 | 1.0000 |
+| TraceRCA lọc hữu hạn | disk | 6 | OK: 6 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| TraceRCA lọc hữu hạn | loss | 6 | ERROR: 1; OK: 5 | 0.3333 | 0.5000 | 0.6667 | 0.4491 | 0.4884 | 0.5000 | 0.6667 | 0.8333 | 0.5000 | 0.4000 |
+| TraceRCA lọc hữu hạn | mem | 3 | ERROR: 1; OK: 2 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 1.0000 | 1.0000 |
+| TraceRCA lọc hữu hạn | socket | 3 | ERROR: 1; OK: 2 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | cpu | 6 | OK: 6 | 0.3333 | 0.3333 | 0.8333 | 0.4694 | 0.5487 | 0.5333 | 0.8333 | 0.8333 | 0.4000 | 0.4000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | delay | 6 | OK: 6 | 0.1667 | 0.1667 | 0.6667 | 0.3029 | 0.3820 | 0.3667 | 0.6667 | 0.6667 | 0.2500 | 0.2500 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | disk | 6 | OK: 6 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | loss | 6 | OK: 6 | 0.6667 | 1.0000 | 1.0000 | 0.8056 | 0.8552 | 0.9000 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | mem | 3 | OK: 3 | 0.6667 | 0.6667 | 1.0000 | 0.7500 | 0.8102 | 0.8000 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | socket | 3 | OK: 3 | 0.3333 | 0.3333 | 1.0000 | 0.5000 | 0.6205 | 0.6000 | 1.0000 | 1.0000 | 0.3333 | 0.3333 |
+| TORAI sửa, nguồn B | cpu | 6 | OK: 6 | 0.6667 | 1.0000 | 1.0000 | 0.7778 | 0.8333 | 0.8667 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| TORAI sửa, nguồn B | delay | 6 | OK: 6 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn B | disk | 6 | OK: 6 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn B | loss | 6 | OK: 6 | 0.6667 | 1.0000 | 1.0000 | 0.8056 | 0.8552 | 0.9000 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| TORAI sửa, nguồn B | mem | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn B | socket | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | cpu | 6 | OK: 6 | 0.3333 | 1.0000 | 1.0000 | 0.6667 | 0.7540 | 0.8667 | 1.0000 | 1.0000 | 0.3333 | 0.3333 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | delay | 6 | OK: 6 | 0.1667 | 0.5000 | 0.6667 | 0.3403 | 0.4051 | 0.4333 | 0.6667 | 0.8333 | 0.2500 | 0.2000 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | disk | 6 | OK: 6 | 0.8333 | 1.0000 | 1.0000 | 0.9167 | 0.9385 | 0.9667 | 1.0000 | 1.0000 | 0.8333 | 0.8333 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | loss | 6 | OK: 6 | 0.1667 | 0.5000 | 0.6667 | 0.3558 | 0.3978 | 0.4000 | 0.6667 | 1.0000 | 0.2500 | 0.1667 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | mem | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | socket | 3 | OK: 3 | 0.3333 | 0.6667 | 1.0000 | 0.5833 | 0.6872 | 0.7333 | 1.0000 | 1.0000 | 0.3333 | 0.3333 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | cpu | 6 | OK: 6 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | delay | 6 | OK: 6 | 0.3333 | 0.3333 | 0.6667 | 0.4261 | 0.4769 | 0.4667 | 0.6667 | 0.6667 | 0.5000 | 0.5000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | disk | 6 | OK: 6 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | loss | 6 | OK: 6 | 0.3333 | 0.8333 | 0.8333 | 0.5707 | 0.6270 | 0.7000 | 0.8333 | 0.8333 | 0.4000 | 0.4000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | mem | 3 | OK: 3 | 0.6667 | 0.6667 | 1.0000 | 0.7500 | 0.8102 | 0.8000 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | socket | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | cpu | 6 | OK: 6 | 0.5000 | 1.0000 | 1.0000 | 0.7500 | 0.8155 | 0.9000 | 1.0000 | 1.0000 | 0.5000 | 0.5000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | delay | 6 | OK: 6 | 0.1667 | 0.5000 | 0.6667 | 0.3862 | 0.4488 | 0.5000 | 0.6667 | 0.6667 | 0.2500 | 0.2500 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | disk | 6 | OK: 6 | 0.8333 | 1.0000 | 1.0000 | 0.9167 | 0.9385 | 0.9667 | 1.0000 | 1.0000 | 0.8333 | 0.8333 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | loss | 6 | OK: 6 | 0.1667 | 0.3333 | 0.3333 | 0.2968 | 0.2500 | 0.2667 | 0.3333 | 0.8333 | 0.5000 | 0.2000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | mem | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | socket | 3 | OK: 3 | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | cpu | 6 | OK: 6 | 0.5000 | 1.0000 | 1.0000 | 0.7500 | 0.8155 | 0.9000 | 1.0000 | 1.0000 | 0.5000 | 0.5000 |
+| TORAI sửa, nguồn A (hồi cứu) | delay | 6 | OK: 6 | 0.5000 | 0.6667 | 0.6667 | 0.5979 | 0.5833 | 0.6000 | 0.6667 | 1.0000 | 0.7500 | 0.5000 |
+| TORAI sửa, nguồn A (hồi cứu) | disk | 6 | OK: 6 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | loss | 6 | OK: 6 | 0.5000 | 1.0000 | 1.0000 | 0.7500 | 0.8155 | 0.9000 | 1.0000 | 1.0000 | 0.5000 | 0.5000 |
+| TORAI sửa, nguồn A (hồi cứu) | mem | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | socket | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| MicroRank top11 | cpu | 6 | OK: 6 | 0.0000 | 0.5000 | 0.5000 | 0.1667 | 0.2500 | 0.3000 | 0.5000 | 0.5000 | 0.0000 | 0.0000 |
+| MicroRank top11 | delay | 6 | ERROR: 1; OK: 5 | 0.3333 | 0.6667 | 0.6667 | 0.4444 | 0.5000 | 0.5333 | 0.6667 | 0.6667 | 0.5000 | 0.5000 |
+| MicroRank top11 | disk | 6 | OK: 6 | 0.0000 | 0.3333 | 0.3333 | 0.1111 | 0.1667 | 0.2000 | 0.3333 | 0.3333 | 0.0000 | 0.0000 |
+| MicroRank top11 | loss | 6 | ERROR: 1; OK: 5 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | N/A | N/A |
+| MicroRank top11 | mem | 3 | ERROR: 1; OK: 2 | 0.0000 | 0.6667 | 0.6667 | 0.3333 | 0.4206 | 0.5333 | 0.6667 | 0.6667 | 0.0000 | 0.0000 |
+| MicroRank top11 | socket | 3 | ERROR: 1; OK: 2 | 0.0000 | 0.6667 | 0.6667 | 0.3333 | 0.4206 | 0.5333 | 0.6667 | 0.6667 | 0.0000 | 0.0000 |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.<id>.summaries.dev30.grouped.fault`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+### Chia theo ô root × loại lỗi — dev30
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đếm theo ca ở từng dòng. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Phương pháp | Nhóm | Ca | Trạng thái | Hit@1 | Hit@3 | Hit@5 | MRR | NDCG@5 | Avg@5 | Retrieval@5 | Retrieval@10 | Rerank@1 K=5 | Rerank@1 K=10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BARO | ts-auth-service\|cpu | 3 | OK: 3 | 0.3333 | 0.6667 | 1.0000 | 0.5833 | 0.6872 | 0.7333 | 1.0000 | 1.0000 | 0.3333 | 0.3333 |
+| BARO | ts-auth-service\|delay | 3 | OK: 3 | 0.0000 | 0.3333 | 0.3333 | 0.1495 | 0.1667 | 0.2000 | 0.3333 | 0.3333 | 0.0000 | 0.0000 |
+| BARO | ts-order-service\|disk | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| BARO | ts-order-service\|loss | 3 | OK: 3 | 0.6667 | 0.6667 | 1.0000 | 0.7500 | 0.8102 | 0.8000 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| BARO | ts-route-service\|mem | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| BARO | ts-route-service\|socket | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| BARO | ts-train-service\|cpu | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| BARO | ts-train-service\|delay | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| BARO | ts-travel-service\|disk | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| BARO | ts-travel-service\|loss | 3 | OK: 3 | 0.3333 | 0.3333 | 0.3333 | 0.3657 | 0.3333 | 0.3333 | 0.3333 | 0.3333 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | ts-auth-service\|cpu | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | ts-auth-service\|delay | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | ts-order-service\|disk | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | ts-order-service\|loss | 3 | OK: 3 | 0.6667 | 0.6667 | 0.6667 | 0.6889 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | ts-route-service\|mem | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | ts-route-service\|socket | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | ts-train-service\|cpu | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | ts-train-service\|delay | 3 | OK: 3 | 0.3333 | 1.0000 | 1.0000 | 0.6111 | 0.7103 | 0.8000 | 1.0000 | 1.0000 | 0.3333 | 0.3333 |
+| SimpleRCA M4 | ts-travel-service\|disk | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | ts-travel-service\|loss | 3 | OK: 3 | 0.3333 | 1.0000 | 1.0000 | 0.6111 | 0.7103 | 0.8000 | 1.0000 | 1.0000 | 0.3333 | 0.3333 |
+| MicroRank xếp đầy đủ | ts-auth-service\|cpu | 3 | OK: 3 | 0.0000 | 0.0000 | 0.0000 | 0.1074 | 0.0000 | 0.0000 | 0.0000 | 1.0000 | N/A | 0.0000 |
+| MicroRank xếp đầy đủ | ts-auth-service\|delay | 3 | OK: 3 | 0.6667 | 0.6667 | 0.6667 | 0.7000 | 0.6667 | 0.6667 | 0.6667 | 1.0000 | 1.0000 | 0.6667 |
+| MicroRank xếp đầy đủ | ts-order-service\|disk | 3 | OK: 3 | 0.0000 | 0.0000 | 0.0000 | 0.1196 | 0.0000 | 0.0000 | 0.0000 | 0.6667 | N/A | 0.0000 |
+| MicroRank xếp đầy đủ | ts-order-service\|loss | 3 | OK: 3 | 0.0000 | 0.0000 | 0.0000 | 0.1053 | 0.0000 | 0.0000 | 0.0000 | 0.6667 | N/A | 0.0000 |
+| MicroRank xếp đầy đủ | ts-route-service\|mem | 3 | ERROR: 1; OK: 2 | 0.0000 | 0.6667 | 0.6667 | 0.3333 | 0.4206 | 0.5333 | 0.6667 | 0.6667 | 0.0000 | 0.0000 |
+| MicroRank xếp đầy đủ | ts-route-service\|socket | 3 | ERROR: 1; OK: 2 | 0.0000 | 0.6667 | 0.6667 | 0.3333 | 0.4206 | 0.5333 | 0.6667 | 0.6667 | 0.0000 | 0.0000 |
+| MicroRank xếp đầy đủ | ts-train-service\|cpu | 3 | OK: 3 | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+| MicroRank xếp đầy đủ | ts-train-service\|delay | 3 | ERROR: 1; OK: 2 | 0.0000 | 0.6667 | 0.6667 | 0.2222 | 0.3333 | 0.4000 | 0.6667 | 0.6667 | 0.0000 | 0.0000 |
+| MicroRank xếp đầy đủ | ts-travel-service\|disk | 3 | OK: 3 | 0.0000 | 0.6667 | 0.6667 | 0.2525 | 0.3333 | 0.4000 | 0.6667 | 0.6667 | 0.0000 | 0.0000 |
+| MicroRank xếp đầy đủ | ts-travel-service\|loss | 3 | ERROR: 1; OK: 2 | 0.0000 | 0.0000 | 0.0000 | 0.0581 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | N/A | N/A |
+| TraceRCA lọc hữu hạn | ts-auth-service\|cpu | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TraceRCA lọc hữu hạn | ts-auth-service\|delay | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TraceRCA lọc hữu hạn | ts-order-service\|disk | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| TraceRCA lọc hữu hạn | ts-order-service\|loss | 3 | OK: 3 | 0.0000 | 0.3333 | 0.6667 | 0.2315 | 0.3102 | 0.3333 | 0.6667 | 1.0000 | 0.0000 | 0.0000 |
+| TraceRCA lọc hữu hạn | ts-route-service\|mem | 3 | ERROR: 1; OK: 2 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 1.0000 | 1.0000 |
+| TraceRCA lọc hữu hạn | ts-route-service\|socket | 3 | ERROR: 1; OK: 2 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 1.0000 | 1.0000 |
+| TraceRCA lọc hữu hạn | ts-train-service\|cpu | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TraceRCA lọc hữu hạn | ts-train-service\|delay | 3 | ERROR: 1; OK: 2 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 1.0000 | 1.0000 |
+| TraceRCA lọc hữu hạn | ts-travel-service\|disk | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| TraceRCA lọc hữu hạn | ts-travel-service\|loss | 3 | ERROR: 1; OK: 2 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | ts-auth-service\|cpu | 3 | OK: 3 | 0.6667 | 0.6667 | 0.6667 | 0.6889 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | ts-auth-service\|delay | 3 | OK: 3 | 0.0000 | 0.0000 | 0.3333 | 0.1057 | 0.1436 | 0.1333 | 0.3333 | 0.3333 | 0.0000 | 0.0000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | ts-order-service\|disk | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | ts-order-service\|loss | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | ts-route-service\|mem | 3 | OK: 3 | 0.6667 | 0.6667 | 1.0000 | 0.7500 | 0.8102 | 0.8000 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | ts-route-service\|socket | 3 | OK: 3 | 0.3333 | 0.3333 | 1.0000 | 0.5000 | 0.6205 | 0.6000 | 1.0000 | 1.0000 | 0.3333 | 0.3333 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | ts-train-service\|cpu | 3 | OK: 3 | 0.0000 | 0.0000 | 1.0000 | 0.2500 | 0.4307 | 0.4000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | ts-train-service\|delay | 3 | OK: 3 | 0.3333 | 0.3333 | 1.0000 | 0.5000 | 0.6205 | 0.6000 | 1.0000 | 1.0000 | 0.3333 | 0.3333 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | ts-travel-service\|disk | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | ts-travel-service\|loss | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.7778 | 0.8333 | 0.8667 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| TORAI sửa, nguồn B | ts-auth-service\|cpu | 3 | OK: 3 | 0.3333 | 1.0000 | 1.0000 | 0.5556 | 0.6667 | 0.7333 | 1.0000 | 1.0000 | 0.3333 | 0.3333 |
+| TORAI sửa, nguồn B | ts-auth-service\|delay | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn B | ts-order-service\|disk | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn B | ts-order-service\|loss | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.7778 | 0.8333 | 0.8667 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| TORAI sửa, nguồn B | ts-route-service\|mem | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn B | ts-route-service\|socket | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn B | ts-train-service\|cpu | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn B | ts-train-service\|delay | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn B | ts-travel-service\|disk | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn B | ts-travel-service\|loss | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | ts-auth-service\|cpu | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | ts-auth-service\|delay | 3 | OK: 3 | 0.0000 | 0.0000 | 0.3333 | 0.1250 | 0.1436 | 0.1333 | 0.3333 | 0.6667 | 0.0000 | 0.0000 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | ts-order-service\|disk | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | ts-order-service\|loss | 3 | OK: 3 | 0.3333 | 0.6667 | 1.0000 | 0.5111 | 0.6290 | 0.6000 | 1.0000 | 1.0000 | 0.3333 | 0.3333 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | ts-route-service\|mem | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | ts-route-service\|socket | 3 | OK: 3 | 0.3333 | 0.6667 | 1.0000 | 0.5833 | 0.6872 | 0.7333 | 1.0000 | 1.0000 | 0.3333 | 0.3333 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | ts-train-service\|cpu | 3 | OK: 3 | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | ts-train-service\|delay | 3 | OK: 3 | 0.3333 | 1.0000 | 1.0000 | 0.5556 | 0.6667 | 0.7333 | 1.0000 | 1.0000 | 0.3333 | 0.3333 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | ts-travel-service\|disk | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | ts-travel-service\|loss | 3 | OK: 3 | 0.0000 | 0.3333 | 0.3333 | 0.2004 | 0.1667 | 0.2000 | 0.3333 | 1.0000 | 0.0000 | 0.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | ts-auth-service\|cpu | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | ts-auth-service\|delay | 3 | OK: 3 | 0.0000 | 0.0000 | 0.3333 | 0.1022 | 0.1436 | 0.1333 | 0.3333 | 0.3333 | 0.0000 | 0.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | ts-order-service\|disk | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | ts-order-service\|loss | 3 | OK: 3 | 0.3333 | 1.0000 | 1.0000 | 0.6667 | 0.7540 | 0.8667 | 1.0000 | 1.0000 | 0.3333 | 0.3333 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | ts-route-service\|mem | 3 | OK: 3 | 0.6667 | 0.6667 | 1.0000 | 0.7500 | 0.8102 | 0.8000 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | ts-route-service\|socket | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | ts-train-service\|cpu | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | ts-train-service\|delay | 3 | OK: 3 | 0.6667 | 0.6667 | 1.0000 | 0.7500 | 0.8102 | 0.8000 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | ts-travel-service\|disk | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | ts-travel-service\|loss | 3 | OK: 3 | 0.3333 | 0.6667 | 0.6667 | 0.4747 | 0.5000 | 0.5333 | 0.6667 | 0.6667 | 0.5000 | 0.5000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | ts-auth-service\|cpu | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | ts-auth-service\|delay | 3 | OK: 3 | 0.0000 | 0.0000 | 0.3333 | 0.1057 | 0.1436 | 0.1333 | 0.3333 | 0.3333 | 0.0000 | 0.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | ts-order-service\|disk | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | ts-order-service\|loss | 3 | OK: 3 | 0.3333 | 0.6667 | 0.6667 | 0.5000 | 0.5000 | 0.5333 | 0.6667 | 1.0000 | 0.5000 | 0.3333 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | ts-route-service\|mem | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | ts-route-service\|socket | 3 | OK: 3 | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | ts-train-service\|cpu | 3 | OK: 3 | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | ts-train-service\|delay | 3 | OK: 3 | 0.3333 | 1.0000 | 1.0000 | 0.6667 | 0.7540 | 0.8667 | 1.0000 | 1.0000 | 0.3333 | 0.3333 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | ts-travel-service\|disk | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | ts-travel-service\|loss | 3 | OK: 3 | 0.0000 | 0.0000 | 0.0000 | 0.0937 | 0.0000 | 0.0000 | 0.0000 | 0.6667 | N/A | 0.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | ts-auth-service\|cpu | 3 | OK: 3 | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | ts-auth-service\|delay | 3 | OK: 3 | 0.0000 | 0.3333 | 0.3333 | 0.1958 | 0.1667 | 0.2000 | 0.3333 | 1.0000 | 0.0000 | 0.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | ts-order-service\|disk | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | ts-order-service\|loss | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| TORAI sửa, nguồn A (hồi cứu) | ts-route-service\|mem | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | ts-route-service\|socket | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | ts-train-service\|cpu | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | ts-train-service\|delay | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | ts-travel-service\|disk | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | ts-travel-service\|loss | 3 | OK: 3 | 0.3333 | 1.0000 | 1.0000 | 0.6667 | 0.7540 | 0.8667 | 1.0000 | 1.0000 | 0.3333 | 0.3333 |
+| MicroRank top11 | ts-auth-service\|cpu | 3 | OK: 3 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | N/A | N/A |
+| MicroRank top11 | ts-auth-service\|delay | 3 | OK: 3 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 1.0000 | 1.0000 |
+| MicroRank top11 | ts-order-service\|disk | 3 | OK: 3 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | N/A | N/A |
+| MicroRank top11 | ts-order-service\|loss | 3 | OK: 3 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | N/A | N/A |
+| MicroRank top11 | ts-route-service\|mem | 3 | ERROR: 1; OK: 2 | 0.0000 | 0.6667 | 0.6667 | 0.3333 | 0.4206 | 0.5333 | 0.6667 | 0.6667 | 0.0000 | 0.0000 |
+| MicroRank top11 | ts-route-service\|socket | 3 | ERROR: 1; OK: 2 | 0.0000 | 0.6667 | 0.6667 | 0.3333 | 0.4206 | 0.5333 | 0.6667 | 0.6667 | 0.0000 | 0.0000 |
+| MicroRank top11 | ts-train-service\|cpu | 3 | OK: 3 | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+| MicroRank top11 | ts-train-service\|delay | 3 | ERROR: 1; OK: 2 | 0.0000 | 0.6667 | 0.6667 | 0.2222 | 0.3333 | 0.4000 | 0.6667 | 0.6667 | 0.0000 | 0.0000 |
+| MicroRank top11 | ts-travel-service\|disk | 3 | OK: 3 | 0.0000 | 0.6667 | 0.6667 | 0.2222 | 0.3333 | 0.4000 | 0.6667 | 0.6667 | 0.0000 | 0.0000 |
+| MicroRank top11 | ts-travel-service\|loss | 3 | ERROR: 1; OK: 2 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | N/A | N/A |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.<id>.summaries.dev30.grouped.cell`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+### Chia theo nhóm vị trí root — dev30
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đếm theo ca ở từng dòng. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Phương pháp | Nhóm | Ca | Trạng thái | Hit@1 | Hit@3 | Hit@5 | MRR | NDCG@5 | Avg@5 | Retrieval@5 | Retrieval@10 | Rerank@1 K=5 | Rerank@1 K=10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BARO | bậc 0 | 6 | OK: 6 | 0.1667 | 0.5000 | 0.6667 | 0.3664 | 0.4269 | 0.4667 | 0.6667 | 0.6667 | 0.2500 | 0.2500 |
+| BARO | hub | 6 | OK: 6 | 0.6667 | 0.6667 | 0.6667 | 0.6828 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 1.0000 | 1.0000 |
+| BARO | không ổn định | 6 | OK: 6 | 0.8333 | 0.8333 | 1.0000 | 0.8750 | 0.9051 | 0.9000 | 1.0000 | 1.0000 | 0.8333 | 0.8333 |
+| BARO | lá | 12 | OK: 12 | 0.9167 | 1.0000 | 1.0000 | 0.9583 | 0.9692 | 0.9833 | 1.0000 | 1.0000 | 0.9167 | 0.9167 |
+| SimpleRCA M4 | bậc 0 | 6 | OK: 6 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | hub | 6 | OK: 6 | 0.6667 | 1.0000 | 1.0000 | 0.8056 | 0.8552 | 0.9000 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| SimpleRCA M4 | không ổn định | 6 | OK: 6 | 0.8333 | 0.8333 | 0.8333 | 0.8444 | 0.8333 | 0.8333 | 0.8333 | 0.8333 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | lá | 12 | OK: 12 | 0.8333 | 1.0000 | 1.0000 | 0.9028 | 0.9276 | 0.9500 | 1.0000 | 1.0000 | 0.8333 | 0.8333 |
+| MicroRank xếp đầy đủ | bậc 0 | 6 | OK: 6 | 0.3333 | 0.3333 | 0.3333 | 0.4037 | 0.3333 | 0.3333 | 0.3333 | 1.0000 | 1.0000 | 0.3333 |
+| MicroRank xếp đầy đủ | hub | 6 | ERROR: 1; OK: 5 | 0.0000 | 0.3333 | 0.3333 | 0.1553 | 0.1667 | 0.2000 | 0.3333 | 0.3333 | 0.0000 | 0.0000 |
+| MicroRank xếp đầy đủ | không ổn định | 6 | OK: 6 | 0.0000 | 0.0000 | 0.0000 | 0.1124 | 0.0000 | 0.0000 | 0.0000 | 0.6667 | N/A | 0.0000 |
+| MicroRank xếp đầy đủ | lá | 12 | ERROR: 3; OK: 9 | 0.0000 | 0.7500 | 0.7500 | 0.3056 | 0.4186 | 0.5167 | 0.7500 | 0.7500 | 0.0000 | 0.0000 |
+| TraceRCA lọc hữu hạn | bậc 0 | 6 | OK: 6 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TraceRCA lọc hữu hạn | hub | 6 | ERROR: 1; OK: 5 | 0.6667 | 0.8333 | 0.8333 | 0.7500 | 0.7718 | 0.8000 | 0.8333 | 0.8333 | 0.8000 | 0.8000 |
+| TraceRCA lọc hữu hạn | không ổn định | 6 | OK: 6 | 0.3333 | 0.6667 | 0.8333 | 0.5324 | 0.5936 | 0.6333 | 0.8333 | 1.0000 | 0.4000 | 0.3333 |
+| TraceRCA lọc hữu hạn | lá | 12 | ERROR: 3; OK: 9 | 0.7500 | 0.7500 | 0.7500 | 0.7500 | 0.7500 | 0.7500 | 0.7500 | 0.7500 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | bậc 0 | 6 | OK: 6 | 0.3333 | 0.3333 | 0.5000 | 0.3973 | 0.4051 | 0.4000 | 0.5000 | 0.5000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | hub | 6 | OK: 6 | 0.8333 | 1.0000 | 1.0000 | 0.8889 | 0.9167 | 0.9333 | 1.0000 | 1.0000 | 0.8333 | 0.8333 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | không ổn định | 6 | OK: 6 | 0.8333 | 1.0000 | 1.0000 | 0.9167 | 0.9385 | 0.9667 | 1.0000 | 1.0000 | 0.8333 | 0.8333 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | lá | 12 | OK: 12 | 0.3333 | 0.3333 | 1.0000 | 0.5000 | 0.6205 | 0.6000 | 1.0000 | 1.0000 | 0.3333 | 0.3333 |
+| TORAI sửa, nguồn B | bậc 0 | 6 | OK: 6 | 0.6667 | 1.0000 | 1.0000 | 0.7778 | 0.8333 | 0.8667 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| TORAI sửa, nguồn B | hub | 6 | OK: 6 | 0.8333 | 1.0000 | 1.0000 | 0.9167 | 0.9385 | 0.9667 | 1.0000 | 1.0000 | 0.8333 | 0.8333 |
+| TORAI sửa, nguồn B | không ổn định | 6 | OK: 6 | 0.8333 | 1.0000 | 1.0000 | 0.8889 | 0.9167 | 0.9333 | 1.0000 | 1.0000 | 0.8333 | 0.8333 |
+| TORAI sửa, nguồn B | lá | 12 | OK: 12 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | bậc 0 | 6 | OK: 6 | 0.3333 | 0.5000 | 0.6667 | 0.4792 | 0.5103 | 0.5333 | 0.6667 | 0.8333 | 0.5000 | 0.4000 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | hub | 6 | OK: 6 | 0.3333 | 0.6667 | 0.6667 | 0.5169 | 0.5218 | 0.5667 | 0.6667 | 1.0000 | 0.5000 | 0.3333 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | không ổn định | 6 | OK: 6 | 0.6667 | 0.8333 | 1.0000 | 0.7556 | 0.8145 | 0.8000 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | lá | 12 | OK: 12 | 0.3333 | 0.9167 | 1.0000 | 0.6181 | 0.7154 | 0.8000 | 1.0000 | 1.0000 | 0.3333 | 0.3333 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | bậc 0 | 6 | OK: 6 | 0.5000 | 0.5000 | 0.6667 | 0.5511 | 0.5718 | 0.5667 | 0.6667 | 0.6667 | 0.7500 | 0.7500 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | hub | 6 | OK: 6 | 0.6667 | 0.8333 | 0.8333 | 0.7374 | 0.7500 | 0.7667 | 0.8333 | 0.8333 | 0.8000 | 0.8000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | không ổn định | 6 | OK: 6 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | lá | 12 | OK: 12 | 0.8333 | 0.8333 | 1.0000 | 0.8750 | 0.9051 | 0.9000 | 1.0000 | 1.0000 | 0.8333 | 0.8333 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | bậc 0 | 6 | OK: 6 | 0.5000 | 0.5000 | 0.6667 | 0.5528 | 0.5718 | 0.5667 | 0.6667 | 0.6667 | 0.7500 | 0.7500 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | hub | 6 | OK: 6 | 0.3333 | 0.5000 | 0.5000 | 0.4635 | 0.4385 | 0.4667 | 0.5000 | 0.8333 | 0.6667 | 0.4000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | không ổn định | 6 | OK: 6 | 0.6667 | 0.8333 | 0.8333 | 0.7500 | 0.7500 | 0.7667 | 0.8333 | 1.0000 | 0.8000 | 0.6667 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | lá | 12 | OK: 12 | 0.2500 | 1.0000 | 1.0000 | 0.6250 | 0.7232 | 0.8500 | 1.0000 | 1.0000 | 0.2500 | 0.2500 |
+| TORAI sửa, nguồn A (hồi cứu) | bậc 0 | 6 | OK: 6 | 0.0000 | 0.6667 | 0.6667 | 0.3479 | 0.3988 | 0.5000 | 0.6667 | 1.0000 | 0.0000 | 0.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | hub | 6 | OK: 6 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| TORAI sửa, nguồn A (hồi cứu) | không ổn định | 6 | OK: 6 | 0.8333 | 1.0000 | 1.0000 | 0.9167 | 0.9385 | 0.9667 | 1.0000 | 1.0000 | 0.8333 | 0.8333 |
+| TORAI sửa, nguồn A (hồi cứu) | lá | 12 | OK: 12 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| MicroRank top11 | bậc 0 | 6 | OK: 6 | 0.3333 | 0.3333 | 0.3333 | 0.3333 | 0.3333 | 0.3333 | 0.3333 | 0.3333 | 1.0000 | 1.0000 |
+| MicroRank top11 | hub | 6 | ERROR: 1; OK: 5 | 0.0000 | 0.3333 | 0.3333 | 0.1111 | 0.1667 | 0.2000 | 0.3333 | 0.3333 | 0.0000 | 0.0000 |
+| MicroRank top11 | không ổn định | 6 | OK: 6 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | N/A | N/A |
+| MicroRank top11 | lá | 12 | ERROR: 3; OK: 9 | 0.0000 | 0.7500 | 0.7500 | 0.3056 | 0.4186 | 0.5167 | 0.7500 | 0.7500 | 0.0000 | 0.0000 |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.<id>.summaries.dev30.grouped.nhom_vi_tri_p75`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+### Chia theo loại lỗi — dev19
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đếm theo ca ở từng dòng. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Phương pháp | Nhóm | Ca | Trạng thái | Hit@1 | Hit@3 | Hit@5 | MRR | NDCG@5 | Avg@5 | Retrieval@5 | Retrieval@10 | Rerank@1 K=5 | Rerank@1 K=10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BARO | cpu | 3 | OK: 3 | 0.3333 | 0.6667 | 1.0000 | 0.5833 | 0.6872 | 0.7333 | 1.0000 | 1.0000 | 0.3333 | 0.3333 |
+| BARO | delay | 4 | OK: 4 | 0.2500 | 0.5000 | 0.5000 | 0.3622 | 0.3750 | 0.4000 | 0.5000 | 0.5000 | 0.5000 | 0.5000 |
+| BARO | disk | 5 | OK: 5 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| BARO | loss | 4 | OK: 4 | 0.5000 | 0.5000 | 0.7500 | 0.5711 | 0.6077 | 0.6000 | 0.7500 | 0.7500 | 0.6667 | 0.6667 |
+| BARO | mem | 2 | OK: 2 | 0.5000 | 1.0000 | 1.0000 | 0.7500 | 0.8155 | 0.9000 | 1.0000 | 1.0000 | 0.5000 | 0.5000 |
+| BARO | socket | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | cpu | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | delay | 4 | OK: 4 | 0.7500 | 1.0000 | 1.0000 | 0.8333 | 0.8750 | 0.9000 | 1.0000 | 1.0000 | 0.7500 | 0.7500 |
+| SimpleRCA M4 | disk | 5 | OK: 5 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | loss | 4 | OK: 4 | 0.5000 | 0.7500 | 0.7500 | 0.6417 | 0.6577 | 0.7000 | 0.7500 | 0.7500 | 0.6667 | 0.6667 |
+| SimpleRCA M4 | mem | 2 | OK: 2 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | socket | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| MicroRank xếp đầy đủ | cpu | 3 | OK: 3 | 0.0000 | 0.0000 | 0.0000 | 0.1074 | 0.0000 | 0.0000 | 0.0000 | 1.0000 | N/A | 0.0000 |
+| MicroRank xếp đầy đủ | delay | 4 | OK: 4 | 0.5000 | 0.7500 | 0.7500 | 0.6083 | 0.6250 | 0.6500 | 0.7500 | 1.0000 | 0.6667 | 0.5000 |
+| MicroRank xếp đầy đủ | disk | 5 | OK: 5 | 0.0000 | 0.2000 | 0.2000 | 0.1566 | 0.1000 | 0.1200 | 0.2000 | 0.6000 | 0.0000 | 0.0000 |
+| MicroRank xếp đầy đủ | loss | 4 | OK: 4 | 0.0000 | 0.0000 | 0.0000 | 0.0998 | 0.0000 | 0.0000 | 0.0000 | 0.5000 | N/A | 0.0000 |
+| MicroRank xếp đầy đủ | mem | 2 | ERROR: 1; OK: 1 | 0.0000 | 0.5000 | 0.5000 | 0.2500 | 0.3155 | 0.4000 | 0.5000 | 0.5000 | 0.0000 | 0.0000 |
+| MicroRank xếp đầy đủ | socket | 1 | OK: 1 | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+| TraceRCA lọc hữu hạn | cpu | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TraceRCA lọc hữu hạn | delay | 4 | OK: 4 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TraceRCA lọc hữu hạn | disk | 5 | OK: 5 | 0.6000 | 1.0000 | 1.0000 | 0.8000 | 0.8524 | 0.9200 | 1.0000 | 1.0000 | 0.6000 | 0.6000 |
+| TraceRCA lọc hữu hạn | loss | 4 | OK: 4 | 0.2500 | 0.5000 | 0.7500 | 0.4236 | 0.4827 | 0.5000 | 0.7500 | 1.0000 | 0.3333 | 0.2500 |
+| TraceRCA lọc hữu hạn | mem | 2 | ERROR: 1; OK: 1 | 0.5000 | 0.5000 | 0.5000 | 0.5000 | 0.5000 | 0.5000 | 0.5000 | 0.5000 | 1.0000 | 1.0000 |
+| TraceRCA lọc hữu hạn | socket | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | cpu | 3 | OK: 3 | 0.6667 | 0.6667 | 0.6667 | 0.6889 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | delay | 4 | OK: 4 | 0.2500 | 0.2500 | 0.5000 | 0.3293 | 0.3577 | 0.3500 | 0.5000 | 0.5000 | 0.5000 | 0.5000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | disk | 5 | OK: 5 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | loss | 4 | OK: 4 | 0.5000 | 1.0000 | 1.0000 | 0.7083 | 0.7827 | 0.8500 | 1.0000 | 1.0000 | 0.5000 | 0.5000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | mem | 2 | OK: 2 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | socket | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn B | cpu | 3 | OK: 3 | 0.3333 | 1.0000 | 1.0000 | 0.5556 | 0.6667 | 0.7333 | 1.0000 | 1.0000 | 0.3333 | 0.3333 |
+| TORAI sửa, nguồn B | delay | 4 | OK: 4 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn B | disk | 5 | OK: 5 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn B | loss | 4 | OK: 4 | 0.7500 | 1.0000 | 1.0000 | 0.8333 | 0.8750 | 0.9000 | 1.0000 | 1.0000 | 0.7500 | 0.7500 |
+| TORAI sửa, nguồn B | mem | 2 | OK: 2 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn B | socket | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | cpu | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | delay | 4 | OK: 4 | 0.2500 | 0.2500 | 0.5000 | 0.3438 | 0.3577 | 0.3500 | 0.5000 | 0.7500 | 0.5000 | 0.3333 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | disk | 5 | OK: 5 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | loss | 4 | OK: 4 | 0.2500 | 0.7500 | 1.0000 | 0.4667 | 0.5967 | 0.6000 | 1.0000 | 1.0000 | 0.2500 | 0.2500 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | mem | 2 | OK: 2 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | socket | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | cpu | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | delay | 4 | OK: 4 | 0.2500 | 0.2500 | 0.5000 | 0.3267 | 0.3577 | 0.3500 | 0.5000 | 0.5000 | 0.5000 | 0.5000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | disk | 5 | OK: 5 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | loss | 4 | OK: 4 | 0.2500 | 0.7500 | 0.7500 | 0.5227 | 0.5655 | 0.6500 | 0.7500 | 0.7500 | 0.3333 | 0.3333 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | mem | 2 | OK: 2 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | socket | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | cpu | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | delay | 4 | OK: 4 | 0.2500 | 0.2500 | 0.5000 | 0.3292 | 0.3577 | 0.3500 | 0.5000 | 0.5000 | 0.5000 | 0.5000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | disk | 5 | OK: 5 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | loss | 4 | OK: 4 | 0.2500 | 0.5000 | 0.5000 | 0.3818 | 0.3750 | 0.4000 | 0.5000 | 0.7500 | 0.5000 | 0.3333 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | mem | 2 | OK: 2 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | socket | 1 | OK: 1 | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | cpu | 3 | OK: 3 | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | delay | 4 | OK: 4 | 0.2500 | 0.5000 | 0.5000 | 0.3968 | 0.3750 | 0.4000 | 0.5000 | 1.0000 | 0.5000 | 0.2500 |
+| TORAI sửa, nguồn A (hồi cứu) | disk | 5 | OK: 5 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | loss | 4 | OK: 4 | 0.5000 | 1.0000 | 1.0000 | 0.7500 | 0.8155 | 0.9000 | 1.0000 | 1.0000 | 0.5000 | 0.5000 |
+| TORAI sửa, nguồn A (hồi cứu) | mem | 2 | OK: 2 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | socket | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| MicroRank top11 | cpu | 3 | OK: 3 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | N/A | N/A |
+| MicroRank top11 | delay | 4 | OK: 4 | 0.5000 | 0.7500 | 0.7500 | 0.5833 | 0.6250 | 0.6500 | 0.7500 | 0.7500 | 0.6667 | 0.6667 |
+| MicroRank top11 | disk | 5 | OK: 5 | 0.0000 | 0.2000 | 0.2000 | 0.0667 | 0.1000 | 0.1200 | 0.2000 | 0.2000 | 0.0000 | 0.0000 |
+| MicroRank top11 | loss | 4 | OK: 4 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | N/A | N/A |
+| MicroRank top11 | mem | 2 | ERROR: 1; OK: 1 | 0.0000 | 0.5000 | 0.5000 | 0.2500 | 0.3155 | 0.4000 | 0.5000 | 0.5000 | 0.0000 | 0.0000 |
+| MicroRank top11 | socket | 1 | OK: 1 | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.<id>.summaries.dev19.grouped.fault`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+### Chia theo ô root × loại lỗi — dev19
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đếm theo ca ở từng dòng. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Phương pháp | Nhóm | Ca | Trạng thái | Hit@1 | Hit@3 | Hit@5 | MRR | NDCG@5 | Avg@5 | Retrieval@5 | Retrieval@10 | Rerank@1 K=5 | Rerank@1 K=10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BARO | ts-auth-service\|cpu | 3 | OK: 3 | 0.3333 | 0.6667 | 1.0000 | 0.5833 | 0.6872 | 0.7333 | 1.0000 | 1.0000 | 0.3333 | 0.3333 |
+| BARO | ts-auth-service\|delay | 3 | OK: 3 | 0.0000 | 0.3333 | 0.3333 | 0.1495 | 0.1667 | 0.2000 | 0.3333 | 0.3333 | 0.0000 | 0.0000 |
+| BARO | ts-order-service\|disk | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| BARO | ts-order-service\|loss | 3 | OK: 3 | 0.6667 | 0.6667 | 1.0000 | 0.7500 | 0.8102 | 0.8000 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| BARO | ts-route-service\|mem | 2 | OK: 2 | 0.5000 | 1.0000 | 1.0000 | 0.7500 | 0.8155 | 0.9000 | 1.0000 | 1.0000 | 0.5000 | 0.5000 |
+| BARO | ts-route-service\|socket | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| BARO | ts-train-service\|delay | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| BARO | ts-travel-service\|disk | 2 | OK: 2 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| BARO | ts-travel-service\|loss | 1 | OK: 1 | 0.0000 | 0.0000 | 0.0000 | 0.0345 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | N/A | N/A |
+| SimpleRCA M4 | ts-auth-service\|cpu | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | ts-auth-service\|delay | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | ts-order-service\|disk | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | ts-order-service\|loss | 3 | OK: 3 | 0.6667 | 0.6667 | 0.6667 | 0.6889 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | ts-route-service\|mem | 2 | OK: 2 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | ts-route-service\|socket | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | ts-train-service\|delay | 1 | OK: 1 | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+| SimpleRCA M4 | ts-travel-service\|disk | 2 | OK: 2 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | ts-travel-service\|loss | 1 | OK: 1 | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+| MicroRank xếp đầy đủ | ts-auth-service\|cpu | 3 | OK: 3 | 0.0000 | 0.0000 | 0.0000 | 0.1074 | 0.0000 | 0.0000 | 0.0000 | 1.0000 | N/A | 0.0000 |
+| MicroRank xếp đầy đủ | ts-auth-service\|delay | 3 | OK: 3 | 0.6667 | 0.6667 | 0.6667 | 0.7000 | 0.6667 | 0.6667 | 0.6667 | 1.0000 | 1.0000 | 0.6667 |
+| MicroRank xếp đầy đủ | ts-order-service\|disk | 3 | OK: 3 | 0.0000 | 0.0000 | 0.0000 | 0.1196 | 0.0000 | 0.0000 | 0.0000 | 0.6667 | N/A | 0.0000 |
+| MicroRank xếp đầy đủ | ts-order-service\|loss | 3 | OK: 3 | 0.0000 | 0.0000 | 0.0000 | 0.1053 | 0.0000 | 0.0000 | 0.0000 | 0.6667 | N/A | 0.0000 |
+| MicroRank xếp đầy đủ | ts-route-service\|mem | 2 | ERROR: 1; OK: 1 | 0.0000 | 0.5000 | 0.5000 | 0.2500 | 0.3155 | 0.4000 | 0.5000 | 0.5000 | 0.0000 | 0.0000 |
+| MicroRank xếp đầy đủ | ts-route-service\|socket | 1 | OK: 1 | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+| MicroRank xếp đầy đủ | ts-train-service\|delay | 1 | OK: 1 | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+| MicroRank xếp đầy đủ | ts-travel-service\|disk | 2 | OK: 2 | 0.0000 | 0.5000 | 0.5000 | 0.2121 | 0.2500 | 0.3000 | 0.5000 | 0.5000 | 0.0000 | 0.0000 |
+| MicroRank xếp đầy đủ | ts-travel-service\|loss | 1 | OK: 1 | 0.0000 | 0.0000 | 0.0000 | 0.0833 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | N/A | N/A |
+| TraceRCA lọc hữu hạn | ts-auth-service\|cpu | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TraceRCA lọc hữu hạn | ts-auth-service\|delay | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TraceRCA lọc hữu hạn | ts-order-service\|disk | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| TraceRCA lọc hữu hạn | ts-order-service\|loss | 3 | OK: 3 | 0.0000 | 0.3333 | 0.6667 | 0.2315 | 0.3102 | 0.3333 | 0.6667 | 1.0000 | 0.0000 | 0.0000 |
+| TraceRCA lọc hữu hạn | ts-route-service\|mem | 2 | ERROR: 1; OK: 1 | 0.5000 | 0.5000 | 0.5000 | 0.5000 | 0.5000 | 0.5000 | 0.5000 | 0.5000 | 1.0000 | 1.0000 |
+| TraceRCA lọc hữu hạn | ts-route-service\|socket | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TraceRCA lọc hữu hạn | ts-train-service\|delay | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TraceRCA lọc hữu hạn | ts-travel-service\|disk | 2 | OK: 2 | 0.5000 | 1.0000 | 1.0000 | 0.7500 | 0.8155 | 0.9000 | 1.0000 | 1.0000 | 0.5000 | 0.5000 |
+| TraceRCA lọc hữu hạn | ts-travel-service\|loss | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | ts-auth-service\|cpu | 3 | OK: 3 | 0.6667 | 0.6667 | 0.6667 | 0.6889 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | ts-auth-service\|delay | 3 | OK: 3 | 0.0000 | 0.0000 | 0.3333 | 0.1057 | 0.1436 | 0.1333 | 0.3333 | 0.3333 | 0.0000 | 0.0000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | ts-order-service\|disk | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | ts-order-service\|loss | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | ts-route-service\|mem | 2 | OK: 2 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | ts-route-service\|socket | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | ts-train-service\|delay | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | ts-travel-service\|disk | 2 | OK: 2 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | ts-travel-service\|loss | 1 | OK: 1 | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+| TORAI sửa, nguồn B | ts-auth-service\|cpu | 3 | OK: 3 | 0.3333 | 1.0000 | 1.0000 | 0.5556 | 0.6667 | 0.7333 | 1.0000 | 1.0000 | 0.3333 | 0.3333 |
+| TORAI sửa, nguồn B | ts-auth-service\|delay | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn B | ts-order-service\|disk | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn B | ts-order-service\|loss | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.7778 | 0.8333 | 0.8667 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| TORAI sửa, nguồn B | ts-route-service\|mem | 2 | OK: 2 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn B | ts-route-service\|socket | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn B | ts-train-service\|delay | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn B | ts-travel-service\|disk | 2 | OK: 2 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn B | ts-travel-service\|loss | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | ts-auth-service\|cpu | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | ts-auth-service\|delay | 3 | OK: 3 | 0.0000 | 0.0000 | 0.3333 | 0.1250 | 0.1436 | 0.1333 | 0.3333 | 0.6667 | 0.0000 | 0.0000 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | ts-order-service\|disk | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | ts-order-service\|loss | 3 | OK: 3 | 0.3333 | 0.6667 | 1.0000 | 0.5111 | 0.6290 | 0.6000 | 1.0000 | 1.0000 | 0.3333 | 0.3333 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | ts-route-service\|mem | 2 | OK: 2 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | ts-route-service\|socket | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | ts-train-service\|delay | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | ts-travel-service\|disk | 2 | OK: 2 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | ts-travel-service\|loss | 1 | OK: 1 | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | ts-auth-service\|cpu | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | ts-auth-service\|delay | 3 | OK: 3 | 0.0000 | 0.0000 | 0.3333 | 0.1022 | 0.1436 | 0.1333 | 0.3333 | 0.3333 | 0.0000 | 0.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | ts-order-service\|disk | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | ts-order-service\|loss | 3 | OK: 3 | 0.3333 | 1.0000 | 1.0000 | 0.6667 | 0.7540 | 0.8667 | 1.0000 | 1.0000 | 0.3333 | 0.3333 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | ts-route-service\|mem | 2 | OK: 2 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | ts-route-service\|socket | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | ts-train-service\|delay | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | ts-travel-service\|disk | 2 | OK: 2 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | ts-travel-service\|loss | 1 | OK: 1 | 0.0000 | 0.0000 | 0.0000 | 0.0909 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | N/A | N/A |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | ts-auth-service\|cpu | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | ts-auth-service\|delay | 3 | OK: 3 | 0.0000 | 0.0000 | 0.3333 | 0.1057 | 0.1436 | 0.1333 | 0.3333 | 0.3333 | 0.0000 | 0.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | ts-order-service\|disk | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | ts-order-service\|loss | 3 | OK: 3 | 0.3333 | 0.6667 | 0.6667 | 0.5000 | 0.5000 | 0.5333 | 0.6667 | 1.0000 | 0.5000 | 0.3333 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | ts-route-service\|mem | 2 | OK: 2 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | ts-route-service\|socket | 1 | OK: 1 | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | ts-train-service\|delay | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | ts-travel-service\|disk | 2 | OK: 2 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | ts-travel-service\|loss | 1 | OK: 1 | 0.0000 | 0.0000 | 0.0000 | 0.0270 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | N/A | N/A |
+| TORAI sửa, nguồn A (hồi cứu) | ts-auth-service\|cpu | 3 | OK: 3 | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | ts-auth-service\|delay | 3 | OK: 3 | 0.0000 | 0.3333 | 0.3333 | 0.1958 | 0.1667 | 0.2000 | 0.3333 | 1.0000 | 0.0000 | 0.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | ts-order-service\|disk | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | ts-order-service\|loss | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| TORAI sửa, nguồn A (hồi cứu) | ts-route-service\|mem | 2 | OK: 2 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | ts-route-service\|socket | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | ts-train-service\|delay | 1 | OK: 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | ts-travel-service\|disk | 2 | OK: 2 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | ts-travel-service\|loss | 1 | OK: 1 | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+| MicroRank top11 | ts-auth-service\|cpu | 3 | OK: 3 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | N/A | N/A |
+| MicroRank top11 | ts-auth-service\|delay | 3 | OK: 3 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 1.0000 | 1.0000 |
+| MicroRank top11 | ts-order-service\|disk | 3 | OK: 3 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | N/A | N/A |
+| MicroRank top11 | ts-order-service\|loss | 3 | OK: 3 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | N/A | N/A |
+| MicroRank top11 | ts-route-service\|mem | 2 | ERROR: 1; OK: 1 | 0.0000 | 0.5000 | 0.5000 | 0.2500 | 0.3155 | 0.4000 | 0.5000 | 0.5000 | 0.0000 | 0.0000 |
+| MicroRank top11 | ts-route-service\|socket | 1 | OK: 1 | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+| MicroRank top11 | ts-train-service\|delay | 1 | OK: 1 | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 |
+| MicroRank top11 | ts-travel-service\|disk | 2 | OK: 2 | 0.0000 | 0.5000 | 0.5000 | 0.1667 | 0.2500 | 0.3000 | 0.5000 | 0.5000 | 0.0000 | 0.0000 |
+| MicroRank top11 | ts-travel-service\|loss | 1 | OK: 1 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | N/A | N/A |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.<id>.summaries.dev19.grouped.cell`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+### Chia theo nhóm vị trí root — dev19
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đếm theo ca ở từng dòng. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Phương pháp | Nhóm | Ca | Trạng thái | Hit@1 | Hit@3 | Hit@5 | MRR | NDCG@5 | Avg@5 | Retrieval@5 | Retrieval@10 | Rerank@1 K=5 | Rerank@1 K=10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BARO | bậc 0 | 6 | OK: 6 | 0.1667 | 0.5000 | 0.6667 | 0.3664 | 0.4269 | 0.4667 | 0.6667 | 0.6667 | 0.2500 | 0.2500 |
+| BARO | hub | 3 | OK: 3 | 0.6667 | 0.6667 | 0.6667 | 0.6782 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 1.0000 | 1.0000 |
+| BARO | không ổn định | 6 | OK: 6 | 0.8333 | 0.8333 | 1.0000 | 0.8750 | 0.9051 | 0.9000 | 1.0000 | 1.0000 | 0.8333 | 0.8333 |
+| BARO | lá | 4 | OK: 4 | 0.7500 | 1.0000 | 1.0000 | 0.8750 | 0.9077 | 0.9500 | 1.0000 | 1.0000 | 0.7500 | 0.7500 |
+| SimpleRCA M4 | bậc 0 | 6 | OK: 6 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | hub | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| SimpleRCA M4 | không ổn định | 6 | OK: 6 | 0.8333 | 0.8333 | 0.8333 | 0.8444 | 0.8333 | 0.8333 | 0.8333 | 0.8333 | 1.0000 | 1.0000 |
+| SimpleRCA M4 | lá | 4 | OK: 4 | 0.7500 | 1.0000 | 1.0000 | 0.8333 | 0.8750 | 0.9000 | 1.0000 | 1.0000 | 0.7500 | 0.7500 |
+| MicroRank xếp đầy đủ | bậc 0 | 6 | OK: 6 | 0.3333 | 0.3333 | 0.3333 | 0.4037 | 0.3333 | 0.3333 | 0.3333 | 1.0000 | 1.0000 | 0.3333 |
+| MicroRank xếp đầy đủ | hub | 3 | OK: 3 | 0.0000 | 0.3333 | 0.3333 | 0.1692 | 0.1667 | 0.2000 | 0.3333 | 0.3333 | 0.0000 | 0.0000 |
+| MicroRank xếp đầy đủ | không ổn định | 6 | OK: 6 | 0.0000 | 0.0000 | 0.0000 | 0.1124 | 0.0000 | 0.0000 | 0.0000 | 0.6667 | N/A | 0.0000 |
+| MicroRank xếp đầy đủ | lá | 4 | ERROR: 1; OK: 3 | 0.0000 | 0.7500 | 0.7500 | 0.3333 | 0.4405 | 0.5500 | 0.7500 | 0.7500 | 0.0000 | 0.0000 |
+| TraceRCA lọc hữu hạn | bậc 0 | 6 | OK: 6 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TraceRCA lọc hữu hạn | hub | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| TraceRCA lọc hữu hạn | không ổn định | 6 | OK: 6 | 0.3333 | 0.6667 | 0.8333 | 0.5324 | 0.5936 | 0.6333 | 0.8333 | 1.0000 | 0.4000 | 0.3333 |
+| TraceRCA lọc hữu hạn | lá | 4 | ERROR: 1; OK: 3 | 0.7500 | 0.7500 | 0.7500 | 0.7500 | 0.7500 | 0.7500 | 0.7500 | 0.7500 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | bậc 0 | 6 | OK: 6 | 0.3333 | 0.3333 | 0.5000 | 0.3973 | 0.4051 | 0.4000 | 0.5000 | 0.5000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | hub | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.7778 | 0.8333 | 0.8667 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | không ổn định | 6 | OK: 6 | 0.8333 | 1.0000 | 1.0000 | 0.9167 | 0.9385 | 0.9667 | 1.0000 | 1.0000 | 0.8333 | 0.8333 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | lá | 4 | OK: 4 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn B | bậc 0 | 6 | OK: 6 | 0.6667 | 1.0000 | 1.0000 | 0.7778 | 0.8333 | 0.8667 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| TORAI sửa, nguồn B | hub | 3 | OK: 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| TORAI sửa, nguồn B | không ổn định | 6 | OK: 6 | 0.8333 | 1.0000 | 1.0000 | 0.8889 | 0.9167 | 0.9333 | 1.0000 | 1.0000 | 0.8333 | 0.8333 |
+| TORAI sửa, nguồn B | lá | 4 | OK: 4 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | bậc 0 | 6 | OK: 6 | 0.3333 | 0.5000 | 0.6667 | 0.4792 | 0.5103 | 0.5333 | 0.6667 | 0.8333 | 0.5000 | 0.4000 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | hub | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.7778 | 0.8333 | 0.8667 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | không ổn định | 6 | OK: 6 | 0.6667 | 0.8333 | 1.0000 | 0.7556 | 0.8145 | 0.8000 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | lá | 4 | OK: 4 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | bậc 0 | 6 | OK: 6 | 0.5000 | 0.5000 | 0.6667 | 0.5511 | 0.5718 | 0.5667 | 0.6667 | 0.6667 | 0.7500 | 0.7500 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | hub | 3 | OK: 3 | 0.6667 | 0.6667 | 0.6667 | 0.6970 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | không ổn định | 6 | OK: 6 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | lá | 4 | OK: 4 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | bậc 0 | 6 | OK: 6 | 0.5000 | 0.5000 | 0.6667 | 0.5528 | 0.5718 | 0.5667 | 0.6667 | 0.6667 | 0.7500 | 0.7500 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | hub | 3 | OK: 3 | 0.6667 | 0.6667 | 0.6667 | 0.6757 | 0.6667 | 0.6667 | 0.6667 | 0.6667 | 1.0000 | 1.0000 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | không ổn định | 6 | OK: 6 | 0.6667 | 0.8333 | 0.8333 | 0.7500 | 0.7500 | 0.7667 | 0.8333 | 1.0000 | 0.8000 | 0.6667 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | lá | 4 | OK: 4 | 0.7500 | 1.0000 | 1.0000 | 0.8750 | 0.9077 | 0.9500 | 1.0000 | 1.0000 | 0.7500 | 0.7500 |
+| TORAI sửa, nguồn A (hồi cứu) | bậc 0 | 6 | OK: 6 | 0.0000 | 0.6667 | 0.6667 | 0.3479 | 0.3988 | 0.5000 | 0.6667 | 1.0000 | 0.0000 | 0.0000 |
+| TORAI sửa, nguồn A (hồi cứu) | hub | 3 | OK: 3 | 0.6667 | 1.0000 | 1.0000 | 0.8333 | 0.8770 | 0.9333 | 1.0000 | 1.0000 | 0.6667 | 0.6667 |
+| TORAI sửa, nguồn A (hồi cứu) | không ổn định | 6 | OK: 6 | 0.8333 | 1.0000 | 1.0000 | 0.9167 | 0.9385 | 0.9667 | 1.0000 | 1.0000 | 0.8333 | 0.8333 |
+| TORAI sửa, nguồn A (hồi cứu) | lá | 4 | OK: 4 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| MicroRank top11 | bậc 0 | 6 | OK: 6 | 0.3333 | 0.3333 | 0.3333 | 0.3333 | 0.3333 | 0.3333 | 0.3333 | 0.3333 | 1.0000 | 1.0000 |
+| MicroRank top11 | hub | 3 | OK: 3 | 0.0000 | 0.3333 | 0.3333 | 0.1111 | 0.1667 | 0.2000 | 0.3333 | 0.3333 | 0.0000 | 0.0000 |
+| MicroRank top11 | không ổn định | 6 | OK: 6 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | N/A | N/A |
+| MicroRank top11 | lá | 4 | ERROR: 1; OK: 3 | 0.0000 | 0.7500 | 0.7500 | 0.3333 | 0.4405 | 0.5500 | 0.7500 | 0.7500 | 0.0000 | 0.0000 |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.<id>.summaries.dev19.grouped.nhom_vi_tri_p75`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+## Từng ca và bốn tập
+
+### BARO: toàn bộ từng ca dev
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: OK: 30. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Mã ca | Trong 19 | Root | Loại lỗi | Ô | Vị trí | Trạng thái | Hit@1 | Hit@3 | Hit@5 | RR | NDCG@5 | Avg@5 | Hit@10 | \|O\| | Trả về | Phân bố hạng root theo seed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dev-03d4910932 | không | ts-route-service | socket | ts-route-service\|socket | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-12a1a88069 | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-14372e1209 | có | ts-route-service | mem | ts-route-service\|mem | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-16597725c1 | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 0.0000 | 0.0000 | 1.0000 | 0.2500 | 0.4307 | 0.4000 | 1.0000 | 68.0000 | 68.0000 | single: {"4": "1"} |
+| dev-16870e660c | có | ts-route-service | mem | ts-route-service\|mem | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-1e6d61b5ec | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-20acb4402d | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-260d332c8d | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-3ae0a6c15a | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-3defe3d34b | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-4e68956051 | không | ts-train-service | delay | ts-train-service\|delay | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-4f8a844308 | không | ts-route-service | mem | ts-route-service\|mem | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-57546fd87b | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 0.0000 | 0.0000 | 0.0000 | 0.0244 | 0.0000 | 0.0000 | 0.0000 | 68.0000 | 68.0000 | single: {"41": "1"} |
+| dev-59f696a169 | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-746fd74313 | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 68.0000 | 68.0000 | single: {"3": "1"} |
+| dev-7f1b6b071d | không | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-8017c6dc70 | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-98bc73c499 | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-a505ab3f65 | không | ts-train-service | delay | ts-train-service\|delay | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-a5cabe5fa7 | không | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 0.0000 | 0.0000 | 0.0000 | 0.0625 | 0.0000 | 0.0000 | 0.0000 | 68.0000 | 68.0000 | single: {"16": "1"} |
+| dev-a915aa2424 | có | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 0.0000 | 0.0000 | 0.0000 | 0.0345 | 0.0000 | 0.0000 | 0.0000 | 68.0000 | 68.0000 | single: {"29": "1"} |
+| dev-b8bd0abf60 | không | ts-route-service | socket | ts-route-service\|socket | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-ba831dbeb8 | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-bcbd4f46ae | có | ts-route-service | socket | ts-route-service\|socket | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-db293894ab | có | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-de89e2f9e9 | có | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-f36d0647d5 | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 0.0000 | 0.0000 | 1.0000 | 0.2500 | 0.4307 | 0.4000 | 1.0000 | 68.0000 | 68.0000 | single: {"4": "1"} |
+| dev-f81f88234e | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 0.0000 | 0.0000 | 0.0000 | 0.0909 | 0.0000 | 0.0000 | 0.0000 | 68.0000 | 68.0000 | single: {"11": "1"} |
+| dev-f9a8e05ed7 | không | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-fbc45b0c67 | có | ts-train-service | delay | ts-train-service\|delay | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.baro.per_case`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Hạng được lưu dưới dạng phân bố do hòa; root vắng hoặc ca lỗi có phân bố rỗng. Root và nhóm ở bảng này chỉ nối sau khi đã chốt và ghi đầu ra phương pháp.
+
+### SimpleRCA M4: toàn bộ từng ca dev
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: OK: 30. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Mã ca | Trong 19 | Root | Loại lỗi | Ô | Vị trí | Trạng thái | Hit@1 | Hit@3 | Hit@5 | RR | NDCG@5 | Avg@5 | Hit@10 | \|O\| | Trả về | Phân bố hạng root theo seed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dev-03d4910932 | không | ts-route-service | socket | ts-route-service\|socket | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-12a1a88069 | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-14372e1209 | có | ts-route-service | mem | ts-route-service\|mem | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 69.0000 | 69.0000 | single: {"1": "1"} |
+| dev-16597725c1 | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-16870e660c | có | ts-route-service | mem | ts-route-service\|mem | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-1e6d61b5ec | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-20acb4402d | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 0.0000 | 0.0000 | 0.0000 | 0.0667 | 0.0000 | 0.0000 | 0.0000 | 68.0000 | 68.0000 | single: {"15": "1"} |
+| dev-260d332c8d | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-3ae0a6c15a | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-3defe3d34b | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-4e68956051 | không | ts-train-service | delay | ts-train-service\|delay | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-4f8a844308 | không | ts-route-service | mem | ts-route-service\|mem | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-57546fd87b | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-59f696a169 | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-746fd74313 | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-7f1b6b071d | không | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 68.0000 | 68.0000 | single: {"3": "1"} |
+| dev-8017c6dc70 | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-98bc73c499 | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-a505ab3f65 | không | ts-train-service | delay | ts-train-service\|delay | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-a5cabe5fa7 | không | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-a915aa2424 | có | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-b8bd0abf60 | không | ts-route-service | socket | ts-route-service\|socket | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-ba831dbeb8 | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-bcbd4f46ae | có | ts-route-service | socket | ts-route-service\|socket | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-db293894ab | có | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-de89e2f9e9 | có | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-f36d0647d5 | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-f81f88234e | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-f9a8e05ed7 | không | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-fbc45b0c67 | có | ts-train-service | delay | ts-train-service\|delay | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 68.0000 | 68.0000 | single: {"3": "1"} |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.simplerca.per_case`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Hạng được lưu dưới dạng phân bố do hòa; root vắng hoặc ca lỗi có phân bố rỗng. Root và nhóm ở bảng này chỉ nối sau khi đã chốt và ghi đầu ra phương pháp.
+
+### MicroRank xếp đầy đủ: toàn bộ từng ca dev
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: ERROR: 4; OK: 26. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Mã ca | Trong 19 | Root | Loại lỗi | Ô | Vị trí | Trạng thái | Hit@1 | Hit@3 | Hit@5 | RR | NDCG@5 | Avg@5 | Hit@10 | \|O\| | Trả về | Phân bố hạng root theo seed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dev-03d4910932 | không | ts-route-service | socket | ts-route-service\|socket | lá | ERROR | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 0.0000 | single: {} |
+| dev-12a1a88069 | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 0.0000 | 0.0000 | 0.0000 | 0.0909 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 27.0000 | single: {"11": "1"} |
+| dev-14372e1209 | có | ts-route-service | mem | ts-route-service\|mem | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 27.0000 | 27.0000 | single: {"2": "1"} |
+| dev-16597725c1 | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 0.0000 | 0.0000 | 0.0000 | 0.1111 | 0.0000 | 0.0000 | 1.0000 | 27.0000 | 27.0000 | single: {"9": "1"} |
+| dev-16870e660c | có | ts-route-service | mem | ts-route-service\|mem | lá | ERROR | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 0.0000 | single: {} |
+| dev-1e6d61b5ec | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 0.0000 | 0.0000 | 0.0000 | 0.1250 | 0.0000 | 0.0000 | 1.0000 | 20.0000 | 20.0000 | single: {"8": "1"} |
+| dev-20acb4402d | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 0.0000 | 0.0000 | 0.0000 | 0.1250 | 0.0000 | 0.0000 | 1.0000 | 20.0000 | 20.0000 | single: {"8": "1"} |
+| dev-260d332c8d | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 0.0000 | 0.0000 | 0.0000 | 0.1000 | 0.0000 | 0.0000 | 1.0000 | 20.0000 | 20.0000 | single: {"10": "1"} |
+| dev-3ae0a6c15a | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 27.0000 | 27.0000 | single: {"3": "1"} |
+| dev-3defe3d34b | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 0.0000 | 0.0000 | 0.0000 | 0.1000 | 0.0000 | 0.0000 | 1.0000 | 27.0000 | 27.0000 | single: {"10": "1"} |
+| dev-4e68956051 | không | ts-train-service | delay | ts-train-service\|delay | lá | ERROR | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 0.0000 | single: {} |
+| dev-4f8a844308 | không | ts-route-service | mem | ts-route-service\|mem | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 27.0000 | 27.0000 | single: {"2": "1"} |
+| dev-57546fd87b | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.0000 | 27.0000 | single: {"1": "1"} |
+| dev-59f696a169 | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 0.0000 | 0.0000 | 0.0000 | 0.1111 | 0.0000 | 0.0000 | 1.0000 | 27.0000 | 27.0000 | single: {"9": "1"} |
+| dev-746fd74313 | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 0.0000 | 0.0000 | 0.0000 | 0.1000 | 0.0000 | 0.0000 | 1.0000 | 27.0000 | 27.0000 | single: {"10": "1"} |
+| dev-7f1b6b071d | không | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 0.0000 | 0.0000 | 0.0000 | 0.0909 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 27.0000 | single: {"11": "1"} |
+| dev-8017c6dc70 | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 0.0000 | 0.0000 | 0.0000 | 0.1429 | 0.0000 | 0.0000 | 1.0000 | 20.0000 | 20.0000 | single: {"7": "1"} |
+| dev-98bc73c499 | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 27.0000 | 27.0000 | single: {"3": "1"} |
+| dev-a505ab3f65 | không | ts-train-service | delay | ts-train-service\|delay | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 27.0000 | 27.0000 | single: {"3": "1"} |
+| dev-a5cabe5fa7 | không | ts-travel-service | loss | ts-travel-service\|loss | hub | ERROR | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 0.0000 | single: {} |
+| dev-a915aa2424 | có | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 0.0000 | 0.0000 | 0.0000 | 0.0833 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 27.0000 | single: {"12": "1"} |
+| dev-b8bd0abf60 | không | ts-route-service | socket | ts-route-service\|socket | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 27.0000 | 27.0000 | single: {"2": "1"} |
+| dev-ba831dbeb8 | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 27.0000 | 27.0000 | single: {"3": "1"} |
+| dev-bcbd4f46ae | có | ts-route-service | socket | ts-route-service\|socket | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 27.0000 | 27.0000 | single: {"2": "1"} |
+| dev-db293894ab | có | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 0.0000 | 0.0000 | 0.0000 | 0.0909 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 27.0000 | single: {"11": "1"} |
+| dev-de89e2f9e9 | có | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 20.0000 | 20.0000 | single: {"3": "1"} |
+| dev-f36d0647d5 | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 0.0000 | 0.0000 | 0.0000 | 0.0909 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 27.0000 | single: {"11": "1"} |
+| dev-f81f88234e | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.0000 | 27.0000 | single: {"1": "1"} |
+| dev-f9a8e05ed7 | không | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 20.0000 | 20.0000 | single: {"3": "1"} |
+| dev-fbc45b0c67 | có | ts-train-service | delay | ts-train-service\|delay | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 27.0000 | 27.0000 | single: {"3": "1"} |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.microrank_full.per_case`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Hạng được lưu dưới dạng phân bố do hòa; root vắng hoặc ca lỗi có phân bố rỗng. Root và nhóm ở bảng này chỉ nối sau khi đã chốt và ghi đầu ra phương pháp.
+
+### TraceRCA lọc hữu hạn: toàn bộ từng ca dev
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: ERROR: 4; OK: 26. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Mã ca | Trong 19 | Root | Loại lỗi | Ô | Vị trí | Trạng thái | Hit@1 | Hit@3 | Hit@5 | RR | NDCG@5 | Avg@5 | Hit@10 | \|O\| | Trả về | Phân bố hạng root theo seed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dev-03d4910932 | không | ts-route-service | socket | ts-route-service\|socket | lá | ERROR | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 0.0000 | single: {} |
+| dev-12a1a88069 | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 27.0000 | 27.0000 | single: {"2": "1"} |
+| dev-14372e1209 | có | ts-route-service | mem | ts-route-service\|mem | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.0000 | 26.0000 | single: {"1": "1"} |
+| dev-16597725c1 | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.0000 | 24.0000 | single: {"1": "1"} |
+| dev-16870e660c | có | ts-route-service | mem | ts-route-service\|mem | lá | ERROR | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 0.0000 | single: {} |
+| dev-1e6d61b5ec | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 20.0000 | 20.0000 | single: {"1": "1"} |
+| dev-20acb4402d | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 0.0000 | 0.0000 | 1.0000 | 0.2500 | 0.4307 | 0.4000 | 1.0000 | 20.0000 | 15.0000 | single: {"4": "1"} |
+| dev-260d332c8d | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 0.0000 | 0.0000 | 0.0000 | 0.1111 | 0.0000 | 0.0000 | 1.0000 | 20.0000 | 18.0000 | single: {"9": "1"} |
+| dev-3ae0a6c15a | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.0000 | 25.0000 | single: {"1": "1"} |
+| dev-3defe3d34b | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.0000 | 24.0000 | single: {"1": "1"} |
+| dev-4e68956051 | không | ts-train-service | delay | ts-train-service\|delay | lá | ERROR | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 0.0000 | single: {} |
+| dev-4f8a844308 | không | ts-route-service | mem | ts-route-service\|mem | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.0000 | 27.0000 | single: {"1": "1"} |
+| dev-57546fd87b | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.0000 | 27.0000 | single: {"1": "1"} |
+| dev-59f696a169 | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.0000 | 22.0000 | single: {"1": "1"} |
+| dev-746fd74313 | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.0000 | 23.0000 | single: {"1": "1"} |
+| dev-7f1b6b071d | không | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.0000 | 26.0000 | single: {"1": "1"} |
+| dev-8017c6dc70 | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 20.0000 | 19.0000 | single: {"1": "1"} |
+| dev-98bc73c499 | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.0000 | 25.0000 | single: {"1": "1"} |
+| dev-a505ab3f65 | không | ts-train-service | delay | ts-train-service\|delay | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.0000 | 23.0000 | single: {"1": "1"} |
+| dev-a5cabe5fa7 | không | ts-travel-service | loss | ts-travel-service\|loss | hub | ERROR | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 0.0000 | single: {} |
+| dev-a915aa2424 | có | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.0000 | 27.0000 | single: {"1": "1"} |
+| dev-b8bd0abf60 | không | ts-route-service | socket | ts-route-service\|socket | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.0000 | 26.0000 | single: {"1": "1"} |
+| dev-ba831dbeb8 | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.0000 | 25.0000 | single: {"1": "1"} |
+| dev-bcbd4f46ae | có | ts-route-service | socket | ts-route-service\|socket | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.0000 | 25.0000 | single: {"1": "1"} |
+| dev-db293894ab | có | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 27.0000 | 23.0000 | single: {"2": "1"} |
+| dev-de89e2f9e9 | có | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 20.0000 | 18.0000 | single: {"1": "1"} |
+| dev-f36d0647d5 | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 27.0000 | 27.0000 | single: {"3": "1"} |
+| dev-f81f88234e | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.0000 | 27.0000 | single: {"1": "1"} |
+| dev-f9a8e05ed7 | không | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 20.0000 | 17.0000 | single: {"1": "1"} |
+| dev-fbc45b0c67 | có | ts-train-service | delay | ts-train-service\|delay | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.0000 | 26.0000 | single: {"1": "1"} |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.tracerca.per_case`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Hạng được lưu dưới dạng phân bố do hòa; root vắng hoặc ca lỗi có phân bố rỗng. Root và nhóm ở bảng này chỉ nối sau khi đã chốt và ghi đầu ra phương pháp.
+
+### CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3: toàn bộ từng ca dev
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: OK: 30. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Mã ca | Trong 19 | Root | Loại lỗi | Ô | Vị trí | Trạng thái | Hit@1 | Hit@3 | Hit@5 | RR | NDCG@5 | Avg@5 | Hit@10 | \|O\| | Trả về | Phân bố hạng root theo seed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dev-03d4910932 | không | ts-route-service | socket | ts-route-service\|socket | lá | OK | 0.0000 | 0.0000 | 1.0000 | 0.2500 | 0.4307 | 0.4000 | 1.0000 | 68.0000 | 68.0000 | single: {"4": "1"} |
+| dev-12a1a88069 | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-14372e1209 | có | ts-route-service | mem | ts-route-service\|mem | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-16597725c1 | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 0.0000 | 0.0000 | 0.0000 | 0.0667 | 0.0000 | 0.0000 | 0.0000 | 68.0000 | 68.0000 | single: {"15": "1"} |
+| dev-16870e660c | có | ts-route-service | mem | ts-route-service\|mem | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-1e6d61b5ec | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-20acb4402d | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-260d332c8d | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-3ae0a6c15a | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 0.0000 | 0.0000 | 1.0000 | 0.2500 | 0.4307 | 0.4000 | 1.0000 | 68.0000 | 68.0000 | single: {"4": "1"} |
+| dev-3defe3d34b | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-4e68956051 | không | ts-train-service | delay | ts-train-service\|delay | lá | OK | 0.0000 | 0.0000 | 1.0000 | 0.2500 | 0.4307 | 0.4000 | 1.0000 | 68.0000 | 68.0000 | single: {"4": "1"} |
+| dev-4f8a844308 | không | ts-route-service | mem | ts-route-service\|mem | lá | OK | 0.0000 | 0.0000 | 1.0000 | 0.2500 | 0.4307 | 0.4000 | 1.0000 | 68.0000 | 68.0000 | single: {"4": "1"} |
+| dev-57546fd87b | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 0.0000 | 0.0000 | 0.0000 | 0.0217 | 0.0000 | 0.0000 | 0.0000 | 68.0000 | 68.0000 | single: {"46": "1"} |
+| dev-59f696a169 | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-746fd74313 | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 0.0000 | 0.0000 | 1.0000 | 0.2500 | 0.4307 | 0.4000 | 1.0000 | 68.0000 | 68.0000 | single: {"4": "1"} |
+| dev-7f1b6b071d | không | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-8017c6dc70 | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-98bc73c499 | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 0.0000 | 0.0000 | 1.0000 | 0.2500 | 0.4307 | 0.4000 | 1.0000 | 68.0000 | 68.0000 | single: {"4": "1"} |
+| dev-a505ab3f65 | không | ts-train-service | delay | ts-train-service\|delay | lá | OK | 0.0000 | 0.0000 | 1.0000 | 0.2500 | 0.4307 | 0.4000 | 1.0000 | 68.0000 | 68.0000 | single: {"4": "1"} |
+| dev-a5cabe5fa7 | không | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-a915aa2424 | có | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 68.0000 | 68.0000 | single: {"3": "1"} |
+| dev-b8bd0abf60 | không | ts-route-service | socket | ts-route-service\|socket | lá | OK | 0.0000 | 0.0000 | 1.0000 | 0.2500 | 0.4307 | 0.4000 | 1.0000 | 68.0000 | 68.0000 | single: {"4": "1"} |
+| dev-ba831dbeb8 | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 0.0000 | 0.0000 | 1.0000 | 0.2500 | 0.4307 | 0.4000 | 1.0000 | 68.0000 | 68.0000 | single: {"4": "1"} |
+| dev-bcbd4f46ae | có | ts-route-service | socket | ts-route-service\|socket | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-db293894ab | có | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-de89e2f9e9 | có | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-f36d0647d5 | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-f81f88234e | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 0.0000 | 0.0000 | 0.0000 | 0.0455 | 0.0000 | 0.0000 | 0.0000 | 68.0000 | 68.0000 | single: {"22": "1"} |
+| dev-f9a8e05ed7 | không | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-fbc45b0c67 | có | ts-train-service | delay | ts-train-service\|delay | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.circa_ols_da.per_case`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Hạng được lưu dưới dạng phân bố do hòa; root vắng hoặc ca lỗi có phân bố rỗng. Root và nhóm ở bảng này chỉ nối sau khi đã chốt và ghi đầu ra phương pháp.
+
+### TORAI sửa, nguồn B: toàn bộ từng ca dev
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: OK: 30. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Mã ca | Trong 19 | Root | Loại lỗi | Ô | Vị trí | Trạng thái | Hit@1 | Hit@3 | Hit@5 | RR | NDCG@5 | Avg@5 | Hit@10 | \|O\| | Trả về | Phân bố hạng root theo seed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dev-03d4910932 | không | ts-route-service | socket | ts-route-service\|socket | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-12a1a88069 | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-14372e1209 | có | ts-route-service | mem | ts-route-service\|mem | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-16597725c1 | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 68.0000 | 68.0000 | 0: {"3": "1"}; 1: {"3": "1"}; 2: {"3": "1"} |
+| dev-16870e660c | có | ts-route-service | mem | ts-route-service\|mem | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-1e6d61b5ec | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-20acb4402d | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-260d332c8d | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-3ae0a6c15a | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-3defe3d34b | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-4e68956051 | không | ts-train-service | delay | ts-train-service\|delay | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-4f8a844308 | không | ts-route-service | mem | ts-route-service\|mem | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-57546fd87b | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-59f696a169 | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 68.0000 | 68.0000 | 0: {"3": "1"}; 1: {"3": "1"}; 2: {"3": "1"} |
+| dev-746fd74313 | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-7f1b6b071d | không | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-8017c6dc70 | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-98bc73c499 | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-a505ab3f65 | không | ts-train-service | delay | ts-train-service\|delay | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-a5cabe5fa7 | không | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | 0: {"2": "1"}; 1: {"2": "1"}; 2: {"2": "1"} |
+| dev-a915aa2424 | có | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-b8bd0abf60 | không | ts-route-service | socket | ts-route-service\|socket | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-ba831dbeb8 | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-bcbd4f46ae | có | ts-route-service | socket | ts-route-service\|socket | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-db293894ab | có | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-de89e2f9e9 | có | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-f36d0647d5 | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 68.0000 | 68.0000 | 0: {"3": "1"}; 1: {"3": "1"}; 2: {"3": "1"} |
+| dev-f81f88234e | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-f9a8e05ed7 | không | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-fbc45b0c67 | có | ts-train-service | delay | ts-train-service\|delay | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.torai_B.per_case`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Hạng được lưu dưới dạng phân bố do hòa; root vắng hoặc ca lỗi có phân bố rỗng. Root và nhóm ở bảng này chỉ nối sau khi đã chốt và ghi đầu ra phương pháp.
+
+### CIRCA kiến trúc, OLS+RHT-only, cấu hình P3: toàn bộ từng ca dev
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: OK: 30. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Mã ca | Trong 19 | Root | Loại lỗi | Ô | Vị trí | Trạng thái | Hit@1 | Hit@3 | Hit@5 | RR | NDCG@5 | Avg@5 | Hit@10 | \|O\| | Trả về | Phân bố hạng root theo seed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dev-03d4910932 | không | ts-route-service | socket | ts-route-service\|socket | lá | OK | 0.0000 | 0.0000 | 1.0000 | 0.2500 | 0.4307 | 0.4000 | 1.0000 | 68.0000 | 68.0000 | single: {"4": "1"} |
+| dev-12a1a88069 | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-14372e1209 | có | ts-route-service | mem | ts-route-service\|mem | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-16597725c1 | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-16870e660c | có | ts-route-service | mem | ts-route-service\|mem | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-1e6d61b5ec | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-20acb4402d | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 68.0000 | 68.0000 | single: {"3": "1"} |
+| dev-260d332c8d | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-3ae0a6c15a | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-3defe3d34b | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-4e68956051 | không | ts-train-service | delay | ts-train-service\|delay | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 68.0000 | 68.0000 | single: {"3": "1"} |
+| dev-4f8a844308 | không | ts-route-service | mem | ts-route-service\|mem | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-57546fd87b | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 0.0000 | 0.0000 | 0.0000 | 0.0250 | 0.0000 | 0.0000 | 0.0000 | 68.0000 | 68.0000 | single: {"40": "1"} |
+| dev-59f696a169 | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-746fd74313 | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 0.0000 | 0.0000 | 1.0000 | 0.2500 | 0.4307 | 0.4000 | 1.0000 | 68.0000 | 68.0000 | single: {"4": "1"} |
+| dev-7f1b6b071d | không | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 0.0000 | 0.0000 | 0.0000 | 0.1250 | 0.0000 | 0.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"8": "1"} |
+| dev-8017c6dc70 | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-98bc73c499 | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-a505ab3f65 | không | ts-train-service | delay | ts-train-service\|delay | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 68.0000 | 68.0000 | single: {"3": "1"} |
+| dev-a5cabe5fa7 | không | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 0.0000 | 0.0000 | 0.0000 | 0.1429 | 0.0000 | 0.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"7": "1"} |
+| dev-a915aa2424 | có | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 68.0000 | 68.0000 | single: {"3": "1"} |
+| dev-b8bd0abf60 | không | ts-route-service | socket | ts-route-service\|socket | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-ba831dbeb8 | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-bcbd4f46ae | có | ts-route-service | socket | ts-route-service\|socket | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-db293894ab | có | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-de89e2f9e9 | có | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-f36d0647d5 | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 0.0000 | 0.0000 | 1.0000 | 0.2000 | 0.3869 | 0.2000 | 1.0000 | 68.0000 | 68.0000 | single: {"5": "1"} |
+| dev-f81f88234e | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 0.0000 | 0.0000 | 0.0000 | 0.1000 | 0.0000 | 0.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"10": "1"} |
+| dev-f9a8e05ed7 | không | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-fbc45b0c67 | có | ts-train-service | delay | ts-train-service\|delay | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.circa_ols_rht.per_case`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Hạng được lưu dưới dạng phân bố do hòa; root vắng hoặc ca lỗi có phân bố rỗng. Root và nhóm ở bảng này chỉ nối sau khi đã chốt và ghi đầu ra phương pháp.
+
+### CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ: toàn bộ từng ca dev
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: OK: 30. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Mã ca | Trong 19 | Root | Loại lỗi | Ô | Vị trí | Trạng thái | Hit@1 | Hit@3 | Hit@5 | RR | NDCG@5 | Avg@5 | Hit@10 | \|O\| | Trả về | Phân bố hạng root theo seed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dev-03d4910932 | không | ts-route-service | socket | ts-route-service\|socket | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-12a1a88069 | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-14372e1209 | có | ts-route-service | mem | ts-route-service\|mem | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-16597725c1 | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-16870e660c | có | ts-route-service | mem | ts-route-service\|mem | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-1e6d61b5ec | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-20acb4402d | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-260d332c8d | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-3ae0a6c15a | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-3defe3d34b | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-4e68956051 | không | ts-train-service | delay | ts-train-service\|delay | lá | OK | 0.0000 | 0.0000 | 1.0000 | 0.2500 | 0.4307 | 0.4000 | 1.0000 | 68.0000 | 68.0000 | single: {"4": "1"} |
+| dev-4f8a844308 | không | ts-route-service | mem | ts-route-service\|mem | lá | OK | 0.0000 | 0.0000 | 1.0000 | 0.2500 | 0.4307 | 0.4000 | 1.0000 | 68.0000 | 68.0000 | single: {"4": "1"} |
+| dev-57546fd87b | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 0.0000 | 0.0000 | 0.0000 | 0.0303 | 0.0000 | 0.0000 | 0.0000 | 68.0000 | 68.0000 | single: {"33": "1"} |
+| dev-59f696a169 | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-746fd74313 | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 0.0000 | 0.0000 | 1.0000 | 0.2500 | 0.4307 | 0.4000 | 1.0000 | 68.0000 | 68.0000 | single: {"4": "1"} |
+| dev-7f1b6b071d | không | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 68.0000 | 68.0000 | single: {"3": "1"} |
+| dev-8017c6dc70 | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-98bc73c499 | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-a505ab3f65 | không | ts-train-service | delay | ts-train-service\|delay | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-a5cabe5fa7 | không | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-a915aa2424 | có | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 0.0000 | 0.0000 | 0.0000 | 0.0909 | 0.0000 | 0.0000 | 0.0000 | 68.0000 | 68.0000 | single: {"11": "1"} |
+| dev-b8bd0abf60 | không | ts-route-service | socket | ts-route-service\|socket | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-ba831dbeb8 | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-bcbd4f46ae | có | ts-route-service | socket | ts-route-service\|socket | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-db293894ab | có | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-de89e2f9e9 | có | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-f36d0647d5 | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-f81f88234e | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 0.0000 | 0.0000 | 0.0000 | 0.0263 | 0.0000 | 0.0000 | 0.0000 | 68.0000 | 68.0000 | single: {"38": "1"} |
+| dev-f9a8e05ed7 | không | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-fbc45b0c67 | có | ts-train-service | delay | ts-train-service\|delay | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.circa_svr_da.per_case`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Hạng được lưu dưới dạng phân bố do hòa; root vắng hoặc ca lỗi có phân bố rỗng. Root và nhóm ở bảng này chỉ nối sau khi đã chốt và ghi đầu ra phương pháp.
+
+### CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ: toàn bộ từng ca dev
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: OK: 30. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Mã ca | Trong 19 | Root | Loại lỗi | Ô | Vị trí | Trạng thái | Hit@1 | Hit@3 | Hit@5 | RR | NDCG@5 | Avg@5 | Hit@10 | \|O\| | Trả về | Phân bố hạng root theo seed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dev-03d4910932 | không | ts-route-service | socket | ts-route-service\|socket | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-12a1a88069 | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-14372e1209 | có | ts-route-service | mem | ts-route-service\|mem | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-16597725c1 | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-16870e660c | có | ts-route-service | mem | ts-route-service\|mem | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-1e6d61b5ec | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-20acb4402d | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 68.0000 | 68.0000 | single: {"3": "1"} |
+| dev-260d332c8d | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-3ae0a6c15a | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-3defe3d34b | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-4e68956051 | không | ts-train-service | delay | ts-train-service\|delay | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-4f8a844308 | không | ts-route-service | mem | ts-route-service\|mem | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-57546fd87b | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 0.0000 | 0.0000 | 0.0000 | 0.0312 | 0.0000 | 0.0000 | 0.0000 | 68.0000 | 68.0000 | single: {"32": "1"} |
+| dev-59f696a169 | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-746fd74313 | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 0.0000 | 0.0000 | 1.0000 | 0.2500 | 0.4307 | 0.4000 | 1.0000 | 68.0000 | 68.0000 | single: {"4": "1"} |
+| dev-7f1b6b071d | không | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 0.0000 | 0.0000 | 0.0000 | 0.1111 | 0.0000 | 0.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"9": "1"} |
+| dev-8017c6dc70 | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-98bc73c499 | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-a505ab3f65 | không | ts-train-service | delay | ts-train-service\|delay | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-a5cabe5fa7 | không | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 0.0000 | 0.0000 | 0.0000 | 0.1429 | 0.0000 | 0.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"7": "1"} |
+| dev-a915aa2424 | có | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 0.0000 | 0.0000 | 0.0000 | 0.0270 | 0.0000 | 0.0000 | 0.0000 | 68.0000 | 68.0000 | single: {"37": "1"} |
+| dev-b8bd0abf60 | không | ts-route-service | socket | ts-route-service\|socket | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-ba831dbeb8 | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-bcbd4f46ae | có | ts-route-service | socket | ts-route-service\|socket | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-db293894ab | có | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-de89e2f9e9 | có | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+| dev-f36d0647d5 | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 0.0000 | 0.0000 | 0.0000 | 0.1667 | 0.0000 | 0.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"6": "1"} |
+| dev-f81f88234e | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 0.0000 | 0.0000 | 0.0000 | 0.0357 | 0.0000 | 0.0000 | 0.0000 | 68.0000 | 68.0000 | single: {"28": "1"} |
+| dev-f9a8e05ed7 | không | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | single: {"2": "1"} |
+| dev-fbc45b0c67 | có | ts-train-service | delay | ts-train-service\|delay | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | single: {"1": "1"} |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.circa_svr_rht.per_case`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Hạng được lưu dưới dạng phân bố do hòa; root vắng hoặc ca lỗi có phân bố rỗng. Root và nhóm ở bảng này chỉ nối sau khi đã chốt và ghi đầu ra phương pháp.
+
+### TORAI sửa, nguồn A (hồi cứu): toàn bộ từng ca dev
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: OK: 30. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Mã ca | Trong 19 | Root | Loại lỗi | Ô | Vị trí | Trạng thái | Hit@1 | Hit@3 | Hit@5 | RR | NDCG@5 | Avg@5 | Hit@10 | \|O\| | Trả về | Phân bố hạng root theo seed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dev-03d4910932 | không | ts-route-service | socket | ts-route-service\|socket | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-12a1a88069 | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-14372e1209 | có | ts-route-service | mem | ts-route-service\|mem | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-16597725c1 | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | 0: {"2": "1"}; 1: {"2": "1"}; 2: {"2": "1"} |
+| dev-16870e660c | có | ts-route-service | mem | ts-route-service\|mem | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-1e6d61b5ec | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-20acb4402d | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-260d332c8d | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-3ae0a6c15a | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-3defe3d34b | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | 0: {"2": "1"}; 1: {"2": "1"}; 2: {"2": "1"} |
+| dev-4e68956051 | không | ts-train-service | delay | ts-train-service\|delay | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-4f8a844308 | không | ts-route-service | mem | ts-route-service\|mem | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-57546fd87b | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 68.0000 | 68.0000 | 0: {"3": "1"}; 1: {"3": "1"}; 2: {"3": "1"} |
+| dev-59f696a169 | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | 0: {"2": "1"}; 1: {"2": "1"}; 2: {"2": "1"} |
+| dev-746fd74313 | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 0.0000 | 0.0000 | 0.0000 | 0.1429 | 0.0000 | 0.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"7": "1"}; 1: {"7": "1"}; 2: {"7": "1"} |
+| dev-7f1b6b071d | không | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-8017c6dc70 | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-98bc73c499 | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-a505ab3f65 | không | ts-train-service | delay | ts-train-service\|delay | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-a5cabe5fa7 | không | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | 0: {"2": "1"}; 1: {"2": "1"}; 2: {"2": "1"} |
+| dev-a915aa2424 | có | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | 0: {"2": "1"}; 1: {"2": "1"}; 2: {"2": "1"} |
+| dev-b8bd0abf60 | không | ts-route-service | socket | ts-route-service\|socket | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-ba831dbeb8 | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-bcbd4f46ae | có | ts-route-service | socket | ts-route-service\|socket | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-db293894ab | có | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-de89e2f9e9 | có | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-f36d0647d5 | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 68.0000 | 68.0000 | 0: {"2": "1"}; 1: {"2": "1"}; 2: {"2": "1"} |
+| dev-f81f88234e | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 0.0000 | 0.0000 | 0.0000 | 0.1111 | 0.0000 | 0.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"9": "1"}; 1: {"9": "1"}; 2: {"9": "1"} |
+| dev-f9a8e05ed7 | không | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+| dev-fbc45b0c67 | có | ts-train-service | delay | ts-train-service\|delay | lá | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 68.0000 | 68.0000 | 0: {"1": "1"}; 1: {"1": "1"}; 2: {"1": "1"} |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.torai_A.per_case`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Hạng được lưu dưới dạng phân bố do hòa; root vắng hoặc ca lỗi có phân bố rỗng. Root và nhóm ở bảng này chỉ nối sau khi đã chốt và ghi đầu ra phương pháp.
+
+### MicroRank top11: toàn bộ từng ca dev
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: ERROR: 4; OK: 26. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Mã ca | Trong 19 | Root | Loại lỗi | Ô | Vị trí | Trạng thái | Hit@1 | Hit@3 | Hit@5 | RR | NDCG@5 | Avg@5 | Hit@10 | \|O\| | Trả về | Phân bố hạng root theo seed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dev-03d4910932 | không | ts-route-service | socket | ts-route-service\|socket | lá | ERROR | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 0.0000 | single: {} |
+| dev-12a1a88069 | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 5.0000 | single: {} |
+| dev-14372e1209 | có | ts-route-service | mem | ts-route-service\|mem | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 27.0000 | 5.0000 | single: {"2": "1"} |
+| dev-16597725c1 | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 4.0000 | single: {} |
+| dev-16870e660c | có | ts-route-service | mem | ts-route-service\|mem | lá | ERROR | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 0.0000 | single: {} |
+| dev-1e6d61b5ec | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 20.0000 | 4.0000 | single: {} |
+| dev-20acb4402d | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 20.0000 | 5.0000 | single: {} |
+| dev-260d332c8d | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 20.0000 | 5.0000 | single: {} |
+| dev-3ae0a6c15a | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 27.0000 | 5.0000 | single: {"3": "1"} |
+| dev-3defe3d34b | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 5.0000 | single: {} |
+| dev-4e68956051 | không | ts-train-service | delay | ts-train-service\|delay | lá | ERROR | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 0.0000 | single: {} |
+| dev-4f8a844308 | không | ts-route-service | mem | ts-route-service\|mem | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 27.0000 | 5.0000 | single: {"2": "1"} |
+| dev-57546fd87b | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.0000 | 7.0000 | single: {"1": "1"} |
+| dev-59f696a169 | có | ts-auth-service | cpu | ts-auth-service\|cpu | bậc 0 | OK | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 4.0000 | single: {} |
+| dev-746fd74313 | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 6.0000 | single: {} |
+| dev-7f1b6b071d | không | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 4.0000 | single: {} |
+| dev-8017c6dc70 | có | ts-order-service | disk | ts-order-service\|disk | không ổn định | OK | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 20.0000 | 4.0000 | single: {} |
+| dev-98bc73c499 | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 27.0000 | 5.0000 | single: {"3": "1"} |
+| dev-a505ab3f65 | không | ts-train-service | delay | ts-train-service\|delay | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 27.0000 | 5.0000 | single: {"3": "1"} |
+| dev-a5cabe5fa7 | không | ts-travel-service | loss | ts-travel-service\|loss | hub | ERROR | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 0.0000 | single: {} |
+| dev-a915aa2424 | có | ts-travel-service | loss | ts-travel-service\|loss | hub | OK | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 5.0000 | single: {} |
+| dev-b8bd0abf60 | không | ts-route-service | socket | ts-route-service\|socket | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 27.0000 | 5.0000 | single: {"2": "1"} |
+| dev-ba831dbeb8 | không | ts-train-service | cpu | ts-train-service\|cpu | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 27.0000 | 5.0000 | single: {"3": "1"} |
+| dev-bcbd4f46ae | có | ts-route-service | socket | ts-route-service\|socket | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.5000 | 0.6309 | 0.8000 | 1.0000 | 27.0000 | 5.0000 | single: {"2": "1"} |
+| dev-db293894ab | có | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 5.0000 | single: {} |
+| dev-de89e2f9e9 | có | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 20.0000 | 5.0000 | single: {"3": "1"} |
+| dev-f36d0647d5 | có | ts-order-service | loss | ts-order-service\|loss | không ổn định | OK | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 27.0000 | 5.0000 | single: {} |
+| dev-f81f88234e | có | ts-auth-service | delay | ts-auth-service\|delay | bậc 0 | OK | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 27.0000 | 6.0000 | single: {"1": "1"} |
+| dev-f9a8e05ed7 | không | ts-travel-service | disk | ts-travel-service\|disk | hub | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 20.0000 | 5.0000 | single: {"3": "1"} |
+| dev-fbc45b0c67 | có | ts-train-service | delay | ts-train-service\|delay | lá | OK | 0.0000 | 1.0000 | 1.0000 | 0.3333 | 0.5000 | 0.6000 | 1.0000 | 27.0000 | 5.0000 | single: {"3": "1"} |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.microrank_top11.per_case`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Hạng được lưu dưới dạng phân bố do hòa; root vắng hoặc ca lỗi có phân bố rỗng. Root và nhóm ở bảng này chỉ nối sau khi đã chốt và ghi đầu ra phương pháp.
+
+### BARO: bốn tập từng ca/seed
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: OK: 30. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Ca | Seed | Trạng thái | Inventory U | Quan sát O | Tập chấm | Trả về | Quan sát ngoài U | Trả về ngoài U |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dev-03d4910932 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-12a1a88069 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-14372e1209 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-16597725c1 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-16870e660c | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-1e6d61b5ec | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-20acb4402d | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-260d332c8d | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3ae0a6c15a | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3defe3d34b | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4e68956051 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4f8a844308 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-57546fd87b | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-59f696a169 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-746fd74313 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-7f1b6b071d | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-8017c6dc70 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-98bc73c499 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a505ab3f65 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a5cabe5fa7 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a915aa2424 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-b8bd0abf60 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-ba831dbeb8 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-bcbd4f46ae | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-db293894ab | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-de89e2f9e9 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f36d0647d5 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f81f88234e | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f9a8e05ed7 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-fbc45b0c67 | single | OK | 68 | 68 | 68 | 68 | không | không |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.baro.per_case.<ca>.four_sets`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+### SimpleRCA M4: bốn tập từng ca/seed
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: OK: 30. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Ca | Seed | Trạng thái | Inventory U | Quan sát O | Tập chấm | Trả về | Quan sát ngoài U | Trả về ngoài U |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dev-03d4910932 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-12a1a88069 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-14372e1209 | single | OK | 68 | 69 | 68 | 69 | istio-init | istio-init |
+| dev-16597725c1 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-16870e660c | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-1e6d61b5ec | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-20acb4402d | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-260d332c8d | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3ae0a6c15a | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3defe3d34b | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4e68956051 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4f8a844308 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-57546fd87b | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-59f696a169 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-746fd74313 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-7f1b6b071d | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-8017c6dc70 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-98bc73c499 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a505ab3f65 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a5cabe5fa7 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a915aa2424 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-b8bd0abf60 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-ba831dbeb8 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-bcbd4f46ae | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-db293894ab | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-de89e2f9e9 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f36d0647d5 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f81f88234e | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f9a8e05ed7 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-fbc45b0c67 | single | OK | 68 | 68 | 68 | 68 | không | không |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.simplerca.per_case.<ca>.four_sets`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+### MicroRank xếp đầy đủ: bốn tập từng ca/seed
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: ERROR: 4; OK: 26. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Ca | Seed | Trạng thái | Inventory U | Quan sát O | Tập chấm | Trả về | Quan sát ngoài U | Trả về ngoài U |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dev-03d4910932 | single | ERROR | 68 | 27 | 68 | 0 | không | không |
+| dev-12a1a88069 | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-14372e1209 | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-16597725c1 | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-16870e660c | single | ERROR | 68 | 27 | 68 | 0 | không | không |
+| dev-1e6d61b5ec | single | OK | 68 | 20 | 68 | 20 | không | không |
+| dev-20acb4402d | single | OK | 68 | 20 | 68 | 20 | không | không |
+| dev-260d332c8d | single | OK | 68 | 20 | 68 | 20 | không | không |
+| dev-3ae0a6c15a | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-3defe3d34b | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-4e68956051 | single | ERROR | 68 | 27 | 68 | 0 | không | không |
+| dev-4f8a844308 | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-57546fd87b | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-59f696a169 | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-746fd74313 | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-7f1b6b071d | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-8017c6dc70 | single | OK | 68 | 20 | 68 | 20 | không | không |
+| dev-98bc73c499 | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-a505ab3f65 | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-a5cabe5fa7 | single | ERROR | 68 | 27 | 68 | 0 | không | không |
+| dev-a915aa2424 | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-b8bd0abf60 | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-ba831dbeb8 | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-bcbd4f46ae | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-db293894ab | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-de89e2f9e9 | single | OK | 68 | 20 | 68 | 20 | không | không |
+| dev-f36d0647d5 | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-f81f88234e | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-f9a8e05ed7 | single | OK | 68 | 20 | 68 | 20 | không | không |
+| dev-fbc45b0c67 | single | OK | 68 | 27 | 68 | 27 | không | không |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.microrank_full.per_case.<ca>.four_sets`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+### TraceRCA lọc hữu hạn: bốn tập từng ca/seed
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: ERROR: 4; OK: 26. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Ca | Seed | Trạng thái | Inventory U | Quan sát O | Tập chấm | Trả về | Quan sát ngoài U | Trả về ngoài U |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dev-03d4910932 | single | ERROR | 68 | 27 | 68 | 0 | không | không |
+| dev-12a1a88069 | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-14372e1209 | single | OK | 68 | 27 | 68 | 26 | không | không |
+| dev-16597725c1 | single | OK | 68 | 27 | 68 | 24 | không | không |
+| dev-16870e660c | single | ERROR | 68 | 27 | 68 | 0 | không | không |
+| dev-1e6d61b5ec | single | OK | 68 | 20 | 68 | 20 | không | không |
+| dev-20acb4402d | single | OK | 68 | 20 | 68 | 15 | không | không |
+| dev-260d332c8d | single | OK | 68 | 20 | 68 | 18 | không | không |
+| dev-3ae0a6c15a | single | OK | 68 | 27 | 68 | 25 | không | không |
+| dev-3defe3d34b | single | OK | 68 | 27 | 68 | 24 | không | không |
+| dev-4e68956051 | single | ERROR | 68 | 27 | 68 | 0 | không | không |
+| dev-4f8a844308 | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-57546fd87b | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-59f696a169 | single | OK | 68 | 27 | 68 | 22 | không | không |
+| dev-746fd74313 | single | OK | 68 | 27 | 68 | 23 | không | không |
+| dev-7f1b6b071d | single | OK | 68 | 27 | 68 | 26 | không | không |
+| dev-8017c6dc70 | single | OK | 68 | 20 | 68 | 19 | không | không |
+| dev-98bc73c499 | single | OK | 68 | 27 | 68 | 25 | không | không |
+| dev-a505ab3f65 | single | OK | 68 | 27 | 68 | 23 | không | không |
+| dev-a5cabe5fa7 | single | ERROR | 68 | 27 | 68 | 0 | không | không |
+| dev-a915aa2424 | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-b8bd0abf60 | single | OK | 68 | 27 | 68 | 26 | không | không |
+| dev-ba831dbeb8 | single | OK | 68 | 27 | 68 | 25 | không | không |
+| dev-bcbd4f46ae | single | OK | 68 | 27 | 68 | 25 | không | không |
+| dev-db293894ab | single | OK | 68 | 27 | 68 | 23 | không | không |
+| dev-de89e2f9e9 | single | OK | 68 | 20 | 68 | 18 | không | không |
+| dev-f36d0647d5 | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-f81f88234e | single | OK | 68 | 27 | 68 | 27 | không | không |
+| dev-f9a8e05ed7 | single | OK | 68 | 20 | 68 | 17 | không | không |
+| dev-fbc45b0c67 | single | OK | 68 | 27 | 68 | 26 | không | không |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.tracerca.per_case.<ca>.four_sets`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+### CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3: bốn tập từng ca/seed
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: OK: 30. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Ca | Seed | Trạng thái | Inventory U | Quan sát O | Tập chấm | Trả về | Quan sát ngoài U | Trả về ngoài U |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dev-03d4910932 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-12a1a88069 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-14372e1209 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-16597725c1 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-16870e660c | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-1e6d61b5ec | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-20acb4402d | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-260d332c8d | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3ae0a6c15a | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3defe3d34b | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4e68956051 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4f8a844308 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-57546fd87b | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-59f696a169 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-746fd74313 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-7f1b6b071d | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-8017c6dc70 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-98bc73c499 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a505ab3f65 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a5cabe5fa7 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a915aa2424 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-b8bd0abf60 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-ba831dbeb8 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-bcbd4f46ae | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-db293894ab | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-de89e2f9e9 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f36d0647d5 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f81f88234e | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f9a8e05ed7 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-fbc45b0c67 | single | OK | 68 | 68 | 68 | 68 | không | không |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.circa_ols_da.per_case.<ca>.four_sets`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+### TORAI sửa, nguồn B: bốn tập từng ca/seed
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: OK: 30. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Ca | Seed | Trạng thái | Inventory U | Quan sát O | Tập chấm | Trả về | Quan sát ngoài U | Trả về ngoài U |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dev-03d4910932 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-03d4910932 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-03d4910932 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-12a1a88069 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-12a1a88069 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-12a1a88069 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-14372e1209 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-14372e1209 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-14372e1209 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-16597725c1 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-16597725c1 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-16597725c1 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-16870e660c | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-16870e660c | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-16870e660c | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-1e6d61b5ec | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-1e6d61b5ec | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-1e6d61b5ec | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-20acb4402d | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-20acb4402d | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-20acb4402d | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-260d332c8d | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-260d332c8d | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-260d332c8d | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3ae0a6c15a | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3ae0a6c15a | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3ae0a6c15a | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3defe3d34b | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3defe3d34b | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3defe3d34b | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4e68956051 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4e68956051 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4e68956051 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4f8a844308 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4f8a844308 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4f8a844308 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-57546fd87b | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-57546fd87b | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-57546fd87b | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-59f696a169 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-59f696a169 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-59f696a169 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-746fd74313 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-746fd74313 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-746fd74313 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-7f1b6b071d | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-7f1b6b071d | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-7f1b6b071d | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-8017c6dc70 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-8017c6dc70 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-8017c6dc70 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-98bc73c499 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-98bc73c499 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-98bc73c499 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a505ab3f65 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a505ab3f65 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a505ab3f65 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a5cabe5fa7 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a5cabe5fa7 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a5cabe5fa7 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a915aa2424 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a915aa2424 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a915aa2424 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-b8bd0abf60 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-b8bd0abf60 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-b8bd0abf60 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-ba831dbeb8 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-ba831dbeb8 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-ba831dbeb8 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-bcbd4f46ae | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-bcbd4f46ae | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-bcbd4f46ae | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-db293894ab | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-db293894ab | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-db293894ab | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-de89e2f9e9 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-de89e2f9e9 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-de89e2f9e9 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f36d0647d5 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f36d0647d5 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f36d0647d5 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f81f88234e | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f81f88234e | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f81f88234e | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f9a8e05ed7 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f9a8e05ed7 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f9a8e05ed7 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-fbc45b0c67 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-fbc45b0c67 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-fbc45b0c67 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.torai_B.per_case.<ca>.four_sets`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+### CIRCA kiến trúc, OLS+RHT-only, cấu hình P3: bốn tập từng ca/seed
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: OK: 30. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Ca | Seed | Trạng thái | Inventory U | Quan sát O | Tập chấm | Trả về | Quan sát ngoài U | Trả về ngoài U |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dev-03d4910932 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-12a1a88069 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-14372e1209 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-16597725c1 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-16870e660c | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-1e6d61b5ec | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-20acb4402d | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-260d332c8d | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3ae0a6c15a | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3defe3d34b | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4e68956051 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4f8a844308 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-57546fd87b | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-59f696a169 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-746fd74313 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-7f1b6b071d | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-8017c6dc70 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-98bc73c499 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a505ab3f65 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a5cabe5fa7 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a915aa2424 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-b8bd0abf60 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-ba831dbeb8 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-bcbd4f46ae | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-db293894ab | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-de89e2f9e9 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f36d0647d5 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f81f88234e | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f9a8e05ed7 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-fbc45b0c67 | single | OK | 68 | 68 | 68 | 68 | không | không |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.circa_ols_rht.per_case.<ca>.four_sets`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+### CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ: bốn tập từng ca/seed
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: OK: 30. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Ca | Seed | Trạng thái | Inventory U | Quan sát O | Tập chấm | Trả về | Quan sát ngoài U | Trả về ngoài U |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dev-03d4910932 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-12a1a88069 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-14372e1209 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-16597725c1 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-16870e660c | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-1e6d61b5ec | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-20acb4402d | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-260d332c8d | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3ae0a6c15a | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3defe3d34b | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4e68956051 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4f8a844308 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-57546fd87b | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-59f696a169 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-746fd74313 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-7f1b6b071d | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-8017c6dc70 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-98bc73c499 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a505ab3f65 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a5cabe5fa7 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a915aa2424 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-b8bd0abf60 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-ba831dbeb8 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-bcbd4f46ae | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-db293894ab | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-de89e2f9e9 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f36d0647d5 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f81f88234e | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f9a8e05ed7 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-fbc45b0c67 | single | OK | 68 | 68 | 68 | 68 | không | không |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.circa_svr_da.per_case.<ca>.four_sets`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+### CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ: bốn tập từng ca/seed
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: OK: 30. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Ca | Seed | Trạng thái | Inventory U | Quan sát O | Tập chấm | Trả về | Quan sát ngoài U | Trả về ngoài U |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dev-03d4910932 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-12a1a88069 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-14372e1209 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-16597725c1 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-16870e660c | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-1e6d61b5ec | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-20acb4402d | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-260d332c8d | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3ae0a6c15a | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3defe3d34b | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4e68956051 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4f8a844308 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-57546fd87b | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-59f696a169 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-746fd74313 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-7f1b6b071d | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-8017c6dc70 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-98bc73c499 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a505ab3f65 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a5cabe5fa7 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a915aa2424 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-b8bd0abf60 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-ba831dbeb8 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-bcbd4f46ae | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-db293894ab | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-de89e2f9e9 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f36d0647d5 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f81f88234e | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f9a8e05ed7 | single | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-fbc45b0c67 | single | OK | 68 | 68 | 68 | 68 | không | không |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.circa_svr_rht.per_case.<ca>.four_sets`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+### TORAI sửa, nguồn A (hồi cứu): bốn tập từng ca/seed
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: OK: 30. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Ca | Seed | Trạng thái | Inventory U | Quan sát O | Tập chấm | Trả về | Quan sát ngoài U | Trả về ngoài U |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dev-03d4910932 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-03d4910932 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-03d4910932 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-12a1a88069 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-12a1a88069 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-12a1a88069 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-14372e1209 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-14372e1209 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-14372e1209 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-16597725c1 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-16597725c1 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-16597725c1 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-16870e660c | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-16870e660c | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-16870e660c | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-1e6d61b5ec | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-1e6d61b5ec | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-1e6d61b5ec | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-20acb4402d | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-20acb4402d | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-20acb4402d | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-260d332c8d | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-260d332c8d | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-260d332c8d | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3ae0a6c15a | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3ae0a6c15a | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3ae0a6c15a | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3defe3d34b | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3defe3d34b | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-3defe3d34b | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4e68956051 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4e68956051 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4e68956051 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4f8a844308 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4f8a844308 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-4f8a844308 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-57546fd87b | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-57546fd87b | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-57546fd87b | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-59f696a169 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-59f696a169 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-59f696a169 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-746fd74313 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-746fd74313 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-746fd74313 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-7f1b6b071d | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-7f1b6b071d | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-7f1b6b071d | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-8017c6dc70 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-8017c6dc70 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-8017c6dc70 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-98bc73c499 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-98bc73c499 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-98bc73c499 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a505ab3f65 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a505ab3f65 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a505ab3f65 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a5cabe5fa7 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a5cabe5fa7 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a5cabe5fa7 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a915aa2424 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a915aa2424 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-a915aa2424 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-b8bd0abf60 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-b8bd0abf60 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-b8bd0abf60 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-ba831dbeb8 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-ba831dbeb8 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-ba831dbeb8 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-bcbd4f46ae | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-bcbd4f46ae | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-bcbd4f46ae | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-db293894ab | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-db293894ab | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-db293894ab | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-de89e2f9e9 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-de89e2f9e9 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-de89e2f9e9 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f36d0647d5 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f36d0647d5 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f36d0647d5 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f81f88234e | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f81f88234e | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f81f88234e | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f9a8e05ed7 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f9a8e05ed7 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-f9a8e05ed7 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-fbc45b0c67 | 0 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-fbc45b0c67 | 1 | OK | 68 | 68 | 68 | 68 | không | không |
+| dev-fbc45b0c67 | 2 | OK | 68 | 68 | 68 | 68 | không | không |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.torai_A.per_case.<ca>.four_sets`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+### MicroRank top11: bốn tập từng ca/seed
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: ERROR: 4; OK: 26. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Ca | Seed | Trạng thái | Inventory U | Quan sát O | Tập chấm | Trả về | Quan sát ngoài U | Trả về ngoài U |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dev-03d4910932 | single | ERROR | 68 | 27 | 68 | 0 | không | không |
+| dev-12a1a88069 | single | OK | 68 | 27 | 68 | 5 | không | không |
+| dev-14372e1209 | single | OK | 68 | 27 | 68 | 5 | không | không |
+| dev-16597725c1 | single | OK | 68 | 27 | 68 | 4 | không | không |
+| dev-16870e660c | single | ERROR | 68 | 27 | 68 | 0 | không | không |
+| dev-1e6d61b5ec | single | OK | 68 | 20 | 68 | 4 | không | không |
+| dev-20acb4402d | single | OK | 68 | 20 | 68 | 5 | không | không |
+| dev-260d332c8d | single | OK | 68 | 20 | 68 | 5 | không | không |
+| dev-3ae0a6c15a | single | OK | 68 | 27 | 68 | 5 | không | không |
+| dev-3defe3d34b | single | OK | 68 | 27 | 68 | 5 | không | không |
+| dev-4e68956051 | single | ERROR | 68 | 27 | 68 | 0 | không | không |
+| dev-4f8a844308 | single | OK | 68 | 27 | 68 | 5 | không | không |
+| dev-57546fd87b | single | OK | 68 | 27 | 68 | 7 | không | không |
+| dev-59f696a169 | single | OK | 68 | 27 | 68 | 4 | không | không |
+| dev-746fd74313 | single | OK | 68 | 27 | 68 | 6 | không | không |
+| dev-7f1b6b071d | single | OK | 68 | 27 | 68 | 4 | không | không |
+| dev-8017c6dc70 | single | OK | 68 | 20 | 68 | 4 | không | không |
+| dev-98bc73c499 | single | OK | 68 | 27 | 68 | 5 | không | không |
+| dev-a505ab3f65 | single | OK | 68 | 27 | 68 | 5 | không | không |
+| dev-a5cabe5fa7 | single | ERROR | 68 | 27 | 68 | 0 | không | không |
+| dev-a915aa2424 | single | OK | 68 | 27 | 68 | 5 | không | không |
+| dev-b8bd0abf60 | single | OK | 68 | 27 | 68 | 5 | không | không |
+| dev-ba831dbeb8 | single | OK | 68 | 27 | 68 | 5 | không | không |
+| dev-bcbd4f46ae | single | OK | 68 | 27 | 68 | 5 | không | không |
+| dev-db293894ab | single | OK | 68 | 27 | 68 | 5 | không | không |
+| dev-de89e2f9e9 | single | OK | 68 | 20 | 68 | 5 | không | không |
+| dev-f36d0647d5 | single | OK | 68 | 27 | 68 | 5 | không | không |
+| dev-f81f88234e | single | OK | 68 | 27 | 68 | 6 | không | không |
+| dev-f9a8e05ed7 | single | OK | 68 | 20 | 68 | 5 | không | không |
+| dev-fbc45b0c67 | single | OK | 68 | 27 | 68 | 5 | không | không |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.microrank_top11.per_case.<ca>.four_sets`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Không điền thực thể vắng vào danh sách. Thực thể ngoài U giữ chỗ trong danh sách, được đếm riêng. Nhóm 19 dùng cùng danh sách ca cho tất cả phương pháp; cột Trong 19 ở bảng từng ca xác định nhóm.
+
+## Chẩn đoán, audit cột và tự kiểm
+
+### Chẩn đoán đầu ra — dev30
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đếm theo ca ở từng dòng. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Phương pháp | Trạng thái | Trường | Giá trị |
+| --- | --- | --- | --- |
+| BARO | OK: 30 | cases_with_rht_gt_1e10 | [] |
+| BARO | OK: 30 | cases_with_value_error_fallback | [] |
+| BARO | OK: 30 | graph | {"metric_edges_max": null, "metric_edges_min": null, "metric_nodes_max": null, "metric_nodes_min": null} |
+| BARO | OK: 30 | n_cases | 30 |
+| BARO | OK: 30 | n_records | 30 |
+| BARO | OK: 30 | regression_routes | {} |
+| BARO | OK: 30 | rht_gt_1e10_nodes_n | 0 |
+| BARO | OK: 30 | torai | {"clusters": 0, "fallback_clusters": 0, "fallback_rate": null, "multi_service_clusters": 0} |
+| BARO | OK: 30 | value_error_fallback_nodes_n | 0 |
+| SimpleRCA M4 | OK: 30 | cases_with_rht_gt_1e10 | [] |
+| SimpleRCA M4 | OK: 30 | cases_with_value_error_fallback | [] |
+| SimpleRCA M4 | OK: 30 | graph | {"metric_edges_max": null, "metric_edges_min": null, "metric_nodes_max": null, "metric_nodes_min": null} |
+| SimpleRCA M4 | OK: 30 | n_cases | 30 |
+| SimpleRCA M4 | OK: 30 | n_records | 30 |
+| SimpleRCA M4 | OK: 30 | regression_routes | {} |
+| SimpleRCA M4 | OK: 30 | rht_gt_1e10_nodes_n | 0 |
+| SimpleRCA M4 | OK: 30 | torai | {"clusters": 0, "fallback_clusters": 0, "fallback_rate": null, "multi_service_clusters": 0} |
+| SimpleRCA M4 | OK: 30 | value_error_fallback_nodes_n | 0 |
+| MicroRank xếp đầy đủ | ERROR: 4; OK: 26 | cases_with_rht_gt_1e10 | [] |
+| MicroRank xếp đầy đủ | ERROR: 4; OK: 26 | cases_with_value_error_fallback | [] |
+| MicroRank xếp đầy đủ | ERROR: 4; OK: 26 | graph | {"metric_edges_max": null, "metric_edges_min": null, "metric_nodes_max": null, "metric_nodes_min": null} |
+| MicroRank xếp đầy đủ | ERROR: 4; OK: 26 | n_cases | 30 |
+| MicroRank xếp đầy đủ | ERROR: 4; OK: 26 | n_records | 30 |
+| MicroRank xếp đầy đủ | ERROR: 4; OK: 26 | regression_routes | {} |
+| MicroRank xếp đầy đủ | ERROR: 4; OK: 26 | rht_gt_1e10_nodes_n | 0 |
+| MicroRank xếp đầy đủ | ERROR: 4; OK: 26 | torai | {"clusters": 0, "fallback_clusters": 0, "fallback_rate": null, "multi_service_clusters": 0} |
+| MicroRank xếp đầy đủ | ERROR: 4; OK: 26 | value_error_fallback_nodes_n | 0 |
+| TraceRCA lọc hữu hạn | ERROR: 4; OK: 26 | cases_with_rht_gt_1e10 | [] |
+| TraceRCA lọc hữu hạn | ERROR: 4; OK: 26 | cases_with_value_error_fallback | [] |
+| TraceRCA lọc hữu hạn | ERROR: 4; OK: 26 | graph | {"metric_edges_max": null, "metric_edges_min": null, "metric_nodes_max": null, "metric_nodes_min": null} |
+| TraceRCA lọc hữu hạn | ERROR: 4; OK: 26 | n_cases | 30 |
+| TraceRCA lọc hữu hạn | ERROR: 4; OK: 26 | n_records | 30 |
+| TraceRCA lọc hữu hạn | ERROR: 4; OK: 26 | regression_routes | {} |
+| TraceRCA lọc hữu hạn | ERROR: 4; OK: 26 | rht_gt_1e10_nodes_n | 0 |
+| TraceRCA lọc hữu hạn | ERROR: 4; OK: 26 | torai | {"clusters": 0, "fallback_clusters": 0, "fallback_rate": null, "multi_service_clusters": 0} |
+| TraceRCA lọc hữu hạn | ERROR: 4; OK: 26 | value_error_fallback_nodes_n | 0 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 30 | cases_with_rht_gt_1e10 | ["dev-03d4910932", "dev-3ae0a6c15a", "dev-4e68956051", "dev-4f8a844308", "dev-7f1b6b071d", "dev-98bc73c499", "dev-a505ab3f65", "dev-a5cabe5fa7", "dev-b8bd0abf60", "dev-ba831dbeb8", "dev-f9a8e05ed7"] |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 30 | cases_with_value_error_fallback | [] |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 30 | graph | {"metric_edges_max": 556, "metric_edges_min": 220, "metric_nodes_max": 301, "metric_nodes_min": 273} |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 30 | n_cases | 30 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 30 | n_records | 30 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 30 | regression_routes | {"linear_regression": 4526, "no_effective_parents": 4079} |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 30 | rht_gt_1e10_nodes_n | 11 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 30 | torai | {"clusters": 0, "fallback_clusters": 0, "fallback_rate": null, "multi_service_clusters": 0} |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 30 | value_error_fallback_nodes_n | 0 |
+| TORAI sửa, nguồn B | OK: 30 | cases_with_rht_gt_1e10 | [] |
+| TORAI sửa, nguồn B | OK: 30 | cases_with_value_error_fallback | [] |
+| TORAI sửa, nguồn B | OK: 30 | graph | {"metric_edges_max": null, "metric_edges_min": null, "metric_nodes_max": null, "metric_nodes_min": null} |
+| TORAI sửa, nguồn B | OK: 30 | n_cases | 30 |
+| TORAI sửa, nguồn B | OK: 30 | n_records | 90 |
+| TORAI sửa, nguồn B | OK: 30 | regression_routes | {} |
+| TORAI sửa, nguồn B | OK: 30 | rht_gt_1e10_nodes_n | 0 |
+| TORAI sửa, nguồn B | OK: 30 | torai | {"clusters": 495, "fallback_clusters": 302, "fallback_rate": 0.8830409356725146, "multi_service_clusters": 342} |
+| TORAI sửa, nguồn B | OK: 30 | value_error_fallback_nodes_n | 0 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | OK: 30 | cases_with_rht_gt_1e10 | ["dev-03d4910932", "dev-3ae0a6c15a", "dev-4e68956051", "dev-4f8a844308", "dev-7f1b6b071d", "dev-98bc73c499", "dev-a505ab3f65", "dev-a5cabe5fa7", "dev-b8bd0abf60", "dev-ba831dbeb8", "dev-f9a8e05ed7"] |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | OK: 30 | cases_with_value_error_fallback | [] |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | OK: 30 | graph | {"metric_edges_max": 556, "metric_edges_min": 220, "metric_nodes_max": 301, "metric_nodes_min": 273} |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | OK: 30 | n_cases | 30 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | OK: 30 | n_records | 30 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | OK: 30 | regression_routes | {"linear_regression": 4526, "no_effective_parents": 4079} |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | OK: 30 | rht_gt_1e10_nodes_n | 11 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | OK: 30 | torai | {"clusters": 0, "fallback_clusters": 0, "fallback_rate": null, "multi_service_clusters": 0} |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | OK: 30 | value_error_fallback_nodes_n | 0 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | OK: 30 | cases_with_rht_gt_1e10 | ["dev-03d4910932", "dev-3ae0a6c15a", "dev-4e68956051", "dev-4f8a844308", "dev-7f1b6b071d", "dev-98bc73c499", "dev-a505ab3f65", "dev-a5cabe5fa7", "dev-b8bd0abf60", "dev-ba831dbeb8", "dev-f9a8e05ed7"] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | OK: 30 | cases_with_value_error_fallback | [] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | OK: 30 | graph | {"metric_edges_max": 556, "metric_edges_min": 220, "metric_nodes_max": 301, "metric_nodes_min": 273} |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | OK: 30 | n_cases | 30 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | OK: 30 | n_records | 30 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | OK: 30 | regression_routes | {"no_effective_parents": 4079, "svr_regression": 4526} |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | OK: 30 | rht_gt_1e10_nodes_n | 11 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | OK: 30 | torai | {"clusters": 0, "fallback_clusters": 0, "fallback_rate": null, "multi_service_clusters": 0} |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | OK: 30 | value_error_fallback_nodes_n | 0 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | OK: 30 | cases_with_rht_gt_1e10 | ["dev-03d4910932", "dev-3ae0a6c15a", "dev-4e68956051", "dev-4f8a844308", "dev-7f1b6b071d", "dev-98bc73c499", "dev-a505ab3f65", "dev-a5cabe5fa7", "dev-b8bd0abf60", "dev-ba831dbeb8", "dev-f9a8e05ed7"] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | OK: 30 | cases_with_value_error_fallback | [] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | OK: 30 | graph | {"metric_edges_max": 556, "metric_edges_min": 220, "metric_nodes_max": 301, "metric_nodes_min": 273} |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | OK: 30 | n_cases | 30 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | OK: 30 | n_records | 30 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | OK: 30 | regression_routes | {"no_effective_parents": 4079, "svr_regression": 4526} |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | OK: 30 | rht_gt_1e10_nodes_n | 11 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | OK: 30 | torai | {"clusters": 0, "fallback_clusters": 0, "fallback_rate": null, "multi_service_clusters": 0} |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | OK: 30 | value_error_fallback_nodes_n | 0 |
+| TORAI sửa, nguồn A (hồi cứu) | OK: 30 | cases_with_rht_gt_1e10 | [] |
+| TORAI sửa, nguồn A (hồi cứu) | OK: 30 | cases_with_value_error_fallback | [] |
+| TORAI sửa, nguồn A (hồi cứu) | OK: 30 | graph | {"metric_edges_max": null, "metric_edges_min": null, "metric_nodes_max": null, "metric_nodes_min": null} |
+| TORAI sửa, nguồn A (hồi cứu) | OK: 30 | n_cases | 30 |
+| TORAI sửa, nguồn A (hồi cứu) | OK: 30 | n_records | 90 |
+| TORAI sửa, nguồn A (hồi cứu) | OK: 30 | regression_routes | {} |
+| TORAI sửa, nguồn A (hồi cứu) | OK: 30 | rht_gt_1e10_nodes_n | 0 |
+| TORAI sửa, nguồn A (hồi cứu) | OK: 30 | torai | {"clusters": 354, "fallback_clusters": 213, "fallback_rate": 0.9342105263157895, "multi_service_clusters": 228} |
+| TORAI sửa, nguồn A (hồi cứu) | OK: 30 | value_error_fallback_nodes_n | 0 |
+| MicroRank top11 | ERROR: 4; OK: 26 | cases_with_rht_gt_1e10 | [] |
+| MicroRank top11 | ERROR: 4; OK: 26 | cases_with_value_error_fallback | [] |
+| MicroRank top11 | ERROR: 4; OK: 26 | graph | {"metric_edges_max": null, "metric_edges_min": null, "metric_nodes_max": null, "metric_nodes_min": null} |
+| MicroRank top11 | ERROR: 4; OK: 26 | n_cases | 30 |
+| MicroRank top11 | ERROR: 4; OK: 26 | n_records | 30 |
+| MicroRank top11 | ERROR: 4; OK: 26 | regression_routes | {} |
+| MicroRank top11 | ERROR: 4; OK: 26 | rht_gt_1e10_nodes_n | 0 |
+| MicroRank top11 | ERROR: 4; OK: 26 | torai | {"clusters": 0, "fallback_clusters": 0, "fallback_rate": null, "multi_service_clusters": 0} |
+| MicroRank top11 | ERROR: 4; OK: 26 | value_error_fallback_nodes_n | 0 |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.<id>.summaries.dev30.diagnostics`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+### Chẩn đoán đầu ra — dev19
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đếm theo ca ở từng dòng. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Phương pháp | Trạng thái | Trường | Giá trị |
+| --- | --- | --- | --- |
+| BARO | OK: 19 | cases_with_rht_gt_1e10 | [] |
+| BARO | OK: 19 | cases_with_value_error_fallback | [] |
+| BARO | OK: 19 | graph | {"metric_edges_max": null, "metric_edges_min": null, "metric_nodes_max": null, "metric_nodes_min": null} |
+| BARO | OK: 19 | n_cases | 19 |
+| BARO | OK: 19 | n_records | 19 |
+| BARO | OK: 19 | regression_routes | {} |
+| BARO | OK: 19 | rht_gt_1e10_nodes_n | 0 |
+| BARO | OK: 19 | torai | {"clusters": 0, "fallback_clusters": 0, "fallback_rate": null, "multi_service_clusters": 0} |
+| BARO | OK: 19 | value_error_fallback_nodes_n | 0 |
+| SimpleRCA M4 | OK: 19 | cases_with_rht_gt_1e10 | [] |
+| SimpleRCA M4 | OK: 19 | cases_with_value_error_fallback | [] |
+| SimpleRCA M4 | OK: 19 | graph | {"metric_edges_max": null, "metric_edges_min": null, "metric_nodes_max": null, "metric_nodes_min": null} |
+| SimpleRCA M4 | OK: 19 | n_cases | 19 |
+| SimpleRCA M4 | OK: 19 | n_records | 19 |
+| SimpleRCA M4 | OK: 19 | regression_routes | {} |
+| SimpleRCA M4 | OK: 19 | rht_gt_1e10_nodes_n | 0 |
+| SimpleRCA M4 | OK: 19 | torai | {"clusters": 0, "fallback_clusters": 0, "fallback_rate": null, "multi_service_clusters": 0} |
+| SimpleRCA M4 | OK: 19 | value_error_fallback_nodes_n | 0 |
+| MicroRank xếp đầy đủ | ERROR: 1; OK: 18 | cases_with_rht_gt_1e10 | [] |
+| MicroRank xếp đầy đủ | ERROR: 1; OK: 18 | cases_with_value_error_fallback | [] |
+| MicroRank xếp đầy đủ | ERROR: 1; OK: 18 | graph | {"metric_edges_max": null, "metric_edges_min": null, "metric_nodes_max": null, "metric_nodes_min": null} |
+| MicroRank xếp đầy đủ | ERROR: 1; OK: 18 | n_cases | 19 |
+| MicroRank xếp đầy đủ | ERROR: 1; OK: 18 | n_records | 19 |
+| MicroRank xếp đầy đủ | ERROR: 1; OK: 18 | regression_routes | {} |
+| MicroRank xếp đầy đủ | ERROR: 1; OK: 18 | rht_gt_1e10_nodes_n | 0 |
+| MicroRank xếp đầy đủ | ERROR: 1; OK: 18 | torai | {"clusters": 0, "fallback_clusters": 0, "fallback_rate": null, "multi_service_clusters": 0} |
+| MicroRank xếp đầy đủ | ERROR: 1; OK: 18 | value_error_fallback_nodes_n | 0 |
+| TraceRCA lọc hữu hạn | ERROR: 1; OK: 18 | cases_with_rht_gt_1e10 | [] |
+| TraceRCA lọc hữu hạn | ERROR: 1; OK: 18 | cases_with_value_error_fallback | [] |
+| TraceRCA lọc hữu hạn | ERROR: 1; OK: 18 | graph | {"metric_edges_max": null, "metric_edges_min": null, "metric_nodes_max": null, "metric_nodes_min": null} |
+| TraceRCA lọc hữu hạn | ERROR: 1; OK: 18 | n_cases | 19 |
+| TraceRCA lọc hữu hạn | ERROR: 1; OK: 18 | n_records | 19 |
+| TraceRCA lọc hữu hạn | ERROR: 1; OK: 18 | regression_routes | {} |
+| TraceRCA lọc hữu hạn | ERROR: 1; OK: 18 | rht_gt_1e10_nodes_n | 0 |
+| TraceRCA lọc hữu hạn | ERROR: 1; OK: 18 | torai | {"clusters": 0, "fallback_clusters": 0, "fallback_rate": null, "multi_service_clusters": 0} |
+| TraceRCA lọc hữu hạn | ERROR: 1; OK: 18 | value_error_fallback_nodes_n | 0 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 19 | cases_with_rht_gt_1e10 | [] |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 19 | cases_with_value_error_fallback | [] |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 19 | graph | {"metric_edges_max": 452, "metric_edges_min": 220, "metric_nodes_max": 299, "metric_nodes_min": 273} |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 19 | n_cases | 19 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 19 | n_records | 19 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 19 | regression_routes | {"linear_regression": 2809, "no_effective_parents": 2610} |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 19 | rht_gt_1e10_nodes_n | 0 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 19 | torai | {"clusters": 0, "fallback_clusters": 0, "fallback_rate": null, "multi_service_clusters": 0} |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 19 | value_error_fallback_nodes_n | 0 |
+| TORAI sửa, nguồn B | OK: 19 | cases_with_rht_gt_1e10 | [] |
+| TORAI sửa, nguồn B | OK: 19 | cases_with_value_error_fallback | [] |
+| TORAI sửa, nguồn B | OK: 19 | graph | {"metric_edges_max": null, "metric_edges_min": null, "metric_nodes_max": null, "metric_nodes_min": null} |
+| TORAI sửa, nguồn B | OK: 19 | n_cases | 19 |
+| TORAI sửa, nguồn B | OK: 19 | n_records | 57 |
+| TORAI sửa, nguồn B | OK: 19 | regression_routes | {} |
+| TORAI sửa, nguồn B | OK: 19 | rht_gt_1e10_nodes_n | 0 |
+| TORAI sửa, nguồn B | OK: 19 | torai | {"clusters": 315, "fallback_clusters": 202, "fallback_rate": 0.8977777777777778, "multi_service_clusters": 225} |
+| TORAI sửa, nguồn B | OK: 19 | value_error_fallback_nodes_n | 0 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | OK: 19 | cases_with_rht_gt_1e10 | [] |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | OK: 19 | cases_with_value_error_fallback | [] |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | OK: 19 | graph | {"metric_edges_max": 452, "metric_edges_min": 220, "metric_nodes_max": 299, "metric_nodes_min": 273} |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | OK: 19 | n_cases | 19 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | OK: 19 | n_records | 19 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | OK: 19 | regression_routes | {"linear_regression": 2809, "no_effective_parents": 2610} |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | OK: 19 | rht_gt_1e10_nodes_n | 0 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | OK: 19 | torai | {"clusters": 0, "fallback_clusters": 0, "fallback_rate": null, "multi_service_clusters": 0} |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | OK: 19 | value_error_fallback_nodes_n | 0 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | OK: 19 | cases_with_rht_gt_1e10 | [] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | OK: 19 | cases_with_value_error_fallback | [] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | OK: 19 | graph | {"metric_edges_max": 452, "metric_edges_min": 220, "metric_nodes_max": 299, "metric_nodes_min": 273} |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | OK: 19 | n_cases | 19 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | OK: 19 | n_records | 19 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | OK: 19 | regression_routes | {"no_effective_parents": 2610, "svr_regression": 2809} |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | OK: 19 | rht_gt_1e10_nodes_n | 0 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | OK: 19 | torai | {"clusters": 0, "fallback_clusters": 0, "fallback_rate": null, "multi_service_clusters": 0} |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | OK: 19 | value_error_fallback_nodes_n | 0 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | OK: 19 | cases_with_rht_gt_1e10 | [] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | OK: 19 | cases_with_value_error_fallback | [] |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | OK: 19 | graph | {"metric_edges_max": 452, "metric_edges_min": 220, "metric_nodes_max": 299, "metric_nodes_min": 273} |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | OK: 19 | n_cases | 19 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | OK: 19 | n_records | 19 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | OK: 19 | regression_routes | {"no_effective_parents": 2610, "svr_regression": 2809} |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | OK: 19 | rht_gt_1e10_nodes_n | 0 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | OK: 19 | torai | {"clusters": 0, "fallback_clusters": 0, "fallback_rate": null, "multi_service_clusters": 0} |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | OK: 19 | value_error_fallback_nodes_n | 0 |
+| TORAI sửa, nguồn A (hồi cứu) | OK: 19 | cases_with_rht_gt_1e10 | [] |
+| TORAI sửa, nguồn A (hồi cứu) | OK: 19 | cases_with_value_error_fallback | [] |
+| TORAI sửa, nguồn A (hồi cứu) | OK: 19 | graph | {"metric_edges_max": null, "metric_edges_min": null, "metric_nodes_max": null, "metric_nodes_min": null} |
+| TORAI sửa, nguồn A (hồi cứu) | OK: 19 | n_cases | 19 |
+| TORAI sửa, nguồn A (hồi cứu) | OK: 19 | n_records | 57 |
+| TORAI sửa, nguồn A (hồi cứu) | OK: 19 | regression_routes | {} |
+| TORAI sửa, nguồn A (hồi cứu) | OK: 19 | rht_gt_1e10_nodes_n | 0 |
+| TORAI sửa, nguồn A (hồi cứu) | OK: 19 | torai | {"clusters": 192, "fallback_clusters": 134, "fallback_rate": 0.9710144927536232, "multi_service_clusters": 138} |
+| TORAI sửa, nguồn A (hồi cứu) | OK: 19 | value_error_fallback_nodes_n | 0 |
+| MicroRank top11 | ERROR: 1; OK: 18 | cases_with_rht_gt_1e10 | [] |
+| MicroRank top11 | ERROR: 1; OK: 18 | cases_with_value_error_fallback | [] |
+| MicroRank top11 | ERROR: 1; OK: 18 | graph | {"metric_edges_max": null, "metric_edges_min": null, "metric_nodes_max": null, "metric_nodes_min": null} |
+| MicroRank top11 | ERROR: 1; OK: 18 | n_cases | 19 |
+| MicroRank top11 | ERROR: 1; OK: 18 | n_records | 19 |
+| MicroRank top11 | ERROR: 1; OK: 18 | regression_routes | {} |
+| MicroRank top11 | ERROR: 1; OK: 18 | rht_gt_1e10_nodes_n | 0 |
+| MicroRank top11 | ERROR: 1; OK: 18 | torai | {"clusters": 0, "fallback_clusters": 0, "fallback_rate": null, "multi_service_clusters": 0} |
+| MicroRank top11 | ERROR: 1; OK: 18 | value_error_fallback_nodes_n | 0 |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.<id>.summaries.dev19.diagnostics`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+CIRCA giữ nguyên OLS/RHT/DA của tác giả, SVR là cấu hình phụ. Số nút RHT vượt ngưỡng và route hồi quy giúp đọc hạn chế của baseline. Tỉ lệ nhánh dự phòng TORAI là chẩn đoán cách xếp trong cụm, không là bằng chứng về giá trị đồ thị.
+
+### Chi phí sáu phương pháp chính — dev30
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đếm theo ca ở từng dòng. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Phương pháp | Trạng thái | Thiết bị | Ca | Lượt riêng | Tổng wall bản ghi (s) | Tổng wall worker (s) | Khoảng wall mỗi lượt (s) | Trung vị wall (s) | RSS đỉnh (MiB) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BARO | OK: 30 | Windows laptop | 30 | 30 | 343.266 | 343.266 | [8.539; 22.916] | 9.854 | 380.3 |
+| SimpleRCA M4 | OK: 30 | Windows laptop | 30 | 30 | 134.397 | 134.397 | [1.842; 7.400] | 4.466 | 1521.9 |
+| MicroRank xếp đầy đủ | ERROR: 4; OK: 26 | Windows laptop | 30 | 30 | 158.540 | 158.540 | [2.115; 8.713] | 5.364 | 1642.3 |
+| TraceRCA lọc hữu hạn | ERROR: 4; OK: 26 | Windows laptop | 30 | 30 | 607.789 | 607.789 | [10.619; 30.861] | 20.216 | 1805.6 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 30 | Windows laptop | 30 | 30 | 241.465 | 241.465 | [4.449; 16.993] | 7.197 | 1446.3 |
+| TORAI sửa, nguồn B | OK: 30 | EC2 | 30 | 90 | 1635.324 | 1635.324 | [12.067; 23.692] | 18.619 | 1535.7 |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.<id>.summaries.dev30.cost_summary`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+TORAI chạy ba seed trên EC2; các phương pháp còn lại chạy laptop. Không so trực tiếp tốc độ hai thiết bị. CIRCA DA/RHT-only dùng chung lượt, MicroRank full/top11 cũng dùng chung lượt; bảng chỉ đếm sáu phương pháp chính, không cộng trùng biến thể. RSS trong trường peak_rss_mb của runner chia byte cho 2^20, nên đơn vị ở đây là MiB. Wall bản ghi là tổng thời gian đã ghi cho từng lượt; wall worker cộng thời gian các tiến trình đọc/cắt/chuẩn bị/phương pháp của lượt đó. Thời gian phiên, lúc nghỉ và test không dùng làm benchmark. Nguồn cấu hình thiết bị và bản ghi chi phí: `results/T-024/cham-a.json` → `methods.<id>.summaries.dev30.cost_summary.source_configs/source_paths`.
+
+### Chi phí sáu phương pháp chính — dev19
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đếm theo ca ở từng dòng. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Phương pháp | Trạng thái | Thiết bị | Ca | Lượt riêng | Tổng wall bản ghi (s) | Tổng wall worker (s) | Khoảng wall mỗi lượt (s) | Trung vị wall (s) | RSS đỉnh (MiB) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BARO | OK: 19 | Windows laptop | 19 | 19 | 219.677 | 219.677 | [8.611; 22.916] | 9.811 | 380.3 |
+| SimpleRCA M4 | OK: 19 | Windows laptop | 19 | 19 | 80.540 | 80.540 | [1.842; 7.400] | 4.180 | 1435.4 |
+| MicroRank xếp đầy đủ | ERROR: 1; OK: 18 | Windows laptop | 19 | 19 | 95.797 | 95.797 | [2.115; 7.964] | 5.055 | 1396.2 |
+| TraceRCA lọc hữu hạn | ERROR: 1; OK: 18 | Windows laptop | 19 | 19 | 380.142 | 380.142 | [11.295; 30.401] | 19.750 | 1578.0 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 19 | Windows laptop | 19 | 19 | 155.624 | 155.624 | [4.950; 16.993] | 7.185 | 1250.4 |
+| TORAI sửa, nguồn B | OK: 19 | EC2 | 19 | 57 | 1006.457 | 1006.457 | [12.067; 22.757] | 18.436 | 1431.3 |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.<id>.summaries.dev19.cost_summary`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+TORAI chạy ba seed trên EC2; các phương pháp còn lại chạy laptop. Không so trực tiếp tốc độ hai thiết bị. CIRCA DA/RHT-only dùng chung lượt, MicroRank full/top11 cũng dùng chung lượt; bảng chỉ đếm sáu phương pháp chính, không cộng trùng biến thể. RSS trong trường peak_rss_mb của runner chia byte cho 2^20, nên đơn vị ở đây là MiB. Wall bản ghi là tổng thời gian đã ghi cho từng lượt; wall worker cộng thời gian các tiến trình đọc/cắt/chuẩn bị/phương pháp của lượt đó. Thời gian phiên, lúc nghỉ và test không dùng làm benchmark. Nguồn cấu hình thiết bị và bản ghi chi phí: `results/T-024/cham-a.json` → `methods.<id>.summaries.dev19.cost_summary.source_configs/source_paths`.
+
+### Audit schema cột metric
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3: OK: 30. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Ca | Số cột | Vắng so với hợp | Danh sách cột vắng | Bản ghi nguồn |
+| --- | --- | --- | --- | --- |
+| dev-03d4910932 | 361 | 21 | istio-init_mem, istio-init_socket, ts-assurance-service_error, ts-auth-service_error, ts-config-service_error, ts-consign-service_error, ts-contacts-service_error, ts-food-map-service_error, ts-food-service_error, ts-inside-payment-service_error, ts-order-other-service_error, ts-order-service_error, ts-preserve-other-service_error, ts-preserve-service_error, ts-price-service_error, ts-route-service_error, ts-seat-service_error, ts-security-service_error, ts-station-service_error, ts-train-service_error, ts-travel2-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-03d4910932-sNone-h0-e54417/ban-ghi-0.json |
+| dev-12a1a88069 | 371 | 11 | istio-init_mem, istio-init_socket, ts-admin-basic-info-service_error, ts-config-service_error, ts-food-map-service_error, ts-food-service_error, ts-inside-payment-service_error, ts-preserve-service_error, ts-route-service_error, ts-station-service_error, ts-train-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-12a1a88069-sNone-h0-ea4bf6/ban-ghi-0.json |
+| dev-14372e1209 | 363 | 19 | ts-assurance-service_error, ts-basic-service_error, ts-config-service_error, ts-contacts-service_error, ts-food-map-service_error, ts-inside-payment-service_error, ts-order-other-service_error, ts-order-service_error, ts-preserve-other-service_error, ts-preserve-service_error, ts-price-service_error, ts-route-service_error, ts-seat-service_error, ts-security-service_error, ts-station-service_error, ts-ticketinfo-service_error, ts-train-service_error, ts-travel-service_error, ts-travel2-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-14372e1209-sNone-h0-7794cb/ban-ghi-0.json |
+| dev-16597725c1 | 367 | 15 | istio-init_mem, istio-init_socket, ts-admin-basic-info-service_error, ts-auth-service_error, ts-config-service_error, ts-consign-service_error, ts-food-map-service_error, ts-food-service_error, ts-inside-payment-service_error, ts-preserve-other-service_error, ts-price-service_error, ts-route-service_error, ts-security-service_error, ts-train-service_error, ts-travel2-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-16597725c1-sNone-h0-89c66d/ban-ghi-0.json |
+| dev-16870e660c | 361 | 21 | istio-init_mem, istio-init_socket, ts-assurance-service_error, ts-basic-service_error, ts-config-service_error, ts-contacts-service_error, ts-food-map-service_error, ts-inside-payment-service_error, ts-order-other-service_error, ts-order-service_error, ts-preserve-other-service_error, ts-preserve-service_error, ts-price-service_error, ts-route-service_error, ts-seat-service_error, ts-security-service_error, ts-station-service_error, ts-ticketinfo-service_error, ts-train-service_error, ts-travel-service_error, ts-travel2-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-16870e660c-sNone-h0-e6efeb/ban-ghi-0.json |
+| dev-1e6d61b5ec | 340 | 42 | istio-init_mem, istio-init_socket, ts-assurance-service_error, ts-auth-service_error, ts-basic-service_error, ts-config-service_error, ts-consign-service_error, ts-contacts-service_error, ts-contacts-service_latency-50, ts-contacts-service_latency-90, ts-contacts-service_workload, ts-food-map-service_error, ts-food-service_error, ts-inside-payment-service_error, ts-order-other-service_error, ts-order-service_error, ts-preserve-other-service_error, ts-preserve-other-service_latency-50, ts-preserve-other-service_latency-90, ts-preserve-other-service_workload, ts-preserve-service_error, ts-preserve-service_latency-50, ts-preserve-service_latency-90, ts-preserve-service_workload, ts-price-service_error, ts-route-service_error, ts-seat-service_error, ts-seat-service_latency-50, ts-seat-service_latency-90, ts-seat-service_workload, ts-security-service_error, ts-security-service_latency-50, ts-security-service_latency-90, ts-security-service_workload, ts-station-service_error, ts-ticketinfo-service_error, ts-train-service_error, ts-travel-service_error, ts-travel2-service_error, ts-user-service_latency-50, ts-user-service_latency-90, ts-user-service_workload | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-1e6d61b5ec-sNone-h0-86dfc7/ban-ghi-0.json |
+| dev-20acb4402d | 345 | 37 | istio-init_mem, istio-init_socket, ts-admin-basic-info-service_error, ts-assurance-service_error, ts-auth-service_error, ts-config-service_error, ts-consign-service_error, ts-contacts-service_error, ts-contacts-service_latency-50, ts-contacts-service_latency-90, ts-contacts-service_workload, ts-food-map-service_error, ts-inside-payment-service_error, ts-preserve-other-service_error, ts-preserve-other-service_latency-50, ts-preserve-other-service_latency-90, ts-preserve-other-service_workload, ts-preserve-service_error, ts-preserve-service_latency-50, ts-preserve-service_latency-90, ts-preserve-service_workload, ts-price-service_error, ts-route-service_error, ts-seat-service_error, ts-seat-service_latency-50, ts-seat-service_latency-90, ts-seat-service_workload, ts-security-service_error, ts-security-service_latency-50, ts-security-service_latency-90, ts-security-service_workload, ts-station-service_error, ts-train-service_error, ts-travel-service_error, ts-user-service_latency-50, ts-user-service_latency-90, ts-user-service_workload | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-20acb4402d-sNone-h0-36d5ef/ban-ghi-0.json |
+| dev-260d332c8d | 345 | 37 | istio-init_mem, istio-init_socket, ts-admin-basic-info-service_error, ts-assurance-service_error, ts-auth-service_error, ts-config-service_error, ts-consign-service_error, ts-contacts-service_error, ts-contacts-service_latency-50, ts-contacts-service_latency-90, ts-contacts-service_workload, ts-food-map-service_error, ts-inside-payment-service_error, ts-preserve-other-service_error, ts-preserve-other-service_latency-50, ts-preserve-other-service_latency-90, ts-preserve-other-service_workload, ts-preserve-service_error, ts-preserve-service_latency-50, ts-preserve-service_latency-90, ts-preserve-service_workload, ts-price-service_error, ts-route-service_error, ts-seat-service_error, ts-seat-service_latency-50, ts-seat-service_latency-90, ts-seat-service_workload, ts-security-service_error, ts-security-service_latency-50, ts-security-service_latency-90, ts-security-service_workload, ts-station-service_error, ts-train-service_error, ts-travel-service_error, ts-user-service_latency-50, ts-user-service_latency-90, ts-user-service_workload | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-260d332c8d-sNone-h0-4db7a2/ban-ghi-0.json |
+| dev-3ae0a6c15a | 370 | 12 | istio-init_mem, istio-init_socket, ts-admin-basic-info-service_error, ts-assurance-service_error, ts-auth-service_error, ts-consign-service_error, ts-contacts-service_error, ts-food-map-service_error, ts-inside-payment-service_error, ts-order-other-service_error, ts-order-service_error, ts-security-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-3ae0a6c15a-sNone-h0-829d79/ban-ghi-0.json |
+| dev-3defe3d34b | 369 | 13 | istio-init_mem, istio-init_socket, ts-admin-basic-info-service_error, ts-auth-service_error, ts-basic-service_error, ts-config-service_error, ts-consign-service_error, ts-price-service_error, ts-route-service_error, ts-station-service_error, ts-ticketinfo-service_error, ts-train-service_error, ts-travel2-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-3defe3d34b-sNone-h0-45f6a5/ban-ghi-0.json |
+| dev-4e68956051 | 358 | 24 | istio-init_mem, istio-init_socket, ts-admin-basic-info-service_error, ts-assurance-service_error, ts-auth-service_error, ts-basic-service_error, ts-config-service_error, ts-consign-service_error, ts-contacts-service_error, ts-food-map-service_error, ts-inside-payment-service_error, ts-order-other-service_error, ts-order-service_error, ts-preserve-other-service_error, ts-preserve-service_error, ts-price-service_error, ts-route-service_error, ts-seat-service_error, ts-security-service_error, ts-station-service_error, ts-ticketinfo-service_error, ts-train-service_error, ts-travel-service_error, ts-travel2-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-4e68956051-sNone-h0-7cd5a1/ban-ghi-0.json |
+| dev-4f8a844308 | 373 | 9 | istio-init_mem, istio-init_socket, ts-assurance-service_error, ts-auth-service_error, ts-config-service_error, ts-consign-service_error, ts-contacts-service_error, ts-food-map-service_error, ts-station-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-4f8a844308-sNone-h0-7aa352/ban-ghi-0.json |
+| dev-57546fd87b | 358 | 24 | istio-init_mem, istio-init_socket, ts-assurance-service_error, ts-auth-service_error, ts-basic-service_error, ts-config-service_error, ts-consign-service_error, ts-contacts-service_error, ts-food-map-service_error, ts-food-service_error, ts-inside-payment-service_error, ts-order-other-service_error, ts-order-service_error, ts-preserve-other-service_error, ts-preserve-service_error, ts-price-service_error, ts-route-service_error, ts-seat-service_error, ts-security-service_error, ts-station-service_error, ts-ticketinfo-service_error, ts-train-service_error, ts-travel-service_error, ts-travel2-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-57546fd87b-sNone-h0-862055/ban-ghi-0.json |
+| dev-59f696a169 | 367 | 15 | istio-init_mem, istio-init_socket, ts-admin-basic-info-service_error, ts-auth-service_error, ts-config-service_error, ts-consign-service_error, ts-food-map-service_error, ts-food-service_error, ts-inside-payment-service_error, ts-preserve-other-service_error, ts-price-service_error, ts-route-service_error, ts-security-service_error, ts-train-service_error, ts-travel2-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-59f696a169-sNone-h0-fc4c19/ban-ghi-0.json |
+| dev-746fd74313 | 371 | 11 | istio-init_mem, istio-init_socket, ts-admin-basic-info-service_error, ts-auth-service_error, ts-basic-service_error, ts-consign-service_error, ts-price-service_error, ts-route-service_error, ts-station-service_error, ts-ticketinfo-service_error, ts-train-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-746fd74313-sNone-h0-6c30c3/ban-ghi-0.json |
+| dev-7f1b6b071d | 361 | 21 | istio-init_mem, istio-init_socket, ts-assurance-service_error, ts-auth-service_error, ts-basic-service_error, ts-config-service_error, ts-consign-service_error, ts-contacts-service_error, ts-food-map-service_error, ts-inside-payment-service_error, ts-order-other-service_error, ts-order-service_error, ts-preserve-other-service_error, ts-preserve-service_error, ts-price-service_error, ts-route-service_error, ts-security-service_error, ts-station-service_error, ts-ticketinfo-service_error, ts-train-service_error, ts-travel2-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-7f1b6b071d-sNone-h0-371dd7/ban-ghi-0.json |
+| dev-8017c6dc70 | 340 | 42 | istio-init_mem, istio-init_socket, ts-assurance-service_error, ts-auth-service_error, ts-basic-service_error, ts-config-service_error, ts-consign-service_error, ts-contacts-service_error, ts-contacts-service_latency-50, ts-contacts-service_latency-90, ts-contacts-service_workload, ts-food-map-service_error, ts-food-service_error, ts-inside-payment-service_error, ts-order-other-service_error, ts-order-service_error, ts-preserve-other-service_error, ts-preserve-other-service_latency-50, ts-preserve-other-service_latency-90, ts-preserve-other-service_workload, ts-preserve-service_error, ts-preserve-service_latency-50, ts-preserve-service_latency-90, ts-preserve-service_workload, ts-price-service_error, ts-route-service_error, ts-seat-service_error, ts-seat-service_latency-50, ts-seat-service_latency-90, ts-seat-service_workload, ts-security-service_error, ts-security-service_latency-50, ts-security-service_latency-90, ts-security-service_workload, ts-station-service_error, ts-ticketinfo-service_error, ts-train-service_error, ts-travel-service_error, ts-travel2-service_error, ts-user-service_latency-50, ts-user-service_latency-90, ts-user-service_workload | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-8017c6dc70-sNone-h0-78c332/ban-ghi-0.json |
+| dev-98bc73c499 | 369 | 13 | istio-init_mem, istio-init_socket, ts-admin-basic-info-service_error, ts-assurance-service_error, ts-auth-service_error, ts-config-service_error, ts-consign-service_error, ts-food-map-service_error, ts-food-service_error, ts-inside-payment-service_error, ts-order-service_error, ts-security-service_error, ts-station-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-98bc73c499-sNone-h0-0e1854/ban-ghi-0.json |
+| dev-a505ab3f65 | 371 | 11 | istio-init_mem, istio-init_socket, ts-admin-basic-info-service_error, ts-assurance-service_error, ts-auth-service_error, ts-consign-service_error, ts-food-map-service_error, ts-inside-payment-service_error, ts-order-other-service_error, ts-order-service_error, ts-security-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-a505ab3f65-sNone-h0-13d377/ban-ghi-0.json |
+| dev-a5cabe5fa7 | 359 | 23 | istio-init_mem, istio-init_socket, ts-assurance-service_error, ts-auth-service_error, ts-basic-service_error, ts-config-service_error, ts-consign-service_error, ts-contacts-service_error, ts-food-map-service_error, ts-food-service_error, ts-inside-payment-service_error, ts-order-other-service_error, ts-order-service_error, ts-preserve-other-service_error, ts-preserve-service_error, ts-price-service_error, ts-route-service_error, ts-seat-service_error, ts-security-service_error, ts-station-service_error, ts-ticketinfo-service_error, ts-train-service_error, ts-travel2-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-a5cabe5fa7-sNone-h0-c727b3/ban-ghi-0.json |
+| dev-a915aa2424 | 368 | 14 | istio-init_mem, istio-init_socket, ts-admin-basic-info-service_error, ts-auth-service_error, ts-config-service_error, ts-consign-service_error, ts-contacts-service_error, ts-food-map-service_error, ts-inside-payment-service_error, ts-order-other-service_error, ts-preserve-other-service_error, ts-preserve-service_error, ts-price-service_error, ts-security-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-a915aa2424-sNone-h0-811696/ban-ghi-0.json |
+| dev-b8bd0abf60 | 375 | 7 | istio-init_mem, istio-init_socket, ts-admin-basic-info-service_error, ts-food-map-service_error, ts-inside-payment-service_error, ts-preserve-service_error, ts-train-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-b8bd0abf60-sNone-h0-0c58be/ban-ghi-0.json |
+| dev-ba831dbeb8 | 368 | 14 | istio-init_mem, istio-init_socket, ts-admin-basic-info-service_error, ts-assurance-service_error, ts-auth-service_error, ts-config-service_error, ts-consign-service_error, ts-food-map-service_error, ts-food-service_error, ts-inside-payment-service_error, ts-order-service_error, ts-route-service_error, ts-security-service_error, ts-station-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-ba831dbeb8-sNone-h0-115b30/ban-ghi-0.json |
+| dev-bcbd4f46ae | 361 | 21 | istio-init_mem, istio-init_socket, ts-assurance-service_error, ts-auth-service_error, ts-config-service_error, ts-consign-service_error, ts-contacts-service_error, ts-food-map-service_error, ts-food-service_error, ts-inside-payment-service_error, ts-order-other-service_error, ts-order-service_error, ts-preserve-other-service_error, ts-preserve-service_error, ts-price-service_error, ts-route-service_error, ts-seat-service_error, ts-security-service_error, ts-station-service_error, ts-train-service_error, ts-travel2-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-bcbd4f46ae-sNone-h0-c69192/ban-ghi-0.json |
+| dev-db293894ab | 360 | 22 | istio-init_mem, istio-init_socket, ts-admin-basic-info-service_error, ts-assurance-service_error, ts-auth-service_error, ts-basic-service_error, ts-config-service_error, ts-consign-service_error, ts-contacts-service_error, ts-food-map-service_error, ts-inside-payment-service_error, ts-order-other-service_error, ts-preserve-other-service_error, ts-preserve-service_error, ts-price-service_error, ts-route-service_error, ts-seat-service_error, ts-security-service_error, ts-station-service_error, ts-ticketinfo-service_error, ts-train-service_error, ts-travel2-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-db293894ab-sNone-h0-fbacc1/ban-ghi-0.json |
+| dev-de89e2f9e9 | 366 | 16 | istio-init_mem, istio-init_socket, ts-auth-service_error, ts-config-service_error, ts-contacts-service_error, ts-food-map-service_error, ts-inside-payment-service_error, ts-order-service_error, ts-preserve-other-service_error, ts-preserve-service_error, ts-price-service_error, ts-route-service_error, ts-seat-service_error, ts-security-service_error, ts-station-service_error, ts-train-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-de89e2f9e9-sNone-h0-999d65/ban-ghi-0.json |
+| dev-f36d0647d5 | 373 | 9 | istio-init_mem, istio-init_socket, ts-admin-basic-info-service_error, ts-food-map-service_error, ts-food-service_error, ts-inside-payment-service_error, ts-preserve-service_error, ts-station-service_error, ts-train-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-f36d0647d5-sNone-h0-c7504e/ban-ghi-0.json |
+| dev-f81f88234e | 359 | 23 | istio-init_mem, istio-init_socket, ts-assurance-service_error, ts-auth-service_error, ts-basic-service_error, ts-config-service_error, ts-consign-service_error, ts-contacts-service_error, ts-food-map-service_error, ts-inside-payment-service_error, ts-order-other-service_error, ts-order-service_error, ts-preserve-other-service_error, ts-preserve-service_error, ts-price-service_error, ts-route-service_error, ts-seat-service_error, ts-security-service_error, ts-station-service_error, ts-ticketinfo-service_error, ts-train-service_error, ts-travel-service_error, ts-travel2-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-f81f88234e-sNone-h0-5efd38/ban-ghi-0.json |
+| dev-f9a8e05ed7 | 365 | 17 | istio-init_mem, istio-init_socket, ts-auth-service_error, ts-config-service_error, ts-consign-service_error, ts-contacts-service_error, ts-food-map-service_error, ts-inside-payment-service_error, ts-order-service_error, ts-preserve-other-service_error, ts-preserve-service_error, ts-price-service_error, ts-route-service_error, ts-seat-service_error, ts-security-service_error, ts-station-service_error, ts-train-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-f9a8e05ed7-sNone-h0-f464ea/ban-ghi-0.json |
+| dev-fbc45b0c67 | 358 | 24 | istio-init_mem, istio-init_socket, ts-admin-basic-info-service_error, ts-assurance-service_error, ts-auth-service_error, ts-basic-service_error, ts-config-service_error, ts-consign-service_error, ts-contacts-service_error, ts-food-map-service_error, ts-inside-payment-service_error, ts-order-other-service_error, ts-order-service_error, ts-preserve-other-service_error, ts-preserve-service_error, ts-price-service_error, ts-route-service_error, ts-seat-service_error, ts-security-service_error, ts-station-service_error, ts-ticketinfo-service_error, ts-train-service_error, ts-travel-service_error, ts-travel2-service_error | results/T-031/runs/circa-ols-h0-001/luot/circa-a-dev-fbc45b0c67-sNone-h0-21effb/ban-ghi-0.json |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `raw_column_audit.by_case`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Hợp cột trên cohort có 382 cột; danh sách đầy đủ ở `results/T-024/cham-a.json` → `raw_column_audit.union_columns`. Đây là schema gốc trong bản ghi đã chốt, trước tiền xử lý riêng của từng phương pháp. Không đưa dấu cột vắng vào phương pháp; chưa kiểm tương quan schema với nhãn ở P4.
+
+### Tính tay ba ca dev khác nhau và đối chiếu evaluator
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: BARO: OK: 30; SimpleRCA M4: OK: 30; MicroRank xếp đầy đủ: ERROR: 4; OK: 26; TraceRCA lọc hữu hạn: ERROR: 4; OK: 26; CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3: OK: 30; TORAI sửa, nguồn B: OK: 30; CIRCA kiến trúc, OLS+RHT-only, cấu hình P3: OK: 30; CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ: OK: 30; CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ: OK: 30; TORAI sửa, nguồn A (hồi cứu): OK: 30; MicroRank top11: ERROR: 4; OK: 26. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Phép kiểm | Phương pháp | Seed | Ca | Root | Phân bố hạng tính độc lập | Hit@1 | Hit@3 | Hit@5 | RR | NDCG@5 | Avg@5 | Đối chiếu |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| khóa đơn có hòa | BARO | single | dev-03d4910932 | ts-route-service | {"1": "1"} | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | khớp |
+| ca khóa đơn khác | BARO | single | dev-12a1a88069 | ts-order-service | {"1": "1"} | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | khớp |
+| TORAI dev | TORAI sửa, nguồn B | 0 | dev-14372e1209 | ts-route-service | {"1": "1"} | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | khớp |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `validation.rank_checks`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Ca `dev-03d4910932`, seed single: Nhóm hòa hạng [1]: xác suất 1/1 mỗi hạng.. Nguồn: `results/T-024/cham-a.json` → `validation.rank_checks` (phân phối độc lập, giá trị tay và giá trị evaluator cùng lưu).
+Ca `dev-12a1a88069`, seed single: Nhóm hòa hạng [1]: xác suất 1/1 mỗi hạng.. Nguồn: `results/T-024/cham-a.json` → `validation.rank_checks` (phân phối độc lập, giá trị tay và giá trị evaluator cùng lưu).
+Ca `dev-14372e1209`, seed 0: Liệt kê 1 hoán vị của 1 khối cùng điểm; 1 vị trí nội khối.. Nguồn: `results/T-024/cham-a.json` → `validation.rank_checks` (phân phối độc lập, giá trị tay và giá trị evaluator cùng lưu).
+Theo khóa xếp hạng đã lưu, không có root trong nhóm hòa ở các bản ghi OK, nên các cận do hòa bằng kỳ vọng. Ca BARO kiểm tay có hòa ở thực thể khác, root đứng riêng hạng 1. Nguồn: `results/T-024/cham-a.json` → `methods.<id>.per_case.<ca>.rank_distribution_by_seed`, `validation.rank_checks`. Công thức nhóm hòa được kiểm riêng tại `results/T-030/tests/test_buoc2.py` (`test_nhom_hoa`), `results/T-024/test-chay-lai/test_buoc2.txt`; fixture TORAI trình riêng bên dưới.
+
+### Kiểm hòa khối TORAI trong cohort thật
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: TORAI sửa, nguồn A (hồi cứu): OK: 30; TORAI sửa, nguồn B: OK: 30. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Bản ghi TORAI A/B đã chốt | Bản ghi có khối cùng điểm |
+| --- | --- |
+| 180 | 0 |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `validation.torai_cohort_ties`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Cohort thật không có hòa khối TORAI; nhánh hoán vị nhiều khối cùng điểm được kiểm bằng fixture riêng theo SPEC đã sửa. Các bản ghi khoa học giữ nguyên.
+Hòa bên trong RCD (bước xếp nhân quả trong cụm của TORAI) chưa kiểm; khối RCD hiện chỉ lưu thứ tự, không giữ khóa bên trong. Root TORAI B thuộc khối RCD ở 0/90 lượt; TORAI A ở 2/90 lượt thuộc 1 ca, nên chưa loại trừ hòa ẩn ở các lượt này. Số 0 hòa theo khóa đã lưu không chứng minh RCD không hòa. Nguồn: `results/T-024/ban-ghi-dua-vao-cham.json` → bản ghi TORAI `blocks`, `extra.nhanh_khoi`; root nối từ `results/T-024/cham-a.json` → `methods.torai_A/torai_B.per_case.<ca>.label.root`. Giới hạn đã khai tại `results/T-022/giao-thuc-v2.md` §6.6 và `docs/WHY.md` → WHY-28. Chưa có bằng chứng các lượt đó thật sự hòa hoặc số chấm hiện tại sai.
+
+### Fixture tổng hợp TORAI: hai khối AB/CD cùng điểm
+
+Phép kiểm công thức cho báo cáo chế độ (a), dùng dữ liệu tổng hợp; các số dưới đây không là kết quả RCA trên ca dev.
+
+Trạng thái: fixture OK; đối chiếu đạt. Đây là phép tự kiểm tổng hợp, không thuộc cohort hoặc mẫu số các bảng khoa học.
+
+| Độ đo | Tính tay | Evaluator | Đối chiếu |
+| --- | --- | --- | --- |
+| Hit@1 | 0.5000 | 0.5000 | khớp |
+| Hit@3 | 1.0000 | 1.0000 | khớp |
+| Hit@5 | 1.0000 | 1.0000 | khớp |
+| RR | 0.6667 | 0.6667 | khớp |
+| NDCG@5 | 0.7500 | 0.7500 | khớp |
+| Avg@5 | 0.8000 | 0.8000 | khớp |
+
+Nguồn số kiểm fixture: `results/T-024/cham-a.json` → `validation.torai_block_fixture`. Fixture theo ví dụ AB/CD ở `results/T-022/giao-thuc-v2.md` §8.4; không phải bản ghi phương pháp trong manifest.
+
+Fixture: {"blocks": [{"groups": [["A"], ["B"]], "key": [0.5]}, {"groups": [["C"], ["D"]], "key": [0.5]}], "status": "OK"}; root `A`; phân bố hạng `{"1": "1/2", "3": "1/2"}`. Lý do: 180 bản ghi TORAI A/B đã chốt không có hòa khối. Minh duyệt SPEC:62: kiểm V2-R2 bằng fixture riêng trong validation; không đưa vào manifest, bảng khoa học hoặc bootstrap.. Nguồn: `results/T-024/cham-a.json` → `validation.torai_block_fixture`. Đây là dữ liệu tổng hợp để kiểm công thức hòa khối; không thêm ca vào cohort, không thay bản ghi đã chốt hoặc số khoa học.
+
+### Tính tay mức ngẫu nhiên một ca
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: BARO: OK: 30. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Phương pháp | Ca | \|O\| | Root trong O | O Hit@1 | O Hit@3 | O Hit@5 | O Hit@10 | \|U\| | U Hit@5 | Đối chiếu |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BARO | dev-03d4910932 | 68 | có | 0.0147 | 0.0441 | 0.0735 | 0.1471 | 68 | 0.0735 | khớp |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `validation.random_check`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Công thức tính tay: min(k,|O|)/|O| nếu root thuộc O; ngược lại 0. Nguồn: `results/T-024/cham-a.json` → `validation.random_check.formula`.
+
+### Các phép kiểm tổng hợp
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: BARO: OK: 30; SimpleRCA M4: OK: 30; MicroRank xếp đầy đủ: ERROR: 4; OK: 26; TraceRCA lọc hữu hạn: ERROR: 4; OK: 26; CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3: OK: 30; TORAI sửa, nguồn B: OK: 30; CIRCA kiến trúc, OLS+RHT-only, cấu hình P3: OK: 30; CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ: OK: 30; CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ: OK: 30; TORAI sửa, nguồn A (hồi cứu): OK: 30; MicroRank top11: ERROR: 4; OK: 26. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Phép kiểm | Kết quả |
+| --- | --- |
+| Bootstrap lặp cùng seed, dev19 | giống hệt |
+| Bootstrap lặp cùng seed, dev30 | giống hệt |
+| AC@k RCAEval bằng Hit@k khi không hòa | 383 bản ghi-ca đã kiểm; khớp |
+| Giữ ca khác OK ở mẫu số | có |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `validation.bootstrap_same_seed_exact; validation.rcaeval_no_tie_parity; validation.non_OK_in_denominator`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+### Phép thử giả: hoán vị root giữa các ca, giữ nguyên đầu ra
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đầu ra và trạng thái ở từng dòng giữ nguyên. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Phương pháp | Trạng thái | Hit@1 thật | Hit@1 root hoán vị | Avg@5 thật | Avg@5 root hoán vị | MRR thật | MRR root hoán vị |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| BARO | OK: 30 | 0.7000 | 0.2000 | 0.8000 | 0.2000 | 0.7682 | 0.2399 |
+| SimpleRCA M4 | OK: 30 | 0.8333 | 0.1000 | 0.9267 | 0.1200 | 0.8911 | 0.1573 |
+| MicroRank xếp đầy đủ | ERROR: 4; OK: 26 | 0.0667 | 0.0667 | 0.3133 | 0.2067 | 0.2565 | 0.1999 |
+| TraceRCA lọc hữu hạn | ERROR: 4; OK: 26 | 0.7000 | 0.0667 | 0.7867 | 0.1467 | 0.7565 | 0.1843 |
+| CIRCA kiến trúc, OLS+RHT+DA, cấu hình P3 | OK: 30 | 0.5333 | 0.1333 | 0.7000 | 0.2667 | 0.6406 | 0.2684 |
+| TORAI sửa, nguồn B | OK: 30 | 0.8667 | 0.1667 | 0.9533 | 0.2600 | 0.9167 | 0.2828 |
+| CIRCA kiến trúc, OLS+RHT-only, cấu hình P3 | OK: 30 | 0.4000 | 0.0667 | 0.7000 | 0.1733 | 0.5975 | 0.1681 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT+DA, cấu hình phụ | OK: 30 | 0.7000 | 0.1000 | 0.8133 | 0.2067 | 0.7744 | 0.2094 |
+| CIRCA kiến trúc, SVR(sigmoid)+RHT-only, cấu hình phụ | OK: 30 | 0.4000 | 0.0667 | 0.7000 | 0.1867 | 0.6033 | 0.1647 |
+| TORAI sửa, nguồn A (hồi cứu) | OK: 30 | 0.7000 | 0.2000 | 0.8800 | 0.3467 | 0.8196 | 0.3413 |
+| MicroRank top11 | ERROR: 4; OK: 26 | 0.0667 | 0.0667 | 0.3133 | 0.2067 | 0.2111 | 0.1500 |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `validation.shuffled_root_check.summaries; methods.<id>.summaries.dev30.main`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Hoán vị dùng seed 20261005; root sau hoán vị vẫn trùng root thật ở 5 ca. Nguồn: `results/T-024/cham-a.json` → `validation.shuffled_root_check`. Phép thử này chỉ đổi nhãn trong evaluator; chưa phân biệt riêng mọi nguyên nhân khả dĩ của điểm cao. Không dùng số phép thử giả để chọn cấu hình hoặc chạy lại phương pháp.
+
+## Đối chiếu và giới hạn
+
+### Đối chiếu mốc công bố BARO RE2-TT
+
+Chế độ (a): biết đúng mốc tiêm; các số này đo xếp hạng RCA quanh mốc đã biết.
+
+Trạng thái: đếm ca dev ở từng dòng. Mọi ca khác `OK` vẫn ở mẫu số và tính trượt.
+
+| Loại lỗi | Avg@5 README | Ca dev | Trạng thái dev | Avg@5 T-024 | T-024 − README |
+| --- | --- | --- | --- | --- | --- |
+| cpu | 0.7200 | 6 | OK: 6 | 0.8667 | 0.1467 |
+| mem | 0.9900 | 3 | OK: 3 | 0.9333 | -0.0567 |
+| disk | 1.0000 | 6 | OK: 6 | 1.0000 | 0.0000 |
+| socket | 0.8300 | 3 | OK: 3 | 1.0000 | 0.1700 |
+| delay | 0.6300 | 6 | OK: 6 | 0.6000 | -0.0300 |
+| loss | 0.6400 | 6 | OK: 6 | 0.5667 | -0.0733 |
+
+Nguồn số thực nghiệm trong bảng: `results/T-024/cham-a.json` → `methods.baro.summaries.dev30.grouped.fault`. Bản ghi nguồn và SHA-256: `results/T-024/ban-ghi-dua-vao-cham.json`; đường dẫn từng ca nằm ở `methods.<id>.per_case.<ca>.source_paths`.
+
+Số công bố đọc từ `docs/knowledge/K4-ho-thuat-toan.md:112` (ghi lại ví dụ RCAEval README). Đây là mốc tham khảo; chưa tái lập toàn bộ bảng công bố. Khác tập ca, cửa sổ, bộ cột, quy tắc hòa và cách giữ ca lỗi ở mẫu số có thể giải thích lệch. Phân bố loại lỗi và service trong 30 ca dev cũng khác toàn bộ RE2-TT; chưa tách riêng đóng góp của từng nguyên nhân. Không chỉnh cấu hình theo độ lệch. Số ASE 2024 trong cùng knowledge dùng corpus Train Ticket khác; không dùng làm mốc khớp cho RE2-TT. Knowledge chưa có bảng số đầy đủ cùng giao thức T-024 cho sáu phương pháp.
+
+Riêng TraceRCA, thứ tự trong bảng là danh sách `ji` hữu hạn do adapter sắp lại theo WHY-32, không phải thứ tự hàm RCAEval trả về. Trên toàn dev30, hai thứ tự khác ở 26/26 lượt OK, hạng root sau bỏ trùng service khác ở 9/26 lượt; nếu dùng thứ tự hàm trả về và vẫn giữ ERROR ở mẫu số, AC@1 là 16/30 = 0.5333. Số này chỉ mô tả tác động của thứ tự, không thay số chính và không chứng minh thứ tự chứa NaN của hàm là đúng. 26/26 lượt OK có NaN, nên phép đối chiếu thứ tự khi không NaN ở giao thức §6.4 không áp dụng được lượt OK nào trong cohort này. Nguồn: `results/T-024/ban-ghi-dua-vao-cham.json` → bản ghi TraceRCA `ranking_native`, `extra.ranks_chinh_thuc`, `diagnostics.key_check`; root và mẫu số từ `results/T-024/cham-a.json` → `methods.tracerca.per_case.<ca>.label.root`, `cohorts.dev30`. Bảng này áp dụng công thức RCAEval cho bản TraceRCA lọc hữu hạn; không được coi là kết quả nguyên trạng của code TraceRCA trong RCAEval.
+
+4 ca MicroRank ERROR và 4 ca TraceRCA ERROR được giữ trong mẫu số. Nguồn: `results/T-024/cham-a.json` → `methods.microrank_full.summaries.dev30.main.trang_thai` và `methods.tracerca.summaries.dev30.main.trang_thai`. MicroRank giữ lỗi operation mới không có nền theo quyết định đã ghi ở LOG T-031; thông điệp lỗi TraceRCA và từng ca nằm trong bản ghi nguồn đã chốt, nên số đo phản ánh cả giới hạn bản cài. Không suy số dev sang 60 ca test, không mở dữ liệu khóa. Chế độ phát hiện (b) thuộc T-025; số ở đây không đo chất lượng phát hiện. Không kết luận về giá trị đồ thị hoặc chọn phương pháp tốt nhất từ thứ tự điểm trung bình. Kết quả mô tả xếp hạng của sáu baseline đã chốt và các khoảng bất định, trước phân tích P4.
