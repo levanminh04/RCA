@@ -1,0 +1,17 @@
+{
+ "mo_ta": "Dự thảo quy tắc bộ cột cho P3 trên RE2-TT dev. Trạng thái từng quy tắc ghi ở trường 'trang_thai'. Không quy tắc 'proposed' nào được bật mặc định trước khi Minh quyết và WHY được ghi.",
+ "nguon": "results/T-022/lua-chon-can-duyet.md mục 4, 10, 11; DECISIONS Q-67",
+ "chung": {
+  "trang_thai": "proposed",
+  "quy_tac": "Mỗi ca dùng cột có trong file metrics.parquet của ca đó. Không điền cột vắng. Không bỏ cột _error. Không dùng bộ cột cố định giao (L*) hay hợp.",
+  "audit_phia_evaluator": "Ghi số cột và danh sách cột vắng so với hợp 30 ca dev; không truyền dấu vắng vào phương pháp."
+ },
+ "theo_phuong_phap": {
+  "baro": {"trang_thai": "proposed", "tien_xu_ly": "theo RCAEval main.py:291-338 (bỏ time.1, bỏ *_latency-50, đổi *_latency-90 thành *_latency, inf->NaN, ffill, fill 0 trên toàn file trước khi cắt) rồi baro() tự bỏ time, cột hằng từng nửa, đổi _mem sang MB, giao cột hai nửa"},
+  "circa_kien_truc": {"trang_thai": "proposed", "tien_xu_ly": "như RCAEval main.py cho metric; mapping hậu tố theo T-014 (workload->T; cpu/mem/socket/diskio->S; latency->L; error->E); cột lạ ghi unknown"},
+  "torai_sua": {"trang_thai": "proposed", "tien_xu_ly": "như RCAEval main.py với torai-TT (giữ cột bắt đầu 'ts-'); logts/tracets theo lựa chọn mục 2"},
+  "simplerca_m4": {"trang_thai": "proposed", "tien_xu_ly": "theo T-017 (WHY-17): không ffill/floor, bỏ NaN/inf có bộ đếm"},
+  "bocpd": {"trang_thai": "decided (Q-67) cho tập cột; proposed cho phần còn lại", "chon_cot": "tên chứa 'latency-50' hoặc '_error'; bỏ 'queue-master', 'rabbitmq_' (BARO e35f4ec reproducibility.py:139-145)", "tien_xu_ly": "drop_constant, ffill, fill 0, min-max trên toàn chuỗi đưa vào (reproducibility.py:147-154); look-ahead khai báo", "so_cot_tho_RE2TT_dev": "25-48/ca (cot-bocpd-dev.csv)"},
+  "nsigma_phat_hien": {"trang_thai": "OPEN (Q12)", "phuong_an": ["cùng tập cột BOCPD (đề xuất)", "mọi cột trừ time (mặc định khi gọi trên cả bảng)"]}
+ }
+}

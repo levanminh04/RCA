@@ -1,0 +1,33 @@
+{
+ "mo_ta": "Cấu hình P3 RE2-TT dev, bản 2 theo DECISIONS Q-64-Q-67, Q-72, Q-74. Bản 1 (p3-re2tt-de-xuat.json) giữ nguyên. 'decided' = có quyết định Minh; 'D1'...'D12' = chi tiết thực thi chờ Minh xác nhận cùng văn bản WHY (giao-thuc-v2.md mục 15). Không mục nào dùng cho số khoa học trước khi WHY tương ứng được ghi vào docs/WHY.md. Cập nhật 06/10/2026: Minh duyệt văn bản WHY gồm D1-D12 (DECISIONS Q-76); đã ghi docs/WHY.md WHY-22 đến WHY-35.",
+ "nguon": "results/T-022/giao-thuc-v2.md",
+ "cua_so": {"trang_thai": "decided (Q-64, Q-74 Q2)", "N_giay": 300, "A_giay": 300, "bien": "nửa mở theo timestamp [t-300,t), [t,t+300)", "span": {"trang_thai": "D2", "quy_tac": "startTime >= t-300 và startTime+duration < t+300"}, "thu_tu": "D1: cắt trước, tiền xử lý sau"},
+ "che_do_a": {"trang_thai": "decided (Q-66)", "moc": "inject_time từ nhan-dev.json, chỉ runner chế độ (a)", "ket_qua_co_luc": "t+300; ngoại lệ (V2-R3): nhánh dùng TORAI A chỉ có kết quả sau cuối file (bin tới t+305, ngưỡng tracets_lat toàn file)"},
+ "baro": {"trang_thai": "decided (Q-62)", "code": "RCAEval 259ea41 e2e/baro.py", "tham_so": "mặc định", "khoa": {"trang_thai": "D10", "cach": "tính lại max robust z, kiểm khớp thứ tự chính thức"}},
+ "simplerca_m4": {"trang_thai": "decided (Q-74 'Thêm')", "cau_hinh": "WHY-17: metric 3sigma ddof0 một phía events; trace P95 tỉ lệ 3; log từ khóa ngưỡng 0; abstain khi toàn 0", "loc_span_truoc_prepare": true},
+ "microrank_sua": {"trang_thai": "decided (Q-74 Q7)", "xep_day_du_lam_chinh": true, "bao_kem_top11": true, "pagerank_vong": 25, "d": 0.85, "alpha": 0.01, "spectrum": "dstar2", "PYTHONHASHSEED": 0, "kiem_them_hashseed": [1], "hop_dong_loi": "giữ ValueError của code -> ERROR; status trả về rỗng -> NO_EVIDENCE (D12)", "dem_ca_loi_truoc_pilot": {"trang_thai": "D6", "quy_tac": "báo Minh mọi trường hợp; dừng chờ nếu >= 1 ca lỗi"}},
+ "tracerca_loc_huu_han": {"trang_thai": "decided (Q-74 Q8)", "lay_diem": {"trang_thai": "D11", "cach": "đọc ji_dict lúc trả về bằng sys.setprofile"}, "ji_nan": "không xếp", "operation_moi": "KeyError -> ERROR", "thuc_the": "serviceName; operation ứng nhiều service -> ERROR"},
+ "circa_kien_truc": {"trang_thai": "decided (Q-74 Q6)", "scorer_chinh": "RHT+DA theta=3", "scorer_kem": "RHT-only", "mo_hinh": {"trang_thai": "D5", "quy_tac": "SVR(kernel='sigmoid') bọc ANMRegressor nếu qua K-SVR1-4; không thì LinearRegression; khóa trước khi chạy evaluator", "ghi_route_hoi_quy": "mỗi nút: no_effective_parents | hồi quy thành công | value_error_fallback (kèm thông điệp); nút có cha rơi value_error_fallback dưới SVR thì K-SVR2 không đạt; mô hình được khóa, cả OLS, báo số nút value_error_fallback (V2-T1)", "sua_06_10_2026": "Q-80: khóa LinearRegression (OLS); SVR(sigmoid) chỉ là cấu hình phụ; quy_tac D5 ở trên là lịch sử, không áp lại. Q-82: chỉ dùng bản OLS gốc; ca có nút RHT > 1e10 báo riêng (giao-thuc-v2.md §6.5)."}, "giu_metric_co_lap": true, "do_thi_tu_trace": {"trang_thai": "D3", "quy_tac": "span có startTime >= t-300 và kết thúc < t"}, "current": {"trang_thai": "D3", "quy_tac": "thời điểm quan sát cuối < t+300"}, "builder_PYTHONHASHSEED": 0, "kiem_do_nhay_hashseed": [1, 2]},
+ "torai_sua": {"trang_thai": "decided (WHY-19, WHY-20, Q-74 Q3)", "seeds": [0, 1, 2], "nguon": ["A: torai-TT tác giả", "B: tự dựng từ parquet RE2"], "dong_chinh": {"trang_thai": "D4", "quy_tac": "B nếu qua K-B1 (>=95% ô theo tên cột, luật tên cột TT ở giao-thuc-v2.md mục 6.6, cột không ghép tính sai; sửa sau V2-R1, N1), K-B2, K-B3; không thì A; luật tên cột sai ở ca khác mà không sửa được thì K-B1 OPEN, trình Minh"}, "khoa": {"trang_thai": "D10", "cach": "hai cấp (sửa sau V2-R2): khối = cụm, khóa điểm cụm; trong khối = thứ tự RCD hoặc y_train ở nhánh dự phòng; dựng lại từ biến cục bộ và trả về của _rcd_multimodal; cụm cùng điểm chỉ hoán vị cả khối (giao-thuc-v2.md mục 8.4)"}},
+ "che_do_b": {
+  "trang_thai": "decided (Q-72, Q-74 Q11-Q14)",
+  "ten": "phát hiện hồi cứu trên bản ghi đã chọn vì có sự cố",
+  "chuoi_dau_vao": "cả bản ghi 1441 điểm, một lần, không khởi động lại",
+  "bocpd": {"hazard": "constant 50", "likelihood": "MultivariateT(dims=d)", "sua_chi_so": "m[i] = argmax R[:, i+1], i=0..T-1", "sentinel": "không còn", "ghi_kem_maxes_goc": true, "kiem_posterior": "mọi phần tử R[:,1..T] hữu hạn; không đạt → ERROR (V2-S1)", "ten_do_tre": "độ lệch vị trí điểm đổi hồi cứu"},
+  "nsigma": {"k": 3, "startsfrom": 100, "tap_cot_chinh": "tập BOCPD", "tap_cot_doi_chung": "mọi cột", "tien_xu_ly": "D9"},
+  "cham_phat_hien": {"trang_thai": "decided (Q-74 Q13); D8 cho cửa sổ", "bao_dong": "thô, không gộp episode", "nhan_proxy": "[t_tiem, cuối file] bất thường (README RCAEval)", "cua_so_giay": 60, "goc_cua_so": "đầu file", "cua_so_duoc_cham": "mọi điểm được bộ phát hiện đánh giá; bỏ cửa sổ cuối 1 điểm", "fa_moi_gio_mau_so": "giờ bình thường được đánh giá của từng bộ"},
+  "luot_rca": {"trang_thai": "decided (Q-74 Q13, Q14); D7", "thoi_gian_tro_giay": 300, "rca_o": "báo động đầu", "thong_bao_sau": "chỉ đếm", "thanh_cong_chung": "t_hat >= t_tiem và root trong top-k", "ranker": ["baro", "circa_kien_truc", "torai_sua"], "ten": "tích hợp P3: <ranker>[<bộ phát hiện>]"}
+ },
+ "cham": {
+  "trang_thai": "decided (MRP P7, Q-65, Q-74 Q4, Q9, Q10)",
+  "universe": "mappings/universe-re2tt-dev.json (68)",
+  "bon_tap": ["inventory", "quan sát", "chấm", "trả về"],
+  "trang_thai_ca": "mọi trạng thái khác OK ở mẫu số, tính trượt; lỗi dữ liệu/runner sửa trước (D12 cho ánh xạ)", "timeout": "giới hạn mỗi lượt khai trong SPEC task chạy trước khi chạy; phép chiếu pilot vượt ngân sách tổng thì quyết trước khi chạy như Q-67; đã cam kết cohort mà hết ngân sách giữa chừng thì ca chưa chạy là TIMEOUT (N3)",
+  "hoa": "một quy tắc cho mọi độ đo bảng chính, theo khóa xếp hạng thật; kỳ vọng + cận",
+  "bang_rcaeval": {"Evaluator_max_k": 10, "dau_vao": "thứ tự gốc, bỏ trùng như main.py; ca không OK = danh sách rỗng"},
+  "retrieval_K": [5, 10],
+  "bootstrap": {"don_vi": "ô (root x loại lỗi), 10 ô", "ghep_cap": true, "B": 10000, "seed": 20261005, "khoang": "phân vị 95%"},
+  "muc_ngau_nhien": "trên tập quan sát của phương pháp; kèm trên U"
+ },
+ "pilot": {"trang_thai": "decided (Q-74 'Thêm')", "chon_ca": "tối đa 3 ca/phương pháp: nhỏ nhất, trung vị dưới, lớn nhất theo yếu tố chi phí sau tiền xử lý; hòa lấy mã mờ nhỏ hơn", "bocpd_gioi_han_laptop_giay": 3600}
+}
