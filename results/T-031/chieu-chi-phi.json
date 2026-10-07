@@ -1,0 +1,264 @@
+{
+ "mo_ta": "T-031 bước 7: tổng hợp số đo và chiếu chi phí 30 ca theo cách khai trước (LOG T-031 10:42). Không dùng nhãn.\n\n- Đo thật 30 ca: MicroRank (bước 2), CIRCA SVR (bước 3), TORAI (bước 4; phần đã chạy).\n- Pilot 3 ca (BARO, SimpleRCA, TraceRCA, N-Sigma chính và đối chứng): wall mỗi lượt nội suy tuyến tính từng đoạn\n  theo yếu tố đầu qua 3 ca pilot, cộng trên 30 ca; kèm 30 × min và 30 × max. \"Chưa kiểm\".\n- BOCPD tiền tố: p, chiếu 1.441 điểm theo T² và T^p; chiếu 30 ca theo d² và d^q; thứ yếu × (1441/300)^(p−2).\n  Số mũ trong lượt từ tiến độ (log thời gian tích lũy theo log số bước, nửa sau lượt). \"Chưa kiểm\".\n\npython chieu_chi_phi.py <cau-hinh.json>   (đường dẫn các tóm tắt, xem ví dụ trong LOG)",
+ "tao_luc_utc": "2026-10-06T04:12:51+00:00",
+ "nguon": {
+  "yeu_to": "results/T-031/runs/yeu-to-002/yeu-to.json",
+  "microrank": "results/T-031/dem-loi-microrank.json",
+  "circa_h0_lan1": "results/T-031/runs/circa-svr-h0-lan1-001/tom-tat.json",
+  "circa_h0_lan2": "results/T-031/runs/circa-svr-h0-lan2-001/tom-tat.json",
+  "circa_h1": "results/T-031/runs/circa-svr-h1-001/tom-tat.json",
+  "circa_h2": "results/T-031/runs/circa-svr-h2-001/tom-tat.json",
+  "torai_B": "results/T-031/runs/torai-B-001/tom-tat.json",
+  "torai_A": null,
+  "pilot_baro": "results/T-031/runs/pilot-baro-001/tom-tat.json",
+  "pilot_simplerca": "results/T-031/runs/pilot-simplerca-001/tom-tat.json",
+  "pilot_tracerca": "results/T-031/runs/pilot-tracerca-001/tom-tat.json",
+  "pilot_nsigma": "results/T-031/runs/pilot-nsigma-001/tom-tat.json",
+  "pilot_nsigma_doi_chung": "results/T-031/runs/pilot-nsigma-doi-chung-001/tom-tat.json",
+  "bocpd_nho": "results/T-031/runs/bocpd-tien-to-dev-20acb4402d-001/tom-tat.json",
+  "bocpd_lon": "results/T-031/runs/bocpd-tien-to-dev-4f8a844308-001/tom-tat.json"
+ },
+ "do_that": {
+  "microrank": {
+   "tong_30_ca_s": 158.5,
+   "max_rss_mb": 1642.3,
+   "max_luot_s": 8.713
+  },
+  "circa_h0_lan1": {
+   "tong_30_ca_s": 221.9,
+   "max_rss_mb": 1446.3,
+   "max_luot_s": 11.94,
+   "so_luot": 30
+  },
+  "circa_h0_lan2": {
+   "tong_30_ca_s": 212.0,
+   "max_rss_mb": 1446.0,
+   "max_luot_s": 15.333,
+   "so_luot": 30
+  },
+  "circa_h1": {
+   "tong_30_ca_s": 230.6,
+   "max_rss_mb": 1446.3,
+   "max_luot_s": 10.928,
+   "so_luot": 30
+  },
+  "circa_h2": {
+   "tong_30_ca_s": 224.1,
+   "max_rss_mb": 1445.4,
+   "max_luot_s": 10.987,
+   "so_luot": 30
+  },
+  "torai_B": {
+   "xong": false,
+   "so_luot": 16,
+   "tong_s": 752.4,
+   "max_luot_s": 87.517,
+   "max_rss_mb": 1344.6
+  }
+ },
+ "pilot_chieu": {
+  "baro": {
+   "diem_pilot": [
+    [
+     264,
+     21.131
+    ],
+    [
+     284,
+     13.816
+    ],
+    [
+     288,
+     11.517
+    ]
+   ],
+   "yeu_to": "baro_cot_hai_nua",
+   "tong_30_ca_s": 436.6,
+   "can_30_min_s": 345.5,
+   "can_30_max_s": 633.9,
+   "max_rss_mb": 382.9,
+   "max_luot_s": 21.131
+  },
+  "simplerca": {
+   "diem_pilot": [
+    [
+     51863,
+     3.882
+    ],
+    [
+     330580,
+     11.764
+    ],
+    [
+     644791,
+     7.873
+    ]
+   ],
+   "yeu_to": "cua_so_span",
+   "tong_30_ca_s": 277.2,
+   "can_30_min_s": 116.5,
+   "can_30_max_s": 352.9,
+   "max_rss_mb": 1516.7,
+   "max_luot_s": 11.764
+  },
+  "tracerca": {
+   "diem_pilot": [
+    [
+     51863,
+     23.844
+    ],
+    [
+     330580,
+     52.366
+    ],
+    [
+     644791,
+     59.059
+    ]
+   ],
+   "yeu_to": "cua_so_span",
+   "tong_30_ca_s": 1401.6,
+   "can_30_min_s": 715.3,
+   "can_30_max_s": 1771.8,
+   "max_rss_mb": 1813.0,
+   "max_luot_s": 59.059
+  },
+  "nsigma": {
+   "diem_pilot": [
+    [
+     25,
+     13.867
+    ],
+    [
+     34,
+     5.409
+    ],
+    [
+     48,
+     7.217
+    ]
+   ],
+   "yeu_to": "nsigma_cot",
+   "tong_30_ca_s": 216.4,
+   "can_30_min_s": 162.3,
+   "can_30_max_s": 416.0,
+   "max_rss_mb": 136.3,
+   "max_luot_s": 13.867
+  },
+  "nsigma_doi_chung": {
+   "diem_pilot": [
+    [
+     340,
+     98.899
+    ],
+    [
+     363,
+     101.297
+    ],
+    [
+     375,
+     108.296
+    ]
+   ],
+   "yeu_to": "nsigma_doi_chung_cot",
+   "tong_30_ca_s": 3084.0,
+   "can_30_min_s": 2967.0,
+   "can_30_max_s": 3248.9,
+   "max_rss_mb": 139.8,
+   "max_luot_s": 108.296
+  }
+ },
+ "bocpd": {
+  "ca_nho": {
+   "opaque_id": "dev-20acb4402d",
+   "d": 22,
+   "luot": {
+    "300": {
+     "trang_thai": "OK",
+     "giay_goi": 96.129,
+     "d": 22,
+     "wall_s": 106.941,
+     "peak_rss_mb": 182.6,
+     "ms_moi_lan_pdf": 2.1291029900332226,
+     "so_mu_trong_luot": 1.0920380559704912,
+     "tien_do_cuoi": null
+    },
+    "600": {
+     "trang_thai": "OK",
+     "giay_goi": 183.778,
+     "d": 22,
+     "wall_s": 186.877,
+     "peak_rss_mb": 184.1,
+     "ms_moi_lan_pdf": 1.0192900721020521,
+     "so_mu_trong_luot": 1.904340670377345,
+     "tien_do_cuoi": null
+    }
+   }
+  },
+  "ca_lon": {
+   "opaque_id": "dev-4f8a844308",
+   "d": 39,
+   "luot": {
+    "150": {
+     "trang_thai": "OK",
+     "giay_goi": 38.697,
+     "d": 39,
+     "wall_s": 41.915,
+     "peak_rss_mb": 181.8,
+     "ms_moi_lan_pdf": 3.416953642384106,
+     "so_mu_trong_luot": 1.8562246914199698,
+     "tien_do_cuoi": null
+    },
+    "300": {
+     "trang_thai": "OK",
+     "giay_goi": 145.971,
+     "d": 39,
+     "wall_s": 149.226,
+     "peak_rss_mb": 184.0,
+     "ms_moi_lan_pdf": 3.2330232558139533,
+     "so_mu_trong_luot": 1.9317466873745246,
+     "tien_do_cuoi": null
+    }
+   }
+  },
+  "tat_ca_OK": true,
+  "p": {
+   "ca_nho": 0.9349204413833824,
+   "ca_lon": 1.915388147605463
+  },
+  "chieu_1441_mot_ca_s": {
+   "ca_nho": {
+    "T2": 1060.0320144944444,
+    "Tp": 416.9103250193624
+   },
+   "ca_lon": {
+    "T2": 3367.8445339000004,
+    "Tp": 2949.0724559468426
+   }
+  },
+  "c": {
+   "ca_nho": 0.0010681,
+   "ca_lon": 0.0016219000000000001
+  },
+  "q": 0.7296121032659147,
+  "chieu_30_ca_s": {
+   "d2_T2": 124889.16634535,
+   "dq_T2": 83007.245837901
+  },
+  "chieu_30_ca_gio": {
+   "d2_T2": 34.69143509593055,
+   "dq_T2": 23.057568288305834
+  },
+  "thu_yeu_nhan_1441_300_mu_p_tru_2": {
+   "d2_T2_p_nho": 6.521162762900425,
+   "d2_T2_p_lon": 30.37775487225449,
+   "dq_T2_p_nho": 4.3342731515414235,
+   "dq_T2_p_lon": 20.19049242199229
+  },
+  "phan_bo_d_30_ca": {
+   "min": 22,
+   "max": 39,
+   "tong": 896
+  }
+ }
+}

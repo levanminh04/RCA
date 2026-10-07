@@ -1,0 +1,686 @@
+{
+ "mo_ta": "T-031 bước 5: kiểm trên ca thật (giao-thuc-v2 §11.6, §11.9, §11.10). Không dùng nhãn, không chấm.\n\n1. §11.6 lấy khóa: BARO và TORAI kiểm trong adapter ở mọi lượt (không khớp → lỗi runner), ở đây chỉ tổng hợp\n   `key_check` từ các tóm tắt; TraceRCA: `ji` hữu hạn của adapter so với phép tính độc lập\n   `results/T-015/scripts/check_tracerca.py::independent_spans` trên cùng span đã cắt, ở 3 ca pilot (cửa sổ thật)\n   và ở cửa sổ bình thường của ca trung vị dưới; CIRCA: `current` = thời điểm quan sát cuối của metric trong A,\n   tính lại từ dữ liệu ở 30 ca.\n2. §11.9 hai cửa sổ bình thường trên ca trung vị dưới của từng phương pháp: mốc giả t′ = t0 + 360 (t0 = thời điểm\n   metric đầu file), N = [t0+60, t0+360), A = [t0+360, t0+660), nằm trong 720 s đầu (khai trước, SPEC bước 5).\n   Ghi trạng thái và điểm; không chỉnh ngưỡng. TORAI seed 0, nguồn đã khóa; CIRCA mô hình đã khóa, hash seed 0.\n3. §11.10 hoán vị trên ca trung vị dưới: bản sao dữ liệu trong work/ (xóa sau khi chạy, giữ manifest): 'cot' =\n   hoán vị cột metric (giữ `time` đầu), 'dong' = hoán vị dòng span và dòng log. BARO: cot; SimpleRCA: cot, dong;\n   TraceRCA: dong; CIRCA: cot, dong. So thứ hạng thực thể theo nhóm hòa với lượt gốc (không in thứ hạng).\n   MicroRank dừng ở D6; TORAI không kiểm hoán vị (GMM và Drain phụ thuộc thứ tự theo thiết kế; như T-030).\n\npython kiem_ca_that.py ca_pilot=<ca-pilot.json> baro=<tom-tat> simplerca=<tom-tat> tracerca=<tom-tat>\n       circa=<tom-tat h0 mô hình khóa> circa_model=<svr|ols> torai=<tom-tat nguồn khóa> torai_method=<torai_A|torai_B>",
+ "run": "kiem-ca-that-001",
+ "nguon": {
+  "ca_pilot": "results/T-031/ca-pilot.json",
+  "baro": "results/T-031/runs/pilot-baro-001/tom-tat.json",
+  "simplerca": "results/T-031/runs/pilot-simplerca-001/tom-tat.json",
+  "tracerca": "results/T-031/runs/pilot-tracerca-001/tom-tat.json",
+  "circa": "results/T-031/runs/circa-svr-h0-lan1-001/tom-tat.json",
+  "circa_model": "svr"
+ },
+ "k_11_6": {
+  "baro": {
+   "so_luot": 3,
+   "key_check_pass": 3,
+   "loi_runner": 0
+  },
+  "tracerca_ji": {
+   "dev-260d332c8d": {
+    "so_op_huu_han": [
+     58,
+     58
+    ],
+    "so_nan": [
+     16,
+     16
+    ],
+    "cung_tap_op": true,
+    "sai_lech_tuong_doi_max": 0.0,
+    "khop": true,
+    "trang_thai_doc_lap": "EVIDENCE"
+   },
+   "dev-ba831dbeb8": {
+    "so_op_huu_han": [
+     113,
+     113
+    ],
+    "so_nan": [
+     39,
+     39
+    ],
+    "cung_tap_op": true,
+    "sai_lech_tuong_doi_max": 0.0,
+    "khop": true,
+    "trang_thai_doc_lap": "EVIDENCE"
+   },
+   "dev-b8bd0abf60": {
+    "so_op_huu_han": [
+     92,
+     92
+    ],
+    "so_nan": [
+     60,
+     60
+    ],
+    "cung_tap_op": true,
+    "sai_lech_tuong_doi_max": 0.0,
+    "khop": true,
+    "trang_thai_doc_lap": "EVIDENCE"
+   }
+  },
+  "circa_current": {
+   "so_ca": 30,
+   "so_khop": 30,
+   "ca": {
+    "dev-03d4910932": {
+     "current_ban_ghi": 1706090078,
+     "max_time_A": 1706090078,
+     "khop": true
+    },
+    "dev-12a1a88069": {
+     "current_ban_ghi": 1705985580,
+     "max_time_A": 1705985580,
+     "khop": true
+    },
+    "dev-14372e1209": {
+     "current_ban_ghi": 1706082431,
+     "max_time_A": 1706082431,
+     "khop": true
+    },
+    "dev-16597725c1": {
+     "current_ban_ghi": 1706023910,
+     "max_time_A": 1706023910,
+     "khop": true
+    },
+    "dev-16870e660c": {
+     "current_ban_ghi": 1706083981,
+     "max_time_A": 1706083981,
+     "khop": true
+    },
+    "dev-1e6d61b5ec": {
+     "current_ban_ghi": 1706060102,
+     "max_time_A": 1706060102,
+     "khop": true
+    },
+    "dev-20acb4402d": {
+     "current_ban_ghi": 1706070520,
+     "max_time_A": 1706070520,
+     "khop": true
+    },
+    "dev-260d332c8d": {
+     "current_ban_ghi": 1706072069,
+     "max_time_A": 1706072069,
+     "khop": true
+    },
+    "dev-3ae0a6c15a": {
+     "current_ban_ghi": 1705942898,
+     "max_time_A": 1705942898,
+     "khop": true
+    },
+    "dev-3defe3d34b": {
+     "current_ban_ghi": 1705918404,
+     "max_time_A": 1705918404,
+     "khop": true
+    },
+    "dev-4e68956051": {
+     "current_ban_ghi": 1706123745,
+     "max_time_A": 1706123745,
+     "khop": true
+    },
+    "dev-4f8a844308": {
+     "current_ban_ghi": 1706179869,
+     "max_time_A": 1706179869,
+     "khop": true
+    },
+    "dev-57546fd87b": {
+     "current_ban_ghi": 1706043348,
+     "max_time_A": 1706043348,
+     "khop": true
+    },
+    "dev-59f696a169": {
+     "current_ban_ghi": 1706025454,
+     "max_time_A": 1706025454,
+     "khop": true
+    },
+    "dev-746fd74313": {
+     "current_ban_ghi": 1705922164,
+     "max_time_A": 1705922164,
+     "khop": true
+    },
+    "dev-7f1b6b071d": {
+     "current_ban_ghi": 1708456439,
+     "max_time_A": 1708456439,
+     "khop": true
+    },
+    "dev-8017c6dc70": {
+     "current_ban_ghi": 1706061651,
+     "max_time_A": 1706061651,
+     "khop": true
+    },
+    "dev-98bc73c499": {
+     "current_ban_ghi": 1706107344,
+     "max_time_A": 1706107344,
+     "khop": true
+    },
+    "dev-a505ab3f65": {
+     "current_ban_ghi": 1705944391,
+     "max_time_A": 1705944391,
+     "khop": true
+    },
+    "dev-a5cabe5fa7": {
+     "current_ban_ghi": 1708454897,
+     "max_time_A": 1708454897,
+     "khop": true
+    },
+    "dev-a915aa2424": {
+     "current_ban_ghi": 1706155217,
+     "max_time_A": 1706155217,
+     "khop": true
+    },
+    "dev-b8bd0abf60": {
+     "current_ban_ghi": 1705992345,
+     "max_time_A": 1705992345,
+     "khop": true
+    },
+    "dev-ba831dbeb8": {
+     "current_ban_ghi": 1706105797,
+     "max_time_A": 1706105797,
+     "khop": true
+    },
+    "dev-bcbd4f46ae": {
+     "current_ban_ghi": 1706088532,
+     "max_time_A": 1706088532,
+     "khop": true
+    },
+    "dev-db293894ab": {
+     "current_ban_ghi": 1706012382,
+     "max_time_A": 1706012382,
+     "khop": true
+    },
+    "dev-de89e2f9e9": {
+     "current_ban_ghi": 1706145076,
+     "max_time_A": 1706145076,
+     "khop": true
+    },
+    "dev-f36d0647d5": {
+     "current_ban_ghi": 1705988565,
+     "max_time_A": 1705988565,
+     "khop": true
+    },
+    "dev-f81f88234e": {
+     "current_ban_ghi": 1708817804,
+     "max_time_A": 1708817804,
+     "khop": true
+    },
+    "dev-f9a8e05ed7": {
+     "current_ban_ghi": 1706143529,
+     "max_time_A": 1706143529,
+     "khop": true
+    },
+    "dev-fbc45b0c67": {
+     "current_ban_ghi": 1706125290,
+     "max_time_A": 1706125290,
+     "khop": true
+    }
+   }
+  }
+ },
+ "k_11_9": {
+  "baro": {
+   "opaque_id": "dev-12a1a88069",
+   "moc_gia_tu_dau_file_s": 360,
+   "loi_runner": null,
+   "ram_truoc_gb": 2.97,
+   "binh_thuong": {
+    "native": {
+     "status": "OK",
+     "method_status_raw": null,
+     "error": null,
+     "so_thuc_the": 68,
+     "so_nhom_hoa": 64,
+     "khoa_dau_5": [
+      47.00000000027756,
+      38.50000000009541,
+      20.999999999981497,
+      20.216216216214917,
+      18.757705475190825
+     ],
+     "khoa_max": 47.00000000027756,
+     "khoa_trung_vi": 3.646153846154979,
+     "cost_wall_s": 12.001
+    }
+   },
+   "cua_so_that": {
+    "native": {
+     "status": "OK",
+     "method_status_raw": null,
+     "error": null,
+     "so_thuc_the": 68,
+     "so_nhom_hoa": 68,
+     "khoa_dau_5": [
+      488346.9281628153,
+      115.77777777777779,
+      113.99999999999834,
+      33.7777777776366,
+      26.666666666670906
+     ],
+     "khoa_max": 488346.9281628153,
+     "khoa_trung_vi": 4.458675177500717,
+     "cost_wall_s": 13.816
+    }
+   }
+  },
+  "simplerca": {
+   "opaque_id": "dev-ba831dbeb8",
+   "moc_gia_tu_dau_file_s": 360,
+   "loi_runner": null,
+   "ram_truoc_gb": 2.84,
+   "binh_thuong": {
+    "native": {
+     "status": "OK",
+     "method_status_raw": "heuristic_alerts",
+     "error": null,
+     "so_thuc_the": 68,
+     "so_nhom_hoa": 44,
+     "khoa_dau_5": [
+      329.0,
+      304.0,
+      297.0,
+      282.0,
+      261.0
+     ],
+     "khoa_max": 329.0,
+     "khoa_trung_vi": 47.5,
+     "cost_wall_s": 3.967
+    }
+   },
+   "cua_so_that": {
+    "native": {
+     "status": "OK",
+     "method_status_raw": "heuristic_alerts",
+     "error": null,
+     "so_thuc_the": 68,
+     "so_nhom_hoa": 45,
+     "khoa_dau_5": [
+      1309.0,
+      950.0,
+      945.0,
+      913.0,
+      709.0
+     ],
+     "khoa_max": 1309.0,
+     "khoa_trung_vi": 38.5,
+     "cost_wall_s": 11.764
+    }
+   }
+  },
+  "tracerca": {
+   "opaque_id": "dev-ba831dbeb8",
+   "moc_gia_tu_dau_file_s": 360,
+   "loi_runner": null,
+   "ram_truoc_gb": 2.8,
+   "binh_thuong": {
+    "native": {
+     "status": "OK",
+     "method_status_raw": null,
+     "error": null,
+     "so_thuc_the": 22,
+     "so_nhom_hoa": 22,
+     "khoa_dau_5": [
+      0.0363931762794476,
+      0.030776687265236885,
+      0.02512057877813505,
+      0.01839550332141032,
+      0.01831661578717837
+     ],
+     "khoa_max": 0.0363931762794476,
+     "khoa_trung_vi": 0.006116907620794617,
+     "cost_wall_s": 19.85
+    }
+   },
+   "cua_so_that": {
+    "native": {
+     "status": "OK",
+     "method_status_raw": null,
+     "error": null,
+     "so_thuc_the": 25,
+     "so_nhom_hoa": 24,
+     "khoa_dau_5": [
+      0.185329364170674,
+      0.08869534305012441,
+      0.08089361318800109,
+      0.07944407925626817,
+      0.07775377969762419
+     ],
+     "khoa_max": 0.185329364170674,
+     "khoa_trung_vi": 0.004090740052063964,
+     "cost_wall_s": 52.366
+    }
+   },
+   "ji_doc_lap": {
+    "so_op_huu_han": [
+     74,
+     74
+    ],
+    "so_nan": [
+     78,
+     78
+    ],
+    "cung_tap_op": true,
+    "sai_lech_tuong_doi_max": 0.0,
+    "khop": true,
+    "trang_thai_doc_lap": "EVIDENCE"
+   }
+  },
+  "circa": {
+   "opaque_id": "dev-03d4910932",
+   "moc_gia_tu_dau_file_s": 360,
+   "loi_runner": null,
+   "ram_truoc_gb": 3.16,
+   "binh_thuong": {
+    "svr+rht_da": {
+     "status": "OK",
+     "method_status_raw": null,
+     "error": null,
+     "so_thuc_the": 68,
+     "so_nhom_hoa": 68,
+     "khoa_dau_5": [
+      55.79404131092015,
+      42.58721830348588,
+      42.361130155615704,
+      38.54386650925806,
+      23.591177490118252
+     ],
+     "khoa_max": 55.79404131092015,
+     "khoa_trung_vi": 4.269560219137784,
+     "cost_wall_s": 6.69
+    },
+    "svr+rht": {
+     "status": "OK",
+     "method_status_raw": null,
+     "error": null,
+     "so_thuc_the": 68,
+     "so_nhom_hoa": 68,
+     "khoa_dau_5": [
+      55.79404131092015,
+      37.395376822282365,
+      31.686023299826527,
+      23.591177490118252,
+      19.130145060329934
+     ],
+     "khoa_max": 55.79404131092015,
+     "khoa_trung_vi": 3.244237183277647,
+     "cost_wall_s": 6.69
+    }
+   },
+   "cua_so_that": {
+    "svr+rht_da": {
+     "status": "OK",
+     "method_status_raw": null,
+     "error": null,
+     "so_thuc_the": 68,
+     "so_nhom_hoa": 68,
+     "khoa_dau_5": [
+      3.767623875752381e+16,
+      3.767623875752362e+16,
+      3.767623875752355e+16,
+      3.767623875752348e+16,
+      3.767623875752347e+16
+     ],
+     "khoa_max": 3.767623875752381e+16,
+     "khoa_trung_vi": 11.815468050427329,
+     "cost_wall_s": 8.256
+    },
+    "svr+rht": {
+     "status": "OK",
+     "method_status_raw": null,
+     "error": null,
+     "so_thuc_the": 68,
+     "so_nhom_hoa": 68,
+     "khoa_dau_5": [
+      3.767623875752344e+16,
+      365.0126214784643,
+      224.73670377003208,
+      179.7825851470249,
+      178.46064020477064
+     ],
+     "khoa_max": 3.767623875752344e+16,
+     "khoa_trung_vi": 10.628054147753584,
+     "cost_wall_s": 8.256
+    }
+   }
+  },
+  "torai": "bỏ qua: nguồn TORAI chưa khóa"
+ },
+ "k_11_10": {
+  "baro-cot": {
+   "opaque_id": "dev-12a1a88069",
+   "loi_runner": null,
+   "manifest_ban_sao": {
+    "metrics.parquet": {
+     "path": "data/rcaeval/dev-12a1a88069/metrics.parquet",
+     "bytes": 995618,
+     "sha256": "bd4c70615bdb30eebee22d8728caafa931af2cc0584b71ccab8a560acd1dabd5"
+    },
+    "traces.parquet": {
+     "path": "data/rcaeval/dev-12a1a88069/traces.parquet",
+     "bytes": 43589680,
+     "sha256": "5098f8143bf2a92a43998ce071f05dede2640cf6454de99a9870ce349512d778"
+    },
+    "logs.parquet": {
+     "path": "data/rcaeval/dev-12a1a88069/logs.parquet",
+     "bytes": 26680731,
+     "sha256": "90c8400c6128295ab3d238a1a1f95912acd980ffa36dfbda66fa4d70e4ff4906"
+    }
+   },
+   "so_sanh": {
+    "native": {
+     "giong_het": true,
+     "giong_trong_sai_so": true,
+     "so_nhom": [
+      68,
+      68
+     ],
+     "trang_thai": [
+      "OK",
+      "OK"
+     ]
+    }
+   }
+  },
+  "simplerca-cot": {
+   "opaque_id": "dev-ba831dbeb8",
+   "loi_runner": null,
+   "manifest_ban_sao": {
+    "metrics.parquet": {
+     "path": "data/rcaeval/dev-ba831dbeb8/metrics.parquet",
+     "bytes": 993969,
+     "sha256": "476e462eb28b2b98c90b60573c87173d7922f075644b6d276db500a1f993442d"
+    },
+    "traces.parquet": {
+     "path": "data/rcaeval/dev-ba831dbeb8/traces.parquet",
+     "bytes": 34416370,
+     "sha256": "e913ed0c991048c508e9e888ade9230892b36dcf7237b509bb1213dcd86e2592"
+    },
+    "logs.parquet": {
+     "path": "data/rcaeval/dev-ba831dbeb8/logs.parquet",
+     "bytes": 17201540,
+     "sha256": "f8b4a004ccc5911bcaa52001b6321f50c4d7b9fb7bab8c0019193652fb814f38"
+    }
+   },
+   "so_sanh": {
+    "native": {
+     "giong_het": true,
+     "giong_trong_sai_so": true,
+     "so_nhom": [
+      45,
+      45
+     ],
+     "trang_thai": [
+      "OK",
+      "OK"
+     ]
+    }
+   }
+  },
+  "simplerca-dong": {
+   "opaque_id": "dev-ba831dbeb8",
+   "loi_runner": null,
+   "manifest_ban_sao": {
+    "metrics.parquet": {
+     "path": "data/rcaeval/dev-ba831dbeb8/metrics.parquet",
+     "bytes": 993982,
+     "sha256": "946555815950db86de95946e412ede0bde6379dbec773f6e72c44f456ff9889f"
+    },
+    "traces.parquet": {
+     "path": "data/rcaeval/dev-ba831dbeb8/traces.parquet",
+     "bytes": 41487944,
+     "sha256": "fe957db56ecd61be893488324b8dcf7df424a75015c47392d2317156ad551272"
+    },
+    "logs.parquet": {
+     "path": "data/rcaeval/dev-ba831dbeb8/logs.parquet",
+     "bytes": 23175377,
+     "sha256": "dabd0e7c8a333d613bdc3e11c8971afac69ecd52816306fad89881df96793a00"
+    }
+   },
+   "so_sanh": {
+    "native": {
+     "giong_het": true,
+     "giong_trong_sai_so": true,
+     "so_nhom": [
+      45,
+      45
+     ],
+     "trang_thai": [
+      "OK",
+      "OK"
+     ]
+    }
+   }
+  },
+  "tracerca-dong": {
+   "opaque_id": "dev-ba831dbeb8",
+   "loi_runner": null,
+   "manifest_ban_sao": {
+    "metrics.parquet": {
+     "path": "data/rcaeval/dev-ba831dbeb8/metrics.parquet",
+     "bytes": 993982,
+     "sha256": "946555815950db86de95946e412ede0bde6379dbec773f6e72c44f456ff9889f"
+    },
+    "traces.parquet": {
+     "path": "data/rcaeval/dev-ba831dbeb8/traces.parquet",
+     "bytes": 41488748,
+     "sha256": "564a3082e786f84a8c3e0e57959cc062f4b82d58ec5ae449adbe7131df593dd0"
+    },
+    "logs.parquet": {
+     "path": "data/rcaeval/dev-ba831dbeb8/logs.parquet",
+     "bytes": 23200748,
+     "sha256": "00066f4202c5517a2816a3b16eb77cf589ba2ac37a99f3cb83b45ad8cc241e81"
+    }
+   },
+   "so_sanh": {
+    "native": {
+     "giong_het": true,
+     "giong_trong_sai_so": true,
+     "so_nhom": [
+      24,
+      24
+     ],
+     "trang_thai": [
+      "OK",
+      "OK"
+     ]
+    }
+   }
+  },
+  "circa-cot": {
+   "opaque_id": "dev-03d4910932",
+   "loi_runner": null,
+   "manifest_ban_sao": {
+    "metrics.parquet": {
+     "path": "data/rcaeval/dev-03d4910932/metrics.parquet",
+     "bytes": 992636,
+     "sha256": "ad7cc89cbd80842311dc3119cbee82c5fde21d069b976e6ee5b90977cb1aea91"
+    },
+    "traces.parquet": {
+     "path": "data/rcaeval/dev-03d4910932/traces.parquet",
+     "bytes": 33098412,
+     "sha256": "267227d5413f6ea16ed1a7c3c45344e9e637da0996654cfe852127283d779713"
+    },
+    "logs.parquet": {
+     "path": "data/rcaeval/dev-03d4910932/logs.parquet",
+     "bytes": 14823426,
+     "sha256": "5afe9f3e6fd4077a7f0f1ce0277b9602957685428872f62be2947807d77f6a32"
+    }
+   },
+   "so_sanh": {
+    "svr+rht_da": {
+     "giong_het": true,
+     "giong_trong_sai_so": true,
+     "so_nhom": [
+      68,
+      68
+     ],
+     "trang_thai": [
+      "OK",
+      "OK"
+     ]
+    },
+    "svr+rht": {
+     "giong_het": true,
+     "giong_trong_sai_so": true,
+     "so_nhom": [
+      68,
+      68
+     ],
+     "trang_thai": [
+      "OK",
+      "OK"
+     ]
+    }
+   }
+  },
+  "circa-dong": {
+   "opaque_id": "dev-03d4910932",
+   "loi_runner": null,
+   "manifest_ban_sao": {
+    "metrics.parquet": {
+     "path": "data/rcaeval/dev-03d4910932/metrics.parquet",
+     "bytes": 992648,
+     "sha256": "fa658b5101061ce61acfc3fc595163ce817b37286cf0fd5a09ba554ade49deb8"
+    },
+    "traces.parquet": {
+     "path": "data/rcaeval/dev-03d4910932/traces.parquet",
+     "bytes": 39745749,
+     "sha256": "8662eced2dddb88c7c165c63a709d478a90bb8ef78faad105a8fb7b8ee2eea08"
+    },
+    "logs.parquet": {
+     "path": "data/rcaeval/dev-03d4910932/logs.parquet",
+     "bytes": 20045068,
+     "sha256": "d48620ad9a1514425a22a20d0733378f92ad5ec3aa6b8c100a19291b505f181a"
+    }
+   },
+   "so_sanh": {
+    "svr+rht_da": {
+     "giong_het": true,
+     "giong_trong_sai_so": true,
+     "so_nhom": [
+      68,
+      68
+     ],
+     "trang_thai": [
+      "OK",
+      "OK"
+     ]
+    },
+    "svr+rht": {
+     "giong_het": true,
+     "giong_trong_sai_so": true,
+     "so_nhom": [
+      68,
+      68
+     ],
+     "trang_thai": [
+      "OK",
+      "OK"
+     ]
+    }
+   }
+  }
+ },
+ "bo_qua": {
+  "microrank": "dừng nhánh ở D6 (bước 2): không chạy cửa sổ bình thường, hoán vị, hash seed 1",
+  "torai_hoan_vi": "không kiểm: GMM (thứ tự cột) và Drain (thứ tự dòng log cùng giây) phụ thuộc thứ tự theo thiết kế"
+ }
+}
