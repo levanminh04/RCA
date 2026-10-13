@@ -1,0 +1,1 @@
+Checkpoint cuối T-033 phiên9. Report002 là bộ đầu ra hiện hành; chờ Claude/Minh. Đọc self-check/ledger/manifest/handoff. LOG/STATE trong manifest dùng snapshot LOG.md.after/STATE.md.after để kiểm lịch sử. Giữ checkpoint001; bản diff chuẩn hóa ở đây chỉ sửa hiển thị line ending, không đổi prefix LOG. Không có EC2 mới hoặc ngân sách khác.

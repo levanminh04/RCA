@@ -1,0 +1,60 @@
+--- SPEC.md before
++++ SPEC.md after
+@@ -1,6 +1,6 @@
+ # T-033 — Lần theo cơ chế báo động trước mốc
+ 
+-- **Trạng thái:** nháp được Minh duyệt sửa ngày 09/10/2026 theo Q-91 và Q-92; chờ Claude kiểm bản sửa và Minh duyệt thực hiện/ngân sách. Chưa khóa SPEC hoặc khởi chạy nghiên cứu.
++- **Trạng thái:** Minh duyệt SPEC và thực hiện ngày 09/10/2026 (Q-91, Q-92; lời duyệt "ĐÃ CHỐT"); SPEC đã khóa. Đang thực hiện các chặng được duyệt; tiến độ ở dòng T-033 STATE và LOG.
+ - **Phạm vi bổ sung:** giữ tên task, lần theo cả báo động trước mốc, tác động các phần tiền xử lý và độ trễ/không báo sau proxy. Không coi mốc tiêm là onset thật.
+ - **Người làm:** Codex (Minh chọn ngày 09/10/2026).
+ - **Người phản biện:** Claude (Minh chọn ngày 09/10/2026).
+--- STATE.md: close-step before
++++ STATE.md: close-step after
+@@ -41,7 +41,7 @@
+ | T-028 | P4: hạn chế xếp hạng chế độ (a) | P4 | Codex | Claude | Xong (08/10/2026), Minh duyệt đóng. Đã sửa R1–R4 và bổ sung R5; kết quả runs/phan-hoi-review-001, phép đo gốc buoc3-005. Nơi xử lý "lan có đáng kể" còn OPEN; chưa phân xử nhân quả. Chưa commit | `tasks/T-028-p4-han-che-xep-hang/` |
+ | T-029 | P4: hạn chế phát hiện chế độ (b) | P4 | Codex | Claude | Xong (09/10, Minh duyệt đóng theo Q-87). Đã sửa REVIEW-4 và P1/P2; REVIEW-5 không có lỗi đáng kể. Giữ các giới hạn đã khai; chưa commit | `tasks/T-029-p4-han-che-phat-hien/` |
+ | T-032 | Lần theo nguyên nhân thất bại xếp hạng | P4 | Codex | Claude | Đang thực hiện: BARO RE2 chạy nền ổn định (LOG phiên 2); MicroRank lệch tuyệt đối cả native, dừng nhánh/A′; chưa khóa đối chứng hay kết luận cơ chế | `tasks/T-032-g2-nguyen-nhan-xep-hang/` |
+-| T-033 | Lần theo cơ chế báo động trước mốc | P4 | Codex | Claude | Đang thực hiện theo Minh duyệt 09/10: chuẩn bị nguồn/hash/EC2; chưa chạy nghiên cứu | `tasks/T-033-g2-nguyen-nhan-phat-hien/` |
++| T-033 | Lần theo cơ chế báo động trước mốc | P4 | Codex | Claude | Đang thực hiện: N-Sigma lõi 60/60 PASS; BOCPD full/FF/PP ca đầu đạt, 29 ca còn lại chạy nền ổn định trên EC2; checkpoint LOG phiên 1. Chưa FP/PF, nền cố định hoặc kết luận cơ chế | `tasks/T-033-g2-nguyen-nhan-phat-hien/` |
+ 
+ 
+ ## Task đang mở
+--- WHY.md before
++++ WHY.md after
+@@ -437,3 +437,16 @@
+ **Bằng chứng:** MRP P4, DT18-NV2/NV3, hướng dẫn cô §1 và đường tính trong code phương pháp ở revision đã tạo P3. Chưa có kết quả task này; lựa chọn là kế hoạch kiểm, không xác nhận giả thuyết.
+ 
+ **Kết luận phụ thuộc:** căn cứ cơ chế tính toán/ứng viên P5–P6, đầu vào K4 của tổng hợp G2 và yêu cầu quan sát FlashTicket; nguyên nhân vật lý và lợi ích đồ thị vẫn cần bằng chứng tương ứng. A′ được chọn không biến câu còn mở thành đã xác nhận. Chỉ phép so toàn gói weighting được hỗ trợ; không quy riêng cạnh/prior hoặc nguồn vật lý của counts. Có thể có tương tác với nhánh thiếu support và operation đạt max service, phải lưu trung gian. Khi phần lõi chưa phân xử caller/root, trình đúng bằng chứng/phép kiểm cần bổ sung và lựa chọn phụ thuộc; không dừng ở OPEN. Không chọn nhánh/ca theo tăng hạng root, không thêm seed/ngưỡng mới. Margin chuẩn hóa để so chênh có dấu giữa ca có thang điểm khác nhau, vẫn giữ điểm thô/mẫu số 0. Đây không là ngưỡng lan hoặc lựa chọn theo accuracy. Chỉ nối mục này vào docs/WHY.md khi Minh duyệt thực hiện đúng nội dung.
++
++
++## WHY-41. Lần theo cơ chế phát hiện — Đã quyết (Minh duyệt SPEC T-033 ngày 09/10/2026)
++
++**Chọn:** xác minh lõi native full/FF/I1 theo trạng thái nguồn, kể cả tái lập non-OK, trước; khóa nhóm/đối chứng và ánh xạ ca; phân rã mask × nguồn min/max trên tiền tố, lần theo độ trễ full và contrast ngưỡng N-Sigma cập nhật/cố định trước proxy. D chuyển sang kiem-tiep, chưa chạy. Nhánh mới là chẩn đoán; không chọn detector online hoặc đổi số P3.
++
++**Vì sao:** cờ/số CP không chỉ bước gây báo; full/I1 đổi nhiều yếu tố. Giữ mask để so scale, giữ nguồn scale để so gói cột/d/prior, báo tương tác để không gán tổng effect cho một phần. Full cần cho trạng thái sau proxy; ngưỡng cố định cùng k native kiểm tác động cập nhật lịch sử, không chứng minh nền sạch. Đặt độ lệch sau proxy cạnh mật độ báo trước và chuỗi cờ qua proxy để không gọi báo đang tiếp diễn là vừa phát hiện sự cố; không thêm ngưỡng. Giữ raw prefix/mask/d/prior thì contrast nguồn scale/fill là khác biệt xử lý, không tự là thay đổi thật của hệ thống; đo đường likelihood/posterior/CP, không buộc đầu vào khác phải đổi CP. Tái dùng FF từ full giảm chạy trùng khi invariants đạt.
++
++**Phương án đã xét:** chỉ so số CP (không chỉ bước); chỉ tiền tố (không giải thích sau proxy); thay prior ở khác chiều như cùng mô hình (không định nghĩa duy nhất); zero-padding hoặc thêm epsilon để đủ factorial (đổi phép tính và có thể tạo kết quả hiển nhiên); chạy surrogate rộng (thay nhiều thuộc tính); chọn D để báo hiệu quả (không có onset/end thật). Chọn native full + thiết kế hai yếu tố có giới hạn, giữ phần không tách được. Đã xét loại mọi range0/d0/input trùng/lỗi khỏi contrast: làm mất khác biệt xử lý hợp lệ hoặc biến không có khác biệt thành thiếu bằng chứng; thay bằng bốn trạng thái riêng, giữ output/lỗi native và mẫu số. Không chữa native để có effect. Không bắt mọi yếu tố phải tách độc lập mới cho phép báo căn cứ có điều kiện.
++
++**Bằng chứng:** MRP P4, DT18-NV2/NV3, hướng dẫn cô §1, code detector ở revision đã chạy và nguồn đóng băng T-025/T-029. Chưa có kết quả task này; đây là kế hoạch kiểm, không xác nhận giả thuyết.
++
++**Kết luận phụ thuộc:** căn cứ thành phần tiền xử lý/detector P6 và giới hạn đánh giá; mask/d/prior chưa tách, nhánh prefix/full đều còn nhìn trước, onset thật chưa biết. Các quy tắc native, factorial, ngưỡng cố định từ [:i_proxy] và chỉ số CP/m/delay là lựa chọn chẩn đoán khai trước; không có ngưỡng Late hoặc surrogate chọn từ accuracy. Cơ chế tính toán không tự xác nhận thay đổi vật lý, nền sạch hoặc ưu thế causal detector; thành phần hiệu chỉnh còn OPEN nếu chưa phân xử. Chỉ nối mục này vào docs/WHY.md khi Minh duyệt thực hiện đúng nội dung.
+--- LOG.md: close-step before
++++ LOG.md: close-step after
+@@ -60,3 +60,17 @@
+ ```
+ 
+ File exit: `~/rca/T-033/runs/bocpd-rest-001.exit`; shell PID: `~/rca/T-033/runs/bocpd-rest-001.shell.pid`. Nếu tmux session không còn, đọc exit và status trước khi kết luận. Lệnh launch đã dùng: `tmux -S ~/rca/T-033/tmux.sock -f /dev/null new-session -d -s t033-bo-rest 'bash /home/ubuntu/rca/T-033/scripts/bocpd_job.sh bocpd-rest-001 rest'`. Không launch lại lệnh này khi chưa kiểm.
++
++
++### Kết thúc phiên 1 — 2026-10-10T00:40:44.956538+07:00
++
++1. Đã làm: khóa nguồn/nhóm ban đầu, nối WHY-41 theo phụ lục duyệt; preflight dev/env/index đạt; N-Sigma native 60/60 đầu ra đạt; BOCPD ca đầu full/FF/PP đạt và lô còn lại chạy nền. Snapshot mới: `results/T-033/runs/checkpoint-session1-002/remote-snapshot.json` → `/statuses`, `/completed_case_branches`, `/resources`, `/scripts`. Tại snapshot, lô còn lại đã hoàn tất full/FF/PP cho 1 ca: dev-03d4910932; PID 28484, status RUNNING. Snapshot cũ vẫn giữ. Chưa xong task.
++2. File thay đổi trong phiên: `results/T-033/` (scripts, source/flags đóng gói, manifest, khóa nhóm, snapshot); tạo và nối `tasks/T-033-g2-nguyen-nhan-phat-hien/LOG.md`; chỉ dòng trạng thái `SPEC.md`; chỉ dòng T-033 `docs/STATE.md`; chỉ nối WHY-41 vào `docs/WHY.md`. EC2 chỉ ghi `~/rca/T-033/`. Không sửa DECISIONS hay nguồn/code/data cũ, không test/locked/heldout, không commit/push, không bật/tắt EC2. Không đọc/ghi vùng kết quả T-032.
++3. Kiểm: hash nguồn cũ và allowlist/dev; N-Sigma toàn cờ/time/columns/hợp native; fixture không nhãn và phép tính tay; BOCPD full/PP source exact, ca đầu same-input native, FF m/CP từng ca hợp lệ; trung gian posterior/normalizer/theta. Lượt metadata lỗi giữ nguyên, recheck chỉ schema khôi phục contract. Snapshot hai đầu cùng hash. Tự kiểm diff lưu `results/T-033/runs/checkpoint-session1-final/scope-verification.json` và `own-diff.txt`: SPEC ngoài dòng status không đổi; lần đóng chỉ dòng T-033 STATE đổi, bảo toàn T-032; WHY prefix và phụ lục chính xác; AGENTS giữ nguyên; AST mọi script đạt. Chưa có kết luận nghiên cứu từ việc khớp nguồn.
++4. OPEN và việc Minh cần làm: cần các nhánh bổ sung, độ trễ/kênh, tính tay/đối chứng và tổng hợp để phân xử cơ chế RQ2/P4; chưa chọn thiết kế P6 hay đóng G2. Ngân sách còn lại phải đo lại trước các nhánh mới; lô đang chạy có guard dừng lỗi/budget. EC2 còn cần bật; Minh có thể tắt laptop cho lô lõi hiện tại, ước lượng xong lô 05:30–08:30 ngày 10/10 +07, chưa phải hoàn tất T-033. Theo AGENTS §5a.2, đề nghị Minh mở phiên Codex mới khi quay lại, tiếp cùng task sau checkpoint; giữ vai trò, không gửi phản biện khi task chưa xong.
++
++Lệnh cuối cùng đã chạy: Python `-B -X utf8 results/T-033/scripts/finish_session1.py` trên laptop để chốt trạng thái/LOG và kiểm phạm vi. Lệnh EC2 cuối: snapshot-only `checkpoint_remote.py --name checkpoint-session1-002`, sau đó chép snapshot+hash về; worker nền không đổi. Bước tiếp theo chính xác: đọc LOG checkpoint trên; SSH kiểm `bocpd-rest-001/status.json`, stdout/stderr/exit, PID từ status và `~/rca/T-033/trang-thai.txt`; kiểm hash manifest của đơn vị đã hoàn tất trước dùng. Không khởi trùng/làm lại ca PASS. Sau khi lõi liên quan đã khớp, tiếp các chặng SPEC và cập nhật dự toán; nếu STOPPED hoặc dự toán vượt giới hạn thì dừng phần phụ thuộc và trình Minh.
++
++Prompt Minh mở phiên Codex tiếp (tiếp thực hiện, chưa là prompt phản biện):
++
++> Đọc AGENTS.md, làm tiếp T-033 trong STATE. Minh đã duyệt thực hiện 09/10/2026 theo lời "ĐÃ CHỐT", phạm vi/ngân sách và ràng buộc trong LOG phiên 1. Đọc toàn SPEC và mục cuối LOG T-033. EC2 3.107.246.249 có lô bocpd-rest-001 đang chạy nền, không khởi trùng hoặc chạy lại đơn vị PASS. Kiểm PID/status/progress, hash nguồn và manifest trước dùng; tiếp phần còn thiếu đúng các chặng, ưu tiên tính đúng. Giữ các giới hạn ghi song song T-032, không test/locked/heldout, không commit/push, không bật/tắt EC2. Nếu lỗi khoa học hay vượt dự toán, checkpoint và trình Minh. Khi task xong mới soạn prompt Claude theo mẫu.

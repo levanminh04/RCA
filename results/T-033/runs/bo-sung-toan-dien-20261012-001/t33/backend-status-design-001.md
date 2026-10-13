@@ -1,0 +1,11 @@
+# K5 — trạng thái literal trong log backend
+
+Phạm vi: đúng 30 devallowlist cũ, union ±60giây quanh điểm/đối chứng đã khóa, mỗi row một lần. Source logs và schema pin trước đọc như log_semantics. Không thay telemetry, detector, nhãn hoặc vùng quan sát; log missing là N/A. Một worker nhẹ threads1 trên EC2T33, output compressed selected literals và summary; không có R hoặc engine rerun.
+
+Grammar1: `Response(status=<integer>, msg=<text until literal , data=>, data=...)`. Chỉ lấy integer trực tiếp và msg trước delimiter `, data=`. Không gán status0/1 thành success/failure. Chỉ grammar khớp mới là decoded occurrence, không request count. Một raw row có nhiều Response được giữ thành nhiều occurrence với cùng source_row và ordinal; nesting/không delimiter giữ N/A unparsed, không đoán một outcome tổng.
+
+Grammar2: literal `:<whitespace><<HTTPcode>,Response(status=...)` hoặc `is : <HTTPcode>,Response(...)` kiểu ResponseEntity thực tế, HTTPcode3digits100–599 phải ngay trước `,Response(` và là đầu payload sau logger colon/phrase `... is :`. Không lấy mọi số3digits trong message làm HTTPstatus; marker không khớp giữ ambiguous/N/A. Grammar này chỉ xác nhận code được serialize trong log, không chứng minh wire-response, invocation, hoặc lỗi benchmark. Header `x-application-context=[...]` giữ literal để hỗ trợ vị trí outcome; không tự alias container/service.
+
+Giữ nguồn row/time/container, SHA256 message nguyên trạng, logger nếu chuẩn Springlog khớp, bounded operationprefix trước Response, correlationkey theo parser hiện hữu (unknown layout N/A). Mọi occurrence giữ exact applicationstatus/msg/serializedHTTPcode và full window membership thông qua source timestamp; source_message đọc lại được qua row/hash. Tổng candidate Response markers = parsed + unparsed theo từng ca; statuscount totals = decodedoccurrences; row-level flags đếm một row một lần và không giả requestcount. HTTP parsed/aliteral source audit phải đọc nguồn và đối chiếu mẫu/mapping/conservation trước dùng.
+
+Giới hạn: literal status/msg có semantics ứng dụng chưa xác minh từ source system; nhiều log outcome có thể từ lời gọi con/cùngrequest/redo và không độc lập. Chưa có certified trace/span/invocation join hoặc cleannegative/onset. Output giúp sửa câu 'không outcome ở bất kỳ đâu' thành đúng vị trí và độ hạt; không chọn P6 hoặc chấm false alarm.

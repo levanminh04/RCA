@@ -1,0 +1,25 @@
+"""Reproducible compact summaries of immutable additive artifacts."""
+import collections,hashlib,json,pathlib,sys
+P=pathlib.Path(__file__).resolve().parent
+def read(p):return json.loads(p.read_text())
+def pin(p):return {'file':p.name,'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'bytes':p.stat().st_size}
+contexts=[(p,read(p)) for p in sorted(P.glob('dev-*--context.json'))];graphs=[(p,read(p)) for p in sorted(P.glob('dev-*--graph-probe.json'))]
+bydet={}
+for det in ['nsigma','nsigma_doi_chung']:
+ rows=[];total_native=0;total_rolling=0;den=0;D={k:collections.Counter() for k in [30,60,120,300,600]};samefirst=collections.Counter()
+ for p,v in contexts:
+  n=next(x for x in v['nsigma'] if x['detector']==det);a=n['native_curve'];b=n['rolling_curve'];total_native+=sum(int(k)*c for k,c in n['native_OR_trigger_count_histogram'].items() if int(k)>0) # per-column trigger cells
+  denom=sum(n['native_OR_trigger_count_histogram'].values());den+=denom;native_OR=sum(c for k,c in n['native_OR_trigger_count_histogram'].items() if int(k)>0);rolling_OR=len(n['rolling_alarm_indices']);total_rolling+=rolling_OR
+  fa,fb=a['first_post_offset'],b['first_post_offset'];relation='equal' if fa==fb else ('missing' if fa is None or fb is None else ('earlier' if fb<fa else 'later'));samefirst[relation]+=1
+  for k in D:
+   if k<len(a['D_seconds']):D[k]['native_post_any']+=a['post_any_alarm_by_D'][k];D[k]['rolling_post_any']+=b['post_any_alarm_by_D'][k]
+  rows.append({'opaque_id':v['opaque_id'],'native_OR_flags':native_OR,'rolling_OR_flags':rolling_OR,'denominator_evaluated_rows':denom,'native_first_pre_offset':a['first_alarm_offset'],'rolling_first_pre_offset':b['first_alarm_offset'],'native_first_post_offset':fa,'rolling_first_post_offset':fb,'rolling_first_post_relation':relation,'rolling_std0_trigger_cells':n['rolling_std0_trigger_cells'],'source':p.name+'#/nsigma/'+str(v['nsigma'].index(n))})
+ bydet[det]={'rows':rows,'first_post_relation':dict(samefirst),'rolling_OR_count':total_rolling,'total_evaluated_rows':den,'D_sensitivity':{str(k):dict(v) for k,v in D.items()},'interpretation':'conditional computational effect; operational false-alarm/onset quality not identified'}
+grows=[]
+for p,v in graphs:
+ e=set(map(tuple,v['usable_edges']));r=set(map(tuple,v['rewired_edges']));grows.append({'opaque_id':v['opaque_id'],'usable_edges':len(e),'edge_symmetric_difference_vs_rewired':len(e^r),'rewired_identical':e==r,'feature_nodes':v['feature_node_count'],'nodes_with_graph_context':sum(x['has_graph_context'] for x in v['effects']),'nodes_real_vs_noedge_changes':sum(x['real_vs_noedge_changed_points']>0 for x in v['effects']),'nodes_real_vs_rewired_changes':sum(x['real_vs_rewired_changed_points']>0 for x in v['effects']),'status_present_rows':v['status_present_rows'],'trace_rows':v['trace_rows'],'source':p.name})
+bo={k:sum(v['bocpd_curve']['post_any_alarm_by_D'][k] for p,v in contexts if k<len(v['bocpd_curve']['D_seconds'])) for k in [30,60,120,300,600]}
+logs=[{'opaque_id':v['opaque_id'],'region_rows':v['full_log_region_semantics'].get('rows'),'missing':v['full_log_region_semantics'].get('messages_missing'),'tokens':v['full_log_region_semantics'].get('level_token_combinations'),'exception_class_tokens':list(v['full_log_region_semantics'].get('exception_or_error_class_token_samples',{})),'source':p.name+'#/full_log_region_semantics'} for p,v in contexts]
+theta=[(p,read(p)) for p in sorted(P.glob('dev-*--theta-density-*.json'))]
+result={'status':'PARTIAL_WHILE_ENGINE_THETA_RUNNING','context_cases':len(contexts),'graph_cases':len(graphs),'source_files':[pin(p) for p,v in contexts+graphs+theta],'nsigma':bydet,'bocpd_post_any_byD':bo,'graph_probe_rows':grows,'full_log_region_rows':logs,'theta_sources_done':len(theta),'theta_points_done':sum(len(v['rows']) for p,v in theta),'theta_originally_absent_points_now_reconstructed':sum(not r['had_saved_theta'] for p,v in theta for r in v['rows']),'theta_stored_state_exact_checks':sum(v['all_saved_theta_checks'] for p,v in theta),'theta_manual_logpdf_max_abs_difference':max([v['manual_log_density_max_abs_difference'] for p,v in theta],default=None),'limits':['No clean-negative/effective-onset/request outcome/fault-end metadata; no operational truth labels synthesized','Rolling previous100 rows, not100finite observations; no independence or Gaussian-tail claim','Graph uses spanSTART baseline100, not necessarily available by clock100; nodes from whole-record conditional inventory','Graph arbitrary formula/single rewiring seed is computational feasibility, no P6 design choice/benefit','Native prior marginal consistency verified algebra/fixture; fixed-d prior sweep does not identify source mask effect','Physical onset/end unidentifiable from unchanged artifacts; new observations required, not more same detector runs']}
+name=sys.argv[1];q=P/name;assert not q.exists();q.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n');print(json.dumps({'summary':name,'contexts':len(contexts),'graphs':len(graphs),'theta_sources':len(theta),'nsigma_first_post':{k:v['first_post_relation'] for k,v in bydet.items()},'bocpd_D':bo},ensure_ascii=False))

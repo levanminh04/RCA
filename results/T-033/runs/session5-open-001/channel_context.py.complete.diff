@@ -1,0 +1,43 @@
+--- channel_context.py.before
++++ channel_context.py
+@@ -80,15 +80,28 @@
+ 
+ def guard(home, source, started, projected=0):
+     require(not (home / 'STOP').exists(), 'STOP user/agent')
+-    elapsed = (datetime.now(timezone.utc) - started).total_seconds()
+-    require(0 <= elapsed < source['budget_compute_s'], 'BUDGET_STOP: approved total calendar budget')
++    ledger_path = home / 'runs/session5-budget-001/ledger.json'
++    expected_ledger = os.environ.get('T033_PROCESSING_LEDGER_SHA256')
++    require(bool(expected_ledger) and sha(ledger_path) == expected_ledger,
++            'BUDGET_LEDGER_HASH: processing ledger must be pinned')
++    ledger = read(ledger_path)
++    require(ledger['accounting_valid_for_next_run'] and ledger['approved_total_processing_s'] is not None,
++            'BUDGET_LEDGER_INCOMPLETE: missing processing time; no new allocation')
++    require(ledger['source_sha256'] == sha(home / 'inputs/source.json'), 'BUDGET_LEDGER_SOURCE mismatch')
++    # The launcher supplies the current process start, not the historic first-compute date.
++    active_started = datetime.fromisoformat(os.environ['T033_ACTIVE_PROCESS_STARTED_UTC'])
++    active_wall = (datetime.now(timezone.utc) - active_started).total_seconds()
++    used_before = float(ledger['approved_total_processing_s'])
++    elapsed = used_before + active_wall
++    require(0 <= active_wall and 0 <= used_before <= elapsed < source['budget_compute_s'],
++            'BUDGET_STOP: cumulative processing budget exhausted')
+     used = sum(p.stat().st_size for p in home.rglob('*') if p.is_file())
+     free = shutil.disk_usage(home).free
+     require(used + projected < source['budget_bytes'], 'BUDGET_STOP: approved storage before write')
+     require(projected < free, 'DISK_STOP: insufficient free bytes before write')
+     return {'new_bytes': used, 'disk_free_bytes': free,
+             'ram_available_bytes': psutil.virtual_memory().available,
+-            'machine_elapsed_since_first_compute_s': elapsed}
++            'cumulative_processing_s': elapsed}
+ 
+ 
+ def integer_values(series, name):
+@@ -243,7 +256,7 @@
+                      'present_rows': int(duration_valid.sum()), 'missing_rows': int((~duration_valid).sum()),
+                      'negative_rows': int(((duration < 0) & duration_valid).sum()),
+                      'physical_conversion_or_end_time_filter_used': False},
+-        'status': {'present_rows': int(status_valid.sum()), 'missing_rows': int((~status_valid).sum()),
++        'status_code': {'present_rows': int(status_valid.sum()), 'missing_rows': int((~status_valid).sum()),
+                    'interpretation': 'Raw values only; no error/status semantics assumed'},
+         'checks': checks}
+     return arrays, summary

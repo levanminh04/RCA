@@ -1,0 +1,11 @@
+--- preserved/channel_context.py
++++ session6-001/channel_context.py
+@@ -80,7 +80,7 @@
+ 
+ def guard(home, source, started, projected=0):
+     require(not (home / 'STOP').exists(), 'STOP user/agent')
+-    ledger_path = home / 'runs/session5-budget-001/ledger.json'
++    ledger_path = (home / os.environ['T033_PROCESSING_LEDGER_PATH']).resolve()
+     expected_ledger = os.environ.get('T033_PROCESSING_LEDGER_SHA256')
+     require(bool(expected_ledger) and sha(ledger_path) == expected_ledger,
+             'BUDGET_LEDGER_HASH: processing ledger must be pinned')

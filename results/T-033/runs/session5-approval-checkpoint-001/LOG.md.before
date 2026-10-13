@@ -1,0 +1,305 @@
+# LOG T-033 — Lần theo cơ chế phát hiện
+
+## Phiên 1 — 09/10/2026 — Codex — laptop Windows 11 và EC2 T-033 — Người làm
+
+- Minh duyệt SPEC ngày 09/10/2026.
+- Intent: EXECUTE. USER_CONFIRMED: Minh nói "ĐÃ CHỐT", duyệt SPEC trên file, thứ tự lõi → nhánh bổ sung, ngân sách 4–12 giờ máy và tối đa 4 GiB mới; chạy nền/qua đêm trên EC2 3.107.246.249 với keys.pem. Vượt dự toán phải checkpoint, dừng và trình Minh. Không test/locked/heldout, không commit/push hoặc bật/tắt EC2.
+- Phạm vi: results/T-033/, LOG chỉ nối, dòng T-033 STATE, trạng thái SPEC T-033, WHY-41 nguyên phụ lục, EC2 ~/rca/T-033/. Không đọc/ghi results/T-032/ hoặc ~/rca/T-032/. Phiên T-032 chịu trách nhiệm DECISIONS lời duyệt chung; phiên này không ghi DECISIONS.
+- Đã đọc AGENTS, STATE, toàn SPEC. Chưa có LOG hoặc results T-033; không có đầu ra cần làm lại. STATE/SPEC còn trạng thái trước duyệt; cập nhật đúng dòng được Minh cho phép. Đọc MRP RQ2/P4, DT18-NV2/NV3, hướng dẫn cô §1, LESSONS và WHY-34/35/39/40; không coi số cờ là cơ chế hoặc proxy là onset thật.
+- Nối WHY-41 nguyên văn phụ lục trước dùng lựa chọn. Bảo toàn byte ngoài dòng SPEC/STATE và prefix WHY; baseline tại results/T-033/runs/prepare-001/.
+- Một trợ lý chỉ đọc hỗ trợ tìm contract N-Sigma; không phải reviewer chính thức, không ghi hoặc chạy phương pháp. Claude vẫn là reviewer do Minh chuyển thủ công.
+- Kết nối đầu: sandbox chặn SSH; thử ngoài sandbox được duyệt tự động nhưng strict host checking báo chưa có khóa host mặc định. Không sửa known_hosts của Minh. Key đã xác định D:/RCA-ext/keys/keys.pem; sẽ lưu khóa host TOFU mới chỉ trong run T-033 với accept-new trước SSH. Không tắt kiểm host key.
+- CẦN GIỮ LAPTOP MỞ: chưa kiểm môi trường, hash và ca đầu; chưa có run ổn định. Các ca/bước chưa chạy. Chưa có kết luận nghiên cứu.
+
+- 2026-10-09T23:39:19.716040+07:00 — Lệnh có ghi: T014-main Python -B -X utf8 scripts/prepare_local.py; chỉ kiểm hash/đóng gói nguồn, không tính phương pháp. Python py không có trong PATH; Python env bị sandbox chặn lần đầu, gọi ngoài sandbox đã chạy mở phiên đạt.
+
+- 2026-10-09T23:39:45.212054+07:00 — Chuẩn bị nguồn PASS 3378 output T-029; nguồn N-Sigma và 60 flags NPZ khớp; 30 ca dev/89 tệp allowlist hash+kích thước đạt. Copy flags/source vào prepare-001/inputs, chưa chuyển telemetry hoặc chạy EC2. Manifest input/source tại prepare-001; sử dụng BARO T-025/src/baro khớp nguồn, không dùng ~/rca/src/baro có hash khác.
+
+- Preflight EC2 lần 1 dừng trước đọc telemetry: source.json chưa chép xong vì lệnh chuyển trả về process còn chạy mà agent đã gọi bước phụ thuộc. Lỗi điều phối của Codex; không dùng đầu ra lượt này. Giữ runs/preflight-001 và preflight.out/err. Sửa script cho tên lượt qua T033_PREFLIGHT; chờ chuyển hoàn tất và kiểm hash rồi chạy preflight-002, không ghi đè lượt hỏng. Script nhỏ chuyển 5,38 giây (bao gồm kết nối); gói input 2,8 MB đang chuyển. Chưa chuyển telemetry, chưa chạy detector.
+
+- Preflight-002 PASS trên EC2: 30 ca/89 tệp dev có sẵn khớp SHA+kích thước, mọi lưới 1.441 điểm/cadence1s/proxy index720, time/columns source flags khớp; mask prefix là tập con full và d khớp. Không cần chuyển telemetry. RAM khả dụng 7.447.810.048 byte, đĩa trống 5.972.393.984 byte; đủ budget4GiB mới. Môi trường Python3.12.3, numpy1.26.4/pandas2.2.3/scipy1.14.1, giữ env cũ T025 và native T025/src/baro; không cài package/đổi version. Hash wrapper/driver/source.json hai đầu khớp. Đã khóa bao-phu-nhom 40 nhóm/90 đường ca-detector; rule nhóm factorial khai trước, coverage/đọc tay chưa làm.
+- Sắp chạy ca đầu N-Sigma trong tmux socket ~/rca/T-033/tmux.sock, session t033-ns-first; command: bash ~/rca/T-033/scripts/nsigma_job.sh nsigma-first-001 first. Python -B -X utf8, cache/tmp chỉ T033. stdout/stderr ~/rca/T-033/runs/nsigma-first-001.{out,err}; PID Python tại status.json, PID shell tại runs/nsigma-first-001.shell.pid; exit tại .exit, progress trang-thai.txt. Chỉ lõi cập nhật native, chưa freeze. Wrapper lưu mọi giá trị/count/mean/std/ngưỡng/margin/Z từ100, so toàn Z từng cột với nguồn và gọi adapter native so alarms. Lỗi kiểm/giới hạn tự dừng, giữ output. CẦN GIỮ LAPTOP MỞ: chưa biết ca đầu đạt hay không; mốc báo lại sau ca đầu hai bộ cột và fixture.
+
+- Lõi N-Sigma ca đầu dev-03d4910932 PASS hai bộ cột: toàn flags/time/column khớp NPZ nguồn, alarms/status native adapter khớp nguồn; fixture không nhãn và mean/ddof/strict tính tay đạt. Main5,69s, allcols62,97s, tổng68,72s; toàn T03317.756.773byte, RAMkhảdụng7.362.244.608byte, đĩacòn5.957.365.760byte. Đã khởi tmux t033-ns-rest chạy29ca còn lại, run nsigma-rest-001; stdout/stderr/PID/exit giống first, giữ error tự dừng. Ước lượng từ ca đầu khoảng33phút, chưa kiểm các ca khác. CẦN GIỮ LAPTOP MỞ vì còn chuẩn bị/kiểm ca BOCPD đầu; chưa báo ổn định cho toàn lịch kế tiếp. Nhánh freeze chưa chạy; bước độ trễ/trace-log/đọc tay/tổng hợp chưa làm.
+
+- Đã chuẩn bị wrapper BOCPD quan sát native: gọi online_changepoint_detection nguyên bản với proxy chỉ đọc pdf/update_theta; không chép/đổi loop. Ghi predictive density toàn lưới, mass reset/normalizer tái tính nguyên biểu thức từ operands native và kiểm posterior tái tính khớp tuyệt đối mỗi bước, R/maxes/m/CP và theta-before/after tại CP±1, điểm đầu,719/720 và vùng proxy→CP đầu hậu proxy hoặc hết chuỗi. Theo parentr→r+1; không lưu mọi covariance mọi runlength. Tolerance so R cùng input khai trước rtol1e-12/atol1e-14, m/CP/status/source exact không được miễn. Mọi native exception/nonfinite giữ ERROR riêng; lỗi observer không được coi native ERROR.
+- Ca BOCPD đầu chọn d full nhỏ nhất theo nguồn rồi opaque_id: dev-20acb4402d (d22), không chọn theo CP/accuracy. Chạy full instrumented + native same-input, FF native cắt đúng processedfull và PP instrumented/native/I1 nguồn. Fixture scalar prior/pdf/update, fill/drop/range0, constant/step/repeated/NaN/Inf/d0 và prefix cố định trước ca. Hash 3 wrapper/driver hai đầu khớp. Dự kiến ca đầu khoảng8–12phút, chưa đo; không đủ để ngoại suy chính xác mọi d39. NS đang6/30ca đạt, RAMđỉnhdư7GiB, tổngT03389MiB. Cho NS nhẹ và một BO worker nặng đồng thời, không chia mutable state phương pháp. Chưa chạy FP/PF/freeze.
+- Sắp khởi tmux t033-bo-first: bash ~/rca/T-033/scripts/bocpd_job.sh bocpd-first-001 first; stdout/stderr runs/bocpd-first-001.out/.err, status/PID runs/bocpd-first-001/status.json, shellPID/exit như NS, progress trang-thai.txt. Budget check trước mỗi ma trận có bound output và512MiB dự trữ NS; không phép đổi tham số hoặc packages. CẦN GIỮ LAPTOP MỞ tới ca đầu full/FF/PP đạt nguồn và wrapper.
+
+- Chuẩn bị mã chưa chạy: nsigma_delay.py tính density/chuỗi cờ/t_hat_plus từ từng NPZ core PASS đã hash (không onset, không threshold mới); factorial_matrices.py tạo FF/FP/PF/PP đúng mask raw-before-fill và min/max nguồn, native range0/Inf giữ nguyên, kiểm identity hai đường chéo và khai gói d/prior. Chưa khởi phép bổ sung/freeze hoặc dùng contrast trong kết luận. AST8scriptsđạt, đọc /cost/wall_s nguồn full BOCPD tổng8.418,559s; lần đọc nhầm field wall_seconds đã dừng chỉ đọc KeyError, sửa con trỏ đúng không thay nguồn. Ca BOCPD đầu mới lưu full.npz, đang native kiểm độc lập; chưa coi nguồn khớp. Budget hiện dưới200MiB trên EC2, chưa cần telemetry transfer.
+
+- BOCPD bocpd-first-001 tự dừng: chỉ checks.detector_columns=False; status/alarms/chi_so/input_shape/diagnostics nguồn và same-input status/alarms/indices/error/maxes/posterior/m đềuTrue. Đây là lỗi metadata wrapper của Codex: result_from_R nhận list(data) cột processed22 thay vì cot_bocpd cột thô30 mà adapter khai. Arraycolumns và X vẫn đúng processed. Không phải CP hay nguồn lệch, không có bằng chứng đổi khoa học/SPEC. Dừng FF/PP đúng guard; giữ nguyên run first-001. Sửa schema wrapper bằng đối số detector_columns raw riêng, còn columnsNPZ giữprocessed. Lưu snapshot 5scripts đã chạy trong prepare-001/scripts-first. Sắp chạy recheck_full_metadata.py: hash oldmanifest/NPZ, nguyên X/time/processedcolumns so preprocessingnative, dựng lại metadata từ nguyên R/maxes và rawcols, kiểm nguồnexact; chỉ khiPASS mới tiếp FF/PP ở first-002, tái dùng fullvalidatedkhông tínhtrùng. Không sửa số/lượt cũ, không nới tiêu chí, không đổi phép tính. N-Sigma độc lập tiếp tục, đã15ca đạt.
+
+- full-metadata-recheck-001 PASS: SHA oldrecord/oldNPZ khớp oldmanifest; X/time/processedcolumns so native preprocessing khớp nguyên; reconstruct result từ nguyên R/maxes với rawcols khớp toàn status/alarms/chi_so/input_shape/detector_columns/diagnostics nguồn. 7same-inputnativechecks từfirst-001 đềuTrue. Giữfirst-001FAILmetadata, không sửa số/cũ. Hash4scripts sửa hai đầu khớp. Đã khởi t033-bo-first2 / bocpd-first-002 first-reuse; full được tái dùng từ recheck, tiếp FF native vàPP instrumented/native mới. NS độc lập đang tiếp~17ca; chưa FP/PF/freeze. Lệnh xem progress giữSSHknownhost riêngT033, tail trang-thai.txt. CẦN GIỮ LAPTOP MỞ tới FF/PP đạt; dự kiến thêm4–6phút, chưa đo.
+
+- Ca BOCPD đầu bocpd-first-002 PASS full/FF/PP, exit0 (00:21:13 ngày10/10 +07). PP tất cảsource và7same-inputnativechecksTrue, wall215,713s gồm observed+plain, NPZ3.941.090byte, RAMđỉnh322.084.864byte. FFm/CPexact và maxposteriorabsdiff0; fullkiểmrawmetadata/source cùngnativeđạt từrecheck giữ số. ToànT033358.413.398byte ởmốcchốtfirst2, disk5.616.324.608byte; NS+BO~0,6GiBRAM, còn~6,7GiB. Sẽ chạy phần lõi29ca còn lại full+FFnative+PP, không FP/PF/freeze. Dự toán lõi dựa nguồn full8.418,559s và ca đầu observedfull428s so nguồn209,66s trong lúcNSđồngthời: khoảng5–8giờ còn lại, ước lượng xong05:30–08:30 ngày10/10, chưa phải giá cố định mọid/máy. Ngân sách toàn task12giờ có thể còn cần cập nhật sau lô vì FP/PF chưa đo; không tự chạy thêm phần vượt dự toán. Storage thô upper mỗi ca checked trước compute, gồm512MiB dành NS; dự toán output lõi từ ca đầu khoảng0,8–1,8GiB trênEC2, chưa kiểm toàn lô; tới budget sẽ dừng, không xóa run.
+- Driver thêm guard ngân sách toàn lịch12h từ timestamp bước tính đầu nsigma-first001 (23:46:29 09/10 +07), checkpoint khi đạt/vượt, không đổi sốTIMEOUT/giao thức của detector. Check mỗi ca/nhánh và mỗi100điểmobserved, sauplain. Đây là vận hành theo lời duyệt vượt dự toán phải dừng, không tiêu chí khoa học mới. Thêm --cases để lượt tiếp chỉ chạy ca thiếu; chưa dùng lọc lại ca hợp lệ. Bản first2 trước guard lưu prepare-001/scripts-first2. Hash driver mới hai đầu khớp, ASTđạt; numericalcode/threshold/sourcechecks giữ nguyên. Sắp khởi tmux t033-bo-rest, runbocpd-rest-001; driver .out/.err/.shell.pid/.exit, status/PID ởrun. Lastcommandsource chuẩn bị:lệnhSSHsha256sum driver; launchtiếp:bash ~/rca/T-033/scripts/bocpd_job.sh bocpd-rest-001 rest.
+
+### Checkpoint phiên 1 — 10/10/2026, 00:36 +07
+
+- Ngữ cảnh đã bị nén. Ghi checkpoint theo AGENTS §5a.2; kết thúc phiên sau kiểm phạm vi và trạng thái. Codex vẫn là người làm, Claude vẫn là người phản biện; không đổi vai hoặc mở vòng phản biện.
+- FACT: N-Sigma lõi đã PASS toàn bộ 30 ca × 2 bộ cột. Từng cờ, cột, thời gian và hợp báo động native khớp nguồn. Snapshot vận hành tại `results/T-033/runs/checkpoint-session1-001/remote-snapshot.json`, `/statuses/nsigma-first-001/status`, `/statuses/nsigma-rest-001/status`, `/completed_case_branches`; 62 NPZ hoàn tất tại thời điểm snapshot được kiểm hash. Snapshot SHA hai đầu khớp; hash nằm trong manifest, không chép lại vào văn bản.
+- FACT: ca đầu BOCPD `dev-20acb4402d` đã PASS full/FF/PP, so native cùng input và nguồn. `bocpd-first-001` vẫn giữ trạng thái STOPPED do lỗi metadata cột của wrapper; `full-metadata-recheck-001` xác nhận nguyên số hợp lệ, `bocpd-first-002` hoàn tất FF/PP. Không sửa kết quả cũ hoặc nới tiêu chí.
+- FACT: `bocpd-rest-001` đang chạy độc lập trong tmux `t033-bo-rest`, socket `/home/ubuntu/rca/T-033/tmux.sock`, Python PID 28484. Live check lúc 00:36 +07: `dev-03d4910932` đã PASS full/FF/PP và lô còn tiếp tục; `/cases/dev-03d4910932/full/checks` và `/cases/dev-03d4910932/PP/checks` toàn true, FF m/CP khớp tuyệt đối. Đây là tiến độ lõi, chưa phải kết luận cơ chế.
+- RAM đỉnh ca mới khoảng 330 MB. Snapshot lúc 00:32 +07 ghi `/resources/new_bytes`, `/resources/ram_available_bytes`, `/resources/disk_free_bytes`; live status lúc 00:36 ghi dung lượng mới khoảng 495 MB, đĩa còn khoảng 5,48 GB. Một worker BOCPD đang chạy; N-Sigma đã kết thúc. Dự toán còn lại cho lô lõi: khoảng 5–8 giờ, ước lượng xong 05:30–08:30 ngày 10/10 +07; không phải thời gian xong toàn T-033. Giới hạn toàn lịch là 12 giờ từ 23:46:29 ngày 09/10 +07 và tối đa 4 GiB mới; guard tự dừng, giữ run và ghi lỗi khi đạt giới hạn hoặc có kiểm không khớp.
+- Progress ở `/home/ubuntu/rca/T-033/trang-thai.txt` (file chung của T-033), KHÔNG ở thư mục từng run. Lệnh live check trước đã thử nhầm đường progress dưới run và báo không tồn tại; không ảnh hưởng worker, status và số. Lệnh đúng được ghi dưới đây.
+- EC2 tiếp tục cần bật. Đã đủ điều kiện cho lô lõi hiện tại chạy không phụ thuộc SSH/laptop: ca đầu đạt, intermediate và nguồn/native đạt, RAM/disk/tốc độ đã đo; driver dừng khi có lỗi. Nhánh FP/PF và nền cố định chưa khởi, phải kiểm ca đầu khi làm tới theo SPEC. Chưa tuyên bố ổn định cho các nhánh ấy.
+- OPEN: chưa phân tích độ trễ N-Sigma, độ nhạy FP/PF, nền cố định, trace/log, tính tay ca đại diện/đối chứng, độ phủ thực tế hay tổng hợp cơ chế. Script `nsigma_delay.py` và `factorial_matrices.py` mới chuẩn bị, chưa chạy. RQ2/P4 và lựa chọn P6/G2 còn OPEN; không dùng chỉ số nguồn hoặc việc tái lập đúng để coi nguyên nhân đã được phân xử.
+- Bước tiếp theo của phiên mới: đọc AGENTS, STATE, toàn SPEC và mục LOG này; đọc snapshot/manifest/checks đã hoàn tất; kiểm tiến trình và trạng thái lô dưới đây. Không chạy lại ca/lô đã PASS, không khởi lô trùng PID đang chạy. Nếu lô STOPPED/BUDGET_STOP thì đọc stderr/status trước, báo Minh phần phụ thuộc, không chạy vượt budget. Khi lô lõi PASS mới tiếp đúng thứ tự SPEC, đo lại dự toán còn lại trước FP/PF và nền cố định; cần giữ laptop mở khi kiểm ca đầu các nhánh mới.
+
+Lệnh Minh xem tiến độ từ PowerShell (không mở dataset):
+
+```powershell
+ssh -i D:/RCA-ext/keys/keys.pem -o UserKnownHostsFile=D:/RCA-flashticket/results/T-033/runs/prepare-001/known_hosts -o StrictHostKeyChecking=yes -o BatchMode=yes ubuntu@3.107.246.249 'tail -n 20 ~/rca/T-033/trang-thai.txt'
+```
+
+Lệnh phiên mới kiểm trạng thái/tiến trình/stdout/stderr (PID tại status mới là nguồn, không giả định PID cũ còn tồn tại):
+
+```powershell
+ssh -i D:/RCA-ext/keys/keys.pem -o UserKnownHostsFile=D:/RCA-flashticket/results/T-033/runs/prepare-001/known_hosts -o StrictHostKeyChecking=yes -o BatchMode=yes ubuntu@3.107.246.249 'cat ~/rca/T-033/runs/bocpd-rest-001/status.json; tail -n 20 ~/rca/T-033/runs/bocpd-rest-001.out; tail -n 20 ~/rca/T-033/runs/bocpd-rest-001.err; ps -p 28484 -o pid,etimes,rss,pcpu,args; tmux -S ~/rca/T-033/tmux.sock list-sessions'
+```
+
+File exit: `~/rca/T-033/runs/bocpd-rest-001.exit`; shell PID: `~/rca/T-033/runs/bocpd-rest-001.shell.pid`. Nếu tmux session không còn, đọc exit và status trước khi kết luận. Lệnh launch đã dùng: `tmux -S ~/rca/T-033/tmux.sock -f /dev/null new-session -d -s t033-bo-rest 'bash /home/ubuntu/rca/T-033/scripts/bocpd_job.sh bocpd-rest-001 rest'`. Không launch lại lệnh này khi chưa kiểm.
+
+
+### Kết thúc phiên 1 — 2026-10-10T00:40:44.956538+07:00
+
+1. Đã làm: khóa nguồn/nhóm ban đầu, nối WHY-41 theo phụ lục duyệt; preflight dev/env/index đạt; N-Sigma native 60/60 đầu ra đạt; BOCPD ca đầu full/FF/PP đạt và lô còn lại chạy nền. Snapshot mới: `results/T-033/runs/checkpoint-session1-002/remote-snapshot.json` → `/statuses`, `/completed_case_branches`, `/resources`, `/scripts`. Tại snapshot, lô còn lại đã hoàn tất full/FF/PP cho 1 ca: dev-03d4910932; PID 28484, status RUNNING. Snapshot cũ vẫn giữ. Chưa xong task.
+2. File thay đổi trong phiên: `results/T-033/` (scripts, source/flags đóng gói, manifest, khóa nhóm, snapshot); tạo và nối `tasks/T-033-g2-nguyen-nhan-phat-hien/LOG.md`; chỉ dòng trạng thái `SPEC.md`; chỉ dòng T-033 `docs/STATE.md`; chỉ nối WHY-41 vào `docs/WHY.md`. EC2 chỉ ghi `~/rca/T-033/`. Không sửa DECISIONS hay nguồn/code/data cũ, không test/locked/heldout, không commit/push, không bật/tắt EC2. Không đọc/ghi vùng kết quả T-032.
+3. Kiểm: hash nguồn cũ và allowlist/dev; N-Sigma toàn cờ/time/columns/hợp native; fixture không nhãn và phép tính tay; BOCPD full/PP source exact, ca đầu same-input native, FF m/CP từng ca hợp lệ; trung gian posterior/normalizer/theta. Lượt metadata lỗi giữ nguyên, recheck chỉ schema khôi phục contract. Snapshot hai đầu cùng hash. Tự kiểm diff lưu `results/T-033/runs/checkpoint-session1-final/scope-verification.json` và `own-diff.txt`: SPEC ngoài dòng status không đổi; lần đóng chỉ dòng T-033 STATE đổi, bảo toàn T-032; WHY prefix và phụ lục chính xác; AGENTS giữ nguyên; AST mọi script đạt. Chưa có kết luận nghiên cứu từ việc khớp nguồn.
+4. OPEN và việc Minh cần làm: cần các nhánh bổ sung, độ trễ/kênh, tính tay/đối chứng và tổng hợp để phân xử cơ chế RQ2/P4; chưa chọn thiết kế P6 hay đóng G2. Ngân sách còn lại phải đo lại trước các nhánh mới; lô đang chạy có guard dừng lỗi/budget. EC2 còn cần bật; Minh có thể tắt laptop cho lô lõi hiện tại, ước lượng xong lô 05:30–08:30 ngày 10/10 +07, chưa phải hoàn tất T-033. Theo AGENTS §5a.2, đề nghị Minh mở phiên Codex mới khi quay lại, tiếp cùng task sau checkpoint; giữ vai trò, không gửi phản biện khi task chưa xong.
+
+Lệnh cuối cùng đã chạy: Python `-B -X utf8 results/T-033/scripts/finish_session1.py` trên laptop để chốt trạng thái/LOG và kiểm phạm vi. Lệnh EC2 cuối: snapshot-only `checkpoint_remote.py --name checkpoint-session1-002`, sau đó chép snapshot+hash về; worker nền không đổi. Bước tiếp theo chính xác: đọc LOG checkpoint trên; SSH kiểm `bocpd-rest-001/status.json`, stdout/stderr/exit, PID từ status và `~/rca/T-033/trang-thai.txt`; kiểm hash manifest của đơn vị đã hoàn tất trước dùng. Không khởi trùng/làm lại ca PASS. Sau khi lõi liên quan đã khớp, tiếp các chặng SPEC và cập nhật dự toán; nếu STOPPED hoặc dự toán vượt giới hạn thì dừng phần phụ thuộc và trình Minh.
+
+Prompt Minh mở phiên Codex tiếp (tiếp thực hiện, chưa là prompt phản biện):
+
+> Đọc AGENTS.md, làm tiếp T-033 trong STATE. Minh đã duyệt thực hiện 09/10/2026 theo lời "ĐÃ CHỐT", phạm vi/ngân sách và ràng buộc trong LOG phiên 1. Đọc toàn SPEC và mục cuối LOG T-033. EC2 3.107.246.249 có lô bocpd-rest-001 đang chạy nền, không khởi trùng hoặc chạy lại đơn vị PASS. Kiểm PID/status/progress, hash nguồn và manifest trước dùng; tiếp phần còn thiếu đúng các chặng, ưu tiên tính đúng. Giữ các giới hạn ghi song song T-032, không test/locked/heldout, không commit/push, không bật/tắt EC2. Nếu lỗi khoa học hay vượt dự toán, checkpoint và trình Minh. Khi task xong mới soạn prompt Claude theo mẫu.
+
+
+## Phiên 2 — 2026-10-10T09:09:03.192892+07:00 — Codex — laptop Windows 11 và EC2 T-033 — Người làm
+
+- Minh duyệt SPEC ngày 09/10/2026. Minh yêu cầu kiểm tiến độ và tiếp thực hiện theo cùng phạm vi/ngân sách; intent EXECUTE. Claude vẫn là người phản biện chính thức. Hai trợ lý nội bộ hỗ trợ cài đúng script frozen và factorial, không tự mở vòng phản biện.
+- Đã đọc lại AGENTS, STATE, toàn SPEC và checkpoint LOG phiên 1. Lời duyệt trong yêu cầu hiện hành và dòng T-033 là nguồn quyền thực hiện; các câu chờ duyệt cũ ngoài dòng trạng thái được giữ nguyên theo phạm vi Minh cho phép.
+- EC2 live check 09:05 ngày 10/10 +07: `bocpd-rest-001/status.json` PASS, 29 ca đủ full và PP; exit0, không còn PID28484; kết thúc 03:35:37 +07, thời gian lô 11.209,136 giây. Progress ở ~/rca/T-033/trang-thai.txt. Kết quả này là trạng thái driver, đang kiểm hash/manifest/intermediate trước dùng và trước nhánh mới. Chưa khởi trùng, chưa đọc locked/test/heldout hoặc T-032.
+- Unified exec mặc định lỗi setup refresh ngay lúc khởi process; exec ngoài sandbox được duyệt tự động và chạy được. Không cài môi trường mới, không đổi package. Source code/data cũ EC2 tiếp tục chỉ đọc.
+- CẦN GIỮ LAPTOP MỞ: đang kiểm lõi và chuẩn bị ca đầu FP/PF/nền cố định; dự kiến cần khoảng 20–40 phút để chuẩn bị và kiểm ca đầu, ước lượng có thể đổi theo lỗi/chiều. Mốc báo lại khi ca đầu các nhánh đạt và đo đủ runtime/RAM/disk.
+
+- Phiên 2 — tự kiểm core-audit-001: dừng bằng SIGINT đúng PID30486 sau khi thấy `np.load(...)[predictive_density]` đặt trong vòng theo điểm, giải nén cả ma trận lặp. Đây là lỗi hiệu năng script tự kiểm của Codex, không phải lệch source detector. Giữ script và run001 STOPPED/KeyboardInterrupt, stdout/stderr và các ca đã kiểm. Tạo audit_core_fast.py/run core-audit-002, chỉ chuyển đọc predictive_density ra ngoài loop, mọi assert/source/hành vi giữ nguyên. Đã kiểm source.json EC2 khớp inputs-manifest laptop; hai core BOCPD manifest hash lấy trực tiếp, sẽ khóa vào driver nhánh mới. Chưa khởi FP/PF/freeze trước audit đạt.
+- Phiên 2 — core-audit-002 PASS120record, source+manifestexact. Kiểm N-Sigma scalarflagformula/nativealarms, BOCPD Rshape/hữu hạn/normalization/reset hazard/m→CP/time và θ CP±1. Ca/nhánh FFnativechecks có đủ30. Audit chỉ đọc predictivearraymộtlần, khôngrun lạidetector. Core lô xong03:35:37 ngày10/10+07; 120records vànguồnR chưa làkếtluận cơchế.
+- Đã soi driver FP/PF và nền cố định. Để phép kiểm firstpostkhông làidentitybyconstruction, frozen tínhmean/std/counttừtừngSeriesdtypegốctheo[:iproxy], nguyênInf→NaN/ffill, soexactcore720; sourcepath/hash/column/time/Xkhớp trướcfreeze. Hai scriptmới không đổi core/helper/SPEC. Driver factorial kiểmsource120records, native/helperhashes và phiên bản; giữmask/scale vàerrorsd0/range0/contrastsnhưSPEC.
+- Khởi background firstpilot: tmux socket ~/rca/T-033/tmux.sock, sessiont033-fac-first, lệnh bash ~/rca/T-033/scripts/factorial_first.sh; runbocpd-factorial-first-001, PIDsource/status trongrun, stdout/stderr/progress trongrun, outerout/err/exit/shell.pid ởruns/. LệnhkhởiN-Sigma: tmux sessiont033-ns-fixed-first chạy bash ~/rca/T-033/scripts/supplement_job.sh nsigma-frozen-first-001 nsigma_frozen.py --first; status/PID/manifest trongrun, progressglobaltrang-thai.txt, stdout/stderr/exit/shell.pid ởruns/. Ghi toànanchors trongfactorial_first.sh; script/helpersha2đầukhớp. Chưakhởi resttrướcpilotPASS. CẦN GIỮ LAPTOP MỞ tới kiểmfirstvàforecast đạt.
+- Hai pilot bổ sung PASS, exit0: bocpd-factorial-first-001 đủFP/PF, tất cả11checkbao gồm sameinputnativeR/m/CP/time true; observedFP47,688s/PF47,736s, cảpilot194,529s; RAMđỉnh312.926.208byte, NPZ3.941.090/4.251.202byte (nguồn /cases/dev-20acb4402d/branches). nsigma-frozen-first-001 đủ2unit, cảpilot2,406s, mọiindependentSeries/mask/flags/threshold/marginchecks vàmanifestsha đạt. Không đổi corek/hazard/prior.
+- Dự toán rest từ kếtquả đãlưu: corebocpd-rest001 /cases/*/PP/wall_s tổng1.851,969s; FPước lượngcubicd_F/d_P cho2.121,382s; cộnghai3.973,351s≈66phút, CHƯA KIỂM giảđịnhchi phí tỷlệd³/ma trậninputlikelihoodkhác, nếu sai runtime/budgetguarddừng. Dựtrù1–1,5giờ choFP/PF, 1–3phút cho58unitfixedtừpilot, mộtworker nặng. Ướclượng xonglô bổsung10:30–11:00 ngày10/10+07. Dung lượng mới≈0,99GB, RAMkhảdụng7,49GB, disk4,98GB; dựtrùhybrid≤0,7GiB vàfixed≤0,2GiB, dưới4GiB. Tấtcảforecast làvận hànhchưa kiểmtoànlô, khônglàkếtluậnphương pháp.
+- Auto-review từngtừchốilệnhkhởi fixed-rest khiFP/PFpilotcònRUNNING. Khôngkhởisau từchối; đãđọclạiFP/PF PASS, kiểm hashmanifest/checksvàforecast nhưtrên, thỏa điều kiện được nêu trước lầnkhởi mới. Nhánhrest tiếp đúngSPEC saucorevàpilotverified, khôngxin mởrộngbudget hayphạm vi.
+
+### Checkpoint phiên 2 — 10/10/2026 — sau khi ngữ cảnh bị nén
+
+- Ghi checkpoint ngay theo AGENTS §5a.2. Codex vẫn là người làm; Claude vẫn là người phản biện. Cần mở phiên Codex mới để tiếp phần nghiên cứu còn thiếu. Không mở vòng phản biện khi task chưa xong.
+- Lõi N-Sigma và BOCPD đã được kiểm lại trong `core-audit-002`, PASS 120 record. Nhánh FP/PF ca đầu `bocpd-factorial-first-001` PASS so native cùng đầu vào và kiểm trung gian. Nhánh N-Sigma nền cố định ca đầu PASS; lô `nsigma-frozen-rest-001` báo PASS 58 đơn vị lúc 09:26:03 +07, cần chốt hash toàn lô trước dùng số.
+- Đã khởi `bocpd-factorial-rest-001` độc lập trong tmux `t033-fac-rest`, socket `/home/ubuntu/rca/T-033/tmux.sock`, Python PID 31734 tại lần khởi 09:25:23 +07. Lệnh đã dùng: `bash /home/ubuntu/rca/T-033/scripts/factorial_rest.sh`. Có 29 ca mới; ca đầu đã đạt được tái dùng theo con trỏ provenance, không tính lại. Trạng thái hiện tại sẽ được lấy thêm một snapshot chỉ đọc để chốt phiên.
+- Nhánh nền cố định được khởi bằng `supplement_job.sh nsigma-frozen-rest-001 nsigma_frozen.py`; lô 58 đơn vị đã kết thúc. Không khởi trùng hoặc chạy lại đơn vị PASS. Chỉ lô FP/PF còn cần EC2 chạy nền ở thời điểm checkpoint.
+- Giới hạn vận hành đang giữ: 12 giờ toàn lịch từ 23:46:29 ngày 09/10 +07, mốc dừng 11:46:29 ngày 10/10 +07; tối đa 4 GiB mới. Dự toán FP/PF xong 10:30–11:00 ngày 10/10 +07 là ước lượng chưa kiểm toàn lô. Không tự đổi guard nếu thời gian hoặc dung lượng không đủ.
+- Chưa chạy `bocpd_delay.py`, `nsigma_delay.py`, hoặc thống kê kênh. Script BOCPD delay mới được chuẩn bị; script kênh đang được trợ lý hoàn thiện, chưa kiểm bởi người làm. Không dùng script chưa chạy như bằng chứng. Đơn vị duration của trace còn OPEN theo nguồn; không tự quy đổi hoặc dùng làm thời điểm vật lý.
+- OPEN: độ trễ, mật độ và chuỗi cờ; thống kê trace/log/workload; khóa nhóm sau các nhánh bổ sung, tính tay ca đại diện và đối chứng; phân xử giải thích khác và tổng hợp cơ chế. RQ2/P4, lựa chọn P6 và G2 chưa được đóng. Đầu ra PASS hiện có xác nhận tính đúng của tính toán, chưa xác nhận nguyên nhân lỗi phát hiện.
+
+
+### Kết thúc phiên 2 — 2026-10-10T09:41:30.885035+07:00
+
+1. Đã làm: kiểm lõi bằng `core-audit-002`, PASS 120 record; chạy và kiểm FP/PF ca đầu theo native cùng đầu vào; chạy nền cố định đủ 60 đơn vị, mọi kiểm độc lập từ Series gốc đạt. Snapshot EC2 lúc 2026-10-10T02:35:01.983466+00:00 tại `results/T-033/runs/checkpoint-session2-001/snapshot.json` → `/statuses`, `/completed_manifests_verified`, `/live_completed_cases`, `/resources`. FP/PF rest còn RUNNING, PID 31734; snapshot kiểm hash hai nhánh của 4 ca mới: dev-03d4910932, dev-12a1a88069, dev-14372e1209, dev-16597725c1. Lô tự tiếp đúng danh sách nguồn; đây không phải hoàn tất T-033.
+2. File thay đổi trong phiên: script và checkpoint/metadata trong `results/T-033/`; chỉ nối `tasks/T-033-g2-nguyen-nhan-phat-hien/LOG.md`; chỉ ô trạng thái dòng T-033 của `docs/STATE.md`. SPEC và WHY không được sửa trong phiên 2. EC2 chỉ ghi `~/rca/T-033/`; nguồn code/data/env cũ chỉ đọc. Không ghi DECISIONS, không đọc/ghi vùng kết quả T-032, không test/locked/heldout, không commit/push, không bật/tắt EC2. Script `bocpd_delay.py` và `nsigma_delay.py` chưa được chạy; channel_context.py có trên laptop: True, chưa được người làm kiểm đầy đủ hoặc chạy.
+3. Kiểm: nguồn/manifest/trung gian lõi PASS; FP/PF ca đầu khớp native R/m/CP/time và ma trận; nền cố định khớp mean/std/count/flags/margin từ Series dtype gốc, mọi cột/ca. Hash toàn manifest của hai lô fixed và pilot FP/PF đạt. Snapshot và archive metadata hai đầu cùng hash; JSON đã nhận được kiểm theo manifest, NPZ được kiểm tại EC2 và không tải về trong checkpoint này. AST script đạt; script đã triển khai khớp laptop/EC2; tự kiểm phạm vi và diff lưu `results/T-033/runs/checkpoint-session2-final/`. Run audit chậm 001 vẫn được giữ; audit 002 chỉ sửa việc giải nén lặp, không đổi tiêu chí. Auto-review từ chối một lệnh khởi khi pilot chưa chốt; đã giải quyết bằng pilot PASS, hash và dự toán trước khởi rest, không còn chặn quyền này.
+4. OPEN và việc Minh cần làm: task chưa hoàn tất. Cần độ trễ/mật độ/chuỗi cờ, đối chiếu kênh, khóa nhóm bổ sung, đọc tay có đối chứng và phân xử cơ chế. Chưa đóng RQ2/P4/G2 hoặc chọn P6. Duration trace giữ raw, đơn vị còn OPEN theo nguồn; số traceID quan sát không tự là số request độc lập. Không dùng PASS của driver làm kết luận vật lý. EC2 còn cần bật; lô FP/PF hiện đã ổn định để Minh tắt laptop. Ước lượng xong lô 10:30–11:00 ngày 10/10 +07, không bảo đảm xong toàn task. Guard 12 giờ toàn lịch dừng tại 11:46:29 ngày 10/10 +07 và giới hạn 4 GiB vẫn giữ. Snapshot ghi dung lượng mới 1182460578 byte, RAM khả dụng 7338868736 byte và đĩa trống 4781690880 byte; đây là nguồn số tại thời điểm snapshot. Nếu phần còn thiếu vượt dự toán thì checkpoint, dừng phần phụ thuộc và trình Minh.
+
+EC2 T-033 ĐÃ ỔN ĐỊNH — Minh có thể tắt laptop
+
+Đang chạy `bocpd-factorial-rest-001`, tmux `t033-fac-rest`, socket `/home/ubuntu/rca/T-033/tmux.sock`. Ca đầu đã đạt kiểm nguồn/điểm đổi/native và trung gian; tốc độ/RAM/dung lượng được đo trước khởi phần còn lại; lỗi hoặc budget tự dừng và ghi lại. Khi mở lại phiên, agent kiểm status/exit/PID, stdout/stderr và hash manifest trước dùng, không khởi trùng; sau đó tiếp chặng còn thiếu theo SPEC. Minh giữ EC2 bật cho tới khi agent báo không còn cần máy.
+
+Lệnh Minh xem tiến độ:
+
+```powershell
+ssh -i D:/RCA-ext/keys/keys.pem -o UserKnownHostsFile=D:/RCA-flashticket/results/T-033/runs/prepare-001/known_hosts -o StrictHostKeyChecking=yes -o BatchMode=yes ubuntu@3.107.246.249 'tail -n 20 ~/rca/T-033/trang-thai.txt'
+```
+
+Nguồn vận hành: `~/rca/T-033/runs/bocpd-factorial-rest-001/status.json` (PID hiện hành); `progress.txt`, `stdout.txt`, `stderr.txt` trong run; outer `.out`, `.err`, `.shell.pid`, `.exit` dưới `runs/`. Lệnh khởi đã dùng `bash ~/rca/T-033/scripts/factorial_rest.sh` trong tmux; không chạy lại lệnh khởi khi worker còn sống. Pilot và fixed có status PASS cùng manifest trong thư mục run của chúng.
+
+Bước tiếp theo chính xác: đọc AGENTS, STATE, toàn SPEC, LOG phiên 2 và snapshot/metadata nêu trên. SSH xem progress bằng lệnh trên; kiểm `bocpd-factorial-rest-001/status.json`, `.exit`, stderr và PID lấy từ status. Nếu PASS, kiểm toàn manifest và đọc con trỏ `reused_record` cho ca pilot; NPZ của ca tái dùng nằm trong pilot, không giả định nằm trong rest. Nếu STOPPED/BUDGET_STOP hoặc không đủ dự toán, đọc lỗi, dừng phần phụ thuộc và trình Minh. Không chạy lại core, pilot, fixed hoặc ca đã PASS. Script delay/kênh còn phải được kiểm nguồn và cài/run trên EC2, laptop không tính nghiên cứu. Đọc CLI và nguồn của `bocpd_delay.py`, `nsigma_delay.py`, `channel_context.py`; lấy anchors từ `factorial_first.sh`/snapshot trước triển khai. Tiếp các chặng, khóa lựa chọn trước diễn giải, giữ câu hỏi chưa phân xử là OPEN. Nếu thấy thiết kế SPEC không phân xử được hoặc sai với code/data, báo vị trí, bằng chứng, hậu quả và đề xuất, không tự đổi SPEC/phép làm.
+
+Lệnh cuối đã chạy để chốt phiên: Python `-B -X utf8 results/T-033/scripts/finish_session2.py` trên laptop (chỉ metadata, AST và cập nhật LOG/STATE). Lệnh EC2 cuối của checkpoint: Python `capture_session2.py` chỉ đọc trạng thái/kiểm hash, ghi snapshot mới; sau đó scp snapshot+archive metadata+hash về. Không thay worker đang chạy.
+
+Theo AGENTS §5a.2: "Thấy ngữ cảnh đã bị nén ... ghi checkpoint ngay ... rồi đề nghị Minh mở phiên mới." Ngữ cảnh phiên đã nén; đề nghị Minh mở phiên Codex mới để tiếp cùng task từ checkpoint. Prompt tiếp thực hiện dưới đây; chưa phải prompt phản biện Claude vì task còn thiếu kết quả.
+
+> Đọc AGENTS.md, check tiến độ và tiếp T-033 trong STATE theo SPEC đã được Minh duyệt thực hiện ngày 09/10/2026, lời "ĐÃ CHỐT". Đọc toàn SPEC và LOG phiên 2/kết thúc phiên 2. Lõi và N-Sigma nền cố định đã PASS; EC2 3.107.246.249 còn lô bocpd-factorial-rest-001 chạy tmux độc lập. Kiểm PID/status/exit/progress và hash nguồn/manifest, không khởi trùng hoặc chạy lại đơn vị PASS; theo con trỏ provenance cho ca pilot tái dùng. Tiếp các chặng còn thiếu đúng SPEC, ưu tiên tính đúng, dừng phần phụ thuộc và trình Minh khi thiết kế không ổn hoặc vượt dự toán. Guard hiện giữ mốc 11:46:29 ngày 10/10 +07 và tối đa 4 GiB mới; không tự đổi. Giữ phạm vi ghi T-033 và ràng buộc chạy song song T-032; không test/locked/heldout, không commit/push, không bật/tắt EC2. Laptop chỉ điều khiển/tài liệu/metadata, tính nghiên cứu trên EC2. Khi task hoàn tất mới soạn prompt Claude theo docs/review-prompt.md: Prompt chung + Soát kết quả + G2.
+
+
+## Phiên 3 — 2026-10-10T12:01:47.736498+07:00 — Codex — laptop Windows 11 và EC2 T-033 — chốt bàn giao
+
+- Minh duyệt SPEC ngày 09/10/2026. Minh yêu cầu: "hãy chốt mới nhất cho tôi để claude có thể kiểm tra toàn vẹn". Intent EXECUTE: chốt checkpoint, nhận đầu ra hiện có, kiểm tính toàn vẹn, cập nhật LOG/dòng T-033 STATE và soạn prompt. Đây không phải lời duyệt sửa guard hoặc chạy chặng nghiên cứu tiếp theo.
+- Codex vẫn là người làm, Claude vẫn là người phản biện. Không tự mở phiên Claude hoặc gửi prompt; Minh chuyển thủ công. Prompt sẽ cho quyền chỉ đọc/trả lời trong chat khi chưa có quyền ghi bản REVIEW cụ thể.
+- Đã đối chiếu checkpoint cũ: snapshot phiên 2 chỉ tới 09:35 ngày 10/10 +07, LOG đóng lúc 09:41 còn ghi FP/PF đang chạy. EC2 `bocpd-factorial-rest-001/status.json` hiện PASS, đủ 30 ca gồm ca pilot tái dùng; kết thúc 10:27:24 ngày 10/10 +07, exit 0, không còn worker. Cần nhận snapshot/manifest cuối và ghi trạng thái mới để không phụ thuộc chat.
+- Vấn đề guard còn OPEN: SPEC mục Chi phí dự trù 4–12 giờ máy và nói "Đây không là timeout". Code guard dùng thời gian lịch liên tục từ lần tính đầu, bao gồm khoảng nghỉ. Mốc 11:46 ngày 10/10 do Codex cài; không được trình bày như thời hạn Minh đã chốt hoặc bằng chứng dùng hết giờ xử lý. Đề xuất chuyển sang tổng thời gian các lượt xử lý, giữ trần 12 giờ/4 GiB, chưa được Minh duyệt; chưa sửa code/nguồn/SPEC. Chi phí EC2 bật kể cả lúc nghỉ cũng chưa có đo đạc AWS độc lập. Chặng nghiên cứu mới phụ thuộc việc giải quyết cách tính ngân sách này.
+- Phạm vi phiên: `results/T-033/`, LOG chỉ nối, duy nhất dòng T-033 STATE; EC2 chỉ `~/rca/T-033/`. SPEC/WHY/DECISIONS/code dữ liệu nguồn giữ nguyên. Không test/locked/heldout, không vùng kết quả T-032, không commit/push, không bật/tắt EC2.
+
+
+### Kết thúc phiên 3 — checkpoint hiện trạng mới nhất — 2026-10-10T12:12:46.246158+07:00
+
+1. Đã làm: chốt `results/T-033/runs/checkpoint-handoff-001/README.md` để Claude kiểm độc lập. Snapshot EC2 lúc 2026-10-10T05:03:15.203298+00:00: FP/PF đủ 30 ca, pilot được tái dùng, kết thúc 10:27:24 ngày 10/10 +07, exit 0; không còn worker/tmux T-033. N-Sigma nền cố định đủ 60 đơn vị; core-audit-002 đã kiểm 120 record lõi. Đóng gói và nhận nguyên 825 file / 1393611373 byte, gồm trung gian NPZ, JSON, scripts, stdout/stderr/progress/exit và lượt lỗi; không chạy lại detector hoặc chặng mới.
+2. File thay đổi: scripts/checkpoint mới trong `results/T-033/`; LOG chỉ nối; chỉ ô trạng thái dòng T-033 STATE. SPEC/AGENTS/review-prompt giữ nguyên; WHY/DECISIONS không được phiên này ghi. Code/data/env nguồn cũ chỉ đọc; nhận bốn file native/adapter làm bản đọc cùng hash. Không test/locked/heldout, không vùng kết quả T-032, không commit/push, không bật/tắt EC2. Yêu cầu chốt hiện trạng không được coi là duyệt sửa guard.
+3. Kiểm: toàn bộ 11 manifest/lô và logs trên EC2 khớp; nguyên 825 file nhận cùng SHA/byte với inventory; hash toàn tar stream khớp hai đầu; bốn code native/adapter khớp nguồn pin; con trỏ tái dùng pilot được kiểm; AST code đạt. `artifact-locator.json` chỉ mục core/FF/hybrid/fixed, `output-presence.json` ghi đầu ra còn thiếu. Kiểm phạm vi/diff và hash tài liệu ở `local-verification.json`, `own-diff.txt`, `handoff-manifest.json`. Prompt soát kết quả bên dưới chép nguyên văn Prompt chung + Soát kết quả + G2, chỉ điền trường trung tính.
+4. OPEN: T-033 chưa hoàn tất, chưa có kết luận cơ chế hoặc căn cứ nghiệm thu RQ2/P4/G2/P6. Còn độ trễ/mật độ/chuỗi cờ, trace/log/workload, khóa nhóm mới, đọc tay/đối chứng, tổng hợp/kiểm tiếp. Guard lịch 12 giờ là cách cài của Codex; mốc 11:46 không phải thời hạn Minh đặt. Đính chính các câu LOG trước coi là giới hạn đã duyệt; đề xuất tính giờ xử lý cộng dồn còn CANDIDATE, chưa sửa hoặc Minh duyệt. `/run_durations_from_status` chỉ là thời gian các run có status, không phải số giờ AWS/đủ tổng mọi bước. Dung lượng gồm archive EC2 và bản nhận được kiểm theo `/storage` của local-verification; còn cần cân lại trước chạy tiếp, không tự xóa/archive cũ hoặc tăng trần.
+
+EC2: mọi lô T-033 hiện đã kết thúc; chưa có tiến trình mới. Minh có thể tắt laptop sau chốt. Giữ EC2 nếu Claude cần môi trường/raw dev để kiểm sâu hoặc Minh cho tiếp chặng chưa làm. Bản nhận đủ code/trung gian hiện có trên laptop; không cần giữ worker cũ. Không tự tắt EC2, task vẫn còn phần cần máy.
+
+Bước tiếp theo chính xác: Minh mở Claude và copy `results/T-033/runs/checkpoint-handoff-001/prompt-claude.md`, hoặc khối dưới đây. Claude đọc README/manifest/locator rồi đầu ra/code/nguồn gốc, trả lời trong chat; chưa cấp quyền REVIEW riêng và không tự chạy thực nghiệm mới. Codex giữ vai người làm, sau đó kiểm nhận xét và trình Minh xử lý. Nếu Minh cho tiếp, trước hết giải quyết ngân sách/guard theo quyền được duyệt, kiểm nguồn/hash, không làm lại đơn vị PASS. Lệnh chỉ đọc EC2 và path môi trường nằm trong README.
+
+Lệnh cuối chốt phiên: `Python -B -X utf8 results/T-033/scripts/finalize_handoff.py` trên laptop (chỉ hash/metadata/AST/tài liệu). Lệnh EC2 đóng gói: `T033_HOME=/home/ubuntu/rca/T-033 ... python -B -X utf8 .../scripts/package_handoff.py`; sau đó receiver dùng SSH `cat .../artifacts.tar` để nhận trực tiếp, không giữ archive thứ hai trên laptop. Lệnh kiểm tiến độ gốc: SSH `tail -n 20 ~/rca/T-033/trang-thai.txt`. Không khởi run mới.
+
+### Prompt Claude kiểm hiện trạng T-033 — Minh chuyển thủ công
+
+```text
+Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
+Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
+
+Thông tin lượt này:
+- Task hoặc đề xuất: T-033 — tasks/T-033-g2-nguyen-nhan-phat-hien/.
+- Công đoạn: soát kết quả.
+- Gói/cổng: P4 / G2.
+- Người làm và người phản biện chính thức: Codex là người làm; Claude là người phản biện chính thức theo SPEC.
+- Tài liệu gốc: AGENTS.md; docs/STATE.md; tasks/T-033-g2-nguyen-nhan-phat-hien/SPEC.md và LOG.md; results/T-033/runs/checkpoint-handoff-001/README.md; phần trực tiếp chi phối của docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md; docs/reference/sources/DT18-de-tai-va-nhiem-vu.md; docs/reference/sources/advisor-2026-09-23.md; diff phạm vi tại results/T-033/runs/checkpoint-handoff-001/own-diff.txt.
+- Phản biện và phản hồi trước: Không có bản REVIEW trên file trong thư mục task tại lần liệt kê để chốt checkpoint.
+- Code và kết quả liên quan: results/T-033/scripts/; results/T-033/runs/checkpoint-handoff-001/artifacts/; artifact-inventory.json, artifact-locator.json và native-source-manifest.json trong cùng checkpoint; source-native/ trong checkpoint; src/p3/; results/T-025/ và results/T-029/ theo manifest nguồn; BARO revision e35f4ec; results/T-031/moi-truong.json; môi trường và lệnh EC2 chỉ đọc theo README của checkpoint.
+- Phạm vi ghi được Minh cho phép trong lượt này: Chỉ đọc và trả lời trong chat; không sửa file.
+
+Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
+
+Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
+Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
+Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
+
+Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
+hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
+Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
+số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
+có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
+
+Bổ sung yêu cầu phản biện:
+1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
+2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
+3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
+4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
+5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
+6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
+7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
+8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
+9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
+10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
+
+Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
+Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
+
+Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
+bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
+Tiếng Việt, câu ngắn.
+
+Cuối lượt báo:
+1. Đã làm gì.
+2. File đã thay đổi, hoặc không sửa file nào.
+3. Kiểm đã chạy và kết quả.
+4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
+
+Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
+
+Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
+
+Công đoạn: soát kết quả.
+Kiểm trên đầu ra thật, code và dữ liệu được phép; không tin tóm tắt LOG. Đối chiếu tiêu chí xong với phần mục tiêu nguồn và mức căn cứ cho bước tiếp theo; chạy lại phần rẻ khi trong quyền được duyệt.
+Phân biệt hoàn thành task mô tả, xác nhận cơ chế và đủ căn cứ chọn/đánh giá thiết kế. Giới hạn đã khai không tự miễn phép kiểm cần thiết còn làm được.
+Chỉ ghi bản phản biện lượt được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ bản cũ; không sửa kết quả thay người làm.
+
+Kiểm chuỗi đầu vào → xử lý → trung gian → đầu ra ở các nhóm quan trọng. Đọc code và trung gian đã lưu trước, đối chiếu ca sai với ca đúng có điều kiện tương ứng. Thiếu trung gian thì nêu đúng phần cần chạy/thu thêm, chi phí và quyết định phụ thuộc; không tự chạy ngoài quyền hoặc bỏ câu hỏi bằng “ngoài SPEC”.
+Kết luận cơ chế phải chỉ được: trong điều kiện X, bước Y làm mất hoặc đánh giá sai thông tin Z. Nếu chưa xác định Y, giữ đúng quan sát, giải thích khác và bằng chứng thiếu.
+Phân biệt dữ liệu/thiếu đầu vào, giao thức, adapter/cài đặt và giả định/cách tính; không cộng cờ chồng lấn thành tỷ lệ nguyên nhân. Hạn chế dữ liệu xác nhận có hệ quả đánh giá và yêu cầu quan sát FlashTicket có thể rút ra không?
+Đầu ra có nêu: hạn chế đã xác nhận và điều kiện; lỗi cài đặt/thiếu đầu vào; hạn chế giả định/phép tính; quan hệ có thể bổ sung thông tin gì; câu chưa trả lời và bằng chứng còn thiếu? Căn cứ nào đủ đề xuất ứng viên, căn cứ nào đủ lựa chọn thiết kế?
+Không bắt mọi task P4 làm xong đối chứng của phương pháp mới. Đối chứng bỏ quan hệ và đồ thị ngẫu nhiên dùng khi đánh giá tác dụng cấu trúc; không là điều kiện trì hoãn mọi phân tích hạn chế baseline.
+```
+
+
+## Phiên 4 — 2026-10-11T01:50:58.929818+07:00 — Codex — laptop Windows 11 — Người làm T-033
+
+- Minh duyệt SPEC ngày 09/10/2026. Intent EXECUTE: tiếp chặng tính EC2 độ trễ/kênh và khóa nhóm theo SPEC; chưa viết kết luận cơ chế/tổng hợp. Codex là người làm, Claude là người phản biện.
+- Đã đọc AGENTS, STATE, toàn bộ SPEC, LOG phiên 3 và README checkpoint từ repo. Phiên mới không dùng lịch sử chat làm bằng chứng. Các phần MRP RQ2/P4, DT18-NV2/NV3, hướng dẫn cô §1, LESSONS và WHY-41 còn phải đọc trực tiếp trước diễn giải.
+
+### Quyết định của Minh trong phiên — lời duyệt ngày 10/10/2026, Minh cung cấp lại trong phiên mới
+
+1. DUYỆT: ngân sách thời gian tính bằng tổng giờ xử lý cộng dồn của các lượt, gồm lượt hỏng và lượt kiểm, trần 12 giờ; bỏ mốc lịch 11:46 ngày 10/10. Chỉ sửa đúng phần guard trong script; giữ bản cũ; kiểm hash hai đầu; ghi cách tính và số giờ đã dùng vào LOG trước khi khởi lượt mới.
+2. DUYỆT: xóa đúng một file ~/rca/T-033/runs/checkpoint-handoff-001/artifacts.tar trên EC2, sau khi tự kiểm lại bản laptop khớp artifact-inventory.json. Trần 4 GiB tính trên đầu ra tại EC2. Không xóa gì khác. Ghi dung lượng trước và sau vào LOG.
+Hai lời duyệt này không mở rộng sang việc khác.
+
+- Hai lời duyệt trên đã có hiệu lực trong phạm vi đã nêu. Chưa ghi docs/DECISIONS.md; trình dòng lưu chính thức trong chat và chờ Minh duyệt. Không sửa SPEC/WHY hoặc quy tắc khoa học.
+
+### Checkpoint ngay khi ngữ cảnh bị nén — 2026-10-11T01:50:58.929818+07:00
+
+- Theo AGENTS §5a.2 và yêu cầu Minh: chốt trạng thái ở results/T-033/runs/session4-checkpoint-001/, đề nghị mở phiên mới; chưa khởi lượt nghiên cứu mới.
+- Chưa sửa guard, chưa tính đủ ledger giờ xử lý, chưa xóa archive EC2, chưa SSH trong phiên này. Snapshot EC2 checkpoint-handoff-001 là lịch sử ngày 10/10, không được gọi là trạng thái EC2 vừa kiểm.
+- Hai trợ lý hỗ trợ tự soát chỉ đọc script, không phải phản biện Claude chính thức. Báo cáo trợ lý là đầu vào kiểm của người làm; fixture và mọi tính nghiên cứu vẫn phải chạy EC2.
+
+
+### Kết thúc phiên 4 — checkpoint khi ngữ cảnh nén — 2026-10-11T01:56:42.793817+07:00
+
+1. Đã làm: đọc toàn SPEC/LOG phiên 3 và README gốc; ghi dòng mở phiên và nguyên hai lời duyệt ngày 10/10. Tự kiểm SHA/byte laptop 825/825 PASS; kiểm chỉ đọc EC2 không worker/tmux, archive còn nguyên. Lưu tự soát trợ lý và tự xác nhận lỗi dict status trùng trong script kênh. Không thực hiện chặng tính mới.
+2. File thay đổi: thêm scripts/checkpoint_session4.py và finish_checkpoint_session4.py, checkpoint session4-checkpoint-001 trong results/T-033/; LOG chỉ nối; chỉ dòng T-033 STATE. Không sửa ba script nghiên cứu/guard, SPEC, WHY, DECISIONS, nguồn code/dữ liệu; không EC2 writes/xóa, không test/locked/heldout/vùng T-032, không commit/push/bật/tắt EC2.
+3. Kiểm: integrity-verification.json PASS 825 file/1393611373 byte, metadata bất biến trong handoff-manifest khớp; local SHA mất 31.014 giây, chỉ kiểm điều khiển. AST ba script PASS; duplicate status tại 229/246 xác nhận. SSH metadata hoàn thành trong 4.182 giây đo từ client, gồm kết nối; không dùng số này làm thời gian tính nghiên cứu EC2. remote-status.json ghi du/archive/disk. LOG lịch sử khớp hash prefix, SPEC khớp pin, script giữ hash, STATE chỉ dòng T-033. Không recompute số/intermediates nghiên cứu trong phiên này.
+4. OPEN: task chưa xong; chưa có kết luận cơ chế/RQ2/P4/P6/G2. Còn thiếu ledger đủ giờ xử lý, sửa guard, xóa archive đúng quyền, người làm tự đọc đủ ba script, fixture/pilot kiểm schema/time/CP/flags/intermediates/RAM/bytes, rest độ trễ/kênh, khóa nhóm/đối chứng, đọc tay/tổng hợp. Lỗi metadata kênh phải sửa trước pilot; báo cáo trợ lý chưa thay kiểm EC2. Đọc trực tiếp MRP/DT18/advisor/LESSONS/WHY-41 trước diễn giải. Không bỏ câu hỏi cơ chế vì mới khớp hash.
+
+EC2: vừa kiểm chỉ đọc 2026-10-10T18:52:19.999080+00:00, không worker/tmux T-033; archive còn nguyên. Minh có thể tắt laptop sau checkpoint. EC2 còn cần cho chặng tính đã duyệt, giữ bật để nối phiên; agent không bật/tắt máy. Không báo lượt mới ổn định vì chưa có pilot. Phiên sau khi kiểm pilot phải giữ laptop theo yêu cầu Minh.
+
+Bước tiếp chính xác: mở phiên Codex mới và copy results/T-033/runs/session4-checkpoint-001/prompt-next-session.md. Đọc README/checkpoint/integrity/remote-status/evidence/notes và ba script; SSH chỉ đọc `tail -n 20 ~/rca/T-033/trang-thai.txt` bằng key/known_hosts và pin trong README; dựng ledger đủ trước sửa guard/khởi run. Tự kiểm lại inventory rồi chỉ xóa archive được duyệt, ghi byte trước/sau. Đừng chạy CLI delay toàn lô hiện có trước hoàn thiện pilot/rest và fixture. Chặng tính chưa đạt nên chưa chuyển đọc tay+tổng hợp hay soạn phản biện chính thức.
+
+Lệnh cuối phiên: `D:/RCA-ext/envs/T-014-main/Scripts/python.exe -B -X utf8 results/T-033/scripts/finish_checkpoint_session4.py` trên laptop — chốt tài liệu và tự kiểm phạm vi/hash; không tính nghiên cứu. Lệnh EC2 cuối: Python pin nhận script metadata qua SSH stdin, chỉ đọc ps/tmux/du/stat/df; nguyên kết quả ở remote-status.json. Lượt SSH trước đó lỗi cú pháp PowerShell trước kết nối, không chạy EC2, đã sửa cách truyền stdin cho lượt chỉ đọc; không có lượt detector lỗi mới.
+
+Đề xuất ghi DECISIONS, chờ Minh duyệt riêng việc lưu sổ theo Luật 0: nối hai dòng mới ngày 10/10/2026, giữ nguyên nội dung hai mục DUYỆT trong “Quyết định của Minh trong phiên”, nguồn Minh cung cấp trong phiên 4. Không tự gán mã đang được phiên T-032 dùng; đọc lại file lấy mã khi có quyền nối. Lời duyệt thực hiện đã có, việc lưu DECISIONS chưa được duyệt.
+
+Prompt phiên kế tiếp nằm ở results/T-033/runs/session4-checkpoint-001/prompt-next-session.md, Minh chuyển thủ công. Không phải prompt phản biện Claude; không tự mở hay gửi vòng review.
+
+
+### Bổ sung sau checkpoint phiên 4 — Minh duyệt ghi sổ và hỏi trạng thái EC2 — 2026-10-11T02:04:32.189192+07:00
+
+Quyết định của Minh trong lượt: "duyệt, nhưng hiện tại ec2 có chạy gì khong ? sang phiên mới được chưa". Intent EXECUTE chỉ cho nối hai dòng DECISIONS đã trình; câu hỏi EC2/phiên mới là kiểm chỉ đọc. Đã nối Q-128 và Q-129 ngày 10/10/2026, đúng nội dung hai dòng Minh duyệt trong chat; lời duyệt ghi sổ ngày 11/10 không đổi ngày quyết định gốc. Các câu checkpoint cũ nói chờ quyền ghi DECISIONS là lịch sử; phần ghi sổ nay đã hoàn tất. Hai lời duyệt thực hiện vẫn giữ nguyên phạm vi; chưa sửa guard/xóa archive/khởi run.
+
+1. Đã làm: lưu hai quyết định vào nguồn DECISIONS trước cập nhật ghi nhận; SSH chỉ đọc kiểm trạng thái EC2 hiện tại.
+2. File thay đổi: docs/DECISIONS.md chỉ nối đúng hai dòng; LOG này chỉ nối; dòng T-033 STATE; thêm remote-status-approval-followup.json và approval-followup.json trong checkpoint T-033. Các file checkpoint cũ giữ nguyên, manifest.json cũ khóa snapshot ban đầu và không bao phủ hai file delta này; approval-followup.json là con trỏ delta mới. Không sửa SPEC/guard/script nghiên cứu, không ghi EC2, không xóa archive/commit/push/bật/tắt máy.
+3. Kiểm: EC2 lúc 2026-10-10T19:03:34.155875+00:00 không có worker hoặc tmux T-033; archive vẫn còn. Thời gian lệnh metadata trên EC2 0.006807 giây, chỉ kiểm trạng thái; ghi số này để ledger phiên sau xem xét, không gọi là ngân sách nghiên cứu đã dùng đầy đủ. DECISIONS giữ nguyên prefix, hai mã mới duy nhất; LOG giữ nguyên prefix; STATE chỉ dòng T-033. Bằng chứng remote-status-approval-followup.json và approval-followup.json.
+4. OPEN: chặng độ trễ/kênh và khóa nhóm chưa chạy; ledger/guard và archive deletion chưa thực hiện; chưa có kết luận cơ chế/RQ2/P4/P6/G2. Không có quyết định mới cần Minh duyệt trong lượt này. Việc tiếp đã được phép trong phạm vi trước, cần người làm tự kiểm nguồn/script/pilot.
+
+EC2 3.107.246.249 còn bật nhưng không chạy công việc T-033. Minh có thể sang phiên Codex mới ngay và tắt laptop trong lúc không có worker. EC2 vẫn cần cho phần tính tiếp; agent không bật/tắt máy. Không kiểm hoặc kết luận trạng thái công việc T-032 trên EC2 khác.
+
+Bước tiếp chính xác: Minh copy results/T-033/runs/session4-checkpoint-001/prompt-next-session.md sang phiên Codex mới; đọc LOG tới bổ sung này và hai dòng DECISIONS mới để biết quyền ghi sổ đã hoàn tất. Không làm lại việc lưu hai quyết định; giữ thứ tự source/hash/ledger/guard/archive/script/pilot/rest/khóa nhóm. Chưa chuyển đọc tay+tổng hợp trước khi chặng tính đạt. Prompt nối việc cũ vẫn dùng được vì yêu cầu kiểm lời duyệt ghi sổ trong LOG; không phải prompt phản biện Claude.
+
+Lệnh cuối: D:/RCA-ext/envs/T-014-main/Scripts/python.exe -B -X utf8 - (script stdin chỉ nối hai dòng đã duyệt, LOG/dòng STATE và kiểm phạm vi). Lệnh EC2 cuối: Python pin qua SSH stdin chỉ đọc ps/tmux/stat, không ghi EC2; kết quả và thời gian ở remote-status-approval-followup.json. Khi nối phiên, SSH chỉ đọc tail -n 20 ~/rca/T-033/trang-thai.txt bằng key/known_hosts của README, kiểm process/hash mới trước khởi run.
+
+
+## Phiên 5 — 2026-10-11T07:19:53.331348+07:00 — Codex — laptop Windows 11 và EC2 T-033 — Người làm
+
+- Intent EXECUTE: tiếp chặng tính EC2 theo lời Minh; Codex người làm, Claude phản biện. Chỉ dùng repo. Đã đọc AGENTS/STATE/toàn SPEC và LOG phiên 3/4, gồm bổ sung sau checkpoint. Q-128/Q-129 đã được Minh duyệt ghi sổ ở cuối phiên 4 và đang có trong DECISIONS; không nối lại.
+- Phạm vi đúng SPEC: results/T-033/, LOG chỉ nối, duy nhất dòng T-033 STATE, EC2 ~/rca/T-033/. Không nguồn cũ/SPEC/WHY/DECISIONS, test/locked/heldout, T-032, commit/push hoặc bật/tắt EC2.
+- Hai trợ lý chỉ đọc hỗ trợ tìm thời gian/script; không thay tự kiểm người làm hay phản biện Claude. Chưa khởi run mới, chưa sửa guard, chưa xóa archive. Baseline trước ghi tại results/T-033/runs/session5-open-001/.
+
+- Bước kiểm/xóa archive đã duyệt: fresh-laptop-integrity.json tự kiểm 825/825 file, 1393611373 byte và native source PASS; remote-readonly-001.json mới không worker/tmux, source/native/env pin khớp. Chỉ xóa /home/ubuntu/rca/T-033/runs/checkpoint-handoff-001/artifacts.tar sau SHA/byte khớp; byte EC2 trước 2791021314 → sau 1395923714 (giảm đúng 1395097600 byte). Không xóa gì khác. Bằng chứng archive-deletion-001.json; chưa khởi nghiên cứu.
+
+- Tự đọc đủ ba script độ trễ/kênh, adapter và native tại source-native; sửa duy nhất key metadata thứ hai của trace summary: status → status_code, giữ field input statusCode và trạng thái OBSERVED_ARTIFACT. Bản cũ giữ session5-open-001/scripts/channel_context.py; diff và hash local/EC2 tại channel-status-fix.diff/.json. Bản EC2 mới ở scripts/session5-001/channel_context.py; không sửa script EC2 cũ. AST đạt; fixture/pilot chưa chạy vì ledger chưa đủ. Các lỗi lifecycle/provenance/pilot-rest khác đã xác nhận qua đọc, chưa thay phép tính/tiêu chí.
+
+- Ledger: tự thu stat birth/mtime 425 mục và kiểm lại raw source 89/89 file, 656358942 byte PASS trên EC2; từng endpoint trong timing-source-verification-001.json. session5-budget-001/ledger.json tái dựng 18 khoảng, tổng represented_marker_s=19135.085507845 (5,315301530 giờ), không cộng lại status/unit/pilot reused. Thêm các timer kiểm điều khiển đã tìm được riêng; represented_markers_and_available_timers_s=19139.06624355099. Đây chưa là tổng đủ; unknown_time_s và remaining_approved_s giữ null. Thiếu setup/exit ngoài marker và SSH/hash rời phiên 1–4 không có timer; không gọi last-write là upper bound. Cần Minh quyết hạch toán hoặc cung cấp thời gian thiếu trước cấp giờ mới.
+- Sửa đúng phần time guard hai script BOCPD/kênh: pin ledger, cộng thời gian xử lý đã hạch toán + thời gian process hiện hành; không còn lấy lịch từ lần tính đầu. Khi ledger chưa hợp lệ, cả hai từ chối BUDGET_LEDGER_INCOMPLETE. Không thay tham số/tiêu chí hoặc phần thống kê. Bản cũ laptop giữ session5-open-001/scripts/; EC2 dùng thư mục mới scripts/session5-guard-001/, ledger runs/session5-budget-001/. Hash hai đầu và AST PASS; test guard trên EC2 chỉ kiểm điều khiển, cả hai từ chối ledger thiếu; không fixture/pilot/detector mới. guard-stage-001.json có thời gian test cần ledger delta trước run sau.
+
+
+### Kết thúc phiên 5 — 2026-10-11T07:31:57.851917+07:00 — dừng phần cấp giờ vì ledger chưa đủ
+
+1. Đã làm: dùng repo mở phiên và kiểm nguồn/checkpoint; tự đọc đủ ba script và native, MRP RQ2/P4, DT18 NV2/NV3, advisor §1, LESSONS và WHY-41. Q-128/Q-129 đã có hiệu lực và được ghi sổ từ bổ sung cuối phiên 4; không ghi lại. Tự kiểm mới laptop825 và raw EC2 89 file; xóa duy nhất archive được duyệt. Sửa key metadata status_code và đúng time guard hai script, giữ bản cũ/hash hai đầu. Dựng ledger mọi lượt tìm được, giữ phần thiếu OPEN. Không khởi nghiên cứu/fixture/pilot mới, không viết kết luận cơ chế.
+2. File thay đổi: scripts/bocpd_delay.py và scripts/channel_context.py trong results/T-033/; scripts/finish_session5.py (tài liệu/checkpoint), runs/session5-open-001/, session5-budget-001/, session5-checkpoint-001/; LOG chỉ nối; duy nhất dòng T-033 STATE. EC2 chỉ thêm scripts/session5-001/, scripts/session5-guard-001/, runs/session5-budget-001/ và xóa đúng runs/checkpoint-handoff-001/artifacts.tar. Không đổi native/adapter/env/raw, SPEC, AGENTS, DECISIONS/WHY/MRP/LESSONS/review-prompt, T-032 hoặc test/locked/heldout; không commit/push/bật/tắt EC2.
+3. Kiểm: laptop825/825 file, 1393611373 byte PASS theo inventory; native/source pin và 89/89 raw EC2, 656358942 byte PASS. Archive byte trước 2791021314 → sau 1395923714, giảm đúng1395097600 byte, không xóa khác. AST ngoài guard và key status_code giữ nguyên; hai hash local/EC2 và AST đạt; cả hai guard từ chối ledger thiếu đúng BUDGET_LEDGER_INCOMPLETE. Bằng chứng trong session5-open-001/*.json/*.diff; script nguyên guard cũ được giữ. Guard đường accounting đầy đủ/fixture/pilot/rest chưa kiểm, không gọi staged script sẵn sàng chạy toàn lô. Hash/byte tài liệu và LOG prefix/phạm vi kiểm trong scope-verification.json.
+4. OPEN: represented_marker_s=19135.085507845, khoảng 5,315301530 giờ, và timer điều khiển riêng không chứng minh tổng xử lý đầy đủ. Ledger còn thiếu setup/exit ngoài marker và SSH/hash rời phiên1–4; unknown_time_s và remaining_approved_s null. Last-write không là upper bound toàn process. Thiếu này chặn cấp giờ/run mới trong trần12h; đã hỏi Minh cung cấp timing hoặc quyết hạch toán, không tự đặt reserve. Có thêm timer guard/test và remote-status trong ledger-delta.json, chưa sửa ledger pin cũ. Chặng tính còn thiếu lifecycle/provenance/pilot-rest/fixtures, ba pilot/time-RAM-byte-schema-CP-flags, rest độ trễ/kênh và khóa nhóm mới. RQ2/P4/G2/P6 chưa được phân xử thêm; đọc tay/tổng hợp vẫn chưa bắt đầu. Không loại nghĩa vụ nghiên cứu vì chặn ngân sách; cần giải quyết ledger rồi làm đủ theo SPEC.
+
+EC2: kiểm mới ở 2026-10-11T00:32:01.999369+00:00, không worker/tmux T-033, archive không còn; byte hiện hành 1396038180, disk free 4566118400. Minh có thể tắt laptop trong lúc chờ vì không có pilot/worker mới; EC2 còn cần cho phần tính, agent không bật/tắt máy. Chưa báo EC2 lượt mới ổn định. Việc Minh cần làm: chốt hạch toán phần thời gian không tái dựng hoặc cung cấp timing còn thiếu.
+
+Bước tiếp chính xác: đọc session5-budget-001/ledger.json#/open và session5-checkpoint-001/ledger-delta.json; kiểm câu trả lời Minh trước mọi cấp giờ. Chưa có trả lời thì chỉ đọc/kiểm điều khiển cần thiết, không chạy CLI. Sau giải quyết, kiểm SSH chỉ đọc `tail -n 20 ~/rca/T-033/trang-thai.txt` với key/known_hosts README, process và source/hash mới. Hoàn thiện điều phối/fixture đúng SPEC rồi mới chạy từng pilot; không chạy lại đơn vị PASS. Prompt nối cùng chặng ở session5-checkpoint-001/prompt-next-session.md; đây không là prompt đọc tay+tổng hợp hay phản biện Claude. Task chưa hoàn tất nên chưa soạn phản biện chính thức.
+
+Lệnh cuối chốt: `D:/RCA-ext/envs/T-014-main/Scripts/python.exe -B -X utf8 results/T-033/scripts/finish_session5.py` (tài liệu/hash/SSH metadata chỉ đọc). Lệnh EC2 cuối: Python pin qua SSH stdin kiểm process/tmux/byte/disk/archive; script nguyên văn nằm trong finish_session5.py, kết quả remote-status.json và timer trong ledger-delta.json. Lệnh pilot còn chưa được tạo/kiểm; không đoán hoặc dùng CLI toàn lô hiện có.

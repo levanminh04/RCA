@@ -1,0 +1,25 @@
+--- bocpd_delay.py.before
++++ bocpd_delay.py
+@@ -118,9 +118,19 @@
+     def guard(self, reserve=0):
+         if (self.home / 'STOP').exists():
+             raise RuntimeError('STOP: preserve all completed descriptions')
+-        elapsed = (datetime.now(timezone.utc) - self.first_compute).total_seconds()
+-        if elapsed >= self.source['budget_compute_s']:
+-            raise RuntimeError('BUDGET_STOP: approved wall budget since first compute exhausted')
++        ledger_path = self.home / 'runs/session5-budget-001/ledger.json'
++        expected_ledger = os.environ.get('T033_PROCESSING_LEDGER_SHA256')
++        if not expected_ledger or sha(ledger_path) != expected_ledger:
++            raise RuntimeError('BUDGET_LEDGER_HASH: processing ledger must be pinned')
++        ledger = json.loads(ledger_path.read_text(encoding='utf-8'))
++        if not ledger['accounting_valid_for_next_run'] or ledger['approved_total_processing_s'] is None:
++            raise RuntimeError('BUDGET_LEDGER_INCOMPLETE: missing processing time; no new allocation')
++        if ledger['source_sha256'] != self.args.source_sha256:
++            raise RuntimeError('BUDGET_LEDGER_SOURCE: source identity mismatch')
++        used_before = float(ledger['approved_total_processing_s'])
++        elapsed = used_before + (time.perf_counter() - self.begin)
++        if not 0 <= used_before <= elapsed < self.source['budget_compute_s']:
++            raise RuntimeError('BUDGET_STOP: cumulative processing budget exhausted')
+         used = sum(p.stat().st_size for p in self.home.rglob('*') if p.is_file())
+         if used + reserve >= self.source['budget_bytes']:
+             raise RuntimeError('STORAGE_STOP: approved 4 GiB limit; do not delete prior runs')

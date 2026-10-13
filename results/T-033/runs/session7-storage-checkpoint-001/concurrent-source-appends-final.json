@@ -1,0 +1,30 @@
+{
+  "docs/DECISIONS.md": {
+    "status": "CONCURRENT_APPEND_FOR_T032_OUTSIDE_THIS_WRITER",
+    "before": {
+      "sha256": "087129fe941c56e7779e96ea9fa43d0ada53dacf17186c275885cb8ee260a515",
+      "bytes": 71980
+    },
+    "current": {
+      "sha256": "81f43897274bea451cd9347c28c160c42f101f94c3a7906f711baef61b68500b",
+      "bytes": 74972
+    },
+    "old_prefix_unchanged": true,
+    "scope_affected": "No change to T-033 decisions or WHY-41",
+    "append_text": "\n| Q-133 | 11/10/2026 | T-032: Minh trả lời \"duyệt\" cho ba điểm Claude trình trong phiên 10: (1) giữ mục 11–14 của khối dán kèm prompt mở phiên là lời Minh, tức dừng sau mục 6 và viết báo cáo chính ở phiên mới; (2) chạy thêm hai nhánh bỏ cạnh theo loại cạnh của CIRCA trên laptop, ghi thiết kế vào file trước khi chạy; (3) dùng tiếp EC2 cho phần còn lại của mục 4 và mục 5. | chat 11/10/2026; ba điểm là chữ của Claude, lời Minh là \"duyệt\"; LOG T-032 phiên 10 |\n\n| Q-134 | 11/10/2026 | T-032: Minh duyệt một lượt gói bổ sung Claude trình ngày 11/10. Lời Minh khi yêu cầu trình: \"trình toàn bộ để tôi duyệt 1 lượt , ưu tiên mọi hướng cho câu hỏi nghiên cứu, bảo vệ trước giảng viên tốt nhất có thể, hạn chế của dattaset hay thuật toán thì chấp nhận, ghi rõ\". Gói gồm bảy việc làm thêm, mức đọc tay, cách xếp mức đo được, danh sách giới hạn chấp nhận, mục WHY mới và điều kiện làm việc như Q-131. Lời duyệt: \"duyệt toàn bộ, sửa luôn giúp tôi , ưu tiên mọi hướng cho câu hỏi nghiên cứu, bảo vệ trước giảng viên tốt nhất có thể\". | chat 11/10/2026; nguyên văn gói ở results/T-032/goi-bo-sung-007.md; LOG T-032 |\n\n| Q-135 | 11/10/2026 | T-032: Minh dán đoạn Claude viết ở phiên trước, đề xuất sửa việc 4 của gói bổ sung (bộ chia trace theo bài MicroRank gốc), kèm lời: \"kiểm tra thông tin này , nếu thấy đúng thì duyệt theo, sai thì phản biện, không dừng các việc khác\". Claude kiểm với code MicroRank gốc bản efd85e8e (anormaly_detector.py dòng 61–70 và 93–105; preprocess_data.py dòng 169–225, 249–254, 311–327), bài báo (n = 1,5) và hồ sơ T-015: cả ba điểm sửa đúng. Vì vậy bản sửa có hiệu lực: (1) đếm trước, chưa chạy phương pháp: số trace có không, một, nhiều span đầu và số trace bị cắt ở biên; (2) dưới 90% trace có đúng một span đầu thì dừng và ghi là hạn chế của dữ liệu; (3) đạt thì chạy hai luật, báo riêng (bài: mức nền cộng 1,5 lần độ lệch chuẩn; code chia nhóm: mức nền cộng 1 lần độ lệch chuẩn, thêm 50 ms mỗi trace), mức nền theo code gốc (thời lượng span trừ tổng thời lượng các span con), nhánh giữ nguyên khớp bản đóng băng từng bit; (4) kết quả chỉ được gọi là \"công thức của bài gốc với span đầu do ta quy ước\", không gọi là MicroRank gốc. Việc ghi bản sửa vào file gói, sổ này và LOG nằm trong đề xuất được duyệt. | chat 11/10/2026; lời Minh trong ngoặc kép; nội dung bản sửa là chữ của Claude; results/T-032/goi-bo-sung-007.md phần \"Bản sửa việc 4\"; LOG T-032 phiên 11 |\n"
+  },
+  "docs/WHY.md": {
+    "status": "CONCURRENT_APPEND_FOR_T032_OUTSIDE_THIS_WRITER",
+    "before": {
+      "sha256": "35de44ce28eda8af298f9a7f393bd9374f39f61a3fbd7284e08a8db10588cb9a",
+      "bytes": 118900
+    },
+    "current": {
+      "sha256": "dc69257c988a8c720954b21d496c8d77841cacf87ccd85c895e993940f149302",
+      "bytes": 121719
+    },
+    "old_prefix_unchanged": true,
+    "scope_affected": "No change to T-033 decisions or WHY-41",
+    "append_text": "\n\n## WHY-45 — Bảng mô tả, phép đổi thêm và gói bổ sung của T-032 (Minh duyệt ngày 11/10/2026)\n\nNguồn nguyên văn: results/T-032/thiet-ke-bang-mo-ta-004.md, thiet-ke-phep-doi-003.md, -005.md, -006.md, goi-bo-sung-007.md.\n\n**Chọn:** (1) bốn bảng mô tả không gọi phương pháp, nối nhãn sau cùng: vị trí tín hiệu của root trong trace; xu hướng nền của cột metric; cấu tạo thời gian của lời gọi; tỷ lệ lời gọi chậm theo cạnh. (2) Mốc đếm: cờ theo mean + 3·std của nền; lời gọi chậm là vượt phân vị 95 của chính cạnh ở nền; chỉ xét cạnh có từ 20 lời gọi mỗi phía; mốc báo cáo 50% và 20%. (3) Tiêu chí mức đo được \"dịch vụ gọi chờ root\" theo ca: có cạnh đủ lời gọi; ở nền, span phía được gọi dài hơn span phía gọi ở không quá 1% lời gọi; mọi chỗ gọi trong mã nguồn là lời gọi chặn ở mọi phiên bản ứng viên. (4) Phép thử giả bằng mốc lùi vào đoạn nền. (5) Phép đổi thêm: bỏ cạnh theo loại ở CIRCA; bỏ cột log ở TORAI B; bộ chia trace theo bài MicroRank gốc. (6) Bảng vị trí trên chuỗi gọi của thực thể đứng trên root; bảng nối lời gọi chậm với span mang cờ; phát lại TORAI nguồn A có quan sát.\n\n**Vì sao:** P4 đòi chỉ ra thông tin của root nằm ở đâu, bước nào làm mất nó, và quan hệ giữa dịch vụ bổ sung được gì. Thứ hạng và cờ không trả lời được; cần bảng theo vị trí và phép đổi đúng một bước.\n\n**Phương án đã xét:** chỉ dùng thứ hạng và cờ (không cho biết vị trí tín hiệu); so trung vị từng phần của lời gọi (che mất ca có hai nhóm lời gọi chậm); ngưỡng cố định theo mili giây (phụ thuộc cạnh); định nghĩa nhãn lan (SPEC không cho); hỏi tác giả về phiên bản Train Ticket (Minh chọn chấp nhận giới hạn).\n\n**Bằng chứng:** results/T-032/ket-qua-phien-10.md cho phần đã chạy. Phần của gói bổ sung chưa có kết quả, là kế hoạch kiểm.\n\n**Giới hạn:** định nghĩa vị trí, mốc đếm và phép đổi thêm đều đặt sau khi đã xem kết quả dev trước đó, nên chỉ là bằng chứng trên dev cho ứng viên. Các mốc 20 lời gọi, phân vị 95, 50% do người làm đặt; số thô được lưu. Bộ chia trace theo bài gốc cần một quy ước lấy thời lượng cả trace, chưa kiểm.\n\n**Kết luận phụ thuộc:** bốn đầu ra đầu của P4 trong T-032; mức đo được theo ca; căn cứ đề xuất ứng viên P5–P6. Lợi ích của đồ thị vẫn cần đánh giá riêng.\n"
+  }
+}

@@ -1,0 +1,30 @@
+--- preserved/bocpd_delay.py
++++ session6-001/bocpd_delay.py
+@@ -118,7 +118,7 @@
+     def guard(self, reserve=0):
+         if (self.home / 'STOP').exists():
+             raise RuntimeError('STOP: preserve all completed descriptions')
+-        ledger_path = self.home / 'runs/session5-budget-001/ledger.json'
++        ledger_path = self.scoped(os.environ['T033_PROCESSING_LEDGER_PATH'])
+         expected_ledger = os.environ.get('T033_PROCESSING_LEDGER_SHA256')
+         if not expected_ledger or sha(ledger_path) != expected_ledger:
+             raise RuntimeError('BUDGET_LEDGER_HASH: processing ledger must be pinned')
+@@ -378,7 +378,7 @@
+         rows, indexes = [], []
+         try:
+             self.setup()
+-            for item in sorted(self.source['cases'], key=lambda c: c['opaque_id']):
++            for item in sorted([c for c in self.source['cases'] if c['opaque_id'] in self.args.cases.split(',')], key=lambda c: c['opaque_id']):
+                 row, index = self.describe(item)
+                 # Keep the overview compact; detailed point chains remain per case.
+                 rows.append({k: v for k, v in row.items() if k not in ('proxy_to_first_post_or_end', 'CP_and_neighbor_evidence')})
+@@ -412,7 +412,8 @@
+ 
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+-    parser.add_argument('--run', default='bocpd-delay-001')
++    parser.add_argument('--run', required=True)
++    parser.add_argument('--cases', required=True)
+     parser.add_argument('--core-first', default='bocpd-first-002')
+     parser.add_argument('--core-rest', default='bocpd-rest-001')
+     parser.add_argument('--core-first-sha256', required=True)

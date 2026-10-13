@@ -1,0 +1,5 @@
+# FF/PF — kiểm prior và kênh thực tế
+
+Giữ S_F, commonX/time/history giống nhau. Tại anchor0, cuối tiền tố và firstdifference m/CP đã lưu (không chọn theo accuracy), chọn các parent của hai MAP/previousMAP. Dựng native states theo cách targeted đã PASS. Native dof=d+1 nên dfpredictive2; marginal prior ν_small=ν_full−(d_full−d_small), μsmall=μfull[S], Ψsmall=Ψfull[S,S], κ giữ. Ψ=inv(scale) là inverse precision-scale, không là covariance Student-t df2.
+
+Kiểm μcommon/df/κ EXACT, Ψcommon principal-block và marginalpredictive logpdf với PF nguyên trạng bằng bound1e-10 đã khai trước cho algebra. Không nới CP hoặc native state gate; storedPDF/R/CP làm numeric source chính. Tách jointlogpdf thành commonmarginal+conditionalextra logpdf; đặt cạnh Rparent của mỗi nhánh để thấy feedback lịch sử. Đây phân rã điều kiện của likelihood/đầu vào trong gói mask, không là prior-alone intervention hoặc chứng minh nguyên nhân vật lý. Những commonfeature input khác phải dừng, không điều chỉnh scale để có identity. Mọi30ca giữ, ca không thêmkênh/inputidentity cũng ghi.

@@ -1,0 +1,301 @@
+{
+  "at": "2026-10-11T10:13:15.846219+07:00",
+  "task": "T-033",
+  "status": "VALID_ACCOUNTING_SNAPSHOT",
+  "decision": "Q-132",
+  "source_sha256": "3071381a24edcfe82c1df19ffe4b816b2356a3afad1117fdae260f6c04f9079c",
+  "budget_compute_s": 43200,
+  "accounting_valid_for_next_run": true,
+  "approved_total_processing_s": 29164.162760098057,
+  "approved_prior_processing_s": 28800,
+  "approved_max_new_processing_s": 14400,
+  "new_processing_charged_s": 364.1627600980557,
+  "remaining_approved_s": 14035.837239901944,
+  "remaining_basis": "approved 4h new minus summed measured full command/job processing; conservative SSH upper bounds; overlaps with launch/poll control charged separately",
+  "historical_actual_processing_s": null,
+  "unknown_time_s": null,
+  "historical_actual_status": "OPEN",
+  "represented_marker_s": 19135.085507845,
+  "represented_markers_and_available_timers_s": 19139.06624355099,
+  "historical_ledger": "results/T-033/runs/session5-budget-001/ledger.json",
+  "historical_ledger_sha256": "680ddbbd8cca8e6adeeda82381baefb8a3329d8bf45ab67c9d64a1ef48da2b42",
+  "historical_delta": "results/T-033/runs/session5-checkpoint-001/ledger-delta.json",
+  "open": [
+    {
+      "part": "Job shell setup/exit outside markers",
+      "input_needed": "process launch/end timestamps or trusted command timings for nine jobs",
+      "owner": "Minh / original runner evidence",
+      "impact": "total cannot be certified exact"
+    },
+    {
+      "part": "Preflight/audit/recheck exit after last-write markers",
+      "input_needed": "process exit timing or accounting decision for missing tails",
+      "owner": "Minh",
+      "impact": "last-write is not full-process upper bound"
+    },
+    {
+      "part": "Checkpoint/package imports before mkdir and tails after last write",
+      "input_needed": "start/end timers for three checkpoint and one package commands",
+      "owner": "Minh",
+      "impact": "intervals cover only represented portions"
+    },
+    {
+      "part": "Separate SSH checks/hash/control in sessions 1-4",
+      "input_needed": "complete historical command timing ledger, or Minh decision acknowledging non-reconstructible time",
+      "owner": "Minh",
+      "impact": "no supported upper bound for all processing time"
+    }
+  ],
+  "next_run_requirements": [
+    "Measure every EC2 command including failure; preserve all ledger history",
+    "Pin this fresh snapshot before processing; do not relaunch verified detectors"
+  ],
+  "charges": [
+    {
+      "source": "results/T-033/runs/session6-open-001/bocpd-delay-pilot-001-launch.timer.json",
+      "sha256": "382d990c35f181ab98b56a1d8e5aa221f0aeef681c31fdba42aa13d604ccea88",
+      "charged_processing_s": 3.5201137999538332,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/bocpd-delay-pilot-001-observe.timer.json",
+      "sha256": "adf9efa06858cd497872f5bf42b30afca11d3e8b7059465fd82a6157023a0194",
+      "charged_processing_s": 3.802520800032653,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/bocpd-delay-rest-001-launch.timer.json",
+      "sha256": "75fcc159c6afbdacbdd70ee502309487a520396e1408cf4c7552c01794e75cd9",
+      "charged_processing_s": 3.384172199992463,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/bocpd-delay-rest-001-observe.timer.json",
+      "sha256": "9c44a71270b0594f7234cc2dc7f58b02c3dc66c3c098c7dca8a24e40e0928481",
+      "charged_processing_s": 4.1094448999501765,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/channel-pilot-001-launch.timer.json",
+      "sha256": "6b42e5dc99b3af6e4c67ea8d7d8d60282ad67ac397dedafb7a65947c3ca05c3b",
+      "charged_processing_s": 3.43112750002183,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/channel-pilot-001-observe.timer.json",
+      "sha256": "c4a60fbb546c53d97e8e230c595dd0a229515ecd1008eb458caee03e190e6210",
+      "charged_processing_s": 3.8930499000125565,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/channel-rest-001-launch.timer.json",
+      "sha256": "70f19858d19688a22f6429789c4259c3b956ddfacbee0a044b1b721db178ea1e",
+      "charged_processing_s": 3.587067799991928,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/channel-rest-001-observe.timer.json",
+      "sha256": "e8002b8e3e46c5e64e6359942707557210a4edfbd68e8d805e76898dc8c94b7a",
+      "charged_processing_s": 8.396551300014835,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/final-preflight-001.timer.json",
+      "sha256": "1e7636b8c160983f0d6bad2802ce03153e4a92135894f6289ca3d0d5b30d037c",
+      "charged_processing_s": 5.389978899969719,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/fresh-preflight-001.timer.json",
+      "sha256": "059d99d4e06995283495902c22a1e7a7af60ef8186c61d97ae15b6ab59998810",
+      "charged_processing_s": 0.05759410001337528,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 255
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/fresh-preflight-002.timer.json",
+      "sha256": "9a1d4313564b7838da8ce42fbce074529c86f682a1ba17c5aa7f5d284055d2d0",
+      "charged_processing_s": 5.328691000002436,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/groups-lock-001.timer.json",
+      "sha256": "b7c187159302f7165310335ec04b4d66a3f4a5e74ca52a41fda08842aa19aff8",
+      "charged_processing_s": 5.753743999986909,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/nsigma-delay-pilot-001-launch.timer.json",
+      "sha256": "6e84358699bab15e9045f913dc334304671a9ab443738f2d5a27c2b6ad5cab05",
+      "charged_processing_s": 3.373776699998416,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/nsigma-delay-pilot-001-observe.timer.json",
+      "sha256": "a0749012bfdd63892b0820abf935cd13272f90a1ef13dcec68c025b42155576d",
+      "charged_processing_s": 3.824442600016482,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/nsigma-delay-rest-001-launch.timer.json",
+      "sha256": "583c730a37848347d6b682088451ce03c313a171dbd74ef2f2f4b10bb35ad4fe",
+      "charged_processing_s": 3.4503511000075378,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/nsigma-delay-rest-001-observe.timer.json",
+      "sha256": "ce5df2eb0b219229e2c7111e19c64cca63d3abac9a144d0be2bbe5000a7c5e1b",
+      "charged_processing_s": 4.471366800018586,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/receive-inventory-001.timer.json",
+      "sha256": "48aa29a4283abe12929fd25a30649adfe0259c88493bbf6325d370544538d958",
+      "charged_processing_s": 4.167366300011054,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/receive-stream-001.timer.json",
+      "sha256": "2d34a23d90988d61e4bdfcf48256c46985f73520a843775d755667a3dea34efe",
+      "charged_processing_s": 37.596556500007864,
+      "basis": "full SSH tar stream elapsed upper bound including laptop receive/hash/IO/network; no separate child timer charged",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/stage-001-stage.timer.json",
+      "sha256": "e0d25835c7f453230293abbc0372103fe3f9c637c1ffb7c93cdfe66cc1122757",
+      "charged_processing_s": 4.726843699987512,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/stage-002-stage.timer.json",
+      "sha256": "b13c02c101cb181c8471fedac412e97c06a4b9305edcc60ea977a1dd7b895652",
+      "charged_processing_s": 4.400413500028662,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/bocpd-delay-pilot-001.processing-timer.json",
+      "sha256": "37bf8d1a85a0f8ad68a43739e037d058d6bf3a969add6e92b4b3d38a238bed4d",
+      "charged_processing_s": 5.171613548,
+      "basis": "shell before Python import through Python exit",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/bocpd-delay-rest-001.processing-timer.json",
+      "sha256": "4cb7bf327a2fb797382d945aab85d247ab8b429d8ec500f621f7a16adbd5de9a",
+      "charged_processing_s": 15.08089462,
+      "basis": "shell before Python import through Python exit",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/channel-pilot-001.processing-timer.json",
+      "sha256": "511b24d49439f83757e26688950138ac231d4b83ae21293c70d893898054a549",
+      "charged_processing_s": 7.192351181,
+      "basis": "shell before Python import through Python exit",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/channel-rest-001.processing-timer.json",
+      "sha256": "4becc2ceb9a8c137d2b89db74f3c34ed335e9ec29aa701664a869b8a33c1c3f5",
+      "charged_processing_s": 83.662110842,
+      "basis": "shell before Python import through Python exit",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/nsigma-delay-pilot-001.processing-timer.json",
+      "sha256": "d5f253bbd240ec0102e1d2d02d9928b30f4afa8bb3dd97758ec4473e7ae2ad5a",
+      "charged_processing_s": 8.716763676,
+      "basis": "shell before Python import through Python exit",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/nsigma-delay-rest-001.processing-timer.json",
+      "sha256": "d94a3363abd402eb051af7b4bef78a5ad81310c666c96263cf9ffb02f9390da7",
+      "charged_processing_s": 12.229628631,
+      "basis": "shell before Python import through Python exit",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session7-open-001/session7-extract-001.timer.json",
+      "sha256": "56073e36679f0a2db50b70b70cc47404b4cef225db11c9e2da2be268ca980645",
+      "charged_processing_s": 87.5822971999878,
+      "exit_code": 1,
+      "basis": "full SSH elapsed upper bound including network/import/exit"
+    },
+    {
+      "source": "results/T-033/runs/session7-open-001/session7-preflight-001.timer.json",
+      "sha256": "1f0341463b662a08202d76392092cbe66a1f25f45907aa2608d07a86cd828bd7",
+      "charged_processing_s": 0.07665910001378506,
+      "exit_code": 255,
+      "basis": "full SSH elapsed upper bound including network/import/exit"
+    },
+    {
+      "source": "results/T-033/runs/session7-open-001/session7-preflight-002.timer.json",
+      "sha256": "a04f66c120859a3ecd0491c249a2d53f4c0e3d59c901e831c4f0dccd78ffb8ad",
+      "charged_processing_s": 5.584321899979841,
+      "exit_code": 0,
+      "basis": "full SSH elapsed upper bound including network/import/exit"
+    },
+    {
+      "source": "results/T-033/runs/session7-open-001/session7-receive-locks-001.timer.json",
+      "sha256": "b0a6c09a713147ace06ed669c40486e0dbacfe7615b74587e7c8de5759c8bea1",
+      "charged_processing_s": 4.948965799994767,
+      "exit_code": 0,
+      "basis": "full SSH elapsed upper bound including network/import/exit"
+    },
+    {
+      "source": "results/T-033/runs/session7-open-001/session7-storage-status-002.timer.json",
+      "sha256": "dd749fdf75cd7f03f4ee98d0ed2e626b247c1be6486c3074b082a03be16b4707",
+      "charged_processing_s": 3.9948769999900833,
+      "exit_code": 0,
+      "basis": "full SSH elapsed upper bound including network/import/exit"
+    },
+    {
+      "source": "results\\T-033\\runs\\session8-open-001\\session8-extract-pilot-001.timer.json",
+      "sha256": "3eeb9ba51839ac291f1406a9a851ffbcad131491314401c45967708ad11e3cdf",
+      "charged_processing_s": 7.461941800022032,
+      "basis": "full SSH elapsed upper bound including network/import/exit",
+      "exit_code": 0
+    },
+    {
+      "source": "results\\T-033\\runs\\session8-open-001\\session8-preflight-001.timer.json",
+      "sha256": "41afa4ab06759cb8b1e78875a9eb121662c69dc0214bfdc8f4a9e83742ce3091",
+      "charged_processing_s": 0.08023780002258718,
+      "basis": "full SSH elapsed upper bound including network/import/exit",
+      "exit_code": 255
+    },
+    {
+      "source": "results\\T-033\\runs\\session8-open-001\\session8-preflight-002.timer.json",
+      "sha256": "a9bc49f24553eb40edbbc9ae875835394220f6f798d5f69b4e7e34064562a1f6",
+      "charged_processing_s": 5.714923600025941,
+      "basis": "full SSH elapsed upper bound including network/import/exit",
+      "exit_code": 0
+    }
+  ],
+  "accounting_source": {
+    "path": "results/T-033/runs/session5-approval-checkpoint-001/approved-accounting.json",
+    "sha256": "1764fbb28e9d2a5b3ddf90f5fd2a2258c739b69800aabbd20db5e55b0fa078aa"
+  },
+  "previous_snapshot": {
+    "path": "results\\T-033\\runs\\session7-storage-approval-checkpoint-001\\ledger.json",
+    "sha256": "0f23c97c61f4054917cd08699d0f2e1c533918f80d650a07318cec0e0b11a01d"
+  }
+}

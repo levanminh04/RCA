@@ -1,0 +1,56 @@
+{
+  "at": "2026-10-11T08:51:11.022139+07:00",
+  "task": "T-033",
+  "status": "APPROVED_ACCOUNTING_BASELINE",
+  "decision": "Q-132",
+  "source_sha256": "3071381a24edcfe82c1df19ffe4b816b2356a3afad1117fdae260f6c04f9079c",
+  "budget_compute_s": 43200,
+  "accounting_valid_for_next_run": true,
+  "approved_total_processing_s": 28800,
+  "approved_prior_processing_s": 28800,
+  "approved_max_new_processing_s": 14400,
+  "new_processing_charged_s": 0,
+  "remaining_approved_s": 14400,
+  "remaining_basis": "Administrative allocation at approval; not a measured residual from actual historical processing",
+  "historical_actual_processing_s": null,
+  "unknown_time_s": null,
+  "historical_actual_status": "OPEN",
+  "represented_marker_s": 19135.085507845,
+  "represented_markers_and_available_timers_s": 19139.06624355099,
+  "historical_ledger": "results/T-033/runs/session5-budget-001/ledger.json",
+  "historical_ledger_sha256": "680ddbbd8cca8e6adeeda82381baefb8a3329d8bf45ab67c9d64a1ef48da2b42",
+  "historical_delta": "results/T-033/runs/session5-checkpoint-001/ledger-delta.json",
+  "open": [
+    {
+      "part": "Job shell setup/exit outside markers",
+      "input_needed": "process launch/end timestamps or trusted command timings for nine jobs",
+      "owner": "Minh / original runner evidence",
+      "impact": "total cannot be certified exact"
+    },
+    {
+      "part": "Preflight/audit/recheck exit after last-write markers",
+      "input_needed": "process exit timing or accounting decision for missing tails",
+      "owner": "Minh",
+      "impact": "last-write is not full-process upper bound"
+    },
+    {
+      "part": "Checkpoint/package imports before mkdir and tails after last write",
+      "input_needed": "start/end timers for three checkpoint and one package commands",
+      "owner": "Minh",
+      "impact": "intervals cover only represented portions"
+    },
+    {
+      "part": "Separate SSH checks/hash/control in sessions 1-4",
+      "input_needed": "complete historical command timing ledger, or Minh decision acknowledging non-reconstructible time",
+      "owner": "Minh",
+      "impact": "no supported upper bound for all processing time"
+    }
+  ],
+  "next_run_requirements": [
+    "Time every EC2 processing run/check after approval, including failed runs; sum charged wall across separate runs",
+    "Do not use calendar elapsed time or only completed-status subtotals as total processing",
+    "Create and pin a fresh per-run ledger snapshot containing 28800 plus all subsequent processing charges",
+    "Update only the approved guard path/hash to the approved accounting snapshot; preserve old script/ledger versions and verify both ends",
+    "Current staged guards still pin the old incomplete ledger; this document does not launch or validate a pilot"
+  ]
+}

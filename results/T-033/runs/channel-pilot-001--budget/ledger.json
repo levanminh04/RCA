@@ -1,0 +1,132 @@
+{
+  "at": "2026-10-11T02:15:35.093299+00:00",
+  "task": "T-033",
+  "status": "VALID_ACCOUNTING_SNAPSHOT",
+  "decision": "Q-132",
+  "source_sha256": "3071381a24edcfe82c1df19ffe4b816b2356a3afad1117fdae260f6c04f9079c",
+  "budget_compute_s": 43200,
+  "accounting_valid_for_next_run": true,
+  "approved_total_processing_s": 28842.922773424034,
+  "approved_prior_processing_s": 28800,
+  "approved_max_new_processing_s": 14400,
+  "new_processing_charged_s": 42.922773424033366,
+  "remaining_approved_s": 14357.077226575966,
+  "remaining_basis": "approved 4h new minus summed measured full command/job processing; conservative SSH upper bounds; overlaps with launch/poll control charged separately",
+  "historical_actual_processing_s": null,
+  "unknown_time_s": null,
+  "historical_actual_status": "OPEN",
+  "represented_marker_s": 19135.085507845,
+  "represented_markers_and_available_timers_s": 19139.06624355099,
+  "historical_ledger": "results/T-033/runs/session5-budget-001/ledger.json",
+  "historical_ledger_sha256": "680ddbbd8cca8e6adeeda82381baefb8a3329d8bf45ab67c9d64a1ef48da2b42",
+  "historical_delta": "results/T-033/runs/session5-checkpoint-001/ledger-delta.json",
+  "open": [
+    {
+      "part": "Job shell setup/exit outside markers",
+      "input_needed": "process launch/end timestamps or trusted command timings for nine jobs",
+      "owner": "Minh / original runner evidence",
+      "impact": "total cannot be certified exact"
+    },
+    {
+      "part": "Preflight/audit/recheck exit after last-write markers",
+      "input_needed": "process exit timing or accounting decision for missing tails",
+      "owner": "Minh",
+      "impact": "last-write is not full-process upper bound"
+    },
+    {
+      "part": "Checkpoint/package imports before mkdir and tails after last write",
+      "input_needed": "start/end timers for three checkpoint and one package commands",
+      "owner": "Minh",
+      "impact": "intervals cover only represented portions"
+    },
+    {
+      "part": "Separate SSH checks/hash/control in sessions 1-4",
+      "input_needed": "complete historical command timing ledger, or Minh decision acknowledging non-reconstructible time",
+      "owner": "Minh",
+      "impact": "no supported upper bound for all processing time"
+    }
+  ],
+  "next_run_requirements": [
+    "Time every EC2 processing run/check after approval, including failed runs; sum charged wall across separate runs",
+    "Do not use calendar elapsed time or only completed-status subtotals as total processing",
+    "Create and pin a fresh per-run ledger snapshot containing 28800 plus all subsequent processing charges",
+    "Update only the approved guard path/hash to the approved accounting snapshot; preserve old script/ledger versions and verify both ends",
+    "Current staged guards still pin the old incomplete ledger; this document does not launch or validate a pilot"
+  ],
+  "charges": [
+    {
+      "source": "results/T-033/runs/session6-open-001/bocpd-delay-pilot-001-launch.timer.json",
+      "sha256": "382d990c35f181ab98b56a1d8e5aa221f0aeef681c31fdba42aa13d604ccea88",
+      "charged_processing_s": 3.5201137999538332,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/bocpd-delay-pilot-001-observe.timer.json",
+      "sha256": "adf9efa06858cd497872f5bf42b30afca11d3e8b7059465fd82a6157023a0194",
+      "charged_processing_s": 3.802520800032653,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/fresh-preflight-001.timer.json",
+      "sha256": "059d99d4e06995283495902c22a1e7a7af60ef8186c61d97ae15b6ab59998810",
+      "charged_processing_s": 0.05759410001337528,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 255
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/fresh-preflight-002.timer.json",
+      "sha256": "9a1d4313564b7838da8ce42fbce074529c86f682a1ba17c5aa7f5d284055d2d0",
+      "charged_processing_s": 5.328691000002436,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/nsigma-delay-pilot-001-launch.timer.json",
+      "sha256": "6e84358699bab15e9045f913dc334304671a9ab443738f2d5a27c2b6ad5cab05",
+      "charged_processing_s": 3.373776699998416,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/nsigma-delay-pilot-001-observe.timer.json",
+      "sha256": "a0749012bfdd63892b0820abf935cd13272f90a1ef13dcec68c025b42155576d",
+      "charged_processing_s": 3.824442600016482,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/stage-001-stage.timer.json",
+      "sha256": "e0d25835c7f453230293abbc0372103fe3f9c637c1ffb7c93cdfe66cc1122757",
+      "charged_processing_s": 4.726843699987512,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/stage-002-stage.timer.json",
+      "sha256": "b13c02c101cb181c8471fedac412e97c06a4b9305edcc60ea977a1dd7b895652",
+      "charged_processing_s": 4.400413500028662,
+      "basis": "full SSH elapsed upper bound; includes imports/process exit/network/control overhead",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/bocpd-delay-pilot-001.processing-timer.json",
+      "sha256": "37bf8d1a85a0f8ad68a43739e037d058d6bf3a969add6e92b4b3d38a238bed4d",
+      "charged_processing_s": 5.171613548,
+      "basis": "shell before Python import through Python exit",
+      "exit_code": 0
+    },
+    {
+      "source": "results/T-033/runs/session6-open-001/nsigma-delay-pilot-001.processing-timer.json",
+      "sha256": "d5f253bbd240ec0102e1d2d02d9928b30f4afa8bb3dd97758ec4473e7ae2ad5a",
+      "charged_processing_s": 8.716763676,
+      "basis": "shell before Python import through Python exit",
+      "exit_code": 0
+    }
+  ],
+  "accounting_source": {
+    "path": "results/T-033/runs/session5-approval-checkpoint-001/approved-accounting.json",
+    "sha256": "1764fbb28e9d2a5b3ddf90f5fd2a2258c739b69800aabbd20db5e55b0fa078aa"
+  }
+}

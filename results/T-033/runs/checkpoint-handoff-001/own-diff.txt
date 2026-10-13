@@ -1,0 +1,109 @@
+--- STATE: only T033 close before
++++ STATE: only T033 close after
+@@ -41,7 +41,7 @@
+ | T-028 | P4: hạn chế xếp hạng chế độ (a) | P4 | Codex | Claude | Xong (08/10/2026), Minh duyệt đóng. Đã sửa R1–R4 và bổ sung R5; kết quả runs/phan-hoi-review-001, phép đo gốc buoc3-005. Nơi xử lý "lan có đáng kể" còn OPEN; chưa phân xử nhân quả. Chưa commit | `tasks/T-028-p4-han-che-xep-hang/` |
+ | T-029 | P4: hạn chế phát hiện chế độ (b) | P4 | Codex | Claude | Xong (09/10, Minh duyệt đóng theo Q-87). Đã sửa REVIEW-4 và P1/P2; REVIEW-5 không có lỗi đáng kể. Giữ các giới hạn đã khai; chưa commit | `tasks/T-029-p4-han-che-phat-hien/` |
+ | T-032 | Lần theo nguyên nhân thất bại xếp hạng | P4 | Codex | Claude | Đang thực hiện: BARO/coverage/SimpleRCA đủ52 PASS; bridge-003/Q-96 đạt, MicroRank cohort FAIL_STOP tại dev-3defe3d34b vượt ngưỡng, chờ Minh quyết chẩn đoán; CIRCA120sourcebytes PASS, wrapperv2 chờ fixture; TraceRCA path chờ duyệt riêng; A′ bị chặn, chưa kết luận cơ chế (LOG phiên3) | `tasks/T-032-g2-nguyen-nhan-xep-hang/` |
+-| T-033 | Lần theo cơ chế báo động trước mốc | P4 | Codex | Claude | Đang thực hiện: lõi N-Sigma/BOCPD đã kiểm PASS; nền cố định 60/60 PASS; FP/PF ca đầu đạt, 29 ca mới chạy nền ổn định; checkpoint LOG phiên 2. Chưa độ trễ/kênh/đối chứng hoặc kết luận cơ chế | `tasks/T-033-g2-nguyen-nhan-phat-hien/` |
++| T-033 | Lần theo cơ chế báo động trước mốc | P4 | Codex | Claude | Đang thực hiện: lõi và nền cố định đạt; FP/PF đủ 30 ca PASS, không còn worker. Đã chốt checkpoint-handoff-001 để Claude kiểm hiện trạng; guard chờ Minh quyết. Chưa độ trễ/kênh/đọc tay/tổng hợp, chưa nghiệm thu | `tasks/T-033-g2-nguyen-nhan-phat-hien/` |
+ 
+ 
+ ## Task đang mở
+--- LOG: checkpoint session before
++++ LOG: checkpoint session after
+@@ -129,3 +129,95 @@
+ Theo AGENTS §5a.2: "Thấy ngữ cảnh đã bị nén ... ghi checkpoint ngay ... rồi đề nghị Minh mở phiên mới." Ngữ cảnh phiên đã nén; đề nghị Minh mở phiên Codex mới để tiếp cùng task từ checkpoint. Prompt tiếp thực hiện dưới đây; chưa phải prompt phản biện Claude vì task còn thiếu kết quả.
+ 
+ > Đọc AGENTS.md, check tiến độ và tiếp T-033 trong STATE theo SPEC đã được Minh duyệt thực hiện ngày 09/10/2026, lời "ĐÃ CHỐT". Đọc toàn SPEC và LOG phiên 2/kết thúc phiên 2. Lõi và N-Sigma nền cố định đã PASS; EC2 3.107.246.249 còn lô bocpd-factorial-rest-001 chạy tmux độc lập. Kiểm PID/status/exit/progress và hash nguồn/manifest, không khởi trùng hoặc chạy lại đơn vị PASS; theo con trỏ provenance cho ca pilot tái dùng. Tiếp các chặng còn thiếu đúng SPEC, ưu tiên tính đúng, dừng phần phụ thuộc và trình Minh khi thiết kế không ổn hoặc vượt dự toán. Guard hiện giữ mốc 11:46:29 ngày 10/10 +07 và tối đa 4 GiB mới; không tự đổi. Giữ phạm vi ghi T-033 và ràng buộc chạy song song T-032; không test/locked/heldout, không commit/push, không bật/tắt EC2. Laptop chỉ điều khiển/tài liệu/metadata, tính nghiên cứu trên EC2. Khi task hoàn tất mới soạn prompt Claude theo docs/review-prompt.md: Prompt chung + Soát kết quả + G2.
++
++
++## Phiên 3 — 2026-10-10T12:01:47.736498+07:00 — Codex — laptop Windows 11 và EC2 T-033 — chốt bàn giao
++
++- Minh duyệt SPEC ngày 09/10/2026. Minh yêu cầu: "hãy chốt mới nhất cho tôi để claude có thể kiểm tra toàn vẹn". Intent EXECUTE: chốt checkpoint, nhận đầu ra hiện có, kiểm tính toàn vẹn, cập nhật LOG/dòng T-033 STATE và soạn prompt. Đây không phải lời duyệt sửa guard hoặc chạy chặng nghiên cứu tiếp theo.
++- Codex vẫn là người làm, Claude vẫn là người phản biện. Không tự mở phiên Claude hoặc gửi prompt; Minh chuyển thủ công. Prompt sẽ cho quyền chỉ đọc/trả lời trong chat khi chưa có quyền ghi bản REVIEW cụ thể.
++- Đã đối chiếu checkpoint cũ: snapshot phiên 2 chỉ tới 09:35 ngày 10/10 +07, LOG đóng lúc 09:41 còn ghi FP/PF đang chạy. EC2 `bocpd-factorial-rest-001/status.json` hiện PASS, đủ 30 ca gồm ca pilot tái dùng; kết thúc 10:27:24 ngày 10/10 +07, exit 0, không còn worker. Cần nhận snapshot/manifest cuối và ghi trạng thái mới để không phụ thuộc chat.
++- Vấn đề guard còn OPEN: SPEC mục Chi phí dự trù 4–12 giờ máy và nói "Đây không là timeout". Code guard dùng thời gian lịch liên tục từ lần tính đầu, bao gồm khoảng nghỉ. Mốc 11:46 ngày 10/10 do Codex cài; không được trình bày như thời hạn Minh đã chốt hoặc bằng chứng dùng hết giờ xử lý. Đề xuất chuyển sang tổng thời gian các lượt xử lý, giữ trần 12 giờ/4 GiB, chưa được Minh duyệt; chưa sửa code/nguồn/SPEC. Chi phí EC2 bật kể cả lúc nghỉ cũng chưa có đo đạc AWS độc lập. Chặng nghiên cứu mới phụ thuộc việc giải quyết cách tính ngân sách này.
++- Phạm vi phiên: `results/T-033/`, LOG chỉ nối, duy nhất dòng T-033 STATE; EC2 chỉ `~/rca/T-033/`. SPEC/WHY/DECISIONS/code dữ liệu nguồn giữ nguyên. Không test/locked/heldout, không vùng kết quả T-032, không commit/push, không bật/tắt EC2.
++
++
++### Kết thúc phiên 3 — checkpoint hiện trạng mới nhất — 2026-10-10T12:12:46.246158+07:00
++
++1. Đã làm: chốt `results/T-033/runs/checkpoint-handoff-001/README.md` để Claude kiểm độc lập. Snapshot EC2 lúc 2026-10-10T05:03:15.203298+00:00: FP/PF đủ 30 ca, pilot được tái dùng, kết thúc 10:27:24 ngày 10/10 +07, exit 0; không còn worker/tmux T-033. N-Sigma nền cố định đủ 60 đơn vị; core-audit-002 đã kiểm 120 record lõi. Đóng gói và nhận nguyên 825 file / 1393611373 byte, gồm trung gian NPZ, JSON, scripts, stdout/stderr/progress/exit và lượt lỗi; không chạy lại detector hoặc chặng mới.
++2. File thay đổi: scripts/checkpoint mới trong `results/T-033/`; LOG chỉ nối; chỉ ô trạng thái dòng T-033 STATE. SPEC/AGENTS/review-prompt giữ nguyên; WHY/DECISIONS không được phiên này ghi. Code/data/env nguồn cũ chỉ đọc; nhận bốn file native/adapter làm bản đọc cùng hash. Không test/locked/heldout, không vùng kết quả T-032, không commit/push, không bật/tắt EC2. Yêu cầu chốt hiện trạng không được coi là duyệt sửa guard.
++3. Kiểm: toàn bộ 11 manifest/lô và logs trên EC2 khớp; nguyên 825 file nhận cùng SHA/byte với inventory; hash toàn tar stream khớp hai đầu; bốn code native/adapter khớp nguồn pin; con trỏ tái dùng pilot được kiểm; AST code đạt. `artifact-locator.json` chỉ mục core/FF/hybrid/fixed, `output-presence.json` ghi đầu ra còn thiếu. Kiểm phạm vi/diff và hash tài liệu ở `local-verification.json`, `own-diff.txt`, `handoff-manifest.json`. Prompt soát kết quả bên dưới chép nguyên văn Prompt chung + Soát kết quả + G2, chỉ điền trường trung tính.
++4. OPEN: T-033 chưa hoàn tất, chưa có kết luận cơ chế hoặc căn cứ nghiệm thu RQ2/P4/G2/P6. Còn độ trễ/mật độ/chuỗi cờ, trace/log/workload, khóa nhóm mới, đọc tay/đối chứng, tổng hợp/kiểm tiếp. Guard lịch 12 giờ là cách cài của Codex; mốc 11:46 không phải thời hạn Minh đặt. Đính chính các câu LOG trước coi là giới hạn đã duyệt; đề xuất tính giờ xử lý cộng dồn còn CANDIDATE, chưa sửa hoặc Minh duyệt. `/run_durations_from_status` chỉ là thời gian các run có status, không phải số giờ AWS/đủ tổng mọi bước. Dung lượng gồm archive EC2 và bản nhận được kiểm theo `/storage` của local-verification; còn cần cân lại trước chạy tiếp, không tự xóa/archive cũ hoặc tăng trần.
++
++EC2: mọi lô T-033 hiện đã kết thúc; chưa có tiến trình mới. Minh có thể tắt laptop sau chốt. Giữ EC2 nếu Claude cần môi trường/raw dev để kiểm sâu hoặc Minh cho tiếp chặng chưa làm. Bản nhận đủ code/trung gian hiện có trên laptop; không cần giữ worker cũ. Không tự tắt EC2, task vẫn còn phần cần máy.
++
++Bước tiếp theo chính xác: Minh mở Claude và copy `results/T-033/runs/checkpoint-handoff-001/prompt-claude.md`, hoặc khối dưới đây. Claude đọc README/manifest/locator rồi đầu ra/code/nguồn gốc, trả lời trong chat; chưa cấp quyền REVIEW riêng và không tự chạy thực nghiệm mới. Codex giữ vai người làm, sau đó kiểm nhận xét và trình Minh xử lý. Nếu Minh cho tiếp, trước hết giải quyết ngân sách/guard theo quyền được duyệt, kiểm nguồn/hash, không làm lại đơn vị PASS. Lệnh chỉ đọc EC2 và path môi trường nằm trong README.
++
++Lệnh cuối chốt phiên: `Python -B -X utf8 results/T-033/scripts/finalize_handoff.py` trên laptop (chỉ hash/metadata/AST/tài liệu). Lệnh EC2 đóng gói: `T033_HOME=/home/ubuntu/rca/T-033 ... python -B -X utf8 .../scripts/package_handoff.py`; sau đó receiver dùng SSH `cat .../artifacts.tar` để nhận trực tiếp, không giữ archive thứ hai trên laptop. Lệnh kiểm tiến độ gốc: SSH `tail -n 20 ~/rca/T-033/trang-thai.txt`. Không khởi run mới.
++
++### Prompt Claude kiểm hiện trạng T-033 — Minh chuyển thủ công
++
++```text
++Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
++Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
++
++Thông tin lượt này:
++- Task hoặc đề xuất: T-033 — tasks/T-033-g2-nguyen-nhan-phat-hien/.
++- Công đoạn: soát kết quả.
++- Gói/cổng: P4 / G2.
++- Người làm và người phản biện chính thức: Codex là người làm; Claude là người phản biện chính thức theo SPEC.
++- Tài liệu gốc: AGENTS.md; docs/STATE.md; tasks/T-033-g2-nguyen-nhan-phat-hien/SPEC.md và LOG.md; results/T-033/runs/checkpoint-handoff-001/README.md; phần trực tiếp chi phối của docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md; docs/reference/sources/DT18-de-tai-va-nhiem-vu.md; docs/reference/sources/advisor-2026-09-23.md; diff phạm vi tại results/T-033/runs/checkpoint-handoff-001/own-diff.txt.
++- Phản biện và phản hồi trước: Không có bản REVIEW trên file trong thư mục task tại lần liệt kê để chốt checkpoint.
++- Code và kết quả liên quan: results/T-033/scripts/; results/T-033/runs/checkpoint-handoff-001/artifacts/; artifact-inventory.json, artifact-locator.json và native-source-manifest.json trong cùng checkpoint; source-native/ trong checkpoint; src/p3/; results/T-025/ và results/T-029/ theo manifest nguồn; BARO revision e35f4ec; results/T-031/moi-truong.json; môi trường và lệnh EC2 chỉ đọc theo README của checkpoint.
++- Phạm vi ghi được Minh cho phép trong lượt này: Chỉ đọc và trả lời trong chat; không sửa file.
++
++Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
++
++Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
++Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
++Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
++
++Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
++hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
++Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
++số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
++có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
++
++Bổ sung yêu cầu phản biện:
++1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
++2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
++3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
++4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
++5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
++6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
++7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
++8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
++9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
++10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
++
++Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
++Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
++
++Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
++bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
++Tiếng Việt, câu ngắn.
++
++Cuối lượt báo:
++1. Đã làm gì.
++2. File đã thay đổi, hoặc không sửa file nào.
++3. Kiểm đã chạy và kết quả.
++4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
++
++Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
++
++Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
++
++Công đoạn: soát kết quả.
++Kiểm trên đầu ra thật, code và dữ liệu được phép; không tin tóm tắt LOG. Đối chiếu tiêu chí xong với phần mục tiêu nguồn và mức căn cứ cho bước tiếp theo; chạy lại phần rẻ khi trong quyền được duyệt.
++Phân biệt hoàn thành task mô tả, xác nhận cơ chế và đủ căn cứ chọn/đánh giá thiết kế. Giới hạn đã khai không tự miễn phép kiểm cần thiết còn làm được.
++Chỉ ghi bản phản biện lượt được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ bản cũ; không sửa kết quả thay người làm.
++
++Kiểm chuỗi đầu vào → xử lý → trung gian → đầu ra ở các nhóm quan trọng. Đọc code và trung gian đã lưu trước, đối chiếu ca sai với ca đúng có điều kiện tương ứng. Thiếu trung gian thì nêu đúng phần cần chạy/thu thêm, chi phí và quyết định phụ thuộc; không tự chạy ngoài quyền hoặc bỏ câu hỏi bằng “ngoài SPEC”.
++Kết luận cơ chế phải chỉ được: trong điều kiện X, bước Y làm mất hoặc đánh giá sai thông tin Z. Nếu chưa xác định Y, giữ đúng quan sát, giải thích khác và bằng chứng thiếu.
++Phân biệt dữ liệu/thiếu đầu vào, giao thức, adapter/cài đặt và giả định/cách tính; không cộng cờ chồng lấn thành tỷ lệ nguyên nhân. Hạn chế dữ liệu xác nhận có hệ quả đánh giá và yêu cầu quan sát FlashTicket có thể rút ra không?
++Đầu ra có nêu: hạn chế đã xác nhận và điều kiện; lỗi cài đặt/thiếu đầu vào; hạn chế giả định/phép tính; quan hệ có thể bổ sung thông tin gì; câu chưa trả lời và bằng chứng còn thiếu? Căn cứ nào đủ đề xuất ứng viên, căn cứ nào đủ lựa chọn thiết kế?
++Không bắt mọi task P4 làm xong đối chứng của phương pháp mới. Đối chứng bỏ quan hệ và đồ thị ngẫu nhiên dùng khi đánh giá tác dụng cấu trúc; không là điều kiện trì hoãn mọi phân tích hạn chế baseline.
++```

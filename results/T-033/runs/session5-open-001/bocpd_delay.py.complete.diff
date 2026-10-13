@@ -1,0 +1,36 @@
+--- bocpd_delay.py.before
++++ bocpd_delay.py
+@@ -118,9 +118,21 @@
+     def guard(self, reserve=0):
+         if (self.home / 'STOP').exists():
+             raise RuntimeError('STOP: preserve all completed descriptions')
+-        elapsed = (datetime.now(timezone.utc) - self.first_compute).total_seconds()
+-        if elapsed >= self.source['budget_compute_s']:
+-            raise RuntimeError('BUDGET_STOP: approved wall budget since first compute exhausted')
++        ledger_path = self.home / 'runs/session5-budget-001/ledger.json'
++        expected_ledger = os.environ.get('T033_PROCESSING_LEDGER_SHA256')
++        if not expected_ledger or sha(ledger_path) != expected_ledger:
++            raise RuntimeError('BUDGET_LEDGER_HASH: processing ledger must be pinned')
++        ledger = json.loads(ledger_path.read_text(encoding='utf-8'))
++        if not ledger['accounting_valid_for_next_run'] or ledger['approved_total_processing_s'] is None:
++            raise RuntimeError('BUDGET_LEDGER_INCOMPLETE: missing processing time; no new allocation')
++        if ledger['source_sha256'] != self.args.source_sha256:
++            raise RuntimeError('BUDGET_LEDGER_SOURCE: source identity mismatch')
++        used_before = float(ledger['approved_total_processing_s'])
++        active_started = datetime.fromisoformat(os.environ['T033_ACTIVE_PROCESS_STARTED_UTC'])
++        active_wall = (datetime.now(timezone.utc) - active_started).total_seconds()
++        elapsed = used_before + active_wall
++        if not 0 <= active_wall or not 0 <= used_before <= elapsed < self.source['budget_compute_s']:
++            raise RuntimeError('BUDGET_STOP: cumulative processing budget exhausted')
+         used = sum(p.stat().st_size for p in self.home.rglob('*') if p.is_file())
+         if used + reserve >= self.source['budget_bytes']:
+             raise RuntimeError('STORAGE_STOP: approved 4 GiB limit; do not delete prior runs')
+@@ -128,7 +140,7 @@
+             raise RuntimeError('DISK_STOP: insufficient space for descriptions')
+         return {'new_bytes': used, 'disk_free_bytes': shutil.disk_usage(self.home).free,
+                 'ram_available_bytes': psutil.virtual_memory().available,
+-                'elapsed_since_first_compute_s': elapsed,
++                'cumulative_processing_s': elapsed,
+                 'remaining_compute_s': self.source['budget_compute_s'] - elapsed}
+ 
+     def core_run(self, name, manifest_sha):
