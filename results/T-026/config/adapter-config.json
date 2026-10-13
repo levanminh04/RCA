@@ -1,0 +1,45 @@
+{
+  "config_id": "t026-ob-q85-native-v1",
+  "mode": "a",
+  "window_s": 300,
+  "methods": [
+    "baro",
+    "simplerca",
+    "microrank",
+    "tracerca",
+    "circa",
+    "torai"
+  ],
+  "unsupported": {
+    "circa": "Only 1-2 real train measurements per source; loader interpolates before train split and 19/22 main cases can use A anchors in the train tail; Q-85",
+    "torai": "B requires missing statusCode; native metric cadence incompatible with row stride 15"
+  },
+  "metric": {
+    "baro": "ordinal native values, front Time_ns marker, P3 preprocess after cut",
+    "simplerca": "native per-channel N/A arrays, no filling"
+  },
+  "trace_sensitivity": {
+    "2022-08-22": 41,
+    "2022-08-23": 32,
+    "normal": "end_ns < t_ns - guard_s*1e9",
+    "anomalous": "unchanged method split",
+    "clock_shift_ns": 0
+  },
+  "hashseed": 0,
+  "microrank_pilot_hashseeds": [
+    0,
+    1
+  ],
+  "timeout_s": 3600,
+  "labels_visible_to_methods": false,
+  "payload_storage": "RAM only",
+  "why_ids": [
+    "WHY-22",
+    "WHY-26",
+    "WHY-27",
+    "WHY-31",
+    "WHY-32",
+    "WHY-33",
+    "WHY-37"
+  ]
+}
