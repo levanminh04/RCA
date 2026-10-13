@@ -1,0 +1,129 @@
+# Phản biện T-029 — lượt 4: nghiệm thu kết quả
+
+- **Người phản biện:** Claude — **Ngày:** 09/10/2026 — **Commit/diff đã đọc:** working tree so với `6c93e6dc31f0c991b4ac6d1cfd44fcc0e989c84c` (`git diff`). Thư mục T-029 và `results/T-029/` chưa được track, đã đọc trực tiếp.
+- **Tên file:** prompt ghi `REVIEW.md`, nhưng file đó đang chứa phản biện thiết kế lượt 1 của Codex. Minh chọn ghi vào `REVIEW-4.md` (trả lời trong chat 09/10/2026). Ba file REVIEW cũ giữ nguyên.
+- **Đã đọc:** `AGENTS.md`; `docs/STATE.md`; SPEC; LOG (phiên 1–8, prompt cuối); REVIEW, REVIEW-2, REVIEW-3; năm báo cáo `ban-do-han-che-phat-hien.md`, `dinh-vi.md`, `nhan-proxy-va-schema.md`, `a-so-b.md`, `doc-tay.md`; `theo-ca.json`, `bocpd-can-thiep.json`, `n-sigma-cot.json`, `a-so-b.json`, `runs/step5-001/V7.json`; `features-no-label/`; `scripts/ec2_chain.py`, `nsigma_features.py`, `nsigma_flags.py`; `src/p3/adapters/phat_hien.py`; `results/T-025/bao-dong.json`; code BARO tại `D:/RCA-ext/src/baro` (HEAD `e35f4ec`, đúng revision manifest T-013): `_bocpd.py`; bài RCAEval v2 §3.3 bản lưu `results/T-002/public-metadata/run-001/sources/paper-v2.html`; `docs/LESSONS.md`; DT18 và hướng dẫn của cô.
+- **Lệnh đã chạy:** chỉ đọc. `git status`, `git diff` theo commit gốc; Python `-I -B -X utf8` đọc JSON đã lưu để tính lại và đếm (ghi ở từng điểm). Không chạy detector hay ranker, không đọc telemetry thô, không mở `data/locked/`.
+
+## Kết luận chung
+
+Có một điểm CHẶN (R1). Can thiệp I1 cho thấy dữ liệu sau mốc, đi qua tiền xử lý, làm BOCPD báo động nền **ít hơn và muộn hơn**, không làm báo sớm. Ba ca S của BOCPD chỉ là S nhờ tiền xử lý toàn chuỗi. Báo cáo chưa nêu chiều này, và đang xếp B2 như cơ chế của báo sai. Có hai điểm KHÔNG CHẶN: B4 vẫn được dùng làm cờ chính dù V7 cho tỉ lệ cùng cỡ ở điểm không báo (R2); mức nền định vị của N-Sigma chính tính cả dịch vụ không có cột nào (R3). Các số đã kiểm đều khớp nguồn. Cả ba điểm sửa bằng chữ, không cần chạy lại.
+
+## Các điểm
+
+### R1. HP-6/B2 không nêu chiều: dữ liệu sau mốc làm giảm và làm muộn báo động nền BOCPD — CHẶN
+
+- **Ở đâu:** `results/T-029/ban-do-han-che-phat-hien.md` dòng 5 (câu "BOCPD nhạy với dữ liệu sau mốc qua tiền xử lý"), dòng 162 (HP-6), dòng 165 (HP-9), bảng "B5 và I1/I2" dòng 1657–1692, phần C1 và C2. `doc-tay.md` dòng 19 và các mục BOCPD có B2. Bước chịu ảnh hưởng: bước 5 (gán nghĩa B2) và bước 8 (viết C1, C2, HP).
+- **Sai gì:**
+  - HP-6 ghi mức "can thiệp I1". Kết luận được phép chỉ ghi "cắt sau mốc làm mất điểm đổi quanh t̂".
+  - Dữ liệu I1 của chính task cho thấy: bỏ dữ liệu sau mốc thì BOCPD có nhiều điểm đổi trong nền hơn, và điểm đổi đầu tiên sớm hơn t̂.
+  - Vậy B2 chỉ giải thích **vị trí** của t̂. Nó không giải thích **vì sao** có báo động trước mốc.
+  - Báo cáo xếp 17 ca B2 như đã có cơ chế, và câu mở đầu đặt "nhạy với dữ liệu sau mốc" làm lời giải thích cho báo động sớm. Người đọc sẽ hiểu ngược với dữ liệu.
+  - Ba ca S cũng phụ thuộc vào tiền xử lý toàn chuỗi. HP-9 và C1 không nêu điều này. HP-9 chỉ ghi "D0 ở S có thể do tất cả cờ BOCPD không có miền hợp lệ".
+- **Bằng chứng:**
+  - `bocpd-can-thiep.json` → `cases.<ca>.cp_counts_Nv`: tổng số điểm đổi trong Nv qua 30 ca là 143 (bản đầy đủ), 338 (I1), 332 (I2).
+  - Theo ca: I1 nhiều hơn bản đầy đủ ở 23/30 ca, bằng ở 3 ca, ít hơn ở 4 ca.
+  - Điểm đổi I1 đầu tiên sớm hơn t̂ ở 26/27 ca E. Ca còn lại là `dev-746fd74313`, bằng nhau (102).
+  - Ở cả 17/17 ca có B2/5 = True, I1 có điểm đổi sớm hơn t̂. Ví dụ: `dev-03d4910932` t̂ = 684, điểm đổi I1 đầu tiên ở 235; `dev-4e68956051` 675 → 193; `dev-a505ab3f65` 384 → 174.
+  - Ba ca S (`dev-3defe3d34b`, `dev-98bc73c499`, `dev-f36d0647d5`): bản đầy đủ có 0 điểm đổi trong Nv. I1 có 12, 11, 16 điểm đổi; điểm đầu tiên ở 246, 238, 214.
+  - So sánh này chỉ khác ở tiền xử lý. `ec2_chain.py:89–111` cắt metric thô `iloc[:720]` rồi gọi `phat_hien.bocpd`. Trong BARO `e35f4ec`, `_bocpd.py:201–216` tính `R[:, t+1]` chỉ từ dữ liệu ≤ t. Prior `MultivariateT` cố định (`_bocpd.py:59–64`). Vậy bản đầy đủ và I1 chỉ khác ở min–max và ở bước bỏ cột hằng.
+  - Lệnh: Python đọc `bocpd-can-thiep.json` và `theo-ca.json`, đếm như trên.
+- **Đoạn có thể phản bác và vì sao chưa đủ:**
+  - HP-6 không viết chữ "gây báo động". Cột giải thích khác có ghi I1 vẫn nhìn trước trong tiền tố.
+  - `doc-tay.md` dòng 568 và 945 có câu "Tiền xử lý tương lai có thể làm mất điểm đổi nền". Bảng B5 có đủ số.
+  - Nhưng bản đồ HP là câu trả lời C2 ("cơ chế nào giải thích báo động sai trong nền"), và HP-6 là dòng duy nhất của BOCPD có mức can thiệp. Chiều tác động không xuất hiện ở HP-6, ở câu mở đầu hay ở C1, C2.
+- **Hậu quả:**
+  - C2 cho BOCPD bị phóng đại: 17/27 ca E trông như đã có cơ chế.
+  - C1 thiếu điều kiện của 3/30 ca S.
+  - P5, P6 và gói G2 trỏ về HP-6 có thể kỳ vọng sai hướng, ví dụ bỏ nhìn trước để giảm báo sai.
+- **Đề xuất sửa:** chỉ sửa chữ, không chạy thêm.
+  - Ở HP-6, câu mở đầu và C1/C2, nêu chiều kèm các số trên.
+  - Ghi rõ: B2 cho biết vị trí t̂ phụ thuộc dữ liệu sau mốc; nó không giải thích sự tồn tại của báo động trước mốc.
+  - Ghi rõ: 3 ca S chỉ là S khi tiền xử lý dùng cả chuỗi.
+  - Giữ giới hạn đã có: I1 vẫn nhìn trước bên trong tiền tố, nên số của I1 không phải số trực tuyến.
+
+### R2. "Không phân biệt" chỉ bật khi tỉ lệ bằng đúng số; B4 vẫn dùng làm cờ chính — KHÔNG CHẶN
+
+- **Ở đâu:** `ban-do-han-che-phat-hien.md` dòng 56 (cột "Cờ chính"), 164 (HP-8), 165 và 303–312 (HP-9), bảng V7 dòng 846–915. `doc-tay.md` dòng 9. `runs/manual-selection-001/`. Bước chịu ảnh hưởng: bước 5 (V7) và bước 7–8.
+- **Sai gì:**
+  - SPEC bước 5: "Cờ xuất hiện dày như nhau ở cả hai nơi thì ghi 'không phân biệt', không dùng làm lời giải thích."
+  - Đọc "như nhau" là "bằng đúng số" thì nhãn chỉ bật ở các dòng B1 0 so với 0. Ở đó không có cờ nào để giải thích.
+  - Với B4, cờ duy nhất mà quy tắc này có tác dụng, nhãn không bao giờ bật.
+  - B4 vẫn nằm trong "Cờ chính". 5 ca BOCPD chỉ có B4 không được tính vào D0.
+  - Cách đọc này không có mục WHY. Trong LOG chỉ thấy "V7 không thêm ngưỡng" (dòng 1247, 1261), không thấy lời Minh quyết.
+- **Bằng chứng:**
+  - `runs/step5-001/V7.json` → `aggregate`:
+    - B4/w30/k3 (cấu hình chính): tại t̂ 20/27 (0,741); điểm không báo 12235/18769 (0,652).
+    - B4/w30/k2: 24/27 (0,889), so với 16726/18769 (0,891).
+    - B4/w60/k2: 23/24 (0,958), so với 0,943.
+  - Theo ô, cấu hình chính: route/mem 1/3 so với 0,519; train/cpu 1/2 so với 0,768; route/socket 2/3 so với 0,680. Ở ba ô này, tỉ lệ cờ tại t̂ còn thấp hơn ở điểm không báo.
+  - `theo-ca.json`, BOCPD, cờ chính: B2+B4 15; B4 5 (`dev-746fd74313`, `dev-a915aa2424`, `dev-b8bd0abf60`, `dev-ba831dbeb8`, `dev-fbc45b0c67`); B2 2; D0 8 (3 S và 5 E).
+- **Đoạn có thể phản bác:**
+  - Câu mở đầu có viết "B4 cũng phổ biến ở điểm không báo". HP-8 ghi "V7 không cho quy mọi cờ thành lời giải thích".
+  - SPEC cấm ngưỡng "đáng kể".
+  - Nhưng bảng từng ca và bảng D0 vẫn đếm B4 như một cơ chế.
+- **Hậu quả:**
+  - Nhóm "chưa giải thích" của BOCPD bị đếm thấp: 5/27 ca E. Nếu không dùng B4 làm lời giải thích, con số là 10/27.
+  - Gộp với R1: không còn ca E nào của BOCPD có cờ giải thích vì sao có báo động trước mốc.
+- **Đề xuất sửa:** Minh quyết cách đọc. Có thể sửa mà không đặt ngưỡng:
+  - Ghi B4 là mô tả, không là lời giải thích. Lý do: tỉ lệ tại t̂ và tại điểm không báo cùng cỡ ở mọi cấu hình, và đổi chiều theo ô.
+  - Báo 5 ca chỉ có B4 cùng nhóm chưa giải thích.
+  - Nếu giữ cách đọc "bằng đúng số", ghi lựa chọn đó vào WHY.
+
+### R3. Mức nền định vị của N-Sigma chính gồm 40–46 dịch vụ không có cột nào — KHÔNG CHẶN
+
+- **Ở đâu:** `dinh-vi.md` dòng 13 và 17–26 (mức nền), dòng 204–213 (tổng hợp). `ban-do-han-che-phat-hien.md` C3 (dòng 1696). Bước chịu ảnh hưởng: E (định vị), bước 5 và 8.
+- **Sai gì:**
+  - Mức nền hoán vị đều trên 68 dịch vụ của universe: E[hạng] 34,5; P(đứng đầu) 0,0147.
+  - Với tập cột BOCPD (latency-50, _error), mỗi ca chỉ 22–28 dịch vụ có ít nhất một cột. Các dịch vụ còn lại không thể báo, nên luôn đồng hạng cuối.
+  - Mức nền hiện tại coi các dịch vụ đó là ứng viên ngang root. Thông tin "dịch vụ có cột latency/error" đến từ tập cột, không đến từ bộ phát hiện.
+  - Đặt 8,2 cạnh 34,5, và 0,178 cạnh 0,0147, làm phóng đại khả năng định vị.
+  - Với N-Sigma đối chứng, 68/68 dịch vụ có cột, nên mức nền hiện tại phù hợp.
+- **Bằng chứng:**
+  - `n-sigma-cot.json` → `cases.<ca>.nsigma.E_services.baseline.<dịch vụ>.so_cot`: số dịch vụ có `so_cot > 0` là 22–28 qua 30 ca. Với `nsigma_doi_chung`: 68/68.
+  - Tôi tính mức nền không dùng nhãn trên chính các khối hòa đã lưu, chỉ hoán vị root giữa các dịch vụ có cột. Kết quả cho N-Sigma chính: E[hạng] trung bình 24,24 (theo ca 18,1–33,8); P(đứng đầu) trung bình 0,037. Lệnh: Python đọc `first_after_index` và `so_cot` trong `n-sigma-cot.json`. Phép tính này không ghi file nào.
+  - Kết quả quan sát 8,2 / 0,178 vẫn tốt hơn mức nền này, nên chiều không đổi. Độ lớn thì giảm: P(đứng đầu) gấp khoảng 4,8 lần mức nền, không phải 12 lần.
+- **Đoạn có thể phản bác:**
+  - SPEC ghi "trên cùng tập dịch vụ", và universe là tập chung của giao thức.
+  - Báo cáo không có câu nào so N-Sigma chính với mức nền.
+  - Nhưng bảng mức nền đặt cạnh kết quả, và Q-86 cho gói G2 trích bảng này.
+- **Đề xuất sửa:**
+  - Ghi trong `dinh-vi.md` số dịch vụ có cột theo ca. Ghi rõ mức nền 68 gồm cả dịch vụ không thể báo, nên không dùng để so độ lớn với N-Sigma chính.
+  - Nếu Minh muốn, thêm mức nền trên dịch vụ có cột. Mức này tính được từ JSON đã lưu, không cần chạy lại. Ghi lựa chọn tập mức nền vào WHY.
+
+## Điều đã kiểm và thấy đúng
+
+- **90 dòng `theo-ca`:** tôi tính lại t̂, t̂⁺, nhóm S/E-gần/E-xa, độ trễ và số báo động trong Nv từ `results/T-025/bao-dong.json`. Kết quả: 0 lệch trên 90 dòng.
+  - Số tổng C1 khớp: BOCPD S 3, E-gần 9, E-xa 18; trung vị độ trễ BOCPD 34; N-Sigma chính trung vị 9, có 11 ca độ trễ 0.
+- **V4 rộng hơn SPEC yêu cầu:** cả 11 ca N-Sigma chính có t̂⁺ = 720, với 4 phương pháp (TORAI đủ 3 seed), có `rank_min`, `rank_max` và status tại t̂⁺ trùng chế độ (a). 0 lệch (`a-so-b.json`).
+- **I1, I2 dựng đúng SPEC:** cắt metric thô trước tiền xử lý, hazard 50 và 250 (`ec2_chain.py:89–125`).
+- **Không thấy nhãn lọt vào phương pháp:** `features-no-label/` không có khóa root, fault hay cell. Script đặc trưng không đọc nhãn. Mốc 720 dùng chung cho mọi ca, đúng SPEC.
+- **Phạm vi ghi:**
+  - `docs/WHY.md` nối WHY-39 trùng nguyên văn Phụ lục SPEC (đã so khối).
+  - `docs/STATE.md`: T-029 chỉ thêm dòng của mình. Dòng T-026, T-028 và đoạn "Task đang mở" thuộc task khác, có từ trước.
+  - DECISIONS Q-84–Q-86 không do phiên thực hiện T-029 ghi.
+  - Không thấy ghi vào `src/` hay `data/`.
+- **Số trong báo cáo khớp JSON ở các chỗ đã soát:**
+  - Bảng V7 B1/B4 khớp `V7.json`.
+  - Bảng B5/I1/I2 khớp `bocpd-can-thiep.json`.
+  - Câu cohort CIRCA ở C4 khớp `a-so-b.json`: BOCPD RHT+DA, chênh sự kiện Hit@5 là +0,1 trên toàn mẫu và −0,125 trên 16 ca không vượt ngưỡng ở mọi điểm.
+- **P1:** bài RCAEval v2 §3.3 (bản lưu, dòng 427) chỉ nêu 10 phút nền rồi tiêm lỗi; không nêu thời lượng lỗi. Ghi D OPEN và không chấm lại P/R/F1 là đúng SPEC.
+- **Tiêu chí xong:**
+  - V1–V8 có bằng chứng.
+  - `theo-ca` đủ 90 dòng, có con trỏ nguồn.
+  - C1–C6 có câu trả lời.
+  - Bảng độ nhạy đủ cho N1, N2, B2, B3, B4 và định vị.
+  - I1, I2 mỗi lượt 30 ca; I3 đủ 60 cặp.
+  - HP-10 đến HP-14 trong bảng chính ghi "phạm vi khảo sát" thay cho số ca. Số theo ô của chúng nằm ở `dinh-vi.md`, `a-so-b.md`, `nhan-proxy-va-schema.md`. Không coi là lỗi.
+- **N-Sigma D0 = 0 theo định nghĩa:** N3 là phần còn lại sau N2, nên N-Sigma không bao giờ rơi vào D0. Báo cáo đã ghi HP-3 là "phần còn lại", nên không coi là lỗi. Tuy vậy, các dòng "0/3 D0" của N-Sigma ở HP-9 không có nghĩa là đã giải thích được báo động.
+- **Độ khớp DT18 và hướng dẫn của cô:** task đi đúng bước "chỉ ra vấn đề tồn đọng, hạn chế của các phương pháp đã có" và DT18-NV2/NV3 (phát hiện bất thường, vùng ảnh hưởng, phân tích ca hạn chế). Không có cam kết thiết kế P5/P6. Không kết luận về "lan" (Q-86).
+
+## Phản hồi của người làm (người làm điền sau)
+
+| Điểm | Ý kiến người làm: đúng / sai / chưa kiểm được | Lý do | Minh quyết |
+|---|---|---|---|
+| R1 | Đúng; giữ CHẶN | Đã kiểm độc lập bằng lệnh R1 ở LOG phiên 9, đọc `results/T-029/bocpd-can-thiep.json#/cases/<ca>/{full,I1,I2,cp_counts_Nv,sensitivity/5/B2}` và `results/T-029/theo-ca.json#/rows`. Tổng điểm đổi Nv full/I1/I2 là 143/338/332; I1 tăng/bằng/giảm số điểm đổi so với full ở 23/3/4 ca. Báo đầu I1 sớm hơn ở 29/30 ca, bằng ở ca còn lại; trong nhóm E là 26/27 sớm hơn. Cả 17/17 ca B2 chính đều có báo I1 sớm hơn. Ba S có điểm đầu full→I1: dev-3defe3d34b 748→246, dev-98bc73c499 761→238, dev-f36d0647d5 752→214; số điểm đổi Nv tương ứng 0→12, 0→11, 0→16. Đúng là HP-6/C1/C2 chưa nêu chiều này; B2 chứng minh vị trí báo đầu phụ thuộc dữ liệu sau mốc qua tiền xử lý, chưa giải thích vì sao tồn tại báo động trước mốc. Tuy nhiên không viết “ít hơn” như quy luật cho mọi ca vì có các ca ngược chiều; “không làm báo sớm” chỉ đúng với chỉ tiêu báo đầu trên mẫu đã kiểm. Code `scripts/ec2_chain.py` và `src/p3/adapters/phat_hien.py` xác nhận cắt raw trước tiền xử lý, posterior dùng quá khứ; prior trong BARO cố định theo số chiều, nên không coi prior số học giống nhau khi bước bỏ cột làm đổi số chiều. I1 vẫn nhìn trước trong tiền tố, không là chất lượng online. Đề xuất sửa lời mở đầu, C1/C2, HP-6/HP-9 và phần đọc tay B2/S; giữ cờ, số P3 và các lượt chạy.  Claude đính chính qua phản hồi do Minh cung cấp: prior cố định theo số chiều, không tuyệt đối giống nhau khi đổi bộ cột; giữ kết luận can thiệp qua tiền xử lý. | Minh duyệt sửa 09/10/2026; đã sửa, chờ rà soát độc lập. |
+| R2 | Đúng một phần; KHÔNG CHẶN | Đồng ý B4 là mô tả bước nhảy telemetry, không đủ để tính “đã giải thích báo sớm”; D0 là không có cờ chính; với nhóm E, D0 là một phần của nhóm chưa giải thích, không phải toàn bộ nhóm đó. Có cờ cũng chưa đồng nghĩa đã giải thích sự tồn tại báo trước mốc. D0 ở S phải đọc riêng vì có thể ngoài miền hợp lệ. Các số tổng/ô Claude dẫn khớp `results/T-029/runs/step5-001/V7.json#/aggregate/B4~1w30~1k3` và lệnh R2 ở LOG phiên 9: cấu hình chính 20/27 so với 12235/18769; có ô chênh ngược chiều. Nhưng câu “B4 không bao giờ bật không phân biệt” sai ở cấp ca: `#/cases/<ca>/B4/60/2` bằng nhau đúng số ở dev-16597725c1, dev-746fd74313, dev-a5cabe5fa7, dev-ba831dbeb8; cả bốn có `at_first=True` và `control_true=control_n`, đã có trong `runs/manual-selection-001/selection.json#/literal_non_discriminating` và đã đọc tay. Ở cấp gộp không có B4 bằng đúng số. Exact equality chỉ được dùng làm dấu mô tả/chọn ca đọc, không chứng minh tương đương hoặc tạo đối chứng cho các cấu hình còn lại. Chưa có Minh duyệt cách hiểu rộng “dày như nhau”; không tự đặt ngưỡng gần bằng. Theo `theo-ca.json#/rows`, có 5 E chỉ B4 và 5 E D0; cộng thành 10 E là nhóm không có B2/B3/B1, không tự là toàn bộ nhóm chưa giải thích vì R1 cũng giới hạn nghĩa B2. Đề xuất làm rõ nghĩa cờ/D0 và không dùng B4 riêng làm lời giải thích; giữ các nhãn đóng băng. Chuyển 5 ca B4 vào D0 sẽ đổi định nghĩa đã khóa và đầu ra, vượt sửa chữ; không đề xuất làm vậy.  Claude đính chính qua phản hồi do Minh cung cấp: B4 không bao giờ bật là sai ở cấp ca; đúng là không bật ở cấu hình chính và cấp gộp. Các ca bằng đúng số đã được đối chiếu trong LOG phiên 9 và phần sửa này. | Minh duyệt sửa 09/10/2026; đã sửa, chờ rà soát độc lập. |
+| R3 | Đúng một phần; KHÔNG CHẶN | Lệnh R3 ở LOG phiên 9 tái lập từ `results/T-029/n-sigma-cot.json#/cases/<ca>/<bộ>/E_services/<mức>/<dịch-vụ>/{so_cot,first_after_index}` và `dinh-vi.json#/cases`: N-Sigma chính giữ cột có 22–28 dịch vụ có cột, 40–46 dịch vụ không thể báo; root có cột ở mọi ca. Mức nền hiện tại 34,5 và 1/68 tính đúng SPEC E và `scripts/analyze_step5.py::locate`; chưa phải lỗi tính hoặc vi phạm thiết kế. Đồng ý bảng cần nêu lợi thế từ tập cột, không quy toàn bộ chênh cho detector. Số 24,237878788 và P=0,037012987 Claude tính đúng khi giữ vị trí/khối hòa trên U rồi chỉ hoán vị root trong nhóm có cột. Nếu thật thu hẹp universe về nhóm có cột, hạng nền trung bình là 14,1; đó là phép so khác và chỉ so được khi tính lại cả hạng quan sát trong U đã thu hẹp. Phạm vi rộng hơn Claude nêu: sau bỏ N2 mức 5/10/20, root hết cột ở 4/2/1 ca, nên mức nền điều kiện root có cột không áp nguyên cả mẫu; đối chứng mức 5 cũng chỉ có 64–68 dịch vụ có cột, không phải luôn đủ 68. Báo cáo hiện chưa tuyên bố tốt hơn nền bao nhiêu lần; lỗi là thiếu giới hạn để người đọc diễn giải độ lớn. Đề xuất bổ sung coverage và giới hạn mức nền trong `dinh-vi.md`/C3, giữ mức nền đã khóa. Nếu Minh muốn bổ sung hoặc thay mức nền, cần duyệt riêng cách giữ U/cohort và WHY/SPEC; không tự loại ca theo nhãn, không thay universe trong phiên này.  Claude đính chính qua phản hồi do Minh cung cấp: đối chứng đủ cột không đúng ở mọi độ nhạy; phạm vi R3 rộng hơn phát biểu ban đầu. Giữ U mới so trực tiếp được với hạng quan sát hiện tại. | Minh duyệt sửa 09/10/2026; đã sửa, chờ rà soát độc lập. |
+| P1 | Đúng về cần ghi rõ; KHÔNG CHẶN | Tách báo đầu 29/1/0 khỏi số điểm đổi nền 23/3/4. “Đa số” đúng nhưng chưa đủ rõ; ngoại lệ ngược chiều chỉ thuộc số điểm đổi. Nguồn và lệnh ở LOG phiên 9, lượt review4-repair-001/summary.json#/intervention/all. Đã sửa hai đại lượng riêng trong báo cáo chính và đọc tay. | Minh duyệt sửa 09/10/2026; đã sửa, chờ rà soát độc lập. |
+| P2 | Đúng; KHÔNG CHẶN | Sửa câu phủ định quá mạnh về D0: với E, D0 là một phần nhóm chưa giải thích; có cờ chưa chắc đã giải thích sự tồn tại báo sớm. Tách D0 ở S vì miền N/A không là thất bại báo sớm. Đã sửa HP-9, chú giải bảng và đọc tay; giữ nhãn D0/cờ. Nguồn: SPEC Quy tắc chung/Rủi ro, theo-ca.json#/rows; đính chính Claude do Minh cung cấp lưu ở LOG phiên 10. | Minh duyệt sửa 09/10/2026; đã sửa, chờ rà soát độc lập. |

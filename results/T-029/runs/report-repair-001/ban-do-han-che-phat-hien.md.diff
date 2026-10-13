@@ -1,0 +1,38 @@
+--- ban-do-han-che-phat-hien.md before
++++ ban-do-han-che-phat-hien.md final
+@@ -153,7 +153,7 @@
+ Bảng HP dùng số cờ đúng / cặp hợp lệ / tổng cặp, có N/A riêng. Dòng “phạm vi khảo sát” không là số ca bị lỗi. Đây là kết quả trên dev và các ngưỡng phân tích khóa trước, không là định nghĩa mới của detector.
+ 
+ | Mã | Bộ / cơ chế | Mức bằng chứng | Kết luận được phép | Giải thích khác / chưa kiểm | Tác giả |
+-|---|---|---|---|---|
++|---|---|---|---|---|---|
+ | HP-1 | N-Sigma / N1: lịch sử ngắn | liên hệ + đọc tay | Có tỉ lệ báo khoảng đầu cao hơn khoảng cuối ở các ca có N1. | Drift, tải và ffill có thể khác theo thời gian; chưa có can thiệp độ dài lịch sử. | BARO nêu baseline khó với chuỗi phức tạp; chưa thấy cơ chế N1 riêng trong nguồn đã khảo sát. |
+ | HP-2 | N-Sigma / N2: cột báo dày | liên hệ + đọc tay | Chỉ ra cột đóng góp vào báo động đầu; số thay mạnh theo tập cột. | p_j cao chưa tách đuôi không chuẩn, nền không dừng hoặc lịch sử hữu hạn. | [BARO, đánh giá phát hiện](https://arxiv.org/html/2405.09330v1#S4.SS5) nêu báo sai baseline; chưa thấy N2 riêng. |
+ | HP-3 | N-Sigma / N3: E không có cột báo dày tại t̂ | liên hệ + đọc tay | Phần còn lại sau N2; ba tỉ lệ là mô tả. | Không chứng minh cộng dồn, độc lập hoặc phân phối chuẩn; một cột thưa cũng đủ gây báo. | Chưa thấy trong nguồn đã khảo sát; công thức OR nằm trong code/hồ sơ N-Sigma. |
+@@ -446,7 +446,7 @@
+ Nguồn: `theo-ca.json#/per_detector/<bộ>/cell/<ô>/flags`. N1/N2/N3 có thể đổi tập ca; B2 đổi theo dung sai; B3 N/A khi B2 đúng; B4 đổi cả ngưỡng và miền theo w. Không chọn cấu hình có số thuận hơn. Bảng dưới giữ đủ đúng/hợp lệ/tổng và N/A theo từng ô.
+ 
+ | Bộ | Ô | Cờ / cấu hình | Đúng / hợp lệ / tổng | N/A |
+-|---|---|---|---|
++|---|---|---|---|---|
+ | BOCPD | ts-auth-service / cpu | B1 | <!--v8:1479-->0<!--/v8-->/<!--v8:1480-->2<!--/v8-->/<!--v8:1481-->3<!--/v8--> | <!--v8:1482-->1<!--/v8--> |
+ | BOCPD | ts-auth-service / cpu | B2/2 | <!--v8:1483-->2<!--/v8-->/<!--v8:1484-->2<!--/v8-->/<!--v8:1485-->3<!--/v8--> | <!--v8:1486-->1<!--/v8--> |
+ | BOCPD | ts-auth-service / cpu | B2/5 | <!--v8:1487-->2<!--/v8-->/<!--v8:1488-->2<!--/v8-->/<!--v8:1489-->3<!--/v8--> | <!--v8:1490-->1<!--/v8--> |
+@@ -810,7 +810,7 @@
+ 
+ ### Những ca đổi cờ khi thay cấu hình
+ 
+-Nguồn: `summary.json#/sensitivity_changes`. “Đổi” bao gồm True/False và miền N/A; bảng chỉ ghi khác biệt, danh sách đầy đủ cờ nằm ở theo-ca.json.
++Nguồn: `runs/report-main-001/summary.json#/sensitivity_changes`. “Đổi” bao gồm True/False và miền N/A; bảng chỉ ghi khác biệt, danh sách đầy đủ cờ nằm ở theo-ca.json.
+ 
+ | Bộ | Cấu hình so với chính | Ca đổi / tổng | Mã ca và chuyển trạng thái |
+ |---|---|---|---|
+@@ -1163,7 +1163,7 @@
+ 
+ ### N5/N6: mô tả theo ca và ô
+ 
+-Nguồn: `n-sigma-cot.json#/cases/<ca>/<bộ>` và `summary.json#/NS_descriptive`. r_obs/r_ind/r_nom không tách nhân quả. r_obs≈r_ind chưa chứng minh độc lập; r_ind khác r_nom có nhiều giải thích. N5 phân loại từ hậu tố; mạng rỗng không chứng minh không có telemetry mạng vì socket/diskio/workload thuộc “khác”. N6 là mật độ từng phút sau mốc; code nền mở rộng hấp thu mọi dữ liệu đã thấy, nhưng giảm báo chưa chứng minh hấp thu gây bỏ sót.
++Nguồn: `n-sigma-cot.json#/cases/<ca>/<bộ>` và `runs/report-main-001/summary.json#/NS_descriptive`. r_obs/r_ind/r_nom không tách nhân quả. r_obs≈r_ind chưa chứng minh độc lập; r_ind khác r_nom có nhiều giải thích. N5 phân loại từ hậu tố; mạng rỗng không chứng minh không có telemetry mạng vì socket/diskio/workload thuộc “khác”. N6 là mật độ từng phút sau mốc; code nền mở rộng hấp thu mọi dữ liệu đã thấy, nhưng giảm báo chưa chứng minh hấp thu gây bỏ sót.
+ 
+ | Ca | Bộ | r_obs | r_ind | r_nom | Tỉ lệ lịch sử đầu / giữa / cuối | Loại cột gây báo |
+ |---|---|---|---|---|---|---|

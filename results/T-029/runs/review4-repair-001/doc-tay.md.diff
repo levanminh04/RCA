@@ -1,0 +1,27 @@
+--- doc-tay.md.before
++++ doc-tay.md
+@@ -1,4 +1,4 @@
+-Nguồn từng số và con trỏ JSON: [doc-tay.md — bảng nguồn](runs/manual-notes-001/doc-tay.md.bindings.json). Dấu nguồn ẩn trong bản Markdown để V8 kiểm từng lần xuất hiện.
++Nguồn từng số và con trỏ JSON: [doc-tay.md — bảng nguồn](runs/review4-repair-001/doc-tay.md.bindings.json). Dấu nguồn ẩn trong bản Markdown để V8 kiểm từng lần xuất hiện.
+ 
+ # Đọc tay hạn chế phát hiện
+ 
+@@ -6,9 +6,17 @@
+ 
+ Đã đọc <!--v8:0-->43<!--/v8--> cặp thuộc <!--v8:1-->28<!--/v8--> ca. Các số dưới đây ở [evidence.json](runs/manual-evidence-002/evidence.json#/rows); nguồn telemetry, hash và con trỏ theo-ca nằm tại từng dòng JSON. Nhận xét tại [notes.json](runs/manual-notes-001/notes.json#/rows). Lượt trích đầu hỏng do kiểu đường dẫn, giữ ở manual-evidence-001; không có đầu ra khoa học thay thế.
+ 
+-“Không phân biệt” dùng khi tỉ lệ đúng bằng nhau, không là kiểm định tương đương. B1 không trúng và đối chứng cũng không trúng chỉ cho biết cờ vắng. Với B4 ở cấu hình w60/k2, ca dev-16597725c1 và dev-746fd74313 có cờ ở mọi điểm không báo hợp lệ: không phân biệt, không dùng cờ này để giải thích báo động. Các cấu hình khác vẫn phải xem tỉ lệ cạnh nhau, không tự gọi phân biệt vì chưa bằng đúng số.
++“Không phân biệt đúng số” là dấu mô tả/chọn ca khi tỉ lệ bằng nhau, không là kiểm định tương đương. B1 không trúng và đối chứng cũng không trúng chỉ cho biết cờ vắng. Với B4 ở cấu hình w60/k2, có <!--v8:2158-->4<!--/v8--> ca có cờ tại báo đầu và mọi điểm không báo hợp lệ: dev-16597725c1, dev-746fd74313, dev-a5cabe5fa7, dev-ba831dbeb8. Không dùng riêng cờ này để giải thích báo động. Chưa bằng đúng số không chứng minh phân biệt; mọi cấu hình vẫn phải đọc hai tỉ lệ cạnh nhau. Không đặt ngưỡng gần bằng. Nguồn: `runs/step5-001/V7.json#/cases/<ca>/B4/60/2` và `runs/manual-selection-001/selection.json#/literal_non_discriminating`.
+ 
+ Mức bằng chứng đọc tay bổ sung việc soi trung gian; không biến liên hệ thành nhân quả. Mọi giải thích khác dưới đây là CANDIDATE/chưa kiểm, không là quyết định hoặc lỗi hệ đã xác nhận. Không đủ nhãn nền sạch, thời lượng lỗi hoặc mốc sự cố khác trong task để phân xử.
++
++## Tổng quan BOCPD trước khi đọc từng ca
++
++Khi cắt sau mốc theo I1, báo đầu sớm hơn ở <!--v8:2159-->29<!--/v8-->/<!--v8:2160-->30<!--/v8--> ca, bằng ở <!--v8:2161-->1<!--/v8--> ca và muộn hơn ở <!--v8:2162-->0<!--/v8--> ca. Số điểm đổi trong Nv tăng/bằng/giảm so với bản đầy đủ lần lượt ở <!--v8:2163-->23<!--/v8-->/<!--v8:2164-->3<!--/v8-->/<!--v8:2165-->4<!--/v8--> ca; tổng full/I1/I2 là <!--v8:2166-->143<!--/v8-->/<!--v8:2167-->338<!--/v8-->/<!--v8:2168-->332<!--/v8-->. Hai đại lượng phải đọc riêng; các ca ngược chiều chỉ thuộc số điểm đổi nền, không thuộc báo đầu trên mẫu này. B2 xác nhận vị trí báo đầu phụ thuộc dữ liệu sau mốc qua tiền xử lý, chưa giải thích sự tồn tại báo sớm; I1 vẫn nhìn trước bên trong tiền tố và đổi cả bộ cột/min–max/số chiều prior. Cả <!--v8:2169-->3<!--/v8--> ca S đều có báo trước mốc trong I1; phân loại S của bản đầy đủ có điều kiện theo tiền xử lý toàn chuỗi.
++
++Với E, D0 là một phần nhóm chưa giải thích; có cờ B2/B4 hoặc N1–N3 chưa đồng nghĩa đã giải thích sự tồn tại của báo trước mốc. D0 ở S phải đọc riêng vì có thể do cờ nằm ngoài miền hợp lệ. B4 là mô tả telemetry, không dùng riêng làm lời giải thích. Không đổi cờ, danh sách đọc tay hoặc nhãn P3.
++
++Nguồn: `runs/review4-repair-001/summary.json#/intervention`, `bocpd-can-thiep.json#/cases`, `theo-ca.json#/rows`; bảng theo ca/ô ở báo cáo chính và các mục đọc tay phía dưới.
+ 
+ ## dev-03d4910932 / bocpd
+ 

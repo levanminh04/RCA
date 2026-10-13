@@ -1,0 +1,1394 @@
+Nguồn từng số và con trỏ JSON: [doc-tay.md — bảng nguồn](runs/manual-notes-001/doc-tay.md.bindings.json). Dấu nguồn ẩn trong bản Markdown để V8 kiểm từng lần xuất hiện.
+
+# Đọc tay hạn chế phát hiện
+
+Quy tắc và danh sách đã ghi trước: [selection.json](runs/manual-selection-001/selection.json), [bảng danh sách](runs/manual-selection-001/selection.md). Chọn mã mờ nhỏ nhất trong từng nhóm; lấy hợp mọi S, D0 và V7 bằng nhau đúng số. Không có ngưỡng gần bằng hoặc lựa chọn theo kết quả mong muốn.
+
+Đã đọc <!--v8:0-->43<!--/v8--> cặp thuộc <!--v8:1-->28<!--/v8--> ca. Các số dưới đây ở [evidence.json](runs/manual-evidence-002/evidence.json#/rows); nguồn telemetry, hash và con trỏ theo-ca nằm tại từng dòng JSON. Nhận xét tại [notes.json](runs/manual-notes-001/notes.json#/rows). Lượt trích đầu hỏng do kiểu đường dẫn, giữ ở manual-evidence-001; không có đầu ra khoa học thay thế.
+
+“Không phân biệt” dùng khi tỉ lệ đúng bằng nhau, không là kiểm định tương đương. B1 không trúng và đối chứng cũng không trúng chỉ cho biết cờ vắng. Với B4 ở cấu hình w60/k2, ca dev-16597725c1 và dev-746fd74313 có cờ ở mọi điểm không báo hợp lệ: không phân biệt, không dùng cờ này để giải thích báo động. Các cấu hình khác vẫn phải xem tỉ lệ cạnh nhau, không tự gọi phân biệt vì chưa bằng đúng số.
+
+Mức bằng chứng đọc tay bổ sung việc soi trung gian; không biến liên hệ thành nhân quả. Mọi giải thích khác dưới đây là CANDIDATE/chưa kiểm, không là quyết định hoặc lỗi hệ đã xác nhận. Không đủ nhãn nền sạch, thời lượng lỗi hoặc mốc sự cố khác trong task để phân xử.
+
+## dev-03d4910932 / bocpd
+
+Ô: ts-route-service / socket; nhóm E-gần; cờ chính B2. t̂=<!--v8:2-->684<!--/v8-->; t̂⁺=<!--v8:3-->724<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-03d4910932.json#/` và `theo-ca.json#/rows/0`; telemetry `data/rcaeval/re2tt_ts-route-service_socket_3/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+B2 đúng: cắt phần sau mốc làm điểm đổi quanh t̂ không còn trong dung sai chính. Can thiệp đổi cả min–max và bộ cột; chưa tách tác động riêng. B4 chính không trúng; cột nền hằng đổi được ghi riêng, không nâng thành B4. 
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:4-->3<!--/v8--> |
+| I1 | <!--v8:5-->15<!--/v8--> |
+| I2 | <!--v8:6-->15<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | ts-food-map-service_latency-50 | <!--v8:7-->0.0077<!--/v8--> | <!--v8:8-->0.00756757<!--/v8--> | <!--v8:9-->6.01504e-05<!--/v8--> | <!--v8:10-->0.000132432<!--/v8--> | <!--v8:11-->1.48502<!--/v8--> | <!--v8:12-->1<!--/v8--> |
+| w30 | ts-price-service_latency-50 | <!--v8:13-->0.00636524<!--/v8--> | <!--v8:14-->0.00596311<!--/v8--> | <!--v8:15-->0.000141266<!--/v8--> | <!--v8:16-->0.000402123<!--/v8--> | <!--v8:17-->1.91999<!--/v8--> | <!--v8:18-->1<!--/v8--> |
+| w60 | N/A: ngoài miền | N/A | N/A | N/A | N/A | N/A | N/A |
+
+w15: Nền hằng đổi riêng (MAD bằng không): ts-admin-basic-info-service_latency-50. Không cộng vào B4.
+w30: Nền hằng đổi riêng (MAD bằng không): ts-admin-basic-info-service_latency-50. Không cộng vào B4.
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 — không phân biệt đúng số | <!--v8:19-->Sai<!--/v8--> | <!--v8:20-->0<!--/v8-->/<!--v8:21-->712<!--/v8--> | <!--v8:22-->0<!--/v8--> |
+| B4/w15/k2 | <!--v8:23-->Sai<!--/v8--> | <!--v8:24-->464<!--/v8-->/<!--v8:25-->659<!--/v8--> | <!--v8:26-->0.704097<!--/v8--> |
+| B4/w15/k3 | <!--v8:27-->Sai<!--/v8--> | <!--v8:28-->241<!--/v8-->/<!--v8:29-->659<!--/v8--> | <!--v8:30-->0.365706<!--/v8--> |
+| B4/w15/k5 | <!--v8:31-->Sai<!--/v8--> | <!--v8:32-->97<!--/v8-->/<!--v8:33-->659<!--/v8--> | <!--v8:34-->0.147193<!--/v8--> |
+| B4/w30/k2 | <!--v8:35-->Sai<!--/v8--> | <!--v8:36-->556<!--/v8-->/<!--v8:37-->629<!--/v8--> | <!--v8:38-->0.883943<!--/v8--> |
+| B4/w30/k3 | <!--v8:39-->Sai<!--/v8--> | <!--v8:40-->433<!--/v8-->/<!--v8:41-->629<!--/v8--> | <!--v8:42-->0.688394<!--/v8--> |
+| B4/w30/k5 | <!--v8:43-->Sai<!--/v8--> | <!--v8:44-->174<!--/v8-->/<!--v8:45-->629<!--/v8--> | <!--v8:46-->0.27663<!--/v8--> |
+| B4/w60/k2 | <!--v8:47-->N/A<!--/v8--> | <!--v8:48-->543<!--/v8-->/<!--v8:49-->570<!--/v8--> | <!--v8:50-->0.952632<!--/v8--> |
+| B4/w60/k3 | <!--v8:51-->N/A<!--/v8--> | <!--v8:52-->454<!--/v8-->/<!--v8:53-->570<!--/v8--> | <!--v8:54-->0.796491<!--/v8--> |
+| B4/w60/k5 | <!--v8:55-->N/A<!--/v8--> | <!--v8:56-->227<!--/v8-->/<!--v8:57-->570<!--/v8--> | <!--v8:58-->0.398246<!--/v8--> |
+
+## dev-03d4910932 / nsigma
+
+Ô: ts-route-service / socket; nhóm E-xa; cờ chính N3. t̂=<!--v8:59-->125<!--/v8-->; t̂⁺=<!--v8:60-->728<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/nsigma/dev-03d4910932--nsigma.json#/` và `theo-ca.json#/rows/1`; telemetry `data/rcaeval/re2tt_ts-route-service_socket_3/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+Các cột trong bảng thực sự vượt ngưỡng hai phía từ lịch sử đã quan sát; danh sách cột gây báo và p_j đã đối chiếu Z lưu trước nối nhãn. Không có cột gây báo đạt N2 chính. N3 không chứng minh OR nhiều cột gây báo, độc lập hoặc đuôi phân phối. 
+
+Lịch sử hữu hạn, nền không dừng, phân phối không chuẩn, điền trước, độ phân giải metric hoặc tải thay đổi đều chưa được tách. V7 N/A cho N1–N4 vì định nghĩa chứa điều kiện báo động. Báo động trong Nv được gọi sai theo nhãn proxy, không khẳng định hệ thực tế bình thường.
+
+r_obs=<!--v8:61-->0.470968<!--/v8-->; r_ind=<!--v8:62-->0.45579<!--/v8-->; r_nom=<!--v8:63-->0.0878257<!--/v8-->. Độ trễ và t̂⁺ phải đọc cạnh r_obs, không coi là thời điểm bắt đầu sự cố.
+
+| Cột gây báo | Giá trị | Mean quá khứ | Std quá khứ | Độ lệch | Ngưỡng | p_j trong Nv |
+|---|---|---|---|---|---|---|
+| ts-security-service_latency-50 | <!--v8:64-->0.046875<!--/v8--> | <!--v8:65-->0.0396706<!--/v8--> | <!--v8:66-->0.00164125<!--/v8--> | <!--v8:67-->0.00720444<!--/v8--> | <!--v8:68-->0.00492376<!--/v8--> | <!--v8:69-->0.0112903<!--/v8--> |
+
+| Khoảng lịch sử | Báo cột-giây / tổng | Tỉ lệ |
+|---|---|---|
+| 100:200 | <!--v8:70-->13<!--/v8-->/<!--v8:71-->3400<!--/v8--> | <!--v8:72-->0.00382353<!--/v8--> |
+| 200:400 | <!--v8:73-->189<!--/v8-->/<!--v8:74-->6800<!--/v8--> | <!--v8:75-->0.0277941<!--/v8--> |
+| 400:720 | <!--v8:76-->162<!--/v8-->/<!--v8:77-->10880<!--/v8--> | <!--v8:78-->0.0148897<!--/v8--> |
+
+## dev-03d4910932 / nsigma_doi_chung
+
+Ô: ts-route-service / socket; nhóm E-xa; cờ chính N2. t̂=<!--v8:79-->100<!--/v8-->; t̂⁺=<!--v8:80-->720<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/nsigma/dev-03d4910932--nsigma_doi_chung.json#/` và `theo-ca.json#/rows/2`; telemetry `data/rcaeval/re2tt_ts-route-service_socket_3/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+Các cột trong bảng thực sự vượt ngưỡng hai phía từ lịch sử đã quan sát; danh sách cột gây báo và p_j đã đối chiếu Z lưu trước nối nhãn. Có cột gây báo có p_j cao trong Nv; cột báo dày là phân rã trực tiếp, không là đối chứng cơ chế. 
+
+Lịch sử hữu hạn, nền không dừng, phân phối không chuẩn, điền trước, độ phân giải metric hoặc tải thay đổi đều chưa được tách. V7 N/A cho N1–N4 vì định nghĩa chứa điều kiện báo động. Báo động trong Nv được gọi sai theo nhãn proxy, không khẳng định hệ thực tế bình thường.
+
+r_obs=<!--v8:81-->0.996774<!--/v8-->; r_ind=<!--v8:82-->0.998939<!--/v8-->; r_nom=<!--v8:83-->0.623192<!--/v8-->. Độ trễ và t̂⁺ phải đọc cạnh r_obs, không coi là thời điểm bắt đầu sự cố.
+
+| Cột gây báo | Giá trị | Mean quá khứ | Std quá khứ | Độ lệch | Ngưỡng | p_j trong Nv |
+|---|---|---|---|---|---|---|
+| ts-config-service_cpu | <!--v8:84-->2.10545<!--/v8--> | <!--v8:85-->1.43741<!--/v8--> | <!--v8:86-->0.211476<!--/v8--> | <!--v8:87-->0.668037<!--/v8--> | <!--v8:88-->0.634429<!--/v8--> | <!--v8:89-->0.0209677<!--/v8--> |
+| ts-rebook-service_cpu | <!--v8:90-->0.0846868<!--/v8--> | <!--v8:91-->0.102271<!--/v8--> | <!--v8:92-->0.00505181<!--/v8--> | <!--v8:93-->0.0175845<!--/v8--> | <!--v8:94-->0.0151554<!--/v8--> | <!--v8:95-->0.0435484<!--/v8--> |
+| ts-cancel-service_mem | <!--v8:96-->1.88703e+08<!--/v8--> | <!--v8:97-->1.88699e+08<!--/v8--> | <!--v8:98-->576.329<!--/v8--> | <!--v8:99-->4014.08<!--/v8--> | <!--v8:100-->1728.99<!--/v8--> | <!--v8:101-->0.0483871<!--/v8--> |
+| ts-assurance-service_latency-90 | <!--v8:102-->0.0099476<!--/v8--> | <!--v8:103-->0.0202591<!--/v8--> | <!--v8:104-->0.00264818<!--/v8--> | <!--v8:105-->0.0103115<!--/v8--> | <!--v8:106-->0.00794454<!--/v8--> | <!--v8:107-->0.00806452<!--/v8--> |
+
+| Khoảng lịch sử | Báo cột-giây / tổng | Tỉ lệ |
+|---|---|---|
+| 100:200 | <!--v8:108-->747<!--/v8-->/<!--v8:109-->36100<!--/v8--> | <!--v8:110-->0.0206925<!--/v8--> |
+| 200:400 | <!--v8:111-->1588<!--/v8-->/<!--v8:112-->72200<!--/v8--> | <!--v8:113-->0.0219945<!--/v8--> |
+| 400:720 | <!--v8:114-->1785<!--/v8-->/<!--v8:115-->115520<!--/v8--> | <!--v8:116-->0.0154519<!--/v8--> |
+
+## dev-12a1a88069 / bocpd
+
+Ô: ts-order-service / disk; nhóm E-xa; cờ chính B2+B4. t̂=<!--v8:117-->128<!--/v8-->; t̂⁺=<!--v8:118-->782<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-12a1a88069.json#/` và `theo-ca.json#/rows/3`; telemetry `data/rcaeval/re2tt_ts-order-service_disk_1/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+B2 đúng: cắt phần sau mốc làm điểm đổi quanh t̂ không còn trong dung sai chính. Can thiệp đổi cả min–max và bộ cột; chưa tách tác động riêng. B4 đúng cho bước median ở cột ghi trong bảng; đây là đổi telemetry, chưa biết nền có sự cố khác hay chỉ đổi tải. 
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:119-->4<!--/v8--> |
+| I1 | <!--v8:120-->6<!--/v8--> |
+| I2 | <!--v8:121-->6<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | ts-security-service_latency-50 | <!--v8:122-->0.23125<!--/v8--> | <!--v8:123-->0.175<!--/v8--> | <!--v8:124-->0.00665103<!--/v8--> | <!--v8:125-->0.05625<!--/v8--> | <!--v8:126-->5.7044<!--/v8--> | <!--v8:127-->4<!--/v8--> |
+| w30 | ts-security-service_latency-50 | <!--v8:128-->0.23125<!--/v8--> | <!--v8:129-->0.175<!--/v8--> | <!--v8:130-->0.00472716<!--/v8--> | <!--v8:131-->0.05625<!--/v8--> | <!--v8:132-->8.02598<!--/v8--> | <!--v8:133-->4<!--/v8--> |
+| w60 | ts-food-map-service_latency-50 | <!--v8:134-->0.00653845<!--/v8--> | <!--v8:135-->0.00728354<!--/v8--> | <!--v8:136-->3.34573e-05<!--/v8--> | <!--v8:137-->0.000745092<!--/v8--> | <!--v8:138-->15.0209<!--/v8--> | <!--v8:139-->9<!--/v8--> |
+
+w15: Nền hằng đổi riêng (MAD bằng không): ts-consign-price-service_latency-50, ts-consign-service_latency-50, ts-order-service_latency-50, ts-payment-service_latency-50. Không cộng vào B4.
+w30: Nền hằng đổi riêng (MAD bằng không): ts-consign-price-service_latency-50, ts-consign-service_latency-50, ts-order-service_latency-50, ts-payment-service_latency-50. Không cộng vào B4.
+w60: Nền hằng đổi riêng (MAD bằng không): ts-admin-basic-info-service_latency-50, ts-consign-price-service_latency-50, ts-consign-service_latency-50, ts-order-service_latency-50, ts-payment-service_latency-50, ts-preserve-other-service_latency-50, ts-preserve-service_latency-50, ts-security-service_latency-50, ts-user-service_latency-50. Không cộng vào B4.
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 | <!--v8:140-->Sai<!--/v8--> | <!--v8:141-->5<!--/v8-->/<!--v8:142-->711<!--/v8--> | <!--v8:143-->0.00703235<!--/v8--> |
+| B4/w15/k2 | <!--v8:144-->Đúng<!--/v8--> | <!--v8:145-->488<!--/v8-->/<!--v8:146-->656<!--/v8--> | <!--v8:147-->0.743902<!--/v8--> |
+| B4/w15/k3 | <!--v8:148-->Đúng<!--/v8--> | <!--v8:149-->316<!--/v8-->/<!--v8:150-->656<!--/v8--> | <!--v8:151-->0.481707<!--/v8--> |
+| B4/w15/k5 | <!--v8:152-->Đúng<!--/v8--> | <!--v8:153-->167<!--/v8-->/<!--v8:154-->656<!--/v8--> | <!--v8:155-->0.254573<!--/v8--> |
+| B4/w30/k2 | <!--v8:156-->Đúng<!--/v8--> | <!--v8:157-->555<!--/v8-->/<!--v8:158-->626<!--/v8--> | <!--v8:159-->0.886581<!--/v8--> |
+| B4/w30/k3 | <!--v8:160-->Đúng<!--/v8--> | <!--v8:161-->414<!--/v8-->/<!--v8:162-->626<!--/v8--> | <!--v8:163-->0.661342<!--/v8--> |
+| B4/w30/k5 | <!--v8:164-->Đúng<!--/v8--> | <!--v8:165-->223<!--/v8-->/<!--v8:166-->626<!--/v8--> | <!--v8:167-->0.35623<!--/v8--> |
+| B4/w60/k2 | <!--v8:168-->Đúng<!--/v8--> | <!--v8:169-->550<!--/v8-->/<!--v8:170-->566<!--/v8--> | <!--v8:171-->0.971731<!--/v8--> |
+| B4/w60/k3 | <!--v8:172-->Đúng<!--/v8--> | <!--v8:173-->421<!--/v8-->/<!--v8:174-->566<!--/v8--> | <!--v8:175-->0.743816<!--/v8--> |
+| B4/w60/k5 | <!--v8:176-->Đúng<!--/v8--> | <!--v8:177-->194<!--/v8-->/<!--v8:178-->566<!--/v8--> | <!--v8:179-->0.342756<!--/v8--> |
+
+## dev-12a1a88069 / nsigma
+
+Ô: ts-order-service / disk; nhóm E-xa; cờ chính N1+N3. t̂=<!--v8:180-->101<!--/v8-->; t̂⁺=<!--v8:181-->768<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/nsigma/dev-12a1a88069--nsigma.json#/` và `theo-ca.json#/rows/4`; telemetry `data/rcaeval/re2tt_ts-order-service_disk_1/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+Các cột trong bảng thực sự vượt ngưỡng hai phía từ lịch sử đã quan sát; danh sách cột gây báo và p_j đã đối chiếu Z lưu trước nối nhãn. Tỉ lệ khoảng đầu so với khoảng cuối thỏa N1; liên hệ với vị trí sớm chưa chứng minh lịch sử ngắn là nguyên nhân. Không có cột gây báo đạt N2 chính. N3 không chứng minh OR nhiều cột gây báo, độc lập hoặc đuôi phân phối. 
+
+Lịch sử hữu hạn, nền không dừng, phân phối không chuẩn, điền trước, độ phân giải metric hoặc tải thay đổi đều chưa được tách. V7 N/A cho N1–N4 vì định nghĩa chứa điều kiện báo động. Báo động trong Nv được gọi sai theo nhãn proxy, không khẳng định hệ thực tế bình thường.
+
+r_obs=<!--v8:182-->0.293548<!--/v8-->; r_ind=<!--v8:183-->0.330398<!--/v8-->; r_nom=<!--v8:184-->0.112157<!--/v8-->. Độ trễ và t̂⁺ phải đọc cạnh r_obs, không coi là thời điểm bắt đầu sự cố.
+
+| Cột gây báo | Giá trị | Mean quá khứ | Std quá khứ | Độ lệch | Ngưỡng | p_j trong Nv |
+|---|---|---|---|---|---|---|
+| ts-ui-dashboard_latency-50 | <!--v8:185-->0.276923<!--/v8--> | <!--v8:186-->0.229589<!--/v8--> | <!--v8:187-->0.0082798<!--/v8--> | <!--v8:188-->0.0473339<!--/v8--> | <!--v8:189-->0.0248394<!--/v8--> | <!--v8:190-->0.0209677<!--/v8--> |
+
+| Khoảng lịch sử | Báo cột-giây / tổng | Tỉ lệ |
+|---|---|---|
+| 100:200 | <!--v8:191-->62<!--/v8-->/<!--v8:192-->4400<!--/v8--> | <!--v8:193-->0.0140909<!--/v8--> |
+| 200:400 | <!--v8:194-->83<!--/v8-->/<!--v8:195-->8800<!--/v8--> | <!--v8:196-->0.00943182<!--/v8--> |
+| 400:720 | <!--v8:197-->98<!--/v8-->/<!--v8:198-->14080<!--/v8--> | <!--v8:199-->0.00696023<!--/v8--> |
+
+## dev-12a1a88069 / nsigma_doi_chung
+
+Ô: ts-order-service / disk; nhóm E-xa; cờ chính N2. t̂=<!--v8:200-->100<!--/v8-->; t̂⁺=<!--v8:201-->720<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/nsigma/dev-12a1a88069--nsigma_doi_chung.json#/` và `theo-ca.json#/rows/5`; telemetry `data/rcaeval/re2tt_ts-order-service_disk_1/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+Các cột trong bảng thực sự vượt ngưỡng hai phía từ lịch sử đã quan sát; danh sách cột gây báo và p_j đã đối chiếu Z lưu trước nối nhãn. Có cột gây báo có p_j cao trong Nv; cột báo dày là phân rã trực tiếp, không là đối chứng cơ chế. 
+
+Lịch sử hữu hạn, nền không dừng, phân phối không chuẩn, điền trước, độ phân giải metric hoặc tải thay đổi đều chưa được tách. V7 N/A cho N1–N4 vì định nghĩa chứa điều kiện báo động. Báo động trong Nv được gọi sai theo nhãn proxy, không khẳng định hệ thực tế bình thường.
+
+r_obs=<!--v8:202-->0.972581<!--/v8-->; r_ind=<!--v8:203-->0.995039<!--/v8-->; r_nom=<!--v8:204-->0.633243<!--/v8-->. Độ trễ và t̂⁺ phải đọc cạnh r_obs, không coi là thời điểm bắt đầu sự cố.
+
+| Cột gây báo | Giá trị | Mean quá khứ | Std quá khứ | Độ lệch | Ngưỡng | p_j trong Nv |
+|---|---|---|---|---|---|---|
+| ts-contacts-service_cpu | <!--v8:205-->0.34517<!--/v8--> | <!--v8:206-->0.174871<!--/v8--> | <!--v8:207-->0.0561148<!--/v8--> | <!--v8:208-->0.170299<!--/v8--> | <!--v8:209-->0.168344<!--/v8--> | <!--v8:210-->0.0580645<!--/v8--> |
+| ts-auth-mongo_mem | <!--v8:211-->6.72481e+07<!--/v8--> | <!--v8:212-->6.72361e+07<!--/v8--> | <!--v8:213-->3897.56<!--/v8--> | <!--v8:214-->12042.2<!--/v8--> | <!--v8:215-->11692.7<!--/v8--> | <!--v8:216-->0.0887097<!--/v8--> |
+| ts-consign-mongo_mem | <!--v8:217-->7.02996e+07<!--/v8--> | <!--v8:218-->7.02839e+07<!--/v8--> | <!--v8:219-->4384.55<!--/v8--> | <!--v8:220-->15728.6<!--/v8--> | <!--v8:221-->13153.7<!--/v8--> | <!--v8:222-->0.0370968<!--/v8--> |
+| ts-consign-price-service_mem | <!--v8:223-->2.43573e+08<!--/v8--> | <!--v8:224-->2.43561e+08<!--/v8--> | <!--v8:225-->3506.64<!--/v8--> | <!--v8:226-->11796.5<!--/v8--> | <!--v8:227-->10519.9<!--/v8--> | <!--v8:228-->0.0967742<!--/v8--> |
+| ts-travel-service_latency-90 | <!--v8:229-->0.173637<!--/v8--> | <!--v8:230-->0.230439<!--/v8--> | <!--v8:231-->0.016097<!--/v8--> | <!--v8:232-->0.0568019<!--/v8--> | <!--v8:233-->0.048291<!--/v8--> | <!--v8:234-->0.016129<!--/v8--> |
+
+| Khoảng lịch sử | Báo cột-giây / tổng | Tỉ lệ |
+|---|---|---|
+| 100:200 | <!--v8:235-->668<!--/v8-->/<!--v8:236-->37100<!--/v8--> | <!--v8:237-->0.0180054<!--/v8--> |
+| 200:400 | <!--v8:238-->1202<!--/v8-->/<!--v8:239-->74200<!--/v8--> | <!--v8:240-->0.0161995<!--/v8--> |
+| 400:720 | <!--v8:241-->1335<!--/v8-->/<!--v8:242-->118720<!--/v8--> | <!--v8:243-->0.0112449<!--/v8--> |
+
+## dev-14372e1209 / bocpd
+
+Ô: ts-route-service / mem; nhóm E-xa; cờ chính D0. t̂=<!--v8:244-->252<!--/v8-->; t̂⁺=<!--v8:245-->818<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-14372e1209.json#/` và `theo-ca.json#/rows/6`; telemetry `data/rcaeval/re2tt_ts-route-service_mem_2/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+D0 ở cấu hình chính: điểm đổi quanh t̂ còn ở I1 và I2, B1 không trúng, B4 hữu hạn dưới ngưỡng chính. Cờ độ nhạy có thể đổi; chưa giải thích được điểm đổi ở cấu hình chính.
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:246-->3<!--/v8--> |
+| I1 | <!--v8:247-->3<!--/v8--> |
+| I2 | <!--v8:248-->3<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | ts-auth-service_latency-50 | <!--v8:249-->0.23913<!--/v8--> | <!--v8:250-->0.265625<!--/v8--> | <!--v8:251-->0.0175<!--/v8--> | <!--v8:252-->0.0264946<!--/v8--> | <!--v8:253-->1.02116<!--/v8--> | <!--v8:254-->0<!--/v8--> |
+| w30 | ts-food-map-service_latency-50 | <!--v8:255-->0.0164788<!--/v8--> | <!--v8:256-->0.014026<!--/v8--> | <!--v8:257-->0.000607652<!--/v8--> | <!--v8:258-->0.00245286<!--/v8--> | <!--v8:259-->2.72266<!--/v8--> | <!--v8:260-->0<!--/v8--> |
+| w60 | ts-food-map-service_latency-50 | <!--v8:261-->0.0168571<!--/v8--> | <!--v8:262-->0.0137931<!--/v8--> | <!--v8:263-->0.000510753<!--/v8--> | <!--v8:264-->0.003064<!--/v8--> | <!--v8:265-->4.04626<!--/v8--> | <!--v8:266-->0<!--/v8--> |
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 | <!--v8:267-->Sai<!--/v8--> | <!--v8:268-->9<!--/v8-->/<!--v8:269-->712<!--/v8--> | <!--v8:270-->0.0126404<!--/v8--> |
+| B4/w15/k2 | <!--v8:271-->Sai<!--/v8--> | <!--v8:272-->352<!--/v8-->/<!--v8:273-->657<!--/v8--> | <!--v8:274-->0.535769<!--/v8--> |
+| B4/w15/k3 | <!--v8:275-->Sai<!--/v8--> | <!--v8:276-->180<!--/v8-->/<!--v8:277-->657<!--/v8--> | <!--v8:278-->0.273973<!--/v8--> |
+| B4/w15/k5 | <!--v8:279-->Sai<!--/v8--> | <!--v8:280-->85<!--/v8-->/<!--v8:281-->657<!--/v8--> | <!--v8:282-->0.129376<!--/v8--> |
+| B4/w30/k2 | <!--v8:283-->Đúng<!--/v8--> | <!--v8:284-->444<!--/v8-->/<!--v8:285-->627<!--/v8--> | <!--v8:286-->0.708134<!--/v8--> |
+| B4/w30/k3 | <!--v8:287-->Sai<!--/v8--> | <!--v8:288-->285<!--/v8-->/<!--v8:289-->627<!--/v8--> | <!--v8:290-->0.454545<!--/v8--> |
+| B4/w30/k5 | <!--v8:291-->Sai<!--/v8--> | <!--v8:292-->97<!--/v8-->/<!--v8:293-->627<!--/v8--> | <!--v8:294-->0.154705<!--/v8--> |
+| B4/w60/k2 | <!--v8:295-->Đúng<!--/v8--> | <!--v8:296-->521<!--/v8-->/<!--v8:297-->567<!--/v8--> | <!--v8:298-->0.918871<!--/v8--> |
+| B4/w60/k3 | <!--v8:299-->Đúng<!--/v8--> | <!--v8:300-->363<!--/v8-->/<!--v8:301-->567<!--/v8--> | <!--v8:302-->0.640212<!--/v8--> |
+| B4/w60/k5 | <!--v8:303-->Sai<!--/v8--> | <!--v8:304-->160<!--/v8-->/<!--v8:305-->567<!--/v8--> | <!--v8:306-->0.282187<!--/v8--> |
+
+## dev-14372e1209 / nsigma
+
+Ô: ts-route-service / mem; nhóm E-xa; cờ chính N1+N3. t̂=<!--v8:307-->107<!--/v8-->; t̂⁺=<!--v8:308-->774<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/nsigma/dev-14372e1209--nsigma.json#/` và `theo-ca.json#/rows/7`; telemetry `data/rcaeval/re2tt_ts-route-service_mem_2/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+Các cột trong bảng thực sự vượt ngưỡng hai phía từ lịch sử đã quan sát; danh sách cột gây báo và p_j đã đối chiếu Z lưu trước nối nhãn. Tỉ lệ khoảng đầu so với khoảng cuối thỏa N1; liên hệ với vị trí sớm chưa chứng minh lịch sử ngắn là nguyên nhân. Không có cột gây báo đạt N2 chính. N3 không chứng minh OR nhiều cột gây báo, độc lập hoặc đuôi phân phối. 
+
+Lịch sử hữu hạn, nền không dừng, phân phối không chuẩn, điền trước, độ phân giải metric hoặc tải thay đổi đều chưa được tách. V7 N/A cho N1–N4 vì định nghĩa chứa điều kiện báo động. Báo động trong Nv được gọi sai theo nhãn proxy, không khẳng định hệ thực tế bình thường.
+
+r_obs=<!--v8:309-->0.0467742<!--/v8-->; r_ind=<!--v8:310-->0.0522602<!--/v8-->; r_nom=<!--v8:311-->0.0878257<!--/v8-->. Độ trễ và t̂⁺ phải đọc cạnh r_obs, không coi là thời điểm bắt đầu sự cố.
+
+| Cột gây báo | Giá trị | Mean quá khứ | Std quá khứ | Độ lệch | Ngưỡng | p_j trong Nv |
+|---|---|---|---|---|---|---|
+| ts-preserve-service_latency-50 | <!--v8:312-->1.28979<!--/v8--> | <!--v8:313-->1.8525<!--/v8--> | <!--v8:314-->0.178945<!--/v8--> | <!--v8:315-->0.562715<!--/v8--> | <!--v8:316-->0.536835<!--/v8--> | <!--v8:317-->0.00967742<!--/v8--> |
+
+| Khoảng lịch sử | Báo cột-giây / tổng | Tỉ lệ |
+|---|---|---|
+| 100:200 | <!--v8:318-->24<!--/v8-->/<!--v8:319-->3400<!--/v8--> | <!--v8:320-->0.00705882<!--/v8--> |
+| 200:400 | <!--v8:321-->9<!--/v8-->/<!--v8:322-->6800<!--/v8--> | <!--v8:323-->0.00132353<!--/v8--> |
+| 400:720 | <!--v8:324-->0<!--/v8-->/<!--v8:325-->10880<!--/v8--> | <!--v8:326-->0<!--/v8--> |
+
+## dev-14372e1209 / nsigma_doi_chung
+
+Ô: ts-route-service / mem; nhóm E-xa; cờ chính N1+N2. t̂=<!--v8:327-->100<!--/v8-->; t̂⁺=<!--v8:328-->720<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/nsigma/dev-14372e1209--nsigma_doi_chung.json#/` và `theo-ca.json#/rows/8`; telemetry `data/rcaeval/re2tt_ts-route-service_mem_2/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+Các cột trong bảng thực sự vượt ngưỡng hai phía từ lịch sử đã quan sát; danh sách cột gây báo và p_j đã đối chiếu Z lưu trước nối nhãn. Tỉ lệ khoảng đầu so với khoảng cuối thỏa N1; liên hệ với vị trí sớm chưa chứng minh lịch sử ngắn là nguyên nhân. Có cột gây báo có p_j cao trong Nv; cột báo dày là phân rã trực tiếp, không là đối chứng cơ chế. 
+
+Lịch sử hữu hạn, nền không dừng, phân phối không chuẩn, điền trước, độ phân giải metric hoặc tải thay đổi đều chưa được tách. V7 N/A cho N1–N4 vì định nghĩa chứa điều kiện báo động. Báo động trong Nv được gọi sai theo nhãn proxy, không khẳng định hệ thực tế bình thường.
+
+r_obs=<!--v8:329-->0.925806<!--/v8-->; r_ind=<!--v8:330-->0.98086<!--/v8-->; r_nom=<!--v8:331-->0.625224<!--/v8-->. Độ trễ và t̂⁺ phải đọc cạnh r_obs, không coi là thời điểm bắt đầu sự cố.
+
+| Cột gây báo | Giá trị | Mean quá khứ | Std quá khứ | Độ lệch | Ngưỡng | p_j trong Nv |
+|---|---|---|---|---|---|---|
+| ts-cancel-service_mem | <!--v8:332-->1.9311e+08<!--/v8--> | <!--v8:333-->1.93052e+08<!--/v8--> | <!--v8:334-->15005.1<!--/v8--> | <!--v8:335-->58204.2<!--/v8--> | <!--v8:336-->45015.2<!--/v8--> | <!--v8:337-->0.0258065<!--/v8--> |
+| ts-station-mongo_mem | <!--v8:338-->6.87923e+07<!--/v8--> | <!--v8:339-->6.87575e+07<!--/v8--> | <!--v8:340-->6092.06<!--/v8--> | <!--v8:341-->34816<!--/v8--> | <!--v8:342-->18276.2<!--/v8--> | <!--v8:343-->0.0822581<!--/v8--> |
+| ts-ui-dashboard_workload | <!--v8:344-->5.2<!--/v8--> | <!--v8:345-->4.01398<!--/v8--> | <!--v8:346-->0.339031<!--/v8--> | <!--v8:347-->1.18602<!--/v8--> | <!--v8:348-->1.01709<!--/v8--> | <!--v8:349-->0.0193548<!--/v8--> |
+
+| Khoảng lịch sử | Báo cột-giây / tổng | Tỉ lệ |
+|---|---|---|
+| 100:200 | <!--v8:350-->641<!--/v8-->/<!--v8:351-->36300<!--/v8--> | <!--v8:352-->0.0176584<!--/v8--> |
+| 200:400 | <!--v8:353-->1038<!--/v8-->/<!--v8:354-->72600<!--/v8--> | <!--v8:355-->0.0142975<!--/v8--> |
+| 400:720 | <!--v8:356-->718<!--/v8-->/<!--v8:357-->116160<!--/v8--> | <!--v8:358-->0.00618113<!--/v8--> |
+
+## dev-16597725c1 / bocpd
+
+Ô: ts-auth-service / cpu; nhóm E-xa; cờ chính B2+B4. t̂=<!--v8:359-->239<!--/v8-->; t̂⁺=<!--v8:360-->722<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-16597725c1.json#/` và `theo-ca.json#/rows/9`; telemetry `data/rcaeval/re2tt_ts-auth-service_cpu_2/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+B2 đúng: cắt phần sau mốc làm điểm đổi quanh t̂ không còn trong dung sai chính. Can thiệp đổi cả min–max và bộ cột; chưa tách tác động riêng. B4 đúng cho bước median ở cột ghi trong bảng; đây là đổi telemetry, chưa biết nền có sự cố khác hay chỉ đổi tải. 
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:361-->5<!--/v8--> |
+| I1 | <!--v8:362-->8<!--/v8--> |
+| I2 | <!--v8:363-->8<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | ts-consign-price-service_latency-50 | <!--v8:364-->0.01<!--/v8--> | <!--v8:365-->0.00875<!--/v8--> | <!--v8:366-->0.000277778<!--/v8--> | <!--v8:367-->0.00125<!--/v8--> | <!--v8:368-->3.03521<!--/v8--> | <!--v8:369-->0<!--/v8--> |
+| w30 | ts-consign-price-service_latency-50 | <!--v8:370-->0.01<!--/v8--> | <!--v8:371-->0.00875<!--/v8--> | <!--v8:372-->0.00025<!--/v8--> | <!--v8:373-->0.00125<!--/v8--> | <!--v8:374-->3.37245<!--/v8--> | <!--v8:375-->0<!--/v8--> |
+| w60 | ts-price-service_latency-50 | <!--v8:376-->0.00360975<!--/v8--> | <!--v8:377-->0.00384343<!--/v8--> | <!--v8:378-->4.97575e-05<!--/v8--> | <!--v8:379-->0.000233679<!--/v8--> | <!--v8:380-->3.16765<!--/v8--> | <!--v8:381-->0<!--/v8--> |
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 — không phân biệt đúng số | <!--v8:382-->Sai<!--/v8--> | <!--v8:383-->0<!--/v8-->/<!--v8:384-->710<!--/v8--> | <!--v8:385-->0<!--/v8--> |
+| B4/w15/k2 | <!--v8:386-->Đúng<!--/v8--> | <!--v8:387-->503<!--/v8-->/<!--v8:388-->656<!--/v8--> | <!--v8:389-->0.766768<!--/v8--> |
+| B4/w15/k3 | <!--v8:390-->Đúng<!--/v8--> | <!--v8:391-->300<!--/v8-->/<!--v8:392-->656<!--/v8--> | <!--v8:393-->0.457317<!--/v8--> |
+| B4/w15/k5 | <!--v8:394-->Sai<!--/v8--> | <!--v8:395-->112<!--/v8-->/<!--v8:396-->656<!--/v8--> | <!--v8:397-->0.170732<!--/v8--> |
+| B4/w30/k2 | <!--v8:398-->Đúng<!--/v8--> | <!--v8:399-->591<!--/v8-->/<!--v8:400-->626<!--/v8--> | <!--v8:401-->0.944089<!--/v8--> |
+| B4/w30/k3 | <!--v8:402-->Đúng<!--/v8--> | <!--v8:403-->457<!--/v8-->/<!--v8:404-->626<!--/v8--> | <!--v8:405-->0.730032<!--/v8--> |
+| B4/w30/k5 | <!--v8:406-->Sai<!--/v8--> | <!--v8:407-->261<!--/v8-->/<!--v8:408-->626<!--/v8--> | <!--v8:409-->0.416933<!--/v8--> |
+| B4/w60/k2 — không phân biệt đúng số | <!--v8:410-->Đúng<!--/v8--> | <!--v8:411-->566<!--/v8-->/<!--v8:412-->566<!--/v8--> | <!--v8:413-->1<!--/v8--> |
+| B4/w60/k3 | <!--v8:414-->Đúng<!--/v8--> | <!--v8:415-->490<!--/v8-->/<!--v8:416-->566<!--/v8--> | <!--v8:417-->0.865724<!--/v8--> |
+| B4/w60/k5 | <!--v8:418-->Sai<!--/v8--> | <!--v8:419-->193<!--/v8-->/<!--v8:420-->566<!--/v8--> | <!--v8:421-->0.340989<!--/v8--> |
+
+## dev-16597725c1 / nsigma
+
+Ô: ts-auth-service / cpu; nhóm E-xa; cờ chính N3. t̂=<!--v8:422-->100<!--/v8-->; t̂⁺=<!--v8:423-->720<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/nsigma/dev-16597725c1--nsigma.json#/` và `theo-ca.json#/rows/10`; telemetry `data/rcaeval/re2tt_ts-auth-service_cpu_2/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+Các cột trong bảng thực sự vượt ngưỡng hai phía từ lịch sử đã quan sát; danh sách cột gây báo và p_j đã đối chiếu Z lưu trước nối nhãn. Không có cột gây báo đạt N2 chính. N3 không chứng minh OR nhiều cột gây báo, độc lập hoặc đuôi phân phối. 
+
+Lịch sử hữu hạn, nền không dừng, phân phối không chuẩn, điền trước, độ phân giải metric hoặc tải thay đổi đều chưa được tách. V7 N/A cho N1–N4 vì định nghĩa chứa điều kiện báo động. Báo động trong Nv được gọi sai theo nhãn proxy, không khẳng định hệ thực tế bình thường.
+
+r_obs=<!--v8:424-->0.466129<!--/v8-->; r_ind=<!--v8:425-->0.461933<!--/v8-->; r_nom=<!--v8:426-->0.102504<!--/v8-->. Độ trễ và t̂⁺ phải đọc cạnh r_obs, không coi là thời điểm bắt đầu sự cố.
+
+| Cột gây báo | Giá trị | Mean quá khứ | Std quá khứ | Độ lệch | Ngưỡng | p_j trong Nv |
+|---|---|---|---|---|---|---|
+| ts-consign-price-service_latency-50 | <!--v8:427-->0.0095<!--/v8--> | <!--v8:428-->0.00803864<!--/v8--> | <!--v8:429-->0.000448935<!--/v8--> | <!--v8:430-->0.00146136<!--/v8--> | <!--v8:431-->0.0013468<!--/v8--> | <!--v8:432-->0.0145161<!--/v8--> |
+
+| Khoảng lịch sử | Báo cột-giây / tổng | Tỉ lệ |
+|---|---|---|
+| 100:200 | <!--v8:433-->13<!--/v8-->/<!--v8:434-->4000<!--/v8--> | <!--v8:435-->0.00325<!--/v8--> |
+| 200:400 | <!--v8:436-->165<!--/v8-->/<!--v8:437-->8000<!--/v8--> | <!--v8:438-->0.020625<!--/v8--> |
+| 400:720 | <!--v8:439-->192<!--/v8-->/<!--v8:440-->12800<!--/v8--> | <!--v8:441-->0.015<!--/v8--> |
+
+## dev-16597725c1 / nsigma_doi_chung
+
+Ô: ts-auth-service / cpu; nhóm E-xa; cờ chính N2. t̂=<!--v8:442-->100<!--/v8-->; t̂⁺=<!--v8:443-->720<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/nsigma/dev-16597725c1--nsigma_doi_chung.json#/` và `theo-ca.json#/rows/11`; telemetry `data/rcaeval/re2tt_ts-auth-service_cpu_2/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+Các cột trong bảng thực sự vượt ngưỡng hai phía từ lịch sử đã quan sát; danh sách cột gây báo và p_j đã đối chiếu Z lưu trước nối nhãn. Có cột gây báo có p_j cao trong Nv; cột báo dày là phân rã trực tiếp, không là đối chứng cơ chế. 
+
+Lịch sử hữu hạn, nền không dừng, phân phối không chuẩn, điền trước, độ phân giải metric hoặc tải thay đổi đều chưa được tách. V7 N/A cho N1–N4 vì định nghĩa chứa điều kiện báo động. Báo động trong Nv được gọi sai theo nhãn proxy, không khẳng định hệ thực tế bình thường.
+
+r_obs=<!--v8:444-->0.993548<!--/v8-->; r_ind=<!--v8:445-->0.998321<!--/v8-->; r_nom=<!--v8:446-->0.629255<!--/v8-->. Độ trễ và t̂⁺ phải đọc cạnh r_obs, không coi là thời điểm bắt đầu sự cố.
+
+| Cột gây báo | Giá trị | Mean quá khứ | Std quá khứ | Độ lệch | Ngưỡng | p_j trong Nv |
+|---|---|---|---|---|---|---|
+| ts-order-service_diskio | <!--v8:447-->103513<!--/v8--> | <!--v8:448-->45253.8<!--/v8--> | <!--v8:449-->15606.5<!--/v8--> | <!--v8:450-->58258.9<!--/v8--> | <!--v8:451-->46819.5<!--/v8--> | <!--v8:452-->0.0177419<!--/v8--> |
+| ts-travel-service_diskio | <!--v8:453-->98645.3<!--/v8--> | <!--v8:454-->54715.5<!--/v8--> | <!--v8:455-->13899.8<!--/v8--> | <!--v8:456-->43929.8<!--/v8--> | <!--v8:457-->41699.3<!--/v8--> | <!--v8:458-->0.0145161<!--/v8--> |
+| ts-consign-price-service_latency-50 | <!--v8:459-->0.0095<!--/v8--> | <!--v8:460-->0.00803864<!--/v8--> | <!--v8:461-->0.000448935<!--/v8--> | <!--v8:462-->0.00146136<!--/v8--> | <!--v8:463-->0.0013468<!--/v8--> | <!--v8:464-->0.0145161<!--/v8--> |
+| ts-ui-dashboard_latency-90 | <!--v8:465-->0.572917<!--/v8--> | <!--v8:466-->0.498754<!--/v8--> | <!--v8:467-->0.0224225<!--/v8--> | <!--v8:468-->0.0741624<!--/v8--> | <!--v8:469-->0.0672676<!--/v8--> | <!--v8:470-->0.0274194<!--/v8--> |
+
+| Khoảng lịch sử | Báo cột-giây / tổng | Tỉ lệ |
+|---|---|---|
+| 100:200 | <!--v8:471-->442<!--/v8-->/<!--v8:472-->36700<!--/v8--> | <!--v8:473-->0.0120436<!--/v8--> |
+| 200:400 | <!--v8:474-->1752<!--/v8-->/<!--v8:475-->73400<!--/v8--> | <!--v8:476-->0.0238692<!--/v8--> |
+| 400:720 | <!--v8:477-->1656<!--/v8-->/<!--v8:478-->117440<!--/v8--> | <!--v8:479-->0.0141008<!--/v8--> |
+
+## dev-16870e660c / bocpd
+
+Ô: ts-route-service / mem; nhóm E-gần; cờ chính D0. t̂=<!--v8:480-->614<!--/v8-->; t̂⁺=<!--v8:481-->754<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-16870e660c.json#/` và `theo-ca.json#/rows/12`; telemetry `data/rcaeval/re2tt_ts-route-service_mem_3/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+D0 ở cấu hình chính: điểm đổi quanh t̂ còn ở I1 và I2, B1 không trúng, B4 hữu hạn dưới ngưỡng chính. Cờ độ nhạy có thể đổi; chưa giải thích được điểm đổi ở cấu hình chính.
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:482-->3<!--/v8--> |
+| I1 | <!--v8:483-->13<!--/v8--> |
+| I2 | <!--v8:484-->13<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | ts-consign-service_latency-50 | <!--v8:485-->0.0333333<!--/v8--> | <!--v8:486-->0.025<!--/v8--> | <!--v8:487-->0.00357143<!--/v8--> | <!--v8:488-->0.00833333<!--/v8--> | <!--v8:489-->1.57381<!--/v8--> | <!--v8:490-->2<!--/v8--> |
+| w30 | ts-contacts-service_latency-50 | <!--v8:491-->0.00761685<!--/v8--> | <!--v8:492-->0.00797619<!--/v8--> | <!--v8:493-->0.000103755<!--/v8--> | <!--v8:494-->0.000359343<!--/v8--> | <!--v8:495-->2.33602<!--/v8--> | <!--v8:496-->3<!--/v8--> |
+| w60 | ts-contacts-service_latency-50 | <!--v8:497-->0.00765873<!--/v8--> | <!--v8:498-->0.00797619<!--/v8--> | <!--v8:499-->0.000113095<!--/v8--> | <!--v8:500-->0.00031746<!--/v8--> | <!--v8:501-->1.89331<!--/v8--> | <!--v8:502-->3<!--/v8--> |
+
+w15: Nền hằng đổi riêng (MAD bằng không): ts-payment-service_latency-50, ts-security-service_latency-50. Không cộng vào B4.
+w30: Nền hằng đổi riêng (MAD bằng không): ts-admin-travel-service_latency-50, ts-payment-service_latency-50, ts-security-service_latency-50. Không cộng vào B4.
+w60: Nền hằng đổi riêng (MAD bằng không): ts-admin-travel-service_latency-50, ts-payment-service_latency-50, ts-security-service_latency-50. Không cộng vào B4.
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 — không phân biệt đúng số | <!--v8:503-->Sai<!--/v8--> | <!--v8:504-->0<!--/v8-->/<!--v8:505-->712<!--/v8--> | <!--v8:506-->0<!--/v8--> |
+| B4/w15/k2 | <!--v8:507-->Sai<!--/v8--> | <!--v8:508-->436<!--/v8-->/<!--v8:509-->658<!--/v8--> | <!--v8:510-->0.662614<!--/v8--> |
+| B4/w15/k3 | <!--v8:511-->Sai<!--/v8--> | <!--v8:512-->256<!--/v8-->/<!--v8:513-->658<!--/v8--> | <!--v8:514-->0.389058<!--/v8--> |
+| B4/w15/k5 | <!--v8:515-->Sai<!--/v8--> | <!--v8:516-->161<!--/v8-->/<!--v8:517-->658<!--/v8--> | <!--v8:518-->0.244681<!--/v8--> |
+| B4/w30/k2 | <!--v8:519-->Đúng<!--/v8--> | <!--v8:520-->528<!--/v8-->/<!--v8:521-->628<!--/v8--> | <!--v8:522-->0.840764<!--/v8--> |
+| B4/w30/k3 | <!--v8:523-->Sai<!--/v8--> | <!--v8:524-->320<!--/v8-->/<!--v8:525-->628<!--/v8--> | <!--v8:526-->0.509554<!--/v8--> |
+| B4/w30/k5 | <!--v8:527-->Sai<!--/v8--> | <!--v8:528-->190<!--/v8-->/<!--v8:529-->628<!--/v8--> | <!--v8:530-->0.302548<!--/v8--> |
+| B4/w60/k2 | <!--v8:531-->Sai<!--/v8--> | <!--v8:532-->479<!--/v8-->/<!--v8:533-->569<!--/v8--> | <!--v8:534-->0.841828<!--/v8--> |
+| B4/w60/k3 | <!--v8:535-->Sai<!--/v8--> | <!--v8:536-->331<!--/v8-->/<!--v8:537-->569<!--/v8--> | <!--v8:538-->0.581722<!--/v8--> |
+| B4/w60/k5 | <!--v8:539-->Sai<!--/v8--> | <!--v8:540-->171<!--/v8-->/<!--v8:541-->569<!--/v8--> | <!--v8:542-->0.300527<!--/v8--> |
+
+## dev-1e6d61b5ec / bocpd
+
+Ô: ts-order-service / disk; nhóm E-xa; cờ chính B2+B4. t̂=<!--v8:543-->119<!--/v8-->; t̂⁺=<!--v8:544-->734<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-1e6d61b5ec.json#/` và `theo-ca.json#/rows/15`; telemetry `data/rcaeval/re2tt_ts-order-service_disk_2/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+B2 đúng: cắt phần sau mốc làm điểm đổi quanh t̂ không còn trong dung sai chính. Can thiệp đổi cả min–max và bộ cột; chưa tách tác động riêng. B4 đúng cho bước median ở cột ghi trong bảng; đây là đổi telemetry, chưa biết nền có sự cố khác hay chỉ đổi tải. 
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:545-->12<!--/v8--> |
+| I1 | <!--v8:546-->11<!--/v8--> |
+| I2 | <!--v8:547-->11<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | ts-order-other-service_latency-50 | <!--v8:548-->0.0141667<!--/v8--> | <!--v8:549-->0.0128125<!--/v8--> | <!--v8:550-->0.000384615<!--/v8--> | <!--v8:551-->0.00135417<!--/v8--> | <!--v8:552-->2.37477<!--/v8--> | <!--v8:553-->0<!--/v8--> |
+| w30 | ts-ticketinfo-service_latency-50 | <!--v8:554-->0.0175231<!--/v8--> | <!--v8:555-->0.0174203<!--/v8--> | <!--v8:556-->2.22027e-05<!--/v8--> | <!--v8:557-->0.000102761<!--/v8--> | <!--v8:558-->3.12174<!--/v8--> | <!--v8:559-->0<!--/v8--> |
+| w60 | ts-ticketinfo-service_latency-50 | <!--v8:560-->0.0175114<!--/v8--> | <!--v8:561-->0.0174275<!--/v8--> | <!--v8:562-->4.22139e-07<!--/v8--> | <!--v8:563-->8.38634e-05<!--/v8--> | <!--v8:564-->133.996<!--/v8--> | <!--v8:565-->0<!--/v8--> |
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 | <!--v8:566-->Sai<!--/v8--> | <!--v8:567-->5<!--/v8-->/<!--v8:568-->703<!--/v8--> | <!--v8:569-->0.00711238<!--/v8--> |
+| B4/w15/k2 | <!--v8:570-->Đúng<!--/v8--> | <!--v8:571-->365<!--/v8-->/<!--v8:572-->648<!--/v8--> | <!--v8:573-->0.563272<!--/v8--> |
+| B4/w15/k3 | <!--v8:574-->Sai<!--/v8--> | <!--v8:575-->192<!--/v8-->/<!--v8:576-->648<!--/v8--> | <!--v8:577-->0.296296<!--/v8--> |
+| B4/w15/k5 | <!--v8:578-->Sai<!--/v8--> | <!--v8:579-->96<!--/v8-->/<!--v8:580-->648<!--/v8--> | <!--v8:581-->0.148148<!--/v8--> |
+| B4/w30/k2 | <!--v8:582-->Đúng<!--/v8--> | <!--v8:583-->491<!--/v8-->/<!--v8:584-->618<!--/v8--> | <!--v8:585-->0.794498<!--/v8--> |
+| B4/w30/k3 | <!--v8:586-->Đúng<!--/v8--> | <!--v8:587-->263<!--/v8-->/<!--v8:588-->618<!--/v8--> | <!--v8:589-->0.425566<!--/v8--> |
+| B4/w30/k5 | <!--v8:590-->Sai<!--/v8--> | <!--v8:591-->157<!--/v8-->/<!--v8:592-->618<!--/v8--> | <!--v8:593-->0.254045<!--/v8--> |
+| B4/w60/k2 | <!--v8:594-->Đúng<!--/v8--> | <!--v8:595-->483<!--/v8-->/<!--v8:596-->559<!--/v8--> | <!--v8:597-->0.864043<!--/v8--> |
+| B4/w60/k3 | <!--v8:598-->Đúng<!--/v8--> | <!--v8:599-->293<!--/v8-->/<!--v8:600-->559<!--/v8--> | <!--v8:601-->0.52415<!--/v8--> |
+| B4/w60/k5 | <!--v8:602-->Đúng<!--/v8--> | <!--v8:603-->136<!--/v8-->/<!--v8:604-->559<!--/v8--> | <!--v8:605-->0.243292<!--/v8--> |
+
+## dev-20acb4402d / bocpd
+
+Ô: ts-order-service / loss; nhóm E-xa; cờ chính B2+B4. t̂=<!--v8:606-->280<!--/v8-->; t̂⁺=<!--v8:607-->726<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-20acb4402d.json#/` và `theo-ca.json#/rows/18`; telemetry `data/rcaeval/re2tt_ts-order-service_loss_2/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+B2 đúng: cắt phần sau mốc làm điểm đổi quanh t̂ không còn trong dung sai chính. Can thiệp đổi cả min–max và bộ cột; chưa tách tác động riêng. B4 đúng cho bước median ở cột ghi trong bảng; đây là đổi telemetry, chưa biết nền có sự cố khác hay chỉ đổi tải. 
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:608-->9<!--/v8--> |
+| I1 | <!--v8:609-->13<!--/v8--> |
+| I2 | <!--v8:610-->13<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | ts-ticketinfo-service_latency-50 | <!--v8:611-->0.0173645<!--/v8--> | <!--v8:612-->0.0172897<!--/v8--> | <!--v8:613-->2.38095e-05<!--/v8--> | <!--v8:614-->7.47382e-05<!--/v8--> | <!--v8:615-->2.11723<!--/v8--> | <!--v8:616-->2<!--/v8--> |
+| w30 | ts-ticketinfo-service_latency-50 | <!--v8:617-->0.0174068<!--/v8--> | <!--v8:618-->0.0172884<!--/v8--> | <!--v8:619-->2.36593e-05<!--/v8--> | <!--v8:620-->0.000118439<!--/v8--> | <!--v8:621-->3.37653<!--/v8--> | <!--v8:622-->2<!--/v8--> |
+| w60 | ts-ticketinfo-service_latency-50 | <!--v8:623-->0.0174123<!--/v8--> | <!--v8:624-->0.0173159<!--/v8--> | <!--v8:625-->2.32157e-05<!--/v8--> | <!--v8:626-->9.64021e-05<!--/v8--> | <!--v8:627-->2.80079<!--/v8--> | <!--v8:628-->2<!--/v8--> |
+
+w15: Nền hằng đổi riêng (MAD bằng không): ts-consign-service_latency-50, ts-price-service_latency-50. Không cộng vào B4.
+w30: Nền hằng đổi riêng (MAD bằng không): ts-consign-service_latency-50, ts-price-service_latency-50. Không cộng vào B4.
+w60: Nền hằng đổi riêng (MAD bằng không): ts-consign-service_latency-50, ts-price-service_latency-50. Không cộng vào B4.
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 — không phân biệt đúng số | <!--v8:629-->Sai<!--/v8--> | <!--v8:630-->0<!--/v8-->/<!--v8:631-->706<!--/v8--> | <!--v8:632-->0<!--/v8--> |
+| B4/w15/k2 | <!--v8:633-->Đúng<!--/v8--> | <!--v8:634-->369<!--/v8-->/<!--v8:635-->653<!--/v8--> | <!--v8:636-->0.565084<!--/v8--> |
+| B4/w15/k3 | <!--v8:637-->Sai<!--/v8--> | <!--v8:638-->217<!--/v8-->/<!--v8:639-->653<!--/v8--> | <!--v8:640-->0.332312<!--/v8--> |
+| B4/w15/k5 | <!--v8:641-->Sai<!--/v8--> | <!--v8:642-->78<!--/v8-->/<!--v8:643-->653<!--/v8--> | <!--v8:644-->0.119449<!--/v8--> |
+| B4/w30/k2 | <!--v8:645-->Đúng<!--/v8--> | <!--v8:646-->511<!--/v8-->/<!--v8:647-->623<!--/v8--> | <!--v8:648-->0.820225<!--/v8--> |
+| B4/w30/k3 | <!--v8:649-->Đúng<!--/v8--> | <!--v8:650-->319<!--/v8-->/<!--v8:651-->623<!--/v8--> | <!--v8:652-->0.512039<!--/v8--> |
+| B4/w30/k5 | <!--v8:653-->Sai<!--/v8--> | <!--v8:654-->163<!--/v8-->/<!--v8:655-->623<!--/v8--> | <!--v8:656-->0.261637<!--/v8--> |
+| B4/w60/k2 | <!--v8:657-->Đúng<!--/v8--> | <!--v8:658-->521<!--/v8-->/<!--v8:659-->565<!--/v8--> | <!--v8:660-->0.922124<!--/v8--> |
+| B4/w60/k3 | <!--v8:661-->Sai<!--/v8--> | <!--v8:662-->337<!--/v8-->/<!--v8:663-->565<!--/v8--> | <!--v8:664-->0.59646<!--/v8--> |
+| B4/w60/k5 | <!--v8:665-->Sai<!--/v8--> | <!--v8:666-->82<!--/v8-->/<!--v8:667-->565<!--/v8--> | <!--v8:668-->0.145133<!--/v8--> |
+
+## dev-260d332c8d / bocpd
+
+Ô: ts-order-service / loss; nhóm E-xa; cờ chính B2+B4. t̂=<!--v8:669-->126<!--/v8-->; t̂⁺=<!--v8:670-->916<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-260d332c8d.json#/` và `theo-ca.json#/rows/21`; telemetry `data/rcaeval/re2tt_ts-order-service_loss_3/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+B2 đúng: cắt phần sau mốc làm điểm đổi quanh t̂ không còn trong dung sai chính. Can thiệp đổi cả min–max và bộ cột; chưa tách tác động riêng. B4 đúng cho bước median ở cột ghi trong bảng; đây là đổi telemetry, chưa biết nền có sự cố khác hay chỉ đổi tải. 
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:671-->8<!--/v8--> |
+| I1 | <!--v8:672-->12<!--/v8--> |
+| I2 | <!--v8:673-->10<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | ts-ticketinfo-service_latency-50 | <!--v8:674-->0.0175<!--/v8--> | <!--v8:675-->0.0175824<!--/v8--> | <!--v8:676-->1.14957e-05<!--/v8--> | <!--v8:677-->8.24176e-05<!--/v8--> | <!--v8:678-->4.83572<!--/v8--> | <!--v8:679-->3<!--/v8--> |
+| w30 | ts-food-map-service_latency-50 | <!--v8:680-->0.00571429<!--/v8--> | <!--v8:681-->0.00598086<!--/v8--> | <!--v8:682-->4.62963e-05<!--/v8--> | <!--v8:683-->0.000266576<!--/v8--> | <!--v8:684-->3.88374<!--/v8--> | <!--v8:685-->4<!--/v8--> |
+| w60 | ts-travel2-service_latency-50 | <!--v8:686-->0.0423648<!--/v8--> | <!--v8:687-->0.0405952<!--/v8--> | <!--v8:688-->0.000383023<!--/v8--> | <!--v8:689-->0.00176953<!--/v8--> | <!--v8:690-->3.11608<!--/v8--> | <!--v8:691-->4<!--/v8--> |
+
+w15: Nền hằng đổi riêng (MAD bằng không): ts-consign-price-service_latency-50, ts-consign-service_latency-50, ts-inside-payment-service_latency-50. Không cộng vào B4.
+w30: Nền hằng đổi riêng (MAD bằng không): ts-assurance-service_latency-50, ts-consign-price-service_latency-50, ts-consign-service_latency-50, ts-inside-payment-service_latency-50. Không cộng vào B4.
+w60: Nền hằng đổi riêng (MAD bằng không): ts-assurance-service_latency-50, ts-config-service_latency-50, ts-consign-price-service_latency-50, ts-consign-service_latency-50. Không cộng vào B4.
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 — không phân biệt đúng số | <!--v8:692-->Sai<!--/v8--> | <!--v8:693-->0<!--/v8-->/<!--v8:694-->707<!--/v8--> | <!--v8:695-->0<!--/v8--> |
+| B4/w15/k2 | <!--v8:696-->Đúng<!--/v8--> | <!--v8:697-->309<!--/v8-->/<!--v8:698-->652<!--/v8--> | <!--v8:699-->0.473926<!--/v8--> |
+| B4/w15/k3 | <!--v8:700-->Đúng<!--/v8--> | <!--v8:701-->145<!--/v8-->/<!--v8:702-->652<!--/v8--> | <!--v8:703-->0.222393<!--/v8--> |
+| B4/w15/k5 | <!--v8:704-->Sai<!--/v8--> | <!--v8:705-->34<!--/v8-->/<!--v8:706-->652<!--/v8--> | <!--v8:707-->0.0521472<!--/v8--> |
+| B4/w30/k2 | <!--v8:708-->Đúng<!--/v8--> | <!--v8:709-->407<!--/v8-->/<!--v8:710-->622<!--/v8--> | <!--v8:711-->0.654341<!--/v8--> |
+| B4/w30/k3 | <!--v8:712-->Đúng<!--/v8--> | <!--v8:713-->216<!--/v8-->/<!--v8:714-->622<!--/v8--> | <!--v8:715-->0.347267<!--/v8--> |
+| B4/w30/k5 | <!--v8:716-->Sai<!--/v8--> | <!--v8:717-->32<!--/v8-->/<!--v8:718-->622<!--/v8--> | <!--v8:719-->0.0514469<!--/v8--> |
+| B4/w60/k2 | <!--v8:720-->Đúng<!--/v8--> | <!--v8:721-->439<!--/v8-->/<!--v8:722-->562<!--/v8--> | <!--v8:723-->0.781139<!--/v8--> |
+| B4/w60/k3 | <!--v8:724-->Đúng<!--/v8--> | <!--v8:725-->205<!--/v8-->/<!--v8:726-->562<!--/v8--> | <!--v8:727-->0.364769<!--/v8--> |
+| B4/w60/k5 | <!--v8:728-->Sai<!--/v8--> | <!--v8:729-->50<!--/v8-->/<!--v8:730-->562<!--/v8--> | <!--v8:731-->0.088968<!--/v8--> |
+
+## dev-3ae0a6c15a / bocpd
+
+Ô: ts-train-service / cpu; nhóm E-gần; cờ chính D0. t̂=<!--v8:732-->649<!--/v8-->; t̂⁺=<!--v8:733-->755<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-3ae0a6c15a.json#/` và `theo-ca.json#/rows/24`; telemetry `data/rcaeval/re2tt_ts-train-service_cpu_1/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+D0 ở cấu hình chính: điểm đổi quanh t̂ còn ở I1 và I2, B1 không trúng, B4 hữu hạn dưới ngưỡng chính. Cờ độ nhạy có thể đổi; chưa giải thích được điểm đổi ở cấu hình chính.
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:734-->3<!--/v8--> |
+| I1 | <!--v8:735-->13<!--/v8--> |
+| I2 | <!--v8:736-->11<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | ts-user-service_latency-50 | <!--v8:737-->0.009375<!--/v8--> | <!--v8:738-->0.00833333<!--/v8--> | <!--v8:739-->0.00047619<!--/v8--> | <!--v8:740-->0.00104167<!--/v8--> | <!--v8:741-->1.47545<!--/v8--> | <!--v8:742-->1<!--/v8--> |
+| w30 | ts-user-service_latency-50 | <!--v8:743-->0.009375<!--/v8--> | <!--v8:744-->0.00799107<!--/v8--> | <!--v8:745-->0.00047619<!--/v8--> | <!--v8:746-->0.00138393<!--/v8--> | <!--v8:747-->1.96024<!--/v8--> | <!--v8:748-->1<!--/v8--> |
+| w60 | ts-admin-basic-info-service_latency-50 | <!--v8:749-->0.0157955<!--/v8--> | <!--v8:750-->0.0133333<!--/v8--> | <!--v8:751-->0.000681818<!--/v8--> | <!--v8:752-->0.00246212<!--/v8--> | <!--v8:753-->2.43566<!--/v8--> | <!--v8:754-->1<!--/v8--> |
+
+w15: Nền hằng đổi riêng (MAD bằng không): ts-payment-service_latency-50. Không cộng vào B4.
+w30: Nền hằng đổi riêng (MAD bằng không): ts-payment-service_latency-50. Không cộng vào B4.
+w60: Nền hằng đổi riêng (MAD bằng không): ts-payment-service_latency-50. Không cộng vào B4.
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 | <!--v8:755-->Sai<!--/v8--> | <!--v8:756-->5<!--/v8-->/<!--v8:757-->712<!--/v8--> | <!--v8:758-->0.00702247<!--/v8--> |
+| B4/w15/k2 | <!--v8:759-->Sai<!--/v8--> | <!--v8:760-->550<!--/v8-->/<!--v8:761-->657<!--/v8--> | <!--v8:762-->0.837139<!--/v8--> |
+| B4/w15/k3 | <!--v8:763-->Sai<!--/v8--> | <!--v8:764-->352<!--/v8-->/<!--v8:765-->657<!--/v8--> | <!--v8:766-->0.535769<!--/v8--> |
+| B4/w15/k5 | <!--v8:767-->Sai<!--/v8--> | <!--v8:768-->152<!--/v8-->/<!--v8:769-->657<!--/v8--> | <!--v8:770-->0.231355<!--/v8--> |
+| B4/w30/k2 | <!--v8:771-->Sai<!--/v8--> | <!--v8:772-->610<!--/v8-->/<!--v8:773-->627<!--/v8--> | <!--v8:774-->0.972887<!--/v8--> |
+| B4/w30/k3 | <!--v8:775-->Sai<!--/v8--> | <!--v8:776-->511<!--/v8-->/<!--v8:777-->627<!--/v8--> | <!--v8:778-->0.814992<!--/v8--> |
+| B4/w30/k5 | <!--v8:779-->Sai<!--/v8--> | <!--v8:780-->208<!--/v8-->/<!--v8:781-->627<!--/v8--> | <!--v8:782-->0.331738<!--/v8--> |
+| B4/w60/k2 | <!--v8:783-->Đúng<!--/v8--> | <!--v8:784-->559<!--/v8-->/<!--v8:785-->568<!--/v8--> | <!--v8:786-->0.984155<!--/v8--> |
+| B4/w60/k3 | <!--v8:787-->Sai<!--/v8--> | <!--v8:788-->470<!--/v8-->/<!--v8:789-->568<!--/v8--> | <!--v8:790-->0.827465<!--/v8--> |
+| B4/w60/k5 | <!--v8:791-->Sai<!--/v8--> | <!--v8:792-->177<!--/v8-->/<!--v8:793-->568<!--/v8--> | <!--v8:794-->0.31162<!--/v8--> |
+
+## dev-3ae0a6c15a / nsigma
+
+Ô: ts-train-service / cpu; nhóm E-xa; cờ chính N2. t̂=<!--v8:795-->100<!--/v8-->; t̂⁺=<!--v8:796-->737<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/nsigma/dev-3ae0a6c15a--nsigma.json#/` và `theo-ca.json#/rows/25`; telemetry `data/rcaeval/re2tt_ts-train-service_cpu_1/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+Các cột trong bảng thực sự vượt ngưỡng hai phía từ lịch sử đã quan sát; danh sách cột gây báo và p_j đã đối chiếu Z lưu trước nối nhãn. Có cột gây báo có p_j cao trong Nv; cột báo dày là phân rã trực tiếp, không là đối chứng cơ chế. 
+
+Lịch sử hữu hạn, nền không dừng, phân phối không chuẩn, điền trước, độ phân giải metric hoặc tải thay đổi đều chưa được tách. V7 N/A cho N1–N4 vì định nghĩa chứa điều kiện báo động. Báo động trong Nv được gọi sai theo nhãn proxy, không khẳng định hệ thực tế bình thường.
+
+r_obs=<!--v8:797-->0.490323<!--/v8-->; r_ind=<!--v8:798-->0.477304<!--/v8-->; r_nom=<!--v8:799-->0.109754<!--/v8-->. Độ trễ và t̂⁺ phải đọc cạnh r_obs, không coi là thời điểm bắt đầu sự cố.
+
+| Cột gây báo | Giá trị | Mean quá khứ | Std quá khứ | Độ lệch | Ngưỡng | p_j trong Nv |
+|---|---|---|---|---|---|---|
+| ts-inside-payment-service_latency-50 | <!--v8:800-->0.05<!--/v8--> | <!--v8:801-->0.0236542<!--/v8--> | <!--v8:802-->0.00473695<!--/v8--> | <!--v8:803-->0.0263458<!--/v8--> | <!--v8:804-->0.0142108<!--/v8--> | <!--v8:805-->0.0274194<!--/v8--> |
+| ts-order-other-service_latency-50 | <!--v8:806-->0.0103649<!--/v8--> | <!--v8:807-->0.011269<!--/v8--> | <!--v8:808-->0.00027984<!--/v8--> | <!--v8:809-->0.000904152<!--/v8--> | <!--v8:810-->0.000839519<!--/v8--> | <!--v8:811-->0.016129<!--/v8--> |
+
+| Khoảng lịch sử | Báo cột-giây / tổng | Tỉ lệ |
+|---|---|---|
+| 100:200 | <!--v8:812-->100<!--/v8-->/<!--v8:813-->4300<!--/v8--> | <!--v8:814-->0.0232558<!--/v8--> |
+| 200:400 | <!--v8:815-->79<!--/v8-->/<!--v8:816-->8600<!--/v8--> | <!--v8:817-->0.00918605<!--/v8--> |
+| 400:720 | <!--v8:818-->212<!--/v8-->/<!--v8:819-->13760<!--/v8--> | <!--v8:820-->0.015407<!--/v8--> |
+
+## dev-3defe3d34b / bocpd
+
+Ô: ts-auth-service / cpu; nhóm S; cờ chính D0. t̂=<!--v8:821-->748<!--/v8-->; t̂⁺=<!--v8:822-->748<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-3defe3d34b.json#/` và `theo-ca.json#/rows/27`; telemetry `data/rcaeval/re2tt_ts-auth-service_cpu_1/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+Bản đầy đủ không có điểm đổi trong Nv, nhưng tiền tố I1 và I2 đều có. Cờ B1–B4 tại báo động đầu là N/A vì ngoài miền nền; D0 ở đây không có nghĩa đã thử và bác mọi cơ chế. Tiền xử lý tương lai có thể làm mất điểm đổi nền, không chỉ tạo điểm đổi.
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:823-->0<!--/v8--> |
+| I1 | <!--v8:824-->12<!--/v8--> |
+| I2 | <!--v8:825-->11<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | N/A: ngoài miền | N/A | N/A | N/A | N/A | N/A | N/A |
+| w30 | N/A: ngoài miền | N/A | N/A | N/A | N/A | N/A | N/A |
+| w60 | N/A: ngoài miền | N/A | N/A | N/A | N/A | N/A | N/A |
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 | <!--v8:826-->N/A<!--/v8--> | <!--v8:827-->0<!--/v8-->/<!--v8:828-->715<!--/v8--> | <!--v8:829-->0<!--/v8--> |
+| B4/w15/k2 | <!--v8:830-->N/A<!--/v8--> | <!--v8:831-->538<!--/v8-->/<!--v8:832-->660<!--/v8--> | <!--v8:833-->0.815152<!--/v8--> |
+| B4/w15/k3 | <!--v8:834-->N/A<!--/v8--> | <!--v8:835-->348<!--/v8-->/<!--v8:836-->660<!--/v8--> | <!--v8:837-->0.527273<!--/v8--> |
+| B4/w15/k5 | <!--v8:838-->N/A<!--/v8--> | <!--v8:839-->167<!--/v8-->/<!--v8:840-->660<!--/v8--> | <!--v8:841-->0.25303<!--/v8--> |
+| B4/w30/k2 | <!--v8:842-->N/A<!--/v8--> | <!--v8:843-->600<!--/v8-->/<!--v8:844-->630<!--/v8--> | <!--v8:845-->0.952381<!--/v8--> |
+| B4/w30/k3 | <!--v8:846-->N/A<!--/v8--> | <!--v8:847-->438<!--/v8-->/<!--v8:848-->630<!--/v8--> | <!--v8:849-->0.695238<!--/v8--> |
+| B4/w30/k5 | <!--v8:850-->N/A<!--/v8--> | <!--v8:851-->206<!--/v8-->/<!--v8:852-->630<!--/v8--> | <!--v8:853-->0.326984<!--/v8--> |
+| B4/w60/k2 | <!--v8:854-->N/A<!--/v8--> | <!--v8:855-->564<!--/v8-->/<!--v8:856-->570<!--/v8--> | <!--v8:857-->0.989474<!--/v8--> |
+| B4/w60/k3 | <!--v8:858-->N/A<!--/v8--> | <!--v8:859-->401<!--/v8-->/<!--v8:860-->570<!--/v8--> | <!--v8:861-->0.703509<!--/v8--> |
+| B4/w60/k5 | <!--v8:862-->N/A<!--/v8--> | <!--v8:863-->179<!--/v8-->/<!--v8:864-->570<!--/v8--> | <!--v8:865-->0.314035<!--/v8--> |
+
+## dev-3defe3d34b / nsigma_doi_chung
+
+Ô: ts-auth-service / cpu; nhóm E-xa; cờ chính N1+N2+N4. t̂=<!--v8:866-->100<!--/v8-->; t̂⁺=<!--v8:867-->720<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/nsigma/dev-3defe3d34b--nsigma_doi_chung.json#/` và `theo-ca.json#/rows/29`; telemetry `data/rcaeval/re2tt_ts-auth-service_cpu_1/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+Các cột trong bảng thực sự vượt ngưỡng hai phía từ lịch sử đã quan sát; danh sách cột gây báo và p_j đã đối chiếu Z lưu trước nối nhãn. Tỉ lệ khoảng đầu so với khoảng cuối thỏa N1; liên hệ với vị trí sớm chưa chứng minh lịch sử ngắn là nguyên nhân. Có cột gây báo có p_j cao trong Nv; cột báo dày là phân rã trực tiếp, không là đối chứng cơ chế. Có std quá khứ bằng không và giá trị hiện tại khác mean: ngưỡng bằng không đủ giải thích phép so số học ở cột đó; chưa giải thích vì sao telemetry đổi. 
+
+Lịch sử hữu hạn, nền không dừng, phân phối không chuẩn, điền trước, độ phân giải metric hoặc tải thay đổi đều chưa được tách. V7 N/A cho N1–N4 vì định nghĩa chứa điều kiện báo động. Báo động trong Nv được gọi sai theo nhãn proxy, không khẳng định hệ thực tế bình thường.
+
+r_obs=<!--v8:868-->0.990323<!--/v8-->; r_ind=<!--v8:869-->0.999262<!--/v8-->; r_nom=<!--v8:870-->0.631254<!--/v8-->. Độ trễ và t̂⁺ phải đọc cạnh r_obs, không coi là thời điểm bắt đầu sự cố.
+
+| Cột gây báo | Giá trị | Mean quá khứ | Std quá khứ | Độ lệch | Ngưỡng | p_j trong Nv |
+|---|---|---|---|---|---|---|
+| ts-admin-travel-service_cpu | <!--v8:871-->0.415592<!--/v8--> | <!--v8:872-->0.247136<!--/v8--> | <!--v8:873-->0.0413651<!--/v8--> | <!--v8:874-->0.168456<!--/v8--> | <!--v8:875-->0.124095<!--/v8--> | <!--v8:876-->0.0241935<!--/v8--> |
+| ts-consign-price-mongo_cpu | <!--v8:877-->0.35312<!--/v8--> | <!--v8:878-->0.468612<!--/v8--> | <!--v8:879-->0.0354312<!--/v8--> | <!--v8:880-->0.115492<!--/v8--> | <!--v8:881-->0.106294<!--/v8--> | <!--v8:882-->0.0193548<!--/v8--> |
+| ts-ticketinfo-service_cpu | <!--v8:883-->2.7702<!--/v8--> | <!--v8:884-->4.51358<!--/v8--> | <!--v8:885-->0.434556<!--/v8--> | <!--v8:886-->1.74338<!--/v8--> | <!--v8:887-->1.30367<!--/v8--> | <!--v8:888-->0.0145161<!--/v8--> |
+| ts-news-service_mem | <!--v8:889-->2.53133e+06<!--/v8--> | <!--v8:890-->2.52338e+06<!--/v8--> | <!--v8:891-->1404.49<!--/v8--> | <!--v8:892-->7946.24<!--/v8--> | <!--v8:893-->4213.47<!--/v8--> | <!--v8:894-->0.0435484<!--/v8--> |
+| ts-notification-mongo_mem | <!--v8:895-->6.67525e+07<!--/v8--> | <!--v8:896-->6.66314e+07<!--/v8--> | <!--v8:897-->33425<!--/v8--> | <!--v8:898-->121078<!--/v8--> | <!--v8:899-->100275<!--/v8--> | <!--v8:900-->0.0467742<!--/v8--> |
+| ts-preserve-other-mongo_mem | <!--v8:901-->6.58268e+07<!--/v8--> | <!--v8:902-->6.58183e+07<!--/v8--> | <!--v8:903-->2516.2<!--/v8--> | <!--v8:904-->8519.68<!--/v8--> | <!--v8:905-->7548.61<!--/v8--> | <!--v8:906-->0.0354839<!--/v8--> |
+| ts-route-plan-service_mem | <!--v8:907-->1.93122e+08<!--/v8--> | <!--v8:908-->1.93118e+08<!--/v8--> | <!--v8:909-->897.2<!--/v8--> | <!--v8:910-->3891.2<!--/v8--> | <!--v8:911-->2691.6<!--/v8--> | <!--v8:912-->0.0435484<!--/v8--> |
+| ts-seat-service_mem | <!--v8:913-->2.42549e+08<!--/v8--> | <!--v8:914-->2.42338e+08<!--/v8--> | <!--v8:915-->45690.5<!--/v8--> | <!--v8:916-->211149<!--/v8--> | <!--v8:917-->137071<!--/v8--> | <!--v8:918-->0.0112903<!--/v8--> |
+| ts-travel2-service_mem | <!--v8:919-->2.77471e+08<!--/v8--> | <!--v8:920-->2.7744e+08<!--/v8--> | <!--v8:921-->6289.03<!--/v8--> | <!--v8:922-->31498.2<!--/v8--> | <!--v8:923-->18867.1<!--/v8--> | <!--v8:924-->0.0677419<!--/v8--> |
+| ts-admin-route-service_socket | <!--v8:925-->4<!--/v8--> | <!--v8:926-->3<!--/v8--> | <!--v8:927-->0<!--/v8--> | <!--v8:928-->1<!--/v8--> | <!--v8:929-->0<!--/v8--> | <!--v8:930-->0.0790323<!--/v8--> |
+| ts-train-service_socket | <!--v8:931-->19<!--/v8--> | <!--v8:932-->18.03<!--/v8--> | <!--v8:933-->0.171447<!--/v8--> | <!--v8:934-->0.97<!--/v8--> | <!--v8:935-->0.51434<!--/v8--> | <!--v8:936-->0.016129<!--/v8--> |
+| ts-travel2-service_latency-50 | <!--v8:937-->0.0189468<!--/v8--> | <!--v8:938-->0.019279<!--/v8--> | <!--v8:939-->0.000105694<!--/v8--> | <!--v8:940-->0.000332201<!--/v8--> | <!--v8:941-->0.000317083<!--/v8--> | <!--v8:942-->0.0016129<!--/v8--> |
+
+| Khoảng lịch sử | Báo cột-giây / tổng | Tỉ lệ |
+|---|---|---|
+| 100:200 | <!--v8:943-->1115<!--/v8-->/<!--v8:944-->36900<!--/v8--> | <!--v8:945-->0.0302168<!--/v8--> |
+| 200:400 | <!--v8:946-->1529<!--/v8-->/<!--v8:947-->73800<!--/v8--> | <!--v8:948-->0.0207182<!--/v8--> |
+| 400:720 | <!--v8:949-->1703<!--/v8-->/<!--v8:950-->118080<!--/v8--> | <!--v8:951-->0.0144224<!--/v8--> |
+
+## dev-4e68956051 / bocpd
+
+Ô: ts-train-service / delay; nhóm E-gần; cờ chính B2+B4. t̂=<!--v8:952-->675<!--/v8-->; t̂⁺=<!--v8:953-->743<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-4e68956051.json#/` và `theo-ca.json#/rows/30`; telemetry `data/rcaeval/re2tt_ts-train-service_delay_2/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+B2 đúng: cắt phần sau mốc làm điểm đổi quanh t̂ không còn trong dung sai chính. Can thiệp đổi cả min–max và bộ cột; chưa tách tác động riêng. B4 đúng cho bước median ở cột ghi trong bảng; đây là đổi telemetry, chưa biết nền có sự cố khác hay chỉ đổi tải. 
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:954-->1<!--/v8--> |
+| I1 | <!--v8:955-->13<!--/v8--> |
+| I2 | <!--v8:956-->13<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | ts-user-service_latency-50 | <!--v8:957-->0.00875<!--/v8--> | <!--v8:958-->0.01<!--/v8--> | <!--v8:959-->0.00030303<!--/v8--> | <!--v8:960-->0.00125<!--/v8--> | <!--v8:961-->2.78227<!--/v8--> | <!--v8:962-->2<!--/v8--> |
+| w30 | ts-user-service_latency-50 | <!--v8:963-->0.00902462<!--/v8--> | <!--v8:964-->0.013<!--/v8--> | <!--v8:965-->0.000238095<!--/v8--> | <!--v8:966-->0.00397538<!--/v8--> | <!--v8:967-->11.2617<!--/v8--> | <!--v8:968-->2<!--/v8--> |
+| w60 | N/A: ngoài miền | N/A | N/A | N/A | N/A | N/A | N/A |
+
+w15: Nền hằng đổi riêng (MAD bằng không): ts-admin-basic-info-service_latency-50, ts-preserve-other-service_latency-50. Không cộng vào B4.
+w30: Nền hằng đổi riêng (MAD bằng không): ts-admin-basic-info-service_latency-50, ts-preserve-other-service_latency-50. Không cộng vào B4.
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 — không phân biệt đúng số | <!--v8:969-->Sai<!--/v8--> | <!--v8:970-->0<!--/v8-->/<!--v8:971-->714<!--/v8--> | <!--v8:972-->0<!--/v8--> |
+| B4/w15/k2 | <!--v8:973-->Đúng<!--/v8--> | <!--v8:974-->534<!--/v8-->/<!--v8:975-->659<!--/v8--> | <!--v8:976-->0.810319<!--/v8--> |
+| B4/w15/k3 | <!--v8:977-->Sai<!--/v8--> | <!--v8:978-->403<!--/v8-->/<!--v8:979-->659<!--/v8--> | <!--v8:980-->0.611533<!--/v8--> |
+| B4/w15/k5 | <!--v8:981-->Sai<!--/v8--> | <!--v8:982-->139<!--/v8-->/<!--v8:983-->659<!--/v8--> | <!--v8:984-->0.210926<!--/v8--> |
+| B4/w30/k2 | <!--v8:985-->Đúng<!--/v8--> | <!--v8:986-->593<!--/v8-->/<!--v8:987-->629<!--/v8--> | <!--v8:988-->0.942766<!--/v8--> |
+| B4/w30/k3 | <!--v8:989-->Đúng<!--/v8--> | <!--v8:990-->481<!--/v8-->/<!--v8:991-->629<!--/v8--> | <!--v8:992-->0.764706<!--/v8--> |
+| B4/w30/k5 | <!--v8:993-->Đúng<!--/v8--> | <!--v8:994-->295<!--/v8-->/<!--v8:995-->629<!--/v8--> | <!--v8:996-->0.468998<!--/v8--> |
+| B4/w60/k2 | <!--v8:997-->N/A<!--/v8--> | <!--v8:998-->543<!--/v8-->/<!--v8:999-->570<!--/v8--> | <!--v8:1000-->0.952632<!--/v8--> |
+| B4/w60/k3 | <!--v8:1001-->N/A<!--/v8--> | <!--v8:1002-->410<!--/v8-->/<!--v8:1003-->570<!--/v8--> | <!--v8:1004-->0.719298<!--/v8--> |
+| B4/w60/k5 | <!--v8:1005-->N/A<!--/v8--> | <!--v8:1006-->326<!--/v8-->/<!--v8:1007-->570<!--/v8--> | <!--v8:1008-->0.57193<!--/v8--> |
+
+## dev-4f8a844308 / bocpd
+
+Ô: ts-route-service / mem; nhóm E-xa; cờ chính B2+B4. t̂=<!--v8:1009-->218<!--/v8-->; t̂⁺=<!--v8:1010-->733<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-4f8a844308.json#/` và `theo-ca.json#/rows/33`; telemetry `data/rcaeval/re2tt_ts-route-service_mem_1/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+B2 đúng: cắt phần sau mốc làm điểm đổi quanh t̂ không còn trong dung sai chính. Can thiệp đổi cả min–max và bộ cột; chưa tách tác động riêng. B4 đúng cho bước median ở cột ghi trong bảng; đây là đổi telemetry, chưa biết nền có sự cố khác hay chỉ đổi tải. 
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:1011-->2<!--/v8--> |
+| I1 | <!--v8:1012-->6<!--/v8--> |
+| I2 | <!--v8:1013-->6<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | ts-contacts-service_latency-50 | <!--v8:1014-->0.015<!--/v8--> | <!--v8:1015-->0.009375<!--/v8--> | <!--v8:1016-->0.000165879<!--/v8--> | <!--v8:1017-->0.005625<!--/v8--> | <!--v8:1018-->22.8721<!--/v8--> | <!--v8:1019-->1<!--/v8--> |
+| w30 | ts-ui-dashboard_latency-50 | <!--v8:1020-->0.237755<!--/v8--> | <!--v8:1021-->0.290006<!--/v8--> | <!--v8:1022-->0.00425581<!--/v8--> | <!--v8:1023-->0.052251<!--/v8--> | <!--v8:1024-->8.2811<!--/v8--> | <!--v8:1025-->1<!--/v8--> |
+| w60 | ts-ui-dashboard_latency-50 | <!--v8:1026-->0.237755<!--/v8--> | <!--v8:1027-->0.27151<!--/v8--> | <!--v8:1028-->0.00391409<!--/v8--> | <!--v8:1029-->0.0337553<!--/v8--> | <!--v8:1030-->5.81684<!--/v8--> | <!--v8:1031-->1<!--/v8--> |
+
+w15: Nền hằng đổi riêng (MAD bằng không): ts-preserve-service_latency-50. Không cộng vào B4.
+w30: Nền hằng đổi riêng (MAD bằng không): ts-preserve-service_latency-50. Không cộng vào B4.
+w60: Nền hằng đổi riêng (MAD bằng không): ts-preserve-service_latency-50. Không cộng vào B4.
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 | <!--v8:1032-->Sai<!--/v8--> | <!--v8:1033-->6<!--/v8-->/<!--v8:1034-->713<!--/v8--> | <!--v8:1035-->0.00841515<!--/v8--> |
+| B4/w15/k2 | <!--v8:1036-->Đúng<!--/v8--> | <!--v8:1037-->490<!--/v8-->/<!--v8:1038-->658<!--/v8--> | <!--v8:1039-->0.744681<!--/v8--> |
+| B4/w15/k3 | <!--v8:1040-->Đúng<!--/v8--> | <!--v8:1041-->214<!--/v8-->/<!--v8:1042-->658<!--/v8--> | <!--v8:1043-->0.325228<!--/v8--> |
+| B4/w15/k5 | <!--v8:1044-->Đúng<!--/v8--> | <!--v8:1045-->72<!--/v8-->/<!--v8:1046-->658<!--/v8--> | <!--v8:1047-->0.109422<!--/v8--> |
+| B4/w30/k2 | <!--v8:1048-->Đúng<!--/v8--> | <!--v8:1049-->569<!--/v8-->/<!--v8:1050-->628<!--/v8--> | <!--v8:1051-->0.906051<!--/v8--> |
+| B4/w30/k3 | <!--v8:1052-->Đúng<!--/v8--> | <!--v8:1053-->373<!--/v8-->/<!--v8:1054-->628<!--/v8--> | <!--v8:1055-->0.593949<!--/v8--> |
+| B4/w30/k5 | <!--v8:1056-->Đúng<!--/v8--> | <!--v8:1057-->123<!--/v8-->/<!--v8:1058-->628<!--/v8--> | <!--v8:1059-->0.19586<!--/v8--> |
+| B4/w60/k2 | <!--v8:1060-->Đúng<!--/v8--> | <!--v8:1061-->564<!--/v8-->/<!--v8:1062-->568<!--/v8--> | <!--v8:1063-->0.992958<!--/v8--> |
+| B4/w60/k3 | <!--v8:1064-->Đúng<!--/v8--> | <!--v8:1065-->445<!--/v8-->/<!--v8:1066-->568<!--/v8--> | <!--v8:1067-->0.783451<!--/v8--> |
+| B4/w60/k5 | <!--v8:1068-->Đúng<!--/v8--> | <!--v8:1069-->168<!--/v8-->/<!--v8:1070-->568<!--/v8--> | <!--v8:1071-->0.295775<!--/v8--> |
+
+## dev-57546fd87b / bocpd
+
+Ô: ts-auth-service / delay; nhóm E-xa; cờ chính B2. t̂=<!--v8:1072-->415<!--/v8-->; t̂⁺=<!--v8:1073-->743<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-57546fd87b.json#/` và `theo-ca.json#/rows/36`; telemetry `data/rcaeval/re2tt_ts-auth-service_delay_2/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+B2 đúng: cắt phần sau mốc làm điểm đổi quanh t̂ không còn trong dung sai chính. Can thiệp đổi cả min–max và bộ cột; chưa tách tác động riêng. B4 chính không trúng; cột nền hằng đổi được ghi riêng, không nâng thành B4. 
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:1074-->4<!--/v8--> |
+| I1 | <!--v8:1075-->7<!--/v8--> |
+| I2 | <!--v8:1076-->7<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | ts-consign-service_latency-50 | <!--v8:1077-->0.05<!--/v8--> | <!--v8:1078-->0.0395833<!--/v8--> | <!--v8:1079-->0.0015625<!--/v8--> | <!--v8:1080-->0.0104167<!--/v8--> | <!--v8:1081-->4.49661<!--/v8--> | <!--v8:1082-->1<!--/v8--> |
+| w30 | ts-assurance-service_latency-50 | <!--v8:1083-->0.0127273<!--/v8--> | <!--v8:1084-->0.01<!--/v8--> | <!--v8:1085-->0.000625<!--/v8--> | <!--v8:1086-->0.00272727<!--/v8--> | <!--v8:1087-->2.94323<!--/v8--> | <!--v8:1088-->1<!--/v8--> |
+| w60 | ts-contacts-service_latency-50 | <!--v8:1089-->0.0165313<!--/v8--> | <!--v8:1090-->0.015<!--/v8--> | <!--v8:1091-->0.000383413<!--/v8--> | <!--v8:1092-->0.00153125<!--/v8--> | <!--v8:1093-->2.69374<!--/v8--> | <!--v8:1094-->1<!--/v8--> |
+
+w15: Nền hằng đổi riêng (MAD bằng không): ts-consign-price-service_latency-50. Không cộng vào B4.
+w30: Nền hằng đổi riêng (MAD bằng không): ts-consign-price-service_latency-50. Không cộng vào B4.
+w60: Nền hằng đổi riêng (MAD bằng không): ts-consign-price-service_latency-50. Không cộng vào B4.
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 | <!--v8:1095-->Sai<!--/v8--> | <!--v8:1096-->5<!--/v8-->/<!--v8:1097-->711<!--/v8--> | <!--v8:1098-->0.00703235<!--/v8--> |
+| B4/w15/k2 | <!--v8:1099-->Đúng<!--/v8--> | <!--v8:1100-->416<!--/v8-->/<!--v8:1101-->656<!--/v8--> | <!--v8:1102-->0.634146<!--/v8--> |
+| B4/w15/k3 | <!--v8:1103-->Đúng<!--/v8--> | <!--v8:1104-->218<!--/v8-->/<!--v8:1105-->656<!--/v8--> | <!--v8:1106-->0.332317<!--/v8--> |
+| B4/w15/k5 | <!--v8:1107-->Sai<!--/v8--> | <!--v8:1108-->95<!--/v8-->/<!--v8:1109-->656<!--/v8--> | <!--v8:1110-->0.144817<!--/v8--> |
+| B4/w30/k2 | <!--v8:1111-->Đúng<!--/v8--> | <!--v8:1112-->501<!--/v8-->/<!--v8:1113-->626<!--/v8--> | <!--v8:1114-->0.800319<!--/v8--> |
+| B4/w30/k3 | <!--v8:1115-->Sai<!--/v8--> | <!--v8:1116-->313<!--/v8-->/<!--v8:1117-->626<!--/v8--> | <!--v8:1118-->0.5<!--/v8--> |
+| B4/w30/k5 | <!--v8:1119-->Sai<!--/v8--> | <!--v8:1120-->170<!--/v8-->/<!--v8:1121-->626<!--/v8--> | <!--v8:1122-->0.271565<!--/v8--> |
+| B4/w60/k2 | <!--v8:1123-->Đúng<!--/v8--> | <!--v8:1124-->532<!--/v8-->/<!--v8:1125-->566<!--/v8--> | <!--v8:1126-->0.939929<!--/v8--> |
+| B4/w60/k3 | <!--v8:1127-->Sai<!--/v8--> | <!--v8:1128-->396<!--/v8-->/<!--v8:1129-->566<!--/v8--> | <!--v8:1130-->0.699647<!--/v8--> |
+| B4/w60/k5 | <!--v8:1131-->Sai<!--/v8--> | <!--v8:1132-->212<!--/v8-->/<!--v8:1133-->566<!--/v8--> | <!--v8:1134-->0.374558<!--/v8--> |
+
+## dev-59f696a169 / nsigma
+
+Ô: ts-auth-service / cpu; nhóm E-xa; cờ chính N2. t̂=<!--v8:1135-->100<!--/v8-->; t̂⁺=<!--v8:1136-->720<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/nsigma/dev-59f696a169--nsigma.json#/` và `theo-ca.json#/rows/40`; telemetry `data/rcaeval/re2tt_ts-auth-service_cpu_3/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+Các cột trong bảng thực sự vượt ngưỡng hai phía từ lịch sử đã quan sát; danh sách cột gây báo và p_j đã đối chiếu Z lưu trước nối nhãn. Có cột gây báo có p_j cao trong Nv; cột báo dày là phân rã trực tiếp, không là đối chứng cơ chế. 
+
+Lịch sử hữu hạn, nền không dừng, phân phối không chuẩn, điền trước, độ phân giải metric hoặc tải thay đổi đều chưa được tách. V7 N/A cho N1–N4 vì định nghĩa chứa điều kiện báo động. Báo động trong Nv được gọi sai theo nhãn proxy, không khẳng định hệ thực tế bình thường.
+
+r_obs=<!--v8:1137-->0.425806<!--/v8-->; r_ind=<!--v8:1138-->0.443923<!--/v8-->; r_nom=<!--v8:1139-->0.102504<!--/v8-->. Độ trễ và t̂⁺ phải đọc cạnh r_obs, không coi là thời điểm bắt đầu sự cố.
+
+| Cột gây báo | Giá trị | Mean quá khứ | Std quá khứ | Độ lệch | Ngưỡng | p_j trong Nv |
+|---|---|---|---|---|---|---|
+| ts-consign-service_latency-50 | <!--v8:1140-->0.0375<!--/v8--> | <!--v8:1141-->0.0177<!--/v8--> | <!--v8:1142-->0.002<!--/v8--> | <!--v8:1143-->0.0198<!--/v8--> | <!--v8:1144-->0.006<!--/v8--> | <!--v8:1145-->0.0403226<!--/v8--> |
+
+| Khoảng lịch sử | Báo cột-giây / tổng | Tỉ lệ |
+|---|---|---|
+| 100:200 | <!--v8:1146-->56<!--/v8-->/<!--v8:1147-->4000<!--/v8--> | <!--v8:1148-->0.014<!--/v8--> |
+| 200:400 | <!--v8:1149-->81<!--/v8-->/<!--v8:1150-->8000<!--/v8--> | <!--v8:1151-->0.010125<!--/v8--> |
+| 400:720 | <!--v8:1152-->214<!--/v8-->/<!--v8:1153-->12800<!--/v8--> | <!--v8:1154-->0.0167188<!--/v8--> |
+
+## dev-746fd74313 / bocpd
+
+Ô: ts-auth-service / delay; nhóm E-xa; cờ chính B4. t̂=<!--v8:1155-->102<!--/v8-->; t̂⁺=<!--v8:1156-->751<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-746fd74313.json#/` và `theo-ca.json#/rows/42`; telemetry `data/rcaeval/re2tt_ts-auth-service_delay_1/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+B2 sai: I1 giữ điểm đổi quanh t̂; điều này chưa loại look-ahead bên trong tiền tố. B4 đúng cho bước median ở cột ghi trong bảng; đây là đổi telemetry, chưa biết nền có sự cố khác hay chỉ đổi tải. Hazard I2 không làm mất điểm đổi đang xét; không phủ nhận ảnh hưởng lên các điểm đổi khác.
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:1157-->3<!--/v8--> |
+| I1 | <!--v8:1158-->13<!--/v8--> |
+| I2 | <!--v8:1159-->13<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | ts-inside-payment-service_latency-50 | <!--v8:1160-->0.025<!--/v8--> | <!--v8:1161-->0.0375<!--/v8--> | <!--v8:1162-->0.00109091<!--/v8--> | <!--v8:1163-->0.0125<!--/v8--> | <!--v8:1164-->7.72854<!--/v8--> | <!--v8:1165-->3<!--/v8--> |
+| w30 | ts-config-service_latency-50 | <!--v8:1166-->0.0046288<!--/v8--> | <!--v8:1167-->0.00573759<!--/v8--> | <!--v8:1168-->0.000128111<!--/v8--> | <!--v8:1169-->0.00110879<!--/v8--> | <!--v8:1170-->5.83768<!--/v8--> | <!--v8:1171-->2<!--/v8--> |
+| w60 | ts-admin-basic-info-service_latency-50 | <!--v8:1172-->0.0161957<!--/v8--> | <!--v8:1173-->0.0169231<!--/v8--> | <!--v8:1174-->4.05117e-08<!--/v8--> | <!--v8:1175-->0.000727425<!--/v8--> | <!--v8:1176-->12111.1<!--/v8--> | <!--v8:1177-->2<!--/v8--> |
+
+w15: Nền hằng đổi riêng (MAD bằng không): ts-seat-service_error, ts-travel2-service_error, ts-ui-dashboard_error. Không cộng vào B4.
+w30: Nền hằng đổi riêng (MAD bằng không): ts-seat-service_error, ts-travel2-service_error. Không cộng vào B4.
+w60: Nền hằng đổi riêng (MAD bằng không): ts-consign-price-service_latency-50, ts-consign-service_latency-50. Không cộng vào B4.
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 | <!--v8:1178-->Sai<!--/v8--> | <!--v8:1179-->5<!--/v8-->/<!--v8:1180-->712<!--/v8--> | <!--v8:1181-->0.00702247<!--/v8--> |
+| B4/w15/k2 | <!--v8:1182-->Đúng<!--/v8--> | <!--v8:1183-->553<!--/v8-->/<!--v8:1184-->657<!--/v8--> | <!--v8:1185-->0.841705<!--/v8--> |
+| B4/w15/k3 | <!--v8:1186-->Đúng<!--/v8--> | <!--v8:1187-->422<!--/v8-->/<!--v8:1188-->657<!--/v8--> | <!--v8:1189-->0.642314<!--/v8--> |
+| B4/w15/k5 | <!--v8:1190-->Đúng<!--/v8--> | <!--v8:1191-->220<!--/v8-->/<!--v8:1192-->657<!--/v8--> | <!--v8:1193-->0.334855<!--/v8--> |
+| B4/w30/k2 | <!--v8:1194-->Đúng<!--/v8--> | <!--v8:1195-->611<!--/v8-->/<!--v8:1196-->627<!--/v8--> | <!--v8:1197-->0.974482<!--/v8--> |
+| B4/w30/k3 | <!--v8:1198-->Đúng<!--/v8--> | <!--v8:1199-->537<!--/v8-->/<!--v8:1200-->627<!--/v8--> | <!--v8:1201-->0.856459<!--/v8--> |
+| B4/w30/k5 | <!--v8:1202-->Đúng<!--/v8--> | <!--v8:1203-->363<!--/v8-->/<!--v8:1204-->627<!--/v8--> | <!--v8:1205-->0.578947<!--/v8--> |
+| B4/w60/k2 — không phân biệt đúng số | <!--v8:1206-->Đúng<!--/v8--> | <!--v8:1207-->567<!--/v8-->/<!--v8:1208-->567<!--/v8--> | <!--v8:1209-->1<!--/v8--> |
+| B4/w60/k3 | <!--v8:1210-->Đúng<!--/v8--> | <!--v8:1211-->486<!--/v8-->/<!--v8:1212-->567<!--/v8--> | <!--v8:1213-->0.857143<!--/v8--> |
+| B4/w60/k5 | <!--v8:1214-->Đúng<!--/v8--> | <!--v8:1215-->368<!--/v8-->/<!--v8:1216-->567<!--/v8--> | <!--v8:1217-->0.64903<!--/v8--> |
+
+## dev-746fd74313 / nsigma
+
+Ô: ts-auth-service / delay; nhóm E-xa; cờ chính N2. t̂=<!--v8:1218-->100<!--/v8-->; t̂⁺=<!--v8:1219-->720<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/nsigma/dev-746fd74313--nsigma.json#/` và `theo-ca.json#/rows/43`; telemetry `data/rcaeval/re2tt_ts-auth-service_delay_1/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+Các cột trong bảng thực sự vượt ngưỡng hai phía từ lịch sử đã quan sát; danh sách cột gây báo và p_j đã đối chiếu Z lưu trước nối nhãn. Có cột gây báo có p_j cao trong Nv; cột báo dày là phân rã trực tiếp, không là đối chứng cơ chế. 
+
+Lịch sử hữu hạn, nền không dừng, phân phối không chuẩn, điền trước, độ phân giải metric hoặc tải thay đổi đều chưa được tách. V7 N/A cho N1–N4 vì định nghĩa chứa điều kiện báo động. Báo động trong Nv được gọi sai theo nhãn proxy, không khẳng định hệ thực tế bình thường.
+
+r_obs=<!--v8:1220-->0.317742<!--/v8-->; r_ind=<!--v8:1221-->0.403548<!--/v8-->; r_nom=<!--v8:1222-->0.112157<!--/v8-->. Độ trễ và t̂⁺ phải đọc cạnh r_obs, không coi là thời điểm bắt đầu sự cố.
+
+| Cột gây báo | Giá trị | Mean quá khứ | Std quá khứ | Độ lệch | Ngưỡng | p_j trong Nv |
+|---|---|---|---|---|---|---|
+| ts-inside-payment-service_latency-50 | <!--v8:1223-->0.03125<!--/v8--> | <!--v8:1224-->0.0213162<!--/v8--> | <!--v8:1225-->0.00268066<!--/v8--> | <!--v8:1226-->0.0099338<!--/v8--> | <!--v8:1227-->0.00804199<!--/v8--> | <!--v8:1228-->0.0725806<!--/v8--> |
+
+| Khoảng lịch sử | Báo cột-giây / tổng | Tỉ lệ |
+|---|---|---|
+| 100:200 | <!--v8:1229-->74<!--/v8-->/<!--v8:1230-->4400<!--/v8--> | <!--v8:1231-->0.0168182<!--/v8--> |
+| 200:400 | <!--v8:1232-->121<!--/v8-->/<!--v8:1233-->8800<!--/v8--> | <!--v8:1234-->0.01375<!--/v8--> |
+| 400:720 | <!--v8:1235-->119<!--/v8-->/<!--v8:1236-->14080<!--/v8--> | <!--v8:1237-->0.0084517<!--/v8--> |
+
+## dev-746fd74313 / nsigma_doi_chung
+
+Ô: ts-auth-service / delay; nhóm E-xa; cờ chính N2+N4. t̂=<!--v8:1238-->100<!--/v8-->; t̂⁺=<!--v8:1239-->720<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/nsigma/dev-746fd74313--nsigma_doi_chung.json#/` và `theo-ca.json#/rows/44`; telemetry `data/rcaeval/re2tt_ts-auth-service_delay_1/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+Các cột trong bảng thực sự vượt ngưỡng hai phía từ lịch sử đã quan sát; danh sách cột gây báo và p_j đã đối chiếu Z lưu trước nối nhãn. Có cột gây báo có p_j cao trong Nv; cột báo dày là phân rã trực tiếp, không là đối chứng cơ chế. Có std quá khứ bằng không và giá trị hiện tại khác mean: ngưỡng bằng không đủ giải thích phép so số học ở cột đó; chưa giải thích vì sao telemetry đổi. 
+
+Lịch sử hữu hạn, nền không dừng, phân phối không chuẩn, điền trước, độ phân giải metric hoặc tải thay đổi đều chưa được tách. V7 N/A cho N1–N4 vì định nghĩa chứa điều kiện báo động. Báo động trong Nv được gọi sai theo nhãn proxy, không khẳng định hệ thực tế bình thường.
+
+r_obs=<!--v8:1240-->1<!--/v8-->; r_ind=<!--v8:1241-->0.999131<!--/v8-->; r_nom=<!--v8:1242-->0.633243<!--/v8-->. Độ trễ và t̂⁺ phải đọc cạnh r_obs, không coi là thời điểm bắt đầu sự cố.
+
+| Cột gây báo | Giá trị | Mean quá khứ | Std quá khứ | Độ lệch | Ngưỡng | p_j trong Nv |
+|---|---|---|---|---|---|---|
+| ts-config-service_cpu | <!--v8:1243-->3.50594<!--/v8--> | <!--v8:1244-->1.34756<!--/v8--> | <!--v8:1245-->0.228567<!--/v8--> | <!--v8:1246-->2.15838<!--/v8--> | <!--v8:1247-->0.6857<!--/v8--> | <!--v8:1248-->0.0387097<!--/v8--> |
+| ts-config-service_mem | <!--v8:1249-->2.59801e+08<!--/v8--> | <!--v8:1250-->2.57183e+08<!--/v8--> | <!--v8:1251-->264426<!--/v8--> | <!--v8:1252-->2.61767e+06<!--/v8--> | <!--v8:1253-->793279<!--/v8--> | <!--v8:1254-->0.016129<!--/v8--> |
+| ts-news-service_mem | <!--v8:1255-->2.84672e+06<!--/v8--> | <!--v8:1256-->2.83877e+06<!--/v8--> | <!--v8:1257-->1404.49<!--/v8--> | <!--v8:1258-->7946.24<!--/v8--> | <!--v8:1259-->4213.47<!--/v8--> | <!--v8:1260-->0.033871<!--/v8--> |
+| ts-route-service_mem | <!--v8:1261-->2.72912e+08<!--/v8--> | <!--v8:1262-->2.72681e+08<!--/v8--> | <!--v8:1263-->70057.3<!--/v8--> | <!--v8:1264-->230932<!--/v8--> | <!--v8:1265-->210172<!--/v8--> | <!--v8:1266-->0.0483871<!--/v8--> |
+| ts-station-service_mem | <!--v8:1267-->2.70602e+08<!--/v8--> | <!--v8:1268-->2.70288e+08<!--/v8--> | <!--v8:1269-->67935.7<!--/v8--> | <!--v8:1270-->314573<!--/v8--> | <!--v8:1271-->203807<!--/v8--> | <!--v8:1272-->0.124194<!--/v8--> |
+| ts-admin-order-service_diskio | <!--v8:1273-->68374.9<!--/v8--> | <!--v8:1274-->38495.2<!--/v8--> | <!--v8:1275-->9337.02<!--/v8--> | <!--v8:1276-->29879.7<!--/v8--> | <!--v8:1277-->28011.1<!--/v8--> | <!--v8:1278-->0.00967742<!--/v8--> |
+| ts-config-service_socket | <!--v8:1279-->8<!--/v8--> | <!--v8:1280-->10.56<!--/v8--> | <!--v8:1281-->0.556323<!--/v8--> | <!--v8:1282-->2.56<!--/v8--> | <!--v8:1283-->1.66897<!--/v8--> | <!--v8:1284-->0.0112903<!--/v8--> |
+| ts-contacts-service_socket | <!--v8:1285-->7<!--/v8--> | <!--v8:1286-->8<!--/v8--> | <!--v8:1287-->0<!--/v8--> | <!--v8:1288-->1<!--/v8--> | <!--v8:1289-->0<!--/v8--> | <!--v8:1290-->0.0677419<!--/v8--> |
+| ts-food-map-service_socket | <!--v8:1291-->10<!--/v8--> | <!--v8:1292-->9.08<!--/v8--> | <!--v8:1293-->0.27266<!--/v8--> | <!--v8:1294-->0.92<!--/v8--> | <!--v8:1295-->0.81798<!--/v8--> | <!--v8:1296-->0.0177419<!--/v8--> |
+| ts-food-service_socket | <!--v8:1297-->12<!--/v8--> | <!--v8:1298-->9.05<!--/v8--> | <!--v8:1299-->0.857233<!--/v8--> | <!--v8:1300-->2.95<!--/v8--> | <!--v8:1301-->2.5717<!--/v8--> | <!--v8:1302-->0.00483871<!--/v8--> |
+| ts-inside-payment-service_latency-50 | <!--v8:1303-->0.03125<!--/v8--> | <!--v8:1304-->0.0213162<!--/v8--> | <!--v8:1305-->0.00268066<!--/v8--> | <!--v8:1306-->0.0099338<!--/v8--> | <!--v8:1307-->0.00804199<!--/v8--> | <!--v8:1308-->0.0725806<!--/v8--> |
+
+| Khoảng lịch sử | Báo cột-giây / tổng | Tỉ lệ |
+|---|---|---|
+| 100:200 | <!--v8:1309-->758<!--/v8-->/<!--v8:1310-->37100<!--/v8--> | <!--v8:1311-->0.0204313<!--/v8--> |
+| 200:400 | <!--v8:1312-->1397<!--/v8-->/<!--v8:1313-->74200<!--/v8--> | <!--v8:1314-->0.0188275<!--/v8--> |
+| 400:720 | <!--v8:1315-->2085<!--/v8-->/<!--v8:1316-->118720<!--/v8--> | <!--v8:1317-->0.0175623<!--/v8--> |
+
+## dev-7f1b6b071d / bocpd
+
+Ô: ts-travel-service / loss; nhóm E-xa; cờ chính D0. t̂=<!--v8:1318-->355<!--/v8-->; t̂⁺=<!--v8:1319-->746<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-7f1b6b071d.json#/` và `theo-ca.json#/rows/45`; telemetry `data/rcaeval/re2tt_ts-travel-service_loss_3/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+D0 ở cấu hình chính: điểm đổi quanh t̂ còn ở I1 và I2, B1 không trúng, B4 hữu hạn dưới ngưỡng chính. Cờ độ nhạy có thể đổi; chưa giải thích được điểm đổi ở cấu hình chính.
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:1320-->7<!--/v8--> |
+| I1 | <!--v8:1321-->16<!--/v8--> |
+| I2 | <!--v8:1322-->16<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | ts-food-map-service_latency-50 | <!--v8:1323-->0.00678571<!--/v8--> | <!--v8:1324-->0.00716981<!--/v8--> | <!--v8:1325-->0.000111502<!--/v8--> | <!--v8:1326-->0.000384097<!--/v8--> | <!--v8:1327-->2.32345<!--/v8--> | <!--v8:1328-->2<!--/v8--> |
+| w30 | ts-config-service_latency-50 | <!--v8:1329-->0.00378338<!--/v8--> | <!--v8:1330-->0.00358919<!--/v8--> | <!--v8:1331-->6.21043e-05<!--/v8--> | <!--v8:1332-->0.000194194<!--/v8--> | <!--v8:1333-->2.10906<!--/v8--> | <!--v8:1334-->3<!--/v8--> |
+| w60 | ts-route-service_latency-50 | <!--v8:1335-->0.00367261<!--/v8--> | <!--v8:1336-->0.00346686<!--/v8--> | <!--v8:1337-->4.14948e-05<!--/v8--> | <!--v8:1338-->0.000205746<!--/v8--> | <!--v8:1339-->3.34437<!--/v8--> | <!--v8:1340-->3<!--/v8--> |
+
+w15: Nền hằng đổi riêng (MAD bằng không): ts-payment-service_latency-50, ts-preserve-service_latency-50. Không cộng vào B4.
+w30: Nền hằng đổi riêng (MAD bằng không): ts-payment-service_latency-50, ts-preserve-other-service_latency-50, ts-preserve-service_latency-50. Không cộng vào B4.
+w60: Nền hằng đổi riêng (MAD bằng không): ts-payment-service_latency-50, ts-preserve-other-service_latency-50, ts-preserve-service_latency-50. Không cộng vào B4.
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 — không phân biệt đúng số | <!--v8:1341-->Sai<!--/v8--> | <!--v8:1342-->0<!--/v8-->/<!--v8:1343-->708<!--/v8--> | <!--v8:1344-->0<!--/v8--> |
+| B4/w15/k2 | <!--v8:1345-->Đúng<!--/v8--> | <!--v8:1346-->479<!--/v8-->/<!--v8:1347-->653<!--/v8--> | <!--v8:1348-->0.733538<!--/v8--> |
+| B4/w15/k3 | <!--v8:1349-->Sai<!--/v8--> | <!--v8:1350-->322<!--/v8-->/<!--v8:1351-->653<!--/v8--> | <!--v8:1352-->0.493109<!--/v8--> |
+| B4/w15/k5 | <!--v8:1353-->Sai<!--/v8--> | <!--v8:1354-->89<!--/v8-->/<!--v8:1355-->653<!--/v8--> | <!--v8:1356-->0.136294<!--/v8--> |
+| B4/w30/k2 | <!--v8:1357-->Đúng<!--/v8--> | <!--v8:1358-->580<!--/v8-->/<!--v8:1359-->623<!--/v8--> | <!--v8:1360-->0.930979<!--/v8--> |
+| B4/w30/k3 | <!--v8:1361-->Sai<!--/v8--> | <!--v8:1362-->397<!--/v8-->/<!--v8:1363-->623<!--/v8--> | <!--v8:1364-->0.637239<!--/v8--> |
+| B4/w30/k5 | <!--v8:1365-->Sai<!--/v8--> | <!--v8:1366-->186<!--/v8-->/<!--v8:1367-->623<!--/v8--> | <!--v8:1368-->0.298555<!--/v8--> |
+| B4/w60/k2 | <!--v8:1369-->Đúng<!--/v8--> | <!--v8:1370-->540<!--/v8-->/<!--v8:1371-->563<!--/v8--> | <!--v8:1372-->0.959147<!--/v8--> |
+| B4/w60/k3 | <!--v8:1373-->Đúng<!--/v8--> | <!--v8:1374-->392<!--/v8-->/<!--v8:1375-->563<!--/v8--> | <!--v8:1376-->0.69627<!--/v8--> |
+| B4/w60/k5 | <!--v8:1377-->Sai<!--/v8--> | <!--v8:1378-->183<!--/v8-->/<!--v8:1379-->563<!--/v8--> | <!--v8:1380-->0.325044<!--/v8--> |
+
+## dev-8017c6dc70 / bocpd
+
+Ô: ts-order-service / disk; nhóm E-xa; cờ chính B2+B4. t̂=<!--v8:1381-->271<!--/v8-->; t̂⁺=<!--v8:1382-->726<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-8017c6dc70.json#/` và `theo-ca.json#/rows/48`; telemetry `data/rcaeval/re2tt_ts-order-service_disk_3/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+B2 đúng: cắt phần sau mốc làm điểm đổi quanh t̂ không còn trong dung sai chính. Can thiệp đổi cả min–max và bộ cột; chưa tách tác động riêng. B4 đúng cho bước median ở cột ghi trong bảng; đây là đổi telemetry, chưa biết nền có sự cố khác hay chỉ đổi tải. 
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:1383-->11<!--/v8--> |
+| I1 | <!--v8:1384-->9<!--/v8--> |
+| I2 | <!--v8:1385-->9<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | ts-food-map-service_latency-50 | <!--v8:1386-->0.00712766<!--/v8--> | <!--v8:1387-->0.00662791<!--/v8--> | <!--v8:1388-->0.000141509<!--/v8--> | <!--v8:1389-->0.000499753<!--/v8--> | <!--v8:1390-->2.38202<!--/v8--> | <!--v8:1391-->2<!--/v8--> |
+| w30 | ts-ticketinfo-service_latency-50 | <!--v8:1392-->0.0168626<!--/v8--> | <!--v8:1393-->0.0165139<!--/v8--> | <!--v8:1394-->5.99633e-05<!--/v8--> | <!--v8:1395-->0.000348704<!--/v8--> | <!--v8:1396-->3.92236<!--/v8--> | <!--v8:1397-->2<!--/v8--> |
+| w60 | ts-price-service_latency-50 | <!--v8:1398-->0.008125<!--/v8--> | <!--v8:1399-->0.0075<!--/v8--> | <!--v8:1400-->4.18332e-05<!--/v8--> | <!--v8:1401-->0.000625<!--/v8--> | <!--v8:1402-->10.0771<!--/v8--> | <!--v8:1403-->2<!--/v8--> |
+
+w15: Nền hằng đổi riêng (MAD bằng không): ts-admin-travel-service_latency-50, ts-inside-payment-service_latency-50. Không cộng vào B4.
+w30: Nền hằng đổi riêng (MAD bằng không): ts-admin-travel-service_latency-50, ts-inside-payment-service_latency-50. Không cộng vào B4.
+w60: Nền hằng đổi riêng (MAD bằng không): ts-admin-travel-service_latency-50, ts-inside-payment-service_latency-50. Không cộng vào B4.
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 — không phân biệt đúng số | <!--v8:1404-->Sai<!--/v8--> | <!--v8:1405-->0<!--/v8-->/<!--v8:1406-->705<!--/v8--> | <!--v8:1407-->0<!--/v8--> |
+| B4/w15/k2 | <!--v8:1408-->Đúng<!--/v8--> | <!--v8:1409-->449<!--/v8-->/<!--v8:1410-->651<!--/v8--> | <!--v8:1411-->0.689708<!--/v8--> |
+| B4/w15/k3 | <!--v8:1412-->Sai<!--/v8--> | <!--v8:1413-->299<!--/v8-->/<!--v8:1414-->651<!--/v8--> | <!--v8:1415-->0.459293<!--/v8--> |
+| B4/w15/k5 | <!--v8:1416-->Sai<!--/v8--> | <!--v8:1417-->149<!--/v8-->/<!--v8:1418-->651<!--/v8--> | <!--v8:1419-->0.228879<!--/v8--> |
+| B4/w30/k2 | <!--v8:1420-->Đúng<!--/v8--> | <!--v8:1421-->486<!--/v8-->/<!--v8:1422-->622<!--/v8--> | <!--v8:1423-->0.78135<!--/v8--> |
+| B4/w30/k3 | <!--v8:1424-->Đúng<!--/v8--> | <!--v8:1425-->404<!--/v8-->/<!--v8:1426-->622<!--/v8--> | <!--v8:1427-->0.649518<!--/v8--> |
+| B4/w30/k5 | <!--v8:1428-->Sai<!--/v8--> | <!--v8:1429-->281<!--/v8-->/<!--v8:1430-->622<!--/v8--> | <!--v8:1431-->0.451768<!--/v8--> |
+| B4/w60/k2 | <!--v8:1432-->Đúng<!--/v8--> | <!--v8:1433-->425<!--/v8-->/<!--v8:1434-->563<!--/v8--> | <!--v8:1435-->0.754885<!--/v8--> |
+| B4/w60/k3 | <!--v8:1436-->Đúng<!--/v8--> | <!--v8:1437-->322<!--/v8-->/<!--v8:1438-->563<!--/v8--> | <!--v8:1439-->0.571936<!--/v8--> |
+| B4/w60/k5 | <!--v8:1440-->Đúng<!--/v8--> | <!--v8:1441-->230<!--/v8-->/<!--v8:1442-->563<!--/v8--> | <!--v8:1443-->0.408526<!--/v8--> |
+
+## dev-98bc73c499 / bocpd
+
+Ô: ts-train-service / cpu; nhóm S; cờ chính D0. t̂=<!--v8:1444-->761<!--/v8-->; t̂⁺=<!--v8:1445-->761<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-98bc73c499.json#/` và `theo-ca.json#/rows/51`; telemetry `data/rcaeval/re2tt_ts-train-service_cpu_3/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+Bản đầy đủ không có điểm đổi trong Nv, nhưng tiền tố I1 và I2 đều có. Cờ B1–B4 tại báo động đầu là N/A vì ngoài miền nền; D0 ở đây không có nghĩa đã thử và bác mọi cơ chế. Tiền xử lý tương lai có thể làm mất điểm đổi nền, không chỉ tạo điểm đổi.
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:1446-->0<!--/v8--> |
+| I1 | <!--v8:1447-->11<!--/v8--> |
+| I2 | <!--v8:1448-->11<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | N/A: ngoài miền | N/A | N/A | N/A | N/A | N/A | N/A |
+| w30 | N/A: ngoài miền | N/A | N/A | N/A | N/A | N/A | N/A |
+| w60 | N/A: ngoài miền | N/A | N/A | N/A | N/A | N/A | N/A |
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 | <!--v8:1449-->N/A<!--/v8--> | <!--v8:1450-->0<!--/v8-->/<!--v8:1451-->715<!--/v8--> | <!--v8:1452-->0<!--/v8--> |
+| B4/w15/k2 | <!--v8:1453-->N/A<!--/v8--> | <!--v8:1454-->488<!--/v8-->/<!--v8:1455-->660<!--/v8--> | <!--v8:1456-->0.739394<!--/v8--> |
+| B4/w15/k3 | <!--v8:1457-->N/A<!--/v8--> | <!--v8:1458-->331<!--/v8-->/<!--v8:1459-->660<!--/v8--> | <!--v8:1460-->0.501515<!--/v8--> |
+| B4/w15/k5 | <!--v8:1461-->N/A<!--/v8--> | <!--v8:1462-->125<!--/v8-->/<!--v8:1463-->660<!--/v8--> | <!--v8:1464-->0.189394<!--/v8--> |
+| B4/w30/k2 | <!--v8:1465-->N/A<!--/v8--> | <!--v8:1466-->611<!--/v8-->/<!--v8:1467-->630<!--/v8--> | <!--v8:1468-->0.969841<!--/v8--> |
+| B4/w30/k3 | <!--v8:1469-->N/A<!--/v8--> | <!--v8:1470-->444<!--/v8-->/<!--v8:1471-->630<!--/v8--> | <!--v8:1472-->0.704762<!--/v8--> |
+| B4/w30/k5 | <!--v8:1473-->N/A<!--/v8--> | <!--v8:1474-->228<!--/v8-->/<!--v8:1475-->630<!--/v8--> | <!--v8:1476-->0.361905<!--/v8--> |
+| B4/w60/k2 | <!--v8:1477-->N/A<!--/v8--> | <!--v8:1478-->568<!--/v8-->/<!--v8:1479-->570<!--/v8--> | <!--v8:1480-->0.996491<!--/v8--> |
+| B4/w60/k3 | <!--v8:1481-->N/A<!--/v8--> | <!--v8:1482-->495<!--/v8-->/<!--v8:1483-->570<!--/v8--> | <!--v8:1484-->0.868421<!--/v8--> |
+| B4/w60/k5 | <!--v8:1485-->N/A<!--/v8--> | <!--v8:1486-->315<!--/v8-->/<!--v8:1487-->570<!--/v8--> | <!--v8:1488-->0.552632<!--/v8--> |
+
+## dev-98bc73c499 / nsigma
+
+Ô: ts-train-service / cpu; nhóm E-xa; cờ chính N1+N3. t̂=<!--v8:1489-->102<!--/v8-->; t̂⁺=<!--v8:1490-->733<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/nsigma/dev-98bc73c499--nsigma.json#/` và `theo-ca.json#/rows/52`; telemetry `data/rcaeval/re2tt_ts-train-service_cpu_3/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+Các cột trong bảng thực sự vượt ngưỡng hai phía từ lịch sử đã quan sát; danh sách cột gây báo và p_j đã đối chiếu Z lưu trước nối nhãn. Tỉ lệ khoảng đầu so với khoảng cuối thỏa N1; liên hệ với vị trí sớm chưa chứng minh lịch sử ngắn là nguyên nhân. Không có cột gây báo đạt N2 chính. N3 không chứng minh OR nhiều cột gây báo, độc lập hoặc đuôi phân phối. 
+
+Lịch sử hữu hạn, nền không dừng, phân phối không chuẩn, điền trước, độ phân giải metric hoặc tải thay đổi đều chưa được tách. V7 N/A cho N1–N4 vì định nghĩa chứa điều kiện báo động. Báo động trong Nv được gọi sai theo nhãn proxy, không khẳng định hệ thực tế bình thường.
+
+r_obs=<!--v8:1491-->0.320968<!--/v8-->; r_ind=<!--v8:1492-->0.465995<!--/v8-->; r_nom=<!--v8:1493-->0.107343<!--/v8-->. Độ trễ và t̂⁺ phải đọc cạnh r_obs, không coi là thời điểm bắt đầu sự cố.
+
+| Cột gây báo | Giá trị | Mean quá khứ | Std quá khứ | Độ lệch | Ngưỡng | p_j trong Nv |
+|---|---|---|---|---|---|---|
+| ts-order-other-service_latency-50 | <!--v8:1494-->0.00774631<!--/v8--> | <!--v8:1495-->0.00736675<!--/v8--> | <!--v8:1496-->0.000117575<!--/v8--> | <!--v8:1497-->0.000379558<!--/v8--> | <!--v8:1498-->0.000352726<!--/v8--> | <!--v8:1499-->0.016129<!--/v8--> |
+
+| Khoảng lịch sử | Báo cột-giây / tổng | Tỉ lệ |
+|---|---|---|
+| 100:200 | <!--v8:1500-->83<!--/v8-->/<!--v8:1501-->4200<!--/v8--> | <!--v8:1502-->0.0197619<!--/v8--> |
+| 200:400 | <!--v8:1503-->272<!--/v8-->/<!--v8:1504-->8400<!--/v8--> | <!--v8:1505-->0.032381<!--/v8--> |
+| 400:720 | <!--v8:1506-->25<!--/v8-->/<!--v8:1507-->13440<!--/v8--> | <!--v8:1508-->0.00186012<!--/v8--> |
+
+## dev-a505ab3f65 / bocpd
+
+Ô: ts-train-service / delay; nhóm E-xa; cờ chính B2+B4. t̂=<!--v8:1509-->384<!--/v8-->; t̂⁺=<!--v8:1510-->759<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-a505ab3f65.json#/` và `theo-ca.json#/rows/54`; telemetry `data/rcaeval/re2tt_ts-train-service_delay_1/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+B2 đúng: cắt phần sau mốc làm điểm đổi quanh t̂ không còn trong dung sai chính. Can thiệp đổi cả min–max và bộ cột; chưa tách tác động riêng. B4 đúng cho bước median ở cột ghi trong bảng; đây là đổi telemetry, chưa biết nền có sự cố khác hay chỉ đổi tải. 
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:1511-->3<!--/v8--> |
+| I1 | <!--v8:1512-->18<!--/v8--> |
+| I2 | <!--v8:1513-->18<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | ts-order-service_latency-50 | <!--v8:1514-->0.00864173<!--/v8--> | <!--v8:1515-->0.0120803<!--/v8--> | <!--v8:1516-->0.000483001<!--/v8--> | <!--v8:1517-->0.00343856<!--/v8--> | <!--v8:1518-->4.80181<!--/v8--> | <!--v8:1519-->1<!--/v8--> |
+| w30 | ts-inside-payment-service_latency-50 | <!--v8:1520-->0.02125<!--/v8--> | <!--v8:1521-->0.05<!--/v8--> | <!--v8:1522-->0.0025001<!--/v8--> | <!--v8:1523-->0.02875<!--/v8--> | <!--v8:1524-->7.75633<!--/v8--> | <!--v8:1525-->1<!--/v8--> |
+| w60 | ts-inside-payment-service_latency-50 | <!--v8:1526-->0.02125<!--/v8--> | <!--v8:1527-->0.055134<!--/v8--> | <!--v8:1528-->0.0025001<!--/v8--> | <!--v8:1529-->0.033884<!--/v8--> | <!--v8:1530-->9.14142<!--/v8--> | <!--v8:1531-->1<!--/v8--> |
+
+w15: Nền hằng đổi riêng (MAD bằng không): ts-payment-service_latency-50. Không cộng vào B4.
+w30: Nền hằng đổi riêng (MAD bằng không): ts-payment-service_latency-50. Không cộng vào B4.
+w60: Nền hằng đổi riêng (MAD bằng không): ts-payment-service_latency-50. Không cộng vào B4.
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 — không phân biệt đúng số | <!--v8:1532-->Sai<!--/v8--> | <!--v8:1533-->0<!--/v8-->/<!--v8:1534-->712<!--/v8--> | <!--v8:1535-->0<!--/v8--> |
+| B4/w15/k2 | <!--v8:1536-->Đúng<!--/v8--> | <!--v8:1537-->585<!--/v8-->/<!--v8:1538-->657<!--/v8--> | <!--v8:1539-->0.890411<!--/v8--> |
+| B4/w15/k3 | <!--v8:1540-->Đúng<!--/v8--> | <!--v8:1541-->459<!--/v8-->/<!--v8:1542-->657<!--/v8--> | <!--v8:1543-->0.69863<!--/v8--> |
+| B4/w15/k5 | <!--v8:1544-->Sai<!--/v8--> | <!--v8:1545-->260<!--/v8-->/<!--v8:1546-->657<!--/v8--> | <!--v8:1547-->0.395738<!--/v8--> |
+| B4/w30/k2 | <!--v8:1548-->Đúng<!--/v8--> | <!--v8:1549-->609<!--/v8-->/<!--v8:1550-->627<!--/v8--> | <!--v8:1551-->0.971292<!--/v8--> |
+| B4/w30/k3 | <!--v8:1552-->Đúng<!--/v8--> | <!--v8:1553-->549<!--/v8-->/<!--v8:1554-->627<!--/v8--> | <!--v8:1555-->0.875598<!--/v8--> |
+| B4/w30/k5 | <!--v8:1556-->Đúng<!--/v8--> | <!--v8:1557-->331<!--/v8-->/<!--v8:1558-->627<!--/v8--> | <!--v8:1559-->0.527911<!--/v8--> |
+| B4/w60/k2 | <!--v8:1560-->Đúng<!--/v8--> | <!--v8:1561-->561<!--/v8-->/<!--v8:1562-->567<!--/v8--> | <!--v8:1563-->0.989418<!--/v8--> |
+| B4/w60/k3 | <!--v8:1564-->Đúng<!--/v8--> | <!--v8:1565-->529<!--/v8-->/<!--v8:1566-->567<!--/v8--> | <!--v8:1567-->0.932981<!--/v8--> |
+| B4/w60/k5 | <!--v8:1568-->Đúng<!--/v8--> | <!--v8:1569-->348<!--/v8-->/<!--v8:1570-->567<!--/v8--> | <!--v8:1571-->0.613757<!--/v8--> |
+
+## dev-a5cabe5fa7 / bocpd
+
+Ô: ts-travel-service / loss; nhóm E-gần; cờ chính B2+B4. t̂=<!--v8:1572-->471<!--/v8-->; t̂⁺=<!--v8:1573-->813<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-a5cabe5fa7.json#/` và `theo-ca.json#/rows/57`; telemetry `data/rcaeval/re2tt_ts-travel-service_loss_1/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+B2 đúng: cắt phần sau mốc làm điểm đổi quanh t̂ không còn trong dung sai chính. Can thiệp đổi cả min–max và bộ cột; chưa tách tác động riêng. B4 đúng cho bước median ở cột ghi trong bảng; đây là đổi telemetry, chưa biết nền có sự cố khác hay chỉ đổi tải. 
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:1574-->6<!--/v8--> |
+| I1 | <!--v8:1575-->8<!--/v8--> |
+| I2 | <!--v8:1576-->8<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | ts-consign-service_latency-50 | <!--v8:1577-->0.03125<!--/v8--> | <!--v8:1578-->0.0291667<!--/v8--> | <!--v8:1579-->0.00125<!--/v8--> | <!--v8:1580-->0.00208333<!--/v8--> | <!--v8:1581-->1.12415<!--/v8--> | <!--v8:1582-->3<!--/v8--> |
+| w30 | ts-preserve-service_latency-50 | <!--v8:1583-->0.75<!--/v8--> | <!--v8:1584-->0.40625<!--/v8--> | <!--v8:1585-->0.0416667<!--/v8--> | <!--v8:1586-->0.34375<!--/v8--> | <!--v8:1587-->5.56455<!--/v8--> | <!--v8:1588-->2<!--/v8--> |
+| w60 | ts-preserve-service_latency-50 | <!--v8:1589-->0.75<!--/v8--> | <!--v8:1590-->0.408482<!--/v8--> | <!--v8:1591-->0.05<!--/v8--> | <!--v8:1592-->0.341518<!--/v8--> | <!--v8:1593-->4.60701<!--/v8--> | <!--v8:1594-->1<!--/v8--> |
+
+w15: Nền hằng đổi riêng (MAD bằng không): ts-admin-basic-info-service_latency-50, ts-preserve-other-service_latency-50, ts-preserve-service_latency-50. Không cộng vào B4.
+w30: Nền hằng đổi riêng (MAD bằng không): ts-admin-basic-info-service_latency-50, ts-preserve-other-service_latency-50. Không cộng vào B4.
+w60: Nền hằng đổi riêng (MAD bằng không): ts-admin-basic-info-service_latency-50. Không cộng vào B4.
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 — không phân biệt đúng số | <!--v8:1595-->Sai<!--/v8--> | <!--v8:1596-->0<!--/v8-->/<!--v8:1597-->709<!--/v8--> | <!--v8:1598-->0<!--/v8--> |
+| B4/w15/k2 | <!--v8:1599-->Sai<!--/v8--> | <!--v8:1600-->562<!--/v8-->/<!--v8:1601-->654<!--/v8--> | <!--v8:1602-->0.859327<!--/v8--> |
+| B4/w15/k3 | <!--v8:1603-->Sai<!--/v8--> | <!--v8:1604-->328<!--/v8-->/<!--v8:1605-->654<!--/v8--> | <!--v8:1606-->0.501529<!--/v8--> |
+| B4/w15/k5 | <!--v8:1607-->Sai<!--/v8--> | <!--v8:1608-->100<!--/v8-->/<!--v8:1609-->654<!--/v8--> | <!--v8:1610-->0.152905<!--/v8--> |
+| B4/w30/k2 | <!--v8:1611-->Đúng<!--/v8--> | <!--v8:1612-->603<!--/v8-->/<!--v8:1613-->624<!--/v8--> | <!--v8:1614-->0.966346<!--/v8--> |
+| B4/w30/k3 | <!--v8:1615-->Đúng<!--/v8--> | <!--v8:1616-->512<!--/v8-->/<!--v8:1617-->624<!--/v8--> | <!--v8:1618-->0.820513<!--/v8--> |
+| B4/w30/k5 | <!--v8:1619-->Đúng<!--/v8--> | <!--v8:1620-->226<!--/v8-->/<!--v8:1621-->624<!--/v8--> | <!--v8:1622-->0.362179<!--/v8--> |
+| B4/w60/k2 — không phân biệt đúng số | <!--v8:1623-->Đúng<!--/v8--> | <!--v8:1624-->566<!--/v8-->/<!--v8:1625-->566<!--/v8--> | <!--v8:1626-->1<!--/v8--> |
+| B4/w60/k3 | <!--v8:1627-->Đúng<!--/v8--> | <!--v8:1628-->480<!--/v8-->/<!--v8:1629-->566<!--/v8--> | <!--v8:1630-->0.848057<!--/v8--> |
+| B4/w60/k5 | <!--v8:1631-->Sai<!--/v8--> | <!--v8:1632-->252<!--/v8-->/<!--v8:1633-->566<!--/v8--> | <!--v8:1634-->0.44523<!--/v8--> |
+
+## dev-a915aa2424 / bocpd
+
+Ô: ts-travel-service / loss; nhóm E-gần; cờ chính B4. t̂=<!--v8:1635-->679<!--/v8-->; t̂⁺=<!--v8:1636-->897<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-a915aa2424.json#/` và `theo-ca.json#/rows/60`; telemetry `data/rcaeval/re2tt_ts-travel-service_loss_2/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+B2 sai: I1 giữ điểm đổi quanh t̂; điều này chưa loại look-ahead bên trong tiền tố. B4 đúng cho bước median ở cột ghi trong bảng; đây là đổi telemetry, chưa biết nền có sự cố khác hay chỉ đổi tải. Hazard I2 không làm mất điểm đổi đang xét; không phủ nhận ảnh hưởng lên các điểm đổi khác.
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:1637-->1<!--/v8--> |
+| I1 | <!--v8:1638-->10<!--/v8--> |
+| I2 | <!--v8:1639-->10<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | ts-train-service_latency-50 | <!--v8:1640-->0.00372801<!--/v8--> | <!--v8:1641-->0.00404491<!--/v8--> | <!--v8:1642-->5.61756e-05<!--/v8--> | <!--v8:1643-->0.000316899<!--/v8--> | <!--v8:1644-->3.80495<!--/v8--> | <!--v8:1645-->5<!--/v8--> |
+| w30 | ts-train-service_latency-50 | <!--v8:1646-->0.00371948<!--/v8--> | <!--v8:1647-->0.00417702<!--/v8--> | <!--v8:1648-->5.37559e-05<!--/v8--> | <!--v8:1649-->0.000457538<!--/v8--> | <!--v8:1650-->5.74086<!--/v8--> | <!--v8:1651-->6<!--/v8--> |
+| w60 | N/A: ngoài miền | N/A | N/A | N/A | N/A | N/A | N/A |
+
+w15: Nền hằng đổi riêng (MAD bằng không): ts-travel-service_error, ts-ui-dashboard_error, ts-consign-service_latency-50, ts-preserve-service_latency-50, ts-security-service_latency-50. Không cộng vào B4.
+w30: Nền hằng đổi riêng (MAD bằng không): ts-travel-service_error, ts-ui-dashboard_error, ts-admin-travel-service_latency-50, ts-consign-service_latency-50, ts-preserve-service_latency-50, ts-security-service_latency-50. Không cộng vào B4.
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 | <!--v8:1652-->Sai<!--/v8--> | <!--v8:1653-->5<!--/v8-->/<!--v8:1654-->714<!--/v8--> | <!--v8:1655-->0.0070028<!--/v8--> |
+| B4/w15/k2 | <!--v8:1656-->Đúng<!--/v8--> | <!--v8:1657-->546<!--/v8-->/<!--v8:1658-->659<!--/v8--> | <!--v8:1659-->0.828528<!--/v8--> |
+| B4/w15/k3 | <!--v8:1660-->Đúng<!--/v8--> | <!--v8:1661-->258<!--/v8-->/<!--v8:1662-->659<!--/v8--> | <!--v8:1663-->0.391502<!--/v8--> |
+| B4/w15/k5 | <!--v8:1664-->Sai<!--/v8--> | <!--v8:1665-->89<!--/v8-->/<!--v8:1666-->659<!--/v8--> | <!--v8:1667-->0.135053<!--/v8--> |
+| B4/w30/k2 | <!--v8:1668-->Đúng<!--/v8--> | <!--v8:1669-->588<!--/v8-->/<!--v8:1670-->629<!--/v8--> | <!--v8:1671-->0.934817<!--/v8--> |
+| B4/w30/k3 | <!--v8:1672-->Đúng<!--/v8--> | <!--v8:1673-->355<!--/v8-->/<!--v8:1674-->629<!--/v8--> | <!--v8:1675-->0.564388<!--/v8--> |
+| B4/w30/k5 | <!--v8:1676-->Đúng<!--/v8--> | <!--v8:1677-->81<!--/v8-->/<!--v8:1678-->629<!--/v8--> | <!--v8:1679-->0.128776<!--/v8--> |
+| B4/w60/k2 | <!--v8:1680-->N/A<!--/v8--> | <!--v8:1681-->550<!--/v8-->/<!--v8:1682-->570<!--/v8--> | <!--v8:1683-->0.964912<!--/v8--> |
+| B4/w60/k3 | <!--v8:1684-->N/A<!--/v8--> | <!--v8:1685-->436<!--/v8-->/<!--v8:1686-->570<!--/v8--> | <!--v8:1687-->0.764912<!--/v8--> |
+| B4/w60/k5 | <!--v8:1688-->N/A<!--/v8--> | <!--v8:1689-->105<!--/v8-->/<!--v8:1690-->570<!--/v8--> | <!--v8:1691-->0.184211<!--/v8--> |
+
+## dev-a915aa2424 / nsigma
+
+Ô: ts-travel-service / loss; nhóm E-xa; cờ chính N2. t̂=<!--v8:1692-->100<!--/v8-->; t̂⁺=<!--v8:1693-->720<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/nsigma/dev-a915aa2424--nsigma.json#/` và `theo-ca.json#/rows/61`; telemetry `data/rcaeval/re2tt_ts-travel-service_loss_2/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+Các cột trong bảng thực sự vượt ngưỡng hai phía từ lịch sử đã quan sát; danh sách cột gây báo và p_j đã đối chiếu Z lưu trước nối nhãn. Có cột gây báo có p_j cao trong Nv; cột báo dày là phân rã trực tiếp, không là đối chứng cơ chế. 
+
+Lịch sử hữu hạn, nền không dừng, phân phối không chuẩn, điền trước, độ phân giải metric hoặc tải thay đổi đều chưa được tách. V7 N/A cho N1–N4 vì định nghĩa chứa điều kiện báo động. Báo động trong Nv được gọi sai theo nhãn proxy, không khẳng định hệ thực tế bình thường.
+
+r_obs=<!--v8:1694-->0.446774<!--/v8-->; r_ind=<!--v8:1695-->0.500268<!--/v8-->; r_nom=<!--v8:1696-->0.104927<!--/v8-->. Độ trễ và t̂⁺ phải đọc cạnh r_obs, không coi là thời điểm bắt đầu sự cố.
+
+| Cột gây báo | Giá trị | Mean quá khứ | Std quá khứ | Độ lệch | Ngưỡng | p_j trong Nv |
+|---|---|---|---|---|---|---|
+| ts-admin-travel-service_latency-50 | <!--v8:1697-->0.180357<!--/v8--> | <!--v8:1698-->0.175321<!--/v8--> | <!--v8:1699-->0.00127866<!--/v8--> | <!--v8:1700-->0.00503571<!--/v8--> | <!--v8:1701-->0.00383598<!--/v8--> | <!--v8:1702-->0.0645161<!--/v8--> |
+
+| Khoảng lịch sử | Báo cột-giây / tổng | Tỉ lệ |
+|---|---|---|
+| 100:200 | <!--v8:1703-->44<!--/v8-->/<!--v8:1704-->4100<!--/v8--> | <!--v8:1705-->0.0107317<!--/v8--> |
+| 200:400 | <!--v8:1706-->64<!--/v8-->/<!--v8:1707-->8200<!--/v8--> | <!--v8:1708-->0.00780488<!--/v8--> |
+| 400:720 | <!--v8:1709-->311<!--/v8-->/<!--v8:1710-->13120<!--/v8--> | <!--v8:1711-->0.0237043<!--/v8--> |
+
+## dev-ba831dbeb8 / bocpd
+
+Ô: ts-train-service / cpu; nhóm E-gần; cờ chính B4. t̂=<!--v8:1712-->548<!--/v8-->; t̂⁺=<!--v8:1713-->750<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-ba831dbeb8.json#/` và `theo-ca.json#/rows/66`; telemetry `data/rcaeval/re2tt_ts-train-service_cpu_2/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+B2 sai: I1 giữ điểm đổi quanh t̂; điều này chưa loại look-ahead bên trong tiền tố. B4 đúng cho bước median ở cột ghi trong bảng; đây là đổi telemetry, chưa biết nền có sự cố khác hay chỉ đổi tải. Hazard I2 không làm mất điểm đổi đang xét; không phủ nhận ảnh hưởng lên các điểm đổi khác.
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:1714-->3<!--/v8--> |
+| I1 | <!--v8:1715-->17<!--/v8--> |
+| I2 | <!--v8:1716-->17<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | ts-inside-payment-service_latency-50 | <!--v8:1717-->0.03125<!--/v8--> | <!--v8:1718-->0.05<!--/v8--> | <!--v8:1719-->0.00208333<!--/v8--> | <!--v8:1720-->0.01875<!--/v8--> | <!--v8:1721-->6.07042<!--/v8--> | <!--v8:1722-->1<!--/v8--> |
+| w30 | ts-inside-payment-service_latency-50 | <!--v8:1723-->0.03125<!--/v8--> | <!--v8:1724-->0.04375<!--/v8--> | <!--v8:1725-->0.001875<!--/v8--> | <!--v8:1726-->0.0125<!--/v8--> | <!--v8:1727-->4.49661<!--/v8--> | <!--v8:1728-->1<!--/v8--> |
+| w60 | ts-assurance-service_latency-50 | <!--v8:1729-->0.00607143<!--/v8--> | <!--v8:1730-->0.008875<!--/v8--> | <!--v8:1731-->0.000357143<!--/v8--> | <!--v8:1732-->0.00280357<!--/v8--> | <!--v8:1733-->5.29475<!--/v8--> | <!--v8:1734-->1<!--/v8--> |
+
+w15: Nền hằng đổi riêng (MAD bằng không): ts-payment-service_latency-50. Không cộng vào B4.
+w30: Nền hằng đổi riêng (MAD bằng không): ts-payment-service_latency-50. Không cộng vào B4.
+w60: Nền hằng đổi riêng (MAD bằng không): ts-payment-service_latency-50. Không cộng vào B4.
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 — không phân biệt đúng số | <!--v8:1735-->Sai<!--/v8--> | <!--v8:1736-->0<!--/v8-->/<!--v8:1737-->712<!--/v8--> | <!--v8:1738-->0<!--/v8--> |
+| B4/w15/k2 | <!--v8:1739-->Đúng<!--/v8--> | <!--v8:1740-->543<!--/v8-->/<!--v8:1741-->657<!--/v8--> | <!--v8:1742-->0.826484<!--/v8--> |
+| B4/w15/k3 | <!--v8:1743-->Đúng<!--/v8--> | <!--v8:1744-->353<!--/v8-->/<!--v8:1745-->657<!--/v8--> | <!--v8:1746-->0.537291<!--/v8--> |
+| B4/w15/k5 | <!--v8:1747-->Đúng<!--/v8--> | <!--v8:1748-->165<!--/v8-->/<!--v8:1749-->657<!--/v8--> | <!--v8:1750-->0.251142<!--/v8--> |
+| B4/w30/k2 | <!--v8:1751-->Đúng<!--/v8--> | <!--v8:1752-->584<!--/v8-->/<!--v8:1753-->627<!--/v8--> | <!--v8:1754-->0.931419<!--/v8--> |
+| B4/w30/k3 | <!--v8:1755-->Đúng<!--/v8--> | <!--v8:1756-->491<!--/v8-->/<!--v8:1757-->627<!--/v8--> | <!--v8:1758-->0.783094<!--/v8--> |
+| B4/w30/k5 | <!--v8:1759-->Sai<!--/v8--> | <!--v8:1760-->266<!--/v8-->/<!--v8:1761-->627<!--/v8--> | <!--v8:1762-->0.424242<!--/v8--> |
+| B4/w60/k2 — không phân biệt đúng số | <!--v8:1763-->Đúng<!--/v8--> | <!--v8:1764-->567<!--/v8-->/<!--v8:1765-->567<!--/v8--> | <!--v8:1766-->1<!--/v8--> |
+| B4/w60/k3 | <!--v8:1767-->Đúng<!--/v8--> | <!--v8:1768-->510<!--/v8-->/<!--v8:1769-->567<!--/v8--> | <!--v8:1770-->0.899471<!--/v8--> |
+| B4/w60/k5 | <!--v8:1771-->Đúng<!--/v8--> | <!--v8:1772-->267<!--/v8-->/<!--v8:1773-->567<!--/v8--> | <!--v8:1774-->0.470899<!--/v8--> |
+
+## dev-bcbd4f46ae / nsigma_doi_chung
+
+Ô: ts-route-service / socket; nhóm E-xa; cờ chính N1+N3. t̂=<!--v8:1775-->100<!--/v8-->; t̂⁺=<!--v8:1776-->720<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/nsigma/dev-bcbd4f46ae--nsigma_doi_chung.json#/` và `theo-ca.json#/rows/71`; telemetry `data/rcaeval/re2tt_ts-route-service_socket_2/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+Các cột trong bảng thực sự vượt ngưỡng hai phía từ lịch sử đã quan sát; danh sách cột gây báo và p_j đã đối chiếu Z lưu trước nối nhãn. Tỉ lệ khoảng đầu so với khoảng cuối thỏa N1; liên hệ với vị trí sớm chưa chứng minh lịch sử ngắn là nguyên nhân. Không có cột gây báo đạt N2 chính. N3 không chứng minh OR nhiều cột gây báo, độc lập hoặc đuôi phân phối. 
+
+Lịch sử hữu hạn, nền không dừng, phân phối không chuẩn, điền trước, độ phân giải metric hoặc tải thay đổi đều chưa được tách. V7 N/A cho N1–N4 vì định nghĩa chứa điều kiện báo động. Báo động trong Nv được gọi sai theo nhãn proxy, không khẳng định hệ thực tế bình thường.
+
+r_obs=<!--v8:1777-->0.982258<!--/v8-->; r_ind=<!--v8:1778-->0.984402<!--/v8-->; r_nom=<!--v8:1779-->0.623192<!--/v8-->. Độ trễ và t̂⁺ phải đọc cạnh r_obs, không coi là thời điểm bắt đầu sự cố.
+
+| Cột gây báo | Giá trị | Mean quá khứ | Std quá khứ | Độ lệch | Ngưỡng | p_j trong Nv |
+|---|---|---|---|---|---|---|
+| ts-admin-basic-info-service_cpu | <!--v8:1780-->2.42402<!--/v8--> | <!--v8:1781-->1.4057<!--/v8--> | <!--v8:1782-->0.334294<!--/v8--> | <!--v8:1783-->1.01832<!--/v8--> | <!--v8:1784-->1.00288<!--/v8--> | <!--v8:1785-->0.016129<!--/v8--> |
+| ts-auth-mongo_cpu | <!--v8:1786-->0.286803<!--/v8--> | <!--v8:1787-->0.522269<!--/v8--> | <!--v8:1788-->0.0674085<!--/v8--> | <!--v8:1789-->0.235466<!--/v8--> | <!--v8:1790-->0.202225<!--/v8--> | <!--v8:1791-->0.00483871<!--/v8--> |
+| ts-inside-payment-service_mem | <!--v8:1792-->2.28844e+08<!--/v8--> | <!--v8:1793-->2.25767e+08<!--/v8--> | <!--v8:1794-->972896<!--/v8--> | <!--v8:1795-->3.07679e+06<!--/v8--> | <!--v8:1796-->2.91869e+06<!--/v8--> | <!--v8:1797-->0.00322581<!--/v8--> |
+| ts-auth-service_socket | <!--v8:1798-->20<!--/v8--> | <!--v8:1799-->16.47<!--/v8--> | <!--v8:1800-->0.540389<!--/v8--> | <!--v8:1801-->3.53<!--/v8--> | <!--v8:1802-->1.62117<!--/v8--> | <!--v8:1803-->0.0145161<!--/v8--> |
+| ts-preserve-other-service_workload | <!--v8:1804-->0.133<!--/v8--> | <!--v8:1805-->0.00532<!--/v8--> | <!--v8:1806-->0.0261939<!--/v8--> | <!--v8:1807-->0.12768<!--/v8--> | <!--v8:1808-->0.0785816<!--/v8--> | <!--v8:1809-->0.016129<!--/v8--> |
+| ts-preserve-other-service_latency-50 | <!--v8:1810-->0.805207<!--/v8--> | <!--v8:1811-->7.23287<!--/v8--> | <!--v8:1812-->1.31526<!--/v8--> | <!--v8:1813-->6.42766<!--/v8--> | <!--v8:1814-->3.94577<!--/v8--> | <!--v8:1815-->0.0112903<!--/v8--> |
+| ts-preserve-service_latency-50 | <!--v8:1816-->1.021<!--/v8--> | <!--v8:1817-->1.70938<!--/v8--> | <!--v8:1818-->0.190129<!--/v8--> | <!--v8:1819-->0.688382<!--/v8--> | <!--v8:1820-->0.570388<!--/v8--> | <!--v8:1821-->0.00806452<!--/v8--> |
+| ts-preserve-other-service_latency-90 | <!--v8:1822-->7.23579<!--/v8--> | <!--v8:1823-->9.4295<!--/v8--> | <!--v8:1824-->0.349252<!--/v8--> | <!--v8:1825-->2.19371<!--/v8--> | <!--v8:1826-->1.04776<!--/v8--> | <!--v8:1827-->0.0193548<!--/v8--> |
+
+| Khoảng lịch sử | Báo cột-giây / tổng | Tỉ lệ |
+|---|---|---|
+| 100:200 | <!--v8:1828-->775<!--/v8-->/<!--v8:1829-->36100<!--/v8--> | <!--v8:1830-->0.0214681<!--/v8--> |
+| 200:400 | <!--v8:1831-->626<!--/v8-->/<!--v8:1832-->72200<!--/v8--> | <!--v8:1833-->0.00867036<!--/v8--> |
+| 400:720 | <!--v8:1834-->1111<!--/v8-->/<!--v8:1835-->115520<!--/v8--> | <!--v8:1836-->0.00961738<!--/v8--> |
+
+## dev-de89e2f9e9 / bocpd
+
+Ô: ts-travel-service / disk; nhóm E-gần; cờ chính D0. t̂=<!--v8:1837-->465<!--/v8-->; t̂⁺=<!--v8:1838-->774<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-de89e2f9e9.json#/` và `theo-ca.json#/rows/75`; telemetry `data/rcaeval/re2tt_ts-travel-service_disk_3/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+D0 ở cấu hình chính: điểm đổi quanh t̂ còn ở I1 và I2, B1 không trúng, B4 hữu hạn dưới ngưỡng chính. Cờ độ nhạy có thể đổi; chưa giải thích được điểm đổi ở cấu hình chính.
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:1839-->3<!--/v8--> |
+| I1 | <!--v8:1840-->14<!--/v8--> |
+| I2 | <!--v8:1841-->14<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | ts-food-service_latency-50 | <!--v8:1842-->0.04<!--/v8--> | <!--v8:1843-->0.0414474<!--/v8--> | <!--v8:1844-->0.0005<!--/v8--> | <!--v8:1845-->0.00144737<!--/v8--> | <!--v8:1846-->1.95247<!--/v8--> | <!--v8:1847-->3<!--/v8--> |
+| w30 | ts-ticketinfo-service_latency-50 | <!--v8:1848-->0.0175<!--/v8--> | <!--v8:1849-->0.0174303<!--/v8--> | <!--v8:1850-->2.81727e-05<!--/v8--> | <!--v8:1851-->6.96621e-05<!--/v8--> | <!--v8:1852-->1.6678<!--/v8--> | <!--v8:1853-->4<!--/v8--> |
+| w60 | ts-ticketinfo-service_latency-50 | <!--v8:1854-->0.0175<!--/v8--> | <!--v8:1855-->0.0173576<!--/v8--> | <!--v8:1856-->2.67061e-05<!--/v8--> | <!--v8:1857-->0.000142405<!--/v8--> | <!--v8:1858-->3.5966<!--/v8--> | <!--v8:1859-->3<!--/v8--> |
+
+w15: Nền hằng đổi riêng (MAD bằng không): ts-ui-dashboard_error, ts-admin-basic-info-service_latency-50, ts-consign-price-service_latency-50. Không cộng vào B4.
+w30: Nền hằng đổi riêng (MAD bằng không): ts-ui-dashboard_error, ts-admin-basic-info-service_latency-50, ts-consign-price-service_latency-50, ts-consign-service_latency-50. Không cộng vào B4.
+w60: Nền hằng đổi riêng (MAD bằng không): ts-admin-basic-info-service_latency-50, ts-consign-price-service_latency-50, ts-consign-service_latency-50. Không cộng vào B4.
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 | <!--v8:1860-->Sai<!--/v8--> | <!--v8:1861-->10<!--/v8-->/<!--v8:1862-->712<!--/v8--> | <!--v8:1863-->0.0140449<!--/v8--> |
+| B4/w15/k2 | <!--v8:1864-->Sai<!--/v8--> | <!--v8:1865-->446<!--/v8-->/<!--v8:1866-->657<!--/v8--> | <!--v8:1867-->0.678843<!--/v8--> |
+| B4/w15/k3 | <!--v8:1868-->Sai<!--/v8--> | <!--v8:1869-->245<!--/v8-->/<!--v8:1870-->657<!--/v8--> | <!--v8:1871-->0.372907<!--/v8--> |
+| B4/w15/k5 | <!--v8:1872-->Sai<!--/v8--> | <!--v8:1873-->125<!--/v8-->/<!--v8:1874-->657<!--/v8--> | <!--v8:1875-->0.190259<!--/v8--> |
+| B4/w30/k2 | <!--v8:1876-->Sai<!--/v8--> | <!--v8:1877-->521<!--/v8-->/<!--v8:1878-->627<!--/v8--> | <!--v8:1879-->0.830941<!--/v8--> |
+| B4/w30/k3 | <!--v8:1880-->Sai<!--/v8--> | <!--v8:1881-->333<!--/v8-->/<!--v8:1882-->627<!--/v8--> | <!--v8:1883-->0.5311<!--/v8--> |
+| B4/w30/k5 | <!--v8:1884-->Sai<!--/v8--> | <!--v8:1885-->130<!--/v8-->/<!--v8:1886-->627<!--/v8--> | <!--v8:1887-->0.207337<!--/v8--> |
+| B4/w60/k2 | <!--v8:1888-->Đúng<!--/v8--> | <!--v8:1889-->505<!--/v8-->/<!--v8:1890-->567<!--/v8--> | <!--v8:1891-->0.890653<!--/v8--> |
+| B4/w60/k3 | <!--v8:1892-->Đúng<!--/v8--> | <!--v8:1893-->330<!--/v8-->/<!--v8:1894-->567<!--/v8--> | <!--v8:1895-->0.582011<!--/v8--> |
+| B4/w60/k5 | <!--v8:1896-->Sai<!--/v8--> | <!--v8:1897-->80<!--/v8-->/<!--v8:1898-->567<!--/v8--> | <!--v8:1899-->0.141093<!--/v8--> |
+
+## dev-f36d0647d5 / bocpd
+
+Ô: ts-order-service / loss; nhóm S; cờ chính D0. t̂=<!--v8:1900-->752<!--/v8-->; t̂⁺=<!--v8:1901-->752<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-f36d0647d5.json#/` và `theo-ca.json#/rows/78`; telemetry `data/rcaeval/re2tt_ts-order-service_loss_1/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+Bản đầy đủ không có điểm đổi trong Nv, nhưng tiền tố I1 và I2 đều có. Cờ B1–B4 tại báo động đầu là N/A vì ngoài miền nền; D0 ở đây không có nghĩa đã thử và bác mọi cơ chế. Tiền xử lý tương lai có thể làm mất điểm đổi nền, không chỉ tạo điểm đổi.
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:1902-->0<!--/v8--> |
+| I1 | <!--v8:1903-->16<!--/v8--> |
+| I2 | <!--v8:1904-->16<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | N/A: ngoài miền | N/A | N/A | N/A | N/A | N/A | N/A |
+| w30 | N/A: ngoài miền | N/A | N/A | N/A | N/A | N/A | N/A |
+| w60 | N/A: ngoài miền | N/A | N/A | N/A | N/A | N/A | N/A |
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 | <!--v8:1905-->N/A<!--/v8--> | <!--v8:1906-->0<!--/v8-->/<!--v8:1907-->715<!--/v8--> | <!--v8:1908-->0<!--/v8--> |
+| B4/w15/k2 | <!--v8:1909-->N/A<!--/v8--> | <!--v8:1910-->498<!--/v8-->/<!--v8:1911-->660<!--/v8--> | <!--v8:1912-->0.754545<!--/v8--> |
+| B4/w15/k3 | <!--v8:1913-->N/A<!--/v8--> | <!--v8:1914-->339<!--/v8-->/<!--v8:1915-->660<!--/v8--> | <!--v8:1916-->0.513636<!--/v8--> |
+| B4/w15/k5 | <!--v8:1917-->N/A<!--/v8--> | <!--v8:1918-->199<!--/v8-->/<!--v8:1919-->660<!--/v8--> | <!--v8:1920-->0.301515<!--/v8--> |
+| B4/w30/k2 | <!--v8:1921-->N/A<!--/v8--> | <!--v8:1922-->603<!--/v8-->/<!--v8:1923-->630<!--/v8--> | <!--v8:1924-->0.957143<!--/v8--> |
+| B4/w30/k3 | <!--v8:1925-->N/A<!--/v8--> | <!--v8:1926-->492<!--/v8-->/<!--v8:1927-->630<!--/v8--> | <!--v8:1928-->0.780952<!--/v8--> |
+| B4/w30/k5 | <!--v8:1929-->N/A<!--/v8--> | <!--v8:1930-->374<!--/v8-->/<!--v8:1931-->630<!--/v8--> | <!--v8:1932-->0.593651<!--/v8--> |
+| B4/w60/k2 | <!--v8:1933-->N/A<!--/v8--> | <!--v8:1934-->566<!--/v8-->/<!--v8:1935-->570<!--/v8--> | <!--v8:1936-->0.992982<!--/v8--> |
+| B4/w60/k3 | <!--v8:1937-->N/A<!--/v8--> | <!--v8:1938-->504<!--/v8-->/<!--v8:1939-->570<!--/v8--> | <!--v8:1940-->0.884211<!--/v8--> |
+| B4/w60/k5 | <!--v8:1941-->N/A<!--/v8--> | <!--v8:1942-->463<!--/v8-->/<!--v8:1943-->570<!--/v8--> | <!--v8:1944-->0.812281<!--/v8--> |
+
+## dev-f36d0647d5 / nsigma
+
+Ô: ts-order-service / loss; nhóm E-xa; cờ chính N1+N2. t̂=<!--v8:1945-->116<!--/v8-->; t̂⁺=<!--v8:1946-->720<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/nsigma/dev-f36d0647d5--nsigma.json#/` và `theo-ca.json#/rows/79`; telemetry `data/rcaeval/re2tt_ts-order-service_loss_1/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+Các cột trong bảng thực sự vượt ngưỡng hai phía từ lịch sử đã quan sát; danh sách cột gây báo và p_j đã đối chiếu Z lưu trước nối nhãn. Tỉ lệ khoảng đầu so với khoảng cuối thỏa N1; liên hệ với vị trí sớm chưa chứng minh lịch sử ngắn là nguyên nhân. Có cột gây báo có p_j cao trong Nv; cột báo dày là phân rã trực tiếp, không là đối chứng cơ chế. 
+
+Lịch sử hữu hạn, nền không dừng, phân phối không chuẩn, điền trước, độ phân giải metric hoặc tải thay đổi đều chưa được tách. V7 N/A cho N1–N4 vì định nghĩa chứa điều kiện báo động. Báo động trong Nv được gọi sai theo nhãn proxy, không khẳng định hệ thực tế bình thường.
+
+r_obs=<!--v8:1947-->0.209677<!--/v8-->; r_ind=<!--v8:1948-->0.238644<!--/v8-->; r_nom=<!--v8:1949-->0.116945<!--/v8-->. Độ trễ và t̂⁺ phải đọc cạnh r_obs, không coi là thời điểm bắt đầu sự cố.
+
+| Cột gây báo | Giá trị | Mean quá khứ | Std quá khứ | Độ lệch | Ngưỡng | p_j trong Nv |
+|---|---|---|---|---|---|---|
+| ts-auth-service_latency-50 | <!--v8:1950-->0.273437<!--/v8--> | <!--v8:1951-->0.228776<!--/v8--> | <!--v8:1952-->0.00905272<!--/v8--> | <!--v8:1953-->0.0446614<!--/v8--> | <!--v8:1954-->0.0271582<!--/v8--> | <!--v8:1955-->0.0370968<!--/v8--> |
+| ts-ui-dashboard_latency-50 | <!--v8:1956-->0.311688<!--/v8--> | <!--v8:1957-->0.282678<!--/v8--> | <!--v8:1958-->0.00958911<!--/v8--> | <!--v8:1959-->0.0290106<!--/v8--> | <!--v8:1960-->0.0287673<!--/v8--> | <!--v8:1961-->0.0016129<!--/v8--> |
+
+| Khoảng lịch sử | Báo cột-giây / tổng | Tỉ lệ |
+|---|---|---|
+| 100:200 | <!--v8:1962-->72<!--/v8-->/<!--v8:1963-->4600<!--/v8--> | <!--v8:1964-->0.0156522<!--/v8--> |
+| 200:400 | <!--v8:1965-->55<!--/v8-->/<!--v8:1966-->9200<!--/v8--> | <!--v8:1967-->0.00597826<!--/v8--> |
+| 400:720 | <!--v8:1968-->39<!--/v8-->/<!--v8:1969-->14720<!--/v8--> | <!--v8:1970-->0.00264946<!--/v8--> |
+
+## dev-f81f88234e / nsigma_doi_chung
+
+Ô: ts-auth-service / delay; nhóm E-xa; cờ chính N2+N4. t̂=<!--v8:1971-->100<!--/v8-->; t̂⁺=<!--v8:1972-->720<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/nsigma/dev-f81f88234e--nsigma_doi_chung.json#/` và `theo-ca.json#/rows/83`; telemetry `data/rcaeval/re2tt_ts-auth-service_delay_3/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+Các cột trong bảng thực sự vượt ngưỡng hai phía từ lịch sử đã quan sát; danh sách cột gây báo và p_j đã đối chiếu Z lưu trước nối nhãn. Có cột gây báo có p_j cao trong Nv; cột báo dày là phân rã trực tiếp, không là đối chứng cơ chế. Có std quá khứ bằng không và giá trị hiện tại khác mean: ngưỡng bằng không đủ giải thích phép so số học ở cột đó; chưa giải thích vì sao telemetry đổi. 
+
+Lịch sử hữu hạn, nền không dừng, phân phối không chuẩn, điền trước, độ phân giải metric hoặc tải thay đổi đều chưa được tách. V7 N/A cho N1–N4 vì định nghĩa chứa điều kiện báo động. Báo động trong Nv được gọi sai theo nhãn proxy, không khẳng định hệ thực tế bình thường.
+
+r_obs=<!--v8:1973-->0.979032<!--/v8-->; r_ind=<!--v8:1974-->0.982158<!--/v8-->; r_nom=<!--v8:1975-->0.621148<!--/v8-->. Độ trễ và t̂⁺ phải đọc cạnh r_obs, không coi là thời điểm bắt đầu sự cố.
+
+| Cột gây báo | Giá trị | Mean quá khứ | Std quá khứ | Độ lệch | Ngưỡng | p_j trong Nv |
+|---|---|---|---|---|---|---|
+| ts-admin-basic-info-service_cpu | <!--v8:1976-->2.89113<!--/v8--> | <!--v8:1977-->1.54427<!--/v8--> | <!--v8:1978-->0.31089<!--/v8--> | <!--v8:1979-->1.34686<!--/v8--> | <!--v8:1980-->0.932671<!--/v8--> | <!--v8:1981-->0.00967742<!--/v8--> |
+| ts-order-other-service_cpu | <!--v8:1982-->9.64068<!--/v8--> | <!--v8:1983-->14.2991<!--/v8--> | <!--v8:1984-->1.54533<!--/v8--> | <!--v8:1985-->4.65838<!--/v8--> | <!--v8:1986-->4.63599<!--/v8--> | <!--v8:1987-->0.0112903<!--/v8--> |
+| ts-consign-service_mem | <!--v8:1988-->2.24657e+08<!--/v8--> | <!--v8:1989-->2.23457e+08<!--/v8--> | <!--v8:1990-->323098<!--/v8--> | <!--v8:1991-->1.20021e+06<!--/v8--> | <!--v8:1992-->969295<!--/v8--> | <!--v8:1993-->0.00645161<!--/v8--> |
+| ts-news-service_mem | <!--v8:1994-->1.98656e+06<!--/v8--> | <!--v8:1995-->1.97911e+06<!--/v8--> | <!--v8:1996-->2356.21<!--/v8--> | <!--v8:1997-->7454.72<!--/v8--> | <!--v8:1998-->7068.63<!--/v8--> | <!--v8:1999-->0.108065<!--/v8--> |
+| ts-rebook-service_mem | <!--v8:2000-->1.84996e+08<!--/v8--> | <!--v8:2001-->1.8497e+08<!--/v8--> | <!--v8:2002-->8108.83<!--/v8--> | <!--v8:2003-->26214.4<!--/v8--> | <!--v8:2004-->24326.5<!--/v8--> | <!--v8:2005-->0.00322581<!--/v8--> |
+| ts-rebook-service_socket | <!--v8:2006-->4<!--/v8--> | <!--v8:2007-->3<!--/v8--> | <!--v8:2008-->0<!--/v8--> | <!--v8:2009-->1<!--/v8--> | <!--v8:2010-->0<!--/v8--> | <!--v8:2011-->0.0741935<!--/v8--> |
+| ts-consign-price-service_workload | <!--v8:2012-->0.467<!--/v8--> | <!--v8:2013-->0.07868<!--/v8--> | <!--v8:2014-->0.0827947<!--/v8--> | <!--v8:2015-->0.38832<!--/v8--> | <!--v8:2016-->0.248384<!--/v8--> | <!--v8:2017-->0.0112903<!--/v8--> |
+| ts-consign-service_workload | <!--v8:2018-->0.533<!--/v8--> | <!--v8:2019-->0.07523<!--/v8--> | <!--v8:2020-->0.0854884<!--/v8--> | <!--v8:2021-->0.45777<!--/v8--> | <!--v8:2022-->0.256465<!--/v8--> | <!--v8:2023-->0.0129032<!--/v8--> |
+
+| Khoảng lịch sử | Báo cột-giây / tổng | Tỉ lệ |
+|---|---|---|
+| 100:200 | <!--v8:2024-->599<!--/v8-->/<!--v8:2025-->35900<!--/v8--> | <!--v8:2026-->0.0166852<!--/v8--> |
+| 200:400 | <!--v8:2027-->744<!--/v8-->/<!--v8:2028-->71800<!--/v8--> | <!--v8:2029-->0.0103621<!--/v8--> |
+| 400:720 | <!--v8:2030-->1094<!--/v8-->/<!--v8:2031-->114880<!--/v8--> | <!--v8:2032-->0.00952298<!--/v8--> |
+
+## dev-f9a8e05ed7 / nsigma_doi_chung
+
+Ô: ts-travel-service / disk; nhóm E-xa; cờ chính N1+N2. t̂=<!--v8:2033-->100<!--/v8-->; t̂⁺=<!--v8:2034-->720<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/nsigma/dev-f9a8e05ed7--nsigma_doi_chung.json#/` và `theo-ca.json#/rows/86`; telemetry `data/rcaeval/re2tt_ts-travel-service_disk_2/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+Các cột trong bảng thực sự vượt ngưỡng hai phía từ lịch sử đã quan sát; danh sách cột gây báo và p_j đã đối chiếu Z lưu trước nối nhãn. Tỉ lệ khoảng đầu so với khoảng cuối thỏa N1; liên hệ với vị trí sớm chưa chứng minh lịch sử ngắn là nguyên nhân. Có cột gây báo có p_j cao trong Nv; cột báo dày là phân rã trực tiếp, không là đối chứng cơ chế. 
+
+Lịch sử hữu hạn, nền không dừng, phân phối không chuẩn, điền trước, độ phân giải metric hoặc tải thay đổi đều chưa được tách. V7 N/A cho N1–N4 vì định nghĩa chứa điều kiện báo động. Báo động trong Nv được gọi sai theo nhãn proxy, không khẳng định hệ thực tế bình thường.
+
+r_obs=<!--v8:2035-->0.998387<!--/v8-->; r_ind=<!--v8:2036-->0.999726<!--/v8-->; r_nom=<!--v8:2037-->0.627245<!--/v8-->. Độ trễ và t̂⁺ phải đọc cạnh r_obs, không coi là thời điểm bắt đầu sự cố.
+
+| Cột gây báo | Giá trị | Mean quá khứ | Std quá khứ | Độ lệch | Ngưỡng | p_j trong Nv |
+|---|---|---|---|---|---|---|
+| ts-basic-service_cpu | <!--v8:2038-->1.80984<!--/v8--> | <!--v8:2039-->1.21404<!--/v8--> | <!--v8:2040-->0.159817<!--/v8--> | <!--v8:2041-->0.595801<!--/v8--> | <!--v8:2042-->0.479451<!--/v8--> | <!--v8:2043-->0.00806452<!--/v8--> |
+| ts-seat-service_cpu | <!--v8:2044-->0.0600055<!--/v8--> | <!--v8:2045-->0.0859404<!--/v8--> | <!--v8:2046-->0.00741703<!--/v8--> | <!--v8:2047-->0.025935<!--/v8--> | <!--v8:2048-->0.0222511<!--/v8--> | <!--v8:2049-->0.00483871<!--/v8--> |
+| ts-admin-user-service_mem | <!--v8:2050-->1.85762e+08<!--/v8--> | <!--v8:2051-->1.85755e+08<!--/v8--> | <!--v8:2052-->2108.75<!--/v8--> | <!--v8:2053-->7208.96<!--/v8--> | <!--v8:2054-->6326.24<!--/v8--> | <!--v8:2055-->0.137097<!--/v8--> |
+| ts-assurance-mongo_mem | <!--v8:2056-->6.63429e+07<!--/v8--> | <!--v8:2057-->6.62082e+07<!--/v8--> | <!--v8:2058-->14072.4<!--/v8--> | <!--v8:2059-->134676<!--/v8--> | <!--v8:2060-->42217.2<!--/v8--> | <!--v8:2061-->0.0483871<!--/v8--> |
+| ts-config-mongo_mem | <!--v8:2062-->6.77356e+07<!--/v8--> | <!--v8:2063-->6.76055e+07<!--/v8--> | <!--v8:2064-->13882.5<!--/v8--> | <!--v8:2065-->130007<!--/v8--> | <!--v8:2066-->41647.6<!--/v8--> | <!--v8:2067-->0.0564516<!--/v8--> |
+| ts-preserve-other-mongo_mem | <!--v8:2068-->6.53722e+07<!--/v8--> | <!--v8:2069-->6.5365e+07<!--/v8--> | <!--v8:2070-->2355.85<!--/v8--> | <!--v8:2071-->7168<!--/v8--> | <!--v8:2072-->7067.56<!--/v8--> | <!--v8:2073-->0.0564516<!--/v8--> |
+| ts-user-mongo_mem | <!--v8:2074-->6.68426e+07<!--/v8--> | <!--v8:2075-->6.68355e+07<!--/v8--> | <!--v8:2076-->1875.22<!--/v8--> | <!--v8:2077-->7168<!--/v8--> | <!--v8:2078-->5625.65<!--/v8--> | <!--v8:2079-->0.0419355<!--/v8--> |
+| ts-consign-price-service_latency-50 | <!--v8:2080-->0.015<!--/v8--> | <!--v8:2081-->0.00851496<!--/v8--> | <!--v8:2082-->0.00122854<!--/v8--> | <!--v8:2083-->0.00648504<!--/v8--> | <!--v8:2084-->0.00368562<!--/v8--> | <!--v8:2085-->0.0241935<!--/v8--> |
+
+| Khoảng lịch sử | Báo cột-giây / tổng | Tỉ lệ |
+|---|---|---|
+| 100:200 | <!--v8:2086-->1324<!--/v8-->/<!--v8:2087-->36500<!--/v8--> | <!--v8:2088-->0.036274<!--/v8--> |
+| 200:400 | <!--v8:2089-->1857<!--/v8-->/<!--v8:2090-->73000<!--/v8--> | <!--v8:2091-->0.0254384<!--/v8--> |
+| 400:720 | <!--v8:2092-->1745<!--/v8-->/<!--v8:2093-->116800<!--/v8--> | <!--v8:2094-->0.0149401<!--/v8--> |
+
+## dev-fbc45b0c67 / bocpd
+
+Ô: ts-train-service / delay; nhóm E-xa; cờ chính B4. t̂=<!--v8:2095-->289<!--/v8-->; t̂⁺=<!--v8:2096-->754<!--/v8-->.
+
+Nguồn: `results/T-029/features-no-label/bocpd/dev-fbc45b0c67.json#/` và `theo-ca.json#/rows/87`; telemetry `data/rcaeval/re2tt_ts-train-service_delay_3/metrics.parquet`. Lý do chọn giữ nguyên trong selection.json.
+
+B2 sai: I1 giữ điểm đổi quanh t̂; điều này chưa loại look-ahead bên trong tiền tố. B4 đúng cho bước median ở cột ghi trong bảng; đây là đổi telemetry, chưa biết nền có sự cố khác hay chỉ đổi tải. Hazard I2 không làm mất điểm đổi đang xét; không phủ nhận ảnh hưởng lên các điểm đổi khác.
+
+Biến động tải, drift, cadence/điền trước và covariance/prior đa biến đều có thể góp phần. Không có nhãn nền sạch hoặc mốc sự cố khác để phân xử. Điểm không báo có B4 thường xuyên; không dùng tần suất đó làm lời giải thích. D và clock tuyệt đối còn OPEN.
+
+| Bản chạy | Điểm đổi trong Nv |
+|---|---|
+| full | <!--v8:2097-->4<!--/v8--> |
+| I1 | <!--v8:2098-->15<!--/v8--> |
+| I2 | <!--v8:2099-->14<!--/v8--> |
+
+| w | Cột có bước chuẩn hóa lớn nhất | Median trước | Median sau | MAD | Bước tuyệt đối | Bước chuẩn hóa | Số cột nền hằng đổi |
+|---|---|---|---|---|---|---|---|
+| w15 | ts-preserve-other-service_latency-50 | <!--v8:2100-->0.5<!--/v8--> | <!--v8:2101-->0.6875<!--/v8--> | <!--v8:2102-->0.0416667<!--/v8--> | <!--v8:2103-->0.1875<!--/v8--> | <!--v8:2104-->3.03521<!--/v8--> | <!--v8:2105-->1<!--/v8--> |
+| w30 | ts-preserve-other-service_latency-50 | <!--v8:2106-->0.40625<!--/v8--> | <!--v8:2107-->0.678571<!--/v8--> | <!--v8:2108-->0.0416667<!--/v8--> | <!--v8:2109-->0.272321<!--/v8--> | <!--v8:2110-->4.40828<!--/v8--> | <!--v8:2111-->1<!--/v8--> |
+| w60 | ts-basic-service_latency-50 | <!--v8:2112-->0.00805908<!--/v8--> | <!--v8:2113-->0.00816959<!--/v8--> | <!--v8:2114-->1.90901e-05<!--/v8--> | <!--v8:2115-->0.000110506<!--/v8--> | <!--v8:2116-->3.9044<!--/v8--> | <!--v8:2117-->3<!--/v8--> |
+
+w15: Nền hằng đổi riêng (MAD bằng không): ts-security-service_latency-50. Không cộng vào B4.
+w30: Nền hằng đổi riêng (MAD bằng không): ts-security-service_latency-50. Không cộng vào B4.
+w60: Nền hằng đổi riêng (MAD bằng không): ts-admin-basic-info-service_latency-50, ts-preserve-other-service_latency-50, ts-security-service_latency-50. Không cộng vào B4.
+
+| Cờ V7 | Tại t̂ | Điểm không báo đúng / tổng | Tỉ lệ điểm không báo |
+|---|---|---|---|
+| B1 — không phân biệt đúng số | <!--v8:2118-->Sai<!--/v8--> | <!--v8:2119-->0<!--/v8-->/<!--v8:2120-->711<!--/v8--> | <!--v8:2121-->0<!--/v8--> |
+| B4/w15/k2 | <!--v8:2122-->Đúng<!--/v8--> | <!--v8:2123-->557<!--/v8-->/<!--v8:2124-->656<!--/v8--> | <!--v8:2125-->0.849085<!--/v8--> |
+| B4/w15/k3 | <!--v8:2126-->Đúng<!--/v8--> | <!--v8:2127-->354<!--/v8-->/<!--v8:2128-->656<!--/v8--> | <!--v8:2129-->0.539634<!--/v8--> |
+| B4/w15/k5 | <!--v8:2130-->Sai<!--/v8--> | <!--v8:2131-->211<!--/v8-->/<!--v8:2132-->656<!--/v8--> | <!--v8:2133-->0.321646<!--/v8--> |
+| B4/w30/k2 | <!--v8:2134-->Đúng<!--/v8--> | <!--v8:2135-->610<!--/v8-->/<!--v8:2136-->626<!--/v8--> | <!--v8:2137-->0.974441<!--/v8--> |
+| B4/w30/k3 | <!--v8:2138-->Đúng<!--/v8--> | <!--v8:2139-->490<!--/v8-->/<!--v8:2140-->626<!--/v8--> | <!--v8:2141-->0.782748<!--/v8--> |
+| B4/w30/k5 | <!--v8:2142-->Sai<!--/v8--> | <!--v8:2143-->216<!--/v8-->/<!--v8:2144-->626<!--/v8--> | <!--v8:2145-->0.345048<!--/v8--> |
+| B4/w60/k2 | <!--v8:2146-->Đúng<!--/v8--> | <!--v8:2147-->554<!--/v8-->/<!--v8:2148-->566<!--/v8--> | <!--v8:2149-->0.978799<!--/v8--> |
+| B4/w60/k3 | <!--v8:2150-->Đúng<!--/v8--> | <!--v8:2151-->462<!--/v8-->/<!--v8:2152-->566<!--/v8--> | <!--v8:2153-->0.816254<!--/v8--> |
+| B4/w60/k5 | <!--v8:2154-->Sai<!--/v8--> | <!--v8:2155-->128<!--/v8-->/<!--v8:2156-->566<!--/v8--> | <!--v8:2157-->0.226148<!--/v8--> |

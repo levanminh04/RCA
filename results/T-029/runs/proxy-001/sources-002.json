@@ -1,0 +1,51 @@
+{
+ "examined_sources": [
+  {
+   "path": "results/T-002/public-metadata/run-002/sources/paper-v2.html",
+   "line": 427,
+   "url": "https://arxiv.org/html/2412.17015v2#S3.SS3",
+   "section": "3.3",
+   "finding": "Nêu 10 phút nền trước tiêm, rồi thu telemetry bất thường; đoạn này không nêu thời lượng lỗi sau tiêm.",
+   "sha256": "f51d363a7b5b75459eb6400d62fa4856e365c13cc44953f60e2b304d1fc415c7"
+  },
+  {
+   "path": "results/T-002/public-metadata/run-002/sources/github-README.md",
+   "line": 162,
+   "url": "https://github.com/phamquiluan/RCAEval/blob/259ea4167160256a74ad30004aa3d96a998c846e/README.md",
+   "finding": "Cấu trúc file nêu inject_time timestamp, không có end_time hoặc D trong phần mô tả này.",
+   "sha256": "25a354ef13f5adf8b2869d67a832958a8a31a6b7b95cf011e060f34ab28c98a9"
+  },
+  {
+   "path": "results/T-002/public-metadata/run-002/sources/hf-README.md",
+   "line": 97,
+   "url": "https://huggingface.co/datasets/phamquiluan/RCAEval/blob/afeacb11bcc94dadfd1c8f483ee4377b2b8b614e/README.md",
+   "finding": "Mô tả inject_time chia normal trước và faulty sau mốc; đây là mô tả proxy, không bằng chứng độc lập về thời điểm kết thúc.",
+   "sha256": "c2990bbe2e040a8d2f55fdd47c4f47f02223d8ea098e5d6e8851585a64956a0f"
+  },
+  {
+   "path": "docs/knowledge/K2-du-lieu.md",
+   "line": 14,
+   "finding": "Đã ghi inject time không phải independent anomaly-onset truth (nhãn thời điểm bất thường độc lập).",
+   "sha256": "f822965e455437c00976c93403fbc372cd2ed8b3a71358eed5bf3d23de6d8743"
+  }
+ ],
+ "looked_up_at": "2026-10-08T20:07:15+07:00",
+ "script_sha256": "8cf3146592afc52eb8a6fcdad6fae5b72439e4b9f905fefa2580d2c10d00502f",
+ "published_fault_duration_D_seconds": null,
+ "duration_status": "OPEN: chưa thấy thời lượng lỗi sau tiêm trong các nguồn đã khảo sát",
+ "original_repository_revision": "259ea4167160256a74ad30004aa3d96a998c846e",
+ "original_repository_tree_check": "git ls-tree -r --name-only HEAD: không thấy tên script inject/chaos/fault/collect/stress; script/ chỉ link/tag",
+ "online_primary_search": {
+  "queries": [
+   "site:github.com/phamquiluan RCAEval fault injection duration",
+   "site:github.com/phamquiluan RCAEval chaosblade inject script"
+  ],
+  "used_url": "https://github.com/phamquiluan/RCAEval",
+  "finding": "Không thấy thông tin D hay script tiêm lỗi trong kết quả primary khảo sát; không kết luận mọi nguồn đều thiếu."
+ },
+ "rescore": {
+  "performed": false,
+  "reason": "SPEC F P1 chỉ cho chấm lại khi nguồn nêu D<721 s; chưa có bằng chứng đó"
+ },
+ "causal_limit": "Median metrics không xác minh được thời điểm kết thúc lỗi hoặc onset thật."
+}

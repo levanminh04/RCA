@@ -1,0 +1,96 @@
+--- ban-do-han-che-phat-hien.md.before
++++ ban-do-han-che-phat-hien.md
+@@ -1,14 +1,24 @@
+-Nguồn từng số và con trỏ JSON: [ban-do-han-che-phat-hien.md — bảng nguồn](runs/report-main-001/ban-do-han-che-phat-hien.md.bindings.json). Dấu nguồn ẩn trong bản Markdown để V8 kiểm từng lần xuất hiện.
++Nguồn từng số và con trỏ JSON: [ban-do-han-che-phat-hien.md — bảng nguồn](runs/review4-repair-001/ban-do-han-che-phat-hien.md.bindings.json). Dấu nguồn ẩn trong bản Markdown để V8 kiểm từng lần xuất hiện.
+ 
+ # Bản đồ hạn chế phát hiện ở chế độ (b)
+ 
+-Báo động đầu thường nằm trước mốc tiêm theo nhãn proxy. BOCPD nhạy với dữ liệu sau mốc qua tiền xử lý; N-Sigma có nhiều báo động nền, nhưng các cờ chưa tách được nguyên nhân thống kê. Bước nhảy telemetry B4 cũng phổ biến ở điểm không báo. Vì vậy bản đồ dưới đây phân biệt bằng chứng can thiệp, liên hệ, đọc tay và phần chưa kiểm.
++Báo động đầu thường nằm trước mốc tiêm theo nhãn proxy. Trên mẫu đã kiểm, tiền xử lý toàn chuỗi của BOCPD cho báo đầu muộn hơn hoặc bằng so với I1 cắt sau mốc; tổng số điểm đổi nền ít hơn nhưng có ca ngược chiều. B2 cho biết vị trí báo đầu phụ thuộc dữ liệu sau mốc qua tiền xử lý, chưa giải thích sự tồn tại của báo động trước mốc. N-Sigma có nhiều báo động nền, nhưng các cờ chưa tách được nguyên nhân thống kê. B4 mô tả bước nhảy telemetry và cũng phổ biến ở điểm không báo; không dùng riêng cờ này làm lời giải thích. Bản đồ phân biệt bằng chứng can thiệp, liên hệ, đọc tay và phần chưa kiểm.
+ 
+ Phạm vi: <!--v8:0-->90<!--/v8--> cặp, mỗi bộ <!--v8:1-->30<!--/v8--> ca dev RE2-TT. Mốc chung, lưới và các ngưỡng theo [SPEC đã khóa](../../tasks/T-029-p4-han-che-phat-hien/SPEC.md). Root/loại lỗi/ô chỉ nối sau khi [đặc trưng được lưu và băm](runs/step5-001/features-frozen.json). I1/I2/I3 dùng nhãn thời gian cho phân tích; không đổi số P3, không là đầu vào triển khai detector.
+ 
+ ## C1 — Thất bại ở đâu (liên hệ/mô tả)
+ 
+ S nghĩa là báo động đầu sau mốc; E-gần/E-xa tách theo cửa sổ RCA có chứa mốc. Miss là không có báo trong đoạn sau mốc, khác với báo động đầu sai. Độ trễ BOCPD là độ lệch vị trí điểm đổi hồi cứu. Độ trễ N-Sigma phải đặt cạnh r_obs trong Nv; báo dày từ trước mốc có thể tiếp tục qua mốc.
++
++Các ca S của BOCPD có điều kiện theo tiền xử lý toàn chuỗi: cả <!--v8:6131-->3<!--/v8--> ca đều có báo động trước mốc trong I1. Bảng sau giữ từng ca; không đổi phân loại hay số T-025. I1 vẫn nhìn trước bên trong tiền tố, nên đây không là chất lượng online.
++
++| Ca / ô | Báo đầu full | Báo đầu I1 | Điểm đổi Nv full | Điểm đổi Nv I1 |
++|---|---|---|---|---|
++| dev-3defe3d34b / ts-auth-service / cpu | <!--v8:6132-->748<!--/v8--> | <!--v8:6133-->246<!--/v8--> | <!--v8:6134-->0<!--/v8--> | <!--v8:6135-->12<!--/v8--> |
++| dev-98bc73c499 / ts-train-service / cpu | <!--v8:6136-->761<!--/v8--> | <!--v8:6137-->238<!--/v8--> | <!--v8:6138-->0<!--/v8--> | <!--v8:6139-->11<!--/v8--> |
++| dev-f36d0647d5 / ts-order-service / loss | <!--v8:6140-->752<!--/v8--> | <!--v8:6141-->214<!--/v8--> | <!--v8:6142-->0<!--/v8--> | <!--v8:6143-->16<!--/v8--> |
++
++Nguồn: `runs/review4-repair-001/summary.json#/intervention/S`; số gốc `bocpd-can-thiep.json#/cases/<ca>/{full,I1,cp_counts_Nv}`.
+ 
+ Nguồn bảng: `theo-ca.json#/per_detector/<bộ>/cell/<ô>` và `runs/report-main-001/summary.json#/delay`.
+ 
+@@ -53,7 +63,7 @@
+ 
+ ### Theo từng ca: giữ mọi cặp
+ 
+-Nguồn: `theo-ca.json#/rows/<dòng>`. Danh sách cờ là đa nhãn, không là thứ tự nguyên nhân trội. D0 ở S có thể do tất cả cờ BOCPD không có miền hợp lệ.
++Nguồn: `theo-ca.json#/rows/<dòng>`. Danh sách cờ là đa nhãn ở cấu hình chính, không là thứ tự nguyên nhân trội hoặc số ca đã giải thích. Với nhóm E, D0 là một phần của nhóm chưa giải thích; có cờ chưa đồng nghĩa đã giải thích sự tồn tại của báo động trước mốc. D0 ở S có thể do các cờ BOCPD không có miền hợp lệ, nên phải tách S/E và không gộp D0 ở S thành thất bại báo sớm.
+ 
+ | Ca | Bộ | Ô | Nhóm | t̂ | t̂⁺ | Độ trễ | Báo sai trong Nv | r_obs Nv | d | Cờ chính |
+ |---|---|---|---|---|---|---|---|---|---|---|
+@@ -159,10 +169,10 @@
+ | HP-3 | N-Sigma / N3: E không có cột báo dày tại t̂ | liên hệ + đọc tay | Phần còn lại sau N2; ba tỉ lệ là mô tả. | Không chứng minh cộng dồn, độc lập hoặc phân phối chuẩn; một cột thưa cũng đủ gây báo. | Chưa thấy trong nguồn đã khảo sát; công thức OR nằm trong code/hồ sơ N-Sigma. |
+ | HP-4 | N-Sigma / N4: std bằng không | liên hệ + đọc tay | Trung gian xác nhận ngưỡng bằng không tại cột gây báo. | Độ phân giải, tải hoặc nền hằng; chưa phân xử ý nghĩa vận hành của socket. | Code tác giả có phép so này; chưa thấy tác giả nêu riêng như hạn chế trong bài đã khảo sát. |
+ | HP-5 | BOCPD / B1: đầu NaN điền không | liên hệ + đọc tay | Không có cờ B1 ở báo động đầu E của dev này. | Không kiểm mọi dạng missing hoặc tác động điền trước; B1 âm không bác ảnh hưởng thiếu dữ liệu. | Code có fillna; chưa thấy trong nguồn đã khảo sát như hạn chế thực nghiệm. |
+-| HP-6 | BOCPD / B2: dữ liệu sau mốc qua tiền xử lý | can thiệp I1 + đọc tay | Cắt sau mốc làm mất điểm đổi quanh t̂ ở các ca B2. | I1 đổi đồng thời bộ cột và min–max; vẫn nhìn dữ liệu sau t̂ trong tiền tố. B2 sai chưa loại look-ahead. | Code tiền xử lý toàn chuỗi; chưa thấy tác giả nêu hạn chế này trong nguồn đã khảo sát. |
++| HP-6 | BOCPD / B2: dữ liệu sau mốc qua tiền xử lý | can thiệp I1 + đọc tay | Vị trí báo đầu phụ thuộc dữ liệu sau mốc qua tiền xử lý; cắt sau mốc làm mất điểm đổi quanh t̂ ở các ca B2 nhưng có báo đầu sớm hơn. B2 chưa giải thích vì sao tồn tại báo động trước mốc; chiều can thiệp và điều kiện của S được báo riêng dưới đây. | I1 đổi bộ cột và min–max, kéo theo số chiều của prior; vẫn nhìn dữ liệu sau t̂ trong tiền tố. B2 sai chưa loại look-ahead; không suy bỏ nhìn trước sẽ giảm báo sai. | Code tiền xử lý toàn chuỗi; chưa thấy tác giả nêu hạn chế này trong nguồn đã khảo sát. |
+ | HP-7 | BOCPD / B3: hazard | can thiệp I2 + đọc tay | Không có B3 đúng trên miền được chấm. Số điểm đổi khác vẫn có thể đổi. | Chỉ kiểm trước mốc; chưa chạy toàn bản ghi với hazard khác theo giới hạn chi phí SPEC. | Hazard thay thế có trong code; chưa thấy phân tích B3 trên giao thức này trong nguồn đã khảo sát. |
+-| HP-8 | BOCPD / B4: bước nhảy telemetry trước mốc | liên hệ, V7 + đọc tay | Có bước median lớn; V7 không cho quy mọi cờ thành lời giải thích. | Nền không sạch, biến động tải, MAD nhỏ, nhiều cơ hội qua nhiều cột; chưa có nhãn nền độc lập. | [BARO, giả định đầu vào](https://arxiv.org/html/2405.09330v1#S3.SS1) nêu bất thường hiện ở latency/error; chưa thấy phân xử B4/V7 này. |
+-| HP-9 | D0: không có cờ chính | đọc tay; chưa giải thích | Không ép vào cơ chế. S và E phải tách; miền N/A không là cờ âm. | Covariance/prior, drift và bước nhỏ vẫn có thể góp phần; chưa có can thiệp phân xử chúng. | Chưa thấy trong nguồn đã khảo sát. |
++| HP-8 | BOCPD / B4: bước nhảy telemetry trước mốc | liên hệ, V7 + đọc tay | Mô tả bước median lớn. Cờ phổ biến ở điểm không báo và đổi chiều theo ô/độ nhạy; không dùng B4 riêng làm lời giải thích sự tồn tại của báo động trước mốc. | Nền không sạch, biến động tải, MAD nhỏ, nhiều cơ hội qua nhiều cột; chưa có nhãn nền độc lập. | [BARO, giả định đầu vào](https://arxiv.org/html/2405.09330v1#S3.SS1) nêu bất thường hiện ở latency/error; chưa thấy phân xử B4/V7 này. |
++| HP-9 | D0: không có cờ chính | đọc tay; chưa giải thích | Với E, D0 thuộc nhóm chưa giải thích nhưng không bao hết nhóm đó: có cờ cũng chưa chắc đã giải thích. Với S, D0 có thể do miền N/A; không tính thành thất bại báo sớm. Không ép vào cơ chế; N/A không là cờ âm. | Covariance/prior, drift và bước nhỏ vẫn có thể góp phần; chưa có can thiệp phân xử chúng. | Chưa thấy trong nguồn đã khảo sát. |
+ | HP-10 | Đầu ra detector và định vị service | liên hệ / thiết kế | N-Sigma cho cột, phân tích E thêm mapping/thứ tự; BOCPD không native attribution. | Báo động kéo dài qua mốc, hòa, root hết cột; chưa chứng minh onset, nhân quả hoặc lan. | [BARO, pipeline](https://arxiv.org/html/2405.09330v1#S3.SS2) tách detector với ranker; chưa thấy rank E như đầu ra native. |
+ | HP-11 | RCA phụ thuộc điểm chạy | can thiệp I3 | Chênh ghép cặp có dấu; bảng G cho kết quả có điều kiện theo ô và cohort. | Đổi cửa sổ cũng đổi nền, cột ứng viên và graph CIRCA; chưa tách riêng các đường tác động. | [BARO, độ nhạy thời điểm](https://arxiv.org/html/2405.09330v1#S4.SS8.SSS1) có nêu; chưa thấy phân rã G của T-029. |
+ | HP-12 | Nhãn proxy / thời lượng lỗi D | chưa kiểm D; liên hệ P1 | Nguồn chưa xác nhận D; chưa chấm lại P/R/F1. Timeline chỉ mô tả telemetry. | Metric phục hồi không đồng nghĩa lỗi đã hết; root có cột thiếu, Nv khác cho quantile khác. | [RCAEval, tạo dữ liệu](https://arxiv.org/html/2412.17015v2#S3.SS3) mô tả mốc và thu thập; chưa thấy D cho các ca này. |
+@@ -170,6 +180,25 @@
+ | HP-14 | N-Sigma / N6: nền mở rộng nhận dữ liệu sau mốc | thiết kế + mô tả; chưa kiểm nhân quả | Code nhận dữ liệu đã quan sát vào mean/std; timeline báo thay đổi mật độ. | Giảm báo có thể do phục hồi, đổi tải, ngưỡng tăng hoặc biến động cột; chưa can thiệp cố định nền. | Code tác giả, [hồ sơ N-Sigma](../T-013/ho-so-nsigma-phat-hien.md); không dùng số bài thay kết quả này. |
+ 
+ Nguồn tác giả đã khảo sát: bài BARO bản v1 (phần giả định, mô hình, phát hiện, độ nhạy thời điểm, giới hạn); code BARO ở revision trong [manifest T-013](../T-013/manifest.json), hồ sơ BOCPD/N-Sigma/cửa sổ; nguồn công bố RCAEval đã lưu cho P1. “Chưa thấy” chỉ áp các nguồn đã khảo sát, không là tuyên bố mọi tài liệu đều không có.
++
++### Chiều can thiệp I1: theo ô và tổng gộp
++
++| Ô | Ca | Điểm đổi Nv full | I1 | I2 | Báo đầu I1 sớm / bằng / muộn | Số điểm đổi I1 tăng / bằng / giảm |
++|---|---|---|---|---|---|---|
++| ts-auth-service / cpu | <!--v8:6144-->3<!--/v8--> | <!--v8:6145-->23<!--/v8--> | <!--v8:6146-->41<!--/v8--> | <!--v8:6147-->40<!--/v8--> | <!--v8:6148-->3<!--/v8--> / <!--v8:6149-->0<!--/v8--> / <!--v8:6150-->0<!--/v8--> | <!--v8:6151-->3<!--/v8--> / <!--v8:6152-->0<!--/v8--> / <!--v8:6153-->0<!--/v8--> |
++| ts-auth-service / delay | <!--v8:6154-->3<!--/v8--> | <!--v8:6155-->11<!--/v8--> | <!--v8:6156-->24<!--/v8--> | <!--v8:6157-->24<!--/v8--> | <!--v8:6158-->2<!--/v8--> / <!--v8:6159-->1<!--/v8--> / <!--v8:6160-->0<!--/v8--> | <!--v8:6161-->2<!--/v8--> / <!--v8:6162-->1<!--/v8--> / <!--v8:6163-->0<!--/v8--> |
++| ts-order-service / disk | <!--v8:6164-->3<!--/v8--> | <!--v8:6165-->27<!--/v8--> | <!--v8:6166-->26<!--/v8--> | <!--v8:6167-->26<!--/v8--> | <!--v8:6168-->3<!--/v8--> / <!--v8:6169-->0<!--/v8--> / <!--v8:6170-->0<!--/v8--> | <!--v8:6171-->1<!--/v8--> / <!--v8:6172-->0<!--/v8--> / <!--v8:6173-->2<!--/v8--> |
++| ts-order-service / loss | <!--v8:6174-->3<!--/v8--> | <!--v8:6175-->17<!--/v8--> | <!--v8:6176-->41<!--/v8--> | <!--v8:6177-->39<!--/v8--> | <!--v8:6178-->3<!--/v8--> / <!--v8:6179-->0<!--/v8--> / <!--v8:6180-->0<!--/v8--> | <!--v8:6181-->3<!--/v8--> / <!--v8:6182-->0<!--/v8--> / <!--v8:6183-->0<!--/v8--> |
++| ts-route-service / mem | <!--v8:6184-->3<!--/v8--> | <!--v8:6185-->8<!--/v8--> | <!--v8:6186-->22<!--/v8--> | <!--v8:6187-->22<!--/v8--> | <!--v8:6188-->3<!--/v8--> / <!--v8:6189-->0<!--/v8--> / <!--v8:6190-->0<!--/v8--> | <!--v8:6191-->2<!--/v8--> / <!--v8:6192-->1<!--/v8--> / <!--v8:6193-->0<!--/v8--> |
++| ts-route-service / socket | <!--v8:6194-->3<!--/v8--> | <!--v8:6195-->9<!--/v8--> | <!--v8:6196-->34<!--/v8--> | <!--v8:6197-->34<!--/v8--> | <!--v8:6198-->3<!--/v8--> / <!--v8:6199-->0<!--/v8--> / <!--v8:6200-->0<!--/v8--> | <!--v8:6201-->2<!--/v8--> / <!--v8:6202-->1<!--/v8--> / <!--v8:6203-->0<!--/v8--> |
++| ts-train-service / cpu | <!--v8:6204-->3<!--/v8--> | <!--v8:6205-->6<!--/v8--> | <!--v8:6206-->41<!--/v8--> | <!--v8:6207-->39<!--/v8--> | <!--v8:6208-->3<!--/v8--> / <!--v8:6209-->0<!--/v8--> / <!--v8:6210-->0<!--/v8--> | <!--v8:6211-->3<!--/v8--> / <!--v8:6212-->0<!--/v8--> / <!--v8:6213-->0<!--/v8--> |
++| ts-train-service / delay | <!--v8:6214-->3<!--/v8--> | <!--v8:6215-->8<!--/v8--> | <!--v8:6216-->46<!--/v8--> | <!--v8:6217-->45<!--/v8--> | <!--v8:6218-->3<!--/v8--> / <!--v8:6219-->0<!--/v8--> / <!--v8:6220-->0<!--/v8--> | <!--v8:6221-->3<!--/v8--> / <!--v8:6222-->0<!--/v8--> / <!--v8:6223-->0<!--/v8--> |
++| ts-travel-service / disk | <!--v8:6224-->3<!--/v8--> | <!--v8:6225-->20<!--/v8--> | <!--v8:6226-->29<!--/v8--> | <!--v8:6227-->29<!--/v8--> | <!--v8:6228-->3<!--/v8--> / <!--v8:6229-->0<!--/v8--> / <!--v8:6230-->0<!--/v8--> | <!--v8:6231-->1<!--/v8--> / <!--v8:6232-->0<!--/v8--> / <!--v8:6233-->2<!--/v8--> |
++| ts-travel-service / loss | <!--v8:6234-->3<!--/v8--> | <!--v8:6235-->14<!--/v8--> | <!--v8:6236-->34<!--/v8--> | <!--v8:6237-->34<!--/v8--> | <!--v8:6238-->3<!--/v8--> / <!--v8:6239-->0<!--/v8--> / <!--v8:6240-->0<!--/v8--> | <!--v8:6241-->3<!--/v8--> / <!--v8:6242-->0<!--/v8--> / <!--v8:6243-->0<!--/v8--> |
++
++Khi cắt sau mốc theo I1, báo đầu sớm hơn ở <!--v8:6244-->29<!--/v8-->/<!--v8:6245-->30<!--/v8--> ca, bằng ở <!--v8:6246-->1<!--/v8--> ca và muộn hơn ở <!--v8:6247-->0<!--/v8--> ca. Số điểm đổi trong Nv tăng/bằng/giảm so với bản đầy đủ lần lượt ở <!--v8:6248-->23<!--/v8-->/<!--v8:6249-->3<!--/v8-->/<!--v8:6250-->4<!--/v8--> ca; tổng full/I1/I2 là <!--v8:6251-->143<!--/v8-->/<!--v8:6252-->338<!--/v8-->/<!--v8:6253-->332<!--/v8-->. Hai đại lượng phải đọc riêng; các ca ngược chiều chỉ thuộc số điểm đổi nền, không thuộc báo đầu trên mẫu này. Cả <!--v8:6254-->17<!--/v8-->/<!--v8:6255-->17<!--/v8--> ca B2 chính có báo đầu sớm hơn trong I1. Đây là tác động lên đầu ra detector qua tiền xử lý, không xác nhận nguyên nhân vận hành của báo sớm.
++
++Nguồn: `runs/review4-repair-001/summary.json#/intervention`; từng ca gốc ở `bocpd-can-thiep.json#/cases` và bảng B5/I1/I2 cuối báo cáo. I1 không loại nhìn trước bên trong tiền tố.
+ 
+ ### Số HP theo từng ô
+ 
+@@ -841,7 +870,7 @@
+ 
+ ### V7: báo động cạnh điểm không báo
+ 
+-B1 chỉ xét cửa sổ quanh i nằm trong Nv. B4 chỉ xét đủ MAD và hai cửa sổ nằm trong nền, cùng miền cho báo động và đối chứng. Mẫu số báo động là ca có t̂ hợp lệ; mẫu số đối chứng là điểm không báo trong miền của từng w. Các ca S vẫn có điểm đối chứng nền nhưng không có t̂ hợp lệ; hai quần thể này không đồng nhất. Đây là tỉ lệ mô tả, không là kiểm định thống kê. N1–N4, B2/B3 V7 N/A vì chứa điều kiện báo động.
++Bằng nhau đúng số chỉ là dấu mô tả để chọn ca đọc tay, không là kiểm định tương đương. Chưa bằng nhau không chứng minh cờ phân biệt; không đặt ngưỡng gần bằng. B4 vẫn giữ trong cờ cấu hình chính để mô tả, không là số ca đã giải thích. B1 chỉ xét cửa sổ quanh i nằm trong Nv. B4 chỉ xét đủ MAD và hai cửa sổ nằm trong nền, cùng miền cho báo động và đối chứng. Mẫu số báo động là ca có t̂ hợp lệ; mẫu số đối chứng là điểm không báo trong miền của từng w. Các ca S vẫn có điểm đối chứng nền nhưng không có t̂ hợp lệ; hai quần thể này không đồng nhất. Đây là tỉ lệ mô tả, không là kiểm định thống kê. N1–N4, B2/B3 V7 N/A vì chứa điều kiện báo động.
+ 
+ Nguồn: `runs/step5-001/V7.json#/aggregate/<cấu hình>/{all,cell}/<nhóm>`.
+ 
+@@ -1693,7 +1722,7 @@
+ 
+ ## C3 — Có chỉ ra vùng không
+ 
+-**Liên hệ/thiết kế.** [Định vị](dinh-vi.md) giữ từng ca, từng ô, mức nền ngẫu nhiên đều và mọi độ nhạy bỏ cột N2. N-Sigma cung cấp danh sách cột, còn xếp dịch vụ là phân tích thêm mapping. Thứ tự báo động đầu sau mốc chưa phải khởi phát; loại N2 không loại mọi báo động kéo qua mốc. BOCPD không chỉ ra cột hoặc service; bảng bước nhảy tại t̂⁺ là heuristic (quy tắc phân tích), không là output BOCPD. Không kết luận nhân quả, lan hoặc giá trị đồ thị từ bảng này.
++**Liên hệ/thiết kế.** [Định vị](dinh-vi.md) giữ từng ca, từng ô, mức nền ngẫu nhiên đều và mọi độ nhạy bỏ cột N2. N-Sigma cung cấp danh sách cột, còn xếp dịch vụ là phân tích thêm mapping. Thứ tự báo động đầu sau mốc chưa phải khởi phát; loại N2 không loại mọi báo động kéo qua mốc. BOCPD không chỉ ra cột hoặc service; bảng bước nhảy tại t̂⁺ là heuristic (quy tắc phân tích), không là output BOCPD. Mức nền giữ toàn universe, gồm dịch vụ không có cột và không thể báo; chênh lệch với mức nền chưa tách giá trị detector khỏi thông tin tập cột. Coverage từng ca/bộ/độ nhạy được bổ sung ở định vị; không thay mức nền đã khóa. Không kết luận nhân quả, lan hoặc giá trị đồ thị từ bảng này.
+ 
+ ## C4 — Phụ thuộc mốc biết trước
+ 

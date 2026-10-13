@@ -1,0 +1,29 @@
+Traceback (most recent call last):
+  File "/home/ubuntu/rca/T-029/scripts/ec2_chain.py", line 186, in <module>
+    if __name__ == '__main__': main()
+                               ^^^^^^
+  File "/home/ubuntu/rca/T-029/scripts/ec2_chain.py", line 175, in main
+    oid = v3()
+          ^^^^
+  File "/home/ubuntu/rca/T-029/scripts/ec2_chain.py", line 78, in v3
+    kq = bocpd(metric(oid))
+         ^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/rca/T-025/repo/src/p3/adapters/phat_hien.py", line 52, in bocpd
+    R, maxes = online_changepoint_detection(data.to_numpy(), partial(constant_hazard, 50),
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/rca/T-025/src/baro/baro/_bocpd.py", line 204, in online_changepoint_detection
+    predprobs = log_likelihood_class.pdf(x)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/rca/T-025/src/baro/baro/_bocpd.py", line 101, in pdf
+    ret[i] = ss.multivariate_t.pdf(x=data, df=df, loc=loc, shape=shape)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/rca/T-025/envs/main/lib/python3.12/site-packages/scipy/stats/_multivariate.py", line 4461, in pdf
+    shape_info = _PSD(shape, allow_singular=allow_singular)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/rca/T-025/envs/main/lib/python3.12/site-packages/scipy/stats/_multivariate.py", line 164, in __init__
+    s, u = scipy.linalg.eigh(M, lower=lower, check_finite=check_finite)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/rca/T-025/envs/main/lib/python3.12/site-packages/scipy/linalg/_decomp.py", line 559, in eigh
+    w, v, *other_args, info = drv(a=a1, **drv_args, **lwork_args)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
