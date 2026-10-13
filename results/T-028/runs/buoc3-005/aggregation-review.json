@@ -1,0 +1,105 @@
+{
+  "task": "T-028",
+  "role": "maker_support_check_not_Claude_review",
+  "status": "passed",
+  "started_at": "2026-10-08T09:43:05.608+07:00",
+  "finished_at": "2026-10-08T09:43:08.505+07:00",
+  "elapsed_s": 2.898063800006639,
+  "sources": [
+    {
+      "path": "results/T-028/runs/buoc3-005/ca-sai.json",
+      "sha256": "2a88e449f61728e289a1ca18293f7b61c63689a20c651e53d5f441713b17b852",
+      "json_pointers": [
+        "/main_rows",
+        "/main_rows/*/evidence/seed_evidence/*/by_k/*/P0",
+        "/main_rows/*/mechanisms/*/assignment"
+      ]
+    },
+    {
+      "path": "results/T-028/runs/buoc3-005/summary-tables.json",
+      "sha256": "fb969a07e125adc64a76ac27b4d159b40b07c79614b98281899ad5b94363c106",
+      "json_pointers": [
+        "/P0_tables"
+      ]
+    },
+    {
+      "path": "results/T-028/runs/buoc3-005/schema-tables.json",
+      "sha256": "7b57566dc6784d511c89889d20550f4b1366e1e379495c756ae0f77acba2f7aa",
+      "json_pointers": [
+        "/by_case",
+        "/by_cell_column",
+        "/by_root_column"
+      ]
+    },
+    {
+      "path": "results/T-028/runs/buoc3-005/independent-ranking.json",
+      "sha256": "a131481f472ecf171beaaa51dbb74dc2cba4cf0c4d667b35b973c46944c4b405",
+      "json_pointers": [
+        "/schema_expected"
+      ]
+    },
+    {
+      "path": "results/T-028/runs/buoc3-005/concentration.json",
+      "sha256": "8f4f1c37718b29016f32f30e64ad13973f3fca990f4dbf8b6c89c3314431ac88",
+      "json_pointers": [
+        "/case_pairs",
+        "/cell_pairs",
+        "/equal_cell_weight_summaries"
+      ]
+    },
+    {
+      "path": "results/T-028/runs/buoc3-005/manual-selection.json",
+      "sha256": "90bc02b6e6a68360c7ed4bcf77a2d3f96e51e6ef3c40cb54fb164a7b5c0beea3",
+      "json_pointers": [
+        ""
+      ]
+    },
+    {
+      "path": "results/T-024/cham-a.json",
+      "sha256": "5527104002a8d115b73243801bd86dfb38c386797e5bcc3a0f7c059d6de0d425",
+      "json_pointers": [
+        "/raw_column_audit"
+      ]
+    }
+  ],
+  "source_hashes_unchanged_during_check": true,
+  "rules": {
+    "schema": "recount case/cell/root presence/absence from saved raw_column_audit; compare independent schema expected; exact native suffix/mapping",
+    "P0": "seed records eligible only OK wrong at k, valid ranking, graph available and root returned; count base flags.M5 True on the same eligible records; no primary=M5 and no OR of P0",
+    "D": "every unordered case pair once per dataset/method/k; average valid case pairs within cell units, then equal weight valid cell units; same/cross cell separate; seeds never case units",
+    "manual_selection": "first two increasing opaque ids per nonempty dataset/method/k/mechanism; M0 all when<=10 otherwise first10; deduplicate cases retaining requirements"
+  },
+  "numeric_tolerance_validation_only": {
+    "absolute": 1e-12,
+    "relative": 1e-12
+  },
+  "check_counts": {
+    "schema_case": 210,
+    "schema_cell": 19100,
+    "schema_root": 5730,
+    "P0_eligibility": 744,
+    "P0_tables": 6752,
+    "D_casepair_coverage": 2,
+    "D_cellpairs": 13632,
+    "D_equalcells": 288,
+    "manual_selection": 1
+  },
+  "n_checks": 46459,
+  "n_mismatches": 0,
+  "mismatches": [],
+  "actual_file_counts": {
+    "main_rows": 312,
+    "schema_cases": 30,
+    "schema_cell_column_rows": 3820,
+    "schema_root_column_rows": 1910,
+    "P0_table_rows": 844,
+    "case_pairs": 7992,
+    "cell_pairs": 1704,
+    "equal_cell_weight_summaries": 48,
+    "manual_cases": 70,
+    "manual_requirements": 106
+  },
+  "method_rerun": false,
+  "raw_data_read": false,
+  "report_numbers_checked": false
+}

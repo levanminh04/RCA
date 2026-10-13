@@ -1,0 +1,169 @@
+{
+  "task": "T-028",
+  "role": "maker_toy_measure_check_not_Claude_review",
+  "status": "passed",
+  "checked_at": "2026-10-08T10:09:26.366380+07:00",
+  "checks": [
+    {
+      "name": "same_deterministic_top2",
+      "O": [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      "L": 4,
+      "k": 2,
+      "p_i": {
+        "a": "1",
+        "b": "1",
+        "c": "0",
+        "d": "0"
+      },
+      "p_j": {
+        "a": "1",
+        "b": "1",
+        "c": "0",
+        "d": "0"
+      },
+      "D_exact": "1",
+      "D0_exact": "1/2",
+      "expected_exact": [
+        "1",
+        "1/2"
+      ],
+      "passed": true
+    },
+    {
+      "name": "disjoint_deterministic_top2",
+      "O": [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      "L": 4,
+      "k": 2,
+      "p_i": {
+        "a": "1",
+        "b": "1",
+        "c": "0",
+        "d": "0"
+      },
+      "p_j": {
+        "a": "0",
+        "b": "0",
+        "c": "1",
+        "d": "1"
+      },
+      "D_exact": "0",
+      "D0_exact": "1/2",
+      "expected_exact": [
+        "0",
+        "1/2"
+      ],
+      "passed": true
+    },
+    {
+      "name": "independent_uniform_tie_draws",
+      "O": [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      "L": 4,
+      "k": 2,
+      "p_i": {
+        "a": "1/2",
+        "b": "1/2",
+        "c": "1/2",
+        "d": "1/2"
+      },
+      "p_j": {
+        "a": "1/2",
+        "b": "1/2",
+        "c": "1/2",
+        "d": "1/2"
+      },
+      "D_exact": "1/2",
+      "D0_exact": "1/2",
+      "expected_exact": [
+        "1/2",
+        "1/2"
+      ],
+      "passed": true
+    },
+    {
+      "name": "saved_Nezha_MicroRank_top5_D1_independent_membership",
+      "source_pair": {
+        "path": "results/T-028/runs/buoc3-005/concentration.json",
+        "json_pointer": "/case_pairs/6145"
+      },
+      "source_rankings": [
+        {
+          "path": "results/T-028/runs/buoc3-005/ca-sai.json",
+          "json_pointer": "/main_rows/224/evidence/seed_evidence/single/ranking"
+        },
+        {
+          "path": "results/T-028/runs/buoc3-005/ca-sai.json",
+          "json_pointer": "/main_rows/225/evidence/seed_evidence/single/ranking"
+        }
+      ],
+      "opaque_ids": [
+        "dev-14701a3bbb",
+        "dev-1ac905bc95"
+      ],
+      "p_i": {
+        "adservice": "0",
+        "cartservice": "1",
+        "checkoutservice": "0",
+        "currencyservice": "1",
+        "emailservice": "0",
+        "frontend": "1",
+        "paymentservice": "0",
+        "productcatalogservice": "1",
+        "recommendationservice": "1",
+        "shippingservice": "0"
+      },
+      "p_j": {
+        "adservice": "0",
+        "cartservice": "1",
+        "checkoutservice": "0",
+        "currencyservice": "1",
+        "emailservice": "0",
+        "frontend": "1",
+        "paymentservice": "0",
+        "productcatalogservice": "1",
+        "recommendationservice": "1",
+        "shippingservice": "0"
+      },
+      "D_exact": "1",
+      "D0_exact": "1/2",
+      "p_i_equals_p_j": true,
+      "all_membership_probabilities_binary": true,
+      "passed": true
+    }
+  ],
+  "sources": [
+    {
+      "path": "results/T-028/runs/buoc3-005/concentration.json",
+      "bytes": 4875979,
+      "sha256": "8f4f1c37718b29016f32f30e64ad13973f3fca990f4dbf8b6c89c3314431ac88"
+    },
+    {
+      "path": "results/T-028/runs/buoc3-005/ca-sai.json",
+      "bytes": 39155613,
+      "sha256": "2a88e449f61728e289a1ca18293f7b61c63689a20c651e53d5f441713b17b852"
+    },
+    {
+      "path": "results/T-028/codebook.md",
+      "bytes": 45956,
+      "sha256": "53e4360431d27514886be8a688aa668f329da121f07be8966c129442a1061d4b"
+    }
+  ],
+  "method_rerun": false,
+  "raw_read": false,
+  "interpretation": "D=1 means identical deterministic membership probabilities for the selected top-k in this saved pair. Scores/order outside or inside that selected set can differ. A full identical tie with independent draws has D<1. Thus D=1 does not establish that a method ignores data or supports a causal mechanism. The conditional D0 is kept separate.",
+  "limits": "Toy checks the declared measure, not ranking methods; one real pair does not establish every cell pattern. Complete case/cell arithmetic is independently checked in independent-ranking.json and aggregation-review.json."
+}
