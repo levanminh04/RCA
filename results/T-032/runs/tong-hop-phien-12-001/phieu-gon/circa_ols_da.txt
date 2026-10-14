@@ -1,0 +1,82 @@
+## RE2-TT|circa_ols_da|k=1|M4 | 8 sai | duong di: {'cuc-lon:co|tren-root-cuc-lon:co|DA:giảm hạng': 7, 'cuc-lon:co|tren-root-cuc-lon:co|DA:không đổi': 1}
+  S  dev-3ae0a6c15a | train|cpu | hang [4, 4] | co k1=['M4', 'M5'] k5=[] | cuc-lon:co|tren-root-cuc-lon:co|DA:giảm hạng
+     trace-ca: muc=đo được một phần; cham-toi-root=0.81; root-dau-o=['own_u', 'in_d', 'in_u', 'in_d_edge'] | tren-root 3 {'TREN': 3}; dau=travel(TREN); uv-phia-tren 9/67 [cung duong di: 7 dv]
+     cuc-lon=C [('ts-admin-travel-service_latency', 'cha7', 'std-y=9.3e-17', 'rht=1.7e+16', 'k2=0.24')]
+     root: ts-train-service_latency | RHT [2, 2] DA [4, 4] (giảm hạng) | K2 [1, 1] k2x [2, 2] k2s [2, 2] | root-cuc-lon-sau-DA=K []
+     ^ travel goi-tt-root=C cuc-lon=C tren-o-RHT=K con-khi-bo-canh=K
+     ^ travel2 goi-tt-root=C cuc-lon=C tren-o-RHT=K con-khi-bo-canh=K
+     ^ admin-travel goi-tt-root=K cuc-lon=C tren-o-RHT=C con-khi-bo-canh=K
+  D  dev-12a1a88069 | order|disk | hang [1, 1] | co k1=[] k5=[] | dung-hang-1|cuc-lon:khong|tren-root-cuc-lon:khong|DA:không đổi
+     trace-ca: muc=đo được một phần; cham-toi-root=0.61; root-dau-o=['own_u', 'in_u'] | tren-root 0 {}; dau=-(-); uv-phia-tren 9/67 [cung-o=K cung-kenh=C]
+     cuc-lon=K []
+     root: ts-order-service_diskio | RHT [1, 1] DA [1, 1] (không đổi) | K2 [1, 1] k2x [1, 1] k2s [1, 1] | root-cuc-lon-sau-DA=K []
+  S  dev-03d4910932 | route|socket | hang [4, 4] | co k1=['M4', 'M5'] k5=[] | cuc-lon:co|tren-root-cuc-lon:co|DA:không đổi
+     trace-ca: muc=đo được một phần; cham-toi-root=0.93; root-dau-o=None | tren-root 3 {'TREN': 3}; dau=travel2(TREN); uv-phia-tren 9/67 [cung duong di: 1 dv]
+     cuc-lon=C [('ts-admin-travel-service_latency', 'cha7', 'std-y=1.2e-16', 'rht=4e+16', 'k2=0.72')]
+     root: ts-route-service_latency | RHT [4, 4] DA [4, 4] (không đổi) | K2 [1, 1] k2x [2, 2] k2s [3, 3] | root-cuc-lon-sau-DA=K []
+     ^ travel2 goi-tt-root=C cuc-lon=C tren-o-RHT=C con-khi-bo-canh=K
+     ^ travel goi-tt-root=C cuc-lon=C tren-o-RHT=K con-khi-bo-canh=K
+     ^ admin-travel goi-tt-root=K cuc-lon=C tren-o-RHT=C con-khi-bo-canh=K
+  D  dev-bcbd4f46ae | route|socket | hang [1, 1] | co k1=[] k5=[] | dung-hang-1|cuc-lon:khong|tren-root-cuc-lon:khong|DA:không đổi
+     trace-ca: muc=đo được một phần; cham-toi-root=0.79; root-dau-o=['own_u', 'in_d', 'in_u', 'in_d_edge'] | tren-root 0 {}; dau=-(-); uv-phia-tren 9/67 [cung-o=C cung-kenh=C]
+     cuc-lon=K []
+     root: ts-route-service_mem | RHT [1, 1] DA [1, 1] (không đổi) | K2 [2, 2] k2x [1, 1] k2s [2, 2] | root-cuc-lon-sau-DA=K []
+## RE2-TT|circa_ols_da|k=1|M5 | 10 sai | duong di: {'cuc-lon:co|tren-root-cuc-lon:co|DA:giảm hạng': 7, 'cuc-lon:co|tren-root-cuc-lon:co|DA:không đổi': 1, 'cuc-lon:khong|tren-root-cuc-lon:khong|DA:không đổi': 1, 'cuc-lon:khong|tren-root-cuc-lon:khong|DA:tăng hạng': 1}
+  S  dev-3ae0a6c15a (da in o tren) [cung duong di: 7 dv]
+  D  dev-12a1a88069 (da in o tren) [cung-o=K cung-kenh=C]
+  S  dev-03d4910932 (da in o tren) [cung duong di: 1 dv]
+  D  dev-bcbd4f46ae (da in o tren) [cung-o=C cung-kenh=C]
+  S  dev-a915aa2424 | travel|loss | hang [3, 3] | co k1=['M5'] k5=[] | cuc-lon:khong|tren-root-cuc-lon:khong|DA:không đổi
+     trace-ca: muc=đo được một phần; cham-toi-root=0.81; root-dau-o=['own_u', 'in_d', 'in_u', 'in_d_edge'] | tren-root 2 {'KLH': 1, '2CHIEU': 1}; dau=user(KLH); uv-phia-tren 4/67 [cung duong di: 1 dv]
+     cuc-lon=K []
+     root: ts-travel-service_latency | RHT [3, 3] DA [3, 3] (không đổi) | K2 [29, 29] k2x [11, 11] k2s [4, 4] | root-cuc-lon-sau-DA=K []
+     ^ user goi-tt-root=K cuc-lon=K tren-o-RHT=C con-khi-bo-canh=C
+     ^ seat goi-tt-root=C cuc-lon=K tren-o-RHT=K con-khi-bo-canh=C
+  D  dev-7f1b6b071d | travel|loss | hang [1, 1] | co k1=[] k5=[] | dung-hang-1|cuc-lon:co|tren-root-cuc-lon:khong|DA:tăng hạng
+     trace-ca: muc=đo được một phần; cham-toi-root=0.69; root-dau-o=['own_u', 'in_d', 'in_u', 'in_d_edge'] | tren-root 0 {}; dau=-(-); uv-phia-tren 4/67 [cung-o=C cung-kenh=C]
+     cuc-lon=C [('ts-admin-travel-service_latency', 'cha7', 'std-y=7.6e-17', 'rht=4e+16', 'k2=0.67')]
+     root: ts-travel-service_latency | RHT [8, 8] DA [1, 1] (tăng hạng) | K2 [8, 8] k2x [9, 9] k2s [9, 9] | root-cuc-lon-sau-DA=C ['nhận qua child_score']
+  S  dev-f36d0647d5 | order|loss | hang [2, 2] | co k1=['M5'] k5=[] | cuc-lon:khong|tren-root-cuc-lon:khong|DA:tăng hạng
+     trace-ca: muc=đo được một phần; cham-toi-root=0.38; root-dau-o=['own_u', 'in_u'] | tren-root 1 {'TREN': 1}; dau=travel2(TREN); uv-phia-tren 9/67 [cung duong di: 1 dv]
+     cuc-lon=K []
+     root: ts-order-service_latency | RHT [5, 5] DA [2, 2] (tăng hạng) | K2 [6, 6] k2x [6, 6] k2s [7, 7] | root-cuc-lon-sau-DA=K []
+     ^ travel2 goi-tt-root=K cuc-lon=K tren-o-RHT=C con-khi-bo-canh=C
+  D  dev-20acb4402d | order|loss | hang [1, 1] | co k1=[] k5=[] | dung-hang-1|cuc-lon:khong|tren-root-cuc-lon:khong|DA:tăng hạng
+     trace-ca: muc=đo được một phần; cham-toi-root=0.17; root-dau-o=['own_d', 'own_u', 'in_d', 'in_u', 'in_d_edge'] | tren-root 0 {}; dau=-(-); uv-phia-tren 1/67 [cung-o=C cung-kenh=C]
+     cuc-lon=K []
+     root: ts-order-service_latency | RHT [3, 3] DA [1, 1] (tăng hạng) | K2 [3, 3] k2x [4, 4] k2s [3, 3] | root-cuc-lon-sau-DA=K []
+## RE2-TT|circa_ols_da|k=1|M0 | 4 sai | duong di: {'cuc-lon:khong|tren-root-cuc-lon:khong|DA:giảm hạng': 3, 'cuc-lon:khong|tren-root-cuc-lon:khong|DA:không đổi': 1}
+  S  dev-16597725c1 | auth|cpu | hang [15, 15] | co k1=['M0'] k5=['M0'] | cuc-lon:khong|tren-root-cuc-lon:khong|DA:giảm hạng
+     trace-ca: muc=không đo được; cham-toi-root=-; root-dau-o=['own_d', 'own_u'] | tren-root 14 {'KLH': 14}; dau=food(KLH); uv-phia-tren 0/67 [cung duong di: 3 dv]
+     cuc-lon=K []
+     root: ts-auth-service_mem | RHT [2, 2] DA [15, 15] (giảm hạng) | K2 [1, 1] k2x [1, 1] k2s [1, 1] | root-cuc-lon-sau-DA=K []
+     ^ food goi-tt-root=K cuc-lon=K tren-o-RHT=K con-khi-bo-canh=K
+     ^ station goi-tt-root=K cuc-lon=K tren-o-RHT=K con-khi-bo-canh=K
+     ^ travel goi-tt-root=K cuc-lon=K tren-o-RHT=K con-khi-bo-canh=K
+     ^ security goi-tt-root=K cuc-lon=K tren-o-RHT=K con-khi-bo-canh=K
+     ^ seat goi-tt-root=K cuc-lon=K tren-o-RHT=K con-khi-bo-canh=K
+     ^ assurance goi-tt-root=K cuc-lon=K tren-o-RHT=K con-khi-bo-canh=K
+     ^ +8 khac: cuc-lon 0/14; tren-o-RHT 1/14
+  D  dev-3defe3d34b | auth|cpu | hang [1, 1] | co k1=[] k5=[] | dung-hang-1|cuc-lon:khong|tren-root-cuc-lon:khong|DA:không đổi
+     trace-ca: muc=không đo được; cham-toi-root=-; root-dau-o=['own_d', 'own_u'] | tren-root 0 {}; dau=-(-); uv-phia-tren 0/67 [cung-o=C cung-kenh=C]
+     cuc-lon=K []
+     root: ts-auth-service_mem | RHT [1, 1] DA [1, 1] (không đổi) | K2 [1, 1] k2x [1, 1] k2s [1, 1] | root-cuc-lon-sau-DA=K []
+  S  dev-746fd74313 | auth|delay | hang [4, 4] | co k1=['M0'] k5=[] | cuc-lon:khong|tren-root-cuc-lon:khong|DA:không đổi
+     trace-ca: muc=không đo được; cham-toi-root=-; root-dau-o=['own_d', 'own_u'] | tren-root 3 {'KLH': 3}; dau=contacts(KLH); uv-phia-tren 0/67 [cung duong di: 1 dv]
+     cuc-lon=K []
+     root: ts-auth-service_socket | RHT [4, 4] DA [4, 4] (không đổi) | K2 [4, 4] k2x [4, 4] k2s [4, 4] | root-cuc-lon-sau-DA=K []
+     ^ contacts goi-tt-root=K cuc-lon=K tren-o-RHT=C con-khi-bo-canh=C
+     ^ user goi-tt-root=K cuc-lon=K tren-o-RHT=C con-khi-bo-canh=C
+     ^ route goi-tt-root=K cuc-lon=K tren-o-RHT=C con-khi-bo-canh=C
+  D  dev-12a1a88069 (da in o tren) [cung-o=K cung-kenh=C]
+## RE2-TT|circa_ols_da|k=5|M0 | 3 sai | duong di: {'cuc-lon:khong|tren-root-cuc-lon:khong|DA:giảm hạng': 3}
+  S  dev-16597725c1 (da in o tren) [cung duong di: 3 dv]
+  D  dev-3defe3d34b (da in o tren) [cung-o=C cung-kenh=C]
+## Nezha-OB|circa_ols_da|k=1|status:UNSUPPORTED | 22 sai | duong di: {'trang-thai:UNSUPPORTED': 22}
+  S  dev-14701a3bbb | shippingservice|cpu_contention | hang [None, None] | co k1=[] k5=[] | trang-thai:UNSUPPORTED
+     trace-ca: muc=đo được; cham-toi-root=0.85; root-dau-o=['in_d', 'in_u', 'in_d_edge'] [cung duong di: 22 dv]
+     KHONG-OK: Q-85: metric chỉ có 1–2 phép đo thật trong train; ở 19/22 ca, loader gốc nội suy đuôi train về điểm A, làm nền lẫn dữ liệu sau mốc. Không viết wrapper per-node, không sửa loader hay chạy thăm dò.
+  D  (khong co doi chung dung: Không có bản ghi OK đúng tại k cùng dataset/config/F/adapter trong tập nguồn; không thay bằng phương pháp khác.)
+## Nezha-OB|circa_ols_da|k=5|status:UNSUPPORTED | 22 sai | duong di: {'trang-thai:UNSUPPORTED': 22}
+  S  dev-14701a3bbb (da in o tren) [cung duong di: 22 dv]
+  D  (khong co doi chung dung: Không có bản ghi OK đúng tại k cùng dataset/config/F/adapter trong tập nguồn; không thay bằng phương pháp khác.)
