@@ -1,0 +1,3 @@
+# Bản kiểm đề nghị sửa R1 — chưa tiếp nhận
+
+checks/source-verification.json: 8/8 điều kiện chuỗi cấu hình đạt; nguồn kiểm byte/Git blob/SHA trước dùng. checks/model.json: literal delta, prefix bản ghi cũ, entity-only/phép chiếu, inventory/tín hiệu và đảo thứ tự đạt. checks/comparison.json: đủ1069 graph, oracle tập/members/phân hoạch/mẫu số/input/lặp/đảo đạt;90 operation bằng nguyên bản trước. Oracle literal được ghi trước prepare_repair.py. Không chạy lại app, baseline, mở raw/test/heldout hoặc đổi shared code. Trạng thái là candidate của người phản biện; root output và pin hiện hành chưa thay.

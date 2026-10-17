@@ -1,0 +1,11 @@
+--- phan-tich-chenh-lech.md:before
++++ phan-tich-chenh-lech.md:after
+@@ -25,7 +25,7 @@
+ 
+ Hợp của full endpoints có đúng năm cặp riêng trace: food→station, seat→travel, seat→travel2, travel→order, travel2→order-other (`phan-tich-chenh-lech.json#/full_union`, entity/endpoints/trace_only). Từng trường hợp, số graph chứa và witnesses gốc còn trong `edge-groups.json` và members; không cộng số xuất hiện qua cửa sổ thành số nguyên nhân.
+ 
+-Đã đọc toàn 38 Java file hiện hành của bốn module và helper liên quan. Không tìm được direct call cho năm cặp trong corpus đó. Control dương cùng cách gọi: food gọi travel và station-food; travel/travel2 gọi seat; seat gọi order hoặc order-other theo nhánh G/D. Chain travel→seat→order có controller/service và callsite đúng dòng; không co thành direct travel→order, không đảo chiều thành seat→travel. Biến stationResult trong food nhận body từ travel, tên biến không tạo endpoint station. Nguồn và line ở `coverage/mismatch-source-followup.json#/pairs`; chuỗi so sánh ở JSON phân tích.
++Đã đọc toàn 38 Java file hiện hành của bốn module và helper liên quan. Không tìm được direct call cho năm cặp trong corpus đó. Control dương cùng cách gọi: food gọi travel và station-food; travel/travel2 gọi seat; seat gọi order hoặc order-other theo nhánh G/D. Chain travel→seat→order có controller/service và callsite đúng dòng; không co thành direct travel→order, không đảo chiều thành seat→travel. Biến stationResult trong food nhận body từ travel, tên biến không tạo endpoint station. Nguồn và line ở `runs/trien-khai-001/coverage/mismatch-source-followup.json#/pairs`; chuỗi so sánh ở JSON phân tích.
+ 
+ Quan sát này hỗ trợ việc nguồn tham khảo không cung cấp direct edge tương ứng trong phần đã kiểm. Chưa phân xử source revision khác, alias/config override, dependency động, thiếu phân tích tĩnh, cấu trúc span hoặc instrumentation runtime. Không gọi absence nguồn là lỗi collector hoặc khẳng định runtime không có call. Cần application/image/instrumentation/deployment của bản thu và callsite/span attributes trước khi phân xử các giải thích đó.
+ 

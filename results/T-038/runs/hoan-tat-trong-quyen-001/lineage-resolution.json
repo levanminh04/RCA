@@ -1,0 +1,90 @@
+{
+  "task": "T-038",
+  "state": "OPEN_RUNTIME_LINEAGE; AUTHORIZED_METADATA_RESEARCH_COMPLETED",
+  "interpretation": "Missing runtime lineage limits conclusions. It does not require stopping the conditional source comparison that SPEC authorizes.",
+  "checked": [
+    {
+      "source": "T002 verified paper",
+      "locator": "paper-v2.html#bib.bib2 and #S3.SS3.p1.1",
+      "finding": "Paper names application repository and telemetry stack; no application commit/image digest/instrumentation revision/deployment identity at the inspected locators."
+    },
+    {
+      "source": "T002 HF README + dataset metadata",
+      "finding": "Parquet conversion and dataset revision identify data packaging, not the application build."
+    },
+    {
+      "source": "Zenodo record14590730 and Figshare article31048672 metadata",
+      "finding": "Dataset catalogue/description link evaluation repository; no explicit application/build identity found in descriptions/related identifiers inspected."
+    },
+    {
+      "source": "RCAEval pinned commit tree",
+      "finding": "No deployment/instrumentation/application source paths by declared keyword scan; cannot rule out provenance elsewhere in file contents."
+    }
+  ],
+  "branch_metadata": [
+    {
+      "requested": "ase24",
+      "tree_entries": 163,
+      "truncated": false,
+      "potential_deployment_or_instrumentation_paths": [],
+      "source_file": "results/T-038/runs/hoan-tat-trong-quyen-001/lineage-branch-followup/ase24-tree.json",
+      "sha256": "1a2050011f7276203a788dd1be01e08a458d09903f2c89440eb020a86a7f58b2"
+    },
+    {
+      "requested": "www25",
+      "tree_entries": 124,
+      "truncated": false,
+      "potential_deployment_or_instrumentation_paths": [],
+      "source_file": "results/T-038/runs/hoan-tat-trong-quyen-001/lineage-branch-followup/www25-tree.json",
+      "sha256": "a83be78c0d29b6f54ea1429f1b66011eb005180d7df8e4985a437a5d06d333b9"
+    }
+  ],
+  "search_queries": [
+    "site:github.com/phamquiluan/RCAEval/issues Train Ticket version",
+    "site:github.com/phamquiluan/RCAEval train-ticket commit",
+    "RCAEval data collection deployment TrainTicket revision",
+    "RCAEval train-ticket v0"
+  ],
+  "search_scope": "Only primary repo/paper/archive metadata used as evidence; secondary search hits and model claims ignored.",
+  "sources": [
+    {
+      "title": "RCAEval official repository",
+      "url": "https://github.com/phamquiluan/RCAEval"
+    },
+    {
+      "title": "RCAEval dataset record",
+      "url": "https://zenodo.org/records/14590730"
+    },
+    {
+      "title": "RCAEval Figshare record",
+      "url": "https://api.figshare.com/v2/articles/31048672"
+    }
+  ],
+  "metadata_request_count": 11,
+  "metadata_received_bytes": 125582,
+  "failed_requests_preserved": [
+    {
+      "url": "https://api.github.com/repos/phamquiluan/RCAEval/git/commits/www25",
+      "error": "<HTTPError 404: 'Not Found'>",
+      "elapsed_seconds": 0.4220000000059372
+    },
+    {
+      "url": "https://api.github.com/repos/phamquiluan/RCAEval/git/commits/ase24",
+      "error": "<HTTPError 404: 'Not Found'>",
+      "elapsed_seconds": 0.39100000000325963
+    }
+  ],
+  "caveat": "Search and selected catalogues cannot prove absence on the internet. Missing deploy/build manifest is not filled by graph similarity. No snapshot/code/image/telemetry was downloaded by these metadata scripts.",
+  "stronger_claim_requires": {
+    "owner": "RCAEval dataset creator, via Minh",
+    "input": [
+      "application commit and image build/digest",
+      "instrumentation version/config",
+      "deployment manifests/env/namespace/time",
+      "workload/capture schema"
+    ],
+    "claim": "Actual RE2 runtime architecture and instrumentation explanation"
+  },
+  "source_comparison_remains_conditional": true,
+  "created_utc": "2026-10-15T23:40:21.202949+00:00"
+}

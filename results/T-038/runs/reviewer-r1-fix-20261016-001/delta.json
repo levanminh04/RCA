@@ -1,0 +1,120 @@
+[
+  {
+    "id": "infra:skywalking:elasticsearch",
+    "source": {
+      "entity": "skywalking:quickstart",
+      "operation": null
+    },
+    "target": {
+      "entity": "elasticsearch:skywalking",
+      "operation": null
+    },
+    "type": "dữ-liệu",
+    "channel": "data",
+    "messaging": null,
+    "context": "Optional Skywalking profile: ConfigMap STORAGE=elasticsearch7 and STORAGE_ES_CLUSTER_NODES are loaded with SW_ prefix by the OAP Deployment. Configured dependency only; effective image, environment overrides, runtime activation and RE2 lineage are unverified.",
+    "provenance": [
+      {
+        "source_id": "TT:deployment/kubernetes-manifests/skywalking/skywalking.yml",
+        "locator": "L1-L9",
+        "condition": "Optional Skywalking profile: ConfigMap STORAGE=elasticsearch7 and STORAGE_ES_CLUSTER_NODES are loaded with SW_ prefix by the OAP Deployment. Configured dependency only; effective image, environment overrides, runtime activation and RE2 lineage are unverified."
+      },
+      {
+        "source_id": "TT:deployment/kubernetes-manifests/skywalking/skywalking.yml",
+        "locator": "L29-L36",
+        "condition": "Optional Skywalking profile: ConfigMap STORAGE=elasticsearch7 and STORAGE_ES_CLUSTER_NODES are loaded with SW_ prefix by the OAP Deployment. Configured dependency only; effective image, environment overrides, runtime activation and RE2 lineage are unverified."
+      },
+      {
+        "source_id": "TT:deployment/kubernetes-manifests/skywalking/es.yml",
+        "locator": "L1-L20",
+        "condition": "Optional Skywalking profile: ConfigMap STORAGE=elasticsearch7 and STORAGE_ES_CLUSTER_NODES are loaded with SW_ prefix by the OAP Deployment. Configured dependency only; effective image, environment overrides, runtime activation and RE2 lineage are unverified."
+      }
+    ]
+  },
+  {
+    "id": "infra:alertsnitch:mysql",
+    "source": {
+      "entity": "alertsnitch:quickstart",
+      "operation": null
+    },
+    "target": {
+      "entity": "mysql-logical:alertsnitch",
+      "operation": null
+    },
+    "type": "dữ-liệu",
+    "channel": "data",
+    "messaging": null,
+    "context": "Optional monitoring profile: ALERTSNITCH_BACKEND=mysql and the configured DSN select the declared alertsnitch database. No credential values are copied into records or reports. Effective image, overrides, runtime connection and RE2 lineage are unverified.",
+    "provenance": [
+      {
+        "source_id": "TT:deployment/kubernetes-manifests/prometheus/alertsnitch.yml",
+        "locator": "L1-L43",
+        "condition": "Optional monitoring profile: ALERTSNITCH_BACKEND=mysql and the configured DSN select the declared alertsnitch database. No credential values are copied into records or reports. Effective image, overrides, runtime connection and RE2 lineage are unverified."
+      },
+      {
+        "source_id": "TT:deployment/kubernetes-manifests/prometheus/alertsnitch.yml",
+        "locator": "L48-L72",
+        "condition": "Optional monitoring profile: ALERTSNITCH_BACKEND=mysql and the configured DSN select the declared alertsnitch database. No credential values are copied into records or reports. Effective image, overrides, runtime connection and RE2 lineage are unverified."
+      }
+    ]
+  },
+  {
+    "id": "infra:nacos:mysql",
+    "source": {
+      "entity": "nacos:quickstart",
+      "operation": null
+    },
+    "target": {
+      "entity": "mysql-logical:nacos:quickstart",
+      "operation": null
+    },
+    "type": "dữ-liệu",
+    "channel": "data",
+    "messaging": null,
+    "context": "Quickstart Nacos chart: values.nacos.db supplies MYSQL_SERVICE_* through the named Secret and the main container envFrom; logical database only. Conditional template source; release overrides, rendering, effective image, physical instance, activation and RE2 lineage remain unverified.",
+    "provenance": [
+      {
+        "source_id": "TT:deployment/kubernetes-manifests/quickstart-k8s/charts/nacos/values.yaml",
+        "locator": "L20-L27",
+        "condition": "Quickstart Nacos chart: values.nacos.db supplies MYSQL_SERVICE_* through the named Secret and the main container envFrom; logical database only. Conditional template source; release overrides, rendering, effective image, physical instance, activation and RE2 lineage remain unverified."
+      },
+      {
+        "source_id": "TT:deployment/kubernetes-manifests/quickstart-k8s/charts/nacos/templates/secrets.yaml",
+        "locator": "L1-L14",
+        "condition": "Quickstart Nacos chart: values.nacos.db supplies MYSQL_SERVICE_* through the named Secret and the main container envFrom; logical database only. Conditional template source; release overrides, rendering, effective image, physical instance, activation and RE2 lineage remain unverified."
+      },
+      {
+        "source_id": "TT:deployment/kubernetes-manifests/quickstart-k8s/charts/nacos/templates/statefulset.yaml",
+        "locator": "L23-L48",
+        "condition": "Quickstart Nacos chart: values.nacos.db supplies MYSQL_SERVICE_* through the named Secret and the main container envFrom; logical database only. Conditional template source; release overrides, rendering, effective image, physical instance, activation and RE2 lineage remain unverified."
+      }
+    ]
+  },
+  {
+    "id": "infra:alertmanager:alertsnitch-webhook",
+    "source": {
+      "entity": "alertmanager:quickstart",
+      "operation": null
+    },
+    "target": {
+      "entity": "alertsnitch:quickstart",
+      "operation": null
+    },
+    "type": "gọi-chưa-phân-kiểu",
+    "channel": "http",
+    "messaging": null,
+    "context": "Optional monitoring profile: Alertmanager mounts its declared config, whose routed receiver contains the literal HTTP alertsnitch webhook. HTTP destination is source evidence; blocking/synchronous execution, delivery, activation and RE2 lineage are unverified. Unknown type must remain excluded from typed comparison.",
+    "provenance": [
+      {
+        "source_id": "TT:deployment/kubernetes-manifests/prometheus/alert-manager-configmap.yml",
+        "locator": "L1-L30",
+        "condition": "Optional monitoring profile: Alertmanager mounts its declared config, whose routed receiver contains the literal HTTP alertsnitch webhook. HTTP destination is source evidence; blocking/synchronous execution, delivery, activation and RE2 lineage are unverified. Unknown type must remain excluded from typed comparison."
+      },
+      {
+        "source_id": "TT:deployment/kubernetes-manifests/prometheus/alert-manager.yml",
+        "locator": "L26-L59",
+        "condition": "Optional monitoring profile: Alertmanager mounts its declared config, whose routed receiver contains the literal HTTP alertsnitch webhook. HTTP destination is source evidence; blocking/synchronous execution, delivery, activation and RE2 lineage are unverified. Unknown type must remain excluded from typed comparison."
+      }
+    ]
+  }
+]

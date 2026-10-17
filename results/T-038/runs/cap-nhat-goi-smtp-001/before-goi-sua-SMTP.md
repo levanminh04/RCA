@@ -1,0 +1,11 @@
+# Xin duyệt gói sửa SMTP chung
+
+Gói cụ thể đã chuẩn bị, chưa áp dụng: [thiết kế, danh sách file, ảnh hưởng và chi phí](runs/hoan-tat-trong-quyen-001/smtp/plan.md); [danh sách máy đọc](runs/hoan-tat-trong-quyen-001/smtp/plan.json); [patch chính xác](runs/hoan-tat-trong-quyen-001/smtp/proposed-shared-code.patch); [oracle trước code](runs/hoan-tat-trong-quyen-001/smtp/oracle-before-code.json); [26 kiểm bản thử](runs/hoan-tat-trong-quyen-001/smtp/kiem-preview-001/checks.json).
+
+Đề nghị thêm channel SMTP cho chặng sender→mail-server, không dựng broker/người nhận và không coi accepted send là delivered. Giữ type theo bằng chứng riêng; Train Ticket mới có interface/config nên dùng gọi-chưa-phân-kiểu. Comparator tách miền SMTP để không nhận khớp với HTTP/RPC hoặc trace thiếu protocol. Host/port/TLS literal giữ theo nguồn/context; phép so chưa xác nhận authority/TLS/delivery. Các lựa chọn đối lập và điều kiện thất bại được nêu trong plan; đây là đề xuất kỹ thuật cần Minh duyệt, không phải quyết định đã có.
+
+Patch dùng chung sửa build.py/compare.py và README, bổ sung hồ sơ hợp đồng/kiểm/pin trong run T036 mới, phụ lục SPEC/LOG T036, WHY/DECISIONS và chuyển cùng pin ở ba SPEC/LOG T037–039. Tiếp nhận ba nhánh theo output thật hiện có; T038 replay đủ1069 graph, T037/T039 không được nhận smoke là hoàn thành task. Giữ các root/run/hợp đồng lịch sử và graph T035. Bảng trong plan ghi đúng từng file/phạm vi, đoạn cũ→mới, runner nhận pin mới tường minh và quy tắc lưu input/output mới; không dùng HEAD hay fork nghĩa riêng.
+
+Bản thử copy đạt26/26, gồm hồi quy build legacy; không thay việc chạy bộ kiểm chung và tiếp nhận pin sau khi duyệt. Dự toán CANDIDATE:31 phút máy,550MB output mới có dự trù một lần sửa/chạy lạiTT; RAM dự trù0,5GiB choTT, shared peak chưa đo. Không tải source/image hay bậtEC2. Dự toán không là phép đo pin mới và không bao giờ là quyền hoàn thành toànT037/T039. Nếu vượt phạm vi/chi phí phải trình lại.
+
+Minh cần duyệt đúng gói/filelist và quyền chuyển pin có điều kiện các kiểm đạt. Nguồn yêu cầu quyền riêng: lời giao T038 và SPEC cấm ghi src/, T036 hoặc task khác; AGENTS Luật0 yêu cầu Minh duyệt đúng đề xuất. Vì vậy quyền “làm tiếp T038” chỉ đủ chuẩn bị bản này, chưa đủ áp dụng shared patch.

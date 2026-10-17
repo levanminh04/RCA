@@ -1,0 +1,311 @@
+{
+  "task": "T-038",
+  "kind": "supplemental extraction validation",
+  "chronology": "Written after the first extractor code and draft runs. Expected values below were transcribed from direct, hash-verified source reads, not generated from source-facts.json. This is supplemental validation; it is not claimed as an oracle written before extractor implementation.",
+  "created_utc": "2026-10-15T17:30:58.888139+00:00",
+  "source_facts_sha256": "2c692427473919a73e9cdcf65a4559c3957f16ea6e2019b1d817de6d9dbd8d97",
+  "oracle_sha256": "e32847d303c535a9fe4c8b463ebf0992bbd53bc2959f085f95f51551b289e851",
+  "checks": [
+    {
+      "check": "config-controller-mappings:source-literals",
+      "ok": true,
+      "expected": [
+        "@RequestMapping(\"api/v1/configservice\")",
+        "@GetMapping(path = \"/welcome\")",
+        "@GetMapping(value = \"/configs\")",
+        "@PostMapping(value = \"/configs\")",
+        "@PutMapping(value = \"/configs\")",
+        "@DeleteMapping(value = \"/configs/{configName}\")",
+        "@GetMapping(value = \"/configs/{configName}\")"
+      ],
+      "actual": []
+    },
+    {
+      "check": "travel-batch-basic-call:source-literals",
+      "ok": true,
+      "expected": [
+        "private String getServiceUrl(String serviceName)",
+        "return \"http://\" + serviceName;",
+        "private List<TripResponse> getTicketsByBatch(",
+        "getServiceUrl(\"ts-basic-service\")",
+        "restTemplate.exchange(",
+        "basic_service_url + \"/api/v1/basicservice/basic/travels\"",
+        "HttpMethod.POST"
+      ],
+      "actual": []
+    },
+    {
+      "check": "notification-listener:source-literals",
+      "ok": true,
+      "expected": [
+        "@RabbitListener(queues = Queues.queueName)",
+        "public void process(String payload)"
+      ],
+      "actual": []
+    },
+    {
+      "check": "notification-listener:constant-literal",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "food-publisher:source-literals",
+      "ok": true,
+      "expected": [
+        "private AmqpTemplate rabbitTemplate;",
+        "public void send(String val)",
+        "this.rabbitTemplate.convertAndSend(Queues.queueName, val);"
+      ],
+      "actual": []
+    },
+    {
+      "check": "food-publisher:constant-literal",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "wait-order-poll-chain:source-literals",
+      "ok": true,
+      "expected": [
+        "public class PollThread extends Thread",
+        "public void run()",
+        "getServiceUrl(\"ts-preserve-service\")",
+        "doPreserve(service_url,requestEntityPreserve)",
+        "return \"http://\" + serviceName;",
+        "private Response doPreserve(String url, HttpEntity requestParam)",
+        "restTemplate.exchange(",
+        "url + \"/api/v1/contactservice/preserve\"",
+        "HttpMethod.POST"
+      ],
+      "actual": []
+    },
+    {
+      "check": "config-repository-datasource:source-literals",
+      "ok": true,
+      "expected": [
+        "public interface ConfigRepository extends CrudRepository<Config, String>",
+        "Config findByName(String name);",
+        "List<Config> findAll();",
+        "void deleteByName(String name);"
+      ],
+      "actual": []
+    },
+    {
+      "check": "config-repository-datasource:config-literal",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "travel-loadbalanced-bean:source-literals",
+      "ok": true,
+      "expected": [
+        "@EnableDiscoveryClient",
+        "@LoadBalanced",
+        "@Bean",
+        "public RestTemplate restTemplate(RestTemplateBuilder builder)",
+        "return builder.build();"
+      ],
+      "actual": []
+    },
+    {
+      "check": "config-controller-mappings:exact-routes",
+      "ok": true,
+      "expected": [
+        [
+          "DELETE",
+          "/api/v1/configservice/configs/{configName}"
+        ],
+        [
+          "GET",
+          "/api/v1/configservice/configs"
+        ],
+        [
+          "GET",
+          "/api/v1/configservice/configs/{configName}"
+        ],
+        [
+          "GET",
+          "/api/v1/configservice/welcome"
+        ],
+        [
+          "POST",
+          "/api/v1/configservice/configs"
+        ],
+        [
+          "PUT",
+          "/api/v1/configservice/configs"
+        ]
+      ],
+      "actual": [
+        [
+          "DELETE",
+          "/api/v1/configservice/configs/{configName}"
+        ],
+        [
+          "GET",
+          "/api/v1/configservice/configs"
+        ],
+        [
+          "GET",
+          "/api/v1/configservice/configs/{configName}"
+        ],
+        [
+          "GET",
+          "/api/v1/configservice/welcome"
+        ],
+        [
+          "POST",
+          "/api/v1/configservice/configs"
+        ],
+        [
+          "PUT",
+          "/api/v1/configservice/configs"
+        ]
+      ]
+    },
+    {
+      "check": "travel-batch-basic-call:resolved-call",
+      "ok": true,
+      "expected": 1,
+      "actual": 1
+    },
+    {
+      "check": "travel-batch-basic-call:caller-owner",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "notification-listener:queue",
+      "ok": true,
+      "expected": "email",
+      "actual": [
+        "email"
+      ]
+    },
+    {
+      "check": "food-publisher:address",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "wait-order-poll-chain:explicit-argument-chain",
+      "ok": true,
+      "expected": 1,
+      "actual": 1
+    },
+    {
+      "check": "wait-order-poll-chain:no-invented-handler",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "config-repository-datasource:repository-interface",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "config-repository-datasource:declared-methods",
+      "ok": true,
+      "expected": [
+        "deleteByName",
+        "findAll",
+        "findByName"
+      ],
+      "actual": [
+        "deleteByName",
+        "findAll",
+        "findByName"
+      ]
+    },
+    {
+      "check": "config-repository-datasource:datasource-separate",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "config-repository-datasource:repo-runtime-name-null",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "travel-loadbalanced-bean:bean-annotation",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "plan-java-file-coverage",
+      "ok": true,
+      "expected": 635,
+      "actual": 635
+    },
+    {
+      "check": "no-pending-source",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "all-source-delimiters-balanced",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "no-current-relations-from-test-or-old-docs",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "every-http-call-has-caller-method-id",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "every-data-call-has-caller-method-id",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "every-repository-class-resolves-import",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "independent-http-callsite-count",
+      "ok": true,
+      "expected": 146,
+      "actual": 146
+    },
+    {
+      "check": "independent-http-callsite-members",
+      "ok": true,
+      "expected": [],
+      "actual": []
+    }
+  ],
+  "summary": {
+    "checks": 31,
+    "passed": 31,
+    "failed": 0,
+    "elapsed_seconds": 0.20110726356506348
+  },
+  "limits": [
+    "Checks do not establish dataset lineage, deployed/runtime reachability, or generic Java type inference.",
+    "The direct callsite scanner checks the same explicitly enumerated RestTemplate API family; other client families are surveyed in pattern_index and require inspection.",
+    "Handwritten supplemental oracle validates selected real patterns, not every source branch or every method declaration."
+  ]
+}

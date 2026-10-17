@@ -1,0 +1,76 @@
+{
+  "client_dates": [
+    "2026-10-15",
+    "2026-10-16",
+    "2026-10-17"
+  ],
+  "environment": "runs/kiem-dau-vao-002/input-verification.json#/environment",
+  "commands": [
+    {
+      "command": "py -3 -X utf8 -B results/T-038/preflight.py kiem-dau-vao-001",
+      "result": "FAIL runner snapshot path",
+      "artifact": "runs/kiem-dau-vao-001/input-verification.json"
+    },
+    {
+      "command": "py -3 -X utf8 -B results/T-038/preflight.py kiem-dau-vao-002",
+      "result": "PASS",
+      "artifact": "runs/kiem-dau-vao-002/input-verification.json"
+    },
+    {
+      "command": "py -3 -X utf8 -B results/T-038/prepare_source_proposal.py metadata-de-xuat-001",
+      "result": "PASS metadata only, Git tree objects verified",
+      "artifact": "runs/metadata-de-xuat-001/metadata-requests.json"
+    },
+    {
+      "command": "py -3 -X utf8 -B results/T-038/audit_graph_scope.py mien-graph-001",
+      "result": "FAIL runner duplicated dev prefix",
+      "artifact": "runs/mien-graph-001/graph-scope.json"
+    },
+    {
+      "command": "py -3 -X utf8 -B results/T-038/audit_graph_scope.py mien-graph-002",
+      "result": "PASS",
+      "artifact": "runs/mien-graph-002/graph-scope.json"
+    }
+  ],
+  "exploratory_metadata": {
+    "saved_raw_bodies": false,
+    "reason": "chỉ tra metadata để lập đề xuất trước quyền ghi nguồn mới",
+    "requests": [
+      "https://api.github.com/repos/FudanSELab/train-ticket",
+      "https://api.github.com/repos/FudanSELab/train-ticket/tags?per_page=100",
+      "https://api.github.com/repos/phamquiluan/RCAEval/git/trees/259ea4167160256a74ad30004aa3d96a998c846e?recursive=1",
+      "https://api.github.com/repos/FudanSELab/train-ticket/git/trees/fa8d9efb35b2ed5ec1d18f60510167767c8fb2bf?recursive=1",
+      "https://api.github.com/repos/FudanSELab/train-ticket/git/trees/350f62000e6658e0e543730580c599d8558253e7?recursive=1",
+      "https://api.github.com/repos/FudanSELab/train-ticket/git/trees/97fe13cc7423654a60250b200c8cea4296c4e073?recursive=1"
+    ],
+    "incident": {
+      "urls": [
+        "https://api.github.com/repos/FudanSELab/train-ticket/commits/fa8d9efb35b2ed5ec1d18f60510167767c8fb2bf",
+        "https://api.github.com/repos/FudanSELab/train-ticket/commits/350f62000e6658e0e543730580c599d8558253e7"
+      ],
+      "body_bytes": [
+        894830,
+        29131
+      ],
+      "included_patch": true,
+      "patch_saved": false,
+      "patch_used": false,
+      "user_notified": true,
+      "correction": "Use only git/commits and git/trees metadata endpoints"
+    }
+  },
+  "current_reproduction": {
+    "command": "py -3 -X utf8 -B results/T-038/runs/sua-r1-20261017-001/repair.py check <fresh-run-name>",
+    "published_run": "results/T-038/runs/sua-r1-20261017-001/checks/full1069-002",
+    "no_root_overwrite": true,
+    "historical_root_writers_retired": [
+      "engine.py",
+      "compare_dev.py",
+      "analyze.py",
+      "finish_reports.py",
+      "finalize_implementation.py",
+      "finalize.py",
+      "fix_report_references.py"
+    ]
+  }
+}

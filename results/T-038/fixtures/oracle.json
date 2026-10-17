@@ -1,0 +1,36 @@
+{
+  "task": "T-038",
+  "kind": "synthetic independent literal oracle before T038 transformation/runner code",
+  "purpose": "Kiểm biến đổi mapping riêng, phân biệt entity-only, owner, unknown và mẫu số N/A; không là dữ liệu TT thật",
+  "entities": [
+    {"id": "ts-a-service", "type": "service"},
+    {"id": "ts-b-service", "type": "service"},
+    {"id": "logical-db", "type": "database"}
+  ],
+  "operations": [
+    {"entity": "ts-a-service", "name": "GET /api/a"},
+    {"entity": "ts-b-service", "name": "GET /api/b/{id}"}
+  ],
+  "relations": [
+    {"id": "http", "source": {"entity": "ts-a-service", "operation": "GET /api/a"}, "target": {"entity": "ts-b-service", "operation": "GET /api/b/{id}"}, "type": "gọi-đồng-bộ", "channel": "http"},
+    {"id": "data", "source": {"entity": "ts-a-service", "operation": null}, "target": {"entity": "logical-db", "operation": null}, "type": "dữ-liệu", "channel": "data"}
+  ],
+  "trace_entity_aliases": {"runtime-a": "ts-a-service", "runtime-b": "ts-b-service", "runtime-db": "logical-db"},
+  "expected": {
+    "entity_edge_count": 2,
+    "operation_edge_count": 1,
+    "projected_entity_edges": [["ts-a-service", "ts-b-service"]],
+    "entity_only_record_ids": ["data"],
+    "entity_endpoints": {"S": 2, "T": 2, "intersection": 2, "static_only": 0, "trace_only": 0},
+    "entity_typed": {"S": 2, "T": 0, "intersection": 0, "static_only": 2, "trace_only": 0, "trace_fraction": null},
+    "mapping_cases": [
+      {"entity": "ts-a-service", "runtime_operation": "GET /api/a", "candidates": ["GET /api/a"], "verified": true},
+      {"entity": "ts-a-service", "runtime_operation": "GET", "candidates": [], "verified": false},
+      {"entity": "ts-a-service", "runtime_operation": "GET /api/b/{id}", "candidates": [], "verified": false},
+      {"entity": "ts-b-service", "runtime_operation": "GET /api/b/{id}", "candidates": ["GET /api/b/{id}"], "verified": true},
+      {"entity": "ts-b-service", "runtime_operation": "GET /api/b/42", "candidates": [], "verified": false}
+    ],
+    "reordered_same_output": true,
+    "input_unchanged": true
+  }
+}

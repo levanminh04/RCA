@@ -1,0 +1,35 @@
+{
+  "review_or_candidate_conclusions_read": false,
+  "observations": [
+    {
+      "id": "N1",
+      "status": "FACT",
+      "blocking": true,
+      "observation": "Root graph has 166 entity edges, 343 operation edges and 509 records; root projection has 121 edges and entity-only 44, summing to 165. SMTP was not propagated to these derived files.",
+      "evidence": [
+        "before/results/T-038/do-thi/thuc-the.json",
+        "before/results/T-038/do-thi/thao-tac.json",
+        "before/results/T-038/do-thi/chieu-thao-tac.json",
+        "before/results/T-038/do-thi/chi-thuc-the.json"
+      ]
+    },
+    {
+      "id": "N2",
+      "status": "FACT",
+      "blocking": true,
+      "observation": "Root engine.pinned_api uses historical R1 code plus live-code hash assertion; assemble uses historical part-document and does not add SMTP. It cannot reproduce current output with current common pin.",
+      "evidence": [
+        "before/results/T-038/engine.py"
+      ]
+    },
+    {
+      "id": "N3",
+      "status": "OPEN",
+      "blocking": false,
+      "observation": "Original part-document inventories support components, but adds only five non-Java relations. Supporting configuration relation completeness needs direct source inspection; no assertion of semantic completeness.",
+      "evidence": [
+        "results/T-038/runs/trien-khai-001/coverage/build_part_document.py"
+      ]
+    }
+  ]
+}

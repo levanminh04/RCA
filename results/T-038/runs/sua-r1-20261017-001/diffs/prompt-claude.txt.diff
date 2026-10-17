@@ -1,0 +1,40 @@
+--- before/prompt-claude.txt
++++ current/prompt-claude.txt
+@@ -2,14 +2,14 @@
+ Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
+ 
+ Thông tin lượt này:
+-- Task hoặc đề xuất: T-038 và results/T-038/runs/doi-chieu-smtp-001/.
+-- Công đoạn: soát kết quả.
+-- Gói/cổng: P5, chuẩn bị G3.
+-- Người làm và người phản biện chính thức: Codex người làm; Claude phản biện kết quả.
+-- Tài liệu gốc: AGENTS.md; SPEC/LOG của T036–T039; docs/MRP.md, WHY.md, DECISIONS.md; results/T-038/runs/cap-nhat-goi-smtp-001/package/plan.json; results/T-036/runs/doi-chieu-smtp-001/authorization.json.
+-- Phản biện và phản hồi trước: Liệt kê các bản REVIEW của từng task được Minh cho phép khi đọc thư mục; không có bản phản biện chính thức riêng của lượt triển khai V2.
+-- Code và kết quả liên quan: src/do_thi_tinh/; results/T-036/runs/doi-chieu-smtp-001/manifest.json; results/T-038/manifest.json và runs/doi-chieu-smtp-001/{pin.json,checks,diff.json}; Windows Python3.12, -X utf8 -B; môi trường D:/RCA-ext/envs/py312-pin/Scripts/python.exe cho checker có pandas.
+-- Phạm vi ghi được Minh cho phép trong lượt này: chỉ đọc và trả lời trong chat; chưa được Minh cho ghi REVIEW hoặc sửa file trong lượt phản biện này.
++- Task hoặc đề xuất: T-038; tasks/T-038-p5b-trainticket/SPEC.md; results/T-038/; results/T-038/runs/sua-r1-20261017-001/.
++- Công đoạn: kiểm lại phản hồi và sửa.
++- Gói/cổng: P5b, chuẩn bị G3.
++- Người làm và người phản biện chính thức: Codex người làm; Codex phiên độc lập do Minh chỉ định là người phản biện kết quả tại REVIEW.md. Giữ vai trò lịch sử.
++- Tài liệu gốc: AGENTS.md; docs/STATE.md; SPEC.md, LOG.md T-038; docs/MRP.md, WHY.md, DECISIONS.md, LESSONS.md; docs/reference/sources/DT18-de-tai-va-nhiem-vu.md; docs/reference/sources/advisor-2026-09-23.md; registry và nguồn được dẫn trong T-038; SPEC/LOG T-040.
++- Phản biện và phản hồi trước: tasks/T-038-p5b-trainticket/REVIEW.md; LOG.md T-038 theo thứ tự phiên; results/T-038/runs/sua-r1-20261017-001/authorization.txt.
++- Code và kết quả liên quan: src/do_thi/; src/do_thi_tinh/; results/T-035/manifest.json; results/T-036/runs/doi-chieu-smtp-001/manifest.json; results/T-038/manifest.json; results/T-038/runs/reviewer-r1-fix-20261016-001/manifest.json; results/T-038/runs/sua-r1-20261017-001/manifest.json, repair.py, reproduction-inputs.json; Windows Python 3.12, dùng -X utf8 -B.
++- Phạm vi ghi được Minh cho phép trong lượt này: chỉ đọc và trả lời trong chat; chưa được ghi bản REVIEW mới hoặc sửa file. Được kiểm hash và tính lại trong bộ nhớ trên các đầu ra dev đã lưu. Không mở raw telemetry, dữ liệu cách ly, test/heldout/archive, tải nguồn, EC2, RCA mới, subagent hay tự mở/gửi chat.
+ 
+ Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
+ 
+@@ -52,10 +52,10 @@
+ 
+ Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
+ 
+-Công đoạn: soát kết quả.
+-Kiểm trên đầu ra thật, code và dữ liệu được phép; không tin tóm tắt LOG. Đối chiếu tiêu chí xong với phần mục tiêu nguồn và mức căn cứ cho bước tiếp theo; chạy lại phần rẻ khi trong quyền được duyệt.
+-Phân biệt hoàn thành task mô tả, xác nhận cơ chế và đủ căn cứ chọn/đánh giá thiết kế. Giới hạn đã khai không tự miễn phép kiểm cần thiết còn làm được.
+-Chỉ ghi bản phản biện lượt được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ bản cũ; không sửa kết quả thay người làm.
++Công đoạn: người phản biện kiểm lại phản hồi và sửa.
++Tự soát yêu cầu và đầu ra gốc trước; sau đó đọc phản biện, phản hồi và các thay đổi được duyệt. Kiểm cả ý kiến phản bác reviewer; không mặc định phản hồi hoặc bản sửa đúng.
++Đối chiếu từng điểm với bằng chứng hiện tại, quyền sửa và hậu quả. Có điểm đúng nhưng chưa được Minh duyệt sửa thì ghi đúng trạng thái; không tự coi đã xử lý hoặc ép người làm sửa.
++Chỉ ghi bản phản biện lượt mới được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ lịch sử, không ghi LOG/STATE hay sửa thay người làm. Nêu bất đồng còn lại và soạn prompt để người làm đáp.
+ 
+ Với từng thành phần, kiểm mục đích và căn cứ: sửa hạn chế P4, đáp ứng DT18 hay nhu cầu kỹ thuật. Có lý do kỹ thuật, phương án khác, bằng chứng dev và điều kiện thất bại không; có dùng mã hạn chế mô tả như bằng chứng cơ chế hoặc chọn theo mức chênh đồ thị trừ không đồ thị không?
+ Nêu rõ nút/cạnh, ánh xạ log/trace/metric và phép tính thực sự sử dụng cạnh. Lần theo thông tin quan hệ và nhãn trong phương pháp lẫn đối chứng; gọi “không đồ thị” có đúng với thông tin còn giữ không?

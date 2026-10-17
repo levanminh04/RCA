@@ -1,0 +1,131 @@
+{
+  "task": "T-038",
+  "scope": "Infrastructure entities enumerated by the existing part-document assembler; same omission path as R1. This is a bounded source audit, not proof of arbitrary runtime or all semantic dependencies.",
+  "applied_to_producer_outputs": true,
+  "proposed_records": [
+    "infra:skywalking:elasticsearch",
+    "infra:alertsnitch:mysql",
+    "infra:nacos:mysql",
+    "infra:alertmanager:alertsnitch-webhook"
+  ],
+  "further_source_addresses": [
+    {
+      "source": "skywalking-ui:quickstart",
+      "target_candidate": "skywalking:quickstart",
+      "state": "CANDIDATE_NOT_MATERIALIZED_PROTOCOL_UNVERIFIED",
+      "evidence": [
+        [
+          "deployment/kubernetes-manifests/skywalking/skywalking.yml",
+          100,
+          105
+        ]
+      ],
+      "fact": "SW_OAP_ADDRESS names the OAP endpoint without a scheme in this file.",
+      "not_inferred": "The port and image name do not verify HTTP/RPC or synchronous behavior.",
+      "needed": "Verified semantics for SW_OAP_ADDRESS at the declared image revision, or a separately approved source-channel contract that retains an unknown protocol.",
+      "owner": "Minh/source owner; any shared-contract change requires separate authorization",
+      "affected_conclusion": "Complete representation of configured UI-to-OAP dependencies; not the four-record candidate regression.",
+      "producer_source_inspected": true,
+      "current_state": "OPEN",
+      "within_scope_resolution": "Đã đọc nguồn hiện có. Cần semantics image/client ngoài nguồn hoặc binding/discovery; hợp đồng hiện hành không có call channel unknown. Không đổi hợp đồng hoặc dựng cạnh từ port/role."
+    },
+    {
+      "source": "prometheus:quickstart",
+      "target_candidate": "alertmanager:quickstart",
+      "state": "CANDIDATE_NOT_MATERIALIZED_CLIENT_DEFAULT_UNVERIFIED",
+      "evidence": [
+        [
+          "deployment/kubernetes-manifests/prometheus/prometheus-configmap.yml",
+          165,
+          168
+        ],
+        [
+          "deployment/kubernetes-manifests/prometheus/prometheus.yml",
+          278,
+          313
+        ]
+      ],
+      "fact": "The loaded Prometheus configuration declares an alertmanager target without an explicit scheme.",
+      "not_inferred": "No dependency-library default or actual execution is verified by this candidate repair.",
+      "needed": "Client configuration semantics at the declared Prometheus revision, or an approved unknown-protocol source representation.",
+      "owner": "Minh/source owner",
+      "affected_conclusion": "Complete representation of monitoring alert transport.",
+      "producer_source_inspected": true,
+      "current_state": "OPEN",
+      "within_scope_resolution": "Đã đọc nguồn hiện có. Cần semantics image/client ngoài nguồn hoặc binding/discovery; hợp đồng hiện hành không có call channel unknown. Không đổi hợp đồng hoặc dựng cạnh từ port/role."
+    },
+    {
+      "source": "prometheus:quickstart",
+      "target_candidate": "Kubernetes-discovered scrape endpoints",
+      "state": "DECLARED_DYNAMIC_TARGET_SELECTION_NOT_FIXED_RUNTIME_EDGES",
+      "evidence": [
+        [
+          "deployment/kubernetes-manifests/prometheus/prometheus-configmap.yml",
+          20,
+          27
+        ],
+        [
+          "deployment/kubernetes-manifests/prometheus/prometheus-configmap.yml",
+          28,
+          163
+        ]
+      ],
+      "fact": "Scrape jobs contain discovery/relabel predicates. Some jobs explicitly declare HTTPS; endpoint addresses and component ownership still depend on discovery data.",
+      "not_inferred": "No service/host or runtime edge is invented from a selector or metric annotation.",
+      "needed": "Approved discovery/ownership evidence or a source model for conditional selectors before converting these declarations to fixed component edges.",
+      "owner": "Minh/source owner; P9 for approved observation requirements",
+      "affected_conclusion": "Full scrape-target topology and physical deployment.",
+      "producer_source_inspected": true,
+      "current_state": "OPEN",
+      "within_scope_resolution": "Đã đọc nguồn hiện có. Cần semantics image/client ngoài nguồn hoặc binding/discovery; hợp đồng hiện hành không có call channel unknown. Không đổi hợp đồng hoặc dựng cạnh từ port/role."
+    },
+    {
+      "source": "grafana:quickstart",
+      "target_candidate": "prometheus:quickstart",
+      "state": "NO_DATASOURCE_TARGET_ESTABLISHED_BY_INSPECTED_DECLARATION",
+      "evidence": [
+        [
+          "deployment/kubernetes-manifests/prometheus/grafana.yml",
+          1,
+          62
+        ]
+      ],
+      "fact": "The inspected Deployment defines auth settings, storage and readiness; it does not declare a Prometheus datasource address.",
+      "not_inferred": "The visualization role alone does not create a datasource edge.",
+      "needed": "Datasource provisioning or configuration with source provenance if this relation is to be claimed.",
+      "owner": "Minh/source owner",
+      "affected_conclusion": "Grafana datasource topology only.",
+      "producer_source_inspected": true,
+      "current_state": "NO_EDGE_JUSTIFIED_FROM_AVAILABLE_SOURCE",
+      "within_scope_resolution": "Không có khai báo datasource trong nguồn này; không suy cạnh từ vai trò Grafana."
+    },
+    {
+      "source": "application Nacos clients",
+      "target_candidate": "nacos:quickstart",
+      "state": "CLIENT_ADDRESS_DECLARATIONS_RETAINED_AS_SOURCE_FACTS",
+      "evidence": [
+        [
+          "ts-gateway-service/src/main/resources/application.yml",
+          10,
+          13
+        ]
+      ],
+      "fact": "Nacos client address fields are already retained in source facts; the assembler did not turn them into transport-qualified call edges.",
+      "not_inferred": "No HTTP/RPC channel, resolved override or runtime activation is inferred from the configuration key.",
+      "needed": "Version-specific client transport and source binding/override evidence, or an approved unknown-protocol representation.",
+      "owner": "Minh/source owner",
+      "affected_conclusion": "Complete application-to-discovery dependency representation.",
+      "producer_source_inspected": true,
+      "current_state": "OPEN",
+      "within_scope_resolution": "Đã đọc nguồn hiện có. Cần semantics image/client ngoài nguồn hoặc binding/discovery; hợp đồng hiện hành không có call channel unknown. Không đổi hợp đồng hoặc dựng cạnh từ port/role."
+    }
+  ],
+  "shared_code_change_proposed": false,
+  "scientific_conclusions": {
+    "configured_dependencies_are_runtime_edges": false,
+    "lineage_verified": false,
+    "semantic_inventory_complete": false,
+    "RCA_benefit_or_P6_selection_established": false
+  },
+  "producer_validation": "results/T-038/runs/sua-r1-20261017-001/source-checks.json"
+}

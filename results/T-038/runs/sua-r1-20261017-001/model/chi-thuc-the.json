@@ -1,0 +1,1149 @@
+{
+  "scope": {
+    "revision": "fa8d9efb35b2ed5ec1d18f60510167767c8fb2bf",
+    "system": "RE2-TT"
+  },
+  "edges": [
+    {
+      "source": "alertmanager:quickstart",
+      "target": "alertsnitch:quickstart",
+      "type": "gọi-chưa-phân-kiểu",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "infra:alertmanager:alertsnitch-webhook"
+      ],
+      "provenance": [
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/prometheus/alert-manager-configmap.yml",
+          "locator": "L1-L30",
+          "condition": "Optional monitoring profile: Alertmanager mounts its declared config, whose routed receiver contains the literal HTTP alertsnitch webhook. HTTP destination is source evidence; blocking/synchronous execution, delivery, activation and RE2 lineage are unverified. Unknown type must remain excluded from typed comparison."
+        },
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/prometheus/alert-manager.yml",
+          "locator": "L26-L59",
+          "condition": "Optional monitoring profile: Alertmanager mounts its declared config, whose routed receiver contains the literal HTTP alertsnitch webhook. HTTP destination is source evidence; blocking/synchronous execution, delivery, activation and RE2 lineage are unverified. Unknown type must remain excluded from typed comparison."
+        }
+      ],
+      "contexts": [
+        "Optional monitoring profile: Alertmanager mounts its declared config, whose routed receiver contains the literal HTTP alertsnitch webhook. HTTP destination is source evidence; blocking/synchronous execution, delivery, activation and RE2 lineage are unverified. Unknown type must remain excluded from typed comparison."
+      ]
+    },
+    {
+      "source": "alertsnitch:quickstart",
+      "target": "mysql-logical:alertsnitch",
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "infra:alertsnitch:mysql"
+      ],
+      "provenance": [
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/prometheus/alertsnitch.yml",
+          "locator": "L1-L43",
+          "condition": "Optional monitoring profile: ALERTSNITCH_BACKEND=mysql and the configured DSN select the declared alertsnitch database. No credential values are copied into records or reports. Effective image, overrides, runtime connection and RE2 lineage are unverified."
+        },
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/prometheus/alertsnitch.yml",
+          "locator": "L48-L72",
+          "condition": "Optional monitoring profile: ALERTSNITCH_BACKEND=mysql and the configured DSN select the declared alertsnitch database. No credential values are copied into records or reports. Effective image, overrides, runtime connection and RE2 lineage are unverified."
+        }
+      ],
+      "contexts": [
+        "Optional monitoring profile: ALERTSNITCH_BACKEND=mysql and the configured DSN select the declared alertsnitch database. No credential values are copied into records or reports. Effective image, overrides, runtime connection and RE2 lineage are unverified."
+      ]
+    },
+    {
+      "source": "nacos:quickstart",
+      "target": "mysql-logical:nacos:quickstart",
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "infra:nacos:mysql"
+      ],
+      "provenance": [
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/quickstart-k8s/charts/nacos/templates/secrets.yaml",
+          "locator": "L1-L14",
+          "condition": "Quickstart Nacos chart: values.nacos.db supplies MYSQL_SERVICE_* through the named Secret and the main container envFrom; logical database only. Conditional template source; release overrides, rendering, effective image, physical instance, activation and RE2 lineage remain unverified."
+        },
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/quickstart-k8s/charts/nacos/values.yaml",
+          "locator": "L20-L27",
+          "condition": "Quickstart Nacos chart: values.nacos.db supplies MYSQL_SERVICE_* through the named Secret and the main container envFrom; logical database only. Conditional template source; release overrides, rendering, effective image, physical instance, activation and RE2 lineage remain unverified."
+        },
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/quickstart-k8s/charts/nacos/templates/statefulset.yaml",
+          "locator": "L23-L48",
+          "condition": "Quickstart Nacos chart: values.nacos.db supplies MYSQL_SERVICE_* through the named Secret and the main container envFrom; logical database only. Conditional template source; release overrides, rendering, effective image, physical instance, activation and RE2 lineage remain unverified."
+        }
+      ],
+      "contexts": [
+        "Quickstart Nacos chart: values.nacos.db supplies MYSQL_SERVICE_* through the named Secret and the main container envFrom; logical database only. Conditional template source; release overrides, rendering, effective image, physical instance, activation and RE2 lineage remain unverified."
+      ]
+    },
+    {
+      "source": "skywalking:quickstart",
+      "target": "elasticsearch:skywalking",
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "infra:skywalking:elasticsearch"
+      ],
+      "provenance": [
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/skywalking/es.yml",
+          "locator": "L1-L20",
+          "condition": "Optional Skywalking profile: ConfigMap STORAGE=elasticsearch7 and STORAGE_ES_CLUSTER_NODES are loaded with SW_ prefix by the OAP Deployment. Configured dependency only; effective image, environment overrides, runtime activation and RE2 lineage are unverified."
+        },
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/skywalking/skywalking.yml",
+          "locator": "L1-L9",
+          "condition": "Optional Skywalking profile: ConfigMap STORAGE=elasticsearch7 and STORAGE_ES_CLUSTER_NODES are loaded with SW_ prefix by the OAP Deployment. Configured dependency only; effective image, environment overrides, runtime activation and RE2 lineage are unverified."
+        },
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/skywalking/skywalking.yml",
+          "locator": "L29-L36",
+          "condition": "Optional Skywalking profile: ConfigMap STORAGE=elasticsearch7 and STORAGE_ES_CLUSTER_NODES are loaded with SW_ prefix by the OAP Deployment. Configured dependency only; effective image, environment overrides, runtime activation and RE2 lineage are unverified."
+        }
+      ],
+      "contexts": [
+        "Optional Skywalking profile: ConfigMap STORAGE=elasticsearch7 and STORAGE_ES_CLUSTER_NODES are loaded with SW_ prefix by the OAP Deployment. Configured dependency only; effective image, environment overrides, runtime activation and RE2 lineage are unverified."
+      ]
+    },
+    {
+      "source": "ts-food-service",
+      "target": "rabbitmq:quickstart",
+      "type": "thông-điệp",
+      "channel": "publish",
+      "messaging": {
+        "broker": "rabbitmq:quickstart",
+        "broker_scope": null,
+        "exchange": null,
+        "queue": null,
+        "routing_key": "food_delivery"
+      },
+      "evidence_source": "static",
+      "destination": null,
+      "queue_metric_address": null,
+      "record_ids": [
+        "tt-17b8edc3261431c4fefc"
+      ],
+      "provenance": [
+        {
+          "condition": "AmqpTemplate call; 2-arg overload uses default exchange/routing key; queue binding/runtime message delivery not inferred",
+          "locator": "L21-L21",
+          "source_id": "TT:ts-food-service/src/main/java/foodsearch/mq/RabbitSend.java"
+        },
+        {
+          "condition": "source declaration; runtime not verified",
+          "locator": "L10-L10",
+          "source_id": "TT:ts-food-service/src/main/java/foodsearch/config/Queues.java"
+        }
+      ],
+      "contexts": [
+        "AmqpTemplate call; 2-arg overload uses default exchange/routing key; queue binding/runtime message delivery not inferred; conditional quickstart broker; namespace/default exchange OPEN"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-admin-basic-info-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-02bc3f719c3fcfb32974"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L17-L17",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-admin-order-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-eee44224caa0534e2a28"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L22-L22",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-admin-route-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-51abed5d0c98dff144a1"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L27-L27",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-admin-travel-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-aef683c756f66b26cf0c"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L32-L32",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-admin-user-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-c427bbd524f06ece1f7c"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L37-L37",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-assurance-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-738fcca9dfec7f3fd4b1"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L42-L42",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-auth-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-59a20f5e3ede8b3c37c2",
+        "tt-60229a321b4005367a55"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L47-L47",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        },
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L52-L52",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-avatar-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-87dba945c9b28ac4f22a"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L57-L57",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-basic-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-18b3444b191ab4f462c0"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L62-L62",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-cancel-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-d14078795a5019677aca"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L67-L67",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-config-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-557596d71c0b3680edc8"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L72-L72",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-consign-price-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-787aefff84e8b77906f3"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L77-L77",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-consign-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-71284d22bb8a8315f6c7"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L82-L82",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-contacts-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-e88a708fc4ec582173d0"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L87-L87",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-execute-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-4abdb2f4016733bea5b7"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L92-L92",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-food-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-cc792e6555c3fc2ab0f7"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L97-L97",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-inside-payment-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-6892b1c98369a58f60f2"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L102-L102",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-notification-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-29383cb8eec27ef94e83"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L107-L107",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-order-other-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-79f2dc7b3be73b299027"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L112-L112",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-order-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-c719396b6f00582381e8"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L117-L117",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-payment-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-a41c5de631fee665a111"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L122-L122",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-preserve-other-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-ee3ba4253f3b0eea9f65"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L127-L127",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-preserve-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-62477b66d86706dff1db"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L132-L132",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-price-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-ace9bb5b8d46f89df695"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L137-L137",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-rebook-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-2fe1bd558640401b986e"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L142-L142",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-route-plan-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-cc614f59cc566bb4d367"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L147-L147",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-route-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-9e06f7e80888527384ae"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L152-L152",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-seat-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-220ccc8d521b9030f67f"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L157-L157",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-security-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-310fcafb3967de8704d1"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L162-L162",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-station-food-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-38661b5aa4fa9659f9cb"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L167-L167",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-station-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-f7a40bea4f42d3daaede"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L172-L172",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-train-food-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-7206c6cd340e9a2f7d7a"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L177-L177",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-train-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-3e9bb200140cd462a6e7"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L182-L182",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-travel-plan-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-9b316adf7b1e0907c04f"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L192-L192",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-travel-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-0d5a10f67d7b4e3023af"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L197-L197",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-travel2-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-061fe8589be1baa7bb4b"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L187-L187",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-user-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-67bc5c92d5eb2e92a007"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L202-L202",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-gateway-service",
+      "target": "ts-verification-code-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "tt-4f16a85d80e4d1427e4f"
+      ],
+      "provenance": [
+        {
+          "condition": "configuration candidate; profile/env override/runtime activation must be checked",
+          "locator": "L207-L207",
+          "source_id": "TT:ts-gateway-service/src/main/resources/application.yml"
+        }
+      ],
+      "contexts": [
+        "declared gateway route; predicate/config condition; runtime not observed"
+      ]
+    },
+    {
+      "source": "ts-notification-service",
+      "target": "rabbitmq:quickstart",
+      "type": "thông-điệp",
+      "channel": "publish",
+      "messaging": {
+        "broker": "rabbitmq:quickstart",
+        "broker_scope": null,
+        "exchange": null,
+        "queue": null,
+        "routing_key": "email"
+      },
+      "evidence_source": "static",
+      "destination": null,
+      "queue_metric_address": null,
+      "record_ids": [
+        "tt-3f639b563db6b9880b3a"
+      ],
+      "provenance": [
+        {
+          "condition": "AmqpTemplate call; 2-arg overload uses default exchange/routing key; queue binding/runtime message delivery not inferred",
+          "locator": "L20-L20",
+          "source_id": "TT:ts-notification-service/src/main/java/notification/mq/RabbitSend.java"
+        },
+        {
+          "condition": "source declaration; runtime not verified",
+          "locator": "L10-L10",
+          "source_id": "TT:ts-notification-service/src/main/java/notification/config/Queues.java"
+        }
+      ],
+      "contexts": [
+        "AmqpTemplate call; 2-arg overload uses default exchange/routing key; queue binding/runtime message delivery not inferred; conditional quickstart broker; namespace/default exchange OPEN"
+      ]
+    },
+    {
+      "source": "ts-preserve-other-service",
+      "target": "rabbitmq:quickstart",
+      "type": "thông-điệp",
+      "channel": "publish",
+      "messaging": {
+        "broker": "rabbitmq:quickstart",
+        "broker_scope": null,
+        "exchange": null,
+        "queue": null,
+        "routing_key": "email"
+      },
+      "evidence_source": "static",
+      "destination": null,
+      "queue_metric_address": null,
+      "record_ids": [
+        "tt-693e951557e765e18d8a"
+      ],
+      "provenance": [
+        {
+          "condition": "AmqpTemplate call; 2-arg overload uses default exchange/routing key; queue binding/runtime message delivery not inferred",
+          "locator": "L22-L22",
+          "source_id": "TT:ts-preserve-other-service/src/main/java/preserveOther/mq/RabbitSend.java"
+        },
+        {
+          "condition": "source declaration; runtime not verified",
+          "locator": "L10-L10",
+          "source_id": "TT:ts-preserve-other-service/src/main/java/preserveOther/config/Queues.java"
+        }
+      ],
+      "contexts": [
+        "AmqpTemplate call; 2-arg overload uses default exchange/routing key; queue binding/runtime message delivery not inferred; conditional quickstart broker; namespace/default exchange OPEN"
+      ]
+    },
+    {
+      "source": "ts-preserve-service",
+      "target": "rabbitmq:quickstart",
+      "type": "thông-điệp",
+      "channel": "publish",
+      "messaging": {
+        "broker": "rabbitmq:quickstart",
+        "broker_scope": null,
+        "exchange": null,
+        "queue": null,
+        "routing_key": "email"
+      },
+      "evidence_source": "static",
+      "destination": null,
+      "queue_metric_address": null,
+      "record_ids": [
+        "tt-5b63828af4ee2ee26f70"
+      ],
+      "provenance": [
+        {
+          "condition": "AmqpTemplate call; 2-arg overload uses default exchange/routing key; queue binding/runtime message delivery not inferred",
+          "locator": "L20-L20",
+          "source_id": "TT:ts-preserve-service/src/main/java/preserve/mq/RabbitSend.java"
+        },
+        {
+          "condition": "source declaration; runtime not verified",
+          "locator": "L10-L10",
+          "source_id": "TT:ts-preserve-service/src/main/java/preserve/config/Queues.java"
+        }
+      ],
+      "contexts": [
+        "AmqpTemplate call; 2-arg overload uses default exchange/routing key; queue binding/runtime message delivery not inferred; conditional quickstart broker; namespace/default exchange OPEN"
+      ]
+    },
+    {
+      "source": "ts-ticket-office-service",
+      "target": "mysql-logical:ts-ticket-office-service",
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "nonjava:office:mysql"
+      ],
+      "provenance": [
+        {
+          "condition": "createConnection uses env HOST/USER/PASSWORD/DATABASE; PORT env is read but not passed. Actual deployment value OPEN.",
+          "locator": "ts-ticket-office-service/bin/db.js:L4-L15",
+          "source_id": "TT:ts-ticket-office-service/bin/db.js"
+        }
+      ],
+      "contexts": [
+        "createConnection uses env HOST/USER/PASSWORD/DATABASE; PORT env is read but not passed. Actual deployment value OPEN."
+      ]
+    },
+    {
+      "source": "ts-ui-dashboard",
+      "target": "ts-gateway-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "nonjava:ui:gateway"
+      ],
+      "provenance": [
+        {
+          "condition": "Nginx location /api/v1/ proxies to default gateway upstream; not all paths.",
+          "locator": "ts-ui-dashboard/nginx.conf:L40-L42",
+          "source_id": "TT:ts-ui-dashboard/nginx.conf"
+        }
+      ],
+      "contexts": [
+        "Nginx location /api/v1/ proxies to default gateway upstream; not all paths."
+      ]
+    }
+  ],
+  "note": "Entity-only configured dependencies; no invented operation nodes."
+}

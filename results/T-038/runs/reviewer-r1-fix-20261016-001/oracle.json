@@ -1,0 +1,73 @@
+{
+  "task": "T-038",
+  "client_date": "2026-10-16",
+  "status": "REVIEWER_REPAIR_PROPOSAL_NOT_PRODUCER_ADOPTION",
+  "chronology": "Literal expected relations recorded before candidate repair code.",
+  "relations": [
+    {
+      "id": "infra:skywalking:elasticsearch",
+      "source": "skywalking:quickstart",
+      "target": "elasticsearch:skywalking",
+      "type": "dữ-liệu",
+      "channel": "data",
+      "evidence": [
+        ["deployment/kubernetes-manifests/skywalking/skywalking.yml", 1, 9],
+        ["deployment/kubernetes-manifests/skywalking/skywalking.yml", 29, 36],
+        ["deployment/kubernetes-manifests/skywalking/es.yml", 1, 20]
+      ],
+      "condition": "Optional Skywalking profile: ConfigMap STORAGE=elasticsearch7 and STORAGE_ES_CLUSTER_NODES are loaded with SW_ prefix by the OAP Deployment. Configured dependency only; effective image, environment overrides, runtime activation and RE2 lineage are unverified."
+    },
+    {
+      "id": "infra:alertsnitch:mysql",
+      "source": "alertsnitch:quickstart",
+      "target": "mysql-logical:alertsnitch",
+      "type": "dữ-liệu",
+      "channel": "data",
+      "evidence": [
+        ["deployment/kubernetes-manifests/prometheus/alertsnitch.yml", 1, 43],
+        ["deployment/kubernetes-manifests/prometheus/alertsnitch.yml", 48, 72]
+      ],
+      "condition": "Optional monitoring profile: ALERTSNITCH_BACKEND=mysql and the configured DSN select the declared alertsnitch database. No credential values are copied into records or reports. Effective image, overrides, runtime connection and RE2 lineage are unverified."
+    },
+    {
+      "id": "infra:nacos:mysql",
+      "source": "nacos:quickstart",
+      "target": "mysql-logical:nacos:quickstart",
+      "type": "dữ-liệu",
+      "channel": "data",
+      "evidence": [
+        ["deployment/kubernetes-manifests/quickstart-k8s/charts/nacos/values.yaml", 20, 27],
+        ["deployment/kubernetes-manifests/quickstart-k8s/charts/nacos/templates/secrets.yaml", 1, 14],
+        ["deployment/kubernetes-manifests/quickstart-k8s/charts/nacos/templates/statefulset.yaml", 23, 48]
+      ],
+      "condition": "Quickstart Nacos chart: values.nacos.db supplies MYSQL_SERVICE_* through the named Secret and the main container envFrom; logical database only. Conditional template source; release overrides, rendering, effective image, physical instance, activation and RE2 lineage remain unverified."
+    },
+    {
+      "id": "infra:alertmanager:alertsnitch-webhook",
+      "source": "alertmanager:quickstart",
+      "target": "alertsnitch:quickstart",
+      "type": "gọi-chưa-phân-kiểu",
+      "channel": "http",
+      "evidence": [
+        ["deployment/kubernetes-manifests/prometheus/alert-manager-configmap.yml", 1, 30],
+        ["deployment/kubernetes-manifests/prometheus/alert-manager.yml", 26, 59]
+      ],
+      "condition": "Optional monitoring profile: Alertmanager mounts its declared config, whose routed receiver contains the literal HTTP alertsnitch webhook. HTTP destination is source evidence; blocking/synchronous execution, delivery, activation and RE2 lineage are unverified. Unknown type must remain excluded from typed comparison."
+    }
+  ],
+  "expected": {
+    "new_entities": 0,
+    "new_operations": 0,
+    "new_relations": 4,
+    "entity_edges_added": 4,
+    "operation_edges_added": 0,
+    "entity_only_edges_added": 4,
+    "entity_endpoints_static_keys_added": 4,
+    "entity_typed_static_keys_added": 3,
+    "entity_typed_unknown_exclusions_added": 1,
+    "trace_side_and_intersections_unchanged": true,
+    "operation_comparisons_exact_equal": true,
+    "source_inventory_semantically_complete": false,
+    "runtime_verified": false
+  }
+}

@@ -1,0 +1,104 @@
+--- before/phan-tich-chenh-lech.md
++++ current/phan-tich-chenh-lech.md
+@@ -1,31 +1,33 @@
+-# Kết quả hiện hành T-038 theo SMTP V2
++# Đối chiếu hiện hành T-038 sau tiếp nhận R1
+ 
+-Đã so đủ1069graph dev bằng cùng pin V2 với T037/T039. Số mới lấy từ runs/doi-chieu-smtp-001/checks/full1069-002/summary.json và phan-tich-chenh-lech.json. Mỗi graph được replay R1 khớp nguyên kết quả đã lưu; comparator mới trên model cũ cũng bằng nguyên kết quả cũ. Delta SMTP tăng đúng một key S/static-only ở endpoints mỗi graph, tăng một loại trừ unknown_type phía static ở typed; tập đủ điều kiện typed, T, giao và phía trace giữ nguyên. Mẫu số static endpoints tăng1 nên tỷ lệ phía static phải đọc bản thống kê mới, không dùng bảng cũ.
++Người làm đã kiểm nguồn rồi sửa chính thức. Chờ người phản biện kiểm bản sửa và Minh quyết; chưa nghiệm thu task. Nguồn số: `results/T-038/runs/sua-r1-20261017-001/checks/full1069-002/summary.json#/rows`, `phan-tich-chenh-lech.json#/family_stats` và `results/T-038/runs/sua-r1-20261017-001/model-checks.json`.
+ 
+-Quan hệ mới dùng source MailService/config có provenance, giữ gọi-chưa-phân-kiểu và giới hạn authority/TLS/delivery/runtime. Record ID SMTP:mail-send:proposed-only giữ từ oracle được duyệt để truy cùng dòng preview; hậu tố lịch sử không còn là trạng thái áp dụng, trạng thái thật nằm manifest/pin. Không suy source-only là runtime không gửi hoặc telemetry lỗi. Delta đã kiểm tách khỏi comparator, không đổi mapping/nhãn để tăng giao.
++Mô hình có 110 thực thể, 993 thao tác, 513 relation, 50 binding và 139 signal. Có 170 cạnh thực thể, 343 cạnh thao tác; phép chiếu 122 cạnh và phần chỉ có ở mức thực thể 48 cạnh. Từng nhóm giữ locator và điều kiện nguồn, không xác nhận quan hệ đã chạy trong dataset.
+ 
+-Các chuỗi nguồn và giải thích cạnh tranh khôngSMTP của phân tích trước giữ giá trị trong phạm vi có điều kiện. Bản đầy đủ trước chuyển nằm runs/doi-chieu-smtp-001/before/results/T-038/phan-tich-chenh-lech.md; các bảng số trong bản ấy là R1 lịch sử. File JSON hiện hành đã dựng lại toàn family/full/union/exclusion/member chains từ output mới. Lineage/runtime, phần PDF lịch sử và nguồn dynamic vẫn OPEN, chưa trả lời lợi ích RCA/RQ3/RQ5/P6/G3.
++R1 là lỗi trích/lập bản ghi: cấu hình → bản ghi từng bỏ Skywalking→Elasticsearch, Alertsnitch→MySQL, Nacos→MySQL và webhook Alertmanager→Alertsnitch. Nguồn gốc đủ để ghi quan hệ cấu hình có điều kiện; chưa đủ để nói runtime hoạt động. Ba cạnh đầu là dữ liệu; webhook giữ gọi-chưa-phân-kiểu/http, không tự nâng thành đồng bộ. Bằng chứng: `results/T-038/runs/sua-r1-20261017-001/source-checks.json#/checks`, `accepted-delta.json` trong cùng run; từng cạnh→record_ids→provenance→locator đi vào members của output.
+ 
+-## Phân tích R1 giữ để đối chiếu lịch sử (không dùng số này thay kết quả V2)
++So với bản SMTP V2 trước sửa: 979 graph entity thêm 4 S/static-only ở endpoints, 3 S/static-only ở typed và 1 unknown exclusion typed. Mẫu số tĩnh tăng tương ứng; tỷ lệ phải đọc lại. T/giao/trace_only, members và exclusions phía trace giữ nguyên. 90 output operation giữ nguyên cấu trúc/tập/số, chỉ đồng bộ mô tả SMTP; JSON graph operation có thêm 4 record/operation exclusion nhưng cạnh không đổi. Root phép chiếu cũ thiếu SMTP đã được thay: 121→122; entity-only44→48. So với phép chiếu V2 đúng trong run cũ, projection122 không đổi. Một mô tả entity.role SMTP được đổi từ ghi chú unsupported lịch sử sang hỗ trợ V2 có điều kiện; chỉ metadata node đổi, không đổi ID/type/provenance hay phép tính. inventory-index trước còn đếm508 relation, nên bản đồng bộ513 gồm4 R1 và1 SMTP đã bị bỏ khỏi chỉ mục. Xem metadata-correction.json và inventory-index-delta.json trong run sửa. Bảng delta từng graph: `results/T-038/runs/sua-r1-20261017-001/checks/full1069-002/delta.json#/rows`.
+ 
+-# Đối chiếu nguồn và graph dev RE2-TT
++| Mức/miền/view | Graph | S | T | Giao | Riêng tĩnh | Riêng trace |
++|---|---:|---:|---:|---:|---:|---:|
++| entity/A/endpoints | 30 | 164 | 16–49 | 15–44 | 120–149 | 1–5 |
++| entity/A/typed | 30 | 162 | 0 | 0 | 162 | 0 |
++| entity/N/endpoints | 30 | 164 | 16–49 | 15–44 | 120–149 | 1–5 |
++| entity/N/typed | 30 | 162 | 0 | 0 | 162 | 0 |
++| entity/full/endpoints | 30 | 164 | 16–49 | 15–44 | 120–149 | 1–5 |
++| entity/full/typed | 30 | 162 | 0 | 0 | 162 | 0 |
++| entity/s300/endpoints | 150 | 164 | 16–49 | 15–44 | 120–149 | 1–5 |
++| entity/s300/typed | 150 | 162 | 0 | 0 | 162 | 0 |
++| entity/s60/endpoints | 739 | 164 | 0–49 | 0–44 | 120–164 | 0–5 |
++| entity/s60/typed | 739 | 162 | 0 | 0 | 162 | 0 |
++| operation/A/endpoints | 30 | 341 | 0 | 0 | 341 | 0 |
++| operation/A/typed | 30 | 340 | 0 | 0 | 340 | 0 |
++| operation/N/endpoints | 30 | 341 | 0 | 0 | 341 | 0 |
++| operation/N/typed | 30 | 340 | 0 | 0 | 340 | 0 |
++| operation/full/endpoints | 30 | 341 | 0 | 0 | 341 | 0 |
++| operation/full/typed | 30 | 340 | 0 | 0 | 340 | 0 |
+ 
+-Đã so mọi graph hiện hành được giao, trên nguồn tham khảo có điều kiện. Số và từng thành viên nằm trong `runs/doi-chieu-dev-002/summary.json#/rows`, JSON gzip theo `doi-chieu/index.json` và `phan-tich-chenh-lech.json`. Bảng sau là min–max từng graph, không phải số cạnh độc nhất gộp qua ca.
+-
+-| Mức/miền | Graph | S | T | Giao | Riêng tĩnh | Riêng trace |
+-|---|---:|---:|---:|---:|---:|---:|
+-| entity/A | 30 | 159 | 16–49 | 15–44 | 115–144 | 1–5 |
+-| entity/N | 30 | 159 | 16–49 | 15–44 | 115–144 | 1–5 |
+-| entity/full | 30 | 159 | 16–49 | 15–44 | 115–144 | 1–5 |
+-| entity/s300 | 150 | 159 | 16–49 | 15–44 | 115–144 | 1–5 |
+-| entity/s60 | 739 | 159 | 0–49 | 0–44 | 115–159 | 0–5 |
+-| operation/A | 30 | 340 | 0 | 0 | 340 | 0 |
+-| operation/N | 30 | 340 | 0 | 0 | 340 | 0 |
+-| operation/full | 30 | 340 | 0 | 0 | 340 | 0 |
+-
+-30 dev ID là mã mờ để điều phối, không đi vào phép tính khóa cạnh. Chọn đúng prefix manifest T035, không trộn lịch sử. Có 979 graph thực thể và 90 graph thao tác; full/N/A ở cả hai mức, 739 cửa sổ 60 giây và 150 cửa sổ 300 giây ở mức thực thể. Giữ interval/miền gốc; không mở lại telemetry để dựng cửa sổ khác. Nguồn số: `summary.json#/graph_family_counts`.
+-
+-S là khóa tĩnh đủ điều kiện, T là khóa trace đủ điều kiện sau mapping; giao và hai phần riêng được tính bằng tập có hướng. Mỗi khóa giữ members với chỉ số/cạnh gốc/provenance riêng hai nguồn; exclusions phân hoạch phần không vào khóa. Không dùng inventory hoặc nút quan sát làm mẫu số cạnh. Typed T rỗng ở toàn bộ 1.069 graph vì kiểu trace còn unknown, hoặc đầu mút thao tác chưa đủ mapping. Trace fraction là null khi mẫu số rỗng, không là 0% coverage. 19 cửa sổ s60 có T endpoints rỗng, cũng giữ null. Các trường min/max/null_count đầy đủ ở `phan-tich-chenh-lech.json#/family_stats`.
++Bảng là min–max từng graph, không phải hợp độc nhất. Có 979 entity, 90 operation, 739 cửa sổ s60 và 150 s300; 30 full/N/A mỗi mức. Các interval và tập graph giữ nguyên. S/T là khóa cạnh đủ điều kiện, không là số inventory. Mẫu số T rỗng giữ null; typed T rỗng không phải không có traffic. Members và exclusions phân hoạch từng chỉ số cạnh; không cộng chúng thành tỷ lệ nguyên nhân.
+ 
+ ## Đầu mút khớp không xác nhận transport hoặc phiên bản
+ 
+@@ -33,7 +35,7 @@
+ 
+ ## Năm cặp riêng trace và đối chiếu nguồn tương ứng
+ 
+-Hợp của full endpoints có đúng năm cặp riêng trace: food→station, seat→travel, seat→travel2, travel→order, travel2→order-other (`phan-tich-chenh-lech.json#/full_union`, entity/endpoints/trace_only). Từng trường hợp, số graph chứa và witnesses gốc còn trong `edge-groups.json` và members; không cộng số xuất hiện qua cửa sổ thành số nguyên nhân.
++Hợp của full endpoints có đúng năm cặp riêng trace: food→station, seat→travel, seat→travel2, travel→order, travel2→order-other (`phan-tich-chenh-lech.json#/full_union`, entity/endpoints/trace_only). Từng trường hợp, số graph chứa và witnesses gốc còn trong `runs/doi-chieu-dev-002/edge-groups.json` và members; không cộng số xuất hiện qua cửa sổ thành số nguyên nhân.
+ 
+ Đã đọc toàn 38 Java file hiện hành của bốn module và helper liên quan. Không tìm được direct call cho năm cặp trong corpus đó. Control dương cùng cách gọi: food gọi travel và station-food; travel/travel2 gọi seat; seat gọi order hoặc order-other theo nhánh G/D. Chain travel→seat→order có controller/service và callsite đúng dòng; không co thành direct travel→order, không đảo chiều thành seat→travel. Biến stationResult trong food nhận body từ travel, tên biến không tạo endpoint station. Nguồn và line ở `runs/trien-khai-001/coverage/mismatch-source-followup.json#/pairs`; chuỗi so sánh ở JSON phân tích.
+ 
+@@ -47,11 +49,11 @@
+ 
+ 54 tên thao tác toàn miền có descriptor HTTP cùng owner khớp chính xác về cấu trúc; 16 mơ hồ, 35 candidate chưa verified và 49 unmapped. Đây là status của 154 tên khác nhau, không phải tỷ lệ cạnh. T035 đặt ID bằng (serviceName, operationName), tại `src/do_thi/builder.py:177–181`; generic GET trong cùng owner không giữ callsite/URL để chọn giữa nhiều source method. Các method repository chỉ là candidate; không biết agent đã tạo span ấy thế nào. Cụ thể chuỗi input operationName → ID T035 → mapping nhiều/chưa xác minh → exclusion đầu mút → không tạo khóa T đã được lưu trong `phan-tich-chenh-lech.json#/exclusions`. Trong 90 graph thao tác, mọi cạnh bị loại ở ít nhất một đầu mút; do đó T đủ điều kiện rỗng, không có nghĩa không có lời gọi.
+ 
+-Đây là hạn chế địa chỉ của graph đầu vào và quan hệ mapping hiện tại. Chưa chứng minh trường URI/kind/callsite đã từng có trước conversion hay collector làm mất: đặc tả T035 §2 chỉ cam kết lõi, p3 thêm kind=null/attributes={}/links=[]; raw không được mở ở task này. Muốn phân xử cần schema/instrumentation tại phiên bản thu hoặc trung gian được duyệt có URI/callsite/span-kind; không được tự dùng endpoint nguồn tạo runtime_name. Runtime_name của các operation nguồn vẫn OPEN. Đối chiếu dương exact owner+HTTP descriptor và phản ví dụ generic GET/sai owner/concrete ID nằm trong oracle và fixture result.
++Đây là hạn chế địa chỉ của graph đầu vào và quan hệ mapping hiện tại. Chưa chứng minh trường URI/kind/callsite đã từng có trước conversion hay collector làm mất: đặc tả T035 §2 chỉ cam kết lõi, p3 thêm kind=null/attributes={}/links=[]; raw RE2 không được mở để phân xử trong phép này. Muốn phân xử cần schema/instrumentation tại phiên bản thu hoặc trung gian được duyệt có URI/callsite/span-kind; không được tự dùng endpoint nguồn tạo runtime_name. Runtime_name của các operation nguồn vẫn OPEN. Đối chiếu dương exact owner+HTTP descriptor và phản ví dụ generic GET/sai owner/concrete ID nằm trong oracle và fixture result.
+ 
+ ## Cửa sổ, nhánh và phần riêng tĩnh
+ 
+-Nguồn là hợp các lời gọi khai báo có điều kiện, không path-sensitive reachability hay workload. Bởi vậy không gán mọi static_only là mất telemetry. `edge-groups.json` giữ ví dụ cùng cặp khớp full nhưng vắng ở s60 cùng dev ID; điều này xác nhận membership thay theo miền, chưa nói vì không chạy nhánh, không quan sát, hay xử lý biên. Muốn phân xử cần workload/version và trung gian đã thu trong quyền. Thành phần source-only và DB default chưa được runtime xác nhận cũng có thể tạo phần riêng tĩnh; không cộng các nhóm chồng lấn thành tỷ lệ nguyên nhân.
++Nguồn là hợp các lời gọi khai báo có điều kiện, không path-sensitive reachability hay workload. Bởi vậy không gán mọi static_only là mất telemetry. `runs/doi-chieu-dev-002/edge-groups.json` giữ ví dụ cùng cặp khớp full nhưng vắng ở s60 cùng dev ID; điều này xác nhận membership thay theo miền, chưa nói vì không chạy nhánh, không quan sát, hay xử lý biên. Muốn phân xử cần workload/version và trung gian đã thu trong quyền. Thành phần source-only và DB default chưa được runtime xác nhận cũng có thể tạo phần riêng tĩnh; không cộng các nhóm chồng lấn thành tỷ lệ nguyên nhân.
+ 
+ ## Lỗi literal nguồn và giới hạn hợp đồng
+ 
+@@ -59,17 +61,12 @@
+ 
+ Messaging giữ queue/routing key khai báo, broker quickstart có điều kiện, broker_scope/exchange chưa xác minh nên bị loại theo hợp đồng; không nối producer→consumer chỉ từ tên queue. DB logical schema khác endpoint instance và owner; source default/env override không là physical deployment. Shared signal chỉ gắn entity một lần theo nguồn, operation=null, không nhân thành tín hiệu quan sát mỗi operation. Java logger và Java-agent env là khai báo; chưa có output schema/correlation, ba module nonJava có env Java-agent chưa chứng minh agent hoạt động.
+ 
+-SMTP có cấu hình smtp.163.com:465 và MailService.sender.send; enum T036 không nhận channel này. Đã lưu phản ví dụ thật, giữ external entity và ngừng riêng relation SMTP, không ép thành HTTP/RPC/broker. Đó là thiếu biểu diễn ở giao thức nguồn, khác thiếu dữ liệu hay lỗi adapter. Toàn mô hình chưa đủ quan hệ. Archive/libraries/config chưa render còn giới hạn về activation/runtime; rà bổ sung đã phân loại toàn bộ27 mục cũ, chỉ body PDF converter lịch sử chưa mở. PDF không chặn declared-current module inventory, nhưng không nhận toàn nội dung/semantics đã đầy đủ.
++SMTP đã biểu diễn theo pin V2; record giữ kiểu chưa phân loại, không suy authority/TLS/delivery hoặc runtime. Hậu tố proposed-only trong ID SMTP là định danh lịch sử được giữ để truy provenance; trạng thái áp dụng nằm ở manifest hiện hành. Bốn dependency cấu hình bổ sung cũng chỉ là khả năng có điều kiện trong snapshot. Không biến nguồn tĩnh thành graph runtime đã xác minh.
+ 
+-## Hàm ý nghiên cứu
++## Phần còn mở và vai trò tính toán
+ 
+-Đồ thị được dùng để chuẩn hóa địa chỉ, chiếu operation→entity, tạo khóa có hướng và tính giao/phần riêng; chưa tính anomaly score, tập ứng viên hay rank. Kết quả hỗ trợ đầu vào kiến trúc/địa chỉ và yêu cầu quan sát cho DT18 bước khảo sát, RQ3/RQ5. Chưa chứng minh lợi ích RCA, cơ chế của lỗi baseline, nên chưa chọn P6 hay đóng G3. Bảng input/owner/phép phân xử/P6/P9 nằm ở `ban-giao.md` và `de-nghi-tiep-theo.md`.
++Đã kiểm các địa chỉ còn lại từ nguồn hiện có tại `results/T-038/runs/sua-r1-20261017-001/source-audit.json#/further_source_addresses`. UI→OAP và Prometheus→Alertmanager thiếu protocol đã xác minh; discovery/scrape thiếu binding/owner, Grafana chưa có datasource address trong file. Hợp đồng đang ghim không nhận call channel unknown. Không dùng port/image/role để lấp; thay hợp đồng hoặc lấy semantics image/client cần quyền riêng. Điều này giới hạn kết luận đầy đủ cấu hình, không phủ nhận bốn quan hệ đã có bằng chứng.
+ 
++Đồ thị dùng nút thực thể/thao tác, cạnh gọi/thông điệp/dữ liệu và provenance để chiếu, tạo khóa có hướng, tính giao/phần riêng. Signal log/trace/metric là địa chỉ khai báo gắn entity/operation theo nguồn; chưa tính anomaly score, vùng ảnh hưởng hoặc rank. Phần này phục vụ DT18-NV2/NV3 và bước1 của cô; chưa chọn P6 hoặc xác nhận lợi ích RCA.
+ 
+-## Bổ sung sau yêu cầu làm hết phần trong quyền
+-
+-Chín cờ `http_target_unresolved_alternative` trước đây không còn là đích chưa biết của source. Đã đọc từng đoạn: URL khởi tạo rỗng, sau đó cả hai nhánh if/else gán URL trước call. Nếu condition/assignment ném exception thì không tới call; nếu tới call bình thường thì không còn giá trị rỗng. Đây là overapproximation của extractor lexical, không phải thiếu telemetry. Oracle đọc tay, source hash/line và chín chuỗi đầy đủ ở `runs/hoan-tat-trong-quyen-001/{manual-branch-oracle.json,source-flag-resolution.json}`. Không sửa source hay tự chứng minh nhánh đã chạy. Các alternative không rỗng đã có trong model005, nên đóng cờ không đổi graph/mapping/kết quả.
+-
+-Đã phân loại toàn151 tracking row:9 closed initializer,71 candidate target operation,67 branch/value conditions và4 external/literal discrepancies đã đọc nguồn. Chúng chồng lấn, không là151 ca lỗi hay tỷ lệ nguyên nhân. Candidate dynamic URL giữ nguyên vì source pattern không chứng minh giá trị URL/routing runtime; bốn no-handler đã có external implementation thiếu hoặc source method/path bất nhất. Giữ chúng có điều kiện là kết quả khảo sát, không tự biến thành nghĩa vụ chạy runtime không được giao.
+-
+-Metadata reconstruction nguồn đã duyệt ghi xóa ticketinfo, tách food-map, migration MySQL và Skywalking (`runs/hoan-tat-trong-quyen-001/release-refactor-metadata.json`). Điều này củng cố khác biệt source/profile đã quan sát; chưa nối được nguồn thu RE2 nên không dùng làm alias hoặc nguyên nhân xác nhận cho năm cặp riêng trace. Tra metadata tiếp có phạm vi/receipt ở lineage-resolution.json; kết quả so vẫn conditional. Không cần chạy lại1069 graph vì mọi input model/graph/mapping và numerical output giữ nguyên hash.
++Coverage toàn cây là bookkeeping, không là toàn semantics. Revision ứng dụng→image→instrumentation→deployment→RE2, body PDF lịch sử, dynamic override/binding/runtime đều còn OPEN. Các chuỗi nguồn/match/mismatch không chịu R1 được dùng lại sau kiểm hash, xem các đường dẫn gốc ở trên. Không chạy lại RCA, mở raw/test/heldout/archive hoặc tải nguồn.

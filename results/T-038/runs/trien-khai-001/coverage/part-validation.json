@@ -1,0 +1,56 @@
+{
+  "ok": true,
+  "entities": 24,
+  "operations": 10,
+  "relations": 5,
+  "signals": 4,
+  "entity_edges": 5,
+  "operation_edges": 3,
+  "unsupported_smtp_outside_graph": [
+    {
+      "source": "ts-notification-service",
+      "target": "smtp.163.com",
+      "target_type": "external",
+      "relation": "SMTP mail send",
+      "address": {
+        "host": "smtp.163.com",
+        "port": 465,
+        "transport": "SMTP/TLS"
+      },
+      "status": "UNSUPPORTED_T036_RELATION_ENUM",
+      "condition": "Default cấu hình mail; không suy đã gửi thật hoặc là transport HTTP/RPC.",
+      "source_chain": [
+        {
+          "source_path": "ts-notification-service/src/main/resources/application.yml",
+          "line": 12,
+          "end_line": 14,
+          "locator": "https://github.com/FudanSELab/train-ticket/blob/fa8d9efb35b2ed5ec1d18f60510167767c8fb2bf/ts-notification-service/src/main/resources/application.yml#L12",
+          "text": "  mail:\n    host: smtp.163.com\n    port: 465"
+        },
+        {
+          "source_path": "ts-notification-service/src/main/java/notification/service/MailService.java",
+          "line": 22,
+          "end_line": 23,
+          "locator": "https://github.com/FudanSELab/train-ticket/blob/fa8d9efb35b2ed5ec1d18f60510167767c8fb2bf/ts-notification-service/src/main/java/notification/service/MailService.java#L22",
+          "text": "    @Autowired\n    private JavaMailSender sender;"
+        },
+        {
+          "source_path": "ts-notification-service/src/main/java/notification/service/MailService.java",
+          "line": 30,
+          "end_line": 46,
+          "locator": "https://github.com/FudanSELab/train-ticket/blob/fa8d9efb35b2ed5ec1d18f60510167767c8fb2bf/ts-notification-service/src/main/java/notification/service/MailService.java#L30",
+          "text": "    public void sendEmail(Mail mail,String template) throws Exception {\n        MimeMessage message = sender.createMimeMessage();\n\n        MimeMessageHelper helper = new MimeMessageHelper(message);\n\n        // Using a subfolder such as /templates here\n        freemarkerConfig.setClassForTemplateLoading(this.getClass(), \"/templates\");\n\n        Template t = freemarkerConfig.getTemplate(template);\n        String text = FreeMarkerTemplateUtils.processTemplateIntoString(t, mail.getModel());\n\n        helper.setTo(mail.getMailTo());\n        helper.setText(text, true);\n        helper.setFrom(mail.getMailFrom());\n        helper.setSubject(mail.getMailSubject());\n\n        sender.send(message);"
+        },
+        {
+          "source_path": "ts-notification-service/src/main/java/notification/mq/RabbitReceive.java",
+          "line": 78,
+          "end_line": 90,
+          "locator": "https://github.com/FudanSELab/train-ticket/blob/fa8d9efb35b2ed5ec1d18f60510167767c8fb2bf/ts-notification-service/src/main/java/notification/mq/RabbitReceive.java#L78",
+          "text": "        try {\n            mailService.sendEmail(mail, \"preserve_success.ftl\");\n            logger.info(\"[process][Send email to user {} success]\", username);\n            info.setSendStatus(true);\n        } catch (Exception e) {\n            logger.error(\"[process][mailService.sendEmail][Send email error][Exception: {}]\", e.getMessage());\n            info.setSendStatus(false);\n        }\n\n\n        info.setId(UUID.randomUUID().toString());\n        logger.info(\"[process][Save notify info object [{}] into database]\", info.getId());\n        notifyRepository.save(info);"
+        }
+      ],
+      "impact": "Giữ external/address và phản ví dụ; không ép thành sync/http/rpc để vượt schema. Phần phụ thuộc nghĩa cạnh cần Minh quyết hợp đồng chung."
+    }
+  ],
+  "not_complete_inventory": true
+}

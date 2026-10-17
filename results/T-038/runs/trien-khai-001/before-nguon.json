@@ -1,0 +1,165 @@
+{
+  "task": "T-038",
+  "status": "preflight_only; application_source_not_acquired",
+  "sources": [
+    {
+      "condition": "nguồn khởi đầu truy phiên bản",
+      "dataset_link": "OPEN",
+      "id": "RCAEval-README",
+      "kind": "public-document",
+      "locator": "toàn văn/JSON",
+      "manifest": "results/T-002/handoff-manifest.json",
+      "open": [
+        {
+          "affects": "quy chênh lệch cho instrumentation",
+          "input": "revision ứng dụng + image/deployment sinh dataset",
+          "owner": "T-038"
+        }
+      ],
+      "path": "results/T-002/public-metadata/run-002/sources/github-README.md",
+      "revision": "259ea4167160256a74ad30004aa3d96a998c846e",
+      "revision_kind": "RCAEval-code-commit; not TrainTicket application",
+      "sha256": "25a354ef13f5adf8b2869d67a832958a8a31a6b7b95cf011e060f34ab28c98a9",
+      "system": "RE2-TT"
+    },
+    {
+      "condition": "nguồn khởi đầu truy phiên bản",
+      "dataset_link": "OPEN",
+      "id": "RCAEval-revision",
+      "kind": "repository-metadata",
+      "locator": "toàn văn/JSON",
+      "manifest": "results/T-002/handoff-manifest.json",
+      "open": [
+        {
+          "affects": "quy chênh lệch cho instrumentation",
+          "input": "revision ứng dụng + image/deployment sinh dataset",
+          "owner": "T-038"
+        }
+      ],
+      "path": "results/T-002/public-metadata/run-002/sources/github-main-commit.json",
+      "revision": "259ea4167160256a74ad30004aa3d96a998c846e",
+      "revision_kind": "RCAEval-code-commit; not TrainTicket application",
+      "sha256": "2f9fd320d4efb0a8f980512db3dba903e0b5f8a1e7861640fdfdadac71e66ed9",
+      "system": "RE2-TT"
+    },
+    {
+      "condition": "nguồn khởi đầu truy phiên bản",
+      "dataset_link": "OPEN",
+      "id": "RCAEval-dataset",
+      "kind": "dataset-metadata",
+      "locator": "toàn văn/JSON",
+      "manifest": "results/T-002/handoff-manifest.json",
+      "open": [
+        {
+          "affects": "quy chênh lệch cho instrumentation",
+          "input": "revision ứng dụng + image/deployment sinh dataset",
+          "owner": "T-038"
+        }
+      ],
+      "path": "results/T-002/public-metadata/run-002/sources/hf-README.md",
+      "revision": "afeacb11bcc94dadfd1c8f483ee4377b2b8b614e",
+      "revision_kind": "dataset snapshot; not application deployment",
+      "sha256": "c2990bbe2e040a8d2f55fdd47c4f47f02223d8ea098e5d6e8851585a64956a0f",
+      "system": "RE2-TT"
+    },
+    {
+      "condition": "provenance capture; not application revision",
+      "dataset_link": "OPEN",
+      "id": "RCAEval-source-manifest",
+      "kind": "capture-metadata",
+      "locator": "README and commit capture rows",
+      "manifest": "results/T-002/handoff-manifest.json",
+      "open": [],
+      "path": "results/T-002/public-metadata/run-002/source-manifest.json",
+      "revision": "run-002 saved capture",
+      "sha256": "f9355f168693d4d9cd22b652a37dc271e0448132995aa6ff2afa3f239076da19",
+      "system": "RE2-TT"
+    }
+  ],
+  "pin": {
+    "created_utc": "2026-10-15T13:45:08.305188+00:00",
+    "current_run": "runs/kiem-r1-after-002"
+  },
+  "input_manifests": {
+    "results/T-036/manifest.json": {
+      "bytes": 36627,
+      "sha256": "d10bb327b2cc62334c87f3e33ac9a7c62ad6a4d78f735530604a64c3eb38d2b1"
+    },
+    "results/T-036/nguon.json": {
+      "bytes": 11508,
+      "sha256": "9a0ca69fbf7c6eecd4580abbd785f958465dfbe5001b22340a36546e54f26f9d"
+    },
+    "results/T-036/runs/kiem-r1-after-002/code-hashes.json": {
+      "bytes": 404,
+      "sha256": "18a74ff899a3928ee72f0149246dbc5573778dd5cb33bd7973361003564baf1a"
+    },
+    "results/T-035/manifest.json": {
+      "bytes": 1230666,
+      "sha256": "9041967bf9fef956f95bf4180992947be0e7dd39e788d4d20741a2a56c35d662"
+    },
+    "results/T-002/handoff-manifest.json": {
+      "bytes": 22017,
+      "sha256": "bb9f82a89028036034a08b06b478ba86d576f118beda50c53323eefac2551609"
+    }
+  },
+  "lineage": [
+    {
+      "axis": "RCAEval code",
+      "state": "FACT",
+      "value": "259ea4167160256a74ad30004aa3d96a998c846e",
+      "evidence": "results/T-002/public-metadata/run-002/sources/github-main-commit.json#/sha",
+      "meaning": "code benchmark, không phải ứng dụng"
+    },
+    {
+      "axis": "dataset",
+      "state": "FACT",
+      "value": "afeacb11bcc94dadfd1c8f483ee4377b2b8b614e",
+      "evidence": "data/README.md#RCAEval; T-002 source metadata và manifest T-035/allowlist",
+      "meaning": "snapshot dataset Parquet; không phải application build"
+    },
+    {
+      "axis": "application",
+      "state": "CANDIDATE",
+      "value": {
+        "repository": "https://github.com/FudanSELab/train-ticket",
+        "tag": "v1.0.0",
+        "commit": "fa8d9efb35b2ed5ec1d18f60510167767c8fb2bf",
+        "tree": "f3050b2077dbd92aa8602fe944778471242c06b9"
+      },
+      "evidence": "runs/metadata-de-xuat-001/de-xuat-tai.json",
+      "meaning": "chưa tải, chưa chọn, chỉ đề xuất tham khảo"
+    },
+    {
+      "axis": "instrumentation",
+      "state": "OPEN",
+      "value": null,
+      "needed": "revision code/agent cấu hình đã dùng thu RE2-TT",
+      "owner": "chủ nguồn RCAEval/Minh",
+      "affects": "quy chênh lệch cho instrumentation"
+    },
+    {
+      "axis": "image",
+      "state": "OPEN",
+      "value": null,
+      "needed": "image digest + build provenance nối application commit",
+      "owner": "chủ nguồn RCAEval/Minh",
+      "affects": "nối revision nguồn với hệ đã chạy"
+    },
+    {
+      "axis": "deployment",
+      "state": "OPEN",
+      "value": null,
+      "needed": "manifest đã triển khai, runtime config/namespace/time scope",
+      "owner": "chủ nguồn RCAEval/Minh",
+      "affects": "mapping runtime và giải thích chênh lệch"
+    }
+  ],
+  "old_source_locators": {
+    "application_reference": "results/T-002/public-metadata/run-002/sources/paper-v2.html#bib.bib2",
+    "collection_stack": "results/T-002/public-metadata/run-002/sources/paper-v2.html#S3.SS3.p1.1",
+    "dataset_conversion": "results/T-002/public-metadata/run-002/sources/hf-README.md:101-114"
+  },
+  "candidate_download_plan": "runs/metadata-de-xuat-001/de-xuat-tai.json",
+  "conditional_reference_required": true,
+  "new_sources_saved": false
+}

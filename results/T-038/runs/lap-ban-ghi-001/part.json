@@ -1,0 +1,654 @@
+{
+  "scope": {
+    "system": "RE2-TT",
+    "revision": "fa8d9efb35b2ed5ec1d18f60510167767c8fb2bf"
+  },
+  "entities": [
+    {
+      "id": "ts-avatar-service",
+      "name": "ts-avatar-service",
+      "type": "service",
+      "granularity": "logical",
+      "role": "application service defined by source entrypoint",
+      "provenance": [
+        {
+          "source_id": "TT:ts-avatar-service/app.py",
+          "locator": "ts-avatar-service/app.py:L12",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "ts-news-service",
+      "name": "ts-news-service",
+      "type": "service",
+      "granularity": "logical",
+      "role": "application service defined by source entrypoint",
+      "provenance": [
+        {
+          "source_id": "TT:ts-news-service/src/main/main.go",
+          "locator": "ts-news-service/src/main/main.go:L50",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "ts-ticket-office-service",
+      "name": "ts-ticket-office-service",
+      "type": "service",
+      "granularity": "logical",
+      "role": "application service defined by source entrypoint",
+      "provenance": [
+        {
+          "source_id": "TT:ts-ticket-office-service/app.js",
+          "locator": "ts-ticket-office-service/app.js:L10",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "ts-voucher-service",
+      "name": "ts-voucher-service",
+      "type": "service",
+      "granularity": "logical",
+      "role": "application service defined by source entrypoint",
+      "provenance": [
+        {
+          "source_id": "TT:ts-voucher-service/server.py",
+          "locator": "ts-voucher-service/server.py:L99",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "ts-ui-dashboard",
+      "name": "ts-ui-dashboard",
+      "type": "service",
+      "granularity": "logical",
+      "role": "application service defined by source entrypoint",
+      "provenance": [
+        {
+          "source_id": "TT:ts-ui-dashboard/nginx.conf",
+          "locator": "ts-ui-dashboard/nginx.conf:L25",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "ts-order-service",
+      "name": "ts-order-service",
+      "type": "service",
+      "granularity": "logical",
+      "role": "default HTTP target declared by voucher source",
+      "provenance": [
+        {
+          "source_id": "TT:ts-voucher-service/server.py",
+          "locator": "ts-voucher-service/server.py:L51",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "ts-order-other-service",
+      "name": "ts-order-other-service",
+      "type": "service",
+      "granularity": "logical",
+      "role": "default HTTP target declared by voucher source",
+      "provenance": [
+        {
+          "source_id": "TT:ts-voucher-service/server.py",
+          "locator": "ts-voucher-service/server.py:L52",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "ts-gateway-service",
+      "name": "ts-gateway-service",
+      "type": "gateway",
+      "granularity": "logical",
+      "role": "HTTP reverse proxy upstream for /api/v1/",
+      "provenance": [
+        {
+          "source_id": "TT:ts-ui-dashboard/nginx.conf",
+          "locator": "ts-ui-dashboard/nginx.conf:L40",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "mysql-logical:ts-ticket-office-service",
+      "name": "ticket-office configured MySQL logical database",
+      "type": "database",
+      "granularity": "logical",
+      "role": "logical database selected by TICKET_OFFICE_MYSQL_DATABASE; actual value not checked",
+      "provenance": [
+        {
+          "source_id": "TT:ts-ticket-office-service/bin/db.js",
+          "locator": "ts-ticket-office-service/bin/db.js:L4",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "mysql-logical:ts-voucher-service",
+      "name": "voucher configured MySQL logical database",
+      "type": "database",
+      "granularity": "logical",
+      "role": "logical database default ts-voucher-mysql; env override may change value",
+      "provenance": [
+        {
+          "source_id": "TT:ts-voucher-service/server.py",
+          "locator": "ts-voucher-service/server.py:L131",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "rabbitmq:quickstart",
+      "name": "rabbitmq",
+      "type": "broker",
+      "granularity": "logical",
+      "role": "logical broker release in quickstart; namespace not selected",
+      "provenance": [
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/quickstart-k8s/charts/rabbitmq/templates/configmap.yaml",
+          "locator": "deployment/kubernetes-manifests/quickstart-k8s/charts/rabbitmq/templates/configmap.yaml:L4",
+          "condition": "Release rabbitmq declared by utils.sh:22,42; ConfigMap rabbitmq_host and Service share release; namespace/generator runtime OPEN."
+        }
+      ]
+    },
+    {
+      "id": "nacos:quickstart",
+      "name": "nacos",
+      "type": "service",
+      "granularity": "logical",
+      "role": "service registry/discovery logical component; client transport OPEN",
+      "provenance": [
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/quickstart-k8s/charts/nacos/values.yaml",
+          "locator": "deployment/kubernetes-manifests/quickstart-k8s/charts/nacos/values.yaml:L9",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "mysql-logical:nacos:quickstart",
+      "name": "nacos logical configuration database",
+      "type": "database",
+      "granularity": "logical",
+      "role": "logical database declared by nacos chart; host/instance values are deployment conditions",
+      "provenance": [
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/quickstart-k8s/charts/nacos/values.yaml",
+          "locator": "deployment/kubernetes-manifests/quickstart-k8s/charts/nacos/values.yaml:L22",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "skywalking:quickstart",
+      "name": "skywalking",
+      "type": "service",
+      "granularity": "logical",
+      "role": "optional distributed tracing collector",
+      "provenance": [
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/skywalking/skywalking.yml",
+          "locator": "deployment/kubernetes-manifests/skywalking/skywalking.yml:L18",
+          "condition": "Optional source profile, not active deployment verified. Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "skywalking-ui:quickstart",
+      "name": "skywalking-ui",
+      "type": "service",
+      "granularity": "logical",
+      "role": "optional distributed tracing UI",
+      "provenance": [
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/skywalking/skywalking.yml",
+          "locator": "deployment/kubernetes-manifests/skywalking/skywalking.yml:L89",
+          "condition": "Optional source profile, not active deployment verified. Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "elasticsearch:skywalking",
+      "name": "elasticsearch",
+      "type": "database",
+      "granularity": "logical",
+      "role": "optional Skywalking storage logical component",
+      "provenance": [
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/skywalking/es.yml",
+          "locator": "deployment/kubernetes-manifests/skywalking/es.yml:L27",
+          "condition": "Optional source profile, not active deployment verified. Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "prometheus:quickstart",
+      "name": "prometheus",
+      "type": "service",
+      "granularity": "logical",
+      "role": "optional metrics collector",
+      "provenance": [
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/prometheus/prometheus.yml",
+          "locator": "deployment/kubernetes-manifests/prometheus/prometheus.yml:L261",
+          "condition": "Optional source profile, not active deployment verified. Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "grafana:quickstart",
+      "name": "grafana",
+      "type": "service",
+      "granularity": "logical",
+      "role": "optional metrics visualization",
+      "provenance": [
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/prometheus/grafana.yml",
+          "locator": "deployment/kubernetes-manifests/prometheus/grafana.yml:L4",
+          "condition": "Optional source profile, not active deployment verified. Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "node-exporter:quickstart",
+      "name": "node-exporter",
+      "type": "service",
+      "granularity": "logical",
+      "role": "optional node metrics exporter; host identity OPEN",
+      "provenance": [
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/prometheus/node-exporter.yml",
+          "locator": "deployment/kubernetes-manifests/prometheus/node-exporter.yml:L22",
+          "condition": "Optional source profile, not active deployment verified. Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "kube-state-metrics:quickstart",
+      "name": "kube-state-metrics",
+      "type": "service",
+      "granularity": "logical",
+      "role": "optional Kubernetes state metrics",
+      "provenance": [
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/prometheus/prometheus.yml",
+          "locator": "deployment/kubernetes-manifests/prometheus/prometheus.yml:L138",
+          "condition": "Optional source profile, not active deployment verified. Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "alertmanager:quickstart",
+      "name": "alertmanager",
+      "type": "service",
+      "granularity": "logical",
+      "role": "optional alert routing",
+      "provenance": [
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/prometheus/alert-manager.yml",
+          "locator": "deployment/kubernetes-manifests/prometheus/alert-manager.yml:L4",
+          "condition": "Optional source profile, not active deployment verified. Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "alertsnitch:quickstart",
+      "name": "alertsnitch",
+      "type": "service",
+      "granularity": "logical",
+      "role": "optional alert logging service",
+      "provenance": [
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/prometheus/alertsnitch.yml",
+          "locator": "deployment/kubernetes-manifests/prometheus/alertsnitch.yml:L50",
+          "condition": "Optional source profile, not active deployment verified. Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "mysql-logical:alertsnitch",
+      "name": "alertsnitch logical MySQL database",
+      "type": "database",
+      "granularity": "logical",
+      "role": "optional alert history storage",
+      "provenance": [
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/prometheus/alertsnitch.yml",
+          "locator": "deployment/kubernetes-manifests/prometheus/alertsnitch.yml:L4",
+          "condition": "Optional source profile, not active deployment verified. Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "smtp.163.com",
+      "name": "smtp.163.com",
+      "type": "external",
+      "granularity": "logical",
+      "role": "external mail server source default; SMTP relation unsupported by T036",
+      "provenance": [
+        {
+          "source_id": "TT:ts-notification-service/src/main/resources/application.yml",
+          "locator": "ts-notification-service/src/main/resources/application.yml:L13",
+          "condition": "Optional source profile, not active deployment verified. Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    }
+  ],
+  "operations": [
+    {
+      "entity": "ts-avatar-service",
+      "name": "POST /api/v1/avatar",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "TT:ts-avatar-service/app.py",
+          "locator": "ts-avatar-service/app.py:L25-L26",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "entity": "ts-news-service",
+      "name": "GET /(.*)",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "TT:ts-news-service/src/main/main.go",
+          "locator": "ts-news-service/src/main/main.go:L51-L52",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "entity": "ts-voucher-service",
+      "name": "POST /getVoucher",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "TT:ts-voucher-service/server.py",
+          "locator": "ts-voucher-service/server.py:L99-L102",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "entity": "ts-ticket-office-service",
+      "name": "GET /office",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "TT:ts-ticket-office-service/bin/router.js",
+          "locator": "ts-ticket-office-service/bin/router.js:L9",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "entity": "ts-ticket-office-service",
+      "name": "GET /office/getRegionList",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "TT:ts-ticket-office-service/bin/router.js",
+          "locator": "ts-ticket-office-service/bin/router.js:L22",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "entity": "ts-ticket-office-service",
+      "name": "GET /office/getAll",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "TT:ts-ticket-office-service/bin/router.js",
+          "locator": "ts-ticket-office-service/bin/router.js:L31",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "entity": "ts-ticket-office-service",
+      "name": "POST /office/getSpecificOffices",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "TT:ts-ticket-office-service/bin/router.js",
+          "locator": "ts-ticket-office-service/bin/router.js:L39",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "entity": "ts-ticket-office-service",
+      "name": "POST /office/addOffice",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "TT:ts-ticket-office-service/bin/router.js",
+          "locator": "ts-ticket-office-service/bin/router.js:L49",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "entity": "ts-ticket-office-service",
+      "name": "POST /office/deleteOffice",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "TT:ts-ticket-office-service/bin/router.js",
+          "locator": "ts-ticket-office-service/bin/router.js:L58",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "entity": "ts-ticket-office-service",
+      "name": "POST /office/updateOffice",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "TT:ts-ticket-office-service/bin/router.js",
+          "locator": "ts-ticket-office-service/bin/router.js:L67",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "id": "nonjava:office:mysql",
+      "source": {
+        "entity": "ts-ticket-office-service",
+        "operation": null
+      },
+      "target": {
+        "entity": "mysql-logical:ts-ticket-office-service",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "createConnection uses env HOST/USER/PASSWORD/DATABASE; PORT env is read but not passed. Actual deployment value OPEN.",
+      "provenance": [
+        {
+          "source_id": "TT:ts-ticket-office-service/bin/db.js",
+          "locator": "ts-ticket-office-service/bin/db.js:L4-L15",
+          "condition": "createConnection uses env HOST/USER/PASSWORD/DATABASE; PORT env is read but not passed. Actual deployment value OPEN."
+        }
+      ]
+    },
+    {
+      "id": "nonjava:voucher:mysql",
+      "source": {
+        "entity": "ts-voucher-service",
+        "operation": "POST /getVoucher"
+      },
+      "target": {
+        "entity": "mysql-logical:ts-voucher-service",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Source logical MySQL default and VOUCHER_MYSQL_* overrides; shared instance unresolved.",
+      "provenance": [
+        {
+          "source_id": "TT:ts-voucher-service/server.py",
+          "locator": "ts-voucher-service/server.py:L131-L154",
+          "condition": "Source logical MySQL default and VOUCHER_MYSQL_* overrides; shared instance unresolved."
+        }
+      ]
+    },
+    {
+      "id": "nonjava:voucher:order",
+      "source": {
+        "entity": "ts-voucher-service",
+        "operation": "POST /getVoucher"
+      },
+      "target": {
+        "entity": "ts-order-service",
+        "operation": null
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "context": "queryOrderByIdAndType type!=0; ORDER_SERVICE_URL override may change default target.",
+      "provenance": [
+        {
+          "source_id": "TT:ts-voucher-service/server.py",
+          "locator": "ts-voucher-service/server.py:L49-L66",
+          "condition": "queryOrderByIdAndType type!=0; ORDER_SERVICE_URL override may change default target."
+        }
+      ]
+    },
+    {
+      "id": "nonjava:voucher:order-other",
+      "source": {
+        "entity": "ts-voucher-service",
+        "operation": "POST /getVoucher"
+      },
+      "target": {
+        "entity": "ts-order-other-service",
+        "operation": null
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "context": "queryOrderByIdAndType type==0; ORDER_OTHER_SERVICE_URL override may change default target.",
+      "provenance": [
+        {
+          "source_id": "TT:ts-voucher-service/server.py",
+          "locator": "ts-voucher-service/server.py:L49-L66",
+          "condition": "queryOrderByIdAndType type==0; ORDER_OTHER_SERVICE_URL override may change default target."
+        }
+      ]
+    },
+    {
+      "id": "nonjava:ui:gateway",
+      "source": {
+        "entity": "ts-ui-dashboard",
+        "operation": null
+      },
+      "target": {
+        "entity": "ts-gateway-service",
+        "operation": null
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "context": "Nginx location /api/v1/ proxies to default gateway upstream; not all paths.",
+      "provenance": [
+        {
+          "source_id": "TT:ts-ui-dashboard/nginx.conf",
+          "locator": "ts-ui-dashboard/nginx.conf:L40-L42",
+          "condition": "Nginx location /api/v1/ proxies to default gateway upstream; not all paths."
+        }
+      ]
+    }
+  ],
+  "resource_bindings": [],
+  "signals": [
+    {
+      "id": "signal:office:access-log",
+      "kind": "log",
+      "entity": "ts-ticket-office-service",
+      "operation": null,
+      "address": [
+        "config:morgan",
+        "output:stdout",
+        "format:dev"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "TT:ts-ticket-office-service/app.js",
+          "locator": "ts-ticket-office-service/app.js:L18",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "signal:avatar:stdout",
+      "kind": "log",
+      "entity": "ts-avatar-service",
+      "operation": null,
+      "address": [
+        "container:stdout-stderr",
+        "env:PYTHONUNBUFFERED=TRUE"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "TT:ts-avatar-service/Dockerfile",
+          "locator": "ts-avatar-service/Dockerfile:L9",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    },
+    {
+      "id": "signal:skywalking:collector",
+      "kind": "trace",
+      "entity": "skywalking:quickstart",
+      "operation": null,
+      "address": [
+        "config:SW_AGENT_COLLECTOR_BACKEND_SERVICES",
+        "endpoint:skywalking:11800"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/quickstart-k8s/yamls/sw_deploy.yaml.sample",
+          "locator": "deployment/kubernetes-manifests/quickstart-k8s/yamls/sw_deploy.yaml.sample:L38-L49",
+          "condition": "Only optional tracing sample; no operation-level or runtime telemetry claim."
+        }
+      ]
+    },
+    {
+      "id": "signal:node-exporter:scrape",
+      "kind": "metric",
+      "entity": "node-exporter:quickstart",
+      "operation": null,
+      "address": [
+        "config:prometheus.io/scrape=true",
+        "config:prometheus.io/port=9100"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "TT:deployment/kubernetes-manifests/prometheus/node-exporter.yml",
+          "locator": "deployment/kubernetes-manifests/prometheus/node-exporter.yml:L6-L10",
+          "condition": "Snapshot v1.0.0 tham khảo có điều kiện; chưa xác minh sinh RE2-TT hoặc deployment runtime."
+        }
+      ]
+    }
+  ]
+}

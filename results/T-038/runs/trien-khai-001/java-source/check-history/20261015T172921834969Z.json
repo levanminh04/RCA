@@ -1,0 +1,1017 @@
+{
+  "task": "T-038",
+  "kind": "supplemental extraction validation",
+  "chronology": "Written after the first extractor code and draft runs. Expected values below were transcribed from direct, hash-verified source reads, not generated from source-facts.json. This is supplemental validation; it is not claimed as an oracle written before extractor implementation.",
+  "created_utc": "2026-10-15T17:29:21.827448+00:00",
+  "source_facts_sha256": "a3ee6e2163c750adffb3b9709e98304ec810a00b67b84531fe4fbd8a2c71b2fe",
+  "oracle_sha256": "e32847d303c535a9fe4c8b463ebf0992bbd53bc2959f085f95f51551b289e851",
+  "checks": [
+    {
+      "check": "config-controller-mappings:source-literals",
+      "ok": true,
+      "expected": [
+        "@RequestMapping(\"api/v1/configservice\")",
+        "@GetMapping(path = \"/welcome\")",
+        "@GetMapping(value = \"/configs\")",
+        "@PostMapping(value = \"/configs\")",
+        "@PutMapping(value = \"/configs\")",
+        "@DeleteMapping(value = \"/configs/{configName}\")",
+        "@GetMapping(value = \"/configs/{configName}\")"
+      ],
+      "actual": []
+    },
+    {
+      "check": "travel-batch-basic-call:source-literals",
+      "ok": true,
+      "expected": [
+        "private String getServiceUrl(String serviceName)",
+        "return \"http://\" + serviceName;",
+        "private List<TripResponse> getTicketsByBatch(",
+        "getServiceUrl(\"ts-basic-service\")",
+        "restTemplate.exchange(",
+        "basic_service_url + \"/api/v1/basicservice/basic/travels\"",
+        "HttpMethod.POST"
+      ],
+      "actual": []
+    },
+    {
+      "check": "notification-listener:source-literals",
+      "ok": true,
+      "expected": [
+        "@RabbitListener(queues = Queues.queueName)",
+        "public void process(String payload)"
+      ],
+      "actual": []
+    },
+    {
+      "check": "notification-listener:constant-literal",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "food-publisher:source-literals",
+      "ok": true,
+      "expected": [
+        "private AmqpTemplate rabbitTemplate;",
+        "public void send(String val)",
+        "this.rabbitTemplate.convertAndSend(Queues.queueName, val);"
+      ],
+      "actual": []
+    },
+    {
+      "check": "food-publisher:constant-literal",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "wait-order-poll-chain:source-literals",
+      "ok": true,
+      "expected": [
+        "public class PollThread extends Thread",
+        "public void run()",
+        "getServiceUrl(\"ts-preserve-service\")",
+        "doPreserve(service_url,requestEntityPreserve)",
+        "return \"http://\" + serviceName;",
+        "private Response doPreserve(String url, HttpEntity requestParam)",
+        "restTemplate.exchange(",
+        "url + \"/api/v1/contactservice/preserve\"",
+        "HttpMethod.POST"
+      ],
+      "actual": []
+    },
+    {
+      "check": "config-repository-datasource:source-literals",
+      "ok": true,
+      "expected": [
+        "public interface ConfigRepository extends CrudRepository<Config, String>",
+        "Config findByName(String name);",
+        "List<Config> findAll();",
+        "void deleteByName(String name);"
+      ],
+      "actual": []
+    },
+    {
+      "check": "config-repository-datasource:config-literal",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "travel-loadbalanced-bean:source-literals",
+      "ok": true,
+      "expected": [
+        "@EnableDiscoveryClient",
+        "@LoadBalanced",
+        "@Bean",
+        "public RestTemplate restTemplate(RestTemplateBuilder builder)",
+        "return builder.build();"
+      ],
+      "actual": []
+    },
+    {
+      "check": "config-controller-mappings:exact-routes",
+      "ok": true,
+      "expected": [
+        [
+          "DELETE",
+          "/api/v1/configservice/configs/{configName}"
+        ],
+        [
+          "GET",
+          "/api/v1/configservice/configs"
+        ],
+        [
+          "GET",
+          "/api/v1/configservice/configs/{configName}"
+        ],
+        [
+          "GET",
+          "/api/v1/configservice/welcome"
+        ],
+        [
+          "POST",
+          "/api/v1/configservice/configs"
+        ],
+        [
+          "PUT",
+          "/api/v1/configservice/configs"
+        ]
+      ],
+      "actual": [
+        [
+          "DELETE",
+          "/api/v1/configservice/configs/{configName}"
+        ],
+        [
+          "GET",
+          "/api/v1/configservice/configs"
+        ],
+        [
+          "GET",
+          "/api/v1/configservice/configs/{configName}"
+        ],
+        [
+          "GET",
+          "/api/v1/configservice/welcome"
+        ],
+        [
+          "POST",
+          "/api/v1/configservice/configs"
+        ],
+        [
+          "PUT",
+          "/api/v1/configservice/configs"
+        ]
+      ]
+    },
+    {
+      "check": "travel-batch-basic-call:resolved-call",
+      "ok": true,
+      "expected": 1,
+      "actual": 1
+    },
+    {
+      "check": "travel-batch-basic-call:caller-owner",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "notification-listener:queue",
+      "ok": true,
+      "expected": "email",
+      "actual": [
+        "email"
+      ]
+    },
+    {
+      "check": "food-publisher:address",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "wait-order-poll-chain:explicit-argument-chain",
+      "ok": true,
+      "expected": 1,
+      "actual": 1
+    },
+    {
+      "check": "wait-order-poll-chain:no-invented-handler",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "config-repository-datasource:repository-interface",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "config-repository-datasource:declared-methods",
+      "ok": true,
+      "expected": [
+        "deleteByName",
+        "findAll",
+        "findByName"
+      ],
+      "actual": [
+        "deleteByName",
+        "findAll",
+        "findByName"
+      ]
+    },
+    {
+      "check": "config-repository-datasource:datasource-separate",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "config-repository-datasource:repo-runtime-name-null",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "travel-loadbalanced-bean:bean-annotation",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "plan-java-file-coverage",
+      "ok": true,
+      "expected": 635,
+      "actual": 635
+    },
+    {
+      "check": "no-pending-source",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "all-source-delimiters-balanced",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "no-current-relations-from-test-or-old-docs",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "every-http-call-has-caller-method-id",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "every-data-call-has-caller-method-id",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "every-repository-class-resolves-import",
+      "ok": true,
+      "expected": null,
+      "actual": null
+    },
+    {
+      "check": "independent-http-callsite-count",
+      "ok": true,
+      "expected": 146,
+      "actual": 146
+    },
+    {
+      "check": "independent-http-callsite-members",
+      "ok": false,
+      "expected": [],
+      "actual": [
+        {
+          "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+          "line": 42,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+          "line": 57,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+          "line": 72,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+          "line": 88,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+          "line": 103,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+          "line": 120,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+          "line": 135,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+          "line": 150,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+          "line": 166,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+          "line": 182,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+          "line": 197,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+          "line": 212,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+          "line": 226,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+          "line": 240,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+          "line": 252,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+          "line": 265,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+          "line": 278,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+          "line": 291,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+          "line": 305,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+          "line": 319,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-order-service/src/main/java/adminorder/service/AdminOrderServiceImpl.java",
+          "line": 46,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-order-service/src/main/java/adminorder/service/AdminOrderServiceImpl.java",
+          "line": 64,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-order-service/src/main/java/adminorder/service/AdminOrderServiceImpl.java",
+          "line": 91,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-order-service/src/main/java/adminorder/service/AdminOrderServiceImpl.java",
+          "line": 102,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-order-service/src/main/java/adminorder/service/AdminOrderServiceImpl.java",
+          "line": 124,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-order-service/src/main/java/adminorder/service/AdminOrderServiceImpl.java",
+          "line": 135,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-order-service/src/main/java/adminorder/service/AdminOrderServiceImpl.java",
+          "line": 155,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-order-service/src/main/java/adminorder/service/AdminOrderServiceImpl.java",
+          "line": 166,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-route-service/src/main/java/adminroute/service/AdminRouteServiceImpl.java",
+          "line": 38,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-route-service/src/main/java/adminroute/service/AdminRouteServiceImpl.java",
+          "line": 68,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-route-service/src/main/java/adminroute/service/AdminRouteServiceImpl.java",
+          "line": 85,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-route-service/src/main/java/adminroute/service/AdminRouteServiceImpl.java",
+          "line": 101,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-travel-service/src/main/java/admintravel/service/AdminTravelServiceImpl.java",
+          "line": 47,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-travel-service/src/main/java/admintravel/service/AdminTravelServiceImpl.java",
+          "line": 65,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-travel-service/src/main/java/admintravel/service/AdminTravelServiceImpl.java",
+          "line": 105,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-travel-service/src/main/java/admintravel/service/AdminTravelServiceImpl.java",
+          "line": 140,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-travel-service/src/main/java/admintravel/service/AdminTravelServiceImpl.java",
+          "line": 169,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-travel-service/src/main/java/admintravel/service/AdminTravelServiceImpl.java",
+          "line": 231,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-travel-service/src/main/java/admintravel/service/AdminTravelServiceImpl.java",
+          "line": 258,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-travel-service/src/main/java/admintravel/service/AdminTravelServiceImpl.java",
+          "line": 272,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-user-service/src/main/java/adminuser/service/AdminUserServiceImpl.java",
+          "line": 43,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-user-service/src/main/java/adminuser/service/AdminUserServiceImpl.java",
+          "line": 68,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-user-service/src/main/java/adminuser/service/AdminUserServiceImpl.java",
+          "line": 92,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-admin-user-service/src/main/java/adminuser/service/AdminUserServiceImpl.java",
+          "line": 113,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-auth-service/src/main/java/auth/service/impl/TokenServiceImpl.java",
+          "line": 65,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-basic-service/src/main/java/fdse/microservice/service/BasicServiceImpl.java",
+          "line": 322,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-basic-service/src/main/java/fdse/microservice/service/BasicServiceImpl.java",
+          "line": 339,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-basic-service/src/main/java/fdse/microservice/service/BasicServiceImpl.java",
+          "line": 356,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-basic-service/src/main/java/fdse/microservice/service/BasicServiceImpl.java",
+          "line": 370,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-basic-service/src/main/java/fdse/microservice/service/BasicServiceImpl.java",
+          "line": 387,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-basic-service/src/main/java/fdse/microservice/service/BasicServiceImpl.java",
+          "line": 401,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-basic-service/src/main/java/fdse/microservice/service/BasicServiceImpl.java",
+          "line": 421,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-basic-service/src/main/java/fdse/microservice/service/BasicServiceImpl.java",
+          "line": 440,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-basic-service/src/main/java/fdse/microservice/service/BasicServiceImpl.java",
+          "line": 455,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-cancel-service/src/main/java/cancel/service/CancelServiceImpl.java",
+          "line": 146,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-cancel-service/src/main/java/cancel/service/CancelServiceImpl.java",
+          "line": 243,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-cancel-service/src/main/java/cancel/service/CancelServiceImpl.java",
+          "line": 267,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-cancel-service/src/main/java/cancel/service/CancelServiceImpl.java",
+          "line": 282,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-cancel-service/src/main/java/cancel/service/CancelServiceImpl.java",
+          "line": 297,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-cancel-service/src/main/java/cancel/service/CancelServiceImpl.java",
+          "line": 311,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-cancel-service/src/main/java/cancel/service/CancelServiceImpl.java",
+          "line": 325,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-consign-service/src/main/java/consign/service/ConsignServiceImpl.java",
+          "line": 65,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-consign-service/src/main/java/consign/service/ConsignServiceImpl.java",
+          "line": 98,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-execute-service/src/main/java/execute/serivce/ExecuteServiceImpl.java",
+          "line": 139,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-execute-service/src/main/java/execute/serivce/ExecuteServiceImpl.java",
+          "line": 153,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-execute-service/src/main/java/execute/serivce/ExecuteServiceImpl.java",
+          "line": 166,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-execute-service/src/main/java/execute/serivce/ExecuteServiceImpl.java",
+          "line": 180,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-inside-payment-service/src/main/java/inside_payment/async/AsyncTask.java",
+          "line": 25,
+          "literal": "restTemplate.getForObject("
+        },
+        {
+          "source_path": "ts-inside-payment-service/src/main/java/inside_payment/service/InsidePaymentServiceImpl.java",
+          "line": 57,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-inside-payment-service/src/main/java/inside_payment/service/InsidePaymentServiceImpl.java",
+          "line": 108,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-inside-payment-service/src/main/java/inside_payment/service/InsidePaymentServiceImpl.java",
+          "line": 295,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-inside-payment-service/src/main/java/inside_payment/service/InsidePaymentServiceImpl.java",
+          "line": 337,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-inside-payment-service/src/main/java/inside_payment/service/InsidePaymentServiceImpl.java",
+          "line": 347,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-order-other-service/src/main/java/other/service/OrderOtherServiceImpl.java",
+          "line": 225,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-order-service/src/main/java/order/service/OrderServiceImpl.java",
+          "line": 210,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-preserve-other-service/src/main/java/preserveOther/service/PreserveOtherServiceImpl.java",
+          "line": 130,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-preserve-other-service/src/main/java/preserveOther/service/PreserveOtherServiceImpl.java",
+          "line": 275,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-preserve-other-service/src/main/java/preserveOther/service/PreserveOtherServiceImpl.java",
+          "line": 303,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-preserve-other-service/src/main/java/preserveOther/service/PreserveOtherServiceImpl.java",
+          "line": 319,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-preserve-other-service/src/main/java/preserveOther/service/PreserveOtherServiceImpl.java",
+          "line": 336,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-preserve-other-service/src/main/java/preserveOther/service/PreserveOtherServiceImpl.java",
+          "line": 350,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-preserve-other-service/src/main/java/preserveOther/service/PreserveOtherServiceImpl.java",
+          "line": 365,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-preserve-other-service/src/main/java/preserveOther/service/PreserveOtherServiceImpl.java",
+          "line": 380,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-preserve-other-service/src/main/java/preserveOther/service/PreserveOtherServiceImpl.java",
+          "line": 395,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-preserve-other-service/src/main/java/preserveOther/service/PreserveOtherServiceImpl.java",
+          "line": 411,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-preserve-other-service/src/main/java/preserveOther/service/PreserveOtherServiceImpl.java",
+          "line": 425,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-preserve-service/src/main/java/preserve/service/PreserveServiceImpl.java",
+          "line": 127,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-preserve-service/src/main/java/preserve/service/PreserveServiceImpl.java",
+          "line": 276,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-preserve-service/src/main/java/preserve/service/PreserveServiceImpl.java",
+          "line": 304,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-preserve-service/src/main/java/preserve/service/PreserveServiceImpl.java",
+          "line": 318,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-preserve-service/src/main/java/preserve/service/PreserveServiceImpl.java",
+          "line": 333,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-preserve-service/src/main/java/preserve/service/PreserveServiceImpl.java",
+          "line": 348,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-preserve-service/src/main/java/preserve/service/PreserveServiceImpl.java",
+          "line": 363,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-preserve-service/src/main/java/preserve/service/PreserveServiceImpl.java",
+          "line": 379,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-preserve-service/src/main/java/preserve/service/PreserveServiceImpl.java",
+          "line": 394,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-preserve-service/src/main/java/preserve/service/PreserveServiceImpl.java",
+          "line": 409,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-preserve-service/src/main/java/preserve/service/PreserveServiceImpl.java",
+          "line": 423,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-rebook-service/src/main/java/rebook/service/RebookServiceImpl.java",
+          "line": 248,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-rebook-service/src/main/java/rebook/service/RebookServiceImpl.java",
+          "line": 306,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-rebook-service/src/main/java/rebook/service/RebookServiceImpl.java",
+          "line": 329,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-rebook-service/src/main/java/rebook/service/RebookServiceImpl.java",
+          "line": 348,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-rebook-service/src/main/java/rebook/service/RebookServiceImpl.java",
+          "line": 368,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-rebook-service/src/main/java/rebook/service/RebookServiceImpl.java",
+          "line": 390,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-rebook-service/src/main/java/rebook/service/RebookServiceImpl.java",
+          "line": 403,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-rebook-service/src/main/java/rebook/service/RebookServiceImpl.java",
+          "line": 416,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-rebook-service/src/main/java/rebook/service/RebookServiceImpl.java",
+          "line": 441,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-rebook-service/src/main/java/rebook/service/RebookServiceImpl.java",
+          "line": 455,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-route-plan-service/src/main/java/plan/service/RoutePlanServiceImpl.java",
+          "line": 167,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-route-plan-service/src/main/java/plan/service/RoutePlanServiceImpl.java",
+          "line": 203,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-route-plan-service/src/main/java/plan/service/RoutePlanServiceImpl.java",
+          "line": 213,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-route-plan-service/src/main/java/plan/service/RoutePlanServiceImpl.java",
+          "line": 251,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-route-plan-service/src/main/java/plan/service/RoutePlanServiceImpl.java",
+          "line": 287,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-route-plan-service/src/main/java/plan/service/RoutePlanServiceImpl.java",
+          "line": 308,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-route-plan-service/src/main/java/plan/service/RoutePlanServiceImpl.java",
+          "line": 323,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-route-plan-service/src/main/java/plan/service/RoutePlanServiceImpl.java",
+          "line": 345,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-seat-service/src/main/java/seat/service/SeatServiceImpl.java",
+          "line": 58,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-seat-service/src/main/java/seat/service/SeatServiceImpl.java",
+          "line": 71,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-seat-service/src/main/java/seat/service/SeatServiceImpl.java",
+          "line": 142,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-seat-service/src/main/java/seat/service/SeatServiceImpl.java",
+          "line": 158,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-seat-service/src/main/java/seat/service/SeatServiceImpl.java",
+          "line": 208,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-security-service/src/main/java/security/service/SecurityServiceImpl.java",
+          "line": 131,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-security-service/src/main/java/security/service/SecurityServiceImpl.java",
+          "line": 146,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-travel-plan-service/src/main/java/travelplan/service/TravelPlanServiceImpl.java",
+          "line": 242,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-travel-plan-service/src/main/java/travelplan/service/TravelPlanServiceImpl.java",
+          "line": 255,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-travel-plan-service/src/main/java/travelplan/service/TravelPlanServiceImpl.java",
+          "line": 267,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-travel-plan-service/src/main/java/travelplan/service/TravelPlanServiceImpl.java",
+          "line": 280,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-travel-plan-service/src/main/java/travelplan/service/TravelPlanServiceImpl.java",
+          "line": 292,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-travel-plan-service/src/main/java/travelplan/service/TravelPlanServiceImpl.java",
+          "line": 305,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-travel-plan-service/src/main/java/travelplan/service/TravelPlanServiceImpl.java",
+          "line": 318,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-travel-service/src/main/java/travel/service/TravelServiceImpl.java",
+          "line": 345,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-travel-service/src/main/java/travel/service/TravelServiceImpl.java",
+          "line": 394,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-travel-service/src/main/java/travel/service/TravelServiceImpl.java",
+          "line": 505,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-travel-service/src/main/java/travel/service/TravelServiceImpl.java",
+          "line": 519,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-travel-service/src/main/java/travel/service/TravelServiceImpl.java",
+          "line": 550,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-travel2-service/src/main/java/travel2/service/TravelServiceImpl.java",
+          "line": 262,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-travel2-service/src/main/java/travel2/service/TravelServiceImpl.java",
+          "line": 310,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-travel2-service/src/main/java/travel2/service/TravelServiceImpl.java",
+          "line": 416,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-travel2-service/src/main/java/travel2/service/TravelServiceImpl.java",
+          "line": 430,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-travel2-service/src/main/java/travel2/service/TravelServiceImpl.java",
+          "line": 461,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-user-service/src/main/java/user/service/impl/UserServiceImpl.java",
+          "line": 92,
+          "literal": "restTemplate.exchange("
+        },
+        {
+          "source_path": "ts-user-service/src/main/java/user/service/impl/UserServiceImpl.java",
+          "line": 181,
+          "literal": "restTemplate.exchange("
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "checks": 31,
+    "passed": 30,
+    "failed": 1,
+    "elapsed_seconds": 0.1427619457244873
+  },
+  "limits": [
+    "Checks do not establish dataset lineage, deployed/runtime reachability, or generic Java type inference.",
+    "The direct callsite scanner checks the same explicitly enumerated RestTemplate API family; other client families are surveyed in pattern_index and require inspection.",
+    "Handwritten supplemental oracle validates selected real patterns, not every source branch or every method declaration."
+  ]
+}

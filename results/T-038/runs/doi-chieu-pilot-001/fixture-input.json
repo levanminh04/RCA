@@ -1,0 +1,124 @@
+{
+  "scope": {
+    "system": "RE2-TT",
+    "revision": "fixture"
+  },
+  "entities": [
+    {
+      "id": "ts-a-service",
+      "type": "service",
+      "name": "ts-a-service",
+      "granularity": "component",
+      "role": "fixture",
+      "provenance": [
+        {
+          "source_id": "fixture",
+          "locator": "literal oracle before root transform code",
+          "condition": "synthetic fixture, not Train Ticket data"
+        }
+      ]
+    },
+    {
+      "id": "ts-b-service",
+      "type": "service",
+      "name": "ts-b-service",
+      "granularity": "component",
+      "role": "fixture",
+      "provenance": [
+        {
+          "source_id": "fixture",
+          "locator": "literal oracle before root transform code",
+          "condition": "synthetic fixture, not Train Ticket data"
+        }
+      ]
+    },
+    {
+      "id": "logical-db",
+      "type": "database",
+      "name": "logical-db",
+      "granularity": "component",
+      "role": "fixture",
+      "provenance": [
+        {
+          "source_id": "fixture",
+          "locator": "literal oracle before root transform code",
+          "condition": "synthetic fixture, not Train Ticket data"
+        }
+      ]
+    }
+  ],
+  "operations": [
+    {
+      "entity": "ts-a-service",
+      "name": "GET /api/a",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "fixture",
+          "locator": "literal oracle before root transform code",
+          "condition": "synthetic fixture, not Train Ticket data"
+        }
+      ]
+    },
+    {
+      "entity": "ts-b-service",
+      "name": "GET /api/b/{id}",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "fixture",
+          "locator": "literal oracle before root transform code",
+          "condition": "synthetic fixture, not Train Ticket data"
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "id": "http",
+      "source": {
+        "entity": "ts-a-service",
+        "operation": "GET /api/a"
+      },
+      "target": {
+        "entity": "ts-b-service",
+        "operation": "GET /api/b/{id}"
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "context": "fixture",
+      "provenance": [
+        {
+          "source_id": "fixture",
+          "locator": "literal oracle before root transform code",
+          "condition": "synthetic fixture, not Train Ticket data"
+        }
+      ]
+    },
+    {
+      "id": "data",
+      "source": {
+        "entity": "ts-a-service",
+        "operation": null
+      },
+      "target": {
+        "entity": "logical-db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "fixture",
+      "provenance": [
+        {
+          "source_id": "fixture",
+          "locator": "literal oracle before root transform code",
+          "condition": "synthetic fixture, not Train Ticket data"
+        }
+      ]
+    }
+  ],
+  "resource_bindings": [],
+  "signals": []
+}

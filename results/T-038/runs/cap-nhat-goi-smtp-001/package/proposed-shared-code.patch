@@ -1,0 +1,29 @@
+--- a/src/do_thi_tinh/compare.py
++++ b/src/do_thi_tinh/compare.py
+@@ -28,11 +28,15 @@
+         nodes |= components
+     for row in graph['edges']:
+         fields(row, ['source', 'target', 'type', 'evidence_source', 'destination', 'event_count', 'witness'],
+-               ['messaging', 'queue_metric_address'])
++               ['messaging', 'queue_metric_address', 'channel'])
+         if row['source'] not in nodes or row['target'] not in nodes:
+             raise ValueError('unknown_trace_endpoint')
+         if row['type'] not in RELATION_TYPES or row['evidence_source'] not in {'trace', 'inferred', 'dataset-other'}:
+             raise ValueError('trace_relation')
++        # Optional protocol evidence on a call hop; never inferred from static.
++        if 'channel' in row and (row['channel'] not in {'http', 'rpc', 'smtp', 'internal'} or
++                                 row['type'] not in {'gọi-đồng-bộ', 'gọi-chưa-phân-kiểu'}):
++            raise ValueError('trace_channel')
+         if type(row['event_count']) is not int or row['event_count'] < 0:
+             raise ValueError('event_count')
+         if row['type'] == 'thông-điệp' and row.get('messaging') is not None:
+@@ -152,7 +156,8 @@
+             address = {key: address[key] for key in required}
+         # Type bỏ riêng cho phép so endpoints; provenance luôn ở member riêng.
+         return dict(source=converted['source'], target=converted['target'], type=typ,
+-                    address=[channel, address] if address is not None else None,
++                    address=[channel, address] if address is not None else
++                            ['smtp', None] if edge.get('channel') == 'smtp' else None,
+                     position=position), None
+ 
+     prepared = {'static': [], 'trace': []}

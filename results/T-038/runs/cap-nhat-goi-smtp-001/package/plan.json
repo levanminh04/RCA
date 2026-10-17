@@ -1,0 +1,215 @@
+{
+  "version": 2,
+  "status": "CANDIDATE_NOT_APPLIED_AWAITING_MINH_APPROVAL",
+  "input_state": "input-state.json",
+  "current_facts": {
+    "T037_SMTP_representation_implemented": true,
+    "T037_full_model_exists": true,
+    "T039_full_comparator_exists": true,
+    "T039_graph_count": 132,
+    "T038_graph_count": 1069
+  },
+  "new_decisions": [
+    "change SMTP matching semantics including endpoints",
+    "publish new common manifest and adopt via all three actual runners",
+    "T038 add provenance-backed SMTP relation using existing builder support"
+  ],
+  "not_new_work": [
+    "add SMTP enum to builder",
+    "create missing T037 model",
+    "create missing T039 comparer"
+  ],
+  "proposed_writes": {
+    "modify_shared_exact_patch": [
+      "src/do_thi_tinh/compare.py"
+    ],
+    "modify_shared_docs": [
+      "src/do_thi_tinh/README.md"
+    ],
+    "unchanged_shared": [
+      "src/do_thi_tinh/build.py",
+      "src/do_thi_tinh/__init__.py"
+    ],
+    "new_run_output_scopes": [
+      "results/T-036/runs/doi-chieu-smtp-001/",
+      "results/T-037/runs/doi-chieu-smtp-001/",
+      "results/T-038/runs/doi-chieu-smtp-001/",
+      "results/T-039/runs/doi-chieu-smtp-001/"
+    ],
+    "permission_and_pin_documents": [
+      "tasks/T-036-p5b-hop-dong-chung/SPEC.md",
+      "tasks/T-037-p5b-flashticket/SPEC.md",
+      "tasks/T-038-p5b-trainticket/SPEC.md",
+      "tasks/T-039-p5b-online-boutique/SPEC.md",
+      "tasks/T-036-p5b-hop-dong-chung/LOG.md",
+      "tasks/T-037-p5b-flashticket/LOG.md",
+      "tasks/T-038-p5b-trainticket/LOG.md",
+      "tasks/T-039-p5b-online-boutique/LOG.md",
+      "docs/WHY.md",
+      "docs/DECISIONS.md",
+      "docs/STATE.md"
+    ],
+    "current_outputs_after_all_adoption_pass": {
+      "T-037": [
+        "results/T-037/ban-ghi.json",
+        "results/T-037/nguon.json",
+        "results/T-037/do-thi/thuc-the.json",
+        "results/T-037/do-thi/thao-tac.json",
+        "results/T-037/kiem-dung-dan.md",
+        "results/T-037/ban-giao.md",
+        "results/T-037/prompt-claude.txt",
+        "results/T-037/manifest.json"
+      ],
+      "T-038": [
+        "results/T-038/ban-ghi.json",
+        "results/T-038/nguon.json",
+        "results/T-038/mapping.json",
+        "results/T-038/do-thi/thuc-the.json",
+        "results/T-038/do-thi/thao-tac.json",
+        "results/T-038/phan-tich-chenh-lech.md",
+        "results/T-038/phan-tich-chenh-lech.json",
+        "results/T-038/kiem-dung-dan.md",
+        "results/T-038/kha-thi.json",
+        "results/T-038/ban-giao.md",
+        "results/T-038/prompt-claude.txt",
+        "results/T-038/manifest.json",
+        "results/T-038/doi-chieu/index.json"
+      ],
+      "T-039": [
+        "results/T-039/ban-ghi.json",
+        "results/T-039/nguon.json",
+        "results/T-039/mapping.json",
+        "results/T-039/do-thi/thuc-the.json",
+        "results/T-039/do-thi/thao-tac.json",
+        "results/T-039/phan-tich-chenh-lech.md",
+        "results/T-039/kiem-dung-dan.md",
+        "results/T-039/ban-giao.md",
+        "results/T-039/prompt-claude.txt",
+        "results/T-039/manifest.json",
+        "results/T-039/doi-chieu/tong-hop.json"
+      ]
+    },
+    "run_files": {
+      "common": [
+        "before/",
+        "pin.json",
+        "pin_loader.py",
+        "oracle.json",
+        "checks/",
+        "cost.json",
+        "diff.json",
+        "manifest.json",
+        "ban-giao.md",
+        "prompt-claude.txt"
+      ],
+      "T036": [
+        "hop-dong.md",
+        "nguon.json",
+        "code/__init__.py",
+        "code/build.py",
+        "code/compare.py",
+        "code-hashes.json",
+        "check_regression.py"
+      ],
+      "T037": [
+        "check_adoption.py",
+        "ban-ghi.json",
+        "nguon.json",
+        "do-thi/",
+        "doi-chieu/"
+      ],
+      "T038": [
+        "engine_smtp.py",
+        "compare_dev_smtp.py",
+        "ban-ghi.json",
+        "nguon.json",
+        "mapping.json",
+        "do-thi/",
+        "doi-chieu/"
+      ],
+      "T039": [
+        "execute_common.py",
+        "ban-ghi.json",
+        "nguon.json",
+        "mapping.json",
+        "do-thi/",
+        "doi-chieu/"
+      ]
+    }
+  },
+  "runner_adoption": {
+    "T037": "graph-003 full model + runner.py/assemble-complete.py and existing fixtures; input-code-hashes.json",
+    "T038": "new explicit loader, preserve engine.py:pinned_api and compare_dev.py legacy; comparator-only vs relation-delta factorial check",
+    "T039": "new execute_common.py adapts current execute_pinned.py; full132 replay; legacy runner snapshot import remains historical"
+  },
+  "regression": {
+    "T037": "full current model and all existing fixtures",
+    "T038": 1069,
+    "T039": 132,
+    "compare": [
+      "sets",
+      "members",
+      "exclusions",
+      "denominators",
+      "projection",
+      "mapping",
+      "unknown",
+      "ordering",
+      "input hashes"
+    ]
+  },
+  "semantics": {
+    "change": "SMTP marker at endpoints and typed",
+    "marker": [
+      "smtp",
+      null
+    ],
+    "trace_channel_optional": true,
+    "infer_missing_channel": false,
+    "authority_port_tls_delivery_verified": false
+  },
+  "preview": {
+    "checks": 29,
+    "all_ok": true,
+    "result": "kiem-preview-001/checks.json",
+    "full_comparison_replay": false,
+    "adoption": false
+  },
+  "cost": {
+    "candidate_only": true,
+    "measured": false,
+    "machine_minutes": 37,
+    "output_bytes_approx": 600000000,
+    "network_source_download_bytes": 0,
+    "stages": [
+      {
+        "scope": "shared T036 + R1 + SMTP",
+        "minutes": 2,
+        "bytes": 50000000
+      },
+      {
+        "scope": "T037 full model + existing fixtures",
+        "minutes": 10,
+        "bytes": 150000000
+      },
+      {
+        "scope": "T038 full 1069 comparisons",
+        "minutes": 10,
+        "bytes": 150000000
+      },
+      {
+        "scope": "T039 full 132 comparisons",
+        "minutes": 5,
+        "bytes": 100000000
+      },
+      {
+        "scope": "one T038 full rerun allowance",
+        "minutes": 10,
+        "bytes": 150000000
+      }
+    ],
+    "TT_RAM_GiB_planning": 0.5,
+    "other_peak_RAM": "OPEN; measure per process; do not add or extrapolate uncontrolled runs",
+    "supersedes": "historical 31min/550MB proposal with incomplete FT/OB replay scope"
+  }
+}

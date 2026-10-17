@@ -1,0 +1,83 @@
+{
+  "task": "T-038",
+  "kind": "supplemental manual source oracle",
+  "chronology": "Written after the first extractor code and draft runs. Expected values below were transcribed from direct, hash-verified source reads, not generated from source-facts.json. This is supplemental validation; it is not claimed as an oracle written before extractor implementation.",
+  "checks": [
+    {
+      "id": "config-controller-mappings",
+      "source_path": "ts-config-service/src/main/java/config/controller/ConfigController.java",
+      "lines": [22, 30, 36, 43, 50, 58, 65],
+      "source_literals": ["@RequestMapping(\"api/v1/configservice\")", "@GetMapping(path = \"/welcome\")", "@GetMapping(value = \"/configs\")", "@PostMapping(value = \"/configs\")", "@PutMapping(value = \"/configs\")", "@DeleteMapping(value = \"/configs/{configName}\")", "@GetMapping(value = \"/configs/{configName}\")"],
+      "expected_owner": "ts-config-service",
+      "expected_routes": [["GET", "/api/v1/configservice/welcome"], ["GET", "/api/v1/configservice/configs"], ["POST", "/api/v1/configservice/configs"], ["PUT", "/api/v1/configservice/configs"], ["DELETE", "/api/v1/configservice/configs/{configName}"], ["GET", "/api/v1/configservice/configs/{configName}"]]
+    },
+    {
+      "id": "travel-batch-basic-call",
+      "source_path": "ts-travel-service/src/main/java/travel/service/TravelServiceImpl.java",
+      "lines": [51, 52, 322, 346, 347, 348, 349],
+      "source_literals": ["private String getServiceUrl(String serviceName)", "return \"http://\" + serviceName;", "private List<TripResponse> getTicketsByBatch(", "getServiceUrl(\"ts-basic-service\")", "restTemplate.exchange(", "basic_service_url + \"/api/v1/basicservice/basic/travels\"", "HttpMethod.POST"],
+      "expected_source": "ts-travel-service",
+      "expected_caller_method": "getTicketsByBatch",
+      "expected_target": "ts-basic-service",
+      "expected_method": "POST",
+      "expected_path": "/api/v1/basicservice/basic/travels"
+    },
+    {
+      "id": "notification-listener",
+      "source_path": "ts-notification-service/src/main/java/notification/mq/RabbitReceive.java",
+      "lines": [51, 52],
+      "source_literals": ["@RabbitListener(queues = Queues.queueName)", "public void process(String payload)"],
+      "constant_source_path": "ts-notification-service/src/main/java/notification/config/Queues.java",
+      "constant_line": 10,
+      "constant_literal": "public final static String queueName = \"email\";",
+      "expected_consumer": "ts-notification-service",
+      "expected_queue": "email"
+    },
+    {
+      "id": "food-publisher",
+      "source_path": "ts-food-service/src/main/java/foodsearch/mq/RabbitSend.java",
+      "lines": [16, 19, 21],
+      "source_literals": ["private AmqpTemplate rabbitTemplate;", "public void send(String val)", "this.rabbitTemplate.convertAndSend(Queues.queueName, val);"],
+      "constant_source_path": "ts-food-service/src/main/java/foodsearch/config/Queues.java",
+      "constant_line": 10,
+      "constant_literal": "public final static String queueName = \"food_delivery\";",
+      "expected_publisher": "ts-food-service",
+      "expected_address_literal": "food_delivery",
+      "expected_argument_count": 2,
+      "limit": "Source confirms the two-argument AmqpTemplate call and address literal. Default-exchange/routing-key meaning comes from external dependency API semantics, not an exchange declaration in this source. Broker runtime binding is OPEN."
+    },
+    {
+      "id": "wait-order-poll-chain",
+      "source_path": "ts-wait-order-service/src/main/java/waitorder/utils/PollThread.java",
+      "lines": [18, 42, 43, 54, 70, 71, 74, 75, 76, 77],
+      "source_literals": ["public class PollThread extends Thread", "public void run()", "getServiceUrl(\"ts-preserve-service\")", "doPreserve(service_url,requestEntityPreserve)", "return \"http://\" + serviceName;", "private Response doPreserve(String url, HttpEntity requestParam)", "restTemplate.exchange(", "url + \"/api/v1/contactservice/preserve\"", "HttpMethod.POST"],
+      "expected_source": "ts-wait-order-service",
+      "expected_target_via_explicit_same_class_argument": "ts-preserve-service",
+      "expected_method": "POST",
+      "expected_literal_path": "/api/v1/contactservice/preserve",
+      "limit": "Do not correct contactservice/preserve to another path merely to match an available handler. Thread source path does not prove an observed runtime span."
+    },
+    {
+      "id": "config-repository-datasource",
+      "source_path": "ts-config-service/src/main/java/config/repository/ConfigRepository.java",
+      "lines": [11, 19, 27, 35],
+      "source_literals": ["public interface ConfigRepository extends CrudRepository<Config, String>", "Config findByName(String name);", "List<Config> findAll();", "void deleteByName(String name);"],
+      "config_source_path": "ts-config-service/src/main/resources/application.yml",
+      "config_line": 9,
+      "config_literal": "url: jdbc:mysql://${CONFIG_MYSQL_HOST:ts-config-mysql}:${CONFIG_MYSQL_PORT:3306}/${CONFIG_MYSQL_DATABASE:ts-config-mysql}?useSSL=false",
+      "expected_repository_class": "config.repository.ConfigRepository",
+      "expected_base_interface": "CrudRepository",
+      "expected_methods": ["findByName", "findAll", "deleteByName"],
+      "limit": "JDBC default address is configuration, not the deployed DB instance; repository runtime operation name remains null."
+    },
+    {
+      "id": "travel-loadbalanced-bean",
+      "source_path": "ts-travel-service/src/main/java/travel/TravelApplication.java",
+      "lines": [23, 30, 31, 32, 33],
+      "source_literals": ["@EnableDiscoveryClient", "@LoadBalanced", "@Bean", "public RestTemplate restTemplate(RestTemplateBuilder builder)", "return builder.build();"],
+      "expected_owner": "ts-travel-service",
+      "expected_loadbalanced": true,
+      "limit": "DiscoveryClient injection and @EnableDiscoveryClient are not a direct getInstances invocation in the URL helper."
+    }
+  ]
+}

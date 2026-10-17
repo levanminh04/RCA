@@ -1,0 +1,758 @@
+[
+  {
+    "source_path": "ts-rebook-service/src/main/java/rebook/service/RebookServiceImpl.java",
+    "sha256": "e01a706cae6aefdf60e0ebc31268eea8c897f881d08a28efb7e647c5471cc5e0",
+    "revision": "fa8d9efb35b2ed5ec1d18f60510167767c8fb2bf",
+    "locator": "L339-L375",
+    "meaning": "PUT match / POST-delete discrepancy",
+    "lines": [
+      {
+        "line": 339,
+        "text": "    private Response updateOrder(Order info, String tripId, HttpHeaders httpHeaders) {"
+      },
+      {
+        "line": 340,
+        "text": "        String requestOrderUtl = \"\";"
+      },
+      {
+        "line": 341,
+        "text": "        String order_service_url = getServiceUrl(\"ts-order-service\");"
+      },
+      {
+        "line": 342,
+        "text": "        String order_other_service_url = getServiceUrl(\"ts-order-other-service\");"
+      },
+      {
+        "line": 343,
+        "text": "        if (tripGD(tripId)) {"
+      },
+      {
+        "line": 344,
+        "text": "            requestOrderUtl = order_service_url + \"/api/v1/orderservice/order\";"
+      },
+      {
+        "line": 345,
+        "text": "        } else {"
+      },
+      {
+        "line": 346,
+        "text": "            requestOrderUtl = order_other_service_url + \"/api/v1/orderOtherService/orderOther\";"
+      },
+      {
+        "line": 347,
+        "text": "        }"
+      },
+      {
+        "line": 348,
+        "text": "        HttpHeaders newHeaders = getAuthorizationHeadersFrom(httpHeaders);"
+      },
+      {
+        "line": 349,
+        "text": "        HttpEntity requestUpdateOrder = new HttpEntity(info, newHeaders);"
+      },
+      {
+        "line": 350,
+        "text": "        ResponseEntity<Response> reUpdateOrder = restTemplate.exchange("
+      },
+      {
+        "line": 351,
+        "text": "                requestOrderUtl,"
+      },
+      {
+        "line": 352,
+        "text": "                HttpMethod.PUT,"
+      },
+      {
+        "line": 353,
+        "text": "                requestUpdateOrder,"
+      },
+      {
+        "line": 354,
+        "text": "                Response.class);"
+      },
+      {
+        "line": 355,
+        "text": "        return reUpdateOrder.getBody();"
+      },
+      {
+        "line": 356,
+        "text": "    }"
+      },
+      {
+        "line": 357,
+        "text": ""
+      },
+      {
+        "line": 358,
+        "text": "    private Response deleteOrder(String orderId, String tripId, HttpHeaders httpHeaders) {"
+      },
+      {
+        "line": 359,
+        "text": ""
+      },
+      {
+        "line": 360,
+        "text": "        String requestUrl = \"\";"
+      },
+      {
+        "line": 361,
+        "text": "        String order_service_url = getServiceUrl(\"ts-order-service\");"
+      },
+      {
+        "line": 362,
+        "text": "        String order_other_service_url = getServiceUrl(\"ts-order-other-service\");"
+      },
+      {
+        "line": 363,
+        "text": "        if (tripGD(tripId)) {"
+      },
+      {
+        "line": 364,
+        "text": "            requestUrl = order_service_url + \"/api/v1/orderservice/order/\" + orderId;"
+      },
+      {
+        "line": 365,
+        "text": "        } else {"
+      },
+      {
+        "line": 366,
+        "text": "            requestUrl = order_other_service_url + \"/api/v1/orderOtherService/orderOther/\" + orderId;"
+      },
+      {
+        "line": 367,
+        "text": "        }"
+      },
+      {
+        "line": 368,
+        "text": "        HttpHeaders newHeaders = getAuthorizationHeadersFrom(httpHeaders);"
+      },
+      {
+        "line": 369,
+        "text": "        HttpEntity requestDeleteOrder = new HttpEntity(newHeaders);"
+      },
+      {
+        "line": 370,
+        "text": "        ResponseEntity<Response> reDeleteOrder = restTemplate.exchange("
+      },
+      {
+        "line": 371,
+        "text": "                requestUrl,"
+      },
+      {
+        "line": 372,
+        "text": "                HttpMethod.POST,"
+      },
+      {
+        "line": 373,
+        "text": "                requestDeleteOrder,"
+      },
+      {
+        "line": 374,
+        "text": "                Response.class);"
+      },
+      {
+        "line": 375,
+        "text": ""
+      }
+    ],
+    "epistemic_state": "FACT source literal; RE2/runtime link OPEN"
+  },
+  {
+    "source_path": "ts-order-service/src/main/java/order/controller/OrderController.java",
+    "sha256": "a35704c0a0d996b619ce47b70130509742e0fb29a7076f5837da5a87d072170f",
+    "revision": "fa8d9efb35b2ed5ec1d18f60510167767c8fb2bf",
+    "locator": "L128-L153",
+    "meaning": "handler verbs",
+    "lines": [
+      {
+        "line": 128,
+        "text": "        OrderController.LOGGER.info(\"[saveChanges][Save Order Info][OrderId:{}]\",orderInfo.getId());"
+      },
+      {
+        "line": 129,
+        "text": "        return ok(orderService.saveChanges(orderInfo, headers));"
+      },
+      {
+        "line": 130,
+        "text": "    }"
+      },
+      {
+        "line": 131,
+        "text": ""
+      },
+      {
+        "line": 132,
+        "text": "    @CrossOrigin(origins = \"*\")"
+      },
+      {
+        "line": 133,
+        "text": "    @PutMapping(path = \"/order/admin\")"
+      },
+      {
+        "line": 134,
+        "text": "    public HttpEntity updateOrder(@RequestBody Order order, @RequestHeader HttpHeaders headers) {"
+      },
+      {
+        "line": 135,
+        "text": "        // Order"
+      },
+      {
+        "line": 136,
+        "text": "        OrderController.LOGGER.info(\"[updateOrder][Update Order][OrderId: {}]\", order.getId());"
+      },
+      {
+        "line": 137,
+        "text": "        return ok(orderService.updateOrder(order, headers));"
+      },
+      {
+        "line": 138,
+        "text": "    }"
+      },
+      {
+        "line": 139,
+        "text": ""
+      },
+      {
+        "line": 140,
+        "text": ""
+      },
+      {
+        "line": 141,
+        "text": "    @CrossOrigin(origins = \"*\")"
+      },
+      {
+        "line": 142,
+        "text": "    @DeleteMapping(path = \"/order/{orderId}\")"
+      },
+      {
+        "line": 143,
+        "text": "    public HttpEntity deleteOrder(@PathVariable String orderId, @RequestHeader HttpHeaders headers) {"
+      },
+      {
+        "line": 144,
+        "text": "        OrderController.LOGGER.info(\"[deleteOrder][Delete Order][OrderId: {}]\", orderId);"
+      },
+      {
+        "line": 145,
+        "text": "        // Order"
+      },
+      {
+        "line": 146,
+        "text": "        return ok(orderService.deleteOrder(orderId, headers));"
+      },
+      {
+        "line": 147,
+        "text": "    }"
+      },
+      {
+        "line": 148,
+        "text": ""
+      },
+      {
+        "line": 149,
+        "text": "    /***************For super admin(Single Service Test*******************/"
+      },
+      {
+        "line": 150,
+        "text": ""
+      },
+      {
+        "line": 151,
+        "text": "    @CrossOrigin(origins = \"*\")"
+      },
+      {
+        "line": 152,
+        "text": "    @GetMapping(path = \"/order\")"
+      },
+      {
+        "line": 153,
+        "text": "    public HttpEntity findAllOrder(@RequestHeader HttpHeaders headers) {"
+      }
+    ],
+    "epistemic_state": "FACT source literal; RE2/runtime link OPEN"
+  },
+  {
+    "source_path": "ts-order-other-service/src/main/java/other/controller/OrderOtherController.java",
+    "sha256": "7589c95d0401f151fea31002ae1c036edbc1c29de29d6f9230317025fc4db42a",
+    "revision": "fa8d9efb35b2ed5ec1d18f60510167767c8fb2bf",
+    "locator": "L125-L149",
+    "meaning": "handler verbs",
+    "lines": [
+      {
+        "line": 125,
+        "text": "                                    @RequestHeader HttpHeaders headers) {"
+      },
+      {
+        "line": 126,
+        "text": ""
+      },
+      {
+        "line": 127,
+        "text": "        OrderOtherController.LOGGER.info(\"[saveChanges][Save Order Info][OrderId:{}]\",orderInfo.getId());"
+      },
+      {
+        "line": 128,
+        "text": "        return ok(orderService.saveChanges(orderInfo, headers));"
+      },
+      {
+        "line": 129,
+        "text": "    }"
+      },
+      {
+        "line": 130,
+        "text": ""
+      },
+      {
+        "line": 131,
+        "text": "    @CrossOrigin(origins = \"*\")"
+      },
+      {
+        "line": 132,
+        "text": "    @PutMapping(path = \"/orderOther/admin\")"
+      },
+      {
+        "line": 133,
+        "text": "    public HttpEntity updateOrder(@RequestBody Order order, @RequestHeader HttpHeaders headers) {"
+      },
+      {
+        "line": 134,
+        "text": "        OrderOtherController.LOGGER.info(\"[updateOrder][Update Order][OrderId: {}]\", order.getId());"
+      },
+      {
+        "line": 135,
+        "text": "        return ok(orderService.updateOrder(order, headers));"
+      },
+      {
+        "line": 136,
+        "text": "    }"
+      },
+      {
+        "line": 137,
+        "text": ""
+      },
+      {
+        "line": 138,
+        "text": "    @CrossOrigin(origins = \"*\")"
+      },
+      {
+        "line": 139,
+        "text": "    @DeleteMapping(path = \"/orderOther/{orderId}\")"
+      },
+      {
+        "line": 140,
+        "text": "    public HttpEntity deleteOrder(@PathVariable String orderId, @RequestHeader HttpHeaders headers) {"
+      },
+      {
+        "line": 141,
+        "text": "        OrderOtherController.LOGGER.info(\"[deleteOrder][Delete Order][OrderId: {}]\", orderId);"
+      },
+      {
+        "line": 142,
+        "text": "        return ok(orderService.deleteOrder(orderId, headers));"
+      },
+      {
+        "line": 143,
+        "text": "    }"
+      },
+      {
+        "line": 144,
+        "text": ""
+      },
+      {
+        "line": 145,
+        "text": "    /***************For super admin(Single Service Test*******************/"
+      },
+      {
+        "line": 146,
+        "text": ""
+      },
+      {
+        "line": 147,
+        "text": "    @CrossOrigin(origins = \"*\")"
+      },
+      {
+        "line": 148,
+        "text": "    @GetMapping(path = \"/orderOther\")"
+      },
+      {
+        "line": 149,
+        "text": "    public HttpEntity findAllOrder(@RequestHeader HttpHeaders headers) {"
+      }
+    ],
+    "epistemic_state": "FACT source literal; RE2/runtime link OPEN"
+  },
+  {
+    "source_path": "ts-wait-order-service/src/main/java/waitorder/utils/PollThread.java",
+    "sha256": "0f66431bd819354c03cd3f6fffa333a297bbb38434f2e87517c29efecf0e559c",
+    "revision": "fa8d9efb35b2ed5ec1d18f60510167767c8fb2bf",
+    "locator": "L40-L83",
+    "meaning": "worker wrong literal preserve path",
+    "lines": [
+      {
+        "line": 40,
+        "text": ""
+      },
+      {
+        "line": 41,
+        "text": "    @Override"
+      },
+      {
+        "line": 42,
+        "text": "    public void run() {"
+      },
+      {
+        "line": 43,
+        "text": "        String service_url=getServiceUrl(\"ts-preserve-service\");"
+      },
+      {
+        "line": 44,
+        "text": "        HttpEntity requestEntityPreserve = new HttpEntity(waitListOrderVO,httpHeaders);"
+      },
+      {
+        "line": 45,
+        "text": ""
+      },
+      {
+        "line": 46,
+        "text": "        //TODO compare with waitUntilTime"
+      },
+      {
+        "line": 47,
+        "text": "        while(true){"
+      },
+      {
+        "line": 48,
+        "text": "            long currentTime=System.currentTimeMillis();"
+      },
+      {
+        "line": 49,
+        "text": "            if(waitUntil.getTime()>currentTime){"
+      },
+      {
+        "line": 50,
+        "text": "                // expired"
+      },
+      {
+        "line": 51,
+        "text": "                waitListOrderService.modifyWaitListOrderStatus(WaitListOrderStatus.EXPIRED.getCode(), waitListOrderVO.getAccountId());"
+      },
+      {
+        "line": 52,
+        "text": "                break;"
+      },
+      {
+        "line": 53,
+        "text": "            }"
+      },
+      {
+        "line": 54,
+        "text": "            Response postResult=doPreserve(service_url,requestEntityPreserve);"
+      },
+      {
+        "line": 55,
+        "text": "            if(postResult.getStatus()==0){"
+      },
+      {
+        "line": 56,
+        "text": "                //预定失败"
+      },
+      {
+        "line": 57,
+        "text": "                try {"
+      },
+      {
+        "line": 58,
+        "text": "                    TimeUnit.MINUTES.sleep(INTERVAL_MINUTES);"
+      },
+      {
+        "line": 59,
+        "text": "                } catch (InterruptedException e) {"
+      },
+      {
+        "line": 60,
+        "text": "                    e.printStackTrace();"
+      },
+      {
+        "line": 61,
+        "text": "                }"
+      },
+      {
+        "line": 62,
+        "text": "            } else{"
+      },
+      {
+        "line": 63,
+        "text": "                // preserve success"
+      },
+      {
+        "line": 64,
+        "text": "                waitListOrderService.modifyWaitListOrderStatus(WaitListOrderStatus.COLLECTED.getCode(),waitListOrderVO.getAccountId());"
+      },
+      {
+        "line": 65,
+        "text": "                break;"
+      },
+      {
+        "line": 66,
+        "text": "            }"
+      },
+      {
+        "line": 67,
+        "text": "        }"
+      },
+      {
+        "line": 68,
+        "text": "    }"
+      },
+      {
+        "line": 69,
+        "text": ""
+      },
+      {
+        "line": 70,
+        "text": "    private String getServiceUrl(String serviceName) {"
+      },
+      {
+        "line": 71,
+        "text": "        return \"http://\" + serviceName;"
+      },
+      {
+        "line": 72,
+        "text": "    }"
+      },
+      {
+        "line": 73,
+        "text": ""
+      },
+      {
+        "line": 74,
+        "text": "    private Response doPreserve(String url, HttpEntity requestParam){"
+      },
+      {
+        "line": 75,
+        "text": "        ResponseEntity<Response<Contacts>> rePostPreserveResult = restTemplate.exchange("
+      },
+      {
+        "line": 76,
+        "text": "                url + \"/api/v1/contactservice/preserve\","
+      },
+      {
+        "line": 77,
+        "text": "                HttpMethod.POST,"
+      },
+      {
+        "line": 78,
+        "text": "                requestParam,"
+      },
+      {
+        "line": 79,
+        "text": "                new ParameterizedTypeReference<Response<Contacts>>() {"
+      },
+      {
+        "line": 80,
+        "text": "                });"
+      },
+      {
+        "line": 81,
+        "text": "        return rePostPreserveResult.getBody();"
+      },
+      {
+        "line": 82,
+        "text": "    }"
+      },
+      {
+        "line": 83,
+        "text": ""
+      }
+    ],
+    "epistemic_state": "FACT source literal; RE2/runtime link OPEN"
+  },
+  {
+    "source_path": "ts-preserve-service/src/main/java/preserve/controller/PreserveController.java",
+    "sha256": "c0ca6084839b2b454ef7120558e56891ba7beddf6a6a3058d943fc2aaae9dbeb",
+    "revision": "fa8d9efb35b2ed5ec1d18f60510167767c8fb2bf",
+    "locator": "L16-L38",
+    "meaning": "declared preserve endpoint",
+    "lines": [
+      {
+        "line": 16,
+        "text": " */"
+      },
+      {
+        "line": 17,
+        "text": "@RestController"
+      },
+      {
+        "line": 18,
+        "text": "@RequestMapping(\"/api/v1/preserveservice\")"
+      },
+      {
+        "line": 19,
+        "text": "public class PreserveController {"
+      },
+      {
+        "line": 20,
+        "text": ""
+      },
+      {
+        "line": 21,
+        "text": "    @Autowired"
+      },
+      {
+        "line": 22,
+        "text": "    private PreserveService preserveService;"
+      },
+      {
+        "line": 23,
+        "text": ""
+      },
+      {
+        "line": 24,
+        "text": "    private static final Logger LOGGER = LoggerFactory.getLogger(PreserveController.class);"
+      },
+      {
+        "line": 25,
+        "text": ""
+      },
+      {
+        "line": 26,
+        "text": "    @GetMapping(path = \"/welcome\")"
+      },
+      {
+        "line": 27,
+        "text": "    public String home() {"
+      },
+      {
+        "line": 28,
+        "text": "        return \"Welcome to [ Preserve Service ] !\";"
+      },
+      {
+        "line": 29,
+        "text": "    }"
+      },
+      {
+        "line": 30,
+        "text": ""
+      },
+      {
+        "line": 31,
+        "text": "    @CrossOrigin(origins = \"*\")"
+      },
+      {
+        "line": 32,
+        "text": "    @PostMapping(value = \"/preserve\")"
+      },
+      {
+        "line": 33,
+        "text": "    public HttpEntity preserve(@RequestBody OrderTicketsInfo oti,"
+      },
+      {
+        "line": 34,
+        "text": "                               @RequestHeader HttpHeaders headers) {"
+      },
+      {
+        "line": 35,
+        "text": "        PreserveController.LOGGER.info(\"[preserve][Preserve Account order][from {} to {} at {}]\", oti.getFrom(), oti.getTo(), oti.getDate());"
+      },
+      {
+        "line": 36,
+        "text": "        return ok(preserveService.preserve(oti, headers));"
+      },
+      {
+        "line": 37,
+        "text": "    }"
+      },
+      {
+        "line": 38,
+        "text": ""
+      }
+    ],
+    "epistemic_state": "FACT source literal; RE2/runtime link OPEN"
+  },
+  {
+    "source_path": "ts-inside-payment-service/src/main/java/inside_payment/async/AsyncTask.java",
+    "sha256": "1885d5c569daf8db9b35962a12c1dee5077692bafebe9054efa741a999e78f14",
+    "revision": "fa8d9efb35b2ed5ec1d18f60510167767c8fb2bf",
+    "locator": "L14-L35",
+    "meaning": "external endpoint source absent",
+    "lines": [
+      {
+        "line": 14,
+        "text": " * @author fdse"
+      },
+      {
+        "line": 15,
+        "text": " */"
+      },
+      {
+        "line": 16,
+        "text": "@Component  "
+      },
+      {
+        "line": 17,
+        "text": "public class AsyncTask {"
+      },
+      {
+        "line": 18,
+        "text": "    "
+      },
+      {
+        "line": 19,
+        "text": "    @Autowired"
+      },
+      {
+        "line": 20,
+        "text": "\tprivate RestTemplate restTemplate;"
+      },
+      {
+        "line": 21,
+        "text": ""
+      },
+      {
+        "line": 22,
+        "text": "    private static final Logger LOGGER = LoggerFactory.getLogger(AsyncTask.class);"
+      },
+      {
+        "line": 23,
+        "text": ""
+      },
+      {
+        "line": 24,
+        "text": "    @Async(\"mySimpleAsync\")"
+      },
+      {
+        "line": 25,
+        "text": "    public Future<Boolean> sendAsyncCallToPaymentService(OutsidePaymentInfo outsidePaymentInfo) {"
+      },
+      {
+        "line": 26,
+        "text": "        AsyncTask.LOGGER.info(\"[sendAsyncCallToPaymentService][Inside Payment Service, Async Task,Begin]\");"
+      },
+      {
+        "line": 27,
+        "text": "        Boolean value = restTemplate.getForObject(\"http://rest-service-external:16100/greet\", Boolean.class);"
+      },
+      {
+        "line": 28,
+        "text": "        AsyncTask.LOGGER.info(\"[sendAsyncCallToPaymentService][Inside Payment Service, Async Task][Receive call Value directly back: {}]\", value);"
+      },
+      {
+        "line": 29,
+        "text": "        return new AsyncResult<>(value);"
+      },
+      {
+        "line": 30,
+        "text": "    }"
+      },
+      {
+        "line": 31,
+        "text": "    "
+      },
+      {
+        "line": 32,
+        "text": "}  "
+      }
+    ],
+    "epistemic_state": "FACT source literal; RE2/runtime link OPEN"
+  }
+]

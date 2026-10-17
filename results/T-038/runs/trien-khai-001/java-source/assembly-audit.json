@@ -1,0 +1,407 @@
+{
+  "task": "T-038",
+  "role": "implementation self-check support; not official review",
+  "created_utc": "2026-10-15T17:37:58.002166+00:00",
+  "run": "lap-ban-ghi-004",
+  "history": [
+    {
+      "task": "T-038",
+      "role": "implementation self-check support; not official review",
+      "created_utc": "2026-10-15T17:36:55.681112+00:00",
+      "run": "lap-ban-ghi-003",
+      "scope": "Read structured facts/records/graphs and pinned pure builder only; no raw samples or forbidden content index read",
+      "input_hashes": {
+        "results\\T-038\\runs\\lap-ban-ghi-003\\engine.py": "c415a838e53e772160e153728ddf255b454facedd61b4f555a854fbe3dc69e43",
+        "results\\T-038\\runs\\lap-ban-ghi-003\\java.json": "a45a63dabb26153aab616fd6bef30a49763c77c1c64509e0a93034aade11dc50",
+        "results\\T-038\\runs\\lap-ban-ghi-003\\ban-ghi.json": "9ae9c1e47db4db2f8d40426bc645c949e500219da5640a804d1015c18d0b49be",
+        "results\\T-038\\runs\\lap-ban-ghi-003\\do-thi\\thuc-the.json": "8226ff3e7fb6ac619789d502f81266dcaf8388297d1115d9a5e90e021fc86acb",
+        "results\\T-038\\runs\\lap-ban-ghi-003\\do-thi\\thao-tac.json": "719838421d9c0ac56c5bc0902855cb37225aab398336f2d71b750546b15481c1"
+      },
+      "checks": [
+        {
+          "check": "java_frozen_input",
+          "ok": true,
+          "detail": {
+            "run_input": "results\\T-038\\runs\\lap-ban-ghi-003\\java.json"
+          }
+        },
+        {
+          "check": "all_160_http_target_alternatives_and_callers_retained",
+          "ok": true,
+          "detail": {
+            "expected": 160,
+            "missing": [],
+            "multiple": []
+          }
+        },
+        {
+          "check": "nine_empty_initializations_remain_open",
+          "ok": true,
+          "detail": {
+            "source_empty": 9,
+            "unresolved_empty": 9
+          }
+        },
+        {
+          "check": "all_273_repository_calls_retained",
+          "ok": true,
+          "detail": {
+            "expected": 273,
+            "mismatches": []
+          }
+        },
+        {
+          "check": "all_42_maven_inventory_members_and_provenance_retained",
+          "ok": true,
+          "detail": {
+            "missing": []
+          }
+        },
+        {
+          "check": "all_610_service_and_102_repository_method_declarations_retained",
+          "ok": true,
+          "detail": {
+            "expected": 712,
+            "missing": []
+          }
+        },
+        {
+          "check": "source_operation_runtime_names_not_invented",
+          "ok": true,
+          "detail": {
+            "operations": 993
+          }
+        },
+        {
+          "check": "http_branch_context_is_source_possibility_not_runtime",
+          "ok": true,
+          "detail": {
+            "records": 160
+          }
+        },
+        {
+          "check": "localhost_default_instance_identity_does_not_merge_owners",
+          "ok": true,
+          "detail": {
+            "in_memory_source_expression_tests": [
+              {
+                "host": "localhost",
+                "values": [
+                  "mysql-default-instance:service-A:localhost:3306",
+                  "mysql-default-instance:service-B:localhost:3306"
+                ],
+                "distinct_by_owner": true
+              },
+              {
+                "host": "127.0.0.1",
+                "values": [
+                  "mysql-default-instance:service-A:127.0.0.1:3306",
+                  "mysql-default-instance:service-B:127.0.0.1:3306"
+                ],
+                "distinct_by_owner": true
+              }
+            ],
+            "actual_localhost_entities": []
+          }
+        },
+        {
+          "check": "record_to_entity_graph_rebuild_exact",
+          "ok": true,
+          "detail": {
+            "records": 508,
+            "edges": 165,
+            "inventory": 110
+          }
+        },
+        {
+          "check": "record_to_operation_graph_rebuild_exact",
+          "ok": true,
+          "detail": {
+            "records": 508,
+            "edges": 342,
+            "nodes": 993
+          }
+        },
+        {
+          "check": "all_records_preserved_in_both_graphs",
+          "ok": true,
+          "detail": {
+            "records": 508
+          }
+        },
+        {
+          "check": "dynamic_handler_parser_candidates_not_promoted_to_unqualified_operation",
+          "ok": false,
+          "detail": {
+            "dynamic_selected_count": 66,
+            "interpretation": "A unique parser candidate can express a possible source handler. Current contexts retain runtime OPEN but do not label candidate shape matching explicitly; ask root to preserve candidate qualification or leave target operation unresolved."
+          }
+        }
+      ],
+      "findings": [
+        {
+          "kind": "candidate_semantics_need_explicit_preservation",
+          "affected": "66 source HTTP alternatives with dynamic path",
+          "examples": [
+            {
+              "relation_id": "tt-4acf89a94770bd33e5cc",
+              "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+              "line": 59,
+              "url_template": "http://ts-contacts-service/api/v1/contactservice/contacts/{contactsId}",
+              "handler_candidates": [
+                "ts-contacts-service::DELETE /api/v1/contactservice/contacts/{contactsId}"
+              ],
+              "selected_target_operation": "DELETE /api/v1/contactservice/contacts/{contactsId}",
+              "context": "call site exists; branch/reachability/discovery resolution/runtime activation OPEN; conservative source assignment alternative HTTP DELETE http://ts-contacts-service/api/v1/contactservice/contacts/{contactsId}"
+            },
+            {
+              "relation_id": "tt-7a957e879c619ef30a7a",
+              "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+              "line": 137,
+              "url_template": "http://ts-station-service/api/v1/stationservice/stations/{id}",
+              "handler_candidates": [
+                "ts-station-service::DELETE /api/v1/stationservice/stations/{stationsId}"
+              ],
+              "selected_target_operation": "DELETE /api/v1/stationservice/stations/{stationsId}",
+              "context": "call site exists; branch/reachability/discovery resolution/runtime activation OPEN; conservative source assignment alternative HTTP DELETE http://ts-station-service/api/v1/stationservice/stations/{id}"
+            },
+            {
+              "relation_id": "tt-8b9581de22089e0f3919",
+              "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+              "line": 199,
+              "url_template": "http://ts-train-service/api/v1/trainservice/trains/{id}",
+              "handler_candidates": [
+                "ts-train-service::DELETE /api/v1/trainservice/trains/{id}"
+              ],
+              "selected_target_operation": "DELETE /api/v1/trainservice/trains/{id}",
+              "context": "call site exists; branch/reachability/discovery resolution/runtime activation OPEN; conservative source assignment alternative HTTP DELETE http://ts-train-service/api/v1/trainservice/trains/{id}"
+            },
+            {
+              "relation_id": "tt-78b6d8ca2c9c591e80d1",
+              "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+              "line": 254,
+              "url_template": "http://ts-config-service/api/v1/configservice/configs/{name}",
+              "handler_candidates": [
+                "ts-config-service::DELETE /api/v1/configservice/configs/{configName}"
+              ],
+              "selected_target_operation": "DELETE /api/v1/configservice/configs/{configName}",
+              "context": "call site exists; branch/reachability/discovery resolution/runtime activation OPEN; conservative source assignment alternative HTTP DELETE http://ts-config-service/api/v1/configservice/configs/{name}"
+            },
+            {
+              "relation_id": "tt-202d063b91a6094d93b6",
+              "source_path": "ts-admin-basic-info-service/src/main/java/adminbasic/service/AdminBasicInfoServiceImpl.java",
+              "line": 307,
+              "url_template": "http://ts-price-service/api/v1/priceservice/prices/{pricesId}",
+              "handler_candidates": [
+                "ts-price-service::DELETE /api/v1/priceservice/prices/{pricesId}"
+              ],
+              "selected_target_operation": "DELETE /api/v1/priceservice/prices/{pricesId}",
+              "context": "call site exists; branch/reachability/discovery resolution/runtime activation OPEN; conservative source assignment alternative HTTP DELETE http://ts-price-service/api/v1/priceservice/prices/{pricesId}"
+            },
+            {
+              "relation_id": "tt-bef09d4e25d40f6fdc45",
+              "source_path": "ts-admin-order-service/src/main/java/adminorder/service/AdminOrderServiceImpl.java",
+              "line": 93,
+              "url_template": "http://ts-order-service/api/v1/orderservice/order/{orderId}",
+              "handler_candidates": [
+                "ts-order-service::DELETE /api/v1/orderservice/order/{orderId}"
+              ],
+              "selected_target_operation": "DELETE /api/v1/orderservice/order/{orderId}",
+              "context": "call site exists; branch/reachability/discovery resolution/runtime activation OPEN; conservative source assignment alternative HTTP DELETE http://ts-order-service/api/v1/orderservice/order/{orderId}"
+            },
+            {
+              "relation_id": "tt-af4cbad135b4ed3811ec",
+              "source_path": "ts-admin-order-service/src/main/java/adminorder/service/AdminOrderServiceImpl.java",
+              "line": 104,
+              "url_template": "http://ts-order-other-service/api/v1/orderOtherService/orderOther/{orderId}",
+              "handler_candidates": [
+                "ts-order-other-service::DELETE /api/v1/orderOtherService/orderOther/{orderId}"
+              ],
+              "selected_target_operation": "DELETE /api/v1/orderOtherService/orderOther/{orderId}",
+              "context": "call site exists; branch/reachability/discovery resolution/runtime activation OPEN; conservative source assignment alternative HTTP DELETE http://ts-order-other-service/api/v1/orderOtherService/orderOther/{orderId}"
+            },
+            {
+              "relation_id": "tt-5d288c3bbbaca0343d57",
+              "source_path": "ts-admin-route-service/src/main/java/adminroute/service/AdminRouteServiceImpl.java",
+              "line": 87,
+              "url_template": "http://ts-route-service/api/v1/routeservice/routes/{routeId}",
+              "handler_candidates": [
+                "ts-route-service::DELETE /api/v1/routeservice/routes/{routeId}"
+              ],
+              "selected_target_operation": "DELETE /api/v1/routeservice/routes/{routeId}",
+              "context": "call site exists; branch/reachability/discovery resolution/runtime activation OPEN; conservative source assignment alternative HTTP DELETE http://ts-route-service/api/v1/routeservice/routes/{routeId}"
+            }
+          ],
+          "minimal_change_options": [
+            "Keep target.operation null unless literal method/path match is validated independently.",
+            "If used as possible source handler, explicitly preserve candidate shape-match status in context and unresolved output; never label it exact dynamic path equality or runtime name validation."
+          ]
+        }
+      ],
+      "summary": {
+        "checks": 13,
+        "passed": 12,
+        "failed_or_needs_root_resolution": 1
+      },
+      "root_outputs_modified": false,
+      "files_written": [
+        "results\\T-038\\runs\\trien-khai-001\\java-source\\assembly-audit.json"
+      ]
+    }
+  ],
+  "scope": "Read structured facts/records/graphs and pinned pure builder only; no raw samples or forbidden content index read",
+  "input_hashes": {
+    "results\\T-038\\runs\\lap-ban-ghi-004\\engine.py": "7cdf42153040fd78dd6ebbba99f2e0b2e87e9b659adece0616d5f375df0ce9f3",
+    "results\\T-038\\runs\\lap-ban-ghi-004\\java.json": "a45a63dabb26153aab616fd6bef30a49763c77c1c64509e0a93034aade11dc50",
+    "results\\T-038\\runs\\lap-ban-ghi-004\\ban-ghi.json": "57dc35ca328ee1ea5286c450ed76f8bad9f7fe8b8fcadd6b6b99ef7e8607ff7d",
+    "results\\T-038\\runs\\lap-ban-ghi-004\\do-thi\\thuc-the.json": "54f84806c747dd461fa23de0edc6abfcf44bd4705d5adf8ee3a80563b036b552",
+    "results\\T-038\\runs\\lap-ban-ghi-004\\do-thi\\thao-tac.json": "3d2a3e235561c6c8c27b4a352ed687e01620e96558f29299eb293c5733000e63"
+  },
+  "checks": [
+    {
+      "check": "java_frozen_input",
+      "ok": true,
+      "detail": {
+        "input": "results\\T-038\\runs\\lap-ban-ghi-004\\java.json"
+      }
+    },
+    {
+      "check": "all_160_http_target_alternatives_and_callers_retained",
+      "ok": true,
+      "detail": {
+        "expected": 160,
+        "mismatches": []
+      }
+    },
+    {
+      "check": "nine_empty_initializations_remain_open",
+      "ok": true,
+      "detail": {
+        "source_empty": 9,
+        "unresolved_empty": 9
+      }
+    },
+    {
+      "check": "all_273_repository_calls_retained",
+      "ok": true,
+      "detail": {
+        "expected": 273,
+        "mismatches": []
+      }
+    },
+    {
+      "check": "all_42_maven_inventory_members_and_provenance_retained",
+      "ok": true,
+      "detail": {
+        "missing": []
+      }
+    },
+    {
+      "check": "all_610_service_and_102_repository_method_declarations_retained",
+      "ok": true,
+      "detail": {
+        "expected": 712,
+        "missing": []
+      }
+    },
+    {
+      "check": "source_operation_runtime_names_not_invented",
+      "ok": true,
+      "detail": {
+        "operations": 993
+      }
+    },
+    {
+      "check": "http_branch_context_is_source_possibility_not_runtime",
+      "ok": true,
+      "detail": {
+        "records": 160
+      }
+    },
+    {
+      "check": "localhost_default_instance_identity_does_not_merge_owners",
+      "ok": true,
+      "detail": {
+        "in_memory_source_expression_tests": [
+          {
+            "host": "localhost",
+            "values": [
+              "mysql-default-instance:service-A:localhost:3306",
+              "mysql-default-instance:service-B:localhost:3306"
+            ],
+            "distinct_by_owner": true
+          },
+          {
+            "host": "127.0.0.1",
+            "values": [
+              "mysql-default-instance:service-A:127.0.0.1:3306",
+              "mysql-default-instance:service-B:127.0.0.1:3306"
+            ],
+            "distinct_by_owner": true
+          }
+        ],
+        "actual_localhost_entities": []
+      }
+    },
+    {
+      "check": "record_to_entity_graph_rebuild_exact",
+      "ok": true,
+      "detail": {
+        "records": 508,
+        "edges": 165,
+        "inventory": 110
+      }
+    },
+    {
+      "check": "record_to_operation_graph_rebuild_exact",
+      "ok": true,
+      "detail": {
+        "records": 508,
+        "edges": 342,
+        "nodes": 993
+      }
+    },
+    {
+      "check": "all_records_preserved_in_both_graphs",
+      "ok": true,
+      "detail": {
+        "records": 508
+      }
+    },
+    {
+      "check": "dynamic_handler_parser_candidates_not_promoted_to_unqualified_operation",
+      "ok": true,
+      "detail": {
+        "promoted_dynamic": [],
+        "wrong_literal_descriptor": [],
+        "selected_exact_literal_targets": 85,
+        "unverified_candidate_records": 71
+      }
+    },
+    {
+      "check": "all_unverified_handler_candidates_kept_open",
+      "ok": true,
+      "detail": {
+        "unverified_candidate_records": 71,
+        "dynamic_candidates": 66,
+        "non_dynamic_non_exact_candidates": 5
+      }
+    }
+  ],
+  "findings": [],
+  "resolved_from_previous_run": {
+    "previous_run": "lap-ban-ghi-003",
+    "previous_issue": "66 dynamic source path alternatives selected a parser candidate handler without explicit candidate qualification",
+    "current_behavior": "Dynamic or non-exact descriptors keep target.operation null; 71 parser handler candidates remain in unresolved. 85 target operations use exact literal method+path descriptors.",
+    "remaining_open": "Candidate compatibility does not establish runtime path, instrumentation name, dataset lineage, or active branch."
+  },
+  "summary": {
+    "checks": 14,
+    "passed": 14,
+    "failed_or_needs_root_resolution": 0
+  },
+  "root_outputs_modified": false,
+  "files_written": [
+    "results\\T-038\\runs\\trien-khai-001\\java-source\\assembly-audit.json"
+  ]
+}
