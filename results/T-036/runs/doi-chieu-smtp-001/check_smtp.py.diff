@@ -1,0 +1,38 @@
+--- 
++++ 
+@@ -11,7 +11,7 @@
+ import traceback
+ 
+ HERE = Path(__file__).resolve().parent
+-ROOT = HERE.parents[4]
++ROOT = Path('D:\\RCA-flashticket')
+ 
+ def load(path):
+     return json.loads(path.read_text(encoding='utf-8-sig'))
+@@ -43,12 +43,12 @@
+     started = time.perf_counter()
+     checks = []
+     try:
+-        oracle = load(HERE/'oracle-before-code.json')
++        oracle = load(HERE/'oracle.json')
+         expected = {x['id']:x for x in oracle['cases']}
+         old = package('smtp_old_preview', ROOT/'results/T-037/runs/graph-003/code')
+-        new = package('smtp_candidate_preview', HERE/'experimental_copy')
++        new = package('smtp_candidate_preview', HERE/'code')
+         reg = {'sources':[{'id':'oracle','kind':'synthetic','revision':'literal-v1',
+-                          'sha256':sha(HERE/'oracle-before-code.json'), 'condition':'synthetic, not runtime'}]}
++                          'sha256':sha(HERE/'oracle.json'), 'condition':'synthetic, not runtime'}]}
+         prov = [{'source_id':'oracle','locator':'cases','condition':'literal synthetic evidence, not actual trace'}]
+         doc = {'scope':{'system':'synthetic-SMTP','revision':'literal-v1'},
+                'entities':[{'id':x,'name':x,'type':t,'granularity':'logical','role':'synthetic','provenance':prov}
+@@ -209,8 +209,8 @@
+                               'all_ok':all(x['ok'] for x in checks),'checks':checks,
+                               'elapsed_seconds':time.perf_counter()-started,'python':sys.version,'platform':platform.platform(),
+                               'created_utc':datetime.now(timezone.utc).isoformat(),
+-                              'oracle_sha256':sha(HERE/'oracle-before-code.json'),
+-                              'shared_code_unchanged':all(sha(ROOT/x['source'])==x['base_sha256'] for x in load(HERE/'candidate-code-hashes.json'))})
++                              'oracle_sha256':sha(HERE/'oracle.json'),
++                              'shared_code_unchanged':all(sha(ROOT/x['source'])==x['candidate_sha256'] for x in load(HERE/'candidate-code-hashes.json'))})
+         print('PASS',len(checks),'proposal checks. No shared changes or actual SMTP execution.')
+     except Exception as exc:
+         save(run/'failure.json',{'error':str(exc),'traceback':traceback.format_exc(),'checks':checks,

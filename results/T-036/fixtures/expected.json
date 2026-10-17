@@ -1,0 +1,253 @@
+{
+  "bindings_count": 5,
+  "comparison_requirements": [
+    "ambiguous_alias_excluded",
+    "unverified_alias_excluded",
+    "missing_alias_excluded",
+    "missing_queue_excluded",
+    "two_queues_retained",
+    "republish_not_event_count",
+    "revision_unverified_conditional",
+    "operation_owner_consistent",
+    "span_parent_not_entity_dependency",
+    "scope_mismatch_rejected",
+    "input_unchanged",
+    "deterministic_reorder"
+  ],
+  "comparisons": {
+    "empty": {
+      "S": [],
+      "T": [],
+      "intersection": [],
+      "numerator": 0,
+      "static_denominator": 0,
+      "static_only": [],
+      "trace_denominator": 0,
+      "trace_only": []
+    },
+    "endpoints_unknown": {
+      "S": [
+        [
+          "A",
+          "B",
+          null,
+          null
+        ]
+      ],
+      "T": [
+        [
+          "A",
+          "B",
+          null,
+          null
+        ]
+      ],
+      "intersection": [
+        [
+          "A",
+          "B",
+          null,
+          null
+        ]
+      ],
+      "numerator": 1,
+      "static_denominator": 1,
+      "static_only": [],
+      "trace_denominator": 1,
+      "trace_only": []
+    },
+    "typed_unknown": {
+      "S": [
+        [
+          "A",
+          "B",
+          "gọi-đồng-bộ",
+          null
+        ]
+      ],
+      "T": [],
+      "intersection": [],
+      "numerator": 0,
+      "static_denominator": 1,
+      "static_only": [
+        [
+          "A",
+          "B",
+          "gọi-đồng-bộ",
+          null
+        ]
+      ],
+      "trace_denominator": 0,
+      "trace_only": []
+    },
+    "typed_wrong": {
+      "S": [
+        [
+          "A",
+          "B",
+          "gọi-đồng-bộ",
+          null
+        ]
+      ],
+      "T": [
+        [
+          "A",
+          "B",
+          "dữ-liệu",
+          null
+        ]
+      ],
+      "intersection": [],
+      "numerator": 0,
+      "static_denominator": 1,
+      "static_only": [
+        [
+          "A",
+          "B",
+          "gọi-đồng-bộ",
+          null
+        ]
+      ],
+      "trace_denominator": 1,
+      "trace_only": [
+        [
+          "A",
+          "B",
+          "dữ-liệu",
+          null
+        ]
+      ]
+    }
+  },
+  "entity_edges": [
+    [
+      "A",
+      "B",
+      "gọi-đồng-bộ",
+      "http",
+      null
+    ],
+    [
+      "A",
+      "B",
+      "gọi-đồng-bộ",
+      "rpc",
+      null
+    ],
+    [
+      "A",
+      "DB1",
+      "dữ-liệu",
+      "data",
+      null
+    ],
+    [
+      "A",
+      "R",
+      "thông-điệp",
+      "publish",
+      {
+        "broker": "R",
+        "broker_scope": "vhost-demo",
+        "exchange": "e",
+        "queue": null,
+        "routing_key": "k"
+      }
+    ],
+    [
+      "A",
+      "X",
+      "gọi-đồng-bộ",
+      "http",
+      null
+    ],
+    [
+      "B",
+      "DB2",
+      "dữ-liệu",
+      "data",
+      null
+    ],
+    [
+      "R",
+      "B",
+      "thông-điệp",
+      "consume",
+      {
+        "broker": "R",
+        "broker_scope": "vhost-demo",
+        "exchange": null,
+        "queue": "q1",
+        "routing_key": null
+      }
+    ],
+    [
+      "R",
+      "B",
+      "thông-điệp",
+      "consume",
+      {
+        "broker": "R",
+        "broker_scope": "vhost-demo",
+        "exchange": null,
+        "queue": "q2",
+        "routing_key": null
+      }
+    ],
+    [
+      "R",
+      "C",
+      "thông-điệp",
+      "consume",
+      {
+        "broker": "R",
+        "broker_scope": "vhost-demo",
+        "exchange": null,
+        "queue": "q3",
+        "routing_key": null
+      }
+    ]
+  ],
+  "entity_ids": [
+    "A",
+    "B",
+    "C",
+    "DB1",
+    "DB2",
+    "H",
+    "PG",
+    "R",
+    "X",
+    "unused"
+  ],
+  "negative_build": {
+    "bad_broker": "messaging_endpoint",
+    "collision": "identifier_collision",
+    "conflicting_entity": "duplicate_conflict",
+    "label": "unknown_fields",
+    "missing_operation": "unknown_operation",
+    "missing_provenance": "provenance",
+    "shared_operation_metric": "shared_signal_operation",
+    "unknown_field": "unknown_fields"
+  },
+  "no_incoming_operations": [
+    "[\"A\",\"callback\"]",
+    "[\"A\",\"scheduler\"]"
+  ],
+  "operation_exclusions": [
+    "entity-only",
+    "saga-compensate"
+  ],
+  "projected_entity_record_ids": [
+    "callback-out",
+    "consume-q1",
+    "consume-q2",
+    "data",
+    "fanout",
+    "http",
+    "http-second-source",
+    "publish",
+    "republish"
+  ],
+  "single_shared_resource": "PG"
+}

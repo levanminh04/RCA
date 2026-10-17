@@ -1,0 +1,465 @@
+--- src/do_thi_tinh/compare.py
++++ src/do_thi_tinh/compare.py
+@@ -148,6 +148,8 @@
+                 return None, 'incomplete_messaging_address'
+             if channel == 'publish' and address['queue'] is not None:
+                 return None, 'invalid_publish_queue'
++            # Khóa so theo vai trò; địa chỉ đầy đủ vẫn ở graph và members gốc.
++            address = {key: address[key] for key in required}
+         # Type bỏ riêng cho phép so endpoints; provenance luôn ở member riêng.
+         return dict(source=converted['source'], target=converted['target'], type=typ,
+                     address=[channel, address] if address is not None else None,
+--- results/T-036/check.py
++++ results/T-036/check.py
+@@ -234,14 +234,14 @@
+         mr = compare(msg_static, msg_graph, mapping, context, registry)
+         save(out / 'compare-two-queues.json', mr)
+         check('two_queue_exact_intersection', mr['views']['typed']['intersection'], [
+-            ['R', 'B', 'thông-điệp', ['consume', dict(broker='R', broker_scope='vhost-demo', exchange=None, routing_key=None, queue='q1')]],
+-            ['R', 'B', 'thông-điệp', ['consume', dict(broker='R', broker_scope='vhost-demo', exchange=None, routing_key=None, queue='q2')]],
++            ['R', 'B', 'thông-điệp', ['consume', dict(broker='R', broker_scope='vhost-demo', queue='q1')]],
++            ['R', 'B', 'thông-điệp', ['consume', dict(broker='R', broker_scope='vhost-demo', queue='q2')]],
+         ])
+         partial = deepcopy(msg_graph); partial['edges'][1]['messaging']['queue'] = None
+         partial_result = compare(msg_static, partial, mapping, context, registry)
+         check('queue_missing_exclusion', partial_result['views']['typed']['exclusions']['trace'][0]['reason'], 'incomplete_messaging_address')
+         check('queue_missing_intersection_literal', partial_result['views']['typed']['intersection'], [
+-            ['R', 'B', 'thông-điệp', ['consume', dict(broker='R', broker_scope='vhost-demo', exchange=None, routing_key=None, queue='q1')]]])
++            ['R', 'B', 'thông-điệp', ['consume', dict(broker='R', broker_scope='vhost-demo', queue='q1')]]])
+         maps = deepcopy(mapping)
+         opmap = dict(level='operation', original='["b","runtime-receive"]',
+                      candidates=['["B","receive"]'], verified=True, provenance=p)
+@@ -252,7 +252,7 @@
+         oc = dict(context, level='operation')
+         opr = compare(msg_op, ot, maps, oc, registry)
+         check('operation_mapped_intersection_literal', opr['views']['typed']['intersection'], [
+-            ['R', '["B","receive"]', 'thông-điệp', ['consume', dict(broker='R', broker_scope='vhost-demo', exchange=None, routing_key=None, queue='q1')]]])
++            ['R', '["B","receive"]', 'thông-điệp', ['consume', dict(broker='R', broker_scope='vhost-demo', queue='q1')]]])
+         maps[1]['candidates'] = ['C']
+         check('operation_owner_conflict', compare(msg_op, ot, maps, oc, registry)
+               ['views']['typed']['exclusions']['trace'][0]['reason'], 'operation_owner_conflict:target')
+@@ -281,7 +281,7 @@
+         pubtrace = trace([edge('a', 'r', 'thông-điệp', pubmsg)], nodes=[{'id': 'a'}, {'id': 'r'}])
+         pubresult = compare(pub, pubtrace, mapping, context, registry)
+         check('publish_address_literal', pubresult['views']['typed']['intersection'], [
+-            ['A', 'R', 'thông-điệp', ['publish', dict(broker='R', broker_scope='vhost-demo', exchange='e', routing_key='k', queue=None)]]])
++            ['A', 'R', 'thông-điệp', ['publish', dict(broker='R', broker_scope='vhost-demo', exchange='e', routing_key='k')]]])
+         check('member_static_no_event_count', 'event_count' not in pubresult['views']['typed']['members']['static'][0]['members'][0]['original'])
+         check('member_trace_preserves_count', pubresult['views']['typed']['members']['trace'][0]['members'][0]['original']['event_count'], 7)
+         # Default exchange chuỗi rỗng có nghĩa, khác thiếu.
+@@ -325,15 +325,92 @@
+         integ_result = compare(integ_static, integ_entity, mapping, context, registry)
+         save(out / 'compare-trace-builder-messaging.json', integ_result)
+         check('trace_builder_broker_legs_literal', integ_result['views']['typed']['intersection'], [
+-            ['A', 'R', 'thông-điệp', ['publish', dict(broker='R', broker_scope='vhost-demo', exchange='e', routing_key='k', queue=None)]],
+-            ['R', 'B', 'thông-điệp', ['consume', dict(broker='R', broker_scope='vhost-demo', exchange=None, routing_key=None, queue='q1')]],
+-            ['R', 'B', 'thông-điệp', ['consume', dict(broker='R', broker_scope='vhost-demo', exchange=None, routing_key=None, queue='q2')]],
++            ['A', 'R', 'thông-điệp', ['publish', dict(broker='R', broker_scope='vhost-demo', exchange='e', routing_key='k')]],
++            ['R', 'B', 'thông-điệp', ['consume', dict(broker='R', broker_scope='vhost-demo', queue='q1')]],
++            ['R', 'B', 'thông-điệp', ['consume', dict(broker='R', broker_scope='vhost-demo', queue='q2')]],
+         ])
+         check('trace_builder_logical_trace_only_literal', integ_result['views']['typed']['trace_only'], [
+             ['A', 'B', 'thông-điệp', ['logical-message', dict(broker='R', broker_scope='vhost-demo', exchange='e', routing_key='k', queue='q1')]],
+             ['A', 'B', 'thông-điệp', ['logical-message', dict(broker='R', broker_scope='vhost-demo', exchange='e', routing_key='k', queue='q2')]],
+         ])
+         check('trace_builder_inferred_provenance', sorted({e['evidence_source'] for e in integ_entity['edges']}), ['inferred', 'trace'])
++
++        progress('r1-role-address-regression')
++        r1_path = ROOT / 'results/T-036/fixtures/r1.json'
++        r1 = read(r1_path)
++        r1_results = []
++        for case in r1['consume_cases']:
++            source_doc = deepcopy(doc)
++            source_doc['relations'] = [r for r in source_doc['relations'] if r['id'] == 'consume-q1']
++            source_doc['relations'][0]['messaging'].update(case['static'])
++            source_entity, source_operation = build(source_doc, registry)
++            address = dict(msg1, **case['trace'])
++            traces = {
++                'entity': trace([edge('r', 'b', 'thông-điệp', address)], nodes=[{'id': 'r'}, {'id': 'b'}]),
++                'operation': trace([edge('r', '["b","runtime-receive"]', 'thông-điệp', address)],
++                    nodes=[dict(id='["b","runtime-receive"]', entity='b')], level='operation',
++                    belongs=[['["b","runtime-receive"]', 'b']], components=[{'id': 'r'}]),
++            }
++            for level, source in [('entity', source_entity), ('operation', source_operation)]:
++                maps = deepcopy(mapping) + ([deepcopy(opmap)] if level == 'operation' else [])
++                before_r1 = canonical([source, traces[level]])
++                value = compare(source, traces[level], maps, dict(context, level=level), registry)
++                r1_results.append(dict(case=case['name'], level=level, result=value))
++                check('r1_input_unchanged:'+case['name']+':'+level,
++                      canonical([source, traces[level]]), before_r1)
++                for view, data in value['views'].items():
++                    label = case['name']+':'+level+':'+view
++                    check('r1_counts:'+label,
++                          [data[k] for k in ['numerator', 'static_denominator', 'trace_denominator']], case['counts'])
++                    if case['counts'][0]:
++                        check('r1_intersection:'+label, data['intersection'], [r1['consume_keys'][level][view]])
++                        check('r1_static_member_preserved:'+label,
++                              data['members']['static'][0]['members'][0]['original'], source['edges'][0])
++                        check('r1_trace_member_preserved:'+label,
++                              data['members']['trace'][0]['members'][0]['original'], traces[level]['edges'][0])
++        # Hai địa chỉ nguồn phát vẫn giữ trong members của một chặng nhận.
++        source_doc = deepcopy(doc)
++        source_doc['relations'] = [r for r in source_doc['relations'] if r['id'] == 'consume-q1']
++        source_doc['relations'][0]['messaging'].update(exchange='e', routing_key='k')
++        second = deepcopy(source_doc['relations'][0]); second['id'] = 'consume-q1-other-route'
++        second['messaging'].update(exchange='other-exchange', routing_key='other-key')
++        source_doc['relations'].append(second)
++        source_entity, _ = build(source_doc, registry)
++        value = compare(source_entity, trace([edge('r', 'b', 'thông-điệp', msg1)],
++                        nodes=[{'id': 'r'}, {'id': 'b'}]), mapping, context, registry)
++        r1_results.append(dict(case='two_source_routes_one_consume', result=value))
++        for view, data in value['views'].items():
++            check('r1_fanin_counts:'+view,
++                  [data[k] for k in ['numerator', 'static_denominator', 'trace_denominator']],
++                  r1['two_source_routes_one_consume']['counts'])
++            check('r1_fanin_members:'+view, len(data['members']['static'][0]['members']),
++                  r1['two_source_routes_one_consume']['static_members'])
++            check('r1_fanin_originals:'+view,
++                  sorted([m['original'] for m in data['members']['static'][0]['members']], key=canonical),
++                  sorted(source_entity['edges'], key=canonical))
++        changed_publish = deepcopy(pubtrace)
++        changed_publish['edges'][0]['messaging']['exchange'] = 'other-exchange'
++        value = compare(pub, changed_publish, mapping, context, registry)
++        r1_results.append(dict(case='publish_different_exchange', result=value))
++        for view, data in value['views'].items():
++            check('r1_publish_distinct:'+view,
++                  [data[k] for k in ['numerator', 'static_denominator', 'trace_denominator']],
++                  r1['publish_different_exchange']['counts'])
++        logical_doc = deepcopy(doc)
++        logical = deepcopy(next(r for r in doc['relations'] if r['id'] == 'http'))
++        logical.update(id='logical-r1', type='thông-điệp', channel='logical-message',
++                       messaging=dict(broker='R', broker_scope='vhost-demo', exchange='e', routing_key='k', queue='q1'))
++        logical_doc['relations'] = [logical]
++        logical_static, _ = build(logical_doc, registry)
++        logical_trace = trace([edge('a', 'b', 'thông-điệp',
++            dict(broker='r', broker_scope='vhost-demo', exchange='e', routing_key='other-key', queue='q1'))])
++        value = compare(logical_static, logical_trace, mapping, context, registry)
++        r1_results.append(dict(case='logical_different_routing', result=value))
++        for view, data in value['views'].items():
++            check('r1_logical_distinct:'+view,
++                  [data[k] for k in ['numerator', 'static_denominator', 'trace_denominator']],
++                  r1['logical_different_routing']['counts'])
++        save(out / 'r1-regression.json', dict(fixture_sha256=sha(r1_path), cases=r1_results))
+ 
+         progress('deterministic-order-and-membership')
+         for seed in [0, 1, 2]:
+--- results/T-036/hop-dong.md
++++ results/T-036/hop-dong.md
+@@ -20,13 +20,13 @@
+ 
+ Graph thực thể nhận mọi cạnh phụ thuộc khác owner; giữ quan hệ nội bộ và span-parent trong records/lớp thao tác, không chiếu thành cạnh thực thể. Lớp thao tác chỉ nhận quan hệ có ít nhất một endpoint operation đã khai; đầu kia không operation là component_context. Quan hệ chỉ có hai entity được báo `operation_exclusions`, giữ nguyên graph thực thể; không tạo operation giả để bắt phép chiếu bằng toàn graph entity. `project` chỉ hứa bằng tập cạnh entity của phần có thể chiếu; phần entity-only được báo riêng. Giữ cả inventory-only, operation đơn lẻ/scheduler không caller, callback trace mới. Không bịa callback edge từ correlation. HTTP external→callback chỉ có nếu nguồn thiết kế/code thật quy định, vẫn là thiết kế; trace không được tự thêm cạnh ấy.
+ 
+-Khóa gộp nguồn tĩnh: hai đầu + type + channel + địa chỉ messaging đầy đủ/null. Provenance và context là các danh sách riêng; nhiều bản ghi cùng quan hệ không làm tăng số cạnh cấu trúc. Không mất provenance khi gộp. Destination legacy của T-035 vẫn giữ riêng, không suy queue từ đó.
++Khóa gộp nguồn tĩnh: hai đầu + type + channel + địa chỉ messaging đầy đủ/null. Đây là khóa lưu thông tin nguồn, khác khóa đối chiếu theo vai trò tại §3. Provenance và context là các danh sách riêng; nhiều bản ghi cùng quan hệ không làm tăng số cạnh cấu trúc. Không mất provenance khi gộp. Destination legacy của T-035 vẫn giữ riêng, không suy queue từ đó.
+ 
+ ## 3. Messaging và địa chỉ tín hiệu
+ 
+ `messaging` là null với cạnh khác messaging, hoặc đủ năm khóa `{broker, broker_scope, exchange, routing_key, queue}`; chưa biết giữ null, chuỗi rỗng có nghĩa chỉ cho exchange/routing_key. Publish hướng producer→broker và không có queue; consume broker→consumer; logical-message producer→consumer. Broker phải khớp endpoint liên quan và type broker. Không nối publish/consume thành logical edge chỉ vì cùng broker/queue/routing. Quan hệ tĩnh logical-message phải là bản ghi riêng có bằng chứng routing/binding/đích; nó nói khả năng giao tiếp, không là một bản tin đã đi qua. Không có message ID/attempt trong khóa cấu trúc. Việc nối bản tin trace giữ nguyên điều kiện link/identity T-035 §7; T-036 không thực hiện lại hoặc nới nó.
+ 
+-Khóa messaging đối chiếu cần broker được mapping; broker_scope được xác minh bằng nguồn mapping scope riêng khi khác tên. Phiên bản v1 yêu cầu địa chỉ chuẩn hóa sẵn và scope equality; không suy alias scope. Publish cần broker/scope/exchange/routing; consume cần broker/scope/queue; logical cần cả năm. Thiếu phần cần thiết bị loại trừ, kể cả hai phía cùng thiếu. Publish và consume không thể khớp nhau. Nhiều queue cùng consumer vẫn nhiều cạnh. Khác kiểu messaging nhưng cùng đầu mút vẫn được phân biệt bởi channel.
++Khóa messaging đối chiếu cần broker được mapping; broker_scope được xác minh bằng nguồn mapping scope riêng khi khác tên. Phiên bản v1 yêu cầu địa chỉ chuẩn hóa sẵn và scope equality; không suy alias scope. Phần địa chỉ trong khóa chỉ chứa các trường theo vai trò: publish dùng broker/broker_scope/exchange/routing_key; consume dùng broker/broker_scope/queue; logical-message dùng cả năm. Thiếu phần cần thiết bị loại trừ, kể cả hai phía cùng thiếu. Publish và consume không thể khớp nhau. Nhiều queue cùng consumer vẫn nhiều khóa; exchange/routing bổ sung ở cạnh consume không làm tách khóa cùng broker/scope/queue. Địa chỉ đầy đủ vẫn giữ trong graph và members, kể cả nhiều bản ghi nguồn cùng chặng nhận. Khớp consume chỉ xác nhận chặng broker→consumer qua queue, chưa xác nhận exchange/routing, binding hoặc bản tin runtime. Khác kiểu messaging nhưng cùng đầu mút vẫn được phân biệt bởi channel. Đính chính khóa đối chiếu theo R1 được Minh duyệt ngày 15/10/2026; bản trước và bằng chứng kiểm ở runs/sua-r1-001/.
+ 
+ `signals`: `{id, kind, entity, operation, address, shared, provenance}`; kind log/trace/metric. Address là danh sách chuỗi có namespace; người lập nguồn phải dẫn schema/khóa tại B16 hoặc cấu hình thật. Metric service/instance/host dùng `shared=true`, operation phải null. Metric operation chỉ có khi đo đúng operation và `shared=false`; không nhân chuỗi shared sang mọi operation. Metric queue là `(broker,broker_scope,queue)` và giữ một địa chỉ dù nhiều cạnh tham chiếu. Log nối trace/span nếu có; thiếu thì entity+time, operation chỉ khi tường minh. Bản ghi địa chỉ không có giá trị metric/log/runtime.
+ 
+@@ -38,7 +38,7 @@
+ 
+ Hai phép so riêng:
+ 
+-- `endpoints`: khóa đầu mút + channel messaging và địa chỉ. Với cạnh không messaging, không dùng type trong khóa; vì thế gọi chưa phân kiểu có thể khớp cặp đầu mút với gọi đồng bộ hoặc dữ liệu nhưng chỉ xác nhận cấu trúc. Báo record/trace edge gốc kèm kiểu, không nâng nghĩa.
++- `endpoints`: khóa đầu mút + channel messaging và phần địa chỉ theo vai trò ở §3. Với cạnh không messaging, không dùng type trong khóa; vì thế gọi chưa phân kiểu có thể khớp cặp đầu mút với gọi đồng bộ hoặc dữ liệu nhưng chỉ xác nhận cấu trúc. Báo record/trace edge gốc kèm kiểu và địa chỉ đầy đủ, không nâng nghĩa.
+ - `typed`: thêm type; loại gọi-chưa-phân-kiểu với lý do unknown_type ở cả phía. Không lấy kiểu tĩnh lấp trace. Span-parent và cạnh nội bộ (kể cả sau alias) bị loại khỏi so phụ thuộc entity; lớp operation có thể so span-parent nếu có nguồn cùng nghĩa. Khớp đầu mút không xác nhận kiểu. Channel messaging luôn giữ riêng; HTTP và RPC có cùng kiểu gọi-đồng-bộ được gộp trong khóa so typed vì T-035 chưa ghi transport. Channel gốc vẫn trong members; phép này chưa xác nhận transport.
+ 
+ Mỗi phép xuất các tập khóa `S`, `T`, `intersection`, `static_only`, `trace_only`, bảng thành viên với provenance/ID/index gốc và exclusions theo phía. Gộp theo khóa cấu trúc đã mapping, giữ toàn bộ thành viên. Báo numerator và denominator riêng: `static_fraction=|giao|/|S|`, `trace_fraction=|giao|/|T|`; mẫu số 0 trả null/N/A. Không gọi precision/recall. Tổng tập phải khớp danh sách, không chỉ đếm. Không gộp provenance static/trace trong một bằng chứng. Điều kiện nguồn vẫn giữ theo từng record, không suy mọi nhánh đã chạy trong cửa sổ. Bảng `nodes` báo mapping mọi nút trace, kể cả nút cô lập; inventory tĩnh giữ riêng và không cộng vào mẫu số cạnh.
+--- results/T-036/kiem-dung-dan.md
++++ results/T-036/kiem-dung-dan.md
+@@ -1,6 +1,6 @@
+ # Kiểm đúng đắn và mức kết luận T-036
+ 
+-Tự soát SPEC từ DT18/cô, MRP, LESSONS, WHY/DECISIONS, B11–B16 và code/đầu ra T-035 chưa phát hiện điểm phải sửa SPEC. Nhận xét độc lập được ghi LOG Phiên 2 trước implementation. Codex giữ người làm, Claude phản biện chính thức. Đầu ra hiện chờ phản biện; chưa nghiệm thu hoặc đóng task.
++Bản hiện hành sau sửa R1 theo lời Minh duyệt ngày 15/10/2026. Codex thực hiện sửa và tự kiểm; phiên Codex sạch tiếp theo là phản biện chính thức toàn bộ T-036 theo chỉ định hiện tại của Minh. Phân công lịch sử trong SPEC giữ nguyên. Chưa nghiệm thu hoặc đóng task. Bản trước sửa được giữ tại runs/sua-r1-001/before/results/T-036/. Trung gian hiện hành của các bảng dưới đây ở runs/kiem-r1-after-002/; các lượt cũ được dẫn riêng để giữ lịch sử.
+ 
+ ## 1. Nguồn và thứ tự bằng chứng
+ 
+@@ -14,7 +14,7 @@
+ 
+ | Phần kiểm | Bằng chứng và kết quả |
+ |---|---|
+-| Inventory/owner/resource | `fixtures/input.json` → `build` → `runs/kiem-005/entity.json#/resource_bindings`; DB1/DB2 riêng, một PG chung, owner riêng và metric PG chung. Inventory không là observed_nodes hay tập ứng viên RCA. |
++| Inventory/owner/resource | `fixtures/input.json` → `build` → `runs/kiem-r1-after-002/entity.json#/resource_bindings`; DB1/DB2 riêng, một PG chung, owner riêng và metric PG chung. Inventory không là observed_nodes hay tập ứng viên RCA. |
+ | Quan hệ và phép chiếu | Oracle `expected.json#/entity_edges` và `#/projected_entity_record_ids` → `entity.json`, `operation.json`, `projection.json`. Entity-only được báo exclusion; không tạo operation giả. Nội bộ/span-parent không thành cạnh entity. Callback/scheduler không có caller giả. |
+ | Messaging | Hai queue cùng consumer, fan-out, republish: queue_metric_address giữ riêng; không event_count tĩnh, không suy logical edge từ broker. `compare-two-queues.json#/views/typed` ghi đủ tập và mẫu số. |
+ | Tích hợp T-035 | `trace-synthetic-messaging.json` do builder T-035 dựng từ span tổng hợp → `compare-trace-builder-messaging.json`. Các chặng broker khớp; cạnh inferred logical của trace giữ riêng trong trace_only khi nguồn tĩnh không ghi quan hệ ấy. Không coi ví dụ là runtime FT. |
+@@ -24,13 +24,26 @@
+ | Graph dev có sẵn | `compatibility.json#/graphs`: 312 graph full/N/A ở hai mức, hai hệ, theo manifest hiện hành. Kiểm hash trước nạp, không sửa đầu vào. Không có mapping nguồn kiến trúc trong phép này nên loại trừ unmapped; chưa là đối chiếu kiến trúc thật. |
+ | Chiếu graph dev | `trace-projections.json`: 156 cặp thao tác/entity khớp, giữ ngoại lệ span-parent. Dùng graph lưu sẵn; không đọc trace thô/test hoặc chạy lại baseline. |
+ 
+-## 3. Các lượt và chi phí thực đo
++## 3. Các lượt và chi phí thực đo trước sửa R1
+ 
+ - `runs/kiem-001/failure.json`: dừng vì selector lấy thêm graph lịch sử trong manifest, đường dẫn không thuộc thư mục hiện hành. Các kiểm trước exception được giữ. Sửa selector trong checker, không sửa đầu vào hay oracle để đạt.
+ - `runs/kiem-002/result.json`: kiểm ban đầu đạt. Sau tự đọc lại code, bổ sung loại nội bộ sau alias và báo nút cô lập; không sửa SPEC.
+ - `runs/kiem-003/result.json`: kiểm bổ sung đạt. Sau đó thêm phép tích hợp T-035 messaging tổng hợp.
+-- `runs/kiem-004/result.json` và `runs/kiem-005/result.json`: mỗi lượt 151 kiểm đạt, 0 lỗi. Lượt cuối 8.754 giây, peak working set khoảng 109.9 MiB; số gốc ở `#/seconds`, `#/peak_working_set_bytes`, Python allocation peak ở `#/python_tracemalloc_peak_bytes`. RAM gồm Python/thư viện và cả checker, không chỉ API. Không chạy việc nặng khác đồng thời.
++- `runs/kiem-004/result.json` và `runs/kiem-005/result.json`: mỗi lượt 151 kiểm đạt, 0 lỗi. Lượt kiem-005 là 8.754 giây, peak working set khoảng 109.9 MiB; số gốc ở `#/seconds`, `#/peak_working_set_bytes`, Python allocation peak ở `#/python_tracemalloc_peak_bytes`. RAM gồm Python/thư viện và cả checker, không chỉ API. Không chạy việc nặng khác đồng thời.
+ - Đảo bản ghi ở ba seed trong checker; hai process khác PYTHONHASHSEED giữ mọi graph/kết quả so sánh trung gian giống từng byte, kiểm ở `runs/ket-phien-001/determinism.json#/checks`. Mã đã chạy được lưu ở `runs/kiem-004/code/`, `runs/kiem-005/code/` cùng hash. Các lượt cũ chưa lưu snapshot mã riêng, không dùng chúng thay bằng chứng của hai lượt cuối.
++
++
++## 3a. Phản biện R1, sửa và kiểm hồi quy
++
++R1 trong chat chỉ ra khóa consume dùng thêm exchange/routing dù chặng nhận chỉ cần broker/scope/queue. Trước sửa, thêm thông tin nguồn phát ở một phía làm mất giao; khóa lưu graph và khóa đối chiếu chưa tách đúng mục đích. Minh duyệt đúng đề xuất sửa; nguyên văn quyền ở runs/sua-r1-001/authorization.txt và LOG Phiên 3. Không suy quyền sửa SPEC, WHY/DECISIONS hoặc nguồn T-035.
++
++fixtures/r1.json và runs/sua-r1-001/oracle-before-fix-002.json giữ oracle trước sửa comparator. kiem-r1-before-001 giữ exception harness mapping_target; harness đã sửa theo mức. kiem-r1-before-002/result.json#/checks giữ 199 kiểm đạt và 22 không đạt; các kiểm cũ đều đạt, phần sai nằm ở R1. Đây là lượt tái lập có chủ ý, không bị bỏ.
++
++Comparator nay chỉ dùng trường địa chỉ theo vai trò trong khóa: publish bốn trường, consume ba trường, logical-message năm trường. Graph và members giữ địa chỉ nguyên bản. Khớp consume không xác minh đường routing/binding hoặc một bản tin runtime; nhiều bản ghi cùng chặng nhận được giữ chung một khóa với đủ members. Không đổi builder, mapping, miền hoặc graph T-035.
++
++runs/kiem-r1-after-001/result.json và runs/kiem-r1-after-002/result.json: mỗi lượt 221 kiểm đạt, 0 lỗi; gồm 70 kiểm R1. R1 kiểm hai phía khác độ chi tiết ở hai mức/hai view; bảo toàn input/member; gộp chặng nhận với nhiều địa chỉ nguồn phát; queue/scope khác hoặc queue thiếu; exchange publish và routing logical vẫn phân biệt. Danh sách gốc tại #/checks; trung gian tại r1-regression.json#/cases. Lượt sau đọc tương thích 312 graph, chiếu 156 cặp; thời gian 16.210 giây, peak working set 110.4 MiB. Đây là chi phí checker/fixture, không là thực nghiệm RCA.
++
++runs/sua-r1-001/determinism-and-preservation.json ghi 10 đầu ra giống từng byte giữa hai process khác hash seed, và 7 đầu ra không chịu tác động giống kiem-005. Các graph nguồn, phép chiếu, so unknown, schema compatibility giữ nguyên. Snapshot code từng lượt được giữ; oracle ban đầu không sửa. Theo tự kiểm, R1 đã được sửa trong các trường hợp này; chưa thay phản biện chính thức toàn task.
+ 
+ ## 4. Kết luận theo câu hỏi nguồn
+ 
+@@ -44,4 +57,4 @@
+ 
+ ## 5. Tự soát cuối và bàn giao
+ 
+-Kiểm hash/manifest/phạm vi/diff ở `runs/ket-phien-001/final-verification.json`; diff phiên ở `changes.diff`. Chỉ nối LOG, cập nhật đúng dòng T-036 trong STATE; giữ SPEC và các tài liệu nguồn. Prompt Claude lấy nguyên văn mẫu ở `prompt-claude.txt` và LOG Phiên 2. Không thêm quyết định khoa học, không tự sửa WHY/DECISIONS, không commit/push.
++Bản trước và diff lượt sửa tại runs/sua-r1-001/; kiểm cuối tại final-verification.json trong thư mục đó. LOG chỉ nối thêm, STATE chỉ cập nhật dòng T-036; SPEC và nguồn bảo vệ giữ nguyên. Prompt hiện hành là prompt-codex-clean.txt, chép nguyên văn mẫu ngoài thông tin trung tính, dành cho phiên Codex sạch phản biện chính thức toàn bộ task từ nguồn trước khi đọc kết luận lịch sử. Prompt Claude và các lượt cũ được giữ. Không thêm quyết định khoa học, không tự sửa WHY/DECISIONS, không commit/push.
+--- results/T-036/ban-giao.md
++++ results/T-036/ban-giao.md
+@@ -1,6 +1,6 @@
+ # Bàn giao T-036 — hợp đồng nguồn tĩnh và đối chiếu
+ 
+-Codex là người làm; Claude là người phản biện chính thức. Đầu ra chờ phản biện và Minh nghiệm thu. SPEC giữ nguyên. Không tự đóng P5/RQ3/RQ5/G3 hoặc chọn P6.
++Codex đã thực hiện lượt sửa theo Minh giao; tự kiểm phần sửa không thay phản biện chính thức. Phiên Codex sạch tiếp theo phản biện chính thức toàn bộ task theo ngoại lệ Minh chỉ định. Phân công lịch sử trong SPEC giữ nguyên. Đầu ra chờ phản biện và Minh nghiệm thu. Không tự đóng P5/RQ3/RQ5/G3 hoặc chọn P6.
+ 
+ ## 1. Đầu vào dùng tiếp
+ 
+@@ -11,13 +11,15 @@
+ 
+ ## 2. Phần đã kiểm và phản ví dụ còn phải giữ
+ 
+-**FACT:** fixture giữ được hai logical DB khác owner cùng một instance PG; mapping ở `runs/kiem-005/entity.json#/resource_bindings`, metric chung ở `#/signals`. Graph cạnh dữ liệu vẫn hướng tới DB logic. T-035 chưa có trường DB→instance tương đương; comparator không biến lớp mapping thành cạnh quan sát hoặc kết quả khớp runtime.
++**FACT:** fixture giữ được hai logical DB khác owner cùng một instance PG; mapping ở `runs/kiem-r1-after-002/entity.json#/resource_bindings`, metric chung ở `#/signals`. Graph cạnh dữ liệu vẫn hướng tới DB logic. T-035 chưa có trường DB→instance tương đương; comparator không biến lớp mapping thành cạnh quan sát hoặc kết quả khớp runtime.
+ 
+ Phản ví dụ: DB1 thuộc A, DB2 thuộc B, cả hai hosted_on PG. Gộp DB1/DB2 thành PG làm mất ownership; dùng hai PG riêng làm mất tài nguyên chung. Giữ hai DB + một PG + hai binding là biểu diễn nguồn tĩnh v1. Các phương án chuyển tiếp cho trace: adapter xác minh endpoint logic và instance/resource ID hoặc bảng mapping có revision/build/time scope từ deployment. Muốn thêm loại cạnh/namespace/adapter T-035 phải trình Minh riêng; chưa có quyền sửa trong task này. P6 có thể đề xuất dùng mapping để nhận diện tập cùng tài nguyên, nhưng phép lan điểm/gộp metric chưa chọn và chưa kiểm lợi ích. P9 phải ghi ID nguồn, không suy lại instance từ tên DB.
+ 
+ **FACT:** graph T-035 v2.1 đã lưu đọc được và không bị sửa; các cặp phép chiếu khớp. Đây là tương thích schema/phép chiếu, không là đối chiếu kiến trúc TT/OB. Trong lượt tương thích không có alias được xác minh nên cạnh được báo unmapped, không tạo matching giả.
+ 
+ **FACT:** mẫu số và tập giao/phần riêng đúng oracle tổng hợp; unknown chỉ có thể khớp đầu mút, không thành sync. Nhiều source/republish không thành nhiều sự kiện; mỗi queue vẫn có địa chỉ riêng. Không suy message/callback từ cùng broker/correlation. Chưa phân xử độ đầy đủ/routing thực hay chất lượng telemetry.
++
++Khóa đối chiếu messaging hiện hành theo vai trò tại hop-dong.md §3; khóa lưu graph nguồn vẫn đủ năm trường. Khớp consume là khớp broker/scope/queue, chưa xác nhận exchange/routing, binding hoặc bản tin. Địa chỉ nguồn đầy đủ và nhiều thành viên cùng chặng nhận được giữ riêng trong members. Bằng chứng sửa/tự kiểm ở runs/kiem-r1-after-002/r1-regression.json và result.json; bản trước và lượt lỗi được giữ tại runs/sua-r1-001/ và runs/kiem-r1-before-*/. Chưa là nghiệm thu của phiên phản biện sạch.
+ 
+ ## 3. Nơi nhận, bằng chứng thiếu và ảnh hưởng
+ 
+@@ -36,6 +38,6 @@
+ 
+ ## 4. Đề xuất bước tiếp
+ 
+-Minh chuyển prompt Claude ở cuối LOG T-036 để phản biện kết quả. Phản biện không tự là lệnh sửa. Sau Minh quyết nghiệm thu hoặc yêu cầu sửa, mới soạn/duyệt SPEC các nhánh tiếp theo. Không tải repo, bật EC2, mở test, commit/push từ bàn giao này.
++Minh chuyển prompt-codex-clean.txt cho phiên Codex mới hoàn toàn để phản biện chính thức toàn bộ T-036 từ nguồn như lần đầu. Phản biện không tự là lệnh sửa. Sau Minh quyết nghiệm thu hoặc yêu cầu sửa, mới soạn/duyệt SPEC các nhánh tiếp theo. Không tải repo, bật EC2, mở test, commit/push từ bàn giao này.
+ 
+ Nội dung có thể đưa vào báo cáo đồ án: phân biệt nguồn thiết kế và quan sát, logical DB/instance, địa chỉ message và metric queue, alias có nguồn và mẫu số khớp cấu trúc có điều kiện. Không viết các kiểm tổng hợp là bằng chứng runtime hoặc hiệu quả RCA.
+--- docs/STATE.md
++++ docs/STATE.md
+@@ -44,7 +44,7 @@
+ | T-033 | Lần theo cơ chế báo động trước mốc | P4 | Codex | Claude | Xong (11/10/2026, Minh nghiệm thu; Q-137–Q-140). Mục1–3 hoàn tất; số bổ sung EC2 khớp Claude, phản biện dừng. Xác nhận chuỗi N-Sigma/BOCPD, hướng tiền xử lý nhìn trước, cờ khác bắt đầu đoạn MAP, freeze19/60. OPEN: câu4/onset thật/báo giả vận hành/prior riêng/tác động bậc thang/lợi ích đồ thị/D; không so cửa sổ trong T033. T034 dùng câu thay mục6 bo-sung-bao-cao.md, không câu cũ report002. Không đóng RQ2/G2 hoặc chọn P6; chưa commit; bổ sung Q-144 hoàn tất phép kiểm13/10, chờ Minh xem báo cáo; giới hạn và kết quả/nghiệm thu cũ giữ rõ; xem LOG và runs/bo-sung-toan-dien-20261012-001/BAO-CAO-TONG-HOP.md | `tasks/T-033-g2-nguyen-nhan-phat-hien/` |
+ | T-034 | Gói trình G2: baseline, bản đồ hạn chế hợp nhất, hai phép E1/E2 | P3, P4 (G2) | Claude | Codex | Chờ Minh nghiệm thu (14/10/2026); chưa đóng. Phản biện dừng 14/10 sau sáu lượt sửa (Q-147, Q-148); lượt sửa cuối chỉ đổi lời văn, Codex chưa kiểm. Đầu ra ở `results/T-034/`, bản hiện tại theo `runs/manifest-cuoi-007/`. E1, E2 đã chạy xong trên dev. G2 đã duyệt (Q-149). Các lựa chọn ở mục 8 của `goi-g2.md` theo quyết định hiện hành trong `docs/DECISIONS.md`; lựa chọn chưa được quyết vẫn chờ Minh. Còn mở: lan có đáng kể, đóng góp của chờ ở CIRCA, chênh hai bản TraceRCA, underflow ngoài hai ca, thời điểm sự cố bắt đầu. Kết quả và LOG của task đã commit 14/10; thay đổi trong `docs/` chưa commit | `tasks/T-034-g2-goi-trinh/` |
+ | T-035 | P5a: đặc tả đồ thị phụ thuộc và bộ dựng từ trace | P5 (G3) | Codex | Claude | Đã đồng bộ văn bản span-parent với bộ dựng theo Q-156 (15/10/2026); giữ kết quả dev đã kiểm. Chờ phiên Codex sạch tự soát toàn task từ nguồn như lần đầu, rồi phản biện chính thức/nghiệm thu. Prompt hiện hành tại results/T-035/runs/dong-bo-span-parent-001/, LOG Phiên 9. Chưa chọn P6/đóng task. | `tasks/T-035-p5-do-thi-tu-trace/` |
+-| T-036 | P5b: hợp đồng nguồn tĩnh và đối chiếu | P5 (G3) | Codex | Claude | Chờ Claude phản biện kết quả (15/10/2026). Codex đã tự soát từ nguồn và triển khai trong SPEC; báo cáo/manifest tại results/T-036/, LOG Phiên 2 và prompt-claude.txt. Mô tả T-036 ở mục Task đang mở là mốc trước triển khai; hiện trạng theo dòng này. Chưa nghiệm thu, đóng task hoặc chọn P6. | `tasks/T-036-p5b-hop-dong-chung/` |
++| T-036 | P5b: hợp đồng nguồn tĩnh và đối chiếu | P5 (G3) | Codex | Claude | Đã sửa và tự kiểm theo Minh duyệt 15/10/2026; chờ phiên Codex sạch phản biện chính thức toàn bộ task từ nguồn theo chỉ định hiện tại của Minh. Prompt: results/T-036/prompt-codex-clean.txt; kết quả và bản trước tại results/T-036/runs/sua-r1-001/. Phân công lịch sử giữ nguyên. Chưa nghiệm thu, đóng task hoặc chọn P6. | `tasks/T-036-p5b-hop-dong-chung/` |
+ 
+ ## Task đang mở
+ 
+--- tasks/T-036-p5b-hop-dong-chung/LOG.md
++++ tasks/T-036-p5b-hop-dong-chung/LOG.md
+@@ -407,3 +407,95 @@
+ Code/revision, cấu hình, giả thuyết, độ đo, tập ca/tập ứng viên, cách xử lý ca lỗi/UNSUPPORTED/nhánh dự phòng và bảng diễn giải đã khóa trước test chưa? Có bỏ nhóm khó sau khi nhìn điểm hoặc dùng test để chọn thiết kế không?
+ Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.
+ ```
++
++
++## Phiên 3 — 15/10/2026 — Codex — LEVANMINH — sửa R1 theo Minh giao
++
++**Mở phiên / quyền:** Minh duyệt: “Duyệt sửa R1 theo đề xuất trong phiên này. Sau khi sửa và kiểm lại, soạn prompt cho phiên Codex sạch phản biện chính thức toàn bộ T-036 như lần đầu, không neo theo kết luận cũ.” Vai trò lượt này là thực hiện sửa theo chỉ định hiện tại; lượt phản biện trước ở chat, chưa có REVIEW. Tự kiểm sửa không là phản biện chính thức mới. Phiên Codex sạch tiếp theo phản biện chính thức toàn bộ task theo ngoại lệ Minh đã chỉ định; không sửa SPEC/phân công lịch sử.
++
++**Phạm vi và thứ tự:** giữ bản trước tại results/T-036/runs/sua-r1-001/before/; ghi oracle R1 và tái lập trước sửa; sửa khóa compare theo vai trò và mô tả hợp đồng; hồi quy checker, báo cáo/bàn giao/manifest, prompt mới và đúng dòng T-036 của STATE. Không sửa SPEC/WHY/DECISIONS/T-035/platform, không mở test, tải nguồn, dùng subagent hoặc commit/push. Hash 95 artifact, 15 nguồn và ba manifest phụ thuộc khớp trước sử dụng; preflight.json ghi chi tiết.
++
++**Oracle và tái lập trước sửa:** fixtures/r1.json và receipt runs/sua-r1-001/oracle-before-fix*.json được ghi khi comparator còn khớp bản before/. Lượt kiem-r1-before-001 giữ exception mapping_target do harness đưa operation mapping vào mức entity; đã sửa harness theo mức, không sửa comparator hoặc oracle. Lượt kiem-r1-before-002 chạy đủ, bộ kiểm cũ đạt; 22 kiểm R1 không đạt ở giao/mẫu số/member của trường hợp khác độ chi tiết. Giữ mọi lượt. Sau đó sửa comparator chỉ chọn trường địa chỉ theo vai trò; graph nguồn/members nguyên bản giữ đầy đủ. Đồng bộ hợp đồng và literal khóa mong đợi trong checker; không đổi oracle ban đầu.
++
++
++**Kết thúc Phiên 3 / kiểm sửa theo Minh duyệt:**
++1. Đã sửa khóa đối chiếu theo vai trò, giữ địa chỉ đầy đủ trong nguồn/members; đồng bộ hợp đồng và tự kiểm hồi quy. R1 đạt trong các trường hợp đã kiểm; chưa là phản biện chính thức mới, chưa nghiệm thu toàn task. Không thêm quyết định khoa học.
++2. File hiện hành sửa: src/do_thi_tinh/compare.py; results/T-036/check.py, hop-dong.md, kiem-dung-dan.md, ban-giao.md, manifest.json. Thêm fixtures/r1.json, các run mới, thư mục sửa có bản trước/oracle/diff/audit, prompt-codex-clean.txt; LOG chỉ nối và STATE chỉ dòng T-036. Không sửa SPEC/WHY/DECISIONS/T-035/platform hoặc oracle ban đầu. Giữ mọi lượt và thay đổi có sẵn.
++3. Kiểm: hai lượt sau sửa đều 221/221 đạt, 0 lỗi; 312 graph và 156 cặp chiếu. 10 trung gian xác định giữa hai process; 7 đầu ra không chịu tác động khớp trước sửa. Trước sửa giữ một exception harness và lượt tái lập 22 kiểm R1 không đạt. Số/hash ở result.json, r1-regression.json, determinism-and-preservation.json và final-verification.json. Không chạy baseline hoặc trace thô/test.
++4. Task có hợp đồng/công cụ và bằng chứng tự kiểm hiện hành; câu nguồn P5/RQ3/RQ5 chưa hoàn tất. Inventory/đối chiếu đầy đủ ba hệ, revision ứng dụng, runtime FT và lợi ích RCA vẫn cần các task đã bàn giao. Khớp consume không xác nhận routing/binding runtime. Minh quyết nghiệm thu sau phản biện toàn task; quyền sửa đã lưu nguyên văn authorization.txt. Không suy đồng thuận thành quyền G3/test.
++
++**Bước tiếp chính xác:** Minh mở phiên Codex mới tại D:/RCA-flashticket và dán results/T-036/prompt-codex-clean.txt. Phiên đó là người phản biện chính thức độc lập theo chỉ định Minh, đọc toàn nguồn/code/đầu ra như lần đầu trước nhận xét lịch sử; chỉ trả lời chat, chưa có quyền ghi REVIEW. Không tự tạo/gửi phiên. Nội dung báo cáo cần giữ: phân biệt khóa lưu thông tin với khóa đo chặng theo vai trò và giới hạn của khớp consume.
++
++**Lệnh kiểm hành vi cuối:** PYTHONHASHSEED=1 với D:/RCA-ext/envs/py312-pin/Scripts/python.exe -X utf8 -B results/T-036/check.py kiem-r1-after-002; đã chạy qua subprocess đặt biến cho process con. **Lệnh cuối của bước bàn giao:** py -3 -X utf8 -B results/T-036/runs/sua-r1-001/finalize-r1.py. Script có guard không ghi đè audit đã có; đọc audit và manifest trước tiếp tục, không chạy lại run cũ.
++
++**Đề xuất commit, chưa thực hiện:** fix: compare messaging addresses by role in T-036. Chỉ commit/push khi Minh yêu cầu hoặc duyệt.
++
++### Prompt Codex sạch — phản biện chính thức toàn bộ T-036 (Minh chuyển thủ công)
++
++```text
++Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
++Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
++
++Thông tin lượt này:
++- Task hoặc đề xuất: toàn bộ T-036; D:/RCA-flashticket/tasks/T-036-p5b-hop-dong-chung/SPEC.md.
++- Công đoạn: soát kết quả toàn bộ task trong một phiên Codex sạch.
++- Gói/cổng: P5; chuẩn bị G3.
++- Người làm và người phản biện chính thức: người làm là Codex ở các phiên triển khai và sửa T-036; người phản biện chính thức là Codex trong một phiên mới độc lập, thay Claude theo chỉ định trực tiếp của Minh. Minh đã cho phép ngoại lệ hai phiên Codex giữ hai vai trò này. SPEC/LOG/STATE còn giữ phân công lịch sử; chưa có quyền sửa SPEC hoặc các sổ phân công. Phiên nhận prompt này là người phản biện chính thức.
++- Tài liệu gốc: D:/RCA-flashticket/AGENTS.md; D:/RCA-flashticket/docs/STATE.md; D:/RCA-flashticket/tasks/T-036-p5b-hop-dong-chung/SPEC.md và LOG.md; D:/RCA-flashticket/docs/MRP.md; D:/RCA-flashticket/docs/WHY.md; D:/RCA-flashticket/docs/DECISIONS.md; D:/RCA-flashticket/docs/LESSONS.md; D:/RCA-flashticket/docs/reference/sources/DT18-de-tai-va-nhiem-vu.md; D:/RCA-flashticket/docs/reference/sources/advisor-2026-09-23.md; D:/RCA-flashticket/results/T-036/nguon.json và các nguồn được registry liệt kê.
++- Phản biện và phản hồi trước: lịch sử các phiên và các lượt của task tại D:/RCA-flashticket/tasks/T-036-p5b-hop-dong-chung/LOG.md và D:/RCA-flashticket/results/T-036/runs/; chưa có file REVIEW chính thức. Nhận xét và phản hồi lịch sử được đọc sau khi đã lập nhận xét độc lập từ nguồn và đầu ra gốc.
++- Code và kết quả liên quan: D:/RCA-flashticket/results/T-036/manifest.json; hop-dong.md; nguon.json; fixtures/; runs/; kiem-dung-dan.md; ban-giao.md; D:/RCA-flashticket/src/do_thi_tinh/README.md và toàn bộ code; D:/RCA-flashticket/results/T-035/manifest.json và các đầu vào SPEC liệt kê. Diff các phiên tại D:/RCA-flashticket/results/T-036/runs/ket-phien-001/changes.diff và D:/RCA-flashticket/results/T-036/runs/sua-r1-001/changes.diff. Windows/PowerShell; môi trường Python và cách chạy theo README.
++- Phạm vi ghi được Minh cho phép trong lượt này: chỉ đọc và trả lời bản phản biện chính thức trong chat; chưa có quyền ghi REVIEW, LOG, STATE, SPEC, DECISIONS, code hoặc kết quả. Không thực hiện quyền triển khai của người làm từ SPEC.
++
++Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
++
++Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
++Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
++Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
++
++Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
++hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
++Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
++số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
++có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
++
++Bổ sung yêu cầu phản biện:
++1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
++2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
++3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
++4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
++5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
++6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
++7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
++8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
++9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
++10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
++
++Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
++Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
++
++Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
++bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
++Tiếng Việt, câu ngắn.
++
++Cuối lượt báo:
++1. Đã làm gì.
++2. File đã thay đổi, hoặc không sửa file nào.
++3. Kiểm đã chạy và kết quả.
++4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
++
++Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
++
++Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
++
++Công đoạn: soát kết quả.
++Kiểm trên đầu ra thật, code và dữ liệu được phép; không tin tóm tắt LOG. Đối chiếu tiêu chí xong với phần mục tiêu nguồn và mức căn cứ cho bước tiếp theo; chạy lại phần rẻ khi trong quyền được duyệt.
++Phân biệt hoàn thành task mô tả, xác nhận cơ chế và đủ căn cứ chọn/đánh giá thiết kế. Giới hạn đã khai không tự miễn phép kiểm cần thiết còn làm được.
++Chỉ ghi bản phản biện lượt được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ bản cũ; không sửa kết quả thay người làm.
++
++Với từng thành phần, kiểm mục đích và căn cứ: sửa hạn chế P4, đáp ứng DT18 hay nhu cầu kỹ thuật. Có lý do kỹ thuật, phương án khác, bằng chứng dev và điều kiện thất bại không; có dùng mã hạn chế mô tả như bằng chứng cơ chế hoặc chọn theo mức chênh đồ thị trừ không đồ thị không?
++Nêu rõ nút/cạnh, ánh xạ log/trace/metric và phép tính thực sự sử dụng cạnh. Lần theo thông tin quan hệ và nhãn trong phương pháp lẫn đối chứng; gọi “không đồ thị” có đúng với thông tin còn giữ không?
++Kiểm baseline và đối chứng đủ mạnh, tương đương về tín hiệu/cửa sổ/tập ứng viên/coverage/tiền xử lý/quy tắc chấm/ngân sách chọn cấu hình ở phần không chủ ý thay; yếu tố thay cùng phải giới hạn kết luận.
++Phương pháp và đối chứng đã được cài và kiểm đầu vào, trung gian, hành vi trên dev chưa, hay chỉ chạy không lỗi? Không đòi đồ thị phải thắng để khóa.
++Code/revision, cấu hình, giả thuyết, độ đo, tập ca/tập ứng viên, cách xử lý ca lỗi/UNSUPPORTED/nhánh dự phòng và bảng diễn giải đã khóa trước test chưa? Có bỏ nhóm khó sau khi nhìn điểm hoặc dùng test để chọn thiết kế không?
++Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.
++```
+--- /dev/null
++++ results/T-036/fixtures/r1.json
+@@ -0,0 +1,24 @@
++{
++  "purpose": "Oracle R1 ghi trước sửa comparator; chỉ kiểm khóa theo vai trò, không xác nhận routing runtime.",
++  "consume_cases": [
++    {"name": "trace-more-detail", "static": {}, "trace": {"exchange": "e", "routing_key": "k"}, "counts": [1, 1, 1]},
++    {"name": "static-more-detail", "static": {"exchange": "e", "routing_key": "k"}, "trace": {}, "counts": [1, 1, 1]},
++    {"name": "different-queue", "static": {}, "trace": {"queue": "q9"}, "counts": [0, 1, 1]},
++    {"name": "different-scope", "static": {}, "trace": {"broker_scope": "other-vhost"}, "counts": [0, 1, 1]},
++    {"name": "missing-trace-queue", "static": {}, "trace": {"queue": null}, "counts": [0, 1, 0]},
++    {"name": "both-missing-queue", "static": {"queue": null}, "trace": {"queue": null}, "counts": [0, 0, 0]}
++  ],
++  "consume_keys": {
++    "entity": {
++      "endpoints": ["R", "B", null, ["consume", {"broker": "R", "broker_scope": "vhost-demo", "queue": "q1"}]],
++      "typed": ["R", "B", "thông-điệp", ["consume", {"broker": "R", "broker_scope": "vhost-demo", "queue": "q1"}]]
++    },
++    "operation": {
++      "endpoints": ["R", "[\"B\",\"receive\"]", null, ["consume", {"broker": "R", "broker_scope": "vhost-demo", "queue": "q1"}]],
++      "typed": ["R", "[\"B\",\"receive\"]", "thông-điệp", ["consume", {"broker": "R", "broker_scope": "vhost-demo", "queue": "q1"}]]
++    }
++  },
++  "two_source_routes_one_consume": {"counts": [1, 1, 1], "static_members": 2},
++  "publish_different_exchange": {"counts": [0, 1, 1]},
++  "logical_different_routing": {"counts": [0, 1, 1]}
++}
+--- /dev/null
++++ results/T-036/prompt-codex-clean.txt
+@@ -0,0 +1,65 @@
++Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
++Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
++
++Thông tin lượt này:
++- Task hoặc đề xuất: toàn bộ T-036; D:/RCA-flashticket/tasks/T-036-p5b-hop-dong-chung/SPEC.md.
++- Công đoạn: soát kết quả toàn bộ task trong một phiên Codex sạch.
++- Gói/cổng: P5; chuẩn bị G3.
++- Người làm và người phản biện chính thức: người làm là Codex ở các phiên triển khai và sửa T-036; người phản biện chính thức là Codex trong một phiên mới độc lập, thay Claude theo chỉ định trực tiếp của Minh. Minh đã cho phép ngoại lệ hai phiên Codex giữ hai vai trò này. SPEC/LOG/STATE còn giữ phân công lịch sử; chưa có quyền sửa SPEC hoặc các sổ phân công. Phiên nhận prompt này là người phản biện chính thức.
++- Tài liệu gốc: D:/RCA-flashticket/AGENTS.md; D:/RCA-flashticket/docs/STATE.md; D:/RCA-flashticket/tasks/T-036-p5b-hop-dong-chung/SPEC.md và LOG.md; D:/RCA-flashticket/docs/MRP.md; D:/RCA-flashticket/docs/WHY.md; D:/RCA-flashticket/docs/DECISIONS.md; D:/RCA-flashticket/docs/LESSONS.md; D:/RCA-flashticket/docs/reference/sources/DT18-de-tai-va-nhiem-vu.md; D:/RCA-flashticket/docs/reference/sources/advisor-2026-09-23.md; D:/RCA-flashticket/results/T-036/nguon.json và các nguồn được registry liệt kê.
++- Phản biện và phản hồi trước: lịch sử các phiên và các lượt của task tại D:/RCA-flashticket/tasks/T-036-p5b-hop-dong-chung/LOG.md và D:/RCA-flashticket/results/T-036/runs/; chưa có file REVIEW chính thức. Nhận xét và phản hồi lịch sử được đọc sau khi đã lập nhận xét độc lập từ nguồn và đầu ra gốc.
++- Code và kết quả liên quan: D:/RCA-flashticket/results/T-036/manifest.json; hop-dong.md; nguon.json; fixtures/; runs/; kiem-dung-dan.md; ban-giao.md; D:/RCA-flashticket/src/do_thi_tinh/README.md và toàn bộ code; D:/RCA-flashticket/results/T-035/manifest.json và các đầu vào SPEC liệt kê. Diff các phiên tại D:/RCA-flashticket/results/T-036/runs/ket-phien-001/changes.diff và D:/RCA-flashticket/results/T-036/runs/sua-r1-001/changes.diff. Windows/PowerShell; môi trường Python và cách chạy theo README.
++- Phạm vi ghi được Minh cho phép trong lượt này: chỉ đọc và trả lời bản phản biện chính thức trong chat; chưa có quyền ghi REVIEW, LOG, STATE, SPEC, DECISIONS, code hoặc kết quả. Không thực hiện quyền triển khai của người làm từ SPEC.
++
++Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
++
++Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
++Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
++Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
++
++Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
++hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
++Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
++số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
++có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
++
++Bổ sung yêu cầu phản biện:
++1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
++2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
++3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
++4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
++5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
++6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
++7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
++8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
++9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
++10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
++
++Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
++Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
++
++Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
++bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
++Tiếng Việt, câu ngắn.
++
++Cuối lượt báo:
++1. Đã làm gì.
++2. File đã thay đổi, hoặc không sửa file nào.
++3. Kiểm đã chạy và kết quả.
++4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
++
++Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
++
++Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
++
++Công đoạn: soát kết quả.
++Kiểm trên đầu ra thật, code và dữ liệu được phép; không tin tóm tắt LOG. Đối chiếu tiêu chí xong với phần mục tiêu nguồn và mức căn cứ cho bước tiếp theo; chạy lại phần rẻ khi trong quyền được duyệt.
++Phân biệt hoàn thành task mô tả, xác nhận cơ chế và đủ căn cứ chọn/đánh giá thiết kế. Giới hạn đã khai không tự miễn phép kiểm cần thiết còn làm được.
++Chỉ ghi bản phản biện lượt được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ bản cũ; không sửa kết quả thay người làm.
++
++Với từng thành phần, kiểm mục đích và căn cứ: sửa hạn chế P4, đáp ứng DT18 hay nhu cầu kỹ thuật. Có lý do kỹ thuật, phương án khác, bằng chứng dev và điều kiện thất bại không; có dùng mã hạn chế mô tả như bằng chứng cơ chế hoặc chọn theo mức chênh đồ thị trừ không đồ thị không?
++Nêu rõ nút/cạnh, ánh xạ log/trace/metric và phép tính thực sự sử dụng cạnh. Lần theo thông tin quan hệ và nhãn trong phương pháp lẫn đối chứng; gọi “không đồ thị” có đúng với thông tin còn giữ không?
++Kiểm baseline và đối chứng đủ mạnh, tương đương về tín hiệu/cửa sổ/tập ứng viên/coverage/tiền xử lý/quy tắc chấm/ngân sách chọn cấu hình ở phần không chủ ý thay; yếu tố thay cùng phải giới hạn kết luận.
++Phương pháp và đối chứng đã được cài và kiểm đầu vào, trung gian, hành vi trên dev chưa, hay chỉ chạy không lỗi? Không đòi đồ thị phải thắng để khóa.
++Code/revision, cấu hình, giả thuyết, độ đo, tập ca/tập ứng viên, cách xử lý ca lỗi/UNSUPPORTED/nhánh dự phòng và bảng diễn giải đã khóa trước test chưa? Có bỏ nhóm khó sau khi nhìn điểm hoặc dùng test để chọn thiết kế không?
++Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.

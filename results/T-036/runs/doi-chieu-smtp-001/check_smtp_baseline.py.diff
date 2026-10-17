@@ -1,0 +1,40 @@
+--- 
++++ 
+@@ -21,7 +21,7 @@
+ import traceback
+ 
+ 
+-ROOT = Path(__file__).resolve().parents[2]
++ROOT = Path('D:\\RCA-flashticket')
+ BASE = ROOT / 'results/T-037'
+ ORACLE = BASE / 'fixtures-smtp.json'
+ ORACLE_SHA256 = '23642f9be9b43297dd9b74bd16bb4959c747ee27e85e9bfd02a8c1a190361330'
+@@ -72,7 +72,7 @@
+ def main():
+     if len(sys.argv) != 2 or not re.fullmatch('smtp-regression-[a-z0-9][a-z0-9-]*', sys.argv[1]):
+         raise ValueError('new_smtp_regression_run_name_required')
+-    out = BASE / 'runs' / sys.argv[1]
++    out = Path('D:\\RCA-flashticket\\results\\T-036\\runs\\doi-chieu-smtp-001\\checks\\smtp-baseline-002')
+     out.mkdir(exist_ok=False)
+     started = time.perf_counter()
+     checks = []
+@@ -132,8 +132,8 @@
+             snapshot = PIN / 'code' / Path(original).name
+             require('old_snapshot:' + original, sha(snapshot), digest)
+             if original != 'src/do_thi_tinh/build.py':
+-                require('unchanged_shared_code:' + original, sha(ROOT / original), digest)
+-            verification.append(dict(path=original, snapshot_sha256=digest, current_sha256=sha(ROOT / original)))
++                require('unchanged_shared_code:' + original, sha((ROOT/'results/T-037/runs/graph-003/code'/Path(original).name) if original.startswith('src/') else ROOT/original), digest)
++            verification.append(dict(path=original, snapshot_sha256=digest, current_sha256=sha((ROOT/'results/T-037/runs/graph-003/code'/Path(original).name) if original.startswith('src/') else ROOT/original)))
+         original_build = old_build.read_text(encoding='utf-8-sig')
+         patched_build = original_build
+         patch_pairs = [
+@@ -154,7 +154,7 @@
+         (out / 'runner.py').write_bytes(Path(__file__).read_bytes())
+         (out / 'current-build.py').write_bytes(current_build_path.read_bytes())
+ 
+-        current = load_package('t037_smtp_current', ROOT / 'src/do_thi_tinh')
++        current = load_package('t037_smtp_current', ROOT / 'results/T-037/runs/graph-003/code')
+         old = load_package('t037_smtp_old', PIN / 'code')
+         registry = dict(sources=[dict(id='SMTP-ORACLE', kind='synthetic', revision='smtp-oracle-v1',
+             sha256=sha(ORACLE), condition='Literal synthetic fixture, not runtime or RCA benefit.')])

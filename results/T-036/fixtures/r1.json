@@ -1,0 +1,24 @@
+{
+  "purpose": "Oracle R1 ghi trước sửa comparator; chỉ kiểm khóa theo vai trò, không xác nhận routing runtime.",
+  "consume_cases": [
+    {"name": "trace-more-detail", "static": {}, "trace": {"exchange": "e", "routing_key": "k"}, "counts": [1, 1, 1]},
+    {"name": "static-more-detail", "static": {"exchange": "e", "routing_key": "k"}, "trace": {}, "counts": [1, 1, 1]},
+    {"name": "different-queue", "static": {}, "trace": {"queue": "q9"}, "counts": [0, 1, 1]},
+    {"name": "different-scope", "static": {}, "trace": {"broker_scope": "other-vhost"}, "counts": [0, 1, 1]},
+    {"name": "missing-trace-queue", "static": {}, "trace": {"queue": null}, "counts": [0, 1, 0]},
+    {"name": "both-missing-queue", "static": {"queue": null}, "trace": {"queue": null}, "counts": [0, 0, 0]}
+  ],
+  "consume_keys": {
+    "entity": {
+      "endpoints": ["R", "B", null, ["consume", {"broker": "R", "broker_scope": "vhost-demo", "queue": "q1"}]],
+      "typed": ["R", "B", "thông-điệp", ["consume", {"broker": "R", "broker_scope": "vhost-demo", "queue": "q1"}]]
+    },
+    "operation": {
+      "endpoints": ["R", "[\"B\",\"receive\"]", null, ["consume", {"broker": "R", "broker_scope": "vhost-demo", "queue": "q1"}]],
+      "typed": ["R", "[\"B\",\"receive\"]", "thông-điệp", ["consume", {"broker": "R", "broker_scope": "vhost-demo", "queue": "q1"}]]
+    }
+  },
+  "two_source_routes_one_consume": {"counts": [1, 1, 1], "static_members": 2},
+  "publish_different_exchange": {"counts": [0, 1, 1]},
+  "logical_different_routing": {"counts": [0, 1, 1]}
+}

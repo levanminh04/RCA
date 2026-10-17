@@ -1,0 +1,5605 @@
+{
+  "N1-01-fanout-three-queues-link-no-id": {
+    "entity_edges": [
+      {
+        "destination": "flash-ticket.v1:event.cancelled.v1",
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "Event",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": "flash-ticket.v1:event.cancelled.v1:booking.events",
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "booking.events",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "booking.events"
+        ],
+        "source": "mq",
+        "target": "Booking",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv-Booking",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": "flash-ticket.v1:event.cancelled.v1:booking.events",
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "booking.events",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "booking.events"
+        ],
+        "source": "Event",
+        "target": "Booking",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv-Booking",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": "flash-ticket.v1:event.cancelled.v1:ticket.events",
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "ticket.events",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "ticket.events"
+        ],
+        "source": "mq",
+        "target": "Ticket",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv-Ticket",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": "flash-ticket.v1:event.cancelled.v1:ticket.events",
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "ticket.events",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "ticket.events"
+        ],
+        "source": "Event",
+        "target": "Ticket",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv-Ticket",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": "flash-ticket.v1:event.cancelled.v1:payment.events",
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "payment.events",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "payment.events"
+        ],
+        "source": "mq",
+        "target": "Payment",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv-Payment",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": "flash-ticket.v1:event.cancelled.v1:payment.events",
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "payment.events",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "payment.events"
+        ],
+        "source": "Event",
+        "target": "Payment",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv-Payment",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "Booking",
+      "Event",
+      "Payment",
+      "Ticket",
+      "mq"
+    ],
+    "messaging_diagnostics": {},
+    "operation_edges": [
+      {
+        "destination": "flash-ticket.v1:event.cancelled.v1",
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"Event\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": "flash-ticket.v1:event.cancelled.v1:booking.events",
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "booking.events",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "booking.events"
+        ],
+        "source": "mq",
+        "target": "[\"Booking\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv-Booking",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": "flash-ticket.v1:event.cancelled.v1:booking.events",
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "booking.events",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "booking.events"
+        ],
+        "source": "[\"Event\",\"publish\"]",
+        "target": "[\"Booking\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv-Booking",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": "flash-ticket.v1:event.cancelled.v1:ticket.events",
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "ticket.events",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "ticket.events"
+        ],
+        "source": "mq",
+        "target": "[\"Ticket\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv-Ticket",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": "flash-ticket.v1:event.cancelled.v1:ticket.events",
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "ticket.events",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "ticket.events"
+        ],
+        "source": "[\"Event\",\"publish\"]",
+        "target": "[\"Ticket\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv-Ticket",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": "flash-ticket.v1:event.cancelled.v1:payment.events",
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "payment.events",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "payment.events"
+        ],
+        "source": "mq",
+        "target": "[\"Payment\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv-Payment",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": "flash-ticket.v1:event.cancelled.v1:payment.events",
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "payment.events",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "payment.events"
+        ],
+        "source": "[\"Event\",\"publish\"]",
+        "target": "[\"Payment\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv-Payment",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"Booking\",\"process\"]",
+      "[\"Event\",\"publish\"]",
+      "[\"Payment\",\"process\"]",
+      "[\"Ticket\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "booking.events"
+      ],
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "payment.events"
+      ],
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "ticket.events"
+      ]
+    ],
+    "unresolved_messages": 0
+  },
+  "N1-02-two-queues-same-consumer-operation": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "r1",
+            "c1"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q2",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q2"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "r2",
+            "c2"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "A",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "r1",
+            "c1"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q2",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q2"
+        ],
+        "source": "A",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "r2",
+            "c2"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {},
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "r1",
+            "c1"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q2",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q2"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "r2",
+            "c2"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "[\"A\",\"publish\"]",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "r1",
+            "c1"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q2",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q2"
+        ],
+        "source": "[\"A\",\"publish\"]",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "r2",
+            "c2"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ],
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q2"
+      ]
+    ],
+    "unresolved_messages": 0
+  },
+  "N1-03-redelivery-count-witness-not-node": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 2,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "r1",
+            "c1"
+          ],
+          [
+            "r2",
+            "c2"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 2,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "A",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "r1",
+            "c1"
+          ],
+          [
+            "send",
+            "p",
+            "r2",
+            "c2"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {},
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 2,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "r1",
+            "c1"
+          ],
+          [
+            "r2",
+            "c2"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 2,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "[\"A\",\"publish\"]",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "r1",
+            "c1"
+          ],
+          [
+            "send",
+            "p",
+            "r2",
+            "c2"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 0
+  },
+  "N1-04-republish-id-ambiguous": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 2,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "s1",
+            "p1"
+          ],
+          [
+            "s2",
+            "p2"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {
+      "identity_ambiguous": {
+        "count": 1,
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    },
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 2,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "s1",
+            "p1"
+          ],
+          [
+            "s2",
+            "p2"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 1
+  },
+  "N1-05-republish-explicit-links": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 2,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "s1",
+            "p1"
+          ],
+          [
+            "s2",
+            "p2"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 2,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "r1",
+            "c1"
+          ],
+          [
+            "r2",
+            "c2"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 2,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "A",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "s1",
+            "p1",
+            "r1",
+            "c1"
+          ],
+          [
+            "s2",
+            "p2",
+            "r2",
+            "c2"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {},
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 2,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "s1",
+            "p1"
+          ],
+          [
+            "s2",
+            "p2"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 2,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "r1",
+            "c1"
+          ],
+          [
+            "r2",
+            "c2"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 2,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "[\"A\",\"publish\"]",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "s1",
+            "p1",
+            "r1",
+            "c1"
+          ],
+          [
+            "s2",
+            "p2",
+            "r2",
+            "c2"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 0
+  },
+  "N1-06-unverified-or-wrong-semantics-no-identity": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 2,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "r1",
+            "c1"
+          ],
+          [
+            "r2",
+            "c2"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {
+      "identity_unverified": {
+        "count": 2,
+        "witness": [
+          [
+            "r1",
+            "c1"
+          ],
+          [
+            "r2",
+            "c2"
+          ]
+        ]
+      }
+    },
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 2,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "r1",
+            "c1"
+          ],
+          [
+            "r2",
+            "c2"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 2
+  },
+  "N1-07-unverified-link-valid-id-fallback": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "A",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {},
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "[\"A\",\"publish\"]",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 0
+  },
+  "N1-08-verified-missing-source-no-id-fallback": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {
+      "link_source_unavailable": {
+        "count": 1,
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    },
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 1
+  },
+  "N1-09-verified-wrong-kind-no-id-fallback": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "C",
+      "mq"
+    ],
+    "messaging_diagnostics": {
+      "link_source_not_producer": {
+        "count": 1,
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    },
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]",
+      "[\"C\",\"serve\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 1
+  },
+  "N1-10-link-conflict-broker": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq2",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq2",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq2",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq",
+      "mq2"
+    ],
+    "messaging_diagnostics": {
+      "link_scope_conflict": {
+        "count": 1,
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    },
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq2",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq2",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq2",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq2",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 1
+  },
+  "N1-10-link-conflict-broker_scope": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-2/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-2/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {
+      "link_scope_conflict": {
+        "count": 1,
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    },
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-2/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-2/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-2/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 1
+  },
+  "N1-10-link-conflict-exchange": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "other-x",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {
+      "link_scope_conflict": {
+        "count": 1,
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    },
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "other-x",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 1
+  },
+  "N1-10-link-conflict-identity_scope": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {
+      "link_scope_conflict": {
+        "count": 1,
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    },
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 1
+  },
+  "N1-10-link-conflict-message_id": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {
+      "link_scope_conflict": {
+        "count": 1,
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    },
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 1
+  },
+  "N1-10-link-conflict-routing_key": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "other-key"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {
+      "link_scope_conflict": {
+        "count": 1,
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    },
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "other-key"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 1
+  },
+  "N1-11-valid-link-kept-beside-invalid-links": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "other-x",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "C",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "other",
+            "p2"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "A",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "C",
+      "mq"
+    ],
+    "messaging_diagnostics": {
+      "link_scope_conflict": {
+        "count": 1,
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      "link_source_unavailable": {
+        "count": 1,
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    },
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "other-x",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"C\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "other",
+            "p2"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "[\"A\",\"publish\"]",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]",
+      "[\"C\",\"publish\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 0
+  },
+  "N1-12-id-collision-different-identity-scopes": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "C",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "other",
+            "p2"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q2",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q2"
+        ],
+        "source": "mq",
+        "target": "D",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv2",
+            "c2"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "A",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q2",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q2"
+        ],
+        "source": "C",
+        "target": "D",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "other",
+            "p2",
+            "recv2",
+            "c2"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "mq"
+    ],
+    "messaging_diagnostics": {},
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"C\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "other",
+            "p2"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q2",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q2"
+        ],
+        "source": "mq",
+        "target": "[\"D\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv2",
+            "c2"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "[\"A\",\"publish\"]",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q2",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q2"
+        ],
+        "source": "[\"C\",\"publish\"]",
+        "target": "[\"D\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "other",
+            "p2",
+            "recv2",
+            "c2"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]",
+      "[\"C\",\"publish\"]",
+      "[\"D\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ],
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q2"
+      ]
+    ],
+    "unresolved_messages": 0
+  },
+  "N1-13-same-queue-name-different-broker-scopes": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-2/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "other",
+            "p2"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-2/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-2/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv2",
+            "c2"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "A",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-2/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-2/vhost-main",
+          "q1"
+        ],
+        "source": "A",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "other",
+            "p2",
+            "recv2",
+            "c2"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {},
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-2/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "other",
+            "p2"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-2/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-2/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv2",
+            "c2"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "[\"A\",\"publish\"]",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-2/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-2/vhost-main",
+          "q1"
+        ],
+        "source": "[\"A\",\"publish\"]",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "other",
+            "p2",
+            "recv2",
+            "c2"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ],
+      [
+        "mq",
+        "deploy-2/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 0
+  },
+  "N1-14-id-no-source": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {
+      "identity_no_source": {
+        "count": 1,
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    },
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 1
+  },
+  "N1-15-consumer-identity-unverified": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {
+      "identity_unverified": {
+        "count": 1,
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    },
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 1
+  },
+  "N1-16-producer-identity-unverified": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {
+      "identity_no_source": {
+        "count": 1,
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    },
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 1
+  },
+  "N1-17-id-route-conflict": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "other-x",
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {
+      "identity_scope_conflict": {
+        "count": 1,
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    },
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "other-x",
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 1
+  },
+  "N1-18-correlation-only": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {
+      "identity_unverified": {
+        "count": 1,
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    },
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 1
+  },
+  "N1-19-link-source-outside-window": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {
+      "link_source_unavailable": {
+        "count": 1,
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    },
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 1
+  },
+  "N1-20-id-source-outside-window": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {
+      "identity_no_source": {
+        "count": 1,
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    },
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 1
+  },
+  "N1-21-metric-address-missing-broker-scope": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": null,
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": null,
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": null,
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": null,
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {
+      "queue_address_incomplete": {
+        "count": 1,
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    },
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": null,
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": null,
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": null,
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": null,
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [],
+    "unresolved_messages": 0
+  },
+  "N1-22-metric-address-missing-queue": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": null,
+          "routing_key": null
+        },
+        "queue_metric_address": null,
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {
+      "queue_address_incomplete": {
+        "count": 1,
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    },
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": null,
+          "routing_key": null
+        },
+        "queue_metric_address": null,
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [],
+    "unresolved_messages": 0
+  },
+  "N1-23-empty-exchange-and-routing-are-known": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "",
+          "queue": null,
+          "routing_key": ""
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "",
+          "queue": "q1",
+          "routing_key": ""
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "",
+          "queue": "q1",
+          "routing_key": ""
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "A",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {},
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "",
+          "queue": null,
+          "routing_key": ""
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "",
+          "queue": "q1",
+          "routing_key": ""
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "",
+          "queue": "q1",
+          "routing_key": ""
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "[\"A\",\"publish\"]",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 0
+  },
+  "N1-24-empty-exchange-not-missing": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "",
+          "queue": null,
+          "routing_key": ""
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": ""
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {
+      "link_scope_conflict": {
+        "count": 1,
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    },
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "",
+          "queue": null,
+          "routing_key": ""
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": ""
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 1
+  },
+  "N1-25-legacy-destination-never-becomes-queue": {
+    "entity_edges": [
+      {
+        "destination": "send-address",
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": null,
+          "exchange": null,
+          "queue": null,
+          "routing_key": null
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": "receive-address",
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": null,
+          "exchange": null,
+          "queue": null,
+          "routing_key": null
+        },
+        "queue_metric_address": null,
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": "receive-address",
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": null,
+          "exchange": null,
+          "queue": null,
+          "routing_key": null
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {
+      "queue_address_incomplete": {
+        "count": 1,
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    },
+    "operation_edges": [
+      {
+        "destination": "send-address",
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": null,
+          "exchange": null,
+          "queue": null,
+          "routing_key": null
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": "receive-address",
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": null,
+          "exchange": null,
+          "queue": null,
+          "routing_key": null
+        },
+        "queue_metric_address": null,
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": "receive-address",
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": null,
+          "exchange": null,
+          "queue": null,
+          "routing_key": null
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [],
+    "unresolved_messages": 0
+  },
+  "N1-26-id-only-unique": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "A",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {},
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "[\"A\",\"publish\"]",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 0
+  },
+  "N1-27-id-value-changed-same-structure": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "A",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {},
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "inferred",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": "q1",
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "[\"A\",\"publish\"]",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p",
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 0
+  },
+  "N1-28-multiple-invalid-links-count-each": {
+    "entity_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "A",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "B",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "entity_nodes": [
+      "A",
+      "B",
+      "mq"
+    ],
+    "messaging_diagnostics": {
+      "link_source_unavailable": {
+        "count": 2,
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    },
+    "operation_edges": [
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": "flash-ticket.v1",
+          "queue": null,
+          "routing_key": "event.cancelled.v1"
+        },
+        "queue_metric_address": null,
+        "source": "[\"A\",\"publish\"]",
+        "target": "mq",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "send",
+            "p"
+          ]
+        ]
+      },
+      {
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "messaging": {
+          "broker": "mq",
+          "broker_scope": "deploy-1/vhost-main",
+          "exchange": null,
+          "queue": "q1",
+          "routing_key": null
+        },
+        "queue_metric_address": [
+          "mq",
+          "deploy-1/vhost-main",
+          "q1"
+        ],
+        "source": "mq",
+        "target": "[\"B\",\"process\"]",
+        "type": "thông-điệp",
+        "witness": [
+          [
+            "recv",
+            "c"
+          ]
+        ]
+      }
+    ],
+    "operation_nodes": [
+      "[\"A\",\"publish\"]",
+      "[\"B\",\"process\"]"
+    ],
+    "queue_metric_addresses": [
+      [
+        "mq",
+        "deploy-1/vhost-main",
+        "q1"
+      ]
+    ],
+    "unresolved_messages": 1
+  }
+}

@@ -1,0 +1,155 @@
+**Mình xác nhận N1 đúng và chặn việc nhận phần hợp đồng đồ thị chung là đầy đủ.** Mình cần thu hẹp kết luận trước: các đồ thị dev đã được kiểm, nhưng phần messaging của mô hình chung còn thiếu một trường hợp cần thiết cho FlashTicket.
+
+Thiếu sót trong tự kiểm trước là F3/F4 đều dùng cùng một `destination` ở phía phát và phía nhận. Vì vậy, chúng chưa kiểm được tình huống một lần phát được chuyển tới nhiều queue riêng.
+
+**Vấn đề nằm ở chỗ hai việc khác nhau đang dùng chung một địa chỉ.**
+
+Theo [B13](D:/Project/flash-ticket-platform/docs/architecture/B13-api-and-event-contracts.md:142), FlashTicket phát vào exchange `flash-ticket.v1`, dùng routing key theo loại bản tin, còn mỗi consumer có queue riêng. Sự kiện hủy được chuyển tới Booking, Ticket và Payment.
+
+Ví dụ minh họa, dùng tên queue giả để dễ đọc:
+
+```text
+Event phát bản tin hủy M1
+        │
+        ▼
+Exchange flash-ticket.v1
+        ├── Queue Booking ──► Booking xử lý M1
+        ├── Queue Ticket  ──► Ticket xử lý M1
+        └── Queue Payment ─► Payment xử lý M1
+```
+
+Ta cần đồng thời biết:
+
+| Thông tin | Dùng để làm gì? |
+|---|---|
+| Địa chỉ phát: exchange và routing key | Biết bản tin được phát vào đâu |
+| Queue nhận | Biết consumer nhận từ đâu; gắn đúng số đo tồn đọng của từng queue |
+| Bằng chứng định danh/nối bản tin | Biết các lần nhận có thực sự thuộc bản tin M1 không |
+
+Trong [bộ dựng hiện tại](D:/RCA-flashticket/src/do_thi/builder.py:175), ngay cả link gửi–nhận đã được xác minh cũng chỉ được chấp nhận khi `(broker, destination)` hai phía bằng nhau. Nhánh nối bằng message ID cũng tìm trong cùng phạm vi đó.
+
+Do đó:
+
+- Giữ địa chỉ phát và queue nhận đúng theo vai trò thì link hợp lệ có thể bị loại.
+- Ép chúng thành một giá trị chung thì không còn địa chỉ riêng đầy đủ để gắn metric từng queue theo hợp đồng hiện tại.
+
+Tài liệu [OpenTelemetry RabbitMQ v1.44.0](https://github.com/open-telemetry/semantic-conventions/blob/v1.44.0/docs/messaging/rabbitmq.md) cũng mô tả địa chỉ phía phát bằng exchange/routing key và phía xử lý có thêm queue. Đây là nguồn đối chiếu thiết kế; chưa phải bằng chứng FlashTicket đang xuất dữ liệu theo phiên bản ấy.
+
+**Phạm vi ảnh hưởng đã xác định được.**
+
+| Phần | Đánh giá |
+|---|---|
+| Hợp đồng messaging và địa chỉ metric queue | Có thiếu sót cần sửa |
+| Kết luận đạt đầy đủ tiêu chí 1 và 9 | Chưa giữ được |
+| Bàn giao messaging cho T-036/P9 | Cần bản hợp đồng đã sửa |
+| Các đồ thị RE2-TT/Nezha đã lưu | Chưa thấy N1 làm sai chúng |
+| Hiệu quả RCA, nghĩa Node, dữ liệu FlashTicket thật | Vẫn là các câu hỏi mở đã khai |
+
+Trong lượt này, mình kiểm lại **2.598 file: đều khớp manifest**. Đọc đủ **1.201 file đồ thị chính** cho thấy các cạnh dev hiện đều là gọi chưa phân kiểu, không có cạnh messaging. Phát lại **18 fixture cũ trong bộ nhớ đều đạt**. Điều đó giải thích vì sao số dev có thể đúng trong khi hợp đồng chung vẫn thiếu.
+
+Nhận xét N1 mô tả **mâu thuẫn thiết kế có thể lần theo trực tiếp trong code**. Chưa có thí nghiệm runtime FlashTicket để nói lỗi này đã xảy ra trong hệ đang chạy.
+
+---
+
+**Mình đề xuất sửa trong T-035 theo gói sau. Đây là đề xuất, chưa thực hiện.**
+
+1. **Tách ba địa chỉ trong hợp đồng nội bộ:** địa chỉ phát, queue nhận và phạm vi định danh bản tin. Queue metric được gắn theo broker/phạm vi triển khai và queue; không dùng message ID làm địa chỉ metric.
+2. **Nhận link tạo bản tin đã xác minh dù địa chỉ phát khác queue nhận.** Vẫn kiểm đúng span nguồn, loại quan hệ và các thông tin phạm vi có thể đối chiếu. Thông tin mâu thuẫn phải được báo, không bỏ toàn bộ điều kiện kiểm.
+3. **Nhánh nối bằng message ID phải có phạm vi định danh được xác minh và nguồn tạo duy nhất.** Thiếu hoặc đa nghĩa thì giữ chưa nối được. Cùng correlation ID vẫn không đủ.
+4. **Giữ riêng queue trong cạnh, phép gộp và phép chiếu hai mức.** Một producer có thể nối tới nhiều consumer có bằng chứng, trong khi số đo của các queue vẫn tách biệt.
+5. **Bổ sung ví dụ kiểm trước khi sửa code:** một lần phát tới ba queue; hai queue cùng consumer; retry/redelivery; link sai hoặc chưa xác minh; ID trùng ở phạm vi khác; nhiều nguồn tạo cùng ID; chỉ có correlation; nguồn nằm ngoài cửa sổ. Kiểm cả cạnh và địa chỉ metric, không chỉ đếm số cạnh.
+
+Đã xét hai cách sửa ngắn hơn: chỉ bỏ phép so `destination` chưa giải quyết địa chỉ queue; ép mọi phía dùng chung `destination` làm mất phân biệt cần cho số đo queue. Vì vậy mình đề xuất tách thông tin ngay trong hợp đồng.
+
+**Bản đồ ảnh hưởng và phạm vi xin duyệt:**
+
+| File/phạm vi | Nội dung sửa |
+|---|---|
+| [WHY.md](D:/RCA-flashticket/docs/WHY.md) | Nối bổ sung WHY-52: lựa chọn tách địa chỉ, lý do, phương án đã xét và giới hạn |
+| [DECISIONS.md](D:/RCA-flashticket/docs/DECISIONS.md) | Ghi đúng lời duyệt và phạm vi nếu Minh đồng ý |
+| [Đặc tả đồ thị](D:/RCA-flashticket/results/T-035/dac-ta-do-thi.md) | Cập nhật hợp đồng messaging và địa chỉ tín hiệu; giữ bản trước sửa |
+| [builder.py](D:/RCA-flashticket/src/do_thi/builder.py), [README](D:/RCA-flashticket/src/do_thi/README.md) | Sửa nối bản tin, định danh cạnh, phép chiếu và hướng dẫn hợp đồng |
+| [Bộ kiểm fixture](D:/RCA-flashticket/results/T-035/fixture/check.py), [runner](D:/RCA-flashticket/results/T-035/scripts/run.py) | Đồng bộ kiểm cạnh/phép chiếu với địa chỉ mới |
+| [Bảng C9](D:/RCA-flashticket/results/T-035/thong-tin-theo-quan-he.md), [báo cáo](D:/RCA-flashticket/results/T-035/thong-ke-do-thi.md), [kiểm đúng đắn](D:/RCA-flashticket/results/T-035/kiem-dung-dan.md), [script sinh tài liệu](D:/RCA-flashticket/results/T-035/scripts/write_docs.py) | Đồng bộ hợp đồng, bằng chứng và trạng thái tiêu chí |
+| `D:/RCA-flashticket/results/T-035/runs/sua-n1-001/` | Lưu bản trước sửa, thiết kế kiểm, fixture mới, script, các lượt chạy, đối chiếu và prompt bàn giao |
+| [Manifest](D:/RCA-flashticket/results/T-035/manifest.json), [LOG](D:/RCA-flashticket/tasks/T-035-p5-do-thi-tu-trace/LOG.md), dòng T-035 trong [STATE](D:/RCA-flashticket/docs/STATE.md) | Cập nhật nguồn đầu ra, nối nhật ký và trạng thái sau kiểm |
+
+Sau sửa, chạy các fixture cũ/mới và kiểm lại toàn bộ 52 ca với cấu hình cũ, lưu lượt mới để đối chiếu. **Ước lượng phần chạy máy khoảng 20–30 phút**, dựa trên lượt đầy đủ trước mất khoảng 18 phút; đây là ước lượng, chưa đo bản sửa. Các kết quả và lượt chạy cũ được giữ. Gói này không bao gồm sửa SPEC, baseline, hệ FlashTicket, mở test hoặc commit/push.
+
+Các nhận xét lịch sử trong nội dung Minh gửi vẫn có đánh giá như sau: hai lập luận về “không mất thông tin” và “phải biết bên nhận” đã được thu hẹp đúng; trách nhiệm nguồn tĩnh đã được làm rõ; STATE và phạm vi Nezha đã đồng bộ. **N1 là thiếu sót riêng còn tồn tại ở hợp đồng triển khai.**
+
+---
+
+**Báo cáo lượt này:** đã kiểm N1 bằng nguồn kiến trúc, đặc tả, code và fixture; không sửa file nào. Các kiểm nêu trên đều đạt trong phạm vi của chúng. Mình đề nghị xử lý N1 trước nghiệm thu phần hợp đồng chung; Claude vẫn là người phản biện chính thức.
+
+Prompt dưới đây để Minh chuyển cho Claude nếu muốn kiểm độc lập trước khi quyết sửa:
+
+Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
+Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
+
+Thông tin lượt này:
+- Task hoặc đề xuất: T-035 — P5a: đặc tả đồ thị phụ thuộc và bộ dựng từ trace; D:/RCA-flashticket/tasks/T-035-p5-do-thi-tu-trace/SPEC.md.
+- Công đoạn: soát kết quả.
+- Gói/cổng: P5; cổng hiện tại G2 đã duyệt, cổng kế tiếp G3.
+- Người làm và người phản biện chính thức: Codex người làm; Claude người phản biện chính thức.
+- Tài liệu gốc: D:/RCA-flashticket/AGENTS.md; docs/STATE.md, MRP.md, WHY.md, DECISIONS.md, LESSONS.md, review-prompt.md; docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và advisor-2026-09-23.md; tasks/_MAU/SPEC.md, REVIEW.md; D:/Project/flash-ticket-platform/docs/architecture/B13-api-and-event-contracts.md, B16-observability-baseline.md và tài liệu kiến trúc liên quan, chỉ đọc; commit gốc 25e71dc4eff86111c6e80dc99a216d9549fdd031; git status/diff, giữ mọi thay đổi có trước.
+- Phản biện và phản hồi trước: LOG T-035 Phiên 1–6; bản tự soát Codex và phản hồi của người làm trong chat ngày 15/10/2026 do Minh cung cấp kèm nguyên văn. Chưa có REVIEW của T-035. Đọc đánh giá và phản hồi sau tự soát nguồn/đầu ra.
+- Code và kết quả liên quan: D:/RCA-flashticket/src/do_thi/; src/p3/; src/circa_kien_truc/builder.py; results/T-035/manifest.json, các báo cáo, fixture, scripts và runs/; results/T-002/local-inspection/run-002/cases.json, handoff-manifest.json; results/T-008/sources/, runs/run-001/manifest.json, runs/evidence-002/summary.json; results/T-003/runs/final-review-003/artifact-manifest.json; results/T-034/runs/manifest-cuoi-007/manifest.json; allowlist/nhãn dev T-022 và T-026; môi trường Windows/PowerShell, Python py312-pin; hướng dẫn src/do_thi/README.md và LOG T-035; phiên bản/code hash trong manifest, environment.json. Tài liệu tham khảo được dẫn trong trao đổi: https://github.com/open-telemetry/semantic-conventions/blob/v1.44.0/docs/messaging/rabbitmq.md.
+- Phạm vi ghi được Minh cho phép trong lượt này: chỉ trả lời trong chat; chưa được phép ghi REVIEW, LOG, STATE, SPEC, code hoặc kết quả; không mở test/heldout/data/locked; dữ liệu dev chỉ qua allowlist/adapter của T-035.
+
+Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
+
+Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
+Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
+Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
+
+Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
+hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
+Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
+số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
+có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
+
+Bổ sung yêu cầu phản biện:
+1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
+2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
+3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
+4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
+5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
+6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
+7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
+8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
+9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
+10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
+
+Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
+Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
+
+Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
+bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
+Tiếng Việt, câu ngắn.
+
+Cuối lượt báo:
+1. Đã làm gì.
+2. File đã thay đổi, hoặc không sửa file nào.
+3. Kiểm đã chạy và kết quả.
+4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
+
+Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
+
+Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
+
+Công đoạn: soát kết quả.
+Kiểm trên đầu ra thật, code và dữ liệu được phép; không tin tóm tắt LOG. Đối chiếu tiêu chí xong với phần mục tiêu nguồn và mức căn cứ cho bước tiếp theo; chạy lại phần rẻ khi trong quyền được duyệt.
+Phân biệt hoàn thành task mô tả, xác nhận cơ chế và đủ căn cứ chọn/đánh giá thiết kế. Giới hạn đã khai không tự miễn phép kiểm cần thiết còn làm được.
+Chỉ ghi bản phản biện lượt được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ bản cũ; không sửa kết quả thay người làm.
+
+Với từng thành phần, kiểm mục đích và căn cứ: sửa hạn chế P4, đáp ứng DT18 hay nhu cầu kỹ thuật. Có lý do kỹ thuật, phương án khác, bằng chứng dev và điều kiện thất bại không; có dùng mã hạn chế mô tả như bằng chứng cơ chế hoặc chọn theo mức chênh đồ thị trừ không đồ thị không?
+Nêu rõ nút/cạnh, ánh xạ log/trace/metric và phép tính thực sự sử dụng cạnh. Lần theo thông tin quan hệ và nhãn trong phương pháp lẫn đối chứng; gọi “không đồ thị” có đúng với thông tin còn giữ không?
+Kiểm baseline và đối chứng đủ mạnh, tương đương về tín hiệu/cửa sổ/tập ứng viên/coverage/tiền xử lý/quy tắc chấm/ngân sách chọn cấu hình ở phần không chủ ý thay; yếu tố thay cùng phải giới hạn kết luận.
+Phương pháp và đối chứng đã được cài và kiểm đầu vào, trung gian, hành vi trên dev chưa, hay chỉ chạy không lỗi? Không đòi đồ thị phải thắng để khóa.
+Code/revision, cấu hình, giả thuyết, độ đo, tập ca/tập ứng viên, cách xử lý ca lỗi/UNSUPPORTED/nhánh dự phòng và bảng diễn giải đã khóa trước test chưa? Có bỏ nhóm khó sau khi nhìn điểm hoặc dùng test để chọn thiết kế không?
+Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.
+
+**Minh có duyệt gói sửa và kiểm lại nêu trên không?**
+
+Cần lời duyệt vì [AGENTS.md, Luật 0](D:/RCA-flashticket/AGENTS.md) yêu cầu: “Muốn sửa thêm, dù nhỏ, phải đề xuất lại.” Nhận xét được gửi sang là đầu vào để xem xét, chưa phải lệnh sửa.

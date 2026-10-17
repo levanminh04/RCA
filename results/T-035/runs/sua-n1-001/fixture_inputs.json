@@ -1,0 +1,2315 @@
+[
+  {
+    "interval_ns": null,
+    "name": "N1-01-fanout-three-queues-link-no-id",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.destination": "flash-ticket.v1:event.cancelled.v1",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "Event",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.destination": "flash-ticket.v1:event.cancelled.v1:booking.events",
+          "messaging.queue": "booking.events"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "p",
+            "traceID": "send"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "Booking",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv-Booking"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.destination": "flash-ticket.v1:event.cancelled.v1:ticket.events",
+          "messaging.queue": "ticket.events"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "p",
+            "traceID": "send"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "Ticket",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv-Ticket"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.destination": "flash-ticket.v1:event.cancelled.v1:payment.events",
+          "messaging.queue": "payment.events"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "p",
+            "traceID": "send"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "Payment",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv-Payment"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-02-two-queues-same-consumer-operation",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "p",
+            "traceID": "send"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c1",
+        "startTime": 20,
+        "traceID": "r1"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.queue": "q2"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "p",
+            "traceID": "send"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c2",
+        "startTime": 20,
+        "traceID": "r2"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-03-redelivery-count-witness-not-node",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.attempt": 1,
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "p",
+            "traceID": "send"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c1",
+        "startTime": 20,
+        "traceID": "r1"
+      },
+      {
+        "attributes": {
+          "messaging.attempt": 2,
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "p",
+            "traceID": "send"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c2",
+        "startTime": 40,
+        "traceID": "r2"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-04-republish-id-ambiguous",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p1",
+        "startTime": 0,
+        "traceID": "s1"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 8,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p2",
+        "startTime": 11,
+        "traceID": "s2"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-05-republish-explicit-links",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p1",
+        "startTime": 0,
+        "traceID": "s1"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 8,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p2",
+        "startTime": 11,
+        "traceID": "s2"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "p1",
+            "traceID": "s1"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c1",
+        "startTime": 20,
+        "traceID": "r1"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "p2",
+            "traceID": "s2"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c2",
+        "startTime": 40,
+        "traceID": "r2"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-06-unverified-or-wrong-semantics-no-identity",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": false,
+            "spanID": "p",
+            "traceID": "send"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c1",
+        "startTime": 20,
+        "traceID": "r1"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "correlation",
+            "semantics_verified": true,
+            "spanID": "p",
+            "traceID": "send"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c2",
+        "startTime": 20,
+        "traceID": "r2"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-07-unverified-link-valid-id-fallback",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": false,
+            "spanID": "missing",
+            "traceID": "absent"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-08-verified-missing-source-no-id-fallback",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "missing",
+            "traceID": "absent"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-09-verified-wrong-kind-no-id-fallback",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {},
+        "duration": 10,
+        "kind": "SERVER",
+        "links": [],
+        "operationName": "serve",
+        "parentSpanID": "",
+        "serviceName": "C",
+        "spanID": "normal",
+        "startTime": 0,
+        "traceID": "ordinary"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "normal",
+            "traceID": "ordinary"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-10-link-conflict-broker",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq2",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "p",
+            "traceID": "send"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-10-link-conflict-broker_scope",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-2/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "p",
+            "traceID": "send"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-10-link-conflict-exchange",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "other-x",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "p",
+            "traceID": "send"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-10-link-conflict-routing_key",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1",
+          "messaging.routing_key": "other-key"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "p",
+            "traceID": "send"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-10-link-conflict-identity_scope",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/other",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "p",
+            "traceID": "send"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-10-link-conflict-message_id",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m2",
+          "messaging.queue": "q1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "p",
+            "traceID": "send"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-11-valid-link-kept-beside-invalid-links",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "other-x",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "C",
+        "spanID": "p2",
+        "startTime": 0,
+        "traceID": "other"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "p",
+            "traceID": "send"
+          },
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "p2",
+            "traceID": "other"
+          },
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "missing",
+            "traceID": "absent"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-12-id-collision-different-identity-scopes",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/other",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "C",
+        "spanID": "p2",
+        "startTime": 0,
+        "traceID": "other"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.identity_scope": "outbox/other",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q2"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "D",
+        "spanID": "c2",
+        "startTime": 20,
+        "traceID": "recv2"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-13-same-queue-name-different-broker-scopes",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-2/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p2",
+        "startTime": 0,
+        "traceID": "other"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-2/vhost-main",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c2",
+        "startTime": 20,
+        "traceID": "recv2"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-14-id-no-source",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "other",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-15-consumer-identity-unverified",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": false,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-16-producer-identity-unverified",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": false,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-17-id-route-conflict",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "other-x",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-18-correlation-only",
+    "spans": [
+      {
+        "attributes": {
+          "correlationId": "same-order",
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "correlationId": "same-order",
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": [
+      15000,
+      40000
+    ],
+    "name": "N1-19-link-source-outside-window",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "p",
+            "traceID": "send"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": [
+      15000,
+      40000
+    ],
+    "name": "N1-20-id-source-outside-window",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-21-metric-address-missing-broker-scope",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "p",
+            "traceID": "send"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-22-metric-address-missing-queue",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "p",
+            "traceID": "send"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-23-empty-exchange-and-routing-are-known",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "",
+          "messaging.routing_key": ""
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "",
+          "messaging.queue": "q1",
+          "messaging.routing_key": ""
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "p",
+            "traceID": "send"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-24-empty-exchange-not-missing",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "",
+          "messaging.routing_key": ""
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.queue": "q1",
+          "messaging.routing_key": ""
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "p",
+            "traceID": "send"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-25-legacy-destination-never-becomes-queue",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.destination": "send-address"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.destination": "receive-address"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "p",
+            "traceID": "send"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-26-id-only-unique",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-27-id-value-changed-same-structure",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "another-id",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "another-id",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  },
+  {
+    "interval_ns": null,
+    "name": "N1-28-multiple-invalid-links-count-each",
+    "spans": [
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.routing_key": "event.cancelled.v1"
+        },
+        "duration": 10,
+        "kind": "PRODUCER",
+        "links": [],
+        "operationName": "publish",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "spanID": "p",
+        "startTime": 0,
+        "traceID": "send"
+      },
+      {
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.broker_scope": "deploy-1/vhost-main",
+          "messaging.identity_scope": "outbox/event",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "m1",
+          "messaging.queue": "q1"
+        },
+        "duration": 10,
+        "kind": "CONSUMER",
+        "links": [
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "x",
+            "traceID": "absent1"
+          },
+          {
+            "semantics": "message_creation",
+            "semantics_verified": true,
+            "spanID": "y",
+            "traceID": "absent2"
+          }
+        ],
+        "operationName": "process",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "spanID": "c",
+        "startTime": 20,
+        "traceID": "recv"
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "Booking": "service",
+      "C": "service",
+      "D": "service",
+      "Event": "service",
+      "Payment": "service",
+      "Ticket": "service",
+      "mq": "broker",
+      "mq2": "broker"
+    }
+  }
+]

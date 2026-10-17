@@ -1,0 +1,26 @@
+--- original-results/T-036/check.py
++++ results/T-036/runs/doi-chieu-smtp-001/checks/smtp-baseline-002/T036-check-adapted.py
+@@ -14,7 +14,7 @@
+ import traceback
+ import tracemalloc
+ 
+-ROOT = Path(__file__).resolve().parents[2]
++ROOT = Path('D:/RCA-flashticket')
+ sys.path.insert(0, str(ROOT / 'src'))
+ from do_thi_tinh import build, compare, project
+ from do_thi_tinh.build import canonical
+@@ -59,12 +59,12 @@
+ def main():
+     if len(sys.argv) != 2 or not re.fullmatch('[a-z0-9][a-z0-9-]*', sys.argv[1]):
+         raise ValueError('new_run_name_required')
+-    out = ROOT / 'results/T-036/runs' / sys.argv[1]
++    out = Path('D:/RCA-flashticket/results/T-036/runs/doi-chieu-smtp-001/checks/smtp-baseline-002/t036-regression')
+     out.mkdir(exist_ok=False)
+     started = time.perf_counter()
+     tracemalloc.start()
+     checks, stages = [], []
+-    env = dict(command=f'{sys.executable} -X utf8 -B results/T-036/check.py {sys.argv[1]}',
++    env = dict(command=f'{sys.executable} -X utf8 -B {Path(__file__).as_posix()} {sys.argv[1]}',
+                python=sys.version, platform=platform.platform(), hashseed=os.getenv('PYTHONHASHSEED'),
+                started_utc=datetime.now(timezone.utc).isoformat())
+     save(out / 'environment.json', env)

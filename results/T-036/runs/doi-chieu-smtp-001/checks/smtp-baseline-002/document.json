@@ -1,0 +1,100 @@
+{
+  "entities": [
+    {
+      "granularity": "logical",
+      "id": "ticket-service",
+      "name": "ticket-service",
+      "provenance": [
+        {
+          "condition": "Tổng hợp, không runtime.",
+          "locator": "base_document/entities/0",
+          "source_id": "SMTP-ORACLE"
+        }
+      ],
+      "role": "synthetic sender",
+      "type": "service"
+    },
+    {
+      "granularity": "component",
+      "id": "smtp",
+      "name": "smtp",
+      "provenance": [
+        {
+          "condition": "Tổng hợp, không runtime.",
+          "locator": "base_document/entities/1",
+          "source_id": "SMTP-ORACLE"
+        }
+      ],
+      "role": "synthetic SMTP boundary",
+      "type": "external"
+    }
+  ],
+  "operations": [
+    {
+      "entity": "ticket-service",
+      "name": "gửi SMTP",
+      "provenance": [
+        {
+          "condition": "Tên tổng hợp kiểm hợp đồng; không khẳng định runtime_name.",
+          "locator": "base_document/operations/0",
+          "source_id": "SMTP-ORACLE"
+        }
+      ],
+      "runtime_name": null
+    },
+    {
+      "entity": "ticket-service",
+      "name": "chuẩn bị delivery",
+      "provenance": [
+        {
+          "condition": "Tên tổng hợp để kiểm quan hệ nội bộ.",
+          "locator": "base_document/operations/1",
+          "source_id": "SMTP-ORACLE"
+        }
+      ],
+      "runtime_name": null
+    },
+    {
+      "entity": "smtp",
+      "name": "nhận tổng hợp",
+      "provenance": [
+        {
+          "condition": "Tên tổng hợp để kiểm operation-level và span-parent; không lập operation thật cho đối tác SMTP.",
+          "locator": "base_document/operations/2",
+          "source_id": "SMTP-ORACLE"
+        }
+      ],
+      "runtime_name": null
+    }
+  ],
+  "relations": [
+    {
+      "channel": "smtp",
+      "context": "Synthetic SMTP transport, no runtime claim.",
+      "id": "smtp-call",
+      "messaging": null,
+      "provenance": [
+        {
+          "condition": "Tổng hợp; giữ nguyên smtp.",
+          "locator": "base_document/relations/0",
+          "source_id": "SMTP-ORACLE"
+        }
+      ],
+      "source": {
+        "entity": "ticket-service",
+        "operation": "gửi SMTP"
+      },
+      "target": {
+        "entity": "smtp",
+        "operation": null
+      },
+      "type": "gọi-đồng-bộ"
+    }
+  ],
+  "resource_bindings": [],
+  "scope": {
+    "revision": "smtp-oracle-v1",
+    "system": "synthetic-smtp"
+  },
+  "signals": []
+}

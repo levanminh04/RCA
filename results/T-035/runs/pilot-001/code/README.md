@@ -1,0 +1,1 @@
+Mã pilot-001 dựng lại từ đúng các thay đổi cục bộ trong cùng phiên; tiến trình đã nạp bản trước tối ưu. Không phải snapshot lấy trước khi chạy. Bản hiện hành tối ưu vị trí lấy witness và độ sâu; giữ cùng ngữ nghĩa.

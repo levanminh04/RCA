@@ -1,0 +1,1080 @@
+{
+  "scope": "Individual fixture observations; schema failures are not distinct semantic defects",
+  "cases": [
+    {
+      "name": "N1-01-fanout-three-queues-link-no-id",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/0",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 3,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 3,
+        "inferred_events": 3,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "booking.events"
+          ],
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "payment.events"
+          ],
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "ticket.events"
+          ]
+        ],
+        "unresolved": 0,
+        "diagnostics": {}
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-02-two-queues-same-consumer-operation",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/1",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 2,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 2,
+        "inferred_events": 2,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ],
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q2"
+          ]
+        ],
+        "unresolved": 0,
+        "diagnostics": {}
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-03-redelivery-count-witness-not-node",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/2",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 2,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 1,
+        "inferred_events": 2,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 0,
+        "diagnostics": {}
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-04-republish-id-ambiguous",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/3",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 1,
+        "diagnostics": {
+          "identity_ambiguous": {
+            "count": 1,
+            "witness": [
+              [
+                "recv",
+                "c"
+              ]
+            ]
+          }
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-05-republish-explicit-links",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/4",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 2,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 1,
+        "inferred_events": 2,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 0,
+        "diagnostics": {}
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-06-unverified-or-wrong-semantics-no-identity",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/5",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 2,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 2,
+        "diagnostics": {
+          "identity_unverified": {
+            "count": 2,
+            "witness": [
+              [
+                "r1",
+                "c1"
+              ],
+              [
+                "r2",
+                "c2"
+              ]
+            ]
+          }
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-07-unverified-link-valid-id-fallback",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/6",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 1,
+        "inferred_events": 1,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 0,
+        "diagnostics": {}
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-08-verified-missing-source-no-id-fallback",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/7",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 1,
+        "diagnostics": {
+          "link_source_unavailable": {
+            "count": 1,
+            "witness": [
+              [
+                "recv",
+                "c"
+              ]
+            ]
+          }
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-09-verified-wrong-kind-no-id-fallback",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/8",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 1,
+        "diagnostics": {
+          "link_source_not_producer": {
+            "count": 1,
+            "witness": [
+              [
+                "recv",
+                "c"
+              ]
+            ]
+          }
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-10-link-conflict-broker",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/9",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [
+          [
+            "mq2",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 1,
+        "diagnostics": {
+          "link_scope_conflict": {
+            "count": 1,
+            "witness": [
+              [
+                "recv",
+                "c"
+              ]
+            ]
+          }
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-10-link-conflict-broker_scope",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/10",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-2/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 1,
+        "diagnostics": {
+          "link_scope_conflict": {
+            "count": 1,
+            "witness": [
+              [
+                "recv",
+                "c"
+              ]
+            ]
+          }
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-10-link-conflict-exchange",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/11",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 1,
+        "diagnostics": {
+          "link_scope_conflict": {
+            "count": 1,
+            "witness": [
+              [
+                "recv",
+                "c"
+              ]
+            ]
+          }
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-10-link-conflict-routing_key",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/12",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 1,
+        "diagnostics": {
+          "link_scope_conflict": {
+            "count": 1,
+            "witness": [
+              [
+                "recv",
+                "c"
+              ]
+            ]
+          }
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-10-link-conflict-identity_scope",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/13",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 1,
+        "diagnostics": {
+          "link_scope_conflict": {
+            "count": 1,
+            "witness": [
+              [
+                "recv",
+                "c"
+              ]
+            ]
+          }
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-10-link-conflict-message_id",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/14",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 1,
+        "diagnostics": {
+          "link_scope_conflict": {
+            "count": 1,
+            "witness": [
+              [
+                "recv",
+                "c"
+              ]
+            ]
+          }
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-11-valid-link-kept-beside-invalid-links",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/15",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 1,
+        "inferred_events": 1,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 0,
+        "diagnostics": {
+          "link_scope_conflict": {
+            "count": 1,
+            "witness": [
+              [
+                "recv",
+                "c"
+              ]
+            ]
+          },
+          "link_source_unavailable": {
+            "count": 1,
+            "witness": [
+              [
+                "recv",
+                "c"
+              ]
+            ]
+          }
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-12-id-collision-different-identity-scopes",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/16",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 2,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 2,
+        "inferred_events": 2,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ],
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q2"
+          ]
+        ],
+        "unresolved": 0,
+        "diagnostics": {}
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-13-same-queue-name-different-broker-scopes",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/17",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 2,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 2,
+        "inferred_events": 2,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ],
+          [
+            "mq",
+            "deploy-2/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 0,
+        "diagnostics": {}
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-14-id-no-source",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/18",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 1,
+        "diagnostics": {
+          "identity_no_source": {
+            "count": 1,
+            "witness": [
+              [
+                "recv",
+                "c"
+              ]
+            ]
+          }
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-15-consumer-identity-unverified",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/19",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 1,
+        "diagnostics": {
+          "identity_unverified": {
+            "count": 1,
+            "witness": [
+              [
+                "recv",
+                "c"
+              ]
+            ]
+          }
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-16-producer-identity-unverified",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/20",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 1,
+        "diagnostics": {
+          "identity_no_source": {
+            "count": 1,
+            "witness": [
+              [
+                "recv",
+                "c"
+              ]
+            ]
+          }
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-17-id-route-conflict",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/21",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 1,
+        "diagnostics": {
+          "identity_scope_conflict": {
+            "count": 1,
+            "witness": [
+              [
+                "recv",
+                "c"
+              ]
+            ]
+          }
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-18-correlation-only",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/22",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 1,
+        "diagnostics": {
+          "identity_unverified": {
+            "count": 1,
+            "witness": [
+              [
+                "recv",
+                "c"
+              ]
+            ]
+          }
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-19-link-source-outside-window",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/23",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 1,
+        "diagnostics": {
+          "link_source_unavailable": {
+            "count": 1,
+            "witness": [
+              [
+                "recv",
+                "c"
+              ]
+            ]
+          }
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-20-id-source-outside-window",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/24",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 1,
+        "diagnostics": {
+          "identity_no_source": {
+            "count": 1,
+            "witness": [
+              [
+                "recv",
+                "c"
+              ]
+            ]
+          }
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-21-metric-address-missing-broker-scope",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/25",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 1,
+        "inferred_events": 1,
+        "metric_addresses": [],
+        "unresolved": 0,
+        "diagnostics": {
+          "queue_address_incomplete": {
+            "count": 1,
+            "witness": [
+              [
+                "recv",
+                "c"
+              ]
+            ]
+          }
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-22-metric-address-missing-queue",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/26",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 1,
+        "inferred_events": 1,
+        "metric_addresses": [],
+        "unresolved": 0,
+        "diagnostics": {
+          "queue_address_incomplete": {
+            "count": 1,
+            "witness": [
+              [
+                "recv",
+                "c"
+              ]
+            ]
+          }
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-23-empty-exchange-and-routing-are-known",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/27",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 1,
+        "inferred_events": 1,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 0,
+        "diagnostics": {}
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-24-empty-exchange-not-missing",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/28",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 1,
+        "diagnostics": {
+          "link_scope_conflict": {
+            "count": 1,
+            "witness": [
+              [
+                "recv",
+                "c"
+              ]
+            ]
+          }
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-25-legacy-destination-never-becomes-queue",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/29",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 1,
+        "inferred_events": 1,
+        "metric_addresses": [],
+        "unresolved": 0,
+        "diagnostics": {
+          "queue_address_incomplete": {
+            "count": 1,
+            "witness": [
+              [
+                "recv",
+                "c"
+              ]
+            ]
+          }
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-26-id-only-unique",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/30",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 1,
+        "inferred_events": 1,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 0,
+        "diagnostics": {}
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-27-id-value-changed-same-structure",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/31",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 1,
+        "inferred_events": 1,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 0,
+        "diagnostics": {}
+      },
+      "pass": true
+    },
+    {
+      "name": "N1-28-multiple-invalid-links-count-each",
+      "v2_pointer": "fixture-v2-seed0-001/result.json#/fixtures/32",
+      "v1": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [],
+        "unresolved": 1,
+        "diagnostics": null
+      },
+      "v2": {
+        "inferred_edges": 0,
+        "inferred_events": 0,
+        "metric_addresses": [
+          [
+            "mq",
+            "deploy-1/vhost-main",
+            "q1"
+          ]
+        ],
+        "unresolved": 1,
+        "diagnostics": {
+          "link_source_unavailable": {
+            "count": 2,
+            "witness": [
+              [
+                "recv",
+                "c"
+              ]
+            ]
+          }
+        }
+      },
+      "pass": true
+    }
+  ]
+}

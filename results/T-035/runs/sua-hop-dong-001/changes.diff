@@ -1,0 +1,467 @@
+--- before/docs/DECISIONS.md
++++ docs/DECISIONS.md
+@@ -189,3 +189,5 @@
+ 
+ 
+ | Q-154 | 15/10/2026 | “duyệt sửa trong phiên này luôn, sau khi sửa, tạo 1 prompt cho phiên codex sạch mới review lại 035 1 lần nữa , phiên này review lại như lần đầu không neo theo những phần đã có tránh anchor” | Minh duyệt gói sửa T-035 đã trình trong chat; phạm vi và nguyên văn đề xuất lưu tại results/T-035/runs/sua-n1-001/de-xuat-da-duyet.txt; quyền ghi cụ thể tại preflight.json. Gồm sửa hợp đồng messaging, bộ dựng, fixture, chạy lại dev, tài liệu và prompt phiên Codex sạch. Không sửa SPEC, baseline, FlashTicket; không mở test, commit/push. Vai trò chính thức giữ nguyên; phiên Codex sạch là lượt tự soát độc lập về ngữ cảnh của người làm. |
++
++| Q-155 | 15/10/2026 | “duyệt sửa trong phiên này luôn, sau khi sửa, tạo 1 prompt cho phiên codex sạch mới review lại 035 1 lần nữa , phiên này review lại như lần đầu không neo theo những phần đã có tránh anchor” | Minh duyệt gói sửa bốn lỗi hợp đồng T-035 sau lượt tự soát Codex sạch. Phạm vi và bản đề xuất tại results/T-035/runs/sua-hop-dong-001/de-xuat-da-duyet.txt và preflight.json. Gồm fixture, hồi quy dev, tài liệu, prompt Codex sạch soát toàn task từ nguồn trước lịch sử. Giữ vai trò Codex người làm, Claude phản biện chính thức; chưa nghiệm thu, không mở test hoặc commit/push. |
+--- before/docs/STATE.md
++++ docs/STATE.md
+@@ -43,7 +43,7 @@
+ | T-032 | Lần theo nguyên nhân thất bại xếp hạng | P4 | Claude | Codex | Xong (13/10/2026, Minh đóng bằng lời “ĐÓNG T-032”). Không đóng RQ2/G2. Trước khi dùng H6, H8, CIRCA, KT-11 đọc runs/bo-sung-toan-dien-20261012-001/doi-chieu-dien-giai-review-001.md. Lịch sử trước khi đóng: chờ kiểm lại bản sửa (12/10/2026). Minh duyệt Codex sửa sau REVIEW và yêu cầu phiên Codex mới kiểm (Q-142), thêm câu S-1 (Q-143); giữ vai trò lịch sử trong SPEC. Bốn báo cáo đã sửa; tiêu chí3 đạt một phần, không đóng RQ2/G2. Gói results/T-032/runs/sua-review-001/: M-D48PASS+4N/A, kiểm số412/412 và17bổ sung, A46/D15/E61đạt; giữ cả lượt lỗi. REVIEW chỉ bảng phản hồi, LOG nối thêm. Còn OPEN: đáp ứng return, trọng số khi nhóm đổi, ca ghép chưa rõ, nguyên nhân độ nhạy cửa sổ; quyết định G2/P5–P6 chưa chốt. Prompt mới đầy đủ ở cuối LOG và prompt-codex-kiem-lai.txt; phiên mới mặc định chỉ đọc. Không sửa baseline/test; chưa commit. EC2 chưa thao tác trong lượt sửa.; bổ sung Q-144 hoàn tất phép kiểm13/10, chờ Minh xem báo cáo; giới hạn và kết quả/nghiệm thu cũ giữ rõ; xem LOG và runs/bo-sung-toan-dien-20261012-001/BAO-CAO-TONG-HOP.md | `tasks/T-032-g2-nguyen-nhan-xep-hang/` |
+ | T-033 | Lần theo cơ chế báo động trước mốc | P4 | Codex | Claude | Xong (11/10/2026, Minh nghiệm thu; Q-137–Q-140). Mục1–3 hoàn tất; số bổ sung EC2 khớp Claude, phản biện dừng. Xác nhận chuỗi N-Sigma/BOCPD, hướng tiền xử lý nhìn trước, cờ khác bắt đầu đoạn MAP, freeze19/60. OPEN: câu4/onset thật/báo giả vận hành/prior riêng/tác động bậc thang/lợi ích đồ thị/D; không so cửa sổ trong T033. T034 dùng câu thay mục6 bo-sung-bao-cao.md, không câu cũ report002. Không đóng RQ2/G2 hoặc chọn P6; chưa commit; bổ sung Q-144 hoàn tất phép kiểm13/10, chờ Minh xem báo cáo; giới hạn và kết quả/nghiệm thu cũ giữ rõ; xem LOG và runs/bo-sung-toan-dien-20261012-001/BAO-CAO-TONG-HOP.md | `tasks/T-033-g2-nguyen-nhan-phat-hien/` |
+ | T-034 | Gói trình G2: baseline, bản đồ hạn chế hợp nhất, hai phép E1/E2 | P3, P4 (G2) | Claude | Codex | Chờ Minh nghiệm thu (14/10/2026); chưa đóng. Phản biện dừng 14/10 sau sáu lượt sửa (Q-147, Q-148); lượt sửa cuối chỉ đổi lời văn, Codex chưa kiểm. Đầu ra ở `results/T-034/`, bản hiện tại theo `runs/manifest-cuoi-007/`. E1, E2 đã chạy xong trên dev. G2 đã duyệt (Q-149). Các lựa chọn ở mục 8 của `goi-g2.md` theo quyết định hiện hành trong `docs/DECISIONS.md`; lựa chọn chưa được quyết vẫn chờ Minh. Còn mở: lan có đáng kể, đóng góp của chờ ở CIRCA, chênh hai bản TraceRCA, underflow ngoài hai ca, thời điểm sự cố bắt đầu. Kết quả và LOG của task đã commit 14/10; thay đổi trong `docs/` chưa commit | `tasks/T-034-g2-goi-trinh/` |
+-| T-035 | P5a: đặc tả đồ thị phụ thuộc và bộ dựng từ trace | P5 (G3) | Codex | Claude | Đã sửa hợp đồng v2 và kiểm lại theo Q-154 (15/10/2026); chờ phiên Codex sạch tự soát toàn task theo lời Minh, rồi phản biện/nghiệm thu. Kết quả và prompt tại results/T-035/runs/sua-n1-001/, LOG Phiên 7. Chưa chọn P6/đóng task. | `tasks/T-035-p5-do-thi-tu-trace/` |
++| T-035 | P5a: đặc tả đồ thị phụ thuộc và bộ dựng từ trace | P5 (G3) | Codex | Claude | Đã sửa bốn lỗi hợp đồng v2.1 và kiểm hồi quy theo Q-155 (15/10/2026); chờ phiên Codex sạch tự soát toàn task như lần đầu, rồi phản biện/nghiệm thu. Kết quả và prompt tại results/T-035/runs/sua-hop-dong-001/, LOG Phiên 8. Chưa chọn P6/đóng task. | `tasks/T-035-p5-do-thi-tu-trace/` |
+ 
+ 
+ ## Task đang mở
+--- before/docs/WHY.md
++++ docs/WHY.md
+@@ -718,3 +718,11 @@
+ - **Bằng chứng / phần chưa kiểm lúc chốt:** nguồn kiến trúc và luồng code v1 xác định mâu thuẫn thiết kế; fixture mới và hồi quy chưa chạy khi viết bổ sung này. Thiết kế trước code tại results/T-035/runs/sua-n1-001/design.md. Dự kiến dev không messaging giữ nguyên, phải kiểm lại; không dùng dự kiến làm số liệu. Bản trước sửa được giữ trong thư mục before/ của lượt này.
+ - **Điều kiện thất bại:** namespace/ID/link được adapter diễn giải sai; source không có trong miền; nhiều lần phát không phân biệt được; địa chỉ queue thiếu deployment/vhost; routing thực khác hợp đồng. Khi đó giữ unresolved/diagnostic và không xác nhận đủ quan sát thực tế.
+ - **Kết luận phụ thuộc:** tiêu chí mô hình/C9 của T-035 và hợp đồng T-036/P9; không tự xác nhận trace FlashTicket thật, lợi ích đồ thị, chọn P6 hay đóng task. Kết quả kiểm phải dẫn file sau chạy; sự đồng ý sửa không là bằng chứng thiết kế đã đúng.
++
++### Bổ sung WHY-52 — Chuẩn hóa dữ liệu thiếu, miền ID và chính sách lỗi đầu vào (15/10/2026, Q-155)
++
++- **Chọn:** tên thao tác thiếu ở dtype pandas khác nhau đều về None trước tạo khóa. Giữ ID hiện hành và từ chối rõ va chạm giữa miền ID thực thể/component với ID thao tác; kiểm cả dựng và API project. Thời gian phải không âm, nguyên và biểu diễn được an toàn trong int64 nanosecond trước ép/cộng/nhân. Kiểu unknown không thay kiểu đã biết; hai kiểu đã biết khác nhau bị từ chối, không chọn theo thứ tự dòng.
++- **Vì sao:** đặc tả đã hứa giữ tên null, địa chỉ đúng thực thể và từ chối thời gian sai; DT18-NV2 cần nút/cạnh phản ánh đúng thành phần. Phản ví dụ nhỏ đã tái lập lỗi dtype, đổi/mất đích cạnh, wrap thời gian và kiểu phụ thuộc thứ tự. Đây là sửa cài đặt/hợp đồng kỹ thuật, không là hạn chế RCA của dataset hoặc bằng chứng lợi ích đồ thị.
++- **Phương án khác:** thêm namespace vào mọi ID sẽ hỗ trợ va chạm nhưng đổi địa chỉ/schema và toàn đầu ra hợp lệ; chọn từ chối minh bạch trong gói sửa tối thiểu đã duyệt. Không suy loại đích từ chuỗi ID. Bỏ kiểm thời gian hoặc chọn kiểu cuối cùng che đầu vào mâu thuẫn. Dùng một hàm project để kiểm chính nó không đủ phát hiện lỗi chung; oracle mới phải ghi đích literal độc lập.
++- **Bằng chứng / chưa kiểm khi viết:** nhận xét Minh chuyển được lưu nguyên văn tại runs/sua-hop-dong-001/nhan-xet-duoc-minh-chuyen.txt. Thiết kế và oracle mới sẽ ghi trước code. Phương án sửa và hồi quy chưa chạy; dự kiến dữ liệu hợp lệ giữ nguyên phải được kiểm, chưa được dùng như kết quả.
++- **Điều kiện thất bại / hệ quả:** nguồn cần dùng ID va chạm bị từ chối rõ; muốn hỗ trợ phải trình đổi namespace riêng. Metadata kiểu mâu thuẫn cần chủ nguồn xác minh, không xác định kiểu nào đúng. Quyền nhận trọn bộ dựng, K1/K5/K7 và bàn giao T-036/P9 phụ thuộc kết quả; không tự trả lời RQ3, xác nhận runtime FlashTicket, chọn P6 hoặc đóng task.
+--- before/results/T-035/dac-ta-do-thi.md
++++ results/T-035/dac-ta-do-thi.md
+@@ -1,6 +1,6 @@
+-# Đặc tả đồ thị phụ thuộc v2 — T-035
++# Đặc tả đồ thị phụ thuộc v2.1 — T-035
+ 
+-V0 được viết trước bộ dựng đầu tiên. V2 sửa hợp đồng messaging theo Q-154; thiết kế và đáp án bổ sung được ghi trước mã sửa. Bản v1 được giữ tại runs/sua-n1-001/before/results/T-035/dac-ta-do-thi.md. Đầu ra mô tả của P5; không là lựa chọn phương pháp P6. Căn cứ: DT18-NV2, bước 1 của cô, MRP P5, SPEC T-035, WHY-52; nhu cầu hệ thống theo B13 §5 và B16 §1, §3–5, §7.
++V0 được viết trước bộ dựng đầu tiên. V2.1 bổ sung chính sách lỗi đầu vào theo Q-155; bản v2 giữ tại runs/sua-hop-dong-001/before/results/T-035/dac-ta-do-thi.md. V2 sửa hợp đồng messaging theo Q-154; thiết kế và đáp án bổ sung được ghi trước mã sửa. Bản v1 được giữ tại runs/sua-n1-001/before/results/T-035/dac-ta-do-thi.md. Đầu ra mô tả của P5; không là lựa chọn phương pháp P6. Căn cứ: DT18-NV2, bước 1 của cô, MRP P5, SPEC T-035, WHY-52; nhu cầu hệ thống theo B13 §5 và B16 §1, §3–5, §7.
+ 
+ ## 1. Mô hình và địa chỉ
+ 
+@@ -90,3 +90,15 @@
+ `unresolved_messages` đếm consumer không có cạnh logic. `messaging_diagnostics` ở cả hai mức báo count và tối đa hai witness (traceID,spanID) theo nguyên nhân: link_source_unavailable, link_source_not_producer, link_scope_conflict, identity_unverified, identity_no_source, identity_ambiguous, identity_scope_conflict, queue_address_incomplete. Thiếu địa chỉ metric đếm một lần mỗi consumer, không đếm producer hoặc đếm lại cạnh logic. Một consumer có thể có nhiều vấn đề; không cộng cờ thành tỷ lệ nguyên nhân. Cạnh không messaging và graph dev không messaging giữ schema cũ.
+ 
+ Thiết kế trước code ở runs/sua-n1-001/design.md; inputs và oracle trước code ở fixture_inputs.json, fixture_expected.json trong cùng lượt. fixture_design.md giải thích từng tình huống và cách kiểm. Kết quả kiểm và hồi quy được ghi sau chạy trong cùng lượt; xem kiem-dung-dan.md. Bản v2 sửa mâu thuẫn hợp đồng v1, không tuyên bố routing/instrumentation FlashTicket thật đã kiểm hoặc lợi ích RCA đã xác nhận.
++
++## 8. V2.1: dữ liệu thiếu, miền ID và chính sách từ chối
++
++Tên thao tác thiếu được chuẩn hóa thành null trước tạo khóa, không phụ thuộc dtype float64, object hoặc nullable string của pandas. Không thay tên có giá trị hoặc tạo thao tác từ mã lần thực thi. missing_operation đếm số span thiếu tên, thao tác của cùng entity/tên null dùng cùng khóa.
++
++ID thao tác giữ định dạng JSON cặp; tập ID này được giữ chỗ trên toàn bảng Prepared. ID thực thể quan sát sau alias hoặc endpoint thực (database/cache, peer, broker, host) không được trùng ID thao tác. Vi phạm từ chối identifier_collision trước xuất đồ thị; project cũng kiểm giao giữa khóa belongs_to với chủ quản/component_context trước chiếu. Inventory-only nằm ngoài tập quan sát nên không gây va chạm. Đây là giới hạn đầu vào tường minh của định dạng hiện tại; cần hỗ trợ ID va chạm thì phải thiết kế namespace riêng, không âm thầm đổi đích hoặc bỏ cạnh.
++
++Mọi cột thời gian có mặt phải là số nguyên hữu hạn, không âm, thuộc [0, 2**63−1] trước ép int64. Số object/chuỗi được kiểm chính xác, không đổi qua float làm tròn số lớn. Khi một đầu thời gian phải đổi từ microsecond, kiểm giá trị hoặc tổng startTime+duration không vượt floor((2**63−1)/1000) trước nhân 1000 hoặc cộng. Ưu tiên _start_ns/_end_ns từng cột khi có; phép đổi us không được dùng thì không bắt buộc thực hiện nó, nhưng cột us vẫn phải hợp lệ trong int64. Sau chọn nguồn, end phải không nhỏ hơn start. Vi phạm từ chối invalid_time, không wrap/clamp hoặc bỏ span. Quy tắc cửa sổ không đổi.
++
++Gộp kiểu từ inventory, entity.type và endpoint theo một quy tắc: unknown với kiểu đã biết nhận kiểu đã biết; kiểu đã biết với unknown giữ kiểu đã biết; hai kiểu đã biết giống nhau giữ nguyên; khác nhau từ chối conflicting_entity_type. Áp dụng cả inventory của endpoint chưa có span. Không coi thứ tự dòng là bằng chứng xác định kiểu.
++
++Thiết kế và đáp án literal trước mã ở runs/sua-hop-dong-001/design.md, oracle.py và receipt oracle-before-code.json; kết quả kiểm/hồi quy được ghi sau chạy. Bản này xử lý hợp đồng kỹ thuật, chưa xác nhận nghĩa vật lý cạnh, runtime FlashTicket hoặc lợi ích RCA.
+--- before/results/T-035/kiem-dung-dan.md
++++ results/T-035/kiem-dung-dan.md
+@@ -50,3 +50,13 @@
+ - Hồi quy đầy đủ: 52 ca/1045 khoảng, K1/K2/K4/K5 đạt; 1201 graph byte bằng bản cũ; mọi trường kết quả ca trừ chi phí máy bằng nhau. comparison.json lưu từng phép so. Node/vocabulary cũng được so; không chạy lại tính điểm RCA hoặc nguồn phụ mức ngày.
+ 
+ Các đường dẫn trên tính từ runs/sua-n1-001/. K3/K6/K8 và số phân nhóm cũ được giữ với bằng chứng cũ; không khai là đã thực nghiệm lại các phép ấy. Đầu ra đồ thị, stats/coverage/checks và input không đổi hỗ trợ dùng lại kết quả mô tả trong đúng phạm vi. Fixture là dữ liệu giả kiểm hợp đồng, không chứng minh instrumentation FlashTicket hay lợi ích RCA.
++
++## Kiểm v2.1 sau sửa lỗi hợp đồng
++
++- Trước sửa: toàn bộ 4.310 artifact của manifest v2 và 362 mục nguồn khớp; nguồn quyền/thiết kế và bản trước giữ ở runs/sua-hop-dong-001/ (preflight.json, input-verification.json, before/). Không lấy hash mới làm xác minh nguồn cũ.
++- Oracle mới có 129 ca literal, đáp án viết trước builder, receipt oracle-before-code.json; thiết kế fixture_design.md. Nhóm: tên thiếu nhiều dtype, va chạm ID và project độc lập, biên thời gian/cộng/nhân int64/ns ưu tiên, kiểu mâu thuẫn và unknown hai thứ tự. Kiểm cả Prepared.graph/build và vocabulary/null khi cần, so đích literal, node/edge/count/witness và lỗi mong đợi.
++- Sửa checker sau lượt đầu chỉ chuẩn hóa comparator JSON strict; bản gốc/đáp án và run fail giữ nguyên. AST hàm tạo fixture và digest inputs/expected trước code được kiểm không đổi ở oracle-revision-002.json. Phép đổi đích sai bị comparator từ chối; không đổi đáp án cho khớp builder.
++- 129 ca mới đạt seed0/1/2 (fixture-oracle-seed0-001 đến seed2-001/result.json); 18 fixture gốc,33messaging,3ca thiếu attributes/links trước đạt cả ba seed. Command receipts ghi argv, seed, thời gian và exit code; dùng code đóng băng frozen-code.json.
++- Hồi quy đủ 52 ca/1045 khoảng, K1/K2/K4/K5 đạt; 1201 graph byte bằng bản v2, mọi trường ca trừ chi phí máy khớp; comparison.json. Không phát lại baseline RCA, K3/K6/K8 hoặc nguồn phụ mức ngày; bằng chứng mô tả trước giữ trong đúng phạm vi.
++
++Các đường trên tính từ runs/sua-hop-dong-001/. Việc fixture và hồi quy đạt không tự khẳng định mọi instrumentation thực tế, lợi ích RCA hoặc đủ căn cứ chọn P6. ID va chạm được từ chối là giới hạn tường minh, không coi là đã hỗ trợ hai miền trùng nhau. Gói sửa và prompt mới được trình để tự soát/phản biện/nghiệm thu; task chưa đóng.
+--- before/results/T-035/scripts/write_docs.py
++++ results/T-035/scripts/write_docs.py
+@@ -1,11 +1,11 @@
+-"""Sinh tài liệu hiện hành v2 từ nguồn/bằng chứng đã lưu của T-035.
++"""Sinh tài liệu hiện hành v2.1 từ nguồn/bằng chứng đã lưu của T-035.
+ 
+ Bản sinh v1 được giữ trong runs/sua-n1-001/before/results/T-035/scripts/.
+-Lệnh này chỉ ghi bốn tài liệu được duyệt; không ghi lại graph hoặc tài liệu Node.
++Lệnh này ghi ba tài liệu v2.1 được duyệt; bảng quan hệ/graph/Node giữ bản đã có.
+ """
+ from pathlib import Path
+ import runpy
+ 
+ if __name__ == '__main__':
+-    script = Path(__file__).resolve().parents[1] / 'runs/sua-n1-001/update_docs.py'
++    script = Path(__file__).resolve().parents[1] / 'runs/sua-hop-dong-001/update_docs.py'
+     runpy.run_path(str(script), run_name='__main__')
+--- before/results/T-035/thong-ke-do-thi.md
++++ results/T-035/thong-ke-do-thi.md
+@@ -78,12 +78,12 @@
+ 
+ | Tiêu chí SPEC | Trạng thái | Bằng chứng/giới hạn |
+ |---|---|---|
+-| 1. Mô hình chung đủ nút/cạnh | Đạt theo hợp đồng v2, chờ nghiệm thu | dac-ta-do-thi.md; fixture cũ và bổ sung; routing/instrumentation FlashTicket thật chưa kiểm |
++| 1. Mô hình chung đủ nút/cạnh | Đạt theo hợp đồng v2.1 trong miền đã kiểm, chờ nghiệm thu | dac-ta-do-thi.md; fixture cũ và bổ sung; ID va chạm bị từ chối rõ; routing/instrumentation FlashTicket thật chưa kiểm |
+ | 2. C1 theo loại cạnh/dataset | Đạt | Mục 3; từ vựng/provenance; trạng thái không dựng/chưa phân xử được giữ |
+ | 3. C2 và giả định | Đạt trong phạm vi mô tả | Cặp cấu trúc; containment/histogram/kiểm tay; kiểu mạng OPEN |
+ | 4. C3 theo ca | Đạt | JSON mọi ca/cửa sổ và theo ô; full khác cửa sổ ngắn |
+ | 5. C4, mọi inventory, K8 | Đạt | Coverage từng thực thể và đối chiếu 8+7; không quy nguyên nhân thiếu |
+-| 6. K1–K7 và F1–F11 | Đạt | kiem-dung-dan.md; K6 chỉ là kiểm mô tả, không đối chiếu độc lập đã xác nhận |
++| 6. K1–K7 và F1–F11 | Đạt trong miền đã kiểm, bổ sung v2.1 | kiem-dung-dan.md; K5 cần đối chiếu đích literal bên cạnh hai phép chiếu; K6 chưa là đối chiếu độc lập đã xác nhận |
+ | 7. C6 nghĩa Node hoặc OPEN | Đạt với OPEN | Cần mã collector/export hoặc định nghĩa cột cụ thể |
+ | 8. C7–C8 ba câu | Đạt | Mục 4; chưa chứng minh lợi ích, nghĩa tên HTTP chung còn thiếu |
+ | 9. C9 đầy đủ | Đạt ở mức hợp đồng v2, chờ nghiệm thu | Địa chỉ phát/queue/ID scope tách riêng; bảng nguồn và nơi nhận; runtime FlashTicket chưa kiểm |
+@@ -91,9 +91,9 @@
+ 
+ Đầu ra hiện chờ phiên Codex sạch tự soát toàn task theo lời Minh, rồi phản biện chính thức và Minh nghiệm thu. Chưa tự nghiệm thu/đóng task, RQ3, P5 hoặc G3. C1–C9 trả lời khả năng dựng và giữ thông tin; không trả lời đồ thị khắc phục hạn chế RCA hay không.
+ 
+-T-036 nhận mô hình v2, graph/coverage và metadata K6: dựng inventory/cạnh tĩnh có revision cho Train Ticket, Online Boutique và FlashTicket; đối chiếu hai nguồn. P6 nhận bảng C5 và các giới hạn C2/C7 để chọn tín hiệu/cơ chế/mức; không suy lợi ích từ số cấu trúc. P9a nhận bảng thông tin để Minh duyệt từng yêu cầu. P9b cấp trace thật chuẩn hóa; phép so với nguồn tĩnh FlashTicket phải được giao trong SPEC tương ứng.
++T-036 nhận mô hình v2.1, graph/coverage và metadata K6: dựng inventory/cạnh tĩnh có revision cho Train Ticket, Online Boutique và FlashTicket; đối chiếu hai nguồn. P6 nhận bảng C5 và các giới hạn C2/C7 để chọn tín hiệu/cơ chế/mức; không suy lợi ích từ số cấu trúc. P9a nhận bảng thông tin để Minh duyệt từng yêu cầu. P9b cấp trace thật chuẩn hóa; phép so với nguồn tĩnh FlashTicket phải được giao trong SPEC tương ứng.
+ 
+-Chi phí lượt đầy đủ v1 (giữ làm lịch sử): 18.14 phút, RAM đỉnh 2.25 GiB. Nguồn `thong-ke-do-thi.json#/cost`; thời gian từng ca/bước/cửa sổ và lượt dừng hiệu năng ở runs/. Giữ mọi lượt; không tải, không dùng EC2, không mở test/heldout. Mọi hash nằm trong manifest. Prompt hiện tại trong LOG Phiên 7 và runs/sua-n1-001/; giữ prompt Phiên 6 làm lịch sử; Minh chuyển thủ công.
++Chi phí lượt đầy đủ v1 (giữ làm lịch sử): 18.14 phút, RAM đỉnh 2.25 GiB. Nguồn `thong-ke-do-thi.json#/cost`; thời gian từng ca/bước/cửa sổ và lượt dừng hiệu năng ở runs/. Giữ mọi lượt; không tải, không dùng EC2, không mở test/heldout. Mọi hash nằm trong manifest. Prompt hiện tại trong LOG Phiên 8 và runs/sua-hop-dong-001/; prompt các phiên trước giữ làm lịch sử; Minh chuyển thủ công.
+ 
+ ## Nhóm thao tác chỉ một phía và cấu trúc theo ô
+ 
+@@ -112,3 +112,17 @@
+ Chạy lại 52 ca, không dùng lại pilot: 1045 khoảng, 1201 graph lưu khớp từng byte bản cũ; nội dung từng ca ngoài thời gian/chi phí máy, vocabulary, Node, coverage và K1/K2/K4/K5 đều khớp. Nguồn `runs/sua-n1-001/comparison.json#/cases`, `#/graphs`, `#/all_K1_K2_K4_K5`. Không ghi đè graph hoặc JSON thống kê cũ. Vì đầu ra đồng nhất, các bảng mô tả và phân nhóm cũ giữ nguyên; đây là kiểm hồi quy, không là bằng chứng messaging đã xuất hiện trên dev.
+ 
+ Lượt mới mất 37.38 phút, RAM đỉnh 2.65 GiB; nguồn `comparison.json#/seconds`, `#/peak_rss_bytes` trong lượt sửa. Tiến độ từng khoảng ở day-du-002/progress.jsonl. Sửa này xác nhận hành vi bộ dựng trên fixture và hồi quy trong miền đã kiểm; chưa xác nhận routing thật, nghĩa Node, cơ chế RCA hoặc lợi ích đồ thị. Chưa tự nghiệm thu T-035/P5/G3. Minh yêu cầu phiên Codex sạch tự soát lại toàn task; Claude vẫn là người phản biện chính thức.
++
++## 8. V2.1 — chính sách dữ liệu thiếu, định danh và lỗi đầu vào
++
++Lượt Codex sạch phát hiện bốn lỗi cài đặt: tên thao tác thiếu ở một số dtype làm lỗi tạo khóa; ID endpoint trùng ID thao tác làm đổi/mất đích khi chiếu; thời gian âm/tràn được nhận; kiểu entity.type mâu thuẫn bị chọn theo thứ tự dòng. Đây là lỗi bộ dựng dùng chung, không là hạn chế RCA hoặc lỗi dataset đã xác nhận. Vì vậy kết quả đạt trên fixture/dev của bản v2 không chứng minh bộ dựng đã tuân thủ toàn hợp đồng.
++
++V2.1 chuẩn hóa tên thiếu về null; từ chối identifier_collision trước xuất/chiếu; kiểm thời gian trước ép/cộng/nhân; gộp kiểu đã biết/unknown nhất quán và từ chối hai kiểu đã biết mâu thuẫn. Giữ định dạng ID và graph hợp lệ. Inventory-only vẫn riêng; ID thực thể quan sát/component trùng ID thao tác không được hỗ trợ trong hợp đồng này. Muốn hỗ trợ cần thiết kế namespace riêng, không âm thầm đổi đích. Quyền ở Q-155, lý do ở phần bổ sung WHY-52, chính sách tại dac-ta-do-thi.md §8.
++
++129 ca literal mới đạt ở seed0/1/2, gồm đối chứng hợp lệ và đích literal độc lập; 18+33+3 ca trước cũng đạt ở ba seed. Nguồn `runs/sua-hop-dong-001/fixture-oracle-seed0-001/result.json#/cases` và các seed khác; lệnh/exit code tại oracle-commands-001.json và legacy-commands-001.json. Cùng oracle JSON chạy bản trước đạt 77/129; số fail là số ca kiểm, không là từng ấy lỗi độc lập.
++
++Checker ban đầu so witness tuple/list native nên chín ca có JSON đúng bị báo trượt. Giữ oracle.py và các lượt đầu; oracle_json.py chỉ sửa comparator JSON strict, inputs/expected/digest trước code không đổi. Nguồn oracle-before-code.json và oracle-revision-002.json. Không sửa đáp án theo output bộ dựng. K5 vẫn được dùng để kiểm nhất quán; các đáp án đích literal mới kiểm thêm trường hợp hai phép chiếu có thể cùng sai.
++
++Hồi quy v2.1: 52 ca chạy mới, không reuse, 1045 khoảng K1/K2/K4/K5 đạt, 1201 graph khớp từng byte bản đã lưu. Mọi nội dung kết quả ca ngoài chi phí máy khớp bản v2; nguồn `runs/sua-hop-dong-001/comparison.json#/cases`, `#/graphs`, `#/all_K1_K2_K4_K5`. Không ghi đè các graph/JSON mô tả cũ; các bảng mô tả giữ nguyên do đầu ra đồng nhất. Chi phí lượt mới 20.44 phút, RAM đỉnh 2.76 GiB (`#/seconds`, `#/peak_rss_bytes`).
++
++Bản sửa trả lời bốn lỗi hợp đồng trong miền fixture và hồi quy đã kiểm; chưa xác nhận routing/instrumentation FlashTicket thật, nghĩa vật lý cạnh/Node hoặc lợi ích RCA. Chưa tự nghiệm thu T-035/P5/G3, chọn P6 hoặc đóng RQ3. Minh yêu cầu phiên Codex sạch soát lại toàn task như lần đầu, nhận xét trước lịch sử; Claude vẫn phản biện chính thức.
+--- before/src/do_thi/README.md
++++ src/do_thi/README.md
+@@ -1,6 +1,6 @@
+ # Bộ dựng đồ thị phụ thuộc P5
+ 
+-Đặc tả: `results/T-035/dac-ta-do-thi.md` (v2), bản trước chạy ở `dac-ta-do-thi-v0.md`; v1 và mã trước sửa được giữ trong `results/T-035/runs/sua-n1-001/before/`. Đây là bộ dựng cấu trúc và độ phủ, chưa phát hiện bất thường hoặc xếp hạng.
++Đặc tả: `results/T-035/dac-ta-do-thi.md` (v2.1), bản trước chạy ở `dac-ta-do-thi-v0.md`; v1 và mã trước sửa được giữ trong `results/T-035/runs/sua-n1-001/before/`. Đây là bộ dựng cấu trúc và độ phủ, chưa phát hiện bất thường hoặc xếp hạng.
+ 
+ `build(spans, interval, aliases, universe)` trả hai đồ thị thực thể/thao tác. `interval` dùng nanosecond hoặc null cho toàn bảng được caller cho phép. `Prepared` tạo chỉ mục một lần cho nhiều khoảng. `from_p3` thêm các trường tùy chọn rỗng. `project` trả tập nút/cạnh chiếu từ mức thao tác; inventory được giữ riêng ở đồ thị thực thể. Thao tác thuộc thực thể bằng khóa cặp, component_context giữ endpoint không có thao tác quan sát.
+ 
+@@ -29,3 +29,11 @@
+ `do_thi.builder.edge_key` trả khóa cấu trúc: 5 trường cũ, thêm chuỗi JSON canonical của messaging khi có. `project` trả các khóa này. Consumer API phải giữ phần mở rộng khi so/gộp cạnh; không cắt lại về source/target hoặc destination. Cạnh không messaging giữ schema cũ.
+ 
+ Fixture bổ sung: `results/T-035/runs/sua-n1-001/check_messaging.py`; inputs/expected và thiết kế được ghi trước sửa code. Chạy checker với tên thư mục con mới, xem `--help`. Hồi quy dùng runner cũ với tên run mới trong phạm vi được duyệt; không chạy lại `report.py` để ghi đè graph cũ. So sánh và nguồn tài liệu v2 ở `runs/sua-n1-001/`. Chỉ các fixture mô tả hợp đồng nội bộ; chưa là adapter OTel hoặc bằng chứng runtime FlashTicket.
++
++## Chính sách đầu vào v2.1
++
++Tên thao tác thiếu ở mọi dtype về None trước tạo khóa. ID thực thể quan sát/component và ID thao tác phải thuộc hai miền không giao; va chạm bị từ chối identifier_collision ở build/Prepared và project. Inventory-only được giữ riêng, không tính là nút quan sát. ID đầu ra hợp lệ giữ nguyên.
++
++Các cột thời gian phải hữu hạn, nguyên, không âm và trong int64; kiểm cả phép cộng/đổi microsecond sang nanosecond trước thực hiện, dùng cột ns khi có. Vi phạm báo invalid_time. Kiểu thực thể gộp inventory/span/endpoint: unknown không hạ kiểu đã biết; hai kiểu đã biết mâu thuẫn báo conflicting_entity_type thay vì chọn theo dòng cuối.
++
++Bản trước v2 và phép kiểm bổ sung trong results/T-035/runs/sua-hop-dong-001/. Oracle được ghi trước code; các kiểm K5 phải đọc cùng đáp án đích literal vì hai phép chiếu có thể cùng sai. Đây là sửa hợp đồng/cài đặt, chưa là bằng chứng về hiệu quả RCA.
+--- before/src/do_thi/builder.py
++++ src/do_thi/builder.py
+@@ -1,6 +1,7 @@
+-"""Bộ dựng theo dac-ta-do-thi.md v2; cấu trúc, count, witness, không điểm RCA."""
++"""Bộ dựng theo dac-ta-do-thi.md v2.1; cấu trúc, count, witness, không điểm RCA."""
+ import json
+ from collections import Counter, defaultdict
++from decimal import Decimal, InvalidOperation
+ 
+ import numpy as np
+ import pandas as pd
+@@ -13,6 +14,46 @@
+ DATA = 'dữ-liệu'
+ DEPLOY = 'triển-khai'
+ TYPES = {'service','gateway','database','cache','broker','identity-provider','external','host','unknown'}
++MAX_I64 = (1 << 63) - 1
++MAX_US = MAX_I64 // 1000
++
++
++def _integer_time(series):
++    """Kiểm miền trước ép kiểu; chuỗi/object không đi qua float làm tròn."""
++    if pd.api.types.is_integer_dtype(series.dtype):
++        if series.isna().any() or (series < 0).any() or (series > MAX_I64).any():
++            raise ValueError('invalid_time')
++        return series.astype('int64')
++    if pd.api.types.is_float_dtype(series.dtype):
++        values = series.to_numpy(dtype=np.float64, na_value=np.nan)
++        if (not np.isfinite(values).all() or (values < 0).any() or
++                (values >= MAX_I64 + 1).any() or (values != np.floor(values)).any()):
++            raise ValueError('invalid_time')
++        return pd.Series(values.astype('int64'), index=series.index)
++    values = []
++    for value in series:
++        try:
++            number = Decimal(str(value))
++        except (InvalidOperation, ValueError):
++            raise ValueError('invalid_time') from None
++        if (not number.is_finite() or number < 0 or number > MAX_I64 or
++                number != number.to_integral_value()):
++            raise ValueError('invalid_time')
++        values.append(int(number))
++    return pd.Series(values, index=series.index, dtype='int64')
++
++
++def _check_identifiers(operations, entities):
++    if set(operations).intersection(entities):
++        raise ValueError('identifier_collision')
++
++
++def _merge_entity_type(current, incoming):
++    if current == 'unknown':
++        return incoming
++    if incoming == 'unknown' or incoming == current:
++        return current
++    raise ValueError('conflicting_entity_type')
+ 
+ 
+ def op_id(entity, operation):
+@@ -103,15 +144,15 @@
+             f[c]=_string(f[c])
+         if ((f.traceID=='') | (f.spanID=='') | (f.serviceName=='')).any():
+             raise ValueError('missing_id')
+-        # Tất cả đồng hồ phải nguyên; tránh ép duration âm hoặc float thành dữ liệu hợp lệ.
++        # Kiểm trước mọi phép ép/cộng/nhân để không nhận thời gian wrap int64.
+         for c in ['startTime','duration']+[c for c in ['_start_ns','_end_ns'] if c in f]:
+-            v=pd.to_numeric(f[c],errors='raise')
+-            if v.isna().any() or not np.isfinite(v).all() or (v != np.floor(v)).any():
+-                raise ValueError('invalid_time')
+-            f[c]=v.astype('int64')
+-        if (f.duration<0).any():
+-            raise ValueError('invalid_time')
+-        f['operationName']=f.operationName.where(f.operationName.notna(),None)
++            f[c]=_integer_time(f[c])
++        if '_start_ns' not in f and (f.startTime > MAX_US).any():
++            raise ValueError('invalid_time')
++        if '_end_ns' not in f and ((f.startTime > MAX_US).any() or
++                                  (f.duration > MAX_US - f.startTime).any()):
++            raise ValueError('invalid_time')
++        f['operationName']=f.operationName.astype(object).where(f.operationName.notna(),None)
+         dup=f.duplicated(['traceID','spanID'],keep=False)
+         if dup.any():
+             check=f.loc[dup].copy()
+@@ -135,6 +176,8 @@
+         self.parent[self.roots]=-1
+         pairs=f[['serviceName','operationName']].drop_duplicates()
+         self.op_map={(e,o):op_id(e,o) for e,o in pairs.itertuples(index=False,name=None)}
++        self.operation_ids=set(self.op_map.values())
++        _check_identifiers(self.operation_ids, set(f.serviceName))
+         self.op=np.asarray([self.op_map[(e,o)] for e,o in f[['serviceName','operationName']].itertuples(index=False,name=None)],dtype=object)
+         self.entities=f.serviceName.to_numpy()
+         self.trace_ids=f.traceID.to_numpy()
+@@ -189,8 +232,10 @@
+             attrs={i:(self.f.attributes.iloc[i] if 'attributes' in self.f and isinstance(self.f.attributes.iloc[i],dict) else {}) for i in idx}
+             def endpoint(name,typ):
+                 if not name or typ not in TYPES:raise ValueError('endpoint_type')
+-                if name in ent_nodes and ent_nodes[name]['type'] not in ('unknown',typ):raise ValueError('conflicting_entity_type')
+-                ent_nodes[name]={'id':name,'type':typ,'source':'trace'};extra.add(name);return name
++                _check_identifiers(self.operation_ids, [name])
++                current=ent_nodes[name]['type'] if name in ent_nodes else self.universe.get(name,'unknown')
++                ent_nodes[name]={'id':name,'type':_merge_entity_type(current,typ),'source':'trace'}
++                extra.add(name);return name
+             producers=defaultdict(list)
+             key_indices={(str(self.f.traceID.iloc[i]),str(self.f.spanID.iloc[i])):i for i in idx}
+             addresses={i:_message_address(a,self.kinds[i]=='PRODUCER') for i,a in attrs.items()
+@@ -205,7 +250,8 @@
+                 et=a.get('entity.type')
+                 if et:
+                     if et not in TYPES:raise ValueError('entity_type')
+-                    ent_nodes[self.entities[i]]['type']=et
++                    node=ent_nodes[self.entities[i]]
++                    node['type']=_merge_entity_type(node['type'],et)
+                 witness=[(str(self.f.traceID.iloc[i]),str(self.f.spanID.iloc[i]))]
+                 if a.get('db.entity'):
+                     dest=endpoint(a['db.entity'],a.get('db.type'))
+@@ -330,6 +376,7 @@
+     """Chiếu độc lập tập nút/cạnh, không dùng đồ thị entity để hoàn thành phép chiếu."""
+     owner=dict(operation['belongs_to'])
+     nodes=set(owner.values())|{n['id'] for n in operation['component_context']}
++    _check_identifiers(owner, nodes)
+     edges=set()
+     for e in operation['edges']:
+         s=owner.get(e['source'],e['source']);t=owner.get(e['target'],e['target'])
+--- before/tasks/T-035-p5-do-thi-tu-trace/LOG.md
++++ tasks/T-035-p5-do-thi-tu-trace/LOG.md
+@@ -1091,3 +1091,180 @@
+ Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.
+ 
+ ```
++
++## Phiên 8 — 15/10/2026 — Codex — LEVANMINH — Người làm
++
++**Mở phiên / quyền:** EXECUTE theo lời Minh Q-155; sửa bốn lỗi hợp đồng đã trình, fixture có đáp án trước code, hồi quy đủ dev và prompt Codex sạch soát toàn T-035 như lượt đầu. Giữ Claude phản biện chính thức, không sửa SPEC. Phạm vi đúng preflight.json và de-xuat-da-duyet.txt trong runs/sua-hop-dong-001/.
++
++**Kiểm trước sửa:** toàn bộ 4.310 artifact ở manifest trước và 362 mục nguồn khớp; AGENTS/SPEC/B13/B16 giữ hash nguồn. Bản trước của 11 file đã được giữ. Nhận xét và quyền được lưu; WHY ghi lựa chọn và phần chưa kiểm trước dùng. Bước tiếp: thiết kế/oracle literal, ghi hash trước code, sửa bộ dựng, kiểm fixture/đối chứng, chạy hồi quy và đối chiếu.
++
++**Thiết kế/fixture trước hồi quy:** 129 ca literal được trợ lý triển khai khai độc lập trước sửa builder; receipt oracle-before-code.json. Lượt đầu oracle nhận 9 false negative do so tuple/list witness native dù JSON cùng nghĩa. Giữ oracle.py và cả hai kết quả đầu; checker oracle_json.py chỉ đổi comparator JSON strict, inputs/expected và digest trước mã giữ nguyên, bằng chứng oracle-revision-002.json. Không đổi đáp án để khớp builder. Checker đúng chạy bản trước đạt77/129 và bản sửa129/129; đây là số ca theo oracle, không gọi52fail là52lỗi riêng. 18+33+3 fixture trước và129fixture bổ sung đạt seed0/1/2 bằng code cuối. Nguồn commands/result trong lượt này. Bộ dựng/runner đóng băng ở frozen-code.json trước hồi quy.
++
++**Hồi quy bắt đầu:** launch_full.py gọi runner hiện hành cho đủ52ca vào sua-hop-dong-001/day-du-001, không reuse. Ước lượng40–50phút từ lượt trước; theo dõi trần1giờ. Chưa kết luận graph bằng nhau trước comparison.json.
++
++**Tự kiểm công cụ khi chờ hồi quy:** trợ lý chỉ đọc ba helper đối chiếu/sinh tài liệu/kết thúc. Phát hiện receipt prompt băm chuỗi LF trước khi Windows ghi CRLF; đã đổi sang băm bytes thực, giữ receipt đầu tại prompt-template-check-before-fix.json. Nội dung prompt và code đóng băng không đổi. Các đường dẫn, phép thay tài liệu, fixture/receipt/schema và phạm vi ghi đã kiểm đạt; phần phụ thuộc summary/comparison/exit code chờ lượt đầy đủ.
++
++**Kết thúc Phiên 8 — sửa bốn lỗi hợp đồng:**
++
++1. **Đã làm:** chuẩn hóa operationName thiếu về None ở mọi dtype; từ chối identifier_collision giữa thực thể quan sát/endpoint với thao tác ở Prepared/build/project; kiểm số nguyên/thời gian không âm và giới hạn trước ép/cộng/nhân int64; gộp unknown/known và từ chối kiểu đã biết mâu thuẫn. Nguồn chính sách v2.1 được ghi trước code. Không đổi định dạng ID/graph hợp lệ hoặc thiết kế RCA.
++2. **File:** đúng 11 file trong preflight.json và đầu ra mới dưới runs/sua-hop-dong-001/. WHY/DECISIONS/LOG nối thêm; STATE chỉ dòng T-035. Giữ mọi artifact/lượt cũ, kể cả các lượt checker fail. Bản trước/sau ở before/ và after/. Không sửa SPEC, AGENTS, MRP, LESSONS, baseline, hệ FlashTicket; không commit/push hoặc mở test.
++3. **Kiểm:** 4.310 artifact cũ và362nguồn khớp trước sửa. Oracle129ca ghi trước builder; giữ oracle.py, bản sửa comparator oracle_json.py chỉ chuẩn hóa JSON, literal/digest không đổi (receipt trước mã và revision002). 129ca mới+18ca gốc+33messaging+3biên cũ đạt seed0/1/2; outputs giữa seed giống nhau. Lượt đầy đủ 52 ca/1045 khoảng chạy mới không reuse, K1/K2/K4/K5 đạt; 1201 graph byte bằng bản đã lưu, mọi nội dung ca trừ chi phí máy khớp bản v2. Nguồn comparison.json và các command/result trong lượt sửa. Chi phí 20.44 phút, RAM đỉnh 2.76GiB. Kiểm cuối: tái sinh tài liệu, hash code đóng băng/snapshot, AST/JSON, diff và tập file, bảo toàn artifact cũ; biên nhận final-verification.json và manifest.
++4. **Mức kết luận / còn mở:** cả bốn nhận xét đúng, đã xử lý theo oracle và hồi quy trong miền đã kiểm. Hai phép chiếu cùng khớp không đủ chứng minh đúng đích; fixture đích literal là bằng chứng bổ sung. ID va chạm bị từ chối rõ, không gọi là đã hỗ trợ ID tùy ý trùng nhau. Chưa xác nhận nghĩa vật lý cạnh/Node, routing/instrumentation FlashTicket thật, lợi ích RCA hoặc chọn P6. Chưa tự nghiệm thu/đóng T-035/P5/G3/RQ3. Chờ phiên Codex sạch soát toàn task như lần đầu, rồi phản biện chính thức và Minh nghiệm thu; Claude vẫn phản biện chính thức.
++
++**Phản hồi từng nhận xét Minh chuyển:** (1) Đúng: NaN/pd.NA trước sửa làm lỗi khóa/JSON; v2.1 giữ null và missing count/vocabulary. (2) Đúng: ID component có thể bị đọc như thao tác; v2.1 từ chối va chạm ở cả API dựng/chiếu, oracle có đích literal và đối chứng. (3) Đúng: trước sửa nhận âm/wrap; v2.1 từ chối trước tính và giữ ưu tiên ns. (4) Đúng: kiểu phụ thuộc thứ tự; v2.1 cùng quy tắc gộp inventory/span/endpoint, không quyết kiểu nào đúng khi mâu thuẫn. Minh quyết sửa cả bốn qua Q-155; chưa là nghiệm thu bản sửa. Bản nhận xét gốc giữ nguyên trong nhan-xet-duoc-minh-chuyen.txt.
++
++**Quyết định Minh trong phiên:** Q-155 ghi nguyên văn lời duyệt gói và yêu cầu prompt Codex sạch. Bổ sung WHY-52 ghi lựa chọn kỹ thuật, phương án namespace thay thế và giới hạn. Không thêm giả thuyết khoa học đã xác nhận.
++
++**Bước tiếp theo chính xác:** Minh mở phiên Codex mới, dán toàn prompt-codex-sach-soat-t035.txt ở lượt này. Phiên đó đọc yêu cầu nguồn/SPEC/hợp đồng/code/graph/JSON trước; ghi nhận xét độc lập rồi mới đối chiếu lịch sử, không chỉ kiểm bốn điểm vừa sửa. Phạm vi chỉ đọc trong chat; không chạy lại lượt dev hợp lệ hoặc mở locked. Prompt Claude kiểm lại cũng kèm để Minh chọn chuyển thủ công, không tự mở/gửi phiên.
++
++**Lệnh đã chạy:** Python D:/RCA-ext/envs/py312-pin/Scripts/python.exe -X utf8 -B; start.py; oracle.py fixture-before-001 --builder-path before/src/do_thi/builder.py, oracle.py fixture-after-001; oracle_json.py fixture-before-002 --builder-path before/src/do_thi/builder.py; run_fixtures.py legacy, run_fixtures.py oracle; launch_full.py gọi results/T-035/scripts/run.py sua-hop-dong-001/day-du-001; compare_full.py; results/T-035/scripts/write_docs.py. Các script không có prefix đầy đủ tính từ results/T-035/runs/sua-hop-dong-001/; --builder-path thực tế dùng đường từ repo như command/output. Không ghi đè tên output cũ.
++
++**Lệnh cuối / kiểm kết thúc:** & 'D:/RCA-ext/envs/py312-pin/Scripts/python.exe' -X utf8 -B results/T-035/runs/sua-hop-dong-001/finalize.py; sau đó đọc lại hash manifest và trạng thái git. Đề xuất commit (chưa làm): fix: enforce T-035 graph input and identity contracts.
++
++### Prompt Codex sạch — tự soát toàn T-035
++
++```text
++Minh yêu cầu phiên Codex sạch đánh giá toàn bộ T-035 như lần đầu. Không nhận danh sách lỗi hoặc kết luận của phiên trước để định hướng tìm kiếm. Đây là lượt tự soát độc lập về ngữ cảnh; Claude vẫn là người phản biện chính thức.
++
++Thứ tự riêng theo lời Minh: đọc yêu cầu nguồn, SPEC, hợp đồng hiện hành, code và bằng chứng đầu vào/trung gian/đầu ra trước. Dùng STATE/quyết định chỉ để xác định vai trò và quyền; không lấy trạng thái hoàn thành làm kết luận. Chưa đọc nhận xét/kết luận trong LOG, REVIEW, báo cáo tự kiểm/tổng kết, bản trước sửa, diff lịch sử hoặc prompt cũ. Ghi danh sách nhận xét độc lập trong chat rồi mới đối chiếu các nguồn lịch sử và báo cáo. Soát toàn task; không chỉ kiểm phần vừa sửa, không mặc định phải có lỗi hoặc ấn định số lỗi. Thứ tự này áp dụng trước hướng dẫn đọc lịch sử thông thường, theo yêu cầu trực tiếp của Minh.
++
++Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
++Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
++
++Thông tin lượt này:
++- Task hoặc đề xuất: T-035 — P5a: đặc tả đồ thị phụ thuộc và bộ dựng từ trace; D:/RCA-flashticket/tasks/T-035-p5-do-thi-tu-trace/SPEC.md.
++- Công đoạn: soát kết quả.
++- Gói/cổng: P5; G2 đã duyệt, G3 là cổng kế tiếp.
++- Người làm và người phản biện chính thức: Codex người làm; Claude người phản biện chính thức theo SPEC. Phiên Codex sạch là lượt tự soát độc lập về ngữ cảnh do Minh yêu cầu, không đổi vai trò chính thức.
++- Tài liệu gốc: D:/RCA-flashticket/AGENTS.md; tasks/T-035-p5-do-thi-tu-trace/SPEC.md; docs/MRP.md, WHY.md, DECISIONS.md, LESSONS.md; docs/reference/sources/DT18-de-tai-va-nhiem-vu.md, advisor-2026-09-23.md; docs/review-prompt.md. D:/Project/flash-ticket-platform/docs/architecture/B13-api-and-event-contracts.md và B16-observability-baseline.md chỉ đọc. Commit gốc theo manifest; kiểm git status và đọc trực tiếp tệp chưa theo dõi. Diff lịch sử dùng sau nhận xét độc lập.
++- Phản biện và phản hồi trước: Lịch sử trong tasks/T-035-p5-do-thi-tu-trace/LOG.md, bản phản biện nếu có sau khi liệt kê thư mục task, results/T-035/runs/ và nội dung Minh cung cấp. Đọc nhận xét, kết luận, phản hồi, prompt cũ và bản trước sửa sau khi đã ghi nhận xét độc lập trong chat.
++- Code và kết quả liên quan: D:/RCA-flashticket/src/do_thi/, src/p3/, src/circa_kien_truc/builder.py; results/T-035/dac-ta-do-thi.md, manifest.json và code, graph/JSON, fixture, báo cáo, các run theo manifest. Nguồn upstream T-002/T-003/T-008/T-034 và allowlist dev T-022/T-026 theo input-verification của lượt hiện hành. Environment của lượt đầy đủ được manifest chỉ tới. Python D:/RCA-ext/envs/py312-pin/Scripts/python.exe -X utf8 -B; hướng dẫn src/do_thi/README.md; Windows/PowerShell. Kiểm hash trước dùng đầu ra cũ.
++- Phạm vi ghi được Minh cho phép trong lượt này: chỉ đọc và trả lời trong chat; không ghi REVIEW/LOG/STATE/code/kết quả hoặc commit/push. Không mở test/heldout/data/locked hoặc repo RCA lưu trữ. Dữ liệu dev chỉ qua allowlist/adapter và phạm vi SPEC; phép phát lại rẻ chỉ trong bộ nhớ, không chạy script có ghi hoặc thực nghiệm mới.
++
++Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
++
++Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
++Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
++Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
++
++Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
++hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
++Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
++số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
++có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
++
++Bổ sung yêu cầu phản biện:
++1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
++2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
++3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
++4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
++5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
++6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
++7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
++8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
++9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
++10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
++
++Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
++Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
++
++Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
++bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
++Tiếng Việt, câu ngắn.
++
++Cuối lượt báo:
++1. Đã làm gì.
++2. File đã thay đổi, hoặc không sửa file nào.
++3. Kiểm đã chạy và kết quả.
++4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
++
++Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
++
++Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
++
++Công đoạn: soát kết quả.
++Kiểm trên đầu ra thật, code và dữ liệu được phép; không tin tóm tắt LOG. Đối chiếu tiêu chí xong với phần mục tiêu nguồn và mức căn cứ cho bước tiếp theo; chạy lại phần rẻ khi trong quyền được duyệt.
++Phân biệt hoàn thành task mô tả, xác nhận cơ chế và đủ căn cứ chọn/đánh giá thiết kế. Giới hạn đã khai không tự miễn phép kiểm cần thiết còn làm được.
++Chỉ ghi bản phản biện lượt được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ bản cũ; không sửa kết quả thay người làm.
++
++Với từng thành phần, kiểm mục đích và căn cứ: sửa hạn chế P4, đáp ứng DT18 hay nhu cầu kỹ thuật. Có lý do kỹ thuật, phương án khác, bằng chứng dev và điều kiện thất bại không; có dùng mã hạn chế mô tả như bằng chứng cơ chế hoặc chọn theo mức chênh đồ thị trừ không đồ thị không?
++Nêu rõ nút/cạnh, ánh xạ log/trace/metric và phép tính thực sự sử dụng cạnh. Lần theo thông tin quan hệ và nhãn trong phương pháp lẫn đối chứng; gọi “không đồ thị” có đúng với thông tin còn giữ không?
++Kiểm baseline và đối chứng đủ mạnh, tương đương về tín hiệu/cửa sổ/tập ứng viên/coverage/tiền xử lý/quy tắc chấm/ngân sách chọn cấu hình ở phần không chủ ý thay; yếu tố thay cùng phải giới hạn kết luận.
++Phương pháp và đối chứng đã được cài và kiểm đầu vào, trung gian, hành vi trên dev chưa, hay chỉ chạy không lỗi? Không đòi đồ thị phải thắng để khóa.
++Code/revision, cấu hình, giả thuyết, độ đo, tập ca/tập ứng viên, cách xử lý ca lỗi/UNSUPPORTED/nhánh dự phòng và bảng diễn giải đã khóa trước test chưa? Có bỏ nhóm khó sau khi nhìn điểm hoặc dùng test để chọn thiết kế không?
++Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.
++
++```
++
++### Prompt Claude — kiểm lại
++
++Minh chuyển thủ công nếu muốn; chưa cấp quyền ghi REVIEW.
++
++```text
++Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
++Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
++
++Thông tin lượt này:
++- Task hoặc đề xuất: T-035 — P5a: đặc tả đồ thị phụ thuộc và bộ dựng từ trace; D:/RCA-flashticket/tasks/T-035-p5-do-thi-tu-trace/SPEC.md.
++- Công đoạn: kiểm lại phản hồi và sửa.
++- Gói/cổng: P5; G2 đã duyệt, G3 là cổng kế tiếp.
++- Người làm và người phản biện chính thức: Codex người làm; Claude người phản biện chính thức theo SPEC.
++- Tài liệu gốc: D:/RCA-flashticket/AGENTS.md; tasks/T-035-p5-do-thi-tu-trace/SPEC.md; docs/MRP.md, WHY.md, DECISIONS.md, LESSONS.md; docs/reference/sources/DT18-de-tai-va-nhiem-vu.md, advisor-2026-09-23.md; docs/review-prompt.md. D:/Project/flash-ticket-platform/docs/architecture/B13-api-and-event-contracts.md và B16-observability-baseline.md chỉ đọc. Commit gốc theo manifest; kiểm git status và đọc trực tiếp tệp chưa theo dõi. Diff lịch sử dùng sau nhận xét độc lập.
++- Phản biện và phản hồi trước: Lịch sử trong tasks/T-035-p5-do-thi-tu-trace/LOG.md, bản phản biện nếu có sau khi liệt kê thư mục task, results/T-035/runs/ và nội dung Minh cung cấp. Đọc nhận xét, kết luận, phản hồi, prompt cũ và bản trước sửa sau khi đã ghi nhận xét độc lập trong chat.
++- Code và kết quả liên quan: D:/RCA-flashticket/src/do_thi/, src/p3/, src/circa_kien_truc/builder.py; results/T-035/dac-ta-do-thi.md, manifest.json và code, graph/JSON, fixture, báo cáo, các run theo manifest. Nguồn upstream T-002/T-003/T-008/T-034 và allowlist dev T-022/T-026 theo input-verification của lượt hiện hành. Environment của lượt đầy đủ được manifest chỉ tới. Python D:/RCA-ext/envs/py312-pin/Scripts/python.exe -X utf8 -B; hướng dẫn src/do_thi/README.md; Windows/PowerShell. Kiểm hash trước dùng đầu ra cũ.
++- Phạm vi ghi được Minh cho phép trong lượt này: chỉ đọc và trả lời trong chat; không ghi REVIEW/LOG/STATE/code/kết quả hoặc commit/push. Không mở test/heldout/data/locked hoặc repo RCA lưu trữ. Dữ liệu dev chỉ qua allowlist/adapter và phạm vi SPEC; phép phát lại rẻ chỉ trong bộ nhớ, không chạy script có ghi hoặc thực nghiệm mới.
++
++Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
++
++Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
++Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
++Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
++
++Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
++hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
++Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
++số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
++có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
++
++Bổ sung yêu cầu phản biện:
++1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
++2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
++3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
++4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
++5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
++6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
++7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
++8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
++9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
++10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
++
++Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
++Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
++
++Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
++bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
++Tiếng Việt, câu ngắn.
++
++Cuối lượt báo:
++1. Đã làm gì.
++2. File đã thay đổi, hoặc không sửa file nào.
++3. Kiểm đã chạy và kết quả.
++4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
++
++Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
++
++Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
++
++Công đoạn: người phản biện kiểm lại phản hồi và sửa.
++Tự soát yêu cầu và đầu ra gốc trước; sau đó đọc phản biện, phản hồi và các thay đổi được duyệt. Kiểm cả ý kiến phản bác reviewer; không mặc định phản hồi hoặc bản sửa đúng.
++Đối chiếu từng điểm với bằng chứng hiện tại, quyền sửa và hậu quả. Có điểm đúng nhưng chưa được Minh duyệt sửa thì ghi đúng trạng thái; không tự coi đã xử lý hoặc ép người làm sửa.
++Chỉ ghi bản phản biện lượt mới được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ lịch sử, không ghi LOG/STATE hay sửa thay người làm. Nêu bất đồng còn lại và soạn prompt để người làm đáp.
++
++Với từng thành phần, kiểm mục đích và căn cứ: sửa hạn chế P4, đáp ứng DT18 hay nhu cầu kỹ thuật. Có lý do kỹ thuật, phương án khác, bằng chứng dev và điều kiện thất bại không; có dùng mã hạn chế mô tả như bằng chứng cơ chế hoặc chọn theo mức chênh đồ thị trừ không đồ thị không?
++Nêu rõ nút/cạnh, ánh xạ log/trace/metric và phép tính thực sự sử dụng cạnh. Lần theo thông tin quan hệ và nhãn trong phương pháp lẫn đối chứng; gọi “không đồ thị” có đúng với thông tin còn giữ không?
++Kiểm baseline và đối chứng đủ mạnh, tương đương về tín hiệu/cửa sổ/tập ứng viên/coverage/tiền xử lý/quy tắc chấm/ngân sách chọn cấu hình ở phần không chủ ý thay; yếu tố thay cùng phải giới hạn kết luận.
++Phương pháp và đối chứng đã được cài và kiểm đầu vào, trung gian, hành vi trên dev chưa, hay chỉ chạy không lỗi? Không đòi đồ thị phải thắng để khóa.
++Code/revision, cấu hình, giả thuyết, độ đo, tập ca/tập ứng viên, cách xử lý ca lỗi/UNSUPPORTED/nhánh dự phòng và bảng diễn giải đã khóa trước test chưa? Có bỏ nhóm khó sau khi nhìn điểm hoặc dùng test để chọn thiết kế không?
++Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.
++
++```

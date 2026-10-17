@@ -1,0 +1,172 @@
+{
+  "status": "V2 candidate oracle written before candidate copy; bases are current T037 SMTP delta and original T038/T039 snapshots",
+  "scope": "synthetic SMTP hop semantics, no dataset or runtime",
+  "cases": [
+    {
+      "id": "smtp_representation_unknown",
+      "expected_entity_edges": 1,
+      "expected_operation_edges": 1,
+      "expected_type": "gọi-chưa-phân-kiểu",
+      "expected_channel": "smtp",
+      "expected_messaging": null
+    },
+    {
+      "id": "smtp_representation_sync_evidence",
+      "expected_entity_edges": 1,
+      "expected_operation_edges": 1,
+      "expected_type": "gọi-đồng-bộ",
+      "expected_channel": "smtp",
+      "expected_messaging": null
+    },
+    {
+      "id": "smtp_entity_only",
+      "expected_entity_edges": 1,
+      "expected_operation_edges": 0,
+      "expected_exclusion": "no_operation_evidence"
+    },
+    {
+      "id": "smtp_projection",
+      "expected_source": "sender",
+      "expected_target": "mail-server",
+      "expected_channel": "smtp",
+      "expected_type": "gọi-đồng-bộ"
+    },
+    {
+      "id": "smtp_type_unknown_not_upgraded",
+      "endpoints_intersection": 1,
+      "typed_intersection": 0,
+      "typed_trace_exclusion": "unknown_type"
+    },
+    {
+      "id": "smtp_explicit_transport_match",
+      "endpoints_intersection": 1,
+      "typed_intersection": 1
+    },
+    {
+      "id": "smtp_vs_http_no_match",
+      "endpoints_intersection": 0,
+      "typed_intersection": 0,
+      "static_only": 1,
+      "trace_only": 1
+    },
+    {
+      "id": "smtp_vs_rpc_no_match",
+      "endpoints_intersection": 0,
+      "typed_intersection": 0,
+      "static_only": 1,
+      "trace_only": 1
+    },
+    {
+      "id": "smtp_vs_missing_transport_no_match",
+      "endpoints_intersection": 0,
+      "typed_intersection": 0,
+      "static_only": 1,
+      "trace_only": 1
+    },
+    {
+      "id": "smtp_missing_type_missing_transport_no_match",
+      "endpoints_intersection": 0,
+      "typed_intersection": 0,
+      "typed_trace_exclusion": "unknown_type"
+    },
+    {
+      "id": "http_rpc_legacy_typed_unchanged",
+      "endpoints_intersection": 1,
+      "typed_intersection": 1
+    },
+    {
+      "id": "smtp_not_message_broker",
+      "expected_error": "unexpected_messaging"
+    },
+    {
+      "id": "smtp_with_data_type_rejected",
+      "expected_error": "relation_channel"
+    },
+    {
+      "id": "smtp_with_messaging_type_rejected",
+      "expected_error": "relation_channel"
+    },
+    {
+      "id": "smtp_trace_data_type_rejected",
+      "expected_error": "trace_channel"
+    },
+    {
+      "id": "unknown_trace_transport_rejected",
+      "expected_error": "trace_channel"
+    },
+    {
+      "id": "smtp_unverified_mapping",
+      "endpoints_intersection": 0,
+      "typed_intersection": 0,
+      "trace_exclusion": "unverified_mapping:target"
+    },
+    {
+      "id": "smtp_empty_trace_denominator",
+      "endpoints_static_denominator": 1,
+      "endpoints_trace_denominator": 0,
+      "endpoints_trace_fraction": null
+    },
+    {
+      "id": "smtp_context_kept_not_address_verified",
+      "expected_contexts": 2,
+      "expected_entity_edges": 1,
+      "authority_tls_verified": false
+    },
+    {
+      "id": "smtp_order_and_input_immutability",
+      "expected": true
+    },
+    {
+      "id": "smtp_runtime_name_not_filled",
+      "expected_runtime_name": null
+    },
+    {
+      "id": "smtp_no_recipient_or_broker_invented",
+      "expected_entity_nodes": [
+        "mail-server",
+        "sender"
+      ],
+      "expected_edge_target": "mail-server"
+    },
+    {
+      "id": "smtp_shared_metric_not_multiplied",
+      "expected_signal_count": 1,
+      "expected_signal_operation": null
+    },
+    {
+      "id": "smtp_operation_mapping_owner_conflict",
+      "expected_trace_exclusion": "operation_owner_conflict:source"
+    },
+    {
+      "id": "legacy_T036_fixture_build_exact_equal",
+      "expected": true
+    },
+    {
+      "id": "legacy_T038_frozen_build_exact_equal",
+      "expected": true
+    },
+    {
+      "id": "current_T037_SMTP_model_build_exact_equal",
+      "expected": true
+    },
+    {
+      "id": "current_T039_model_build_exact_equal",
+      "expected": true
+    },
+    {
+      "id": "current_structural_to_proposed_protocol_comparison",
+      "baseline_endpoints_intersection": 1,
+      "candidate_endpoints_intersection": 0,
+      "note": "Intended comparison semantics change, not a bug fix to current accepted structural comparator."
+    }
+  ],
+  "not_tested_by_this_oracle": [
+    "SMTP network",
+    "JavaMailSender implementation",
+    "TLS negotiation",
+    "recipient delivery",
+    "whole inventory",
+    "RCA benefit",
+    "new shared pin adoption"
+  ]
+}

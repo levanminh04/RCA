@@ -1,0 +1,832 @@
+[
+  {
+    "name": "F1",
+    "spans": [
+      {
+        "traceID": "t",
+        "spanID": "a",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "operationName": "a",
+        "startTime": 0,
+        "duration": 100,
+        "kind": null,
+        "attributes": {},
+        "links": []
+      },
+      {
+        "traceID": "t",
+        "spanID": "b",
+        "parentSpanID": "a",
+        "serviceName": "B",
+        "operationName": "b",
+        "startTime": 10,
+        "duration": 40,
+        "kind": null,
+        "attributes": {},
+        "links": []
+      },
+      {
+        "traceID": "t",
+        "spanID": "c",
+        "parentSpanID": "a",
+        "serviceName": "C",
+        "operationName": "c",
+        "startTime": 20,
+        "duration": 40,
+        "kind": null,
+        "attributes": {},
+        "links": []
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "C": "service",
+      "db": "database",
+      "cache": "cache",
+      "mq": "broker",
+      "partner": "external",
+      "host": "host"
+    }
+  },
+  {
+    "name": "F2",
+    "spans": [
+      {
+        "traceID": "t",
+        "spanID": "a",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "operationName": "a",
+        "startTime": 0,
+        "duration": 10,
+        "kind": null,
+        "attributes": {
+          "db.entity": "db",
+          "db.type": "database"
+        },
+        "links": []
+      },
+      {
+        "traceID": "t",
+        "spanID": "b",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "operationName": "b",
+        "startTime": 0,
+        "duration": 10,
+        "kind": null,
+        "attributes": {
+          "db.entity": "db",
+          "db.type": "database"
+        },
+        "links": []
+      },
+      {
+        "traceID": "t",
+        "spanID": "c",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "operationName": "c",
+        "startTime": 0,
+        "duration": 10,
+        "kind": null,
+        "attributes": {
+          "db.entity": "cache",
+          "db.type": "cache"
+        },
+        "links": []
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "C": "service",
+      "db": "database",
+      "cache": "cache",
+      "mq": "broker",
+      "partner": "external",
+      "host": "host"
+    }
+  },
+  {
+    "name": "F3",
+    "spans": [
+      {
+        "traceID": "send",
+        "spanID": "p",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "operationName": "p",
+        "startTime": 0,
+        "duration": 10,
+        "kind": "PRODUCER",
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.destination": "orders",
+          "messaging.message_id": "m1"
+        },
+        "links": []
+      },
+      {
+        "traceID": "receive",
+        "spanID": "c",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "operationName": "c",
+        "startTime": 20,
+        "duration": 10,
+        "kind": "CONSUMER",
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.destination": "orders",
+          "messaging.message_id": "m1"
+        },
+        "links": [
+          {
+            "traceID": "send",
+            "spanID": "p",
+            "semantics": "message_creation",
+            "semantics_verified": true
+          }
+        ]
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "C": "service",
+      "db": "database",
+      "cache": "cache",
+      "mq": "broker",
+      "partner": "external",
+      "host": "host"
+    }
+  },
+  {
+    "name": "F4",
+    "spans": [
+      {
+        "traceID": "send",
+        "spanID": "p",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "operationName": "p",
+        "startTime": 0,
+        "duration": 10,
+        "kind": "PRODUCER",
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.destination": "orders",
+          "messaging.message_id": "m1"
+        },
+        "links": []
+      },
+      {
+        "traceID": "r1",
+        "spanID": "c1",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "operationName": "c1",
+        "startTime": 20,
+        "duration": 10,
+        "kind": "CONSUMER",
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.destination": "orders",
+          "messaging.message_id": "m1",
+          "messaging.attempt": 1
+        },
+        "links": [
+          {
+            "traceID": "send",
+            "spanID": "p",
+            "semantics": "message_creation",
+            "semantics_verified": true
+          }
+        ]
+      },
+      {
+        "traceID": "r2",
+        "spanID": "c2",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "operationName": "c2",
+        "startTime": 40,
+        "duration": 10,
+        "kind": "CONSUMER",
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.destination": "orders",
+          "messaging.message_id": "m1",
+          "messaging.attempt": 2
+        },
+        "links": [
+          {
+            "traceID": "send",
+            "spanID": "p",
+            "semantics": "message_creation",
+            "semantics_verified": true
+          }
+        ]
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "C": "service",
+      "db": "database",
+      "cache": "cache",
+      "mq": "broker",
+      "partner": "external",
+      "host": "host"
+    }
+  },
+  {
+    "name": "F5",
+    "spans": [
+      {
+        "traceID": "t",
+        "spanID": "a",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "operationName": "saga",
+        "startTime": 0,
+        "duration": 100,
+        "kind": null,
+        "attributes": {},
+        "links": []
+      },
+      {
+        "traceID": "t",
+        "spanID": "b",
+        "parentSpanID": "a",
+        "serviceName": "B",
+        "operationName": "charge",
+        "startTime": 10,
+        "duration": 10,
+        "kind": null,
+        "attributes": {},
+        "links": []
+      },
+      {
+        "traceID": "t",
+        "spanID": "c",
+        "parentSpanID": "a",
+        "serviceName": "C",
+        "operationName": "issue",
+        "startTime": 30,
+        "duration": 10,
+        "kind": null,
+        "attributes": {},
+        "links": []
+      },
+      {
+        "traceID": "t",
+        "spanID": "b2",
+        "parentSpanID": "a",
+        "serviceName": "B",
+        "operationName": "refund-compensation",
+        "startTime": 50,
+        "duration": 10,
+        "kind": null,
+        "attributes": {},
+        "links": []
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "C": "service",
+      "db": "database",
+      "cache": "cache",
+      "mq": "broker",
+      "partner": "external",
+      "host": "host"
+    }
+  },
+  {
+    "name": "F6",
+    "spans": [
+      {
+        "traceID": "out",
+        "spanID": "client",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "operationName": "client",
+        "startTime": 0,
+        "duration": 10,
+        "kind": "CLIENT",
+        "attributes": {
+          "peer.entity": "partner",
+          "peer.type": "external"
+        },
+        "links": []
+      },
+      {
+        "traceID": "new",
+        "spanID": "callback",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "operationName": "callback-validate",
+        "startTime": 100,
+        "duration": 10,
+        "kind": null,
+        "attributes": {},
+        "links": []
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "C": "service",
+      "db": "database",
+      "cache": "cache",
+      "mq": "broker",
+      "partner": "external",
+      "host": "host"
+    }
+  },
+  {
+    "name": "F7",
+    "spans": [
+      {
+        "traceID": "t",
+        "spanID": "timer",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "operationName": "expiry-scheduler",
+        "startTime": 0,
+        "duration": 10,
+        "kind": null,
+        "attributes": {},
+        "links": []
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "C": "service",
+      "db": "database",
+      "cache": "cache",
+      "mq": "broker",
+      "partner": "external",
+      "host": "host"
+    }
+  },
+  {
+    "name": "F8",
+    "spans": [
+      {
+        "traceID": "t",
+        "spanID": "a",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "operationName": "a",
+        "startTime": 0,
+        "duration": 100,
+        "kind": null,
+        "attributes": {},
+        "links": []
+      },
+      {
+        "traceID": "t",
+        "spanID": "b",
+        "parentSpanID": "a",
+        "serviceName": "B",
+        "operationName": "b",
+        "startTime": 10,
+        "duration": 70,
+        "kind": null,
+        "attributes": {},
+        "links": []
+      },
+      {
+        "traceID": "t",
+        "spanID": "a2",
+        "parentSpanID": "b",
+        "serviceName": "A",
+        "operationName": "a2",
+        "startTime": 20,
+        "duration": 30,
+        "kind": null,
+        "attributes": {},
+        "links": []
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "C": "service",
+      "db": "database",
+      "cache": "cache",
+      "mq": "broker",
+      "partner": "external",
+      "host": "host"
+    }
+  },
+  {
+    "name": "F9",
+    "spans": [
+      {
+        "traceID": "t",
+        "spanID": "a",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "operationName": "a",
+        "startTime": 0,
+        "duration": 100,
+        "kind": null,
+        "attributes": {},
+        "links": []
+      },
+      {
+        "traceID": "t",
+        "spanID": "inner",
+        "parentSpanID": "a",
+        "serviceName": "A",
+        "operationName": "inner",
+        "startTime": 10,
+        "duration": 70,
+        "kind": null,
+        "attributes": {},
+        "links": []
+      },
+      {
+        "traceID": "t",
+        "spanID": "inner2",
+        "parentSpanID": "inner",
+        "serviceName": "A",
+        "operationName": "inner2",
+        "startTime": 20,
+        "duration": 30,
+        "kind": null,
+        "attributes": {},
+        "links": []
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "C": "service",
+      "db": "database",
+      "cache": "cache",
+      "mq": "broker",
+      "partner": "external",
+      "host": "host"
+    }
+  },
+  {
+    "name": "F10-orphan",
+    "spans": [
+      {
+        "traceID": "t",
+        "spanID": "a",
+        "parentSpanID": "missing",
+        "serviceName": "A",
+        "operationName": "a",
+        "startTime": 0,
+        "duration": 10,
+        "kind": null,
+        "attributes": {},
+        "links": []
+      },
+      {
+        "traceID": "t",
+        "spanID": "x",
+        "parentSpanID": "",
+        "serviceName": "outside",
+        "operationName": "x",
+        "startTime": 0,
+        "duration": 10,
+        "kind": null,
+        "attributes": {},
+        "links": []
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "C": "service",
+      "db": "database",
+      "cache": "cache",
+      "mq": "broker",
+      "partner": "external",
+      "host": "host"
+    }
+  },
+  {
+    "name": "F10-duplicate",
+    "spans": [
+      {
+        "traceID": "t",
+        "spanID": "a",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "operationName": "a",
+        "startTime": 0,
+        "duration": 10,
+        "kind": null,
+        "attributes": {},
+        "links": []
+      },
+      {
+        "traceID": "t",
+        "spanID": "a",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "operationName": "a",
+        "startTime": 0,
+        "duration": 10,
+        "kind": null,
+        "attributes": {},
+        "links": []
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "C": "service",
+      "db": "database",
+      "cache": "cache",
+      "mq": "broker",
+      "partner": "external",
+      "host": "host"
+    }
+  },
+  {
+    "name": "F10-conflict",
+    "spans": [
+      {
+        "traceID": "t",
+        "spanID": "a",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "operationName": "a",
+        "startTime": 0,
+        "duration": 10,
+        "kind": null,
+        "attributes": {},
+        "links": []
+      },
+      {
+        "traceID": "t",
+        "spanID": "a",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "operationName": "a",
+        "startTime": 0,
+        "duration": 10,
+        "kind": null,
+        "attributes": {},
+        "links": []
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "C": "service",
+      "db": "database",
+      "cache": "cache",
+      "mq": "broker",
+      "partner": "external",
+      "host": "host"
+    }
+  },
+  {
+    "name": "F10-empty",
+    "spans": [],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "C": "service",
+      "db": "database",
+      "cache": "cache",
+      "mq": "broker",
+      "partner": "external",
+      "host": "host"
+    }
+  },
+  {
+    "name": "F10-invalid",
+    "spans": [
+      {
+        "traceID": "t",
+        "spanID": "a",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "operationName": "a",
+        "startTime": 0,
+        "duration": -1,
+        "kind": null,
+        "attributes": {},
+        "links": []
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "C": "service",
+      "db": "database",
+      "cache": "cache",
+      "mq": "broker",
+      "partner": "external",
+      "host": "host"
+    }
+  },
+  {
+    "name": "F11",
+    "spans": [
+      {
+        "traceID": "t",
+        "spanID": "a",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "operationName": "a",
+        "startTime": 0,
+        "duration": 10,
+        "kind": null,
+        "attributes": {
+          "host.id": "host",
+          "host.identity_verified": true
+        },
+        "links": []
+      },
+      {
+        "traceID": "t",
+        "spanID": "b",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "operationName": "b",
+        "startTime": 0,
+        "duration": 10,
+        "kind": null,
+        "attributes": {
+          "host.id": "host",
+          "host.identity_verified": true
+        },
+        "links": []
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "C": "service",
+      "db": "database",
+      "cache": "cache",
+      "mq": "broker",
+      "partner": "external",
+      "host": "host"
+    }
+  },
+  {
+    "name": "message-correlation-only",
+    "spans": [
+      {
+        "traceID": "t",
+        "spanID": "p",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "operationName": "p",
+        "startTime": 0,
+        "duration": 10,
+        "kind": "PRODUCER",
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.destination": "orders",
+          "correlationId": "order"
+        },
+        "links": []
+      },
+      {
+        "traceID": "r",
+        "spanID": "c",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "operationName": "c",
+        "startTime": 0,
+        "duration": 10,
+        "kind": "CONSUMER",
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.destination": "orders",
+          "correlationId": "order"
+        },
+        "links": []
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "C": "service",
+      "db": "database",
+      "cache": "cache",
+      "mq": "broker",
+      "partner": "external",
+      "host": "host"
+    }
+  },
+  {
+    "name": "message-ambiguous",
+    "spans": [
+      {
+        "traceID": "s1",
+        "spanID": "p",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "operationName": "p",
+        "startTime": 0,
+        "duration": 10,
+        "kind": "PRODUCER",
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.destination": "orders",
+          "messaging.message_id": "m1"
+        },
+        "links": []
+      },
+      {
+        "traceID": "s2",
+        "spanID": "p2",
+        "parentSpanID": "",
+        "serviceName": "C",
+        "operationName": "p2",
+        "startTime": 0,
+        "duration": 10,
+        "kind": "PRODUCER",
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.destination": "orders",
+          "messaging.message_id": "m1"
+        },
+        "links": []
+      },
+      {
+        "traceID": "r",
+        "spanID": "c",
+        "parentSpanID": "",
+        "serviceName": "B",
+        "operationName": "c",
+        "startTime": 0,
+        "duration": 10,
+        "kind": "CONSUMER",
+        "attributes": {
+          "messaging.broker": "mq",
+          "messaging.destination": "orders",
+          "messaging.message_id": "m1"
+        },
+        "links": []
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "C": "service",
+      "db": "database",
+      "cache": "cache",
+      "mq": "broker",
+      "partner": "external",
+      "host": "host"
+    }
+  },
+  {
+    "name": "typed-call",
+    "spans": [
+      {
+        "traceID": "t",
+        "spanID": "client",
+        "parentSpanID": "",
+        "serviceName": "A",
+        "operationName": "client",
+        "startTime": 0,
+        "duration": 100,
+        "kind": "CLIENT",
+        "attributes": {},
+        "links": []
+      },
+      {
+        "traceID": "t",
+        "spanID": "server",
+        "parentSpanID": "client",
+        "serviceName": "B",
+        "operationName": "server",
+        "startTime": 10,
+        "duration": 40,
+        "kind": "SERVER",
+        "attributes": {},
+        "links": []
+      }
+    ],
+    "universe": {
+      "A": "service",
+      "B": "service",
+      "C": "service",
+      "db": "database",
+      "cache": "cache",
+      "mq": "broker",
+      "partner": "external",
+      "host": "host"
+    }
+  }
+]

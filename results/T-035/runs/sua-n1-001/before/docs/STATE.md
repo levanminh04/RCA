@@ -1,0 +1,56 @@
+# Trạng thái
+
+Cập nhật: 14/10/2026. Không quá một trang. Chi tiết từng task nằm ở `tasks/<mã>/LOG.md`.
+
+- **Cổng hiện tại:** G2 đã duyệt ngày 14/10/2026 (Q-149); bước kế tiếp là P5. G1 đã duyệt ngày 05/10/2026 (Q-61–Q-69; chốt G1 ở Q-70). G0 đã duyệt ngày 02/10/2026 (Q-36).
+- **Test và dataset giữ ngoài:** test: 60 ca RE2-TT (TX1, `data/locked/`) và phần test theo ô của Nezha-OB (Q-61, Q-63); Eadro-TT đã duyệt 3 dev/6 test ngày 05/10, danh sách tại `results/T-023/allowlist-phien.json`. Không dùng Eadro trong thực nghiệm tới G2 (Q-83); giữ ngoài: RE3-OB (chưa tải).
+- **Remote git:** `github.com/levanminh04/RCA`. Đã có commit đầu tiên.
+
+## Mục lục task
+
+| Mã | Tên | Gói | Người làm | Người phản biện | Trạng thái | Thư mục |
+|---|---|---|---|---|---|---|
+| T-000 | Nền tảng: MRP v3 và quy trình | P0 | Claude | Codex | Xong (02/10) | `tasks/T-000-nen-tang/` |
+| T-001 | Chốt danh sách phương pháp | P1 | Claude | Codex | Xong (03/10) | `tasks/T-001-danh-sach-phuong-phap/` |
+| T-002 | Thẻ dataset họ RCAEval | P2 | Codex | Claude | Xong (04/10) | `tasks/T-002-the-dataset-rcaeval/` |
+| T-003 | Gói thẻ dataset ngoài RCAEval | P2 | Codex | Claude | Xong (04/10) | `tasks/T-003-the-dataset-ngoai-rcaeval/` |
+| T-005 | Đo khả thi môi trường và thời gian chạy | P1 | Claude | Codex | Xong (04/10) | `tasks/T-005-do-kha-thi/` |
+| T-006 | Kiểm đúng đắn các phương pháp trên laptop | P1 | Claude | Codex | Xong (04/10). WHY-15 đã ghi. Q-52–54 đã ghi DECISIONS (Minh duyệt 04/10). Mục 11 điểm 3–6 của `kiem-dung-dan.md`: chuyển cho T-014 (CIRCA) và T-016 (RCD) đánh giá | `tasks/T-006-kiem-dung-dan-laptop/` |
+| T-007 | Kiểm đúng đắn trên EC2 (MicroRank, TraceRCA, BOCPD) | P1 | Claude | Codex | Xong (04/10). Việc dọn còn lại: xóa `~/.sudo_as_admin_successful` khi bật lại EC2 của T-007 | `tasks/T-007-kiem-dung-dan-ec2/` |
+| T-008 | Thẻ Nezha OB/TT | P2 | Codex | Claude | Xong (04/10) | `tasks/T-008-the-dataset-nezha/` |
+| T-009 | Thẻ Eadro TT/SN | P2 | Codex | Claude | Xong (04/10) | `tasks/T-009-the-dataset-eadro/` |
+| T-010 | Thẻ DeepTraLog TT | P2 | Codex | Claude | Xong (04/10) | `tasks/T-010-the-dataset-deeptralog/` |
+| T-011 | Thẻ LEMMA-RCA | P2 | Codex | Claude | Xong (04/10) | `tasks/T-011-the-dataset-lemma-rca/` |
+| T-012 | Khảo sát dataset 2025–2026 | P2 | Codex | Claude | Xong (04/10) | `tasks/T-012-khao-sat-dataset-2025-2026/` |
+| T-014 | Hồ sơ CIRCA PC và kiến trúc | P1 | Codex | Claude | Xong (04/10/2026) | `tasks/T-014-ho-so-circa/` |
+| T-013 | Hồ sơ BARO và bộ phát hiện | P1 | Codex | Claude | Xong (04/10/2026); Minh duyệt sau sửa R1 và N1–N3 | `tasks/T-013-ho-so-baro/` |
+| T-015 | Hồ sơ MicroRank, TraceRCA và detector trace | P1 | Codex | Claude | Xong (04/10/2026) | `tasks/T-015-ho-so-microrank/` |
+| T-019 | Thẻ Sock Shop RCAEval | P2 | Codex | Claude | Xong (04/10/2026) | `tasks/T-019-the-sock-shop/` |
+| T-016 | Hồ sơ TORAI, lõi RCD và biến thể RCD | P1 | Claude | Codex | Xong (04/10). Đã áp WHY-19, WHY-20, SL36, K1 C.5/C.8, Q-57; đính chính T-001/T-005/T-006 (D1–D6) | `tasks/T-016-ho-so-torai/` |
+| T-017 | Hồ sơ SimpleRCA M4 và luật Type I/II | P1 | Codex | Claude | Xong (04/10/2026); Q-55 | `tasks/T-017-simplerca/` |
+| T-018 | Hồ sơ GDN và đọc DecompRCA | P1 | Claude | Codex | Xong (04/10/2026); Q-56, WHY-18. E2 chuyển G1 | `tasks/T-018-ho-so-gdn-decomprca/` |
+| T-020 | Tổng hợp G1: phương pháp, dataset, cách chia | P1, P2 | Codex | Claude | Đóng 05/10/2026: thay bằng T-021 (Minh đồng ý đề xuất 0); R1–R3 xử lý ở `results/T-021/goi-g1.md` mục 7 | `tasks/T-020-tong-hop-g1/` |
+| T-021 | Gói G1 thu gọn | P1, P2 | Claude | Codex | Xong 05/10/2026: Minh trả lời 7 câu G1 (Q-61–Q-69), không thêm vòng phản biện (đề xuất 0) | `tasks/T-021-goi-g1-thu-gon/` |
+| T-022 | Giao thức P3, adapter RE2, bộ chấm, pilot | P3 | Claude | Codex | Xong (06/10, Minh duyệt đóng). Giao thức V2 + WHY-22–35 (Q-74, Q-76); code/pilot chuyển T-030. Còn: ghi sổ Q-75 (mã để trống), chưa commit | `tasks/T-022-giao-thuc-p3/` |
+| T-023 | Kiểm điều kiện dùng Eadro-TT | P3 | Codex | Claude | Xong (06/10, Minh duyệt đóng; Q-83). Không đưa Eadro vào thực nghiệm tới G2; không triển khai T-027 trong đợt này. Giữ kết quả kiểm và mọi run; clock/cửa sổ/lineage/reference còn OPEN. Chưa commit | `tasks/T-023-kiem-eadro/` |
+| T-030 | Cài giao thức P3 trên RE2-TT dev: mã chung, fixture, D1, K-B1 | P3 | Claude | Codex | Xong (06/10, Minh duyệt đóng). Mã `src/p3/`, 57 test đạt; D1, phát lại khớp, K-B1 đạt. Phản biện Codex hai lượt: R1, R2, N1 đã sửa, Codex xác nhận; R3 đã sửa theo lời duyệt, Codex chưa kiểm lại. Chuyển sang T-031: chi phí BOCPD đo trên dữ liệu tổng hợp ≈ 27–83 giờ/30 ca, vượt Q-72; T-031 đo lại trên tiền tố (Q-77). Chưa commit | `tasks/T-030-cai-dat-p3/` |
+| T-031 | Chạy P3 trên RE2-TT dev: kiểm khóa cấu hình, pilot chi phí | P3 | Claude | Codex | Xong (06/10, Minh duyệt đóng). Khóa CIRCA OLS (Q-80, Q-82; 11 ca vượt ngưỡng 1e10 báo riêng), TORAI nguồn B; MicroRank 4 ERROR tính trượt; chi phí và đề xuất T-024/T-025 ở `results/T-031/do-chi-phi.md`. Phản biện hai lượt: REVIEW R1–R4 và REVIEW-2 R1–R3 đã xử lý, Codex chưa kiểm lại lượt 2. Chưa commit | `tasks/T-031-chay-khoa-pilot/` |
+| T-024 | Chấm tầng 1 chế độ (a) trên 30 ca dev RE2-TT | P3 | Codex | Claude | Xong (07/10, Minh duyệt đóng). Hai lượt phản biện đã xử lý; 420 bản ghi và số/bảng giữ nguyên. Nguồn code TORAI EC2 đã đối chiếu khớp (LOG phiên 7). Giới hạn CIRCA làm tròn và hòa ẩn RCD giữ rõ trong báo cáo. Chưa commit | `tasks/T-024-cham-che-do-a/` |
+| T-025 | Chế độ (b): N-Sigma, BOCPD (EC2, TIMEOUT 6 giờ/ca), RCA tại báo động đầu | P3 | Claude | Codex | Xong (07/10, Minh duyệt đóng). Báo động đầu đúng BOCPD 3/30, N-Sigma 0/30; thành công chung bị chặn trước hết ở bộ phát hiện. Phản biện R1–R3, N1–N4 đã xử lý (sửa mô tả, tách số TORAI, WHY-35 "biên file"). Hai EC2 đã tắt. Chưa commit | `tasks/T-025-che-do-b/` |
+| T-026 | Adapter và chấm tầng 1 chế độ (a) trên Nezha-OB dev (22 ca) | P3 | Codex | Claude | Xong (07/10, Minh duyệt đóng). R1/R2 đã sửa và kiểm đạt; 248 nguồn/số chấm giữ nguyên. Giữ 1 ERROR MicroRank cắt N; CIRCA/TORAI B UNSUPPORTED. Các OPEN nguyên nhân/nền/clock/test/license giữ trong báo cáo và LOG phiên7–8. Chưa commit | `tasks/T-026-nezha-ob-che-do-a/` |
+| T-028 | P4: hạn chế xếp hạng chế độ (a) | P4 | Codex | Claude | Xong (08/10/2026), Minh duyệt đóng. Đã sửa R1–R4 và bổ sung R5; kết quả runs/phan-hoi-review-001, phép đo gốc buoc3-005. Nơi xử lý "lan có đáng kể" còn OPEN; chưa phân xử nhân quả. Chưa commit | `tasks/T-028-p4-han-che-xep-hang/` |
+| T-029 | P4: hạn chế phát hiện chế độ (b) | P4 | Codex | Claude | Xong (09/10, Minh duyệt đóng theo Q-87). Đã sửa REVIEW-4 và P1/P2; REVIEW-5 không có lỗi đáng kể. Giữ các giới hạn đã khai; chưa commit | `tasks/T-029-p4-han-che-phat-hien/` |
+| T-032 | Lần theo nguyên nhân thất bại xếp hạng | P4 | Claude | Codex | Xong (13/10/2026, Minh đóng bằng lời “ĐÓNG T-032”). Không đóng RQ2/G2. Trước khi dùng H6, H8, CIRCA, KT-11 đọc runs/bo-sung-toan-dien-20261012-001/doi-chieu-dien-giai-review-001.md. Lịch sử trước khi đóng: chờ kiểm lại bản sửa (12/10/2026). Minh duyệt Codex sửa sau REVIEW và yêu cầu phiên Codex mới kiểm (Q-142), thêm câu S-1 (Q-143); giữ vai trò lịch sử trong SPEC. Bốn báo cáo đã sửa; tiêu chí3 đạt một phần, không đóng RQ2/G2. Gói results/T-032/runs/sua-review-001/: M-D48PASS+4N/A, kiểm số412/412 và17bổ sung, A46/D15/E61đạt; giữ cả lượt lỗi. REVIEW chỉ bảng phản hồi, LOG nối thêm. Còn OPEN: đáp ứng return, trọng số khi nhóm đổi, ca ghép chưa rõ, nguyên nhân độ nhạy cửa sổ; quyết định G2/P5–P6 chưa chốt. Prompt mới đầy đủ ở cuối LOG và prompt-codex-kiem-lai.txt; phiên mới mặc định chỉ đọc. Không sửa baseline/test; chưa commit. EC2 chưa thao tác trong lượt sửa.; bổ sung Q-144 hoàn tất phép kiểm13/10, chờ Minh xem báo cáo; giới hạn và kết quả/nghiệm thu cũ giữ rõ; xem LOG và runs/bo-sung-toan-dien-20261012-001/BAO-CAO-TONG-HOP.md | `tasks/T-032-g2-nguyen-nhan-xep-hang/` |
+| T-033 | Lần theo cơ chế báo động trước mốc | P4 | Codex | Claude | Xong (11/10/2026, Minh nghiệm thu; Q-137–Q-140). Mục1–3 hoàn tất; số bổ sung EC2 khớp Claude, phản biện dừng. Xác nhận chuỗi N-Sigma/BOCPD, hướng tiền xử lý nhìn trước, cờ khác bắt đầu đoạn MAP, freeze19/60. OPEN: câu4/onset thật/báo giả vận hành/prior riêng/tác động bậc thang/lợi ích đồ thị/D; không so cửa sổ trong T033. T034 dùng câu thay mục6 bo-sung-bao-cao.md, không câu cũ report002. Không đóng RQ2/G2 hoặc chọn P6; chưa commit; bổ sung Q-144 hoàn tất phép kiểm13/10, chờ Minh xem báo cáo; giới hạn và kết quả/nghiệm thu cũ giữ rõ; xem LOG và runs/bo-sung-toan-dien-20261012-001/BAO-CAO-TONG-HOP.md | `tasks/T-033-g2-nguyen-nhan-phat-hien/` |
+| T-034 | Gói trình G2: baseline, bản đồ hạn chế hợp nhất, hai phép E1/E2 | P3, P4 (G2) | Claude | Codex | Chờ Minh nghiệm thu (14/10/2026); chưa đóng. Phản biện dừng 14/10 sau sáu lượt sửa (Q-147, Q-148); lượt sửa cuối chỉ đổi lời văn, Codex chưa kiểm. Đầu ra ở `results/T-034/`, bản hiện tại theo `runs/manifest-cuoi-007/`. E1, E2 đã chạy xong trên dev. G2 đã duyệt (Q-149). Các lựa chọn ở mục 8 của `goi-g2.md` theo quyết định hiện hành trong `docs/DECISIONS.md`; lựa chọn chưa được quyết vẫn chờ Minh. Còn mở: lan có đáng kể, đóng góp của chờ ở CIRCA, chênh hai bản TraceRCA, underflow ngoài hai ca, thời điểm sự cố bắt đầu. Kết quả và LOG của task đã commit 14/10; thay đổi trong `docs/` chưa commit | `tasks/T-034-g2-goi-trinh/` |
+| T-035 | P5a: đặc tả đồ thị phụ thuộc và bộ dựng từ trace | P5 (G3) | Codex | Claude | Chờ Claude phản biện kết quả (14/10/2026). Đã triển khai theo Q-153; v0/v1, bộ dựng và toàn bộ dev hoàn tất; K1–K8 kiểm theo SPEC, giới hạn tại results/T-035/. Node/semantics cạnh còn OPEN; chưa chọn P6, chưa nghiệm thu/đóng task. Prompt ở LOG Phiên 6 và results/T-035/prompt-claude-soat-ket-qua.txt. T-036 nhận v1, chưa có SPEC. | `tasks/T-035-p5-do-thi-tu-trace/` |
+
+
+## Task đang mở
+
+G2 đã duyệt; T-034 vẫn chờ Minh nghiệm thu, không tự đóng RQ2. T-035 đã triển khai, đang chờ Claude phản biện kết quả; prompt bàn giao ở LOG Phiên 6. Khi có đặc tả v1, soạn SPEC T-036 cho nguồn kiến trúc và đối chiếu, gồm danh mục thành phần/đồ thị tĩnh FlashTicket theo phiên bản nguồn. P6 chọn tín hiệu, cơ chế và mức đồ thị bằng SPEC riêng. T-004 (P9a) chưa triển khai; nhận yêu cầu quan sát từ P5. P9b cung cấp trace FlashTicket chuẩn hóa; đối chiếu với nguồn tĩnh khi có dữ liệu phải được giao trong SPEC tương ứng. Các câu nghiên cứu còn mở và việc chờ Minh xem từng dòng task và `docs/DECISIONS.md`.
+
+## Đang chờ Minh
+
+- T-003, T-012 đã đóng 04/10 (Minh xác nhận Q-51 gồm cả việc sửa SPEC T-012). License/clock/lineage còn OPEN theo thẻ. EC2 đã Stop (Minh báo 04/10); dữ liệu trên EC2 giữ nguyên.
+- T-022: ghi sổ Q-75, commit. T-030: commit; xóa ghi chú scratchpad phiên 1 (ngoài repo). T-031: commit. T-024 đã đóng 07/10, chờ duyệt commit; T-025 đã đóng 07/10, chờ duyệt commit. T-023 đã đóng (Q-83); còn đề xuất commit thay đổi đã duyệt.

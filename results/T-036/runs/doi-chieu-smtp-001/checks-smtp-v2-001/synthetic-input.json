@@ -1,0 +1,156 @@
+{
+  "context": {
+    "domain": "synthetic",
+    "level": "entity",
+    "revision_link_verified": false,
+    "revision_provenance": [],
+    "system": "synthetic-SMTP",
+    "trace_revision": "literal-v1"
+  },
+  "document": {
+    "entities": [
+      {
+        "granularity": "logical",
+        "id": "sender",
+        "name": "sender",
+        "provenance": [
+          {
+            "condition": "literal synthetic evidence, not actual trace",
+            "locator": "cases",
+            "source_id": "oracle"
+          }
+        ],
+        "role": "synthetic",
+        "type": "service"
+      },
+      {
+        "granularity": "logical",
+        "id": "mail-server",
+        "name": "mail-server",
+        "provenance": [
+          {
+            "condition": "literal synthetic evidence, not actual trace",
+            "locator": "cases",
+            "source_id": "oracle"
+          }
+        ],
+        "role": "synthetic",
+        "type": "external"
+      }
+    ],
+    "operations": [
+      {
+        "entity": "sender",
+        "name": "send-mail",
+        "provenance": [
+          {
+            "condition": "literal synthetic evidence, not actual trace",
+            "locator": "cases",
+            "source_id": "oracle"
+          }
+        ],
+        "runtime_name": null
+      }
+    ],
+    "relations": [
+      {
+        "channel": "smtp",
+        "context": "host=mail.test;port=465;ssl=true configured;runtime unverified",
+        "id": "smtp-hop",
+        "messaging": null,
+        "provenance": [
+          {
+            "condition": "literal synthetic evidence, not actual trace",
+            "locator": "cases",
+            "source_id": "oracle"
+          }
+        ],
+        "source": {
+          "entity": "sender",
+          "operation": "send-mail"
+        },
+        "target": {
+          "entity": "mail-server",
+          "operation": null
+        },
+        "type": "gọi-đồng-bộ"
+      }
+    ],
+    "resource_bindings": [],
+    "scope": {
+      "revision": "literal-v1",
+      "system": "synthetic-SMTP"
+    },
+    "signals": []
+  },
+  "mapping": [
+    {
+      "candidates": [
+        "sender"
+      ],
+      "level": "entity",
+      "original": "sender",
+      "provenance": [
+        {
+          "condition": "literal synthetic evidence, not actual trace",
+          "locator": "cases",
+          "source_id": "oracle"
+        }
+      ],
+      "verified": true
+    },
+    {
+      "candidates": [
+        "mail-server"
+      ],
+      "level": "entity",
+      "original": "mail-server",
+      "provenance": [
+        {
+          "condition": "literal synthetic evidence, not actual trace",
+          "locator": "cases",
+          "source_id": "oracle"
+        }
+      ],
+      "verified": true
+    }
+  ],
+  "registry": {
+    "sources": [
+      {
+        "condition": "synthetic, not runtime",
+        "id": "oracle",
+        "kind": "synthetic",
+        "revision": "literal-v1",
+        "sha256": "09a1ec958ef82799a1e5c70b203c73b7e062cfea82cf9530a22517a8ed6fdd9a"
+      }
+    ]
+  },
+  "trace": {
+    "edges": [
+      {
+        "channel": "smtp",
+        "destination": null,
+        "event_count": 1,
+        "evidence_source": "trace",
+        "source": "sender",
+        "target": "mail-server",
+        "type": "gọi-đồng-bộ",
+        "witness": []
+      }
+    ],
+    "interval_ns": [
+      0,
+      1
+    ],
+    "level": "entity",
+    "nodes": [
+      {
+        "id": "sender"
+      },
+      {
+        "id": "mail-server"
+      }
+    ]
+  }
+}

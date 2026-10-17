@@ -1,0 +1,160 @@
+{
+  "builder_source_not_read_or_imported": true,
+  "case_count": 129,
+  "changed_file": "results/T-035/runs/sua-hop-dong-001/oracle_json.py",
+  "checker_not_executed": true,
+  "created_utc": "2026-10-15T07:18:27.329647+00:00",
+  "diff": "--- oracle.py\n+++ oracle_json.py\n@@ -360,7 +360,7 @@\n     def matches(value):\n         if 'error' in expected:\n             return value=={'error_type':'ValueError','error':expected['error']}\n-        return value=={'value':expected}\n+        return json.loads(json.dumps(value,ensure_ascii=False,allow_nan=False))==json.loads(json.dumps({'value':expected},ensure_ascii=False,allow_nan=False))\n     return {'name':case['name'],'input':normal({k:v for k,v in case.items() if k!='expected'}),\n             'expected':expected,'actual':normal(actual),'pass':all(matches(v) for v in actual.values())}\n \n",
+  "expected_and_inputs_unchanged": true,
+  "fixture_cases_ast_unchanged": true,
+  "isolated_comparator_checks": [
+    {
+      "api": "Prepared.graph",
+      "case": "identifier_control_database",
+      "new_json_comparison": true,
+      "old_native_comparison": false,
+      "wrong_target_rejected": true
+    },
+    {
+      "api": "build",
+      "case": "identifier_control_database",
+      "new_json_comparison": true,
+      "old_native_comparison": false,
+      "wrong_target_rejected": true
+    },
+    {
+      "api": "Prepared.graph",
+      "case": "identifier_control_cache",
+      "new_json_comparison": true,
+      "old_native_comparison": false,
+      "wrong_target_rejected": true
+    },
+    {
+      "api": "build",
+      "case": "identifier_control_cache",
+      "new_json_comparison": true,
+      "old_native_comparison": false,
+      "wrong_target_rejected": true
+    },
+    {
+      "api": "Prepared.graph",
+      "case": "identifier_control_peer",
+      "new_json_comparison": true,
+      "old_native_comparison": false,
+      "wrong_target_rejected": true
+    },
+    {
+      "api": "build",
+      "case": "identifier_control_peer",
+      "new_json_comparison": true,
+      "old_native_comparison": false,
+      "wrong_target_rejected": true
+    },
+    {
+      "api": "Prepared.graph",
+      "case": "identifier_control_broker_producer",
+      "new_json_comparison": true,
+      "old_native_comparison": false,
+      "wrong_target_rejected": true
+    },
+    {
+      "api": "build",
+      "case": "identifier_control_broker_producer",
+      "new_json_comparison": true,
+      "old_native_comparison": false,
+      "wrong_target_rejected": true
+    },
+    {
+      "api": "Prepared.graph",
+      "case": "identifier_control_broker_consumer",
+      "new_json_comparison": true,
+      "old_native_comparison": false,
+      "wrong_target_rejected": true
+    },
+    {
+      "api": "build",
+      "case": "identifier_control_broker_consumer",
+      "new_json_comparison": true,
+      "old_native_comparison": false,
+      "wrong_target_rejected": true
+    },
+    {
+      "api": "Prepared.graph",
+      "case": "identifier_control_host",
+      "new_json_comparison": true,
+      "old_native_comparison": false,
+      "wrong_target_rejected": true
+    },
+    {
+      "api": "build",
+      "case": "identifier_control_host",
+      "new_json_comparison": true,
+      "old_native_comparison": false,
+      "wrong_target_rejected": true
+    },
+    {
+      "api": "Prepared.graph",
+      "case": "type_endpoint_control_known_unknown",
+      "new_json_comparison": true,
+      "old_native_comparison": false,
+      "wrong_target_rejected": true
+    },
+    {
+      "api": "build",
+      "case": "type_endpoint_control_known_unknown",
+      "new_json_comparison": true,
+      "old_native_comparison": false,
+      "wrong_target_rejected": true
+    },
+    {
+      "api": "Prepared.graph",
+      "case": "type_endpoint_control_unknown_known",
+      "new_json_comparison": true,
+      "old_native_comparison": false,
+      "wrong_target_rejected": true
+    },
+    {
+      "api": "build",
+      "case": "type_endpoint_control_unknown_known",
+      "new_json_comparison": true,
+      "old_native_comparison": false,
+      "wrong_target_rejected": true
+    },
+    {
+      "api": "Prepared.graph",
+      "case": "type_endpoint_control_inventory_known_unknown",
+      "new_json_comparison": true,
+      "old_native_comparison": false,
+      "wrong_target_rejected": true
+    },
+    {
+      "api": "build",
+      "case": "type_endpoint_control_inventory_known_unknown",
+      "new_json_comparison": true,
+      "old_native_comparison": false,
+      "wrong_target_rejected": true
+    }
+  ],
+  "literal_cases_sha256_after": "7c9c16f1d3a9da15bd72b28623ed76b6ab9397a4c9f5366789f543bd48769b1b",
+  "literal_cases_sha256_before": "7c9c16f1d3a9da15bd72b28623ed76b6ab9397a4c9f5366789f543bd48769b1b",
+  "original_files_unchanged": true,
+  "original_oracle_sha256": "20f4cc0142127ad52d58638ffce45030d4f4dd0b3613848f2a5cf0ee31891f5a",
+  "original_receipt_sha256": "522e988b94ddec84f7ce5299c3cb968d3c88d3e4c09881f377505fb396136c0b",
+  "reason": "Nine saved failures have exact JSON actual/expected equality; native tuple witnesses differ from literal list witnesses under Python ==. Normalize only the successful value comparison through strict JSON roundtrip.",
+  "revised_oracle_sha256": "cffd748ffd4d6dfa3c058a83940cd33a206db311e15926add0d68b32dd3aaa59",
+  "saved_false_failures": [
+    "identifier_control_database",
+    "identifier_control_cache",
+    "identifier_control_peer",
+    "identifier_control_broker_producer",
+    "identifier_control_broker_consumer",
+    "identifier_control_host",
+    "type_endpoint_control_known_unknown",
+    "type_endpoint_control_unknown_known",
+    "type_endpoint_control_inventory_known_unknown"
+  ],
+  "sole_text_change": {
+    "new": "return json.loads(json.dumps(value,ensure_ascii=False,allow_nan=False))==json.loads(json.dumps({'value':expected},ensure_ascii=False,allow_nan=False))",
+    "old": "return value=={'value':expected}"
+  }
+}

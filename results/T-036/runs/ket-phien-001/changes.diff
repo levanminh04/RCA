@@ -1,0 +1,2865 @@
+--- /dev/null
++++ src/do_thi_tinh/__init__.py
+@@ -0,0 +1,6 @@
++"""Hợp đồng nguồn tĩnh v1; không I/O và không tính điểm RCA."""
++
++from .build import build, project
++from .compare import compare
++
++__all__ = ['build', 'project', 'compare']
+--- /dev/null
++++ src/do_thi_tinh/build.py
+@@ -0,0 +1,255 @@
++"""Bản ghi có nguồn → graph tĩnh. Hợp đồng: results/T-036/hop-dong.md."""
++from copy import deepcopy
++import json
++import re
++
++ENTITY_TYPES = {'service', 'gateway', 'database', 'cache', 'broker', 'identity-provider',
++                'external', 'host', 'unknown'}
++RELATION_TYPES = {'gọi-đồng-bộ', 'gọi-chưa-phân-kiểu', 'dữ-liệu', 'thông-điệp',
++                  'triển-khai', 'span-parent'}
++CHANNELS = {'http', 'rpc', 'data', 'publish', 'consume', 'logical-message',
++            'deployment', 'internal', 'span-parent'}
++MESSAGE_FIELDS = {'broker', 'broker_scope', 'exchange', 'routing_key', 'queue'}
++
++
++def canonical(value):
++    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(',', ':'), allow_nan=False)
++
++
++def fields(row, required, optional=()):
++    if not isinstance(row, dict):
++        raise ValueError('record_type')
++    if set(row) - set(required) - set(optional):
++        raise ValueError('unknown_fields:' + ','.join(sorted(set(row) - set(required) - set(optional))))
++    if set(required) - set(row):
++        raise ValueError('missing_fields:' + ','.join(sorted(set(required) - set(row))))
++
++
++def string(value):
++    if not isinstance(value, str) or not value.strip():
++        raise ValueError('nonempty_string')
++    return value
++
++
++def registry_index(registry):
++    if not isinstance(registry, dict) or not isinstance(registry.get('sources'), list):
++        raise ValueError('registry')
++    result = {}
++    for source in registry['sources']:
++        for key in ['id', 'kind', 'revision', 'sha256', 'condition']:
++            string(source.get(key))
++        if not re.fullmatch('[0-9a-f]{64}', source['sha256']):
++            raise ValueError('source_sha256')
++        if source['id'] in result:
++            raise ValueError('duplicate_source')
++        result[source['id']] = source
++    return result
++
++
++def provenance(rows, sources):
++    if not isinstance(rows, list) or not rows:
++        raise ValueError('provenance')
++    out = {}
++    for row in rows:
++        fields(row, ['source_id', 'locator', 'condition'])
++        for value in row.values():
++            string(value)
++        if row['source_id'] not in sources:
++            raise ValueError('unknown_source')
++        out[canonical(row)] = deepcopy(row)
++    return [out[k] for k in sorted(out)]
++
++
++def operation_id(entity, operation):
++    return json.dumps([entity, operation], ensure_ascii=False, separators=(',', ':'))
++
++
++def unique_rows(rows, key):
++    if not isinstance(rows, list):
++        raise ValueError('record_list')
++    out = {}
++    for row in rows:
++        ident = key(row)
++        if ident in out and canonical(out[ident]) != canonical(row):
++            raise ValueError('duplicate_conflict:' + str(ident))
++        out[ident] = deepcopy(row)
++    return [out[k] for k in sorted(out)]
++
++
++def edge_signature(edge):
++    return [edge['source'], edge['target'], edge['type'], edge['channel'], edge.get('messaging')]
++
++
++def message_address(value):
++    if value is None:
++        return None
++    fields(value, MESSAGE_FIELDS)
++    for key, item in value.items():
++        if item is not None and (not isinstance(item, str) or
++                                  (not item and key not in {'exchange', 'routing_key'})):
++            raise ValueError('messaging_attribute_type')
++    return deepcopy(value)
++
++
++def build(document, registry):
++    """Không suy quan hệ; nguồn do người đọc lập. Không đọc đường dẫn/nhãn."""
++    fields(document, ['scope', 'entities', 'operations', 'relations', 'resource_bindings', 'signals'])
++    fields(document['scope'], ['system', 'revision'])
++    for value in document['scope'].values():
++        string(value)
++    sources = registry_index(registry)
++    doc = deepcopy(document)
++    for collection in ['entities', 'operations', 'relations', 'resource_bindings', 'signals']:
++        if not isinstance(doc[collection], list):
++            raise ValueError('record_list')
++        for row in doc[collection]:
++            if not isinstance(row, dict):
++                raise ValueError('record_type')
++            row['provenance'] = provenance(row.get('provenance'), sources)
++    entities = unique_rows(doc['entities'], lambda r: string(r['id']))
++    index = {}
++    for row in entities:
++        fields(row, ['id', 'name', 'type', 'granularity', 'role', 'provenance'])
++        for key in ['id', 'name', 'role']:
++            string(row[key])
++        if row['type'] not in ENTITY_TYPES or row['granularity'] not in {'logical', 'instance', 'component'}:
++            raise ValueError('entity_type')
++        index[row['id']] = row
++    operations = unique_rows(doc['operations'], lambda r: operation_id(r['entity'], r['name']))
++    op_index = {}
++    for row in operations:
++        fields(row, ['entity', 'name', 'runtime_name', 'provenance'])
++        string(row['name'])
++        if row['entity'] not in index:
++            raise ValueError('unknown_entity')
++        if row['runtime_name'] is not None:
++            string(row['runtime_name'])
++        ident = operation_id(row['entity'], row['name'])
++        if ident in index:
++            raise ValueError('identifier_collision')
++        op_index[ident] = dict(row, id=ident)
++
++    def endpoint(row):
++        fields(row, ['entity', 'operation'])
++        if row['entity'] not in index:
++            raise ValueError('unknown_entity')
++        if row['operation'] is not None:
++            string(row['operation'])
++            if operation_id(row['entity'], row['operation']) not in op_index:
++                raise ValueError('unknown_operation')
++        return operation_id(row['entity'], row['operation']) if row['operation'] is not None else row['entity']
++
++    relations = unique_rows(doc['relations'], lambda r: string(r['id']))
++    ent_edges, op_edges, exclusions = {}, {}, []
++    context_ids = set()
++
++    def add(target, edge, record):
++        key = canonical(edge_signature(edge))
++        if key not in target:
++            target[key] = dict(edge, record_ids=[], provenance=[], contexts=[])
++        row = target[key]
++        row['record_ids'] = sorted(set(row['record_ids'] + [record['id']]))
++        row['provenance'] = provenance(row['provenance'] + record['provenance'], sources)
++        row['contexts'] = sorted(set(row['contexts'] + [record['context']]))
++
++    for row in relations:
++        fields(row, ['id', 'source', 'target', 'type', 'channel', 'messaging', 'context', 'provenance'])
++        string(row['context'])
++        s, t = endpoint(row['source']), endpoint(row['target'])
++        se, te = row['source']['entity'], row['target']['entity']
++        typ, channel = row['type'], row['channel']
++        if typ not in RELATION_TYPES or channel not in CHANNELS:
++            raise ValueError('relation_type')
++        if (typ == 'thông-điệp') != (channel in {'publish', 'consume', 'logical-message'}):
++            raise ValueError('relation_channel')
++        if ((typ == 'dữ-liệu' and channel != 'data') or
++                (typ == 'triển-khai' and channel != 'deployment') or
++                (typ == 'span-parent' and channel != 'span-parent') or
++                (typ in {'gọi-đồng-bộ', 'gọi-chưa-phân-kiểu'} and channel not in {'http', 'rpc', 'internal'})):
++            raise ValueError('relation_channel')
++        msg = message_address(row['messaging'])
++        if typ == 'thông-điệp':
++            if msg is None or msg['broker'] not in index or index[msg['broker']]['type'] != 'broker':
++                raise ValueError('messaging_endpoint')
++            if ((channel == 'publish' and (te != msg['broker'] or msg['queue'] is not None)) or
++                    (channel == 'consume' and se != msg['broker'])):
++                raise ValueError('messaging_endpoint')
++        elif msg is not None:
++            raise ValueError('unexpected_messaging')
++        if typ == 'dữ-liệu' and index[te]['type'] not in {'database', 'cache'}:
++            raise ValueError('data_endpoint')
++        if typ == 'triển-khai' and index[te]['type'] != 'host':
++            raise ValueError('deployment_endpoint')
++        edge = dict(source=s, target=t, type=typ, channel=channel, messaging=msg,
++                    evidence_source='static', destination=None)
++        if msg is not None:
++            q = [msg[k] for k in ['broker', 'broker_scope', 'queue']]
++            edge['queue_metric_address'] = q if all(q) else None
++        if se != te and typ != 'span-parent':
++            add(ent_edges, dict(edge, source=se, target=te), row)
++        if s in op_index or t in op_index:
++            add(op_edges, edge, row)
++            context_ids.update(x for x in [s, t] if x not in op_index)
++        else:
++            exclusions.append(dict(record_id=row['id'], reason='no_operation_evidence'))
++    bindings = unique_rows(doc['resource_bindings'], lambda r: string(r['id']))
++    for row in bindings:
++        fields(row, ['id', 'entity', 'resource', 'relation', 'provenance'])
++        if row['entity'] not in index or row['resource'] not in index:
++            raise ValueError('unknown_resource')
++        if row['relation'] not in {'hosted_on', 'owned_by'} or row['entity'] == row['resource']:
++            raise ValueError('resource_relation')
++        if row['relation'] == 'hosted_on' and index[row['resource']]['granularity'] != 'instance' and index[row['resource']]['type'] != 'host':
++            raise ValueError('resource_target')
++    signals = unique_rows(doc['signals'], lambda r: string(r['id']))
++    for row in signals:
++        fields(row, ['id', 'kind', 'entity', 'operation', 'address', 'shared', 'provenance'])
++        endpoint(dict(entity=row['entity'], operation=row['operation']))
++        if row['kind'] not in {'log', 'trace', 'metric'} or not isinstance(row['shared'], bool):
++            raise ValueError('signal_type')
++        if not isinstance(row['address'], list) or not row['address']:
++            raise ValueError('signal_address')
++        for part in row['address']:
++            string(part)
++        if row['shared'] and row['operation'] is not None:
++            raise ValueError('shared_signal_operation')
++    evidence = dict(representation='supported', runtime='not_checked', rca_benefit='not_checked',
++                    source_evidence=sorted({sources[p['source_id']]['kind']
++                                            for col in [entities, operations, relations, bindings, signals]
++                                            for row in col for p in row['provenance']}))
++    common = dict(schema_version=1, scope=doc['scope'], evidence=evidence,
++                  resource_bindings=bindings, signals=signals, records=relations)
++    entity = dict(deepcopy(common), level='entity', nodes=entities, inventory=entities,
++                  observed_nodes=[], edges=[ent_edges[k] for k in sorted(ent_edges)])
++    operation = dict(deepcopy(common), level='operation',
++                     inventory=entities,
++                     nodes=[op_index[k] for k in sorted(op_index)],
++                     belongs_to=[[k, op_index[k]['entity']] for k in sorted(op_index)],
++                     component_context=[index[k] for k in sorted(context_ids)],
++                     edges=[op_edges[k] for k in sorted(op_edges)], operation_exclusions=exclusions)
++    return entity, operation
++
++
++def project(operation):
++    """Chiếu phần có bằng chứng operation; không bổ sung cạnh entity-only."""
++    if operation['level'] != 'operation':
++        raise ValueError('level')
++    owner = dict(operation['belongs_to'])
++    nodes = set(owner.values()) | {n['id'] for n in operation['component_context']}
++    if set(owner) & nodes:
++        raise ValueError('identifier_collision')
++    edges = {}
++    for row in operation['edges']:
++        s, t = owner.get(row['source'], row['source']), owner.get(row['target'], row['target'])
++        if s == t or row['type'] == 'span-parent':
++            continue
++        e = deepcopy(dict(row, source=s, target=t))
++        key = canonical(edge_signature(e))
++        if key not in edges:
++            edges[key] = e
++        else:
++            for field in ['record_ids', 'contexts']:
++                edges[key][field] = sorted(set(edges[key][field] + e[field]))
++            edges[key]['provenance'] = [json.loads(k) for k in sorted(
++                {canonical(p) for p in edges[key]['provenance'] + e['provenance']})]
++    return dict(nodes=sorted(nodes), edges=[edges[k] for k in sorted(edges)])
+--- /dev/null
++++ src/do_thi_tinh/compare.py
+@@ -0,0 +1,207 @@
++"""Tập hai chiều theo miền và mapping có nguồn, không suy runtime từ thiết kế."""
++from copy import deepcopy
++import json
++
++from .build import (RELATION_TYPES, canonical, fields, message_address, provenance,
++                    registry_index, string)
++
++
++def _trace_shape(graph, level):
++    """Đọc graph đã lưu v2.1, không đọc span/labels/dataset hoặc đổi graph."""
++    if graph.get('level') != level:
++        raise ValueError('level_mismatch')
++    fields(graph, ['level', 'nodes', 'edges', 'interval_ns'],
++           ['inventory', 'coverage', 'outside_inventory', 'stats', 'belongs_to',
++            'component_context', 'messaging_diagnostics'])
++    interval = graph['interval_ns']
++    if interval is not None and (not isinstance(interval, (tuple, list)) or len(interval) != 2 or
++                                 any(type(x) is not int or x < 0 for x in interval) or interval[1] < interval[0]):
++        raise ValueError('invalid_interval')
++    nodes = {row['id'] for row in graph['nodes']}
++    owner = dict(graph.get('belongs_to', []))
++    if level == 'operation':
++        if nodes != set(owner) or any(row.get('entity') != owner[row['id']] for row in graph['nodes']):
++            raise ValueError('belongs_to')
++        components = {row['id'] for row in graph.get('component_context', [])}
++        if set(owner) & (set(owner.values()) | components):
++            raise ValueError('identifier_collision')
++        nodes |= components
++    for row in graph['edges']:
++        fields(row, ['source', 'target', 'type', 'evidence_source', 'destination', 'event_count', 'witness'],
++               ['messaging', 'queue_metric_address'])
++        if row['source'] not in nodes or row['target'] not in nodes:
++            raise ValueError('unknown_trace_endpoint')
++        if row['type'] not in RELATION_TYPES or row['evidence_source'] not in {'trace', 'inferred', 'dataset-other'}:
++            raise ValueError('trace_relation')
++        if type(row['event_count']) is not int or row['event_count'] < 0:
++            raise ValueError('event_count')
++        if row['type'] == 'thông-điệp' and row.get('messaging') is not None:
++            message_address(row['messaging'])
++    return owner
++
++
++def compare(static_graph, trace_graph, mappings, context, registry):
++    """Một hệ/mức/miền/cửa sổ. Report orchestration và nhãn ở ngoài API."""
++    fields(context, ['system', 'level', 'domain', 'trace_revision', 'revision_link_verified',
++                     'revision_provenance'], ['relation_types'])
++    if context['level'] not in {'entity', 'operation'} or context['domain'] not in {'synthetic', 'dev-file', 'dev-adapter'}:
++        raise ValueError('comparison_domain')
++    for key in ['system', 'trace_revision']:
++        string(context[key])
++    if context['system'] == 'Nezha-OB' and context['domain'] != 'dev-adapter':
++        raise ValueError('comparison_domain')
++    if type(context['revision_link_verified']) is not bool:
++        raise ValueError('revision_verified_type')
++    sources = registry_index(registry)
++    if context['revision_link_verified']:
++        provenance(context['revision_provenance'], sources)
++    elif context['revision_provenance']:
++        provenance(context['revision_provenance'], sources)
++    if (static_graph['scope']['system'] != context['system'] or
++            static_graph['level'] != context['level']):
++        raise ValueError('scope_mismatch')
++    relation_types = context.get('relation_types', sorted(RELATION_TYPES))
++    if not isinstance(relation_types, list) or not set(relation_types) <= RELATION_TYPES:
++        raise ValueError('relation_types')
++    owner = _trace_shape(trace_graph, context['level'])
++    static_entities = {r['id'] for r in static_graph['inventory']}
++    static_owner = dict(static_graph.get('belongs_to', []))
++    static_operations = set(static_owner)
++    mapping_index = {}
++    if not isinstance(mappings, list):
++        raise ValueError('mappings')
++    for row in mappings:
++        fields(row, ['level', 'original', 'candidates', 'verified', 'provenance'])
++        string(row['original'])
++        if row['level'] not in {'entity', 'operation'} or type(row['verified']) is not bool:
++            raise ValueError('mapping_type')
++        provenance(row['provenance'], sources)
++        if not isinstance(row['candidates'], list):
++            raise ValueError('mapping_candidates')
++        for candidate in row['candidates']:
++            string(candidate)
++            if candidate not in (static_entities if row['level'] == 'entity' else static_operations):
++                raise ValueError('mapping_target')
++        key = row['level'], row['original']
++        if key in mapping_index:
++            raise ValueError('duplicate_mapping')
++        mapping_index[key] = deepcopy(row)
++
++    def resolve(ident, level):
++        row = mapping_index.get((level, ident))
++        if row is None:
++            return None, 'unmapped'
++        candidates = sorted(set(row['candidates']))
++        if len(candidates) != 1:
++            return None, 'ambiguous_mapping' if candidates else 'unmapped'
++        if not row['verified']:
++            return None, 'unverified_mapping'
++        target = candidates[0]
++        if level == 'operation':
++            if ident not in owner:
++                return None, 'operation_without_owner'
++            mapped_owner, reason = resolve(owner[ident], 'entity')
++            if reason:
++                return None, 'operation_owner_' + reason
++            if static_owner[target] != mapped_owner:
++                return None, 'operation_owner_conflict'
++        return target, None
++
++    def normalized(side, edge, position):
++        typ = edge['type']
++        if typ not in relation_types:
++            return None, 'outside_relation_domain'
++        if context['level'] == 'entity' and (typ == 'span-parent' or edge['source'] == edge['target']):
++            return None, 'not_entity_dependency'
++        converted = {}
++        for end in ['source', 'target']:
++            original = edge[end]
++            if side == 'trace':
++                converted[end], reason = resolve(original, 'operation' if original in owner else 'entity')
++                if reason:
++                    return None, reason + ':' + end
++            else:
++                converted[end] = original
++        if context['level'] == 'entity' and converted['source'] == converted['target']:
++            return None, 'mapped_internal_relation'
++        address = deepcopy(edge.get('messaging'))
++        channel = None
++        if typ == 'thông-điệp':
++            if address is None:
++                return None, 'missing_messaging_address'
++            address = message_address(address)
++            original_broker = address['broker']
++            if side == 'trace':
++                if original_broker is None:
++                    return None, 'incomplete_messaging_address'
++                address['broker'], reason = resolve(original_broker, 'entity')
++                if reason:
++                    return None, reason + ':broker'
++                se, te = owner.get(edge['source'], edge['source']), owner.get(edge['target'], edge['target'])
++                channel = 'publish' if te == original_broker else 'consume' if se == original_broker else 'logical-message'
++            else:
++                channel = edge['channel']
++            required = ['broker', 'broker_scope'] + (
++                ['exchange', 'routing_key'] if channel == 'publish' else
++                ['queue'] if channel == 'consume' else ['exchange', 'routing_key', 'queue'])
++            if any(address[k] is None for k in required):
++                return None, 'incomplete_messaging_address'
++            if channel == 'publish' and address['queue'] is not None:
++                return None, 'invalid_publish_queue'
++        # Type bỏ riêng cho phép so endpoints; provenance luôn ở member riêng.
++        return dict(source=converted['source'], target=converted['target'], type=typ,
++                    address=[channel, address] if address is not None else None,
++                    position=position), None
++
++    prepared = {'static': [], 'trace': []}
++    common_exclusions = {'static': [], 'trace': []}
++    for side, graph in [('static', static_graph), ('trace', trace_graph)]:
++        for position, edge in enumerate(graph['edges']):
++            normalized_row, reason = normalized(side, edge, position)
++            if reason:
++                common_exclusions[side].append(dict(index=position, reason=reason,
++                                                     original=deepcopy(edge)))
++            else:
++                prepared[side].append(normalized_row)
++    views = {}
++    for view in ['endpoints', 'typed']:
++        sets = {'static': {}, 'trace': {}}
++        exclusions = deepcopy(common_exclusions)
++        for side in ['static', 'trace']:
++            graph = static_graph if side == 'static' else trace_graph
++            for row in prepared[side]:
++                original = graph['edges'][row['position']]
++                if view == 'typed' and row['type'] == 'gọi-chưa-phân-kiểu':
++                    exclusions[side].append(dict(index=row['position'], reason='unknown_type',
++                                                 original=deepcopy(original)))
++                    continue
++                key = canonical([row['source'], row['target'],
++                                 row['type'] if view == 'typed' else None, row['address']])
++                sets[side].setdefault(key, []).append(dict(index=row['position'], original=deepcopy(original)))
++        s, t = set(sets['static']), set(sets['trace'])
++        intersection = s & t
++        groups = dict(S=s, T=t, intersection=intersection, static_only=s-t, trace_only=t-s)
++        views[view] = {key: [json.loads(k) for k in sorted(values)] for key, values in groups.items()}
++        views[view].update(
++            numerator=len(intersection), static_denominator=len(s), trace_denominator=len(t),
++            static_fraction=len(intersection)/len(s) if s else None,
++            trace_fraction=len(intersection)/len(t) if t else None,
++            members={side: [dict(key=json.loads(k), members=sets[side][k]) for k in sorted(sets[side])]
++                     for side in ['static', 'trace']}, exclusions=exclusions)
++    node_mapping = []
++    for node in trace_graph['nodes'] + trace_graph.get('component_context', []):
++        level = 'operation' if node['id'] in owner else 'entity'
++        mapped, reason = resolve(node['id'], level)
++        node_mapping.append(dict(original=deepcopy(node), level=level, canonical_id=mapped,
++                                 status=reason or 'mapped'))
++    # Không sửa trace/static hay coi revision ứng viên là deployment đã xác minh.
++    return dict(schema_version=1, context=deepcopy(context),
++                static_scope=deepcopy(static_graph['scope']), interval_ns=deepcopy(trace_graph['interval_ns']),
++                conditional_reference=not context['revision_link_verified'],
++                interpretation='structural_agreement; not runtime ground truth or RCA benefit',
++                views=views, mappings=sorted(deepcopy(mappings), key=canonical),
++                nodes=dict(static=deepcopy(static_graph['nodes']),
++                           trace=sorted(node_mapping, key=canonical),
++                           static_inventory=deepcopy(static_graph['inventory'])),
++                competing_explanations=['revision', 'alias', 'domain/window', 'branch_not_executed',
++                                       'incomplete_static_source', 'missing_telemetry', 'conversion_error'])
+--- /dev/null
++++ src/do_thi_tinh/README.md
+@@ -0,0 +1,22 @@
++# Bộ dựng từ bản ghi có nguồn và bộ đối chiếu
++
++Hợp đồng ở `results/T-036/hop-dong.md`; registry ban đầu ở `results/T-036/nguon.json`. Hai API thuần không đọc file, không tải nguồn và không nhận nhãn:
++
++```python
++from do_thi_tinh import build, compare, project
++entity, operation = build(document, registry)
++result = compare(entity, trace_entity, mappings, context, registry)
++partial_projection = project(operation)
++```
++
++Đặt `src` trong Python path tại runner. Python 3.12, chỉ standard library cho mã tĩnh. Kiểm tích hợp T-035 dùng môi trường hiện có `D:/RCA-ext/envs/py312-pin/Scripts/python.exe` vì bộ dựng trace dùng pandas/numpy. Luôn `-X utf8 -B` để không tạo bytecode ngoài phạm vi. Không cần cài gói hoặc thay môi trường.
++
++`build` trả inventory và graph thực thể; graph thao tác giữ component_context và bảng phần không có operation. Resource binding và signal address là lớp có nguồn riêng, chưa là cạnh runtime của T-035. `compare` yêu cầu graph trace T-035 v2.1 đã kiểm manifest ở runner, mapping có nguồn kể cả identity, cùng context miền/revision. Kết quả tách so đầu mút và kiểu; có tập, thành viên gốc, loại trừ và mẫu số. Không sửa graph trace.
++
++Chạy checker bằng tên run mới, không chạy lại tên cũ:
++
++```powershell
++& 'D:/RCA-ext/envs/py312-pin/Scripts/python.exe' -X utf8 -B results/T-036/check.py <run-moi>
++```
++
++Checker giữ cả exception/đầu ra lỗi trong run mới, kiểm oracle literal đã có trước code và tính xác định. Đọc `kiem-dung-dan.md` cùng JSON trong run. Không chạy lại `fixtures/define.py` trên fixture đã tồn tại. Fixture là dữ liệu giả kiểm hợp đồng, chưa là graph FlashTicket hay đối chiếu đủ TT/OB. Các task sau phải dẫn từng quan hệ nguồn, xác minh mapping và giữ giới hạn revision. Đọc `ban-giao.md` trước dùng P6/P9.
+--- /dev/null
++++ results/T-036/ban-giao.md
+@@ -0,0 +1,41 @@
++# Bàn giao T-036 — hợp đồng nguồn tĩnh và đối chiếu
++
++Codex là người làm; Claude là người phản biện chính thức. Đầu ra chờ phản biện và Minh nghiệm thu. SPEC giữ nguyên. Không tự đóng P5/RQ3/RQ5/G3 hoặc chọn P6.
++
++## 1. Đầu vào dùng tiếp
++
++- `hop-dong.md`, `nguon.json`: mô hình bản ghi, inventory/operation/resource binding/signal, quy tắc alias/miền/kiểu/địa chỉ/mẫu số. Registry khởi đầu có revision/hash; không thay khảo sát đầy đủ từng hệ.
++- `src/do_thi_tinh/{__init__.py,build.py,compare.py,README.md}`: API thuần. Bộ dựng chỉ chuyển bản ghi đã đọc nguồn, không tự phân tích code. Phép chiếu operation chỉ giữ phần có bằng chứng, báo entity-only; không tạo thao tác giả.
++- `fixtures/input.json`, `expected.json`, `oracle-before-code.json`: ví dụ tổng hợp và đáp án literal trước mã. `check.py` chứa cả biến thể bổ sung sau khi tự đọc lại implementation; không gọi mọi kiểm bổ sung là oracle trước code.
++- `kiem-dung-dan.md`, `runs/`: bằng chứng kiểm và mọi lượt, gồm lượt lỗi. Kiểm hash theo `manifest.json` trước sử dụng. Mã/hash nguồn T-035 giữ nguyên; T-035 chưa được nghiệm thu từ việc dùng trong T-036.
++
++## 2. Phần đã kiểm và phản ví dụ còn phải giữ
++
++**FACT:** fixture giữ được hai logical DB khác owner cùng một instance PG; mapping ở `runs/kiem-005/entity.json#/resource_bindings`, metric chung ở `#/signals`. Graph cạnh dữ liệu vẫn hướng tới DB logic. T-035 chưa có trường DB→instance tương đương; comparator không biến lớp mapping thành cạnh quan sát hoặc kết quả khớp runtime.
++
++Phản ví dụ: DB1 thuộc A, DB2 thuộc B, cả hai hosted_on PG. Gộp DB1/DB2 thành PG làm mất ownership; dùng hai PG riêng làm mất tài nguyên chung. Giữ hai DB + một PG + hai binding là biểu diễn nguồn tĩnh v1. Các phương án chuyển tiếp cho trace: adapter xác minh endpoint logic và instance/resource ID hoặc bảng mapping có revision/build/time scope từ deployment. Muốn thêm loại cạnh/namespace/adapter T-035 phải trình Minh riêng; chưa có quyền sửa trong task này. P6 có thể đề xuất dùng mapping để nhận diện tập cùng tài nguyên, nhưng phép lan điểm/gộp metric chưa chọn và chưa kiểm lợi ích. P9 phải ghi ID nguồn, không suy lại instance từ tên DB.
++
++**FACT:** graph T-035 v2.1 đã lưu đọc được và không bị sửa; các cặp phép chiếu khớp. Đây là tương thích schema/phép chiếu, không là đối chiếu kiến trúc TT/OB. Trong lượt tương thích không có alias được xác minh nên cạnh được báo unmapped, không tạo matching giả.
++
++**FACT:** mẫu số và tập giao/phần riêng đúng oracle tổng hợp; unknown chỉ có thể khớp đầu mút, không thành sync. Nhiều source/republish không thành nhiều sự kiện; mỗi queue vẫn có địa chỉ riêng. Không suy message/callback từ cùng broker/correlation. Chưa phân xử độ đầy đủ/routing thực hay chất lượng telemetry.
++
++## 3. Nơi nhận, bằng chứng thiếu và ảnh hưởng
++
++| Nơi nhận / owner | Việc cần làm, đầu vào và phép phân xử | Quyết định phụ thuộc |
++|---|---|---|
++| T-037 / người làm theo SPEC riêng | Ghim B11–B16 bản được dùng; inventory đầy đủ và từng quan hệ/thao tác/điểm quan sát có nguồn. Bao phủ HTTP/RPC, DB/cache/ownership/resource, outbox/inbox, fan-out/retry/dedup, callback/query, scheduler, Saga/bù trừ/terminal fence, delivery/check-in, role-grant/projection và hỗ trợ/vận hành. Ghi operation runtime_name OPEN khi chưa instrumentation. | Độ đầy đủ thiết kế FT; không dùng vài fixture thay bảng coverage toàn hệ. |
++| T-038 / người làm theo SPEC riêng | Truy Train Ticket từ RCAEval snapshot và repo ứng dụng chính thức; nối manifest/image/instrumentation với dataset đang dùng. So hai chiều từng graph/cửa sổ dev bằng mapping có nguồn; đọc cả khác biệt và trường hợp khớp tương ứng. Tải nguồn cần trình danh sách/revision/byte riêng. | Chưa có nối revision thì chỉ đối chiếu tham khảo có điều kiện; chưa quy chênh lệch cho thiếu instrumentation. |
++| T-039 / người làm theo SPEC riêng | Truy Nezha/Augmented-OnlineBoutique; phân biệt tree/code RCA/dataset/deployment. Không dùng metadata mức ngày chọn P6. Miền toàn tập chỉ dev-adapter, không cả ngày. | Độc lập nguồn tĩnh, revision sinh dữ liệu, nghĩa Node/host còn phải có bằng chứng. |
++| T-040 / người làm theo SPEC riêng | Kiểm chung revision hợp đồng, ID/alias, phép chiếu, miền/mẫu số, provenance và các nhóm thiếu. Tổng hợp P5b sau ba hệ. | Nghiệm thu P5b và đầu vào thiết kế P6/P9, chưa tự đóng câu nghiên cứu. |
++| P6 / Minh và người làm thiết kế | Chọn tín hiệu/mức/thuật toán bằng SPEC; nêu phép tính dùng cạnh/resource mapping. Static chỉ khả năng phụ thuộc; cây span và thời gian từng lần vẫn cần khi phân rã chờ/nội bộ. Metric shared là một chuỗi, không nhân theo operation. | Chọn thiết kế và đánh giá RCA; T-036 không chứng minh cơ chế hoặc khắc phục P4. |
++| P9a / nhóm hệ thống và Minh | Xác minh tên service/instance/host, DB logic/instance, kind/endpoint, broker/scope/exchange/routing/queue, message identity namespace, semantics link. Kiểm retry/fan-out/batch/collision/callback/scheduler/đứt context bằng instrumentation/config/broker, không giao collector phục hồi dữ liệu chưa ghi. | Địa chỉ và độ đầy đủ quan sát runtime; yêu cầu gửi sang hệ thống cần duyệt riêng. |
++| P9b / nhóm chuẩn hóa | Export trace/log/metric cùng build/deployment/source versions, clock offset, sampling/drop/retention, namespace và manifest. Adapter kiểm nghĩa trước điền. Nối log theo trace/span, thiếu thì entity/time; metric đúng scope. | Đối chiếu FT thật bằng SPEC sau, không tự thêm cạnh static vào trace. |
++| P7/P10 / thực nghiệm | Thiết kế khóa, đối chứng tương ứng, workload/nhánh và nhãn giao thức riêng; Minh duyệt mở test. | Khẳng định lợi ích quan hệ và khả năng áp dụng FT. |
++
++Các giải thích chênh lệch chưa được task này phân xử: revision, alias, miền/cửa sổ, nhánh chưa chạy, nguồn tĩnh thiếu, telemetry thiếu, lỗi chuyển đổi. Không cộng cờ thành tỷ lệ nguyên nhân. Chưa làm khảo sát toàn hệ khác với không thể phân xử bằng dữ liệu hiện có.
++
++## 4. Đề xuất bước tiếp
++
++Minh chuyển prompt Claude ở cuối LOG T-036 để phản biện kết quả. Phản biện không tự là lệnh sửa. Sau Minh quyết nghiệm thu hoặc yêu cầu sửa, mới soạn/duyệt SPEC các nhánh tiếp theo. Không tải repo, bật EC2, mở test, commit/push từ bàn giao này.
++
++Nội dung có thể đưa vào báo cáo đồ án: phân biệt nguồn thiết kế và quan sát, logical DB/instance, địa chỉ message và metric queue, alias có nguồn và mẫu số khớp cấu trúc có điều kiện. Không viết các kiểm tổng hợp là bằng chứng runtime hoặc hiệu quả RCA.
+--- /dev/null
++++ results/T-036/check.py
+@@ -0,0 +1,424 @@
++"""Oracle literal, chẩn đoán trung gian và kiểm tương thích graph dev đã lưu."""
++from copy import deepcopy
++from datetime import datetime, timezone
++import hashlib
++import inspect
++import json
++import os
++from pathlib import Path
++import platform
++import random
++import re
++import sys
++import time
++import traceback
++import tracemalloc
++
++ROOT = Path(__file__).resolve().parents[2]
++sys.path.insert(0, str(ROOT / 'src'))
++from do_thi_tinh import build, compare, project
++from do_thi_tinh.build import canonical
++
++
++def read(path):
++    return json.loads(path.read_text(encoding='utf-8-sig'))
++
++
++def sha(path):
++    return hashlib.sha256(path.read_bytes()).hexdigest()
++
++
++def save(path, value):
++    with path.open('x', encoding='utf-8') as f:
++        json.dump(value, f, ensure_ascii=False, indent=2, sort_keys=True)
++        f.write('\n')
++
++
++def peak_working_set():
++    if os.name != 'nt':
++        return None
++    import ctypes
++    from ctypes import wintypes
++
++    class Counters(ctypes.Structure):
++        _fields_ = [('cb', wintypes.DWORD), ('PageFaultCount', wintypes.DWORD)] + [
++            (name, ctypes.c_size_t) for name in ['PeakWorkingSetSize', 'WorkingSetSize',
++              'QuotaPeakPagedPoolUsage', 'QuotaPagedPoolUsage', 'QuotaPeakNonPagedPoolUsage',
++              'QuotaNonPagedPoolUsage', 'PagefileUsage', 'PeakPagefileUsage']]
++    counters = Counters()
++    counters.cb = ctypes.sizeof(counters)
++    get_process = ctypes.windll.kernel32.GetCurrentProcess
++    get_process.restype = wintypes.HANDLE
++    get_memory = ctypes.windll.psapi.GetProcessMemoryInfo
++    get_memory.argtypes = [wintypes.HANDLE, ctypes.POINTER(Counters), wintypes.DWORD]
++    if not get_memory(get_process(), ctypes.byref(counters), counters.cb):
++        raise ctypes.WinError()
++    return counters.PeakWorkingSetSize
++
++
++def main():
++    if len(sys.argv) != 2 or not re.fullmatch('[a-z0-9][a-z0-9-]*', sys.argv[1]):
++        raise ValueError('new_run_name_required')
++    out = ROOT / 'results/T-036/runs' / sys.argv[1]
++    out.mkdir(exist_ok=False)
++    started = time.perf_counter()
++    tracemalloc.start()
++    checks, stages = [], []
++    env = dict(command=f'{sys.executable} -X utf8 -B results/T-036/check.py {sys.argv[1]}',
++               python=sys.version, platform=platform.platform(), hashseed=os.getenv('PYTHONHASHSEED'),
++               started_utc=datetime.now(timezone.utc).isoformat())
++    save(out / 'environment.json', env)
++    code_files = [ROOT / 'src/do_thi_tinh' / p for p in ['__init__.py', 'build.py', 'compare.py']]
++    code_files.append(Path(__file__))
++    (out / 'code').mkdir()
++    for path in code_files:
++        (out / 'code' / path.name).write_bytes(path.read_bytes())
++    save(out / 'code-hashes.json', {p.relative_to(ROOT).as_posix(): sha(p) for p in code_files})
++
++    def progress(name):
++        stages.append(dict(stage=name, elapsed_seconds=time.perf_counter()-started))
++        with (out / 'progress.jsonl').open('a', encoding='utf-8') as f:
++            f.write(canonical(stages[-1])+'\n')
++
++    def check(name, actual, expected=True):
++        ok = actual == expected
++        checks.append(dict(name=name, ok=ok, actual=actual, expected=expected))
++
++    def reject(name, fn, expected):
++        try:
++            fn()
++        except ValueError as error:
++            check(name, str(error).split(':')[0], expected)
++        else:
++            check(name, 'accepted', expected)
++
++    try:
++        progress('verify-sources-and-oracle')
++        registry = read(ROOT / 'results/T-036/nguon.json')
++        for source in registry['sources']:
++            p = Path(source['path'])
++            p = p if p.is_absolute() else ROOT / p
++            check('source:'+source['id'], sha(p), source['sha256'])
++        receipt = read(ROOT / 'results/T-036/fixtures/oracle-before-code.json')
++        check('oracle_before_implementation', receipt['implementation_exists'], False)
++        for p, digest in receipt['sha256'].items():
++            check('oracle_hash:'+p, sha(ROOT / 'results/T-036/fixtures' / p), digest)
++        if not all(c['ok'] for c in checks):
++            raise ValueError('input_verification_failed')
++        doc = read(ROOT / 'results/T-036/fixtures/input.json')
++        expected = read(ROOT / 'results/T-036/fixtures/expected.json')
++        before = canonical(doc)
++        entity, operation = build(doc, registry)
++        save(out / 'entity.json', entity)
++        save(out / 'operation.json', operation)
++        projected = project(operation)
++        save(out / 'projection.json', projected)
++        progress('builder-and-projection')
++        check('entity_ids_literal', sorted(n['id'] for n in entity['nodes']), expected['entity_ids'])
++        signatures = [[r[k] for k in ['source', 'target', 'type', 'channel', 'messaging']] for r in entity['edges']]
++        check('entity_edges_literal', sorted(signatures, key=canonical), sorted(expected['entity_edges'], key=canonical))
++        check('operation_exclusions_literal', [r['record_id'] for r in operation['operation_exclusions']],
++              expected['operation_exclusions'])
++        check('projection_record_ids_literal', sorted({x for e in projected['edges'] for x in e['record_ids']}),
++              expected['projected_entity_record_ids'])
++        for ident in expected['no_incoming_operations']:
++            check('root_operation:'+ident, not any(e['target'] == ident for e in operation['edges']))
++        check('bindings_literal', len(entity['resource_bindings']), expected['bindings_count'])
++        check('shared_instance_literal', sorted({r['resource'] for r in entity['resource_bindings']
++                                               if r['entity'] in {'DB1', 'DB2'} and r['relation'] == 'hosted_on'}), ['PG'])
++        check('inventory_not_observation', entity['observed_nodes'], [])
++        check('no_static_event_count', all('event_count' not in e for g in [entity, operation] for e in g['edges']))
++        check('document_unchanged', canonical(doc), before)
++        check('retry_preserves_record_members', next(e['record_ids'] for e in entity['edges']
++              if e['channel'] == 'publish'), ['publish', 'republish'])
++        check('queue_addresses_literal', sorted(e['queue_metric_address'] for e in entity['edges']
++              if e['channel'] == 'consume'), [['R', 'vhost-demo', 'q1'], ['R', 'vhost-demo', 'q2'], ['R', 'vhost-demo', 'q3']])
++        two = deepcopy(doc)
++        next(r for r in two['relations'] if r['id'] == 'http-second-source')['provenance'][0]['source_id'] = 'B14'
++        et, _ = build(two, registry)
++        check('same_edge_two_source_provenances', sorted(p['source_id'] for e in et['edges'] if e['channel'] == 'http'
++              and e['target'] == 'B' for p in e['provenance']), ['B13', 'B14'])
++        bad = {}
++        bad['unknown_field'] = deepcopy(doc); bad['unknown_field']['new'] = 1
++        bad['missing_provenance'] = deepcopy(doc); bad['missing_provenance']['entities'][0]['provenance'] = []
++        bad['conflicting_entity'] = deepcopy(doc)
++        bad['conflicting_entity']['entities'].append(dict(doc['entities'][0], type='host'))
++        bad['missing_operation'] = deepcopy(doc); bad['missing_operation']['relations'][0]['source']['operation'] = 'absent'
++        bad['bad_broker'] = deepcopy(doc)
++        next(r for r in bad['bad_broker']['relations'] if r['id'] == 'publish')['messaging']['broker'] = 'X'
++        bad['shared_operation_metric'] = deepcopy(doc)
++        bad['shared_operation_metric']['signals'][0].update(entity='A', operation='send')
++        bad['label'] = deepcopy(doc); bad['label']['relations'][0]['root'] = 'A'
++        bad['collision'] = deepcopy(doc)
++        bad['collision']['entities'].append(dict(doc['entities'][0], id='["A","send"]'))
++        for name, value in bad.items():
++            reject('negative_build:'+name, lambda d=value: build(d, registry), expected['negative_build'][name])
++        check('build_api', list(inspect.signature(build).parameters), ['document', 'registry'])
++        check('compare_api', list(inspect.signature(compare).parameters),
++              ['static_graph', 'trace_graph', 'mappings', 'context', 'registry'])
++        check('no_rca_claim', entity['evidence']['rca_benefit'], 'not_checked')
++        check('no_runtime_claim', entity['evidence']['runtime'], 'not_checked')
++
++        progress('comparator-fixtures')
++        p = doc['relations'][0]['provenance']
++        mapping = [dict(level='entity', original=x.lower(), candidates=[x], verified=True, provenance=p)
++                   for x in ['A', 'B', 'C', 'DB1', 'DB2', 'PG', 'R', 'X', 'H', 'unused']]
++        context = dict(system='synthetic', level='entity', domain='synthetic', trace_revision='runtime-open',
++                       revision_link_verified=False, revision_provenance=[])
++        simple_doc = deepcopy(doc); simple_doc['relations'] = [doc['relations'][0]]
++        simple, _ = build(simple_doc, registry)
++
++        def trace(edges, nodes=None, level='entity', belongs=None, components=None, interval=None):
++            graph = dict(level=level, nodes=nodes or [{'id': 'a'}, {'id': 'b'}],
++                         edges=edges, interval_ns=interval)
++            if level == 'operation':
++                graph.update(belongs_to=belongs or [], component_context=components or [])
++            return graph
++
++        def edge(s='a', t='b', typ='gọi-chưa-phân-kiểu', msg=None):
++            e = dict(source=s, target=t, type=typ, evidence_source='trace', destination=None,
++                     event_count=7, witness=[['trace-synthetic', 'span-synthetic']])
++            if msg is not None:
++                e['messaging'] = msg
++                e['queue_metric_address'] = [msg.get(k) for k in ['broker', 'broker_scope', 'queue']]
++            return e
++
++        graph = trace([edge()])
++        snapshots = canonical([simple, graph, mapping, context, registry])
++        result = compare(simple, graph, mapping, context, registry)
++        save(out / 'compare-unknown.json', result)
++        for view, oracle in [('typed', 'typed_unknown'), ('endpoints', 'endpoints_unknown')]:
++            for key, value in expected['comparisons'][oracle].items():
++                check('unknown:'+view+':'+key, result['views'][view][key], value)
++        check('unknown_not_sync', result['views']['typed']['exclusions']['trace'][0]['reason'], 'unknown_type')
++        check('all_compare_inputs_unchanged', canonical([simple, graph, mapping, context, registry]), snapshots)
++        check('revision_conditional', result['conditional_reference'])
++        wrong = compare(simple, trace([edge(typ='dữ-liệu')]), mapping, context, registry)
++        for key, value in expected['comparisons']['typed_wrong'].items():
++            check('wrong_type:'+key, wrong['views']['typed'][key], value)
++        # Hai cửa sổ: một trace rỗng, và hai phía rỗng; không biến static thành runtime.
++        empty_doc = deepcopy(doc); empty_doc['relations'] = []
++        empty, _ = build(empty_doc, registry)
++        empty_result = compare(empty, trace([], interval=[10, 10]), mapping, context, registry)
++        for key, value in expected['comparisons']['empty'].items():
++            check('empty:'+key, empty_result['views']['typed'][key], value)
++        check('empty_NA', empty_result['views']['typed']['static_fraction'], None)
++        check('empty_NA_trace', empty_result['views']['typed']['trace_fraction'], None)
++        check('empty_trace_keeps_static', compare(simple, trace([]), mapping, context, registry)
++              ['views']['typed']['static_only'], [['A', 'B', 'gọi-đồng-bộ', None]])
++        for name, candidates, verified, reason in [
++                ('ambiguous', ['A', 'C'], True, 'ambiguous_mapping:source'),
++                ('unverified', ['A'], False, 'unverified_mapping:source'),
++                ('missing', [], True, 'unmapped:source')]:
++            maps = deepcopy(mapping); maps[0].update(candidates=candidates, verified=verified)
++            r = compare(simple, graph, maps, context, registry)
++            check('alias_'+name, r['views']['endpoints']['exclusions']['trace'][0]['reason'], reason)
++            check('alias_'+name+'_no_match', r['views']['endpoints']['intersection'], [])
++        maps = deepcopy(mapping); maps.append(deepcopy(maps[0]))
++        reject('duplicate_mapping', lambda: compare(simple, graph, maps, context, registry), 'duplicate_mapping')
++        reject('wrong_system', lambda: compare(simple, graph, mapping, dict(context, system='other'), registry), 'scope_mismatch')
++        reject('day_domain', lambda: compare(simple, graph, mapping, dict(context, domain='all-day'), registry), 'comparison_domain')
++        reject('verified_no_source', lambda: compare(simple, graph, mapping,
++               dict(context, revision_link_verified=True), registry), 'provenance')
++        reject('label_context', lambda: compare(simple, graph, mapping, dict(context, root='A'), registry), 'unknown_fields')
++        reject('label_trace', lambda: compare(simple, dict(graph, root='A'), mapping, context, registry), 'unknown_fields')
++        span_parent = compare(simple, trace([edge(typ='span-parent')]), mapping, context, registry)
++        check('span_parent_excluded', span_parent['views']['endpoints']['exclusions']['trace'][0]['reason'], 'not_entity_dependency')
++        msg_doc = deepcopy(doc)
++        msg_doc['relations'] = [r for r in doc['relations'] if r['id'] in {'consume-q1', 'consume-q2'}]
++        msg_static, msg_op = build(msg_doc, registry)
++        msg1 = dict(broker='r', broker_scope='vhost-demo', exchange=None, routing_key=None, queue='q1')
++        msg2 = dict(msg1, queue='q2')
++        msg_graph = trace([edge('r', 'b', 'thông-điệp', msg1), edge('r', 'b', 'thông-điệp', msg2)],
++                          nodes=[{'id': 'r'}, {'id': 'b'}])
++        mr = compare(msg_static, msg_graph, mapping, context, registry)
++        save(out / 'compare-two-queues.json', mr)
++        check('two_queue_exact_intersection', mr['views']['typed']['intersection'], [
++            ['R', 'B', 'thông-điệp', ['consume', dict(broker='R', broker_scope='vhost-demo', exchange=None, routing_key=None, queue='q1')]],
++            ['R', 'B', 'thông-điệp', ['consume', dict(broker='R', broker_scope='vhost-demo', exchange=None, routing_key=None, queue='q2')]],
++        ])
++        partial = deepcopy(msg_graph); partial['edges'][1]['messaging']['queue'] = None
++        partial_result = compare(msg_static, partial, mapping, context, registry)
++        check('queue_missing_exclusion', partial_result['views']['typed']['exclusions']['trace'][0]['reason'], 'incomplete_messaging_address')
++        check('queue_missing_intersection_literal', partial_result['views']['typed']['intersection'], [
++            ['R', 'B', 'thông-điệp', ['consume', dict(broker='R', broker_scope='vhost-demo', exchange=None, routing_key=None, queue='q1')]]])
++        maps = deepcopy(mapping)
++        opmap = dict(level='operation', original='["b","runtime-receive"]',
++                     candidates=['["B","receive"]'], verified=True, provenance=p)
++        maps.append(opmap)
++        ot = trace([edge('r', '["b","runtime-receive"]', 'thông-điệp', msg1)],
++                   nodes=[dict(id='["b","runtime-receive"]', entity='b')], level='operation',
++                   belongs=[['["b","runtime-receive"]', 'b']], components=[{'id': 'r'}])
++        oc = dict(context, level='operation')
++        opr = compare(msg_op, ot, maps, oc, registry)
++        check('operation_mapped_intersection_literal', opr['views']['typed']['intersection'], [
++            ['R', '["B","receive"]', 'thông-điệp', ['consume', dict(broker='R', broker_scope='vhost-demo', exchange=None, routing_key=None, queue='q1')]]])
++        maps[1]['candidates'] = ['C']
++        check('operation_owner_conflict', compare(msg_op, ot, maps, oc, registry)
++              ['views']['typed']['exclusions']['trace'][0]['reason'], 'operation_owner_conflict:target')
++        maps = deepcopy(mapping); maps[1]['candidates'] = ['A']
++        collapsed = compare(simple, graph, maps, context, registry)
++        check('mapped_internal_excluded', collapsed['views']['endpoints']['exclusions']['trace'][0]['reason'],
++              'mapped_internal_relation')
++        check('isolated_node_explicit', next(n['status'] for n in compare(empty, trace([], nodes=[{'id': 'isolated'}]),
++              mapping, context, registry)['nodes']['trace']), 'unmapped')
++        check('no_logical_message_synthesis', [e for e in entity['edges'] if e['channel'] == 'logical-message'], [])
++        check('no_callback_invention', [e for e in operation['edges'] if e['target'] == '["A","callback"]'], [])
++        same_missing = deepcopy(msg_static)
++        for e in same_missing['edges']:
++            e['messaging']['queue'] = None
++        both_missing = deepcopy(msg_graph)
++        for e in both_missing['edges']:
++            e['messaging']['queue'] = None
++        missing_result = compare(same_missing, both_missing, mapping, context, registry)
++        check('both_missing_queue_not_match', missing_result['views']['endpoints']['intersection'], [])
++        check('both_missing_queue_empty_eligible', missing_result['views']['typed']['static_denominator'], 0)
++        # Nguồn static khác runtime không được đổi provenance hoặc bịa event_count.
++        published_doc = deepcopy(doc)
++        published_doc['relations'] = [r for r in doc['relations'] if r['id'] in {'publish', 'republish'}]
++        pub, _ = build(published_doc, registry)
++        pubmsg = dict(broker='r', broker_scope='vhost-demo', exchange='e', routing_key='k', queue=None)
++        pubtrace = trace([edge('a', 'r', 'thông-điệp', pubmsg)], nodes=[{'id': 'a'}, {'id': 'r'}])
++        pubresult = compare(pub, pubtrace, mapping, context, registry)
++        check('publish_address_literal', pubresult['views']['typed']['intersection'], [
++            ['A', 'R', 'thông-điệp', ['publish', dict(broker='R', broker_scope='vhost-demo', exchange='e', routing_key='k', queue=None)]]])
++        check('member_static_no_event_count', 'event_count' not in pubresult['views']['typed']['members']['static'][0]['members'][0]['original'])
++        check('member_trace_preserves_count', pubresult['views']['typed']['members']['trace'][0]['members'][0]['original']['event_count'], 7)
++        # Default exchange chuỗi rỗng có nghĩa, khác thiếu.
++        default_doc = deepcopy(published_doc)
++        for e in default_doc['relations']:
++            e['messaging'].update(exchange='', routing_key='')
++        default_static, _ = build(default_doc, registry)
++        default_trace = deepcopy(pubtrace)
++        default_trace['edges'][0]['messaging'].update(exchange='', routing_key='')
++        default_result = compare(default_static, default_trace, mapping, context, registry)
++        check('default_exchange_not_missing', default_result['views']['typed']['numerator'], 1)
++        unknown_exchange = deepcopy(default_trace); unknown_exchange['edges'][0]['messaging']['exchange'] = None
++        check('unknown_exchange_excluded', compare(default_static, unknown_exchange, mapping, context, registry)
++              ['views']['typed']['exclusions']['trace'][0]['reason'], 'incomplete_messaging_address')
++        filtered = compare(simple, graph, mapping, dict(context, relation_types=['dữ-liệu']), registry)
++        check('outside_relation_domain_static', filtered['views']['typed']['exclusions']['static'][0]['reason'], 'outside_relation_domain')
++        reject('invalid_interval', lambda: compare(simple, dict(graph, interval_ns=[10, 2]), mapping, context, registry), 'invalid_interval')
++
++        progress('trace-builder-messaging-integration')
++        import pandas as pd
++        from do_thi.builder import build as trace_build
++        rows = []
++        for ident, service, operation_name, kind, attrs, links in [
++            ('p', 'a', 'send', 'PRODUCER', {'messaging.broker': 'r', 'messaging.broker_scope': 'vhost-demo',
++             'messaging.exchange': 'e', 'messaging.routing_key': 'k'}, []),
++            ('c1', 'b', 'receive', 'CONSUMER', {'messaging.broker': 'r', 'messaging.broker_scope': 'vhost-demo',
++             'messaging.queue': 'q1'}, [{'traceID': 'trace-demo', 'spanID': 'p',
++                                        'semantics': 'message_creation', 'semantics_verified': True}]),
++            ('c2', 'b', 'receive', 'CONSUMER', {'messaging.broker': 'r', 'messaging.broker_scope': 'vhost-demo',
++             'messaging.queue': 'q2'}, [{'traceID': 'trace-demo', 'spanID': 'p',
++                                        'semantics': 'message_creation', 'semantics_verified': True}]),
++        ]:
++            rows.append(dict(traceID='trace-demo', spanID=ident, parentSpanID='0', serviceName=service,
++                             operationName=operation_name, startTime=1, duration=1, kind=kind,
++                             attributes=attrs, links=links))
++        integ_entity, integ_operation = trace_build(pd.DataFrame(rows), None, {}, {'a': 'service', 'b': 'service', 'r': 'broker'})
++        save(out / 'trace-synthetic-messaging.json', dict(entity=integ_entity, operation=integ_operation))
++        integration_doc = deepcopy(doc)
++        integration_doc['relations'] = [r for r in doc['relations'] if r['id'] in {'publish', 'consume-q1', 'consume-q2'}]
++        integ_static, _ = build(integration_doc, registry)
++        integ_result = compare(integ_static, integ_entity, mapping, context, registry)
++        save(out / 'compare-trace-builder-messaging.json', integ_result)
++        check('trace_builder_broker_legs_literal', integ_result['views']['typed']['intersection'], [
++            ['A', 'R', 'thông-điệp', ['publish', dict(broker='R', broker_scope='vhost-demo', exchange='e', routing_key='k', queue=None)]],
++            ['R', 'B', 'thông-điệp', ['consume', dict(broker='R', broker_scope='vhost-demo', exchange=None, routing_key=None, queue='q1')]],
++            ['R', 'B', 'thông-điệp', ['consume', dict(broker='R', broker_scope='vhost-demo', exchange=None, routing_key=None, queue='q2')]],
++        ])
++        check('trace_builder_logical_trace_only_literal', integ_result['views']['typed']['trace_only'], [
++            ['A', 'B', 'thông-điệp', ['logical-message', dict(broker='R', broker_scope='vhost-demo', exchange='e', routing_key='k', queue='q1')]],
++            ['A', 'B', 'thông-điệp', ['logical-message', dict(broker='R', broker_scope='vhost-demo', exchange='e', routing_key='k', queue='q2')]],
++        ])
++        check('trace_builder_inferred_provenance', sorted({e['evidence_source'] for e in integ_entity['edges']}), ['inferred', 'trace'])
++
++        progress('deterministic-order-and-membership')
++        for seed in [0, 1, 2]:
++            shuffled = deepcopy(doc)
++            rng = random.Random(seed)
++            for key in ['entities', 'operations', 'relations', 'resource_bindings', 'signals']:
++                rng.shuffle(shuffled[key])
++            check('build_reorder:'+str(seed), canonical(build(shuffled, registry)), canonical((entity, operation)))
++            maps = deepcopy(mapping); rng.shuffle(maps)
++            check('compare_mapping_reorder:'+str(seed), canonical(compare(simple, graph, maps, context, registry)), canonical(result))
++        for name, value in [('unknown', result), ('two-queues', mr), ('missing-queue', partial_result), ('wrong-type', wrong)]:
++            for view, data in value['views'].items():
++                # Bảo toàn phân hoạch từ danh sách thực, độc lập số tổng.
++                ss = {canonical(x) for x in data['S']}; tt = {canonical(x) for x in data['T']}
++                ii = {canonical(x) for x in data['intersection']}
++                check(f'partition:{name}:{view}', ss == ii | {canonical(x) for x in data['static_only']} and
++                      tt == ii | {canonical(x) for x in data['trace_only']} and ii == ss & tt)
++                for side in ['static', 'trace']:
++                    source = simple if side == 'static' and name in {'unknown', 'wrong-type'} else msg_static if side == 'static' else graph
++                    check(f'membership:{name}:{view}:{side}', len(data['members'][side]), len(data['S' if side == 'static' else 'T']))
++
++        progress('saved-dev-graph-compatibility')
++        manifest_path = ROOT / 'results/T-035/manifest.json'
++        manifest = read(manifest_path)
++        graph_rows = [r for r in manifest['files'] if r['path'].startswith('results/T-035/do-thi/') and
++                      r['path'].endswith(('/full.json', '/N.json', '/A.json'))]
++        compatibility = []
++        # Chỉ graph allowlisted được manifest liệt kê; không đọc trace thô hoặc nhãn.
++        for row in graph_rows:
++            path = ROOT / row['path']
++            if sha(path) != row['sha256']:
++                raise ValueError('saved_graph_hash_mismatch:'+row['path'])
++            actual = read(path)
++            dataset = path.relative_to(ROOT / 'results/T-035/do-thi').parts[0]
++            empty_source = dict(scope=dict(system=dataset, revision='compatibility-only'),
++                                entities=[], operations=[], relations=[], resource_bindings=[], signals=[])
++            eg, og = build(empty_source, registry)
++            ctx = dict(system=dataset, level=actual['level'], domain='dev-adapter' if dataset == 'Nezha-OB' else 'dev-file',
++                       trace_revision='dataset-application-OPEN', revision_link_verified=False, revision_provenance=[])
++            before_hash = canonical(actual)
++            adapted = compare(eg if actual['level'] == 'entity' else og, actual, [], ctx, registry)
++            if canonical(actual) != before_hash:
++                raise AssertionError('trace_mutated')
++            compatibility.append(dict(path=row['path'], sha256=row['sha256'], level=actual['level'],
++                                      edge_count=len(actual['edges']),
++                                      excluded_without_mapping=len(adapted['views']['endpoints']['exclusions']['trace']),
++                                      conditional=adapted['conditional_reference']))
++        save(out / 'compatibility.json', dict(manifest_sha256=sha(manifest_path), graphs=compatibility,
++             meaning='schema/không mutation; không là đối chiếu kiến trúc TT/OB',
++             all_excluded_without_mapping=all(x['edge_count'] == x['excluded_without_mapping'] for x in compatibility)))
++        check('real_graphs_present_both_datasets', sorted({Path(r['path']).parts[3] for r in compatibility}), ['Nezha-OB', 'RE2-TT'])
++        check('real_graphs_no_fabricated_mapping', all(x['edge_count'] == x['excluded_without_mapping'] for x in compatibility))
++        check('real_graphs_both_levels', sorted({x['level'] for x in compatibility}), ['entity', 'operation'])
++        # T-035 project sử dụng độc lập code trace; so phép chiếu với graph entity đã lưu.
++        from do_thi.builder import edge_key, project as trace_project
++        paired = []
++        by_path = {r['path']: r for r in graph_rows}
++        for row in graph_rows:
++            if '/thao-tac/' not in row['path']:
++                continue
++            ent_path = row['path'].replace('/thao-tac/', '/thuc-the/')
++            if ent_path not in by_path:
++                raise ValueError('missing_projection_pair')
++            ent, ops = read(ROOT / ent_path), read(ROOT / row['path'])
++            pn, pe = trace_project(ops)
++            ok = pn == {n['id'] for n in ent['nodes']} and pe == {edge_key(e) for e in ent['edges']}
++            paired.append(dict(operation=row['path'], entity=ent_path, ok=ok))
++        save(out / 'trace-projections.json', paired)
++        check('saved_trace_projection_pairs', bool(paired) and all(x['ok'] for x in paired))
++        progress('finished')
++        save(out / 'result.json', dict(checks=checks, passed=sum(c['ok'] for c in checks),
++             failed=sum(not c['ok'] for c in checks), all_pass=all(c['ok'] for c in checks),
++             compatibility_graph_count=len(compatibility), trace_projection_pair_count=len(paired),
++             seconds=time.perf_counter()-started, python_tracemalloc_peak_bytes=tracemalloc.get_traced_memory()[1],
++             peak_working_set_bytes=peak_working_set(),
++             memory_note='Python allocation peak, not whole-process RSS', stages=stages))
++        print(canonical(dict(passed=sum(c['ok'] for c in checks), failed=[c['name'] for c in checks if not c['ok']],
++                             graphs=len(compatibility), projection_pairs=len(paired), seconds=time.perf_counter()-started)))
++        return 0 if all(c['ok'] for c in checks) else 1
++    except Exception:
++        save(out / 'failure.json', dict(traceback=traceback.format_exc(), checks=checks,
++                                        seconds=time.perf_counter()-started, stages=stages))
++        traceback.print_exc()
++        return 1
++
++
++if __name__ == '__main__':
++    raise SystemExit(main())
+--- /dev/null
++++ results/T-036/finalize.py
+@@ -0,0 +1,247 @@
++"""Tổng hợp kiểm hiện có, ghi bàn giao và kiểm phạm vi đã duyệt. Không chạy thực nghiệm."""
++from datetime import datetime, timezone
++import difflib
++import hashlib
++import json
++from pathlib import Path
++import re
++import subprocess
++
++ROOT = Path(__file__).resolve().parents[2]
++TASK = ROOT / 'tasks/T-036-p5b-hop-dong-chung'
++BASE = ROOT / 'results/T-036'
++OUT = BASE / 'runs/ket-phien-001'
++
++
++def read(path):
++    return json.loads(path.read_text(encoding='utf-8-sig'))
++
++
++def digest(path):
++    return hashlib.sha256(path.read_bytes()).hexdigest()
++
++
++def save(path, value):
++    with path.open('x', encoding='utf-8') as f:
++        json.dump(value, f, ensure_ascii=False, indent=2, sort_keys=True)
++        f.write('\n')
++
++
++def git(*args):
++    return subprocess.check_output(['git', '-C', str(ROOT), *args]).decode('utf-8')
++
++
++def main():
++    OUT.mkdir(exist_ok=False)
++    preflight = read(BASE / 'runs/chuan-bi-001/preflight.json')
++    final = read(BASE / 'runs/kiem-005/result.json')
++    previous = read(BASE / 'runs/kiem-004/result.json')
++    assert final['all_pass'] and previous['all_pass']
++    repeat = []
++    for name in ['entity.json', 'operation.json', 'projection.json', 'compare-unknown.json',
++                 'compare-two-queues.json', 'compare-trace-builder-messaging.json',
++                 'trace-synthetic-messaging.json', 'compatibility.json', 'trace-projections.json', 'code-hashes.json']:
++        one = BASE / 'runs/kiem-004' / name
++        two = BASE / 'runs/kiem-005' / name
++        repeat.append(dict(artifact=name, left_sha256=digest(one), right_sha256=digest(two),
++                           byte_identical=one.read_bytes() == two.read_bytes()))
++    assert all(r['byte_identical'] for r in repeat)
++    save(OUT / 'determinism.json', dict(runs=['kiem-004', 'kiem-005'], checks=repeat, all_identical=True))
++    for path, expected in read(BASE / 'runs/kiem-005/code-hashes.json').items():
++        assert digest(ROOT / path) == expected, path
++    checks = read(BASE / 'runs/chuan-bi-001/input-verification.json')['checks']
++    seconds = final['seconds']
++    ram = final['peak_working_set_bytes'] / 1024**2
++    report = f'''# Kiểm đúng đắn và mức kết luận T-036
++
++Tự soát SPEC từ DT18/cô, MRP, LESSONS, WHY/DECISIONS, B11–B16 và code/đầu ra T-035 chưa phát hiện điểm phải sửa SPEC. Nhận xét độc lập được ghi LOG Phiên 2 trước implementation. Codex giữ người làm, Claude phản biện chính thức. Đầu ra hiện chờ phản biện; chưa nghiệm thu hoặc đóng task.
++
++## 1. Nguồn và thứ tự bằng chứng
++
++`runs/chuan-bi-001/input-verification.json#/checks`: {len(checks)} artifact được chọn kiểm hash, tất cả khớp; gồm toàn bộ manifest T-035 và nguồn công khai được dùng ban đầu. `preflight.json` ghi môi trường, base commit, quyền ghi, manifest hash và hash tài liệu bảo vệ. B11-C/B12/B13/B14/B16 ghim revision/hash nội dung trong `nguon.json#/sources`, đều không dirty lúc đọc. Không lấy HEAD làm hash file.
++
++Registry hiện có {len(read(BASE/'nguon.json')['sources'])} nguồn. Bổ sung capture metadata đã kiểm hash ở `runs/chuan-bi-001/revision-verification.json`: tách RCAEval code commit, snapshot dataset và tree object Nezha; README Nezha khớp blob trong tree đã lưu. Những revision đó chưa chứng minh revision ứng dụng/deployment sinh dataset. Repo TT/Augmented-OB chỉ là nguồn ứng viên cho task sau, chưa tải.
++
++`fixtures/oracle-before-code.json#/implementation_exists` là false; hash input/expected/definition khớp. Oracle cơ sở literal có trước implementation, không dùng builder để sinh đáp án. Các phép kiểm mở rộng trong checker (hai nguồn, nội bộ sau alias, nút cô lập, default exchange, tích hợp trace builder) được thêm khi tự đọc implementation; không gọi chúng là toàn bộ oracle trước mã. Tính đúng không chỉ dựa vào việc chạy không lỗi.
++
++## 2. Đầu vào → xử lý → trung gian → đầu ra
++
++| Phần kiểm | Bằng chứng và kết quả |
++|---|---|
++| Inventory/owner/resource | `fixtures/input.json` → `build` → `runs/kiem-005/entity.json#/resource_bindings`; DB1/DB2 riêng, một PG chung, owner riêng và metric PG chung. Inventory không là observed_nodes hay tập ứng viên RCA. |
++| Quan hệ và phép chiếu | Oracle `expected.json#/entity_edges` và `#/projected_entity_record_ids` → `entity.json`, `operation.json`, `projection.json`. Entity-only được báo exclusion; không tạo operation giả. Nội bộ/span-parent không thành cạnh entity. Callback/scheduler không có caller giả. |
++| Messaging | Hai queue cùng consumer, fan-out, republish: queue_metric_address giữ riêng; không event_count tĩnh, không suy logical edge từ broker. `compare-two-queues.json#/views/typed` ghi đủ tập và mẫu số. |
++| Tích hợp T-035 | `trace-synthetic-messaging.json` do builder T-035 dựng từ span tổng hợp → `compare-trace-builder-messaging.json`. Các chặng broker khớp; cạnh inferred logical của trace giữ riêng trong trace_only khi nguồn tĩnh không ghi quan hệ ấy. Không coi ví dụ là runtime FT. |
++| Alias/kiểu/miền | `compare-unknown.json#/views`: đầu mút khớp nhưng typed loại unknown. Checker kiểm alias thiếu/mơ hồ/chưa xác minh, operation khác owner, cạnh nội bộ sau alias, địa chỉ thiếu cả hai phía, relation domain và interval lỗi. Không đổi nghĩa quan sát theo thiết kế. |
++| Tập và mẫu số | `result.json#/checks` đối chiếu danh sách literal cho giao/phần riêng/S/T, unknown/khác kiểu/rỗng. Mẫu số 0 là null, không gọi precision/recall. Members giữ bản ghi tĩnh và cạnh trace riêng. |
++| Nhãn và lỗi đầu vào | API thuần; trường lạ/nhãn bị từ chối, provenance thiếu hoặc ID/kiểu mâu thuẫn bị báo. Không nhận tên ca, đường dẫn ca hay mốc tiêm để chọn cạnh. Locator nguồn chỉ truy vết. |
++| Graph dev có sẵn | `compatibility.json#/graphs`: {final['compatibility_graph_count']} graph full/N/A ở hai mức, hai hệ, theo manifest hiện hành. Kiểm hash trước nạp, không sửa đầu vào. Không có mapping nguồn kiến trúc trong phép này nên loại trừ unmapped; chưa là đối chiếu kiến trúc thật. |
++| Chiếu graph dev | `trace-projections.json`: {final['trace_projection_pair_count']} cặp thao tác/entity khớp, giữ ngoại lệ span-parent. Dùng graph lưu sẵn; không đọc trace thô/test hoặc chạy lại baseline. |
++
++## 3. Các lượt và chi phí thực đo
++
++- `runs/kiem-001/failure.json`: dừng vì selector lấy thêm graph lịch sử trong manifest, đường dẫn không thuộc thư mục hiện hành. Các kiểm trước exception được giữ. Sửa selector trong checker, không sửa đầu vào hay oracle để đạt.
++- `runs/kiem-002/result.json`: kiểm ban đầu đạt. Sau tự đọc lại code, bổ sung loại nội bộ sau alias và báo nút cô lập; không sửa SPEC.
++- `runs/kiem-003/result.json`: kiểm bổ sung đạt. Sau đó thêm phép tích hợp T-035 messaging tổng hợp.
++- `runs/kiem-004/result.json` và `runs/kiem-005/result.json`: mỗi lượt {final['passed']} kiểm đạt, 0 lỗi. Lượt cuối {seconds:.3f} giây, peak working set khoảng {ram:.1f} MiB; số gốc ở `#/seconds`, `#/peak_working_set_bytes`, Python allocation peak ở `#/python_tracemalloc_peak_bytes`. RAM gồm Python/thư viện và cả checker, không chỉ API. Không chạy việc nặng khác đồng thời.
++- Đảo bản ghi ở ba seed trong checker; hai process khác PYTHONHASHSEED giữ mọi graph/kết quả so sánh trung gian giống từng byte, kiểm ở `runs/ket-phien-001/determinism.json#/checks`. Mã đã chạy được lưu ở `runs/kiem-004/code/`, `runs/kiem-005/code/` cùng hash. Các lượt cũ chưa lưu snapshot mã riêng, không dùng chúng thay bằng chứng của hai lượt cuối.
++
++## 4. Kết luận theo câu hỏi nguồn
++
++**FACT:** công cụ giữ được các phản ví dụ đã kiểm, truy ngược bản ghi/provenance và phân tách mẫu số đúng hợp đồng. Thiết kế/code, quan sát runtime và lợi ích RCA không bị nâng chung một nhãn. Bộ dựng tĩnh không sinh event_count hoặc tự thêm quan hệ do correlation. Comparator không sửa graph trace.
++
++**Suy luận có giới hạn:** hợp đồng có thể dùng làm đầu vào khảo sát T-037–039 trong các nhu cầu đã kiểm. Chưa chứng minh inventory/quan hệ toàn hệ đầy đủ; chưa có đối chiếu kiến trúc thật TT/OB. Khớp typed của non-messaging không xác nhận transport HTTP/RPC vì T-035 chưa ghi transport; members giữ channel nguồn tĩnh.
++
++**OPEN:** runtime/build/deployment/instrumentation FlashTicket; revision ứng dụng TT/OB sinh dataset; nghĩa host của Node; độc lập metadata ngày; độ đầy đủ telemetry; lợi ích cấu trúc và lựa chọn P6. DB→instance được giữ trong lớp binding tĩnh; T-035 chưa có trường tương đương. Thiếu telemetry/mapping resource không được điền từ tên DB. Phản ví dụ, phương án bổ sung/owner/ảnh hưởng cụ thể tại `ban-giao.md` §2–3; muốn sửa hợp đồng trace hoặc thu thêm phải trình Minh riêng.
++
++T-036 đáp ứng phần hợp đồng/công cụ trong phạm vi kiểm, chưa trả lời xong RQ3/RQ5 hoặc toàn P5b. T-037–040 cần SPEC riêng. P6/P7/P9/P10 nhận nghĩa vụ còn thiếu; dừng phản biện hay nghiệm thu công cụ không tự cho mở test hoặc khẳng định RCA có lợi.
++
++## 5. Tự soát cuối và bàn giao
++
++Kiểm hash/manifest/phạm vi/diff ở `runs/ket-phien-001/final-verification.json`; diff phiên ở `changes.diff`. Chỉ nối LOG, cập nhật đúng dòng T-036 trong STATE; giữ SPEC và các tài liệu nguồn. Prompt Claude lấy nguyên văn mẫu ở `prompt-claude.txt` và LOG Phiên 2. Không thêm quyết định khoa học, không tự sửa WHY/DECISIONS, không commit/push.
++'''
++    (BASE / 'kiem-dung-dan.md').write_text(report, encoding='utf-8')
++    template = (ROOT / 'docs/review-prompt.md').read_text(encoding='utf-8-sig')
++
++    def block(heading):
++        tail = template.split(heading, 1)[1]
++        return re.search(r'```text\n(.*?)\n```', tail, re.S).group(1)
++
++    common = block('## Prompt chung')
++    placeholders = re.findall(r'<[^>]+>', common)
++    values = [
++        'T-036; D:/RCA-flashticket/tasks/T-036-p5b-hop-dong-chung/SPEC.md',
++        'soát kết quả',
++        'P5; chuẩn bị G3',
++        'Codex người làm; Claude người phản biện chính thức',
++        'D:/RCA-flashticket/AGENTS.md; docs/STATE.md; tasks/T-036-p5b-hop-dong-chung/SPEC.md và LOG.md; '
++        'docs/MRP.md; docs/WHY.md; docs/DECISIONS.md; docs/LESSONS.md; docs/reference/sources/DT18-de-tai-va-nhiem-vu.md; '
++        'docs/reference/sources/advisor-2026-09-23.md; nguồn và manifest tại results/T-036/nguon.json',
++        'không có bản phản biện chính thức T-036 trước lượt này',
++        'D:/RCA-flashticket/results/T-036/manifest.json; hop-dong.md; nguon.json; fixtures/; runs/; kiem-dung-dan.md; '
++        'ban-giao.md; src/do_thi_tinh/README.md và code; results/T-035/manifest.json và các đầu vào SPEC liệt kê; '
++        'Windows/PowerShell, Python theo README; diff phiên ở results/T-036/runs/ket-phien-001/changes.diff',
++        'chỉ đọc và trả lời trong chat; chưa có quyền ghi REVIEW, LOG, STATE, SPEC, code hoặc kết quả',
++    ]
++    assert len(placeholders) == len(values)
++    for placeholder, value in zip(placeholders, values):
++        common = common.replace(placeholder, value, 1)
++    prompt = '\n\n'.join([common, block('### Soát kết quả'), block('### G3 — Khóa thiết kế trước khi mở test')]) + '\n'
++    (BASE / 'prompt-claude.txt').write_text(prompt, encoding='utf-8')
++    save(OUT / 'prompt-check.json', dict(common_metadata_fields=len(placeholders),
++         stage_exact=block('### Soát kết quả') in prompt,
++         gate_exact=block('### G3 — Khóa thiết kế trước khi mở test') in prompt,
++         template_sha256=digest(ROOT / 'docs/review-prompt.md'), no_remaining_placeholders=not re.search(r'<[^>]+>', prompt)))
++    state = ROOT / 'docs/STATE.md'
++    old_state = state.read_bytes()
++    old_log = (TASK / 'LOG.md').read_bytes()
++    (OUT / 'STATE-before.md').write_bytes(old_state)
++    (OUT / 'LOG-before-final.md').write_bytes(old_log)
++    text = old_state.decode('utf-8-sig')
++    lines = text.splitlines(keepends=True)
++    matched = [i for i, line in enumerate(lines) if line.startswith('| T-036 |')]
++    assert len(matched) == 1
++    i = matched[0]
++    parts = lines[i].split('|')
++    parts[6] = (' Chờ Claude phản biện kết quả (15/10/2026). Codex đã tự soát từ nguồn và triển khai trong SPEC; '
++                'báo cáo/manifest tại results/T-036/, LOG Phiên 2 và prompt-claude.txt. '
++                'Mô tả T-036 ở mục Task đang mở là mốc trước triển khai; hiện trạng theo dòng này. '
++                'Chưa nghiệm thu, đóng task hoặc chọn P6. ')
++    lines[i] = '|'.join(parts)
++    state.write_bytes(''.join(lines).encode('utf-8'))
++    endlog = f'''
++**Hoàn tất implementation / tự soát:** bổ sung bảng mapping nút cô lập, loại cạnh nội bộ sau alias, phân biệt default exchange rỗng với thiếu, bảo toàn provenance/record membership và giữ source evidence khác runtime/RCA. Registry cập nhật revision cụ thể khi nguồn lưu chứng minh được; giữ 15 nguồn hiện hành, không nâng tree/code/dataset revision thành application deployment. Nguồn registry ban đầu giữ ở runs/chuan-bi-001/nguon-ban-dau.json. Kiểm tích hợp messaging dùng span tổng hợp qua T-035, không mở trace thô.
++
++**Kết thúc Phiên 2:**
++1. Đã tự soát SPEC độc lập từ nguồn, chưa phát hiện lỗi cần sửa SPEC; đã cài hợp đồng/registry, builder/comparator, oracle, kiểm, báo cáo và bàn giao. Đầu ra công cụ đạt các phản ví dụ đã kiểm; chưa có inventory/đối chiếu kiến trúc đủ ba hệ. T-036 chờ Claude phản biện, Minh nghiệm thu; tự soát không thay phản biện chính thức.
++2. File thay đổi đúng quyền: results/T-036/; src/do_thi_tinh/__init__.py, build.py, compare.py, README.md; nối LOG này; chỉ dòng T-036 trong docs/STATE.md. SPEC không sửa. Giữ mọi thay đổi có sẵn. Không sửa T-035/platform/WHY/DECISIONS hoặc file task khác; không mở test, tải repo, bật EC2, dùng subagent, commit/push.
++3. Kiểm: manifest đầu vào khớp; oracle literal có trước code; lượt cuối {final['passed']} kiểm đạt, 312 graph dev full/N/A đọc tương thích và 156 cặp chiếu khớp. Hai process seed khác cho trung gian giống từng byte; kết quả ở runs/kiem-004, kiem-005 và runs/ket-phien-001/determinism.json. Lượt cuối {seconds:.3f}s, RAM peak working set {ram:.1f}MiB; số gốc trong result.json. Giữ lượt lỗi kiem-001 (selector graph lịch sử), các lượt sau và snapshot mã hai lượt cuối. Kiểm cuối diff/phạm vi/manifest ở runs/ket-phien-001/final-verification.json; không chạy lại baseline hoặc trace thô.
++4. Câu nguồn: cung cấp biểu diễn và phép so có điều kiện cho P5, chưa trả lời RQ3/RQ5, toàn P5b hoặc cơ chế RCA. OPEN: deployment/runtime FT; revision ứng dụng sinh TT/OB; nghĩa host/metadata ngày; độ đầy đủ telemetry; lựa chọn/lợi ích P6. Binding DB→instance được giữ ngoài cạnh trace; T-035 chưa có trường tương đương. ban-giao.md nêu phản ví dụ, phương án adapter/mapping cần trình, owner và quyết định phụ thuộc. Không coi thiếu bằng chứng là không thể làm hoặc tự loại nhóm khỏi nghiên cứu.
++
++**Quyết định/bất đồng:** không có phản biện chính thức T-036 trước phiên này, không có bất đồng với Claude được kết luận thay. Không thêm quyết định khoa học. Quyền triển khai đã được Q-157/SPEC ghi, không tự sửa sổ. Minh quyết nghiệm thu hoặc bước sửa sau phản biện. Nội dung nên vào báo cáo: phân biệt nguồn/quan sát, logical DB/instance, địa chỉ messaging/metric shared và mẫu số có điều kiện, cùng giới hạn fixture/runtime.
++
++**Bước tiếp chính xác:** Minh mở phiên Claude mới tại D:/RCA-flashticket, copy results/T-036/prompt-claude.txt (cũng dưới đây). Claude đọc nguồn/đầu ra/code trước các kết luận, kiểm độc lập theo mẫu. Phạm vi mặc định của prompt chỉ đọc/trả lời chat; ghi REVIEW cần Minh cấp đúng file lượt. Không tự gửi hoặc tự mở phiên. T-037–040 cần SPEC riêng sau hợp đồng được xem xét; không triển khai từ quyền T-036.
++
++**Lệnh cuối của phiên:** py -3 -X utf8 -B results/T-036/finalize.py (tổng hợp và kiểm diff/phạm vi/manifest); lệnh kiểm hành vi cuối: & 'D:/RCA-ext/envs/py312-pin/Scripts/python.exe' -X utf8 -B results/T-036/check.py kiem-005. Không chạy lại tên run cũ. Nếu phát hiện lỗi lúc tổng hợp, giữ kết quả lỗi và trình đúng phạm vi; không sửa SPEC.
++
++**Đề xuất nội dung commit, chưa thực hiện:** feat: add sourced static graph contract and trace comparison for T-036. Minh yêu cầu không commit/push trong phiên này; không thực hiện.
++
++### Prompt Claude — soát kết quả (Minh chuyển thủ công)
++
++```text
++{prompt}```
++'''
++    with (TASK / 'LOG.md').open('a', encoding='utf-8', newline='') as f:
++        f.write(endlog)
++    assert (TASK / 'LOG.md').read_bytes().startswith(old_log)
++    new_lines = state.read_text(encoding='utf-8').splitlines()
++    old_lines = old_state.decode('utf-8-sig').splitlines()
++    assert [j for j, (a, b) in enumerate(zip(old_lines, new_lines)) if a != b] == [i]
++    assert len(new_lines) == len(old_lines)
++    protected = []
++    for path, expected in preflight['protected_hashes'].items():
++        protected.append(dict(path=path, unchanged=digest(ROOT / path) == expected))
++    assert all(x['unchanged'] for x in protected)
++    # Tracked diff ngoài đúng STATE phải giữ nguyên nội dung đầu phiên.
++    def outside_state(diff):
++        return ''.join(part for part in re.split(r'(?=^diff --git )', diff, flags=re.M)
++                       if not part.startswith('diff --git a/docs/STATE.md b/docs/STATE.md'))
++    old_diff = (BASE / 'runs/chuan-bi-001/tracked-before.diff').read_text(encoding='utf-8')
++    current_diff = git('diff', '--binary')
++    assert outside_state(old_diff) == outside_state(current_diff), 'outside_scope_tracked_diff_changed'
++    before_status = preflight['git_status_before'].splitlines()
++    after_status = git('status', '--porcelain').splitlines()
++    prefixes = ['results/T-036/', 'src/do_thi_tinh/', 'tasks/T-036-p5b-hop-dong-chung/', 'docs/STATE.md']
++    def outside_status(lines):
++        return [line for line in lines if not any(line[3:].startswith(prefix) for prefix in prefixes)]
++    assert outside_status(before_status) == outside_status(after_status), 'outside_scope_status_changed'
++    # Diff đầy đủ file mới: base rỗng; STATE/LOG so phần của phiên đã lưu.
++    source_files = [ROOT / 'src/do_thi_tinh' / p for p in ['__init__.py', 'build.py', 'compare.py', 'README.md']]
++    artifact_files = sorted(p for p in BASE.rglob('*') if p.is_file())
++    change_text = ''
++    for path in source_files + artifact_files:
++        if path.suffix not in {'.py', '.md', '.txt', '.json', '.jsonl'}:
++            continue
++        if path.is_relative_to(OUT) or '/runs/' in path.as_posix():
++            continue
++        change_text += ''.join(difflib.unified_diff([], path.read_text(encoding='utf-8').splitlines(True),
++                              fromfile='/dev/null', tofile=path.relative_to(ROOT).as_posix()))
++    change_text += ''.join(difflib.unified_diff(old_lines, new_lines, fromfile='STATE-before', tofile='docs/STATE.md', lineterm='\n'))
++    change_text += ''.join(difflib.unified_diff(old_log.decode('utf-8').splitlines(True),
++                          (TASK/'LOG.md').read_text(encoding='utf-8').splitlines(True),
++                          fromfile='LOG-before-final', tofile='tasks/T-036-p5b-hop-dong-chung/LOG.md'))
++    (OUT / 'changes.diff').write_text(change_text, encoding='utf-8')
++    subprocess.run(['git', '-C', str(ROOT), 'diff', '--check'], check=True)
++    source_checks = []
++    for source in read(BASE/'nguon.json')['sources']:
++        p = Path(source['path']); p = p if p.is_absolute() else ROOT / p
++        source_checks.append(dict(source=source['id'], ok=digest(p) == source['sha256']))
++    assert all(x['ok'] for x in source_checks)
++    assert all(digest(ROOT/path) == expected for path, expected in preflight['manifest_hashes'].items())
++    save(OUT / 'final-verification.json', dict(
++        protected=protected, sources=source_checks, state_only_task_row=True, log_append_only=True,
++        outside_tracked_diff_unchanged=True, outside_git_status_unchanged=True,
++        spec_unchanged=digest(TASK/'SPEC.md') == preflight['spec_sha256'],
++        dependency_manifests_unchanged=True, diff_check=True,
++        prompt_template_exact=True, determinism=True, test_pass=True,
++        current_checks=final['passed'], failed_checks=final['failed'],
++        current_run='runs/kiem-005', historical_failed_runs_retained=['runs/kiem-001'],
++        state_sha256=digest(state), log_sha256=digest(TASK/'LOG.md'),
++        final_status='awaiting_official_review_and_Minh_acceptance', commit_push=False,
++        note='STATE phần diễn giải ngoài dòng T-036 giữ nguyên theo quyền; dòng task ghi rõ mốc hiện hành'))
++    files = source_files + sorted(p for p in BASE.rglob('*') if p.is_file() and p != BASE/'manifest.json')
++    records = [dict(path=p.relative_to(ROOT).as_posix(), bytes=p.stat().st_size, sha256=digest(p)) for p in files]
++    save(BASE / 'manifest.json', dict(task='T-036', schema_version=1, created_utc=datetime.now(timezone.utc).isoformat(),
++        files=records, count=len(records), total_bytes=sum(r['bytes'] for r in records),
++        excludes='manifest self; append-only LOG and STATE hashes in final-verification',
++        final_verification='runs/ket-phien-001/final-verification.json',
++        source_registry='nguon.json', spec_sha256=preflight['spec_sha256'],
++        input_manifests=preflight['manifest_hashes'], decision_state_changes=[],
++        state='awaiting_official_review_and_Minh_acceptance', tests_opened=False, commit_push=False))
++    assert all(digest(ROOT/r['path']) == r['sha256'] for r in records)
++    print(json.dumps(dict(ok=True, artifacts=len(records), bytes=sum(r['bytes'] for r in records),
++                          passed=final['passed'], prompt=str(BASE/'prompt-claude.txt'))))
++
++
++if __name__ == '__main__':
++    main()
+--- /dev/null
++++ results/T-036/fixtures/define.py
+@@ -0,0 +1,125 @@
++"""Đầu vào và đáp án literal, ghi trước mã build/compare. Không import mã đang kiểm."""
++import hashlib
++import json
++from pathlib import Path
++
++OUT = Path(__file__).parent
++
++
++def write(name, value):
++    with (OUT / name).open('x', encoding='utf-8') as f:
++        json.dump(value, f, ensure_ascii=False, indent=2, sort_keys=True)
++        f.write('\n')
++
++
++def prov(source, locator):
++    return [{'source_id': source, 'locator': locator, 'condition': 'ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime'}]
++
++
++def entity(ident, typ='service', granularity='component'):
++    return dict(id=ident, name=ident, type=typ, granularity=granularity,
++                role='fixture', provenance=prov('B12', '§2'))
++
++
++def op(owner, name):
++    return dict(entity=owner, name=name, runtime_name=None, provenance=prov('B16', '§5'))
++
++
++def rel(ident, s, t, typ, channel, msg=None, context=''):
++    return dict(id=ident, source=dict(entity=s[0], operation=s[1]),
++                target=dict(entity=t[0], operation=t[1]), type=typ, channel=channel,
++                messaging=msg, context=context or 'fixture', provenance=prov('B13', '§5'))
++
++
++def main():
++    entities = [entity('A'), entity('B'), entity('C'), entity('unused'),
++                entity('DB1', 'database', 'logical'), entity('DB2', 'database', 'logical'),
++                entity('PG', 'database', 'instance'), entity('R', 'broker'),
++                entity('X', 'external'), entity('H', 'host')]
++    operations = [op('A', 'send'), op('A', 'callback'), op('A', 'scheduler'),
++                  op('A', 'outbox'), op('B', 'receive'), op('C', 'receive')]
++    publish = dict(broker='R', broker_scope='vhost-demo', exchange='e', routing_key='k', queue=None)
++    q1 = dict(broker='R', broker_scope='vhost-demo', exchange=None, routing_key=None, queue='q1')
++    q2 = dict(q1, queue='q2')
++    doc = dict(scope=dict(system='synthetic', revision='design-v1'), entities=entities,
++               operations=operations, relations=[
++                   rel('http', ('A', 'send'), ('B', 'receive'), 'gọi-đồng-bộ', 'http'),
++                   rel('http-second-source', ('A', 'send'), ('B', 'receive'), 'gọi-đồng-bộ', 'http'),
++                   rel('data', ('A', 'outbox'), ('DB1', None), 'dữ-liệu', 'data'),
++                   rel('entity-only', ('B', None), ('DB2', None), 'dữ-liệu', 'data'),
++                   rel('publish', ('A', 'send'), ('R', None), 'thông-điệp', 'publish', publish),
++                   rel('republish', ('A', 'send'), ('R', None), 'thông-điệp', 'publish', publish, 'retry cùng logical message; không count'),
++                   rel('consume-q1', ('R', None), ('B', 'receive'), 'thông-điệp', 'consume', q1),
++                   rel('consume-q2', ('R', None), ('B', 'receive'), 'thông-điệp', 'consume', q2),
++                   rel('fanout', ('R', None), ('C', 'receive'), 'thông-điệp', 'consume', dict(q1, queue='q3')),
++                   rel('callback-out', ('A', 'send'), ('X', None), 'gọi-đồng-bộ', 'http'),
++                   rel('internal', ('A', 'scheduler'), ('A', 'outbox'), 'gọi-chưa-phân-kiểu', 'internal'),
++                   rel('span-parent', ('A', 'send'), ('B', 'receive'), 'span-parent', 'span-parent'),
++                   rel('saga-compensate', ('A', None), ('B', None), 'gọi-đồng-bộ', 'rpc', context='bù trừ; giữ chiều A→B'),
++               ], resource_bindings=[
++                   dict(id='own1', entity='DB1', resource='A', relation='owned_by', provenance=prov('B12', '§2')),
++                   dict(id='own2', entity='DB2', resource='B', relation='owned_by', provenance=prov('B12', '§2')),
++                   dict(id='share1', entity='DB1', resource='PG', relation='hosted_on', provenance=prov('B12', '§2')),
++                   dict(id='share2', entity='DB2', resource='PG', relation='hosted_on', provenance=prov('B12', '§2')),
++                   dict(id='placement', entity='PG', resource='H', relation='hosted_on', provenance=prov('B11', '§6')),
++               ], signals=[
++                   dict(id='metric-shared', kind='metric', entity='PG', operation=None,
++                        address=['instance', 'PG'], shared=True, provenance=prov('B16', '§5/7')),
++                   dict(id='metric-queue', kind='metric', entity='R', operation=None,
++                        address=['R', 'vhost-demo', 'q1'], shared=True, provenance=prov('B16', '§5')),
++                   dict(id='log-callback', kind='log', entity='A', operation='callback',
++                        address=['serviceName', 'traceId', 'spanId'], shared=False, provenance=prov('B16', '§3/4')),
++               ])
++    write('input.json', doc)
++    write('expected.json', {
++        'entity_ids': ['A', 'B', 'C', 'DB1', 'DB2', 'H', 'PG', 'R', 'X', 'unused'],
++        'entity_edges': [
++            ['A', 'B', 'gọi-đồng-bộ', 'http', None],
++            ['A', 'B', 'gọi-đồng-bộ', 'rpc', None],
++            ['A', 'DB1', 'dữ-liệu', 'data', None],
++            ['A', 'R', 'thông-điệp', 'publish', publish],
++            ['A', 'X', 'gọi-đồng-bộ', 'http', None],
++            ['B', 'DB2', 'dữ-liệu', 'data', None],
++            ['R', 'B', 'thông-điệp', 'consume', q1],
++            ['R', 'B', 'thông-điệp', 'consume', q2],
++            ['R', 'C', 'thông-điệp', 'consume', dict(q1, queue='q3')],
++        ],
++        'operation_exclusions': ['entity-only', 'saga-compensate'],
++        'no_incoming_operations': ['["A","callback"]', '["A","scheduler"]'],
++        'projected_entity_record_ids': ['callback-out', 'consume-q1', 'consume-q2', 'data', 'fanout',
++                                        'http', 'http-second-source', 'publish', 'republish'],
++        'bindings_count': 5, 'single_shared_resource': 'PG',
++        'comparisons': {
++            'typed_unknown': {'S': [['A', 'B', 'gọi-đồng-bộ', None]], 'T': [], 'intersection': [],
++                              'static_only': [['A', 'B', 'gọi-đồng-bộ', None]], 'trace_only': [],
++                              'numerator': 0, 'static_denominator': 1, 'trace_denominator': 0},
++            'endpoints_unknown': {'S': [['A', 'B', None, None]], 'T': [['A', 'B', None, None]],
++                                  'intersection': [['A', 'B', None, None]], 'static_only': [], 'trace_only': [],
++                                  'numerator': 1, 'static_denominator': 1, 'trace_denominator': 1},
++            'typed_wrong': {'S': [['A', 'B', 'gọi-đồng-bộ', None]], 'T': [['A', 'B', 'dữ-liệu', None]],
++                            'intersection': [], 'static_only': [['A', 'B', 'gọi-đồng-bộ', None]],
++                            'trace_only': [['A', 'B', 'dữ-liệu', None]], 'numerator': 0,
++                            'static_denominator': 1, 'trace_denominator': 1},
++            'empty': {'S': [], 'T': [], 'intersection': [], 'static_only': [], 'trace_only': [],
++                      'numerator': 0, 'static_denominator': 0, 'trace_denominator': 0},
++        },
++        'negative_build': {
++            'unknown_field': 'unknown_fields', 'missing_provenance': 'provenance',
++            'conflicting_entity': 'duplicate_conflict', 'missing_operation': 'unknown_operation',
++            'bad_broker': 'messaging_endpoint', 'shared_operation_metric': 'shared_signal_operation',
++            'label': 'unknown_fields', 'collision': 'identifier_collision'},
++        'comparison_requirements': ['ambiguous_alias_excluded', 'unverified_alias_excluded',
++                                    'missing_alias_excluded', 'missing_queue_excluded',
++                                    'two_queues_retained', 'republish_not_event_count',
++                                    'revision_unverified_conditional', 'operation_owner_consistent',
++                                    'span_parent_not_entity_dependency', 'scope_mismatch_rejected',
++                                    'input_unchanged', 'deterministic_reorder'],
++    })
++    write('oracle-before-code.json', {'definition': 'define.py không import builder/comparator',
++          'implementation_exists': any(Path('src/do_thi_tinh', p).exists() for p in ['build.py', 'compare.py']),
++          'sha256': {p: hashlib.sha256((OUT / p).read_bytes()).hexdigest()
++                     for p in ['define.py', 'input.json', 'expected.json']}})
++
++
++if __name__ == '__main__':
++    main()
+--- /dev/null
++++ results/T-036/fixtures/expected.json
+@@ -0,0 +1,253 @@
++{
++  "bindings_count": 5,
++  "comparison_requirements": [
++    "ambiguous_alias_excluded",
++    "unverified_alias_excluded",
++    "missing_alias_excluded",
++    "missing_queue_excluded",
++    "two_queues_retained",
++    "republish_not_event_count",
++    "revision_unverified_conditional",
++    "operation_owner_consistent",
++    "span_parent_not_entity_dependency",
++    "scope_mismatch_rejected",
++    "input_unchanged",
++    "deterministic_reorder"
++  ],
++  "comparisons": {
++    "empty": {
++      "S": [],
++      "T": [],
++      "intersection": [],
++      "numerator": 0,
++      "static_denominator": 0,
++      "static_only": [],
++      "trace_denominator": 0,
++      "trace_only": []
++    },
++    "endpoints_unknown": {
++      "S": [
++        [
++          "A",
++          "B",
++          null,
++          null
++        ]
++      ],
++      "T": [
++        [
++          "A",
++          "B",
++          null,
++          null
++        ]
++      ],
++      "intersection": [
++        [
++          "A",
++          "B",
++          null,
++          null
++        ]
++      ],
++      "numerator": 1,
++      "static_denominator": 1,
++      "static_only": [],
++      "trace_denominator": 1,
++      "trace_only": []
++    },
++    "typed_unknown": {
++      "S": [
++        [
++          "A",
++          "B",
++          "gọi-đồng-bộ",
++          null
++        ]
++      ],
++      "T": [],
++      "intersection": [],
++      "numerator": 0,
++      "static_denominator": 1,
++      "static_only": [
++        [
++          "A",
++          "B",
++          "gọi-đồng-bộ",
++          null
++        ]
++      ],
++      "trace_denominator": 0,
++      "trace_only": []
++    },
++    "typed_wrong": {
++      "S": [
++        [
++          "A",
++          "B",
++          "gọi-đồng-bộ",
++          null
++        ]
++      ],
++      "T": [
++        [
++          "A",
++          "B",
++          "dữ-liệu",
++          null
++        ]
++      ],
++      "intersection": [],
++      "numerator": 0,
++      "static_denominator": 1,
++      "static_only": [
++        [
++          "A",
++          "B",
++          "gọi-đồng-bộ",
++          null
++        ]
++      ],
++      "trace_denominator": 1,
++      "trace_only": [
++        [
++          "A",
++          "B",
++          "dữ-liệu",
++          null
++        ]
++      ]
++    }
++  },
++  "entity_edges": [
++    [
++      "A",
++      "B",
++      "gọi-đồng-bộ",
++      "http",
++      null
++    ],
++    [
++      "A",
++      "B",
++      "gọi-đồng-bộ",
++      "rpc",
++      null
++    ],
++    [
++      "A",
++      "DB1",
++      "dữ-liệu",
++      "data",
++      null
++    ],
++    [
++      "A",
++      "R",
++      "thông-điệp",
++      "publish",
++      {
++        "broker": "R",
++        "broker_scope": "vhost-demo",
++        "exchange": "e",
++        "queue": null,
++        "routing_key": "k"
++      }
++    ],
++    [
++      "A",
++      "X",
++      "gọi-đồng-bộ",
++      "http",
++      null
++    ],
++    [
++      "B",
++      "DB2",
++      "dữ-liệu",
++      "data",
++      null
++    ],
++    [
++      "R",
++      "B",
++      "thông-điệp",
++      "consume",
++      {
++        "broker": "R",
++        "broker_scope": "vhost-demo",
++        "exchange": null,
++        "queue": "q1",
++        "routing_key": null
++      }
++    ],
++    [
++      "R",
++      "B",
++      "thông-điệp",
++      "consume",
++      {
++        "broker": "R",
++        "broker_scope": "vhost-demo",
++        "exchange": null,
++        "queue": "q2",
++        "routing_key": null
++      }
++    ],
++    [
++      "R",
++      "C",
++      "thông-điệp",
++      "consume",
++      {
++        "broker": "R",
++        "broker_scope": "vhost-demo",
++        "exchange": null,
++        "queue": "q3",
++        "routing_key": null
++      }
++    ]
++  ],
++  "entity_ids": [
++    "A",
++    "B",
++    "C",
++    "DB1",
++    "DB2",
++    "H",
++    "PG",
++    "R",
++    "X",
++    "unused"
++  ],
++  "negative_build": {
++    "bad_broker": "messaging_endpoint",
++    "collision": "identifier_collision",
++    "conflicting_entity": "duplicate_conflict",
++    "label": "unknown_fields",
++    "missing_operation": "unknown_operation",
++    "missing_provenance": "provenance",
++    "shared_operation_metric": "shared_signal_operation",
++    "unknown_field": "unknown_fields"
++  },
++  "no_incoming_operations": [
++    "[\"A\",\"callback\"]",
++    "[\"A\",\"scheduler\"]"
++  ],
++  "operation_exclusions": [
++    "entity-only",
++    "saga-compensate"
++  ],
++  "projected_entity_record_ids": [
++    "callback-out",
++    "consume-q1",
++    "consume-q2",
++    "data",
++    "fanout",
++    "http",
++    "http-second-source",
++    "publish",
++    "republish"
++  ],
++  "single_shared_resource": "PG"
++}
+--- /dev/null
++++ results/T-036/fixtures/input.json
+@@ -0,0 +1,665 @@
++{
++  "entities": [
++    {
++      "granularity": "component",
++      "id": "A",
++      "name": "A",
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§2",
++          "source_id": "B12"
++        }
++      ],
++      "role": "fixture",
++      "type": "service"
++    },
++    {
++      "granularity": "component",
++      "id": "B",
++      "name": "B",
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§2",
++          "source_id": "B12"
++        }
++      ],
++      "role": "fixture",
++      "type": "service"
++    },
++    {
++      "granularity": "component",
++      "id": "C",
++      "name": "C",
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§2",
++          "source_id": "B12"
++        }
++      ],
++      "role": "fixture",
++      "type": "service"
++    },
++    {
++      "granularity": "component",
++      "id": "unused",
++      "name": "unused",
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§2",
++          "source_id": "B12"
++        }
++      ],
++      "role": "fixture",
++      "type": "service"
++    },
++    {
++      "granularity": "logical",
++      "id": "DB1",
++      "name": "DB1",
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§2",
++          "source_id": "B12"
++        }
++      ],
++      "role": "fixture",
++      "type": "database"
++    },
++    {
++      "granularity": "logical",
++      "id": "DB2",
++      "name": "DB2",
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§2",
++          "source_id": "B12"
++        }
++      ],
++      "role": "fixture",
++      "type": "database"
++    },
++    {
++      "granularity": "instance",
++      "id": "PG",
++      "name": "PG",
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§2",
++          "source_id": "B12"
++        }
++      ],
++      "role": "fixture",
++      "type": "database"
++    },
++    {
++      "granularity": "component",
++      "id": "R",
++      "name": "R",
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§2",
++          "source_id": "B12"
++        }
++      ],
++      "role": "fixture",
++      "type": "broker"
++    },
++    {
++      "granularity": "component",
++      "id": "X",
++      "name": "X",
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§2",
++          "source_id": "B12"
++        }
++      ],
++      "role": "fixture",
++      "type": "external"
++    },
++    {
++      "granularity": "component",
++      "id": "H",
++      "name": "H",
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§2",
++          "source_id": "B12"
++        }
++      ],
++      "role": "fixture",
++      "type": "host"
++    }
++  ],
++  "operations": [
++    {
++      "entity": "A",
++      "name": "send",
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§5",
++          "source_id": "B16"
++        }
++      ],
++      "runtime_name": null
++    },
++    {
++      "entity": "A",
++      "name": "callback",
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§5",
++          "source_id": "B16"
++        }
++      ],
++      "runtime_name": null
++    },
++    {
++      "entity": "A",
++      "name": "scheduler",
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§5",
++          "source_id": "B16"
++        }
++      ],
++      "runtime_name": null
++    },
++    {
++      "entity": "A",
++      "name": "outbox",
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§5",
++          "source_id": "B16"
++        }
++      ],
++      "runtime_name": null
++    },
++    {
++      "entity": "B",
++      "name": "receive",
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§5",
++          "source_id": "B16"
++        }
++      ],
++      "runtime_name": null
++    },
++    {
++      "entity": "C",
++      "name": "receive",
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§5",
++          "source_id": "B16"
++        }
++      ],
++      "runtime_name": null
++    }
++  ],
++  "relations": [
++    {
++      "channel": "http",
++      "context": "fixture",
++      "id": "http",
++      "messaging": null,
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§5",
++          "source_id": "B13"
++        }
++      ],
++      "source": {
++        "entity": "A",
++        "operation": "send"
++      },
++      "target": {
++        "entity": "B",
++        "operation": "receive"
++      },
++      "type": "gọi-đồng-bộ"
++    },
++    {
++      "channel": "http",
++      "context": "fixture",
++      "id": "http-second-source",
++      "messaging": null,
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§5",
++          "source_id": "B13"
++        }
++      ],
++      "source": {
++        "entity": "A",
++        "operation": "send"
++      },
++      "target": {
++        "entity": "B",
++        "operation": "receive"
++      },
++      "type": "gọi-đồng-bộ"
++    },
++    {
++      "channel": "data",
++      "context": "fixture",
++      "id": "data",
++      "messaging": null,
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§5",
++          "source_id": "B13"
++        }
++      ],
++      "source": {
++        "entity": "A",
++        "operation": "outbox"
++      },
++      "target": {
++        "entity": "DB1",
++        "operation": null
++      },
++      "type": "dữ-liệu"
++    },
++    {
++      "channel": "data",
++      "context": "fixture",
++      "id": "entity-only",
++      "messaging": null,
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§5",
++          "source_id": "B13"
++        }
++      ],
++      "source": {
++        "entity": "B",
++        "operation": null
++      },
++      "target": {
++        "entity": "DB2",
++        "operation": null
++      },
++      "type": "dữ-liệu"
++    },
++    {
++      "channel": "publish",
++      "context": "fixture",
++      "id": "publish",
++      "messaging": {
++        "broker": "R",
++        "broker_scope": "vhost-demo",
++        "exchange": "e",
++        "queue": null,
++        "routing_key": "k"
++      },
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§5",
++          "source_id": "B13"
++        }
++      ],
++      "source": {
++        "entity": "A",
++        "operation": "send"
++      },
++      "target": {
++        "entity": "R",
++        "operation": null
++      },
++      "type": "thông-điệp"
++    },
++    {
++      "channel": "publish",
++      "context": "retry cùng logical message; không count",
++      "id": "republish",
++      "messaging": {
++        "broker": "R",
++        "broker_scope": "vhost-demo",
++        "exchange": "e",
++        "queue": null,
++        "routing_key": "k"
++      },
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§5",
++          "source_id": "B13"
++        }
++      ],
++      "source": {
++        "entity": "A",
++        "operation": "send"
++      },
++      "target": {
++        "entity": "R",
++        "operation": null
++      },
++      "type": "thông-điệp"
++    },
++    {
++      "channel": "consume",
++      "context": "fixture",
++      "id": "consume-q1",
++      "messaging": {
++        "broker": "R",
++        "broker_scope": "vhost-demo",
++        "exchange": null,
++        "queue": "q1",
++        "routing_key": null
++      },
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§5",
++          "source_id": "B13"
++        }
++      ],
++      "source": {
++        "entity": "R",
++        "operation": null
++      },
++      "target": {
++        "entity": "B",
++        "operation": "receive"
++      },
++      "type": "thông-điệp"
++    },
++    {
++      "channel": "consume",
++      "context": "fixture",
++      "id": "consume-q2",
++      "messaging": {
++        "broker": "R",
++        "broker_scope": "vhost-demo",
++        "exchange": null,
++        "queue": "q2",
++        "routing_key": null
++      },
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§5",
++          "source_id": "B13"
++        }
++      ],
++      "source": {
++        "entity": "R",
++        "operation": null
++      },
++      "target": {
++        "entity": "B",
++        "operation": "receive"
++      },
++      "type": "thông-điệp"
++    },
++    {
++      "channel": "consume",
++      "context": "fixture",
++      "id": "fanout",
++      "messaging": {
++        "broker": "R",
++        "broker_scope": "vhost-demo",
++        "exchange": null,
++        "queue": "q3",
++        "routing_key": null
++      },
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§5",
++          "source_id": "B13"
++        }
++      ],
++      "source": {
++        "entity": "R",
++        "operation": null
++      },
++      "target": {
++        "entity": "C",
++        "operation": "receive"
++      },
++      "type": "thông-điệp"
++    },
++    {
++      "channel": "http",
++      "context": "fixture",
++      "id": "callback-out",
++      "messaging": null,
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§5",
++          "source_id": "B13"
++        }
++      ],
++      "source": {
++        "entity": "A",
++        "operation": "send"
++      },
++      "target": {
++        "entity": "X",
++        "operation": null
++      },
++      "type": "gọi-đồng-bộ"
++    },
++    {
++      "channel": "internal",
++      "context": "fixture",
++      "id": "internal",
++      "messaging": null,
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§5",
++          "source_id": "B13"
++        }
++      ],
++      "source": {
++        "entity": "A",
++        "operation": "scheduler"
++      },
++      "target": {
++        "entity": "A",
++        "operation": "outbox"
++      },
++      "type": "gọi-chưa-phân-kiểu"
++    },
++    {
++      "channel": "span-parent",
++      "context": "fixture",
++      "id": "span-parent",
++      "messaging": null,
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§5",
++          "source_id": "B13"
++        }
++      ],
++      "source": {
++        "entity": "A",
++        "operation": "send"
++      },
++      "target": {
++        "entity": "B",
++        "operation": "receive"
++      },
++      "type": "span-parent"
++    },
++    {
++      "channel": "rpc",
++      "context": "bù trừ; giữ chiều A→B",
++      "id": "saga-compensate",
++      "messaging": null,
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§5",
++          "source_id": "B13"
++        }
++      ],
++      "source": {
++        "entity": "A",
++        "operation": null
++      },
++      "target": {
++        "entity": "B",
++        "operation": null
++      },
++      "type": "gọi-đồng-bộ"
++    }
++  ],
++  "resource_bindings": [
++    {
++      "entity": "DB1",
++      "id": "own1",
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§2",
++          "source_id": "B12"
++        }
++      ],
++      "relation": "owned_by",
++      "resource": "A"
++    },
++    {
++      "entity": "DB2",
++      "id": "own2",
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§2",
++          "source_id": "B12"
++        }
++      ],
++      "relation": "owned_by",
++      "resource": "B"
++    },
++    {
++      "entity": "DB1",
++      "id": "share1",
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§2",
++          "source_id": "B12"
++        }
++      ],
++      "relation": "hosted_on",
++      "resource": "PG"
++    },
++    {
++      "entity": "DB2",
++      "id": "share2",
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§2",
++          "source_id": "B12"
++        }
++      ],
++      "relation": "hosted_on",
++      "resource": "PG"
++    },
++    {
++      "entity": "PG",
++      "id": "placement",
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§6",
++          "source_id": "B11"
++        }
++      ],
++      "relation": "hosted_on",
++      "resource": "H"
++    }
++  ],
++  "scope": {
++    "revision": "design-v1",
++    "system": "synthetic"
++  },
++  "signals": [
++    {
++      "address": [
++        "instance",
++        "PG"
++      ],
++      "entity": "PG",
++      "id": "metric-shared",
++      "kind": "metric",
++      "operation": null,
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§5/7",
++          "source_id": "B16"
++        }
++      ],
++      "shared": true
++    },
++    {
++      "address": [
++        "R",
++        "vhost-demo",
++        "q1"
++      ],
++      "entity": "R",
++      "id": "metric-queue",
++      "kind": "metric",
++      "operation": null,
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§5",
++          "source_id": "B16"
++        }
++      ],
++      "shared": true
++    },
++    {
++      "address": [
++        "serviceName",
++        "traceId",
++        "spanId"
++      ],
++      "entity": "A",
++      "id": "log-callback",
++      "kind": "log",
++      "operation": "callback",
++      "provenance": [
++        {
++          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
++          "locator": "§3/4",
++          "source_id": "B16"
++        }
++      ],
++      "shared": false
++    }
++  ]
++}
+--- /dev/null
++++ results/T-036/fixtures/oracle-before-code.json
+@@ -0,0 +1,9 @@
++{
++  "definition": "define.py không import builder/comparator",
++  "implementation_exists": false,
++  "sha256": {
++    "define.py": "1109e56fe220bbfb564707a22cbf4e4c8a6eef05a3003485139998c385bac8da",
++    "expected.json": "f093c860af92d44cdfce0f0d7f1b1110a5a447119ae0381c9f15e8d3173b7943",
++    "input.json": "e3bcc085d18e53635d5bc830e886be07cfe3a8e61ea042f967d7497a62329827"
++  }
++}
+--- /dev/null
++++ results/T-036/fixtures/README.md
+@@ -0,0 +1,7 @@
++# Ví dụ kiểm trước mã
++
++`input.json` là dữ liệu tổng hợp, không là danh mục FlashTicket thật. A/B/C, DB1/DB2/PG, R/X/H đều là ID giả. Provenance chỉ đoạn nguồn quy định nhu cầu được mô phỏng: B12 §2 ownership/tài nguyên chung; B13 §5 message và Saga; B14 §3–7 retry/bù trừ/worker; B16 §3–5 callback/scheduler/địa chỉ. Không coi các ID/queue giả là tên runtime đã duyệt.
++
++`expected.json` ghi đích literal trước builder/comparator. Hai bản ghi HTTP cùng đầu mút/kiểu/channel phải gộp cạnh nhưng giữ hai nguồn bản ghi. Publish lặp giữ cấu trúc, không tạo event_count. Hai queue cùng B.receive và fan-out sang C phải riêng. Callback/scheduler có operation gốc không caller. Saga vẫn A→B. DB1/DB2 khác nhau, cùng trỏ một PG; PG có metric chung, không sao thành metric từng thao tác.
++
++Phép so đơn A→B có đích tập literal cho unknown, khác kiểu, cửa sổ rỗng. Các biến thể thiếu/mơ hồ mapping và địa chỉ có đích loại trừ; unknown chỉ khớp đầu mút. Tập dự kiến được viết độc lập; checker không được dùng hàm đang kiểm để tính expected. Biên nhận oracle ghi hash và xác nhận chưa có implementation, không phải bằng chứng các phép kiểm đã đạt.
+--- /dev/null
++++ results/T-036/hop-dong.md
+@@ -0,0 +1,52 @@
++# Hợp đồng nguồn tĩnh và đối chiếu v1 — T-036
++
++Căn cứ: DT18-NV2, cô bước 1, MRP P5, WHY-52/53 và SPEC T-036. Hợp đồng phục vụ biểu diễn quan hệ, giữ địa chỉ tín hiệu và tính giao/phần riêng của hai nguồn. Chưa chọn phép phát hiện hay xếp hạng P6. Registry ban đầu ở `nguon.json`; hash nguồn ở registry và manifest, không dùng HEAD thay hash nội dung.
++
++## 1. Bản ghi và trạng thái bằng chứng
++
++API thuần `build(document, registry)` không đọc file. Runner kiểm hash trước khi nạp. `document` chỉ có `scope`, `entities`, `operations`, `relations`, `resource_bindings`, `signals`. Trường lạ bị từ chối ở mọi bản ghi có schema; không có tham số nhãn, đường dẫn ca, root, fault, mốc tiêm hoặc lựa chọn theo kết quả. Locator nguồn chỉ truy vết, không chọn cạnh. Scope chỉ gồm `system`, `revision`; một document cho một hệ/revision nguồn.
++
++Mọi thực thể, thao tác, quan hệ, binding và địa chỉ tín hiệu giữ `provenance`: danh sách `{source_id, locator, condition}` không rỗng. Registry nguồn bắt buộc có ID, kind, revision, SHA-256 và condition; locator là vị trí đoạn/mục/dòng đọc, không chỉ tên repo. Hợp đồng không tự chứng minh đoạn trích đúng: người lập bản ghi và phản biện phải đọc nguồn ghim. Cùng ID khác nội dung bị từ chối; bản ghi lặp hệt được giữ một bản. Thứ tự đầu vào không là bằng chứng ưu tiên.
++
++Tách bốn chiều trong đầu ra: `representation=supported` chỉ nói bộ dựng giữ được bản ghi; `source_evidence` giữ nguồn thiết kế/code/tài liệu; `runtime=not_checked`; `rca_benefit=not_checked`. Không có cờ chung nâng tất cả. Nguồn tĩnh không có `event_count`; số provenance/bản ghi không là số lần thực thi. Graph giữ ID bản ghi để truy ngược về danh sách nguyên bản đã chuẩn hóa. Không suy ownership/kiểu từ tên hoặc đường dẫn.
++
++## 2. Inventory, thao tác và tài nguyên chung
++
++`entities`: `{id, name, type, granularity, role, provenance}`. Type tương thích T-035: service/gateway/database/cache/broker/identity-provider/external/host/unknown. Granularity là logical/instance/component; role mô tả vai trò, không chọn tập ứng viên RCA. Inventory đầy đủ tách khỏi `observed_nodes` (tĩnh không có nút quan sát). Không gộp database logic với instance. Một PostgreSQL instance có một ID, nhiều database logic có ID riêng; `resource_bindings` `{id, entity, resource, relation, provenance}` giữ quan hệ `hosted_on` hoặc `owned_by`. Đây là lớp địa chỉ có nguồn, không thêm cạnh gọi hay tự xác nhận deployment runtime. Mapping nhiều tầng có thể giữ DB→instance→host.
++
++`operations`: `{entity, name, runtime_name, provenance}`. ID là JSON canonical của cặp owner/name như T-035. Tên thiết kế giữ nguyên; runtime_name có thể null, không tự lấy name điền vào. Không dựng mọi hàm. Producer/consumer, worker, callback, coordinator là role/ngữ cảnh của thao tác có bằng chứng, không tự là thực thể/thao tác mới. Không nhận operation thiếu tên từ nguồn tĩnh; endpoint chỉ có entity vẫn hợp lệ. Hai miền ID operation/entity không được giao nhau; báo lỗi thay vì đổi tên ngầm.
++
++`relations`: `{id, source, target, type, channel, messaging, context, provenance}`. Mỗi endpoint là `{entity, operation}`; operation null nghĩa chưa có bằng chứng thao tác. Type giữ gọi-đồng-bộ/gọi-chưa-phân-kiểu/dữ-liệu/thông-điệp/triển-khai/span-parent. Channel là http/rpc/data/publish/consume/logical-message/deployment/internal/span-parent. Context là chuỗi nêu điều kiện nhánh/transaction/retry/bù trừ, không số sự kiện. Cạnh dữ liệu hướng service→database/cache; deployment hướng entity→host; messaging theo §3. Không tự đảo cạnh ở bù trừ.
++
++Graph thực thể nhận mọi cạnh phụ thuộc khác owner; giữ quan hệ nội bộ và span-parent trong records/lớp thao tác, không chiếu thành cạnh thực thể. Lớp thao tác chỉ nhận quan hệ có ít nhất một endpoint operation đã khai; đầu kia không operation là component_context. Quan hệ chỉ có hai entity được báo `operation_exclusions`, giữ nguyên graph thực thể; không tạo operation giả để bắt phép chiếu bằng toàn graph entity. `project` chỉ hứa bằng tập cạnh entity của phần có thể chiếu; phần entity-only được báo riêng. Giữ cả inventory-only, operation đơn lẻ/scheduler không caller, callback trace mới. Không bịa callback edge từ correlation. HTTP external→callback chỉ có nếu nguồn thiết kế/code thật quy định, vẫn là thiết kế; trace không được tự thêm cạnh ấy.
++
++Khóa gộp nguồn tĩnh: hai đầu + type + channel + địa chỉ messaging đầy đủ/null. Provenance và context là các danh sách riêng; nhiều bản ghi cùng quan hệ không làm tăng số cạnh cấu trúc. Không mất provenance khi gộp. Destination legacy của T-035 vẫn giữ riêng, không suy queue từ đó.
++
++## 3. Messaging và địa chỉ tín hiệu
++
++`messaging` là null với cạnh khác messaging, hoặc đủ năm khóa `{broker, broker_scope, exchange, routing_key, queue}`; chưa biết giữ null, chuỗi rỗng có nghĩa chỉ cho exchange/routing_key. Publish hướng producer→broker và không có queue; consume broker→consumer; logical-message producer→consumer. Broker phải khớp endpoint liên quan và type broker. Không nối publish/consume thành logical edge chỉ vì cùng broker/queue/routing. Quan hệ tĩnh logical-message phải là bản ghi riêng có bằng chứng routing/binding/đích; nó nói khả năng giao tiếp, không là một bản tin đã đi qua. Không có message ID/attempt trong khóa cấu trúc. Việc nối bản tin trace giữ nguyên điều kiện link/identity T-035 §7; T-036 không thực hiện lại hoặc nới nó.
++
++Khóa messaging đối chiếu cần broker được mapping; broker_scope được xác minh bằng nguồn mapping scope riêng khi khác tên. Phiên bản v1 yêu cầu địa chỉ chuẩn hóa sẵn và scope equality; không suy alias scope. Publish cần broker/scope/exchange/routing; consume cần broker/scope/queue; logical cần cả năm. Thiếu phần cần thiết bị loại trừ, kể cả hai phía cùng thiếu. Publish và consume không thể khớp nhau. Nhiều queue cùng consumer vẫn nhiều cạnh. Khác kiểu messaging nhưng cùng đầu mút vẫn được phân biệt bởi channel.
++
++`signals`: `{id, kind, entity, operation, address, shared, provenance}`; kind log/trace/metric. Address là danh sách chuỗi có namespace; người lập nguồn phải dẫn schema/khóa tại B16 hoặc cấu hình thật. Metric service/instance/host dùng `shared=true`, operation phải null. Metric operation chỉ có khi đo đúng operation và `shared=false`; không nhân chuỗi shared sang mọi operation. Metric queue là `(broker,broker_scope,queue)` và giữ một địa chỉ dù nhiều cạnh tham chiếu. Log nối trace/span nếu có; thiếu thì entity+time, operation chỉ khi tường minh. Bản ghi địa chỉ không có giá trị metric/log/runtime.
++
++## 4. Miền so sánh, alias và mẫu số
++
++`compare(static_graph, trace_graph, mappings, context, registry)` thuần, không I/O, không ghi/sửa đầu vào. Context tách `system`, `level`, `domain`, `trace_revision`, `revision_link_verified`, `revision_provenance`. Domain chỉ `dev-adapter`, `dev-file`, `synthetic`; không nhận tên ca hoặc đường dẫn. Giữ interval_ns nguyên bản từ graph. Nezha toàn miền là dev-adapter; không nhận domain ngày. Mỗi lời gọi xử lý đúng một graph mức entity/operation và một cửa sổ có sẵn; runner điều phối các ca ở ngoài API. Cửa sổ không hợp lệ bị từ chối. Revision link chỉ verified khi có provenance; chưa xác minh thì `conditional_reference=true` ngay tại kết quả.
++
++Mapping là danh sách `{level, original, candidates, verified, provenance}`. Identity mapping cũng phải khai, dẫn nguồn. Candidate là ID chuẩn bên nguồn tĩnh; nhiều candidate hoặc verified=false được báo mơ hồ/chưa xác minh. Thiếu mapping được báo riêng; không đoán theo hậu tố, không fallback tên giống nhau. Mapping endpoint thao tác phải giữ owner tương ứng entity mapping đã xác minh. Mapping không tự sửa tên/kiểu graph trace. Alias tường minh nhiều tên runtime về một entity chuẩn hợp lệ; nhiều operation runtime về một thao tác thiết kế chỉ khi có nguồn, provenance giữ toàn bộ.
++
++Hai phép so riêng:
++
++- `endpoints`: khóa đầu mút + channel messaging và địa chỉ. Với cạnh không messaging, không dùng type trong khóa; vì thế gọi chưa phân kiểu có thể khớp cặp đầu mút với gọi đồng bộ hoặc dữ liệu nhưng chỉ xác nhận cấu trúc. Báo record/trace edge gốc kèm kiểu, không nâng nghĩa.
++- `typed`: thêm type; loại gọi-chưa-phân-kiểu với lý do unknown_type ở cả phía. Không lấy kiểu tĩnh lấp trace. Span-parent và cạnh nội bộ (kể cả sau alias) bị loại khỏi so phụ thuộc entity; lớp operation có thể so span-parent nếu có nguồn cùng nghĩa. Khớp đầu mút không xác nhận kiểu. Channel messaging luôn giữ riêng; HTTP và RPC có cùng kiểu gọi-đồng-bộ được gộp trong khóa so typed vì T-035 chưa ghi transport. Channel gốc vẫn trong members; phép này chưa xác nhận transport.
++
++Mỗi phép xuất các tập khóa `S`, `T`, `intersection`, `static_only`, `trace_only`, bảng thành viên với provenance/ID/index gốc và exclusions theo phía. Gộp theo khóa cấu trúc đã mapping, giữ toàn bộ thành viên. Báo numerator và denominator riêng: `static_fraction=|giao|/|S|`, `trace_fraction=|giao|/|T|`; mẫu số 0 trả null/N/A. Không gọi precision/recall. Tổng tập phải khớp danh sách, không chỉ đếm. Không gộp provenance static/trace trong một bằng chứng. Điều kiện nguồn vẫn giữ theo từng record, không suy mọi nhánh đã chạy trong cửa sổ. Bảng `nodes` báo mapping mọi nút trace, kể cả nút cô lập; inventory tĩnh giữ riêng và không cộng vào mẫu số cạnh.
++
++## 5. Tương thích và giới hạn
++
++Đọc nguyên schema T-035 v2.1 (entity/operation, component_context/belongs_to, edge type/evidence_source/destination, messaging). Không đổi file hay thêm cạnh vào trace. Phép chiếu operation T-035 giữ ngoại lệ span-parent và intra-owner. Static có lớp resource_bindings và signals riêng; T-035 chưa có trường tương đương cho DB→instance. Đây là thông tin hiện chưa có để so, được bàn giao cùng phản ví dụ B12 §2; không đòi bộ dựng trace xác nhận tài nguyên từ tên DB. Nếu P9/P6 cần graph computational cho shared instance thì phải trình hợp đồng/adapter và phép dùng mapping riêng, không gọi đó là tính năng đã kiểm của T-035.
++
++Các giải thích chênh lệch luôn còn cạnh tranh: revision, alias, miền/cửa sổ, nhánh chưa chạy, nguồn tĩnh thiếu, telemetry thiếu, lỗi chuyển đổi. T-038/039 phải đọc nguồn và trường hợp khớp tương ứng để phân xử. Không cộng cờ thành tỷ lệ nguyên nhân. T-037 phải khảo sát đủ các nhóm thiết kế, không lấy fixture đại diện làm coverage toàn hệ. Registry ban đầu không xác minh revision ứng dụng TT/OB sinh dataset. Nguồn chưa có thì giữ owner/đầu vào/bước xử lý OPEN; không tự tải hoặc coi collector phục hồi thông tin chưa ghi.
++
++Phương án đã loại: regex gộp tên (mất ownership), một DB đại diện mọi logical DB (mất phạm vi), nhiều instance giả (mất tài nguyên chung), mọi operation đều có metric service độc lập (nhân bằng chứng), static là ground truth runtime (sai revision/nhánh), nối message bằng correlation (không chứng minh bản tin). Điều kiện thất bại: người đọc dẫn nguồn sai, source không đúng deployment, mapping không có nghĩa ổn định hoặc instrumentation thiếu. Fixture kiểm công cụ và phản ví dụ kỹ thuật, không chứng minh độ đầy đủ/runtimes hay lợi ích RCA.
+--- /dev/null
++++ results/T-036/kiem-dung-dan.md
+@@ -0,0 +1,47 @@
++# Kiểm đúng đắn và mức kết luận T-036
++
++Tự soát SPEC từ DT18/cô, MRP, LESSONS, WHY/DECISIONS, B11–B16 và code/đầu ra T-035 chưa phát hiện điểm phải sửa SPEC. Nhận xét độc lập được ghi LOG Phiên 2 trước implementation. Codex giữ người làm, Claude phản biện chính thức. Đầu ra hiện chờ phản biện; chưa nghiệm thu hoặc đóng task.
++
++## 1. Nguồn và thứ tự bằng chứng
++
++`runs/chuan-bi-001/input-verification.json#/checks`: 5673 artifact được chọn kiểm hash, tất cả khớp; gồm toàn bộ manifest T-035 và nguồn công khai được dùng ban đầu. `preflight.json` ghi môi trường, base commit, quyền ghi, manifest hash và hash tài liệu bảo vệ. B11-C/B12/B13/B14/B16 ghim revision/hash nội dung trong `nguon.json#/sources`, đều không dirty lúc đọc. Không lấy HEAD làm hash file.
++
++Registry hiện có 15 nguồn. Bổ sung capture metadata đã kiểm hash ở `runs/chuan-bi-001/revision-verification.json`: tách RCAEval code commit, snapshot dataset và tree object Nezha; README Nezha khớp blob trong tree đã lưu. Những revision đó chưa chứng minh revision ứng dụng/deployment sinh dataset. Repo TT/Augmented-OB chỉ là nguồn ứng viên cho task sau, chưa tải.
++
++`fixtures/oracle-before-code.json#/implementation_exists` là false; hash input/expected/definition khớp. Oracle cơ sở literal có trước implementation, không dùng builder để sinh đáp án. Các phép kiểm mở rộng trong checker (hai nguồn, nội bộ sau alias, nút cô lập, default exchange, tích hợp trace builder) được thêm khi tự đọc implementation; không gọi chúng là toàn bộ oracle trước mã. Tính đúng không chỉ dựa vào việc chạy không lỗi.
++
++## 2. Đầu vào → xử lý → trung gian → đầu ra
++
++| Phần kiểm | Bằng chứng và kết quả |
++|---|---|
++| Inventory/owner/resource | `fixtures/input.json` → `build` → `runs/kiem-005/entity.json#/resource_bindings`; DB1/DB2 riêng, một PG chung, owner riêng và metric PG chung. Inventory không là observed_nodes hay tập ứng viên RCA. |
++| Quan hệ và phép chiếu | Oracle `expected.json#/entity_edges` và `#/projected_entity_record_ids` → `entity.json`, `operation.json`, `projection.json`. Entity-only được báo exclusion; không tạo operation giả. Nội bộ/span-parent không thành cạnh entity. Callback/scheduler không có caller giả. |
++| Messaging | Hai queue cùng consumer, fan-out, republish: queue_metric_address giữ riêng; không event_count tĩnh, không suy logical edge từ broker. `compare-two-queues.json#/views/typed` ghi đủ tập và mẫu số. |
++| Tích hợp T-035 | `trace-synthetic-messaging.json` do builder T-035 dựng từ span tổng hợp → `compare-trace-builder-messaging.json`. Các chặng broker khớp; cạnh inferred logical của trace giữ riêng trong trace_only khi nguồn tĩnh không ghi quan hệ ấy. Không coi ví dụ là runtime FT. |
++| Alias/kiểu/miền | `compare-unknown.json#/views`: đầu mút khớp nhưng typed loại unknown. Checker kiểm alias thiếu/mơ hồ/chưa xác minh, operation khác owner, cạnh nội bộ sau alias, địa chỉ thiếu cả hai phía, relation domain và interval lỗi. Không đổi nghĩa quan sát theo thiết kế. |
++| Tập và mẫu số | `result.json#/checks` đối chiếu danh sách literal cho giao/phần riêng/S/T, unknown/khác kiểu/rỗng. Mẫu số 0 là null, không gọi precision/recall. Members giữ bản ghi tĩnh và cạnh trace riêng. |
++| Nhãn và lỗi đầu vào | API thuần; trường lạ/nhãn bị từ chối, provenance thiếu hoặc ID/kiểu mâu thuẫn bị báo. Không nhận tên ca, đường dẫn ca hay mốc tiêm để chọn cạnh. Locator nguồn chỉ truy vết. |
++| Graph dev có sẵn | `compatibility.json#/graphs`: 312 graph full/N/A ở hai mức, hai hệ, theo manifest hiện hành. Kiểm hash trước nạp, không sửa đầu vào. Không có mapping nguồn kiến trúc trong phép này nên loại trừ unmapped; chưa là đối chiếu kiến trúc thật. |
++| Chiếu graph dev | `trace-projections.json`: 156 cặp thao tác/entity khớp, giữ ngoại lệ span-parent. Dùng graph lưu sẵn; không đọc trace thô/test hoặc chạy lại baseline. |
++
++## 3. Các lượt và chi phí thực đo
++
++- `runs/kiem-001/failure.json`: dừng vì selector lấy thêm graph lịch sử trong manifest, đường dẫn không thuộc thư mục hiện hành. Các kiểm trước exception được giữ. Sửa selector trong checker, không sửa đầu vào hay oracle để đạt.
++- `runs/kiem-002/result.json`: kiểm ban đầu đạt. Sau tự đọc lại code, bổ sung loại nội bộ sau alias và báo nút cô lập; không sửa SPEC.
++- `runs/kiem-003/result.json`: kiểm bổ sung đạt. Sau đó thêm phép tích hợp T-035 messaging tổng hợp.
++- `runs/kiem-004/result.json` và `runs/kiem-005/result.json`: mỗi lượt 151 kiểm đạt, 0 lỗi. Lượt cuối 8.754 giây, peak working set khoảng 109.9 MiB; số gốc ở `#/seconds`, `#/peak_working_set_bytes`, Python allocation peak ở `#/python_tracemalloc_peak_bytes`. RAM gồm Python/thư viện và cả checker, không chỉ API. Không chạy việc nặng khác đồng thời.
++- Đảo bản ghi ở ba seed trong checker; hai process khác PYTHONHASHSEED giữ mọi graph/kết quả so sánh trung gian giống từng byte, kiểm ở `runs/ket-phien-001/determinism.json#/checks`. Mã đã chạy được lưu ở `runs/kiem-004/code/`, `runs/kiem-005/code/` cùng hash. Các lượt cũ chưa lưu snapshot mã riêng, không dùng chúng thay bằng chứng của hai lượt cuối.
++
++## 4. Kết luận theo câu hỏi nguồn
++
++**FACT:** công cụ giữ được các phản ví dụ đã kiểm, truy ngược bản ghi/provenance và phân tách mẫu số đúng hợp đồng. Thiết kế/code, quan sát runtime và lợi ích RCA không bị nâng chung một nhãn. Bộ dựng tĩnh không sinh event_count hoặc tự thêm quan hệ do correlation. Comparator không sửa graph trace.
++
++**Suy luận có giới hạn:** hợp đồng có thể dùng làm đầu vào khảo sát T-037–039 trong các nhu cầu đã kiểm. Chưa chứng minh inventory/quan hệ toàn hệ đầy đủ; chưa có đối chiếu kiến trúc thật TT/OB. Khớp typed của non-messaging không xác nhận transport HTTP/RPC vì T-035 chưa ghi transport; members giữ channel nguồn tĩnh.
++
++**OPEN:** runtime/build/deployment/instrumentation FlashTicket; revision ứng dụng TT/OB sinh dataset; nghĩa host của Node; độc lập metadata ngày; độ đầy đủ telemetry; lợi ích cấu trúc và lựa chọn P6. DB→instance được giữ trong lớp binding tĩnh; T-035 chưa có trường tương đương. Thiếu telemetry/mapping resource không được điền từ tên DB. Phản ví dụ, phương án bổ sung/owner/ảnh hưởng cụ thể tại `ban-giao.md` §2–3; muốn sửa hợp đồng trace hoặc thu thêm phải trình Minh riêng.
++
++T-036 đáp ứng phần hợp đồng/công cụ trong phạm vi kiểm, chưa trả lời xong RQ3/RQ5 hoặc toàn P5b. T-037–040 cần SPEC riêng. P6/P7/P9/P10 nhận nghĩa vụ còn thiếu; dừng phản biện hay nghiệm thu công cụ không tự cho mở test hoặc khẳng định RCA có lợi.
++
++## 5. Tự soát cuối và bàn giao
++
++Kiểm hash/manifest/phạm vi/diff ở `runs/ket-phien-001/final-verification.json`; diff phiên ở `changes.diff`. Chỉ nối LOG, cập nhật đúng dòng T-036 trong STATE; giữ SPEC và các tài liệu nguồn. Prompt Claude lấy nguyên văn mẫu ở `prompt-claude.txt` và LOG Phiên 2. Không thêm quyết định khoa học, không tự sửa WHY/DECISIONS, không commit/push.
+--- /dev/null
++++ results/T-036/nguon.json
+@@ -0,0 +1,289 @@
++{
++  "branches": {
++    "FlashTicket": {
++      "application_code": "chưa có bản mới theo Minh",
++      "next": "T-037"
++    },
++    "Nezha-OB": {
++      "candidate_repository": "https://github.com/IntelligentDDS/Augmented-OnlineBoutique",
++      "next": "T-039",
++      "revision_dataset_application": "OPEN; chưa tải"
++    },
++    "RE2-TT": {
++      "candidate_repository": "https://github.com/FudanSELab/train-ticket",
++      "next": "T-038",
++      "revision_dataset_application": "OPEN; chưa tải"
++    }
++  },
++  "sources": [
++    {
++      "condition": "thiết kế bản mới; chưa là runtime",
++      "dataset_link": "not_applicable",
++      "dirty": false,
++      "id": "B11",
++      "kind": "design",
++      "locator": "toàn văn; các đoạn dùng được dẫn riêng trong provenance",
++      "open": [
++        {
++          "affects": "xác nhận hệ đã chạy và placement thực",
++          "input": "build/deployment/export runtime",
++          "owner": "nhóm hệ thống/P9b"
++        }
++      ],
++      "path": "D:/Project/flash-ticket-platform/docs/architecture/B11-C-target-architecture.md",
++      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
++      "sha256": "80e9a738c16dfdea39d7354a5cb2d7f0f4ca522faa787bb157f864af770a5635",
++      "system": "FlashTicket"
++    },
++    {
++      "condition": "thiết kế bản mới; chưa là runtime",
++      "dataset_link": "not_applicable",
++      "dirty": false,
++      "id": "B12",
++      "kind": "design",
++      "locator": "toàn văn; các đoạn dùng được dẫn riêng trong provenance",
++      "open": [
++        {
++          "affects": "xác nhận hệ đã chạy và placement thực",
++          "input": "build/deployment/export runtime",
++          "owner": "nhóm hệ thống/P9b"
++        }
++      ],
++      "path": "D:/Project/flash-ticket-platform/docs/architecture/B12-data-ownership-and-schema.md",
++      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
++      "sha256": "85ba37aa6fb911f596159621b38c5063eb3f1f258a4c9607b0fd33ca57a9ab09",
++      "system": "FlashTicket"
++    },
++    {
++      "condition": "thiết kế bản mới; chưa là runtime",
++      "dataset_link": "not_applicable",
++      "dirty": false,
++      "id": "B13",
++      "kind": "design",
++      "locator": "toàn văn; các đoạn dùng được dẫn riêng trong provenance",
++      "open": [
++        {
++          "affects": "xác nhận hệ đã chạy và placement thực",
++          "input": "build/deployment/export runtime",
++          "owner": "nhóm hệ thống/P9b"
++        }
++      ],
++      "path": "D:/Project/flash-ticket-platform/docs/architecture/B13-api-and-event-contracts.md",
++      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
++      "sha256": "7c7e3999e9a549d4cae84fc1f37da49a4051093e8da524d70ba83e98d033c6b0",
++      "system": "FlashTicket"
++    },
++    {
++      "condition": "thiết kế bản mới; chưa là runtime",
++      "dataset_link": "not_applicable",
++      "dirty": false,
++      "id": "B14",
++      "kind": "design",
++      "locator": "toàn văn; các đoạn dùng được dẫn riêng trong provenance",
++      "open": [
++        {
++          "affects": "xác nhận hệ đã chạy và placement thực",
++          "input": "build/deployment/export runtime",
++          "owner": "nhóm hệ thống/P9b"
++        }
++      ],
++      "path": "D:/Project/flash-ticket-platform/docs/architecture/B14-main-flow-sequences.md",
++      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
++      "sha256": "45117e230b6977bdd08dd91bdc21dc3048fdc87eb31fe3f0204ceb66c2bdf44a",
++      "system": "FlashTicket"
++    },
++    {
++      "condition": "thiết kế bản mới; chưa là runtime",
++      "dataset_link": "not_applicable",
++      "dirty": false,
++      "id": "B16",
++      "kind": "design",
++      "locator": "toàn văn; các đoạn dùng được dẫn riêng trong provenance",
++      "open": [
++        {
++          "affects": "xác nhận hệ đã chạy và placement thực",
++          "input": "build/deployment/export runtime",
++          "owner": "nhóm hệ thống/P9b"
++        }
++      ],
++      "path": "D:/Project/flash-ticket-platform/docs/architecture/B16-observability-baseline.md",
++      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
++      "sha256": "12d9ab32969443e3b2bb12f8ad4d77f895ddeaf05ae325c9e4b77f72f6bdc6a8",
++      "system": "FlashTicket"
++    },
++    {
++      "condition": "nguồn khởi đầu truy phiên bản",
++      "dataset_link": "OPEN",
++      "id": "RCAEval-README",
++      "kind": "public-document",
++      "locator": "toàn văn/JSON",
++      "manifest": "results/T-002/handoff-manifest.json",
++      "open": [
++        {
++          "affects": "quy chênh lệch cho instrumentation",
++          "input": "revision ứng dụng + image/deployment sinh dataset",
++          "owner": "T-038"
++        }
++      ],
++      "path": "results/T-002/public-metadata/run-002/sources/github-README.md",
++      "revision": "259ea4167160256a74ad30004aa3d96a998c846e",
++      "revision_kind": "RCAEval-code-commit; not TrainTicket application",
++      "sha256": "25a354ef13f5adf8b2869d67a832958a8a31a6b7b95cf011e060f34ab28c98a9",
++      "system": "RE2-TT"
++    },
++    {
++      "condition": "nguồn khởi đầu truy phiên bản",
++      "dataset_link": "OPEN",
++      "id": "RCAEval-revision",
++      "kind": "repository-metadata",
++      "locator": "toàn văn/JSON",
++      "manifest": "results/T-002/handoff-manifest.json",
++      "open": [
++        {
++          "affects": "quy chênh lệch cho instrumentation",
++          "input": "revision ứng dụng + image/deployment sinh dataset",
++          "owner": "T-038"
++        }
++      ],
++      "path": "results/T-002/public-metadata/run-002/sources/github-main-commit.json",
++      "revision": "259ea4167160256a74ad30004aa3d96a998c846e",
++      "revision_kind": "RCAEval-code-commit; not TrainTicket application",
++      "sha256": "2f9fd320d4efb0a8f980512db3dba903e0b5f8a1e7861640fdfdadac71e66ed9",
++      "system": "RE2-TT"
++    },
++    {
++      "condition": "nguồn khởi đầu truy phiên bản",
++      "dataset_link": "OPEN",
++      "id": "RCAEval-dataset",
++      "kind": "dataset-metadata",
++      "locator": "toàn văn/JSON",
++      "manifest": "results/T-002/handoff-manifest.json",
++      "open": [
++        {
++          "affects": "quy chênh lệch cho instrumentation",
++          "input": "revision ứng dụng + image/deployment sinh dataset",
++          "owner": "T-038"
++        }
++      ],
++      "path": "results/T-002/public-metadata/run-002/sources/hf-README.md",
++      "revision": "afeacb11bcc94dadfd1c8f483ee4377b2b8b614e",
++      "revision_kind": "dataset snapshot; not application deployment",
++      "sha256": "c2990bbe2e040a8d2f55fdd47c4f47f02223d8ea098e5d6e8851585a64956a0f",
++      "system": "RE2-TT"
++    },
++    {
++      "condition": "nguồn khởi đầu truy phiên bản",
++      "dataset_link": "OPEN",
++      "id": "Nezha-README",
++      "kind": "public-document",
++      "locator": "toàn văn/JSON",
++      "manifest": "results/T-003/runs/final-review-003/artifact-manifest.json",
++      "open": [
++        {
++          "affects": "quy chênh lệch cho instrumentation",
++          "input": "revision ứng dụng + image/deployment sinh dataset",
++          "owner": "T-039"
++        }
++      ],
++      "path": "results/T-008/sources/README.md",
++      "readme_blob_verified": "ba662fdfc7bbf5ba0d5063adfb5ab4b3ba5c900f",
++      "revision": "d8140101fdb4e7dfb60d3ef9f64706f382b68470",
++      "revision_kind": "git tree object; not deployment/commit proven to generate dataset",
++      "sha256": "efb2eac6e1a1e7c69e560575fb8cf5e604635a1380457b70b5c7d563ebca72d5",
++      "system": "Nezha-OB"
++    },
++    {
++      "condition": "nguồn khởi đầu truy phiên bản",
++      "dataset_link": "OPEN",
++      "id": "Nezha-repository",
++      "kind": "repository-metadata",
++      "locator": "toàn văn/JSON",
++      "manifest": "results/T-003/runs/final-review-003/artifact-manifest.json",
++      "open": [
++        {
++          "affects": "quy chênh lệch cho instrumentation",
++          "input": "revision ứng dụng + image/deployment sinh dataset",
++          "owner": "T-039"
++        }
++      ],
++      "path": "results/T-008/sources/repository.json",
++      "revision": "snapshot đã lưu theo manifest; không là revision ứng dụng",
++      "sha256": "f46fa849f6f29c740117da9929c52f15ab4d440dd2cce0b2e47a4ed208933538",
++      "system": "Nezha-OB"
++    },
++    {
++      "condition": "nguồn khởi đầu truy phiên bản",
++      "dataset_link": "OPEN",
++      "id": "Nezha-tree",
++      "kind": "repository-metadata",
++      "locator": "toàn văn/JSON",
++      "manifest": "results/T-003/runs/final-review-003/artifact-manifest.json",
++      "open": [
++        {
++          "affects": "quy chênh lệch cho instrumentation",
++          "input": "revision ứng dụng + image/deployment sinh dataset",
++          "owner": "T-039"
++        }
++      ],
++      "path": "results/T-008/sources/tree.json",
++      "readme_blob_verified": "ba662fdfc7bbf5ba0d5063adfb5ab4b3ba5c900f",
++      "revision": "d8140101fdb4e7dfb60d3ef9f64706f382b68470",
++      "revision_kind": "git tree object; not deployment/commit proven to generate dataset",
++      "sha256": "a6d916e496eb84403be0a4b270528fa3cdf33f068b4cab4aeeeb892e02cff99a",
++      "system": "Nezha-OB"
++    },
++    {
++      "condition": "đầu vào ghim; chưa suy nghiệm thu T-035",
++      "dataset_link": "not_applicable",
++      "id": "T035-contract",
++      "kind": "internal-contract",
++      "locator": "toàn văn",
++      "manifest": "results/T-035/manifest.json",
++      "open": [],
++      "path": "results/T-035/dac-ta-do-thi.md",
++      "revision": "v2.1",
++      "sha256": "c591941709ebf19ce9864048b60ed70dbbf8084fad9aebef3190eee88c8ecd6b",
++      "system": "common"
++    },
++    {
++      "condition": "đầu vào ghim; chưa suy nghiệm thu T-035",
++      "dataset_link": "not_applicable",
++      "id": "T035-code",
++      "kind": "internal-contract",
++      "locator": "toàn văn",
++      "manifest": "results/T-035/manifest.json",
++      "open": [],
++      "path": "src/do_thi/builder.py",
++      "revision": "v2.1",
++      "sha256": "d58663a82397ae0ece10a1d8e95d81a655600ee363eed23c28cbdc06d0543a49",
++      "system": "common"
++    },
++    {
++      "condition": "đầu vào ghim; chưa suy nghiệm thu T-035",
++      "dataset_link": "not_applicable",
++      "id": "T035-signals",
++      "kind": "internal-contract",
++      "locator": "toàn văn",
++      "manifest": "results/T-035/manifest.json",
++      "open": [],
++      "path": "results/T-035/thong-tin-theo-quan-he.md",
++      "revision": "v2.1",
++      "sha256": "388829f255bd2fd0b45afd5b628c487db61478b272edaccced7d9ecbfb8b23fc",
++      "system": "common"
++    },
++    {
++      "condition": "provenance capture; not application revision",
++      "dataset_link": "OPEN",
++      "id": "RCAEval-source-manifest",
++      "kind": "capture-metadata",
++      "locator": "README and commit capture rows",
++      "manifest": "results/T-002/handoff-manifest.json",
++      "open": [],
++      "path": "results/T-002/public-metadata/run-002/source-manifest.json",
++      "revision": "run-002 saved capture",
++      "sha256": "f9355f168693d4d9cd22b652a37dc271e0448132995aa6ff2afa3f239076da19",
++      "system": "RE2-TT"
++    }
++  ],
++  "version": 1
++}
+--- /dev/null
++++ results/T-036/prompt-claude.txt
+@@ -0,0 +1,65 @@
++Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
++Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
++
++Thông tin lượt này:
++- Task hoặc đề xuất: T-036; D:/RCA-flashticket/tasks/T-036-p5b-hop-dong-chung/SPEC.md.
++- Công đoạn: soát kết quả.
++- Gói/cổng: P5; chuẩn bị G3.
++- Người làm và người phản biện chính thức: Codex người làm; Claude người phản biện chính thức.
++- Tài liệu gốc: D:/RCA-flashticket/AGENTS.md; docs/STATE.md; tasks/T-036-p5b-hop-dong-chung/SPEC.md và LOG.md; docs/MRP.md; docs/WHY.md; docs/DECISIONS.md; docs/LESSONS.md; docs/reference/sources/DT18-de-tai-va-nhiem-vu.md; docs/reference/sources/advisor-2026-09-23.md; nguồn và manifest tại results/T-036/nguon.json.
++- Phản biện và phản hồi trước: không có bản phản biện chính thức T-036 trước lượt này.
++- Code và kết quả liên quan: D:/RCA-flashticket/results/T-036/manifest.json; hop-dong.md; nguon.json; fixtures/; runs/; kiem-dung-dan.md; ban-giao.md; src/do_thi_tinh/README.md và code; results/T-035/manifest.json và các đầu vào SPEC liệt kê; Windows/PowerShell, Python theo README; diff phiên ở results/T-036/runs/ket-phien-001/changes.diff.
++- Phạm vi ghi được Minh cho phép trong lượt này: chỉ đọc và trả lời trong chat; chưa có quyền ghi REVIEW, LOG, STATE, SPEC, code hoặc kết quả.
++
++Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
++
++Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
++Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
++Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
++
++Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
++hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
++Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
++số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
++có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
++
++Bổ sung yêu cầu phản biện:
++1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
++2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
++3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
++4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
++5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
++6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
++7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
++8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
++9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
++10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
++
++Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
++Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
++
++Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
++bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
++Tiếng Việt, câu ngắn.
++
++Cuối lượt báo:
++1. Đã làm gì.
++2. File đã thay đổi, hoặc không sửa file nào.
++3. Kiểm đã chạy và kết quả.
++4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
++
++Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
++
++Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
++
++Công đoạn: soát kết quả.
++Kiểm trên đầu ra thật, code và dữ liệu được phép; không tin tóm tắt LOG. Đối chiếu tiêu chí xong với phần mục tiêu nguồn và mức căn cứ cho bước tiếp theo; chạy lại phần rẻ khi trong quyền được duyệt.
++Phân biệt hoàn thành task mô tả, xác nhận cơ chế và đủ căn cứ chọn/đánh giá thiết kế. Giới hạn đã khai không tự miễn phép kiểm cần thiết còn làm được.
++Chỉ ghi bản phản biện lượt được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ bản cũ; không sửa kết quả thay người làm.
++
++Với từng thành phần, kiểm mục đích và căn cứ: sửa hạn chế P4, đáp ứng DT18 hay nhu cầu kỹ thuật. Có lý do kỹ thuật, phương án khác, bằng chứng dev và điều kiện thất bại không; có dùng mã hạn chế mô tả như bằng chứng cơ chế hoặc chọn theo mức chênh đồ thị trừ không đồ thị không?
++Nêu rõ nút/cạnh, ánh xạ log/trace/metric và phép tính thực sự sử dụng cạnh. Lần theo thông tin quan hệ và nhãn trong phương pháp lẫn đối chứng; gọi “không đồ thị” có đúng với thông tin còn giữ không?
++Kiểm baseline và đối chứng đủ mạnh, tương đương về tín hiệu/cửa sổ/tập ứng viên/coverage/tiền xử lý/quy tắc chấm/ngân sách chọn cấu hình ở phần không chủ ý thay; yếu tố thay cùng phải giới hạn kết luận.
++Phương pháp và đối chứng đã được cài và kiểm đầu vào, trung gian, hành vi trên dev chưa, hay chỉ chạy không lỗi? Không đòi đồ thị phải thắng để khóa.
++Code/revision, cấu hình, giả thuyết, độ đo, tập ca/tập ứng viên, cách xử lý ca lỗi/UNSUPPORTED/nhánh dự phòng và bảng diễn giải đã khóa trước test chưa? Có bỏ nhóm khó sau khi nhìn điểm hoặc dùng test để chọn thiết kế không?
++Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.
+--- STATE-before
++++ docs/STATE.md
+@@ -44,7 +44,7 @@
+ | T-033 | Lần theo cơ chế báo động trước mốc | P4 | Codex | Claude | Xong (11/10/2026, Minh nghiệm thu; Q-137–Q-140). Mục1–3 hoàn tất; số bổ sung EC2 khớp Claude, phản biện dừng. Xác nhận chuỗi N-Sigma/BOCPD, hướng tiền xử lý nhìn trước, cờ khác bắt đầu đoạn MAP, freeze19/60. OPEN: câu4/onset thật/báo giả vận hành/prior riêng/tác động bậc thang/lợi ích đồ thị/D; không so cửa sổ trong T033. T034 dùng câu thay mục6 bo-sung-bao-cao.md, không câu cũ report002. Không đóng RQ2/G2 hoặc chọn P6; chưa commit; bổ sung Q-144 hoàn tất phép kiểm13/10, chờ Minh xem báo cáo; giới hạn và kết quả/nghiệm thu cũ giữ rõ; xem LOG và runs/bo-sung-toan-dien-20261012-001/BAO-CAO-TONG-HOP.md | `tasks/T-033-g2-nguyen-nhan-phat-hien/` | | T-034 | Gói trình G2: baseline, bản đồ hạn chế hợp nhất, hai phép E1/E2 | P3, P4 (G2) | Claude | Codex | Chờ Minh nghiệm thu (14/10/2026); chưa đóng. Phản biện dừng 14/10 sau sáu lượt sửa (Q-147, Q-148); lượt sửa cuối chỉ đổi lời văn, Codex chưa kiểm. Đầu ra ở `results/T-034/`, bản hiện tại theo `runs/manifest-cuoi-007/`. E1, E2 đã chạy xong trên dev. G2 đã duyệt (Q-149). Các lựa chọn ở mục 8 của `goi-g2.md` theo quyết định hiện hành trong `docs/DECISIONS.md`; lựa chọn chưa được quyết vẫn chờ Minh. Còn mở: lan có đáng kể, đóng góp của chờ ở CIRCA, chênh hai bản TraceRCA, underflow ngoài hai ca, thời điểm sự cố bắt đầu. Kết quả và LOG của task đã commit 14/10; thay đổi trong `docs/` chưa commit | `tasks/T-034-g2-goi-trinh/` | | T-035 | P5a: đặc tả đồ thị phụ thuộc và bộ dựng từ trace | P5 (G3) | Codex | Claude | Đã đồng bộ văn bản span-parent với bộ dựng theo Q-156 (15/10/2026); giữ kết quả dev đã kiểm. Chờ phiên Codex sạch tự soát toàn task từ nguồn như lần đầu, rồi phản biện chính thức/nghiệm thu. Prompt hiện hành tại results/T-035/runs/dong-bo-span-parent-001/, LOG Phiên 9. Chưa chọn P6/đóng task. | `tasks/T-035-p5-do-thi-tu-trace/` |-| T-036 | P5b: hợp đồng nguồn tĩnh và đối chiếu | P5 (G3) | Codex | Claude | Minh duyệt 15/10/2026; đã ghi SPEC, chưa triển khai. Phiên Codex mới tự soát từ nguồn; cần sửa SPEC thì dừng trình Minh, không có vấn đề mới triển khai. Prompt tại LOG Phiên 1. | `tasks/T-036-p5b-hop-dong-chung/` |+| T-036 | P5b: hợp đồng nguồn tĩnh và đối chiếu | P5 (G3) | Codex | Claude | Chờ Claude phản biện kết quả (15/10/2026). Codex đã tự soát từ nguồn và triển khai trong SPEC; báo cáo/manifest tại results/T-036/, LOG Phiên 2 và prompt-claude.txt. Mô tả T-036 ở mục Task đang mở là mốc trước triển khai; hiện trạng theo dòng này. Chưa nghiệm thu, đóng task hoặc chọn P6. | `tasks/T-036-p5b-hop-dong-chung/` |  ## Task đang mở --- LOG-before-final
++++ tasks/T-036-p5b-hop-dong-chung/LOG.md
+@@ -317,7 +317,93 @@
+ **Bản đồ tác động theo SPEC:** nguồn hợp đồng results/T-036/hop-dong.md trước; fixtures có oracle trước bốn file src/do_thi_tinh; chạy kiểm và báo cáo/manifest/bàn giao sau; chỉ nối LOG này và thay dòng T-036 trong STATE. Không thay SPEC/WHY/DECISIONS/T-035/platform. Giữ toàn bộ thay đổi có sẵn.
+ 
+ **Quyết định Minh trong phiên:** triển khai T-036 sau tự soát không có vấn đề; không có lựa chọn khoa học mới. Quyền này đã được ghi ở Q-157 và SPEC, không xin ghi thêm quyết định trùng.
+-
+-**Tiến độ bước nguồn/hợp đồng/oracle:** registry 14 nguồn, kiểm 5.673 artifact được chọn từ manifest; kết quả và hash tại runs/chuan-bi-001/input-verification.json và preflight.json. Đọc B11-C/B12/B13/B14/B16 hiện hành, không dùng code cũ. Ghi hợp đồng và oracle literal trước implementation; biên nhận fixtures/oracle-before-code.json xác nhận chưa có build.py/compare.py. Nguồn công khai chỉ là điểm bắt đầu truy revision, chưa là deployment sinh dataset.
+-
+-**Tiến độ cài/kiểm:** viết bốn file src/do_thi_tinh và checker trong phạm vi. runs/kiem-001 dừng ở bước chọn graph lịch sử vì selector rộng; mọi kiểm fixture đã chạy trước đó đạt, failure.json giữ exception. Sửa selector chỉ chọn results/T-035/do-thi/ hiện hành, không sửa graph/manifest đầu vào. runs/kiem-002 đạt các kiểm literal và tương thích. Tự đọc lại code phát hiện cần báo nút cô lập và loại cạnh nội bộ sau alias; bổ sung trong implementation, giữ SPEC. Bổ sung kiểm biên tương ứng trước lượt cuối, không thay oracle gốc để đạt.
++
++**Tiến độ bước nguồn/hợp đồng/oracle:** registry 14 nguồn, kiểm 5.673 artifact được chọn từ manifest; kết quả và hash tại runs/chuan-bi-001/input-verification.json và preflight.json. Đọc B11-C/B12/B13/B14/B16 hiện hành, không dùng code cũ. Ghi hợp đồng và oracle literal trước implementation; biên nhận fixtures/oracle-before-code.json xác nhận chưa có build.py/compare.py. Nguồn công khai chỉ là điểm bắt đầu truy revision, chưa là deployment sinh dataset.
++
++**Tiến độ cài/kiểm:** viết bốn file src/do_thi_tinh và checker trong phạm vi. runs/kiem-001 dừng ở bước chọn graph lịch sử vì selector rộng; mọi kiểm fixture đã chạy trước đó đạt, failure.json giữ exception. Sửa selector chỉ chọn results/T-035/do-thi/ hiện hành, không sửa graph/manifest đầu vào. runs/kiem-002 đạt các kiểm literal và tương thích. Tự đọc lại code phát hiện cần báo nút cô lập và loại cạnh nội bộ sau alias; bổ sung trong implementation, giữ SPEC. Bổ sung kiểm biên tương ứng trước lượt cuối, không thay oracle gốc để đạt.
++
++**Hoàn tất implementation / tự soát:** bổ sung bảng mapping nút cô lập, loại cạnh nội bộ sau alias, phân biệt default exchange rỗng với thiếu, bảo toàn provenance/record membership và giữ source evidence khác runtime/RCA. Registry cập nhật revision cụ thể khi nguồn lưu chứng minh được; giữ 15 nguồn hiện hành, không nâng tree/code/dataset revision thành application deployment. Nguồn registry ban đầu giữ ở runs/chuan-bi-001/nguon-ban-dau.json. Kiểm tích hợp messaging dùng span tổng hợp qua T-035, không mở trace thô.
++
++**Kết thúc Phiên 2:**
++1. Đã tự soát SPEC độc lập từ nguồn, chưa phát hiện lỗi cần sửa SPEC; đã cài hợp đồng/registry, builder/comparator, oracle, kiểm, báo cáo và bàn giao. Đầu ra công cụ đạt các phản ví dụ đã kiểm; chưa có inventory/đối chiếu kiến trúc đủ ba hệ. T-036 chờ Claude phản biện, Minh nghiệm thu; tự soát không thay phản biện chính thức.
++2. File thay đổi đúng quyền: results/T-036/; src/do_thi_tinh/__init__.py, build.py, compare.py, README.md; nối LOG này; chỉ dòng T-036 trong docs/STATE.md. SPEC không sửa. Giữ mọi thay đổi có sẵn. Không sửa T-035/platform/WHY/DECISIONS hoặc file task khác; không mở test, tải repo, bật EC2, dùng subagent, commit/push.
++3. Kiểm: manifest đầu vào khớp; oracle literal có trước code; lượt cuối 151 kiểm đạt, 312 graph dev full/N/A đọc tương thích và 156 cặp chiếu khớp. Hai process seed khác cho trung gian giống từng byte; kết quả ở runs/kiem-004, kiem-005 và runs/ket-phien-001/determinism.json. Lượt cuối 8.754s, RAM peak working set 109.9MiB; số gốc trong result.json. Giữ lượt lỗi kiem-001 (selector graph lịch sử), các lượt sau và snapshot mã hai lượt cuối. Kiểm cuối diff/phạm vi/manifest ở runs/ket-phien-001/final-verification.json; không chạy lại baseline hoặc trace thô.
++4. Câu nguồn: cung cấp biểu diễn và phép so có điều kiện cho P5, chưa trả lời RQ3/RQ5, toàn P5b hoặc cơ chế RCA. OPEN: deployment/runtime FT; revision ứng dụng sinh TT/OB; nghĩa host/metadata ngày; độ đầy đủ telemetry; lựa chọn/lợi ích P6. Binding DB→instance được giữ ngoài cạnh trace; T-035 chưa có trường tương đương. ban-giao.md nêu phản ví dụ, phương án adapter/mapping cần trình, owner và quyết định phụ thuộc. Không coi thiếu bằng chứng là không thể làm hoặc tự loại nhóm khỏi nghiên cứu.
++
++**Quyết định/bất đồng:** không có phản biện chính thức T-036 trước phiên này, không có bất đồng với Claude được kết luận thay. Không thêm quyết định khoa học. Quyền triển khai đã được Q-157/SPEC ghi, không tự sửa sổ. Minh quyết nghiệm thu hoặc bước sửa sau phản biện. Nội dung nên vào báo cáo: phân biệt nguồn/quan sát, logical DB/instance, địa chỉ messaging/metric shared và mẫu số có điều kiện, cùng giới hạn fixture/runtime.
++
++**Bước tiếp chính xác:** Minh mở phiên Claude mới tại D:/RCA-flashticket, copy results/T-036/prompt-claude.txt (cũng dưới đây). Claude đọc nguồn/đầu ra/code trước các kết luận, kiểm độc lập theo mẫu. Phạm vi mặc định của prompt chỉ đọc/trả lời chat; ghi REVIEW cần Minh cấp đúng file lượt. Không tự gửi hoặc tự mở phiên. T-037–040 cần SPEC riêng sau hợp đồng được xem xét; không triển khai từ quyền T-036.
++
++**Lệnh cuối của phiên:** py -3 -X utf8 -B results/T-036/finalize.py (tổng hợp và kiểm diff/phạm vi/manifest); lệnh kiểm hành vi cuối: & 'D:/RCA-ext/envs/py312-pin/Scripts/python.exe' -X utf8 -B results/T-036/check.py kiem-005. Không chạy lại tên run cũ. Nếu phát hiện lỗi lúc tổng hợp, giữ kết quả lỗi và trình đúng phạm vi; không sửa SPEC.
++
++**Đề xuất nội dung commit, chưa thực hiện:** feat: add sourced static graph contract and trace comparison for T-036. Minh yêu cầu không commit/push trong phiên này; không thực hiện.
++
++### Prompt Claude — soát kết quả (Minh chuyển thủ công)
++
++```text
++Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
++Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
++
++Thông tin lượt này:
++- Task hoặc đề xuất: T-036; D:/RCA-flashticket/tasks/T-036-p5b-hop-dong-chung/SPEC.md.
++- Công đoạn: soát kết quả.
++- Gói/cổng: P5; chuẩn bị G3.
++- Người làm và người phản biện chính thức: Codex người làm; Claude người phản biện chính thức.
++- Tài liệu gốc: D:/RCA-flashticket/AGENTS.md; docs/STATE.md; tasks/T-036-p5b-hop-dong-chung/SPEC.md và LOG.md; docs/MRP.md; docs/WHY.md; docs/DECISIONS.md; docs/LESSONS.md; docs/reference/sources/DT18-de-tai-va-nhiem-vu.md; docs/reference/sources/advisor-2026-09-23.md; nguồn và manifest tại results/T-036/nguon.json.
++- Phản biện và phản hồi trước: không có bản phản biện chính thức T-036 trước lượt này.
++- Code và kết quả liên quan: D:/RCA-flashticket/results/T-036/manifest.json; hop-dong.md; nguon.json; fixtures/; runs/; kiem-dung-dan.md; ban-giao.md; src/do_thi_tinh/README.md và code; results/T-035/manifest.json và các đầu vào SPEC liệt kê; Windows/PowerShell, Python theo README; diff phiên ở results/T-036/runs/ket-phien-001/changes.diff.
++- Phạm vi ghi được Minh cho phép trong lượt này: chỉ đọc và trả lời trong chat; chưa có quyền ghi REVIEW, LOG, STATE, SPEC, code hoặc kết quả.
++
++Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
++
++Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
++Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
++Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
++
++Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
++hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
++Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
++số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
++có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
++
++Bổ sung yêu cầu phản biện:
++1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
++2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
++3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
++4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
++5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
++6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
++7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
++8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
++9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
++10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
++
++Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
++Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
++
++Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
++bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
++Tiếng Việt, câu ngắn.
++
++Cuối lượt báo:
++1. Đã làm gì.
++2. File đã thay đổi, hoặc không sửa file nào.
++3. Kiểm đã chạy và kết quả.
++4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
++
++Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
++
++Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
++
++Công đoạn: soát kết quả.
++Kiểm trên đầu ra thật, code và dữ liệu được phép; không tin tóm tắt LOG. Đối chiếu tiêu chí xong với phần mục tiêu nguồn và mức căn cứ cho bước tiếp theo; chạy lại phần rẻ khi trong quyền được duyệt.
++Phân biệt hoàn thành task mô tả, xác nhận cơ chế và đủ căn cứ chọn/đánh giá thiết kế. Giới hạn đã khai không tự miễn phép kiểm cần thiết còn làm được.
++Chỉ ghi bản phản biện lượt được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ bản cũ; không sửa kết quả thay người làm.
++
++Với từng thành phần, kiểm mục đích và căn cứ: sửa hạn chế P4, đáp ứng DT18 hay nhu cầu kỹ thuật. Có lý do kỹ thuật, phương án khác, bằng chứng dev và điều kiện thất bại không; có dùng mã hạn chế mô tả như bằng chứng cơ chế hoặc chọn theo mức chênh đồ thị trừ không đồ thị không?
++Nêu rõ nút/cạnh, ánh xạ log/trace/metric và phép tính thực sự sử dụng cạnh. Lần theo thông tin quan hệ và nhãn trong phương pháp lẫn đối chứng; gọi “không đồ thị” có đúng với thông tin còn giữ không?
++Kiểm baseline và đối chứng đủ mạnh, tương đương về tín hiệu/cửa sổ/tập ứng viên/coverage/tiền xử lý/quy tắc chấm/ngân sách chọn cấu hình ở phần không chủ ý thay; yếu tố thay cùng phải giới hạn kết luận.
++Phương pháp và đối chứng đã được cài và kiểm đầu vào, trung gian, hành vi trên dev chưa, hay chỉ chạy không lỗi? Không đòi đồ thị phải thắng để khóa.
++Code/revision, cấu hình, giả thuyết, độ đo, tập ca/tập ứng viên, cách xử lý ca lỗi/UNSUPPORTED/nhánh dự phòng và bảng diễn giải đã khóa trước test chưa? Có bỏ nhóm khó sau khi nhìn điểm hoặc dùng test để chọn thiết kế không?
++Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.
++```

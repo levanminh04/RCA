@@ -1,0 +1,987 @@
+{
+  "edges": [
+    {
+      "channel": "http",
+      "contexts": [
+        "fixture"
+      ],
+      "destination": null,
+      "evidence_source": "static",
+      "messaging": null,
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5",
+          "source_id": "B13"
+        }
+      ],
+      "record_ids": [
+        "http",
+        "http-second-source"
+      ],
+      "source": "A",
+      "target": "B",
+      "type": "gọi-đồng-bộ"
+    },
+    {
+      "channel": "rpc",
+      "contexts": [
+        "bù trừ; giữ chiều A→B"
+      ],
+      "destination": null,
+      "evidence_source": "static",
+      "messaging": null,
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5",
+          "source_id": "B13"
+        }
+      ],
+      "record_ids": [
+        "saga-compensate"
+      ],
+      "source": "A",
+      "target": "B",
+      "type": "gọi-đồng-bộ"
+    },
+    {
+      "channel": "data",
+      "contexts": [
+        "fixture"
+      ],
+      "destination": null,
+      "evidence_source": "static",
+      "messaging": null,
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5",
+          "source_id": "B13"
+        }
+      ],
+      "record_ids": [
+        "data"
+      ],
+      "source": "A",
+      "target": "DB1",
+      "type": "dữ-liệu"
+    },
+    {
+      "channel": "publish",
+      "contexts": [
+        "fixture",
+        "retry cùng logical message; không count"
+      ],
+      "destination": null,
+      "evidence_source": "static",
+      "messaging": {
+        "broker": "R",
+        "broker_scope": "vhost-demo",
+        "exchange": "e",
+        "queue": null,
+        "routing_key": "k"
+      },
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5",
+          "source_id": "B13"
+        }
+      ],
+      "queue_metric_address": null,
+      "record_ids": [
+        "publish",
+        "republish"
+      ],
+      "source": "A",
+      "target": "R",
+      "type": "thông-điệp"
+    },
+    {
+      "channel": "http",
+      "contexts": [
+        "fixture"
+      ],
+      "destination": null,
+      "evidence_source": "static",
+      "messaging": null,
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5",
+          "source_id": "B13"
+        }
+      ],
+      "record_ids": [
+        "callback-out"
+      ],
+      "source": "A",
+      "target": "X",
+      "type": "gọi-đồng-bộ"
+    },
+    {
+      "channel": "data",
+      "contexts": [
+        "fixture"
+      ],
+      "destination": null,
+      "evidence_source": "static",
+      "messaging": null,
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5",
+          "source_id": "B13"
+        }
+      ],
+      "record_ids": [
+        "entity-only"
+      ],
+      "source": "B",
+      "target": "DB2",
+      "type": "dữ-liệu"
+    },
+    {
+      "channel": "consume",
+      "contexts": [
+        "fixture"
+      ],
+      "destination": null,
+      "evidence_source": "static",
+      "messaging": {
+        "broker": "R",
+        "broker_scope": "vhost-demo",
+        "exchange": null,
+        "queue": "q1",
+        "routing_key": null
+      },
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5",
+          "source_id": "B13"
+        }
+      ],
+      "queue_metric_address": [
+        "R",
+        "vhost-demo",
+        "q1"
+      ],
+      "record_ids": [
+        "consume-q1"
+      ],
+      "source": "R",
+      "target": "B",
+      "type": "thông-điệp"
+    },
+    {
+      "channel": "consume",
+      "contexts": [
+        "fixture"
+      ],
+      "destination": null,
+      "evidence_source": "static",
+      "messaging": {
+        "broker": "R",
+        "broker_scope": "vhost-demo",
+        "exchange": null,
+        "queue": "q2",
+        "routing_key": null
+      },
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5",
+          "source_id": "B13"
+        }
+      ],
+      "queue_metric_address": [
+        "R",
+        "vhost-demo",
+        "q2"
+      ],
+      "record_ids": [
+        "consume-q2"
+      ],
+      "source": "R",
+      "target": "B",
+      "type": "thông-điệp"
+    },
+    {
+      "channel": "consume",
+      "contexts": [
+        "fixture"
+      ],
+      "destination": null,
+      "evidence_source": "static",
+      "messaging": {
+        "broker": "R",
+        "broker_scope": "vhost-demo",
+        "exchange": null,
+        "queue": "q3",
+        "routing_key": null
+      },
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5",
+          "source_id": "B13"
+        }
+      ],
+      "queue_metric_address": [
+        "R",
+        "vhost-demo",
+        "q3"
+      ],
+      "record_ids": [
+        "fanout"
+      ],
+      "source": "R",
+      "target": "C",
+      "type": "thông-điệp"
+    }
+  ],
+  "evidence": {
+    "rca_benefit": "not_checked",
+    "representation": "supported",
+    "runtime": "not_checked",
+    "source_evidence": [
+      "design"
+    ]
+  },
+  "inventory": [
+    {
+      "granularity": "component",
+      "id": "A",
+      "name": "A",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "role": "fixture",
+      "type": "service"
+    },
+    {
+      "granularity": "component",
+      "id": "B",
+      "name": "B",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "role": "fixture",
+      "type": "service"
+    },
+    {
+      "granularity": "component",
+      "id": "C",
+      "name": "C",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "role": "fixture",
+      "type": "service"
+    },
+    {
+      "granularity": "logical",
+      "id": "DB1",
+      "name": "DB1",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "role": "fixture",
+      "type": "database"
+    },
+    {
+      "granularity": "logical",
+      "id": "DB2",
+      "name": "DB2",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "role": "fixture",
+      "type": "database"
+    },
+    {
+      "granularity": "component",
+      "id": "H",
+      "name": "H",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "role": "fixture",
+      "type": "host"
+    },
+    {
+      "granularity": "instance",
+      "id": "PG",
+      "name": "PG",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "role": "fixture",
+      "type": "database"
+    },
+    {
+      "granularity": "component",
+      "id": "R",
+      "name": "R",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "role": "fixture",
+      "type": "broker"
+    },
+    {
+      "granularity": "component",
+      "id": "X",
+      "name": "X",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "role": "fixture",
+      "type": "external"
+    },
+    {
+      "granularity": "component",
+      "id": "unused",
+      "name": "unused",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "role": "fixture",
+      "type": "service"
+    }
+  ],
+  "level": "entity",
+  "nodes": [
+    {
+      "granularity": "component",
+      "id": "A",
+      "name": "A",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "role": "fixture",
+      "type": "service"
+    },
+    {
+      "granularity": "component",
+      "id": "B",
+      "name": "B",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "role": "fixture",
+      "type": "service"
+    },
+    {
+      "granularity": "component",
+      "id": "C",
+      "name": "C",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "role": "fixture",
+      "type": "service"
+    },
+    {
+      "granularity": "logical",
+      "id": "DB1",
+      "name": "DB1",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "role": "fixture",
+      "type": "database"
+    },
+    {
+      "granularity": "logical",
+      "id": "DB2",
+      "name": "DB2",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "role": "fixture",
+      "type": "database"
+    },
+    {
+      "granularity": "component",
+      "id": "H",
+      "name": "H",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "role": "fixture",
+      "type": "host"
+    },
+    {
+      "granularity": "instance",
+      "id": "PG",
+      "name": "PG",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "role": "fixture",
+      "type": "database"
+    },
+    {
+      "granularity": "component",
+      "id": "R",
+      "name": "R",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "role": "fixture",
+      "type": "broker"
+    },
+    {
+      "granularity": "component",
+      "id": "X",
+      "name": "X",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "role": "fixture",
+      "type": "external"
+    },
+    {
+      "granularity": "component",
+      "id": "unused",
+      "name": "unused",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "role": "fixture",
+      "type": "service"
+    }
+  ],
+  "observed_nodes": [],
+  "records": [
+    {
+      "channel": "http",
+      "context": "fixture",
+      "id": "callback-out",
+      "messaging": null,
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5",
+          "source_id": "B13"
+        }
+      ],
+      "source": {
+        "entity": "A",
+        "operation": "send"
+      },
+      "target": {
+        "entity": "X",
+        "operation": null
+      },
+      "type": "gọi-đồng-bộ"
+    },
+    {
+      "channel": "consume",
+      "context": "fixture",
+      "id": "consume-q1",
+      "messaging": {
+        "broker": "R",
+        "broker_scope": "vhost-demo",
+        "exchange": null,
+        "queue": "q1",
+        "routing_key": null
+      },
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5",
+          "source_id": "B13"
+        }
+      ],
+      "source": {
+        "entity": "R",
+        "operation": null
+      },
+      "target": {
+        "entity": "B",
+        "operation": "receive"
+      },
+      "type": "thông-điệp"
+    },
+    {
+      "channel": "consume",
+      "context": "fixture",
+      "id": "consume-q2",
+      "messaging": {
+        "broker": "R",
+        "broker_scope": "vhost-demo",
+        "exchange": null,
+        "queue": "q2",
+        "routing_key": null
+      },
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5",
+          "source_id": "B13"
+        }
+      ],
+      "source": {
+        "entity": "R",
+        "operation": null
+      },
+      "target": {
+        "entity": "B",
+        "operation": "receive"
+      },
+      "type": "thông-điệp"
+    },
+    {
+      "channel": "data",
+      "context": "fixture",
+      "id": "data",
+      "messaging": null,
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5",
+          "source_id": "B13"
+        }
+      ],
+      "source": {
+        "entity": "A",
+        "operation": "outbox"
+      },
+      "target": {
+        "entity": "DB1",
+        "operation": null
+      },
+      "type": "dữ-liệu"
+    },
+    {
+      "channel": "data",
+      "context": "fixture",
+      "id": "entity-only",
+      "messaging": null,
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5",
+          "source_id": "B13"
+        }
+      ],
+      "source": {
+        "entity": "B",
+        "operation": null
+      },
+      "target": {
+        "entity": "DB2",
+        "operation": null
+      },
+      "type": "dữ-liệu"
+    },
+    {
+      "channel": "consume",
+      "context": "fixture",
+      "id": "fanout",
+      "messaging": {
+        "broker": "R",
+        "broker_scope": "vhost-demo",
+        "exchange": null,
+        "queue": "q3",
+        "routing_key": null
+      },
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5",
+          "source_id": "B13"
+        }
+      ],
+      "source": {
+        "entity": "R",
+        "operation": null
+      },
+      "target": {
+        "entity": "C",
+        "operation": "receive"
+      },
+      "type": "thông-điệp"
+    },
+    {
+      "channel": "http",
+      "context": "fixture",
+      "id": "http",
+      "messaging": null,
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5",
+          "source_id": "B13"
+        }
+      ],
+      "source": {
+        "entity": "A",
+        "operation": "send"
+      },
+      "target": {
+        "entity": "B",
+        "operation": "receive"
+      },
+      "type": "gọi-đồng-bộ"
+    },
+    {
+      "channel": "http",
+      "context": "fixture",
+      "id": "http-second-source",
+      "messaging": null,
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5",
+          "source_id": "B13"
+        }
+      ],
+      "source": {
+        "entity": "A",
+        "operation": "send"
+      },
+      "target": {
+        "entity": "B",
+        "operation": "receive"
+      },
+      "type": "gọi-đồng-bộ"
+    },
+    {
+      "channel": "internal",
+      "context": "fixture",
+      "id": "internal",
+      "messaging": null,
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5",
+          "source_id": "B13"
+        }
+      ],
+      "source": {
+        "entity": "A",
+        "operation": "scheduler"
+      },
+      "target": {
+        "entity": "A",
+        "operation": "outbox"
+      },
+      "type": "gọi-chưa-phân-kiểu"
+    },
+    {
+      "channel": "publish",
+      "context": "fixture",
+      "id": "publish",
+      "messaging": {
+        "broker": "R",
+        "broker_scope": "vhost-demo",
+        "exchange": "e",
+        "queue": null,
+        "routing_key": "k"
+      },
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5",
+          "source_id": "B13"
+        }
+      ],
+      "source": {
+        "entity": "A",
+        "operation": "send"
+      },
+      "target": {
+        "entity": "R",
+        "operation": null
+      },
+      "type": "thông-điệp"
+    },
+    {
+      "channel": "publish",
+      "context": "retry cùng logical message; không count",
+      "id": "republish",
+      "messaging": {
+        "broker": "R",
+        "broker_scope": "vhost-demo",
+        "exchange": "e",
+        "queue": null,
+        "routing_key": "k"
+      },
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5",
+          "source_id": "B13"
+        }
+      ],
+      "source": {
+        "entity": "A",
+        "operation": "send"
+      },
+      "target": {
+        "entity": "R",
+        "operation": null
+      },
+      "type": "thông-điệp"
+    },
+    {
+      "channel": "rpc",
+      "context": "bù trừ; giữ chiều A→B",
+      "id": "saga-compensate",
+      "messaging": null,
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5",
+          "source_id": "B13"
+        }
+      ],
+      "source": {
+        "entity": "A",
+        "operation": null
+      },
+      "target": {
+        "entity": "B",
+        "operation": null
+      },
+      "type": "gọi-đồng-bộ"
+    },
+    {
+      "channel": "span-parent",
+      "context": "fixture",
+      "id": "span-parent",
+      "messaging": null,
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5",
+          "source_id": "B13"
+        }
+      ],
+      "source": {
+        "entity": "A",
+        "operation": "send"
+      },
+      "target": {
+        "entity": "B",
+        "operation": "receive"
+      },
+      "type": "span-parent"
+    }
+  ],
+  "resource_bindings": [
+    {
+      "entity": "DB1",
+      "id": "own1",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "relation": "owned_by",
+      "resource": "A"
+    },
+    {
+      "entity": "DB2",
+      "id": "own2",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "relation": "owned_by",
+      "resource": "B"
+    },
+    {
+      "entity": "PG",
+      "id": "placement",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§6",
+          "source_id": "B11"
+        }
+      ],
+      "relation": "hosted_on",
+      "resource": "H"
+    },
+    {
+      "entity": "DB1",
+      "id": "share1",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "relation": "hosted_on",
+      "resource": "PG"
+    },
+    {
+      "entity": "DB2",
+      "id": "share2",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§2",
+          "source_id": "B12"
+        }
+      ],
+      "relation": "hosted_on",
+      "resource": "PG"
+    }
+  ],
+  "schema_version": 1,
+  "scope": {
+    "revision": "design-v1",
+    "system": "synthetic"
+  },
+  "signals": [
+    {
+      "address": [
+        "serviceName",
+        "traceId",
+        "spanId"
+      ],
+      "entity": "A",
+      "id": "log-callback",
+      "kind": "log",
+      "operation": "callback",
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§3/4",
+          "source_id": "B16"
+        }
+      ],
+      "shared": false
+    },
+    {
+      "address": [
+        "R",
+        "vhost-demo",
+        "q1"
+      ],
+      "entity": "R",
+      "id": "metric-queue",
+      "kind": "metric",
+      "operation": null,
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5",
+          "source_id": "B16"
+        }
+      ],
+      "shared": true
+    },
+    {
+      "address": [
+        "instance",
+        "PG"
+      ],
+      "entity": "PG",
+      "id": "metric-shared",
+      "kind": "metric",
+      "operation": null,
+      "provenance": [
+        {
+          "condition": "ví dụ tổng hợp theo nhu cầu nguồn; chưa runtime",
+          "locator": "§5/7",
+          "source_id": "B16"
+        }
+      ],
+      "shared": true
+    }
+  ]
+}
