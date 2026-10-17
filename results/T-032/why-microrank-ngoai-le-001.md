@@ -1,0 +1,13 @@
+# Đoạn WHY ngoại lệ MicroRank — ĐỀ XUẤT CHỜ MINH DUYỆT
+
+Mã mục sẽ lấy số tiếp theo sau khi đọc lại docs/WHY.md ngay trước nối; không dùng lại WHY-40 hay WHY-41. Chưa nối hoặc dùng kết quả MicroRank mới trong báo cáo.
+
+**Chọn:** Chỉ trong T-032/MicroRank, chấp nhận sai lệch float64 của score operation/service khi đồng thời ≤16 ULP biểu diễn và ≤16×2^-52 tương đối, không absolute floor; giữ exact trạng thái, mapping/tập ứng viên, thứ tự và partition hòa service, Hit@1..10 và toàn cờ M của T-028. Operation đảo chỉ trong cùng service, sát ngưỡng ở cả hai output và không làm đổi tổng hợp trong cùng output; không ép gần điểm thành hòa. Native–observed vẫn exact. Khóa ngưỡng trước bảng 30 RE2+22 Nezha, báo max ULP/relative từng ca; vượt thì dừng/trình, không tăng.
+
+**Vì sao:** Ca pilot đã kiểm source/hash cho thấy native–observed exact nhưng native–frozen có lệch nhỏ ở số và thứ tự operation cùng service. Khớp byte toàn điểm giữ cho phát lại khác nền tảng chưa thực hiện được; chấp nhận sai lệch rộng hoặc chỉ so top1/top5 có thể che thay đổi service/nhóm hòa/cờ dùng trong phân tích. Comparator hẹp giữ các quyết định chấm và khoảng cách định lượng tới ngưỡng, không hợp thức hóa lỗi thuật toán.
+
+**Phương án đã xét:** (1) Giữ exact và xử lý môi trường để tái lập nguồn; vẫn hợp lệ nhưng chưa xác định thành phần gây drift. (2) Phát lại laptop Windows/Python nguồn với exact; giảm khác nền tảng, cần quyền ngoại lệ EC2-only và đo RAM/thời gian capture toàn52, không bảo đảm exact. (3) Tolerance tuyệt đối chung hoặc bỏ thứ tự operation; không chọn vì có thể che thay đổi gần zero, giữa service hoặc trạng thái hòa. (4) Chỉ chấp nhận comparator hẹp khi score và các invariant đầu ra đều đạt; Minh chọn phương án này, không áp phương pháp khác.
+
+**Bằng chứng và phần chưa kiểm:** runs/tiep-tuc-003/microrank-numeric-audit.json#/native_observed_exact, /float_exact_count, /other_difference_count, /max_absolute; native_vs_frozen/differences ở diagnostic-check. Hai đầu transfer/source hash đã kiểm. Ngưỡng là lựa chọn kiểm kỹ thuật sau khi đã thấy pilot, chưa là cận sai số lý thuyết hay bằng chứng nguyên nhân nền tảng. Bảng52/comparator/benchmark và khớp Hit/cờ M chưa chạy. Frozen P3 thiếu mask/partition lịch sử; counts bằng nhau không đủ chứng minh từng membership lịch sử bằng nhau.
+
+**Kết luận phụ thuộc:** Chỉ các ca qua toàn hợp đồng được dùng trung gian mới cho phân tích MicroRank. Đạt comparator không tự xác nhận cơ chế vật lý, partition lịch sử hoặc lợi ích đồ thị; A′ vẫn cần đầy đủ lõi/khóa mẫu/nhóm N/A/invariant của SPEC. Ca đổi service order/hòa/chấm hoặc vượt số phải dừng MicroRank/A′ và trình. Các phương pháp khác giữ exact. Quyền thực hiện và kết quả kiểm tách riêng; chưa dùng lựa chọn này trong báo cáo trước Minh duyệt WHY.

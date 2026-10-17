@@ -1,0 +1,185 @@
+{
+ "schema": "T040-con-mo-v1",
+ "run": "runs/tong-hop-011",
+ "nguyen_tac": "Mỗi mục tách quan sát, bằng chứng đã có, bằng chứng thiếu, nơi cung cấp và quyết định phụ thuộc. Không mục nào được coi là đã phân xử chỉ vì T-040 có đủ tệp.",
+ "items": [
+  {
+   "id": "OM-01",
+   "cau_hoi": "Mô hình tĩnh Train Ticket có thiếu các phụ thuộc cấu hình hạ tầng có nguồn không, và phạm vi sửa là gì?",
+   "trang_thai": "DA_SUA_DUNG_PHAN_BIEN_CHUA_NGHIEM_THU",
+   "bang_chung_da_co": "Người làm T-038 đã đáp REVIEW R1 và tiếp nhận 4 quan hệ cấu hình có nguồn (results/T-038/runs/sua-r1-20261017-001/); gói sửa đã được kiểm lại chỉ đọc và dừng phản biện (docs/DECISIONS.md Q-171; LOG T-038 Phiên 4; không có REVIEW mới); T-040 tính lại 1.069 graph: chỉ phía tĩnh đổi đúng delta đã báo (runs/tong-hop-007/so-sanh-005-007.json)",
+   "bang_chung_thieu": "Nghiệm thu toàn T-038 của Minh; semantics/binding của UI→OAP, cảnh báo, scrape/discovery, Grafana, Nacos client còn OPEN theo source-audit.json của T-038",
+   "noi_cung_cap": "Minh quyết nghiệm thu T-038; chủ nguồn cho semantics còn thiếu",
+   "quyet_dinh_phu_thuoc": [
+    "Gỡ nhãn có điều kiện cho số TT phía tĩnh trong T-040",
+    "P6 có dùng graph tĩnh TT không"
+   ],
+   "con_tro": "results/T-040/tong-hop.json#/he_thong/TT/doi_chieu/phu_thuoc_S"
+  },
+  {
+   "id": "OM-02",
+   "cau_hoi": "Thư mục do-thi/ gốc của T-038 trộn phép chiếu trước V2 với graph thực thể V2; người dùng sau có đọc nhầm không?",
+   "trang_thai": "DA_XU_LY_O_NGUON",
+   "bang_chung_da_co": "Graph gốc results/T-038/do-thi/ (thực thể, thao tác, chiếu, entity-only) nay cùng byte với model của run sửa R1",
+   "bang_chung_thieu": "Không",
+   "noi_cung_cap": "Đã xử lý bởi người làm T-038",
+   "quyet_dinh_phu_thuoc": [
+    "Không còn"
+   ],
+   "con_tro": "results/T-040/dau-vao.json#/tep_goc_TT_dong_bo_model_sua"
+  },
+  {
+   "id": "OM-03",
+   "cau_hoi": "Revision ứng dụng/deployment nào đã sinh RE2-TT và Nezha-OB?",
+   "trang_thai": "OPEN",
+   "bang_chung_da_co": "Mọi kết quả đối chiếu có conditional_reference=true; T-038 lineage-resolution, T-039 bao-phu-nguon ghi chưa nối được",
+   "bang_chung_thieu": "Chuỗi source→build→image→deployment→dataset từ chủ dataset",
+   "noi_cung_cap": "Tác giả dataset hoặc nguồn công khai mới, qua Minh",
+   "quyet_dinh_phu_thuoc": [
+    "Mức tin cậy của graph tĩnh làm cấu trúc cho dữ liệu dev",
+    "Nhánh đồ thị tĩnh so với quan sát ở P7"
+   ],
+   "con_tro": "results/T-040/runs/tong-hop-011/rows-TT.json.gz; rows-OB.json.gz (trường conditional_reference, revision_link_verified)"
+  },
+  {
+   "id": "OM-04",
+   "cau_hoi": "Cạnh trace dev là gọi đồng bộ hay quan hệ cha–con khác?",
+   "trang_thai": "KHONG_PHAN_XU_DUOC_VOI_DU_LIEU_HIEN_CO",
+   "bang_chung_da_co": "Typed T rỗng ở mọi graph TT và OB; kiểu trace đều unknown",
+   "bang_chung_thieu": "span kind và thuộc tính đích trong export; dataset hiện có không ghi",
+   "noi_cung_cap": "FlashTicket qua R-01; dataset công khai không bổ sung được",
+   "quyet_dinh_phu_thuoc": [
+    "Cách P6 dùng cạnh gọi",
+    "Phép so typed"
+   ],
+   "con_tro": "results/T-040/tong-hop.json#/he_thong/TT/doi_chieu/ho_graph/entity:full/views/typed/graphs_T_empty"
+  },
+  {
+   "id": "OM-05",
+   "cau_hoi": "Mức thao tác có so được với nguồn tĩnh không?",
+   "trang_thai": "OPEN",
+   "bang_chung_da_co": "TT: T rỗng ở 90/90 graph thao tác do ánh xạ mơ hồ/chưa xác minh; OB: 10 khóa đủ điều kiện",
+   "bang_chung_thieu": "URI/route hoặc callsite trong span phía gọi; bảng ánh xạ có nguồn",
+   "noi_cung_cap": "FlashTicket qua R-02; với dataset công khai cần schema thu ở phiên bản đã dùng",
+   "quyet_dinh_phu_thuoc": [
+    "Chọn mức đồ thị ở P6"
+   ],
+   "con_tro": "results/T-040/tong-hop.json#/he_thong/TT/doi_chieu/ho_graph/operation:full/views/endpoints/trace_exclusion_pairs_by_reason"
+  },
+  {
+   "id": "OM-06",
+   "cau_hoi": "Vì sao 5 cặp TT chỉ có ở trace?",
+   "trang_thai": "OPEN",
+   "bang_chung_da_co": "Cùng dạng span với 44 cặp khớp; handler phía nhận có trong mô hình tĩnh; dấu hiệu không có bên gọi tĩnh không phân biệt nhóm (25/44 cặp khớp cũng vậy); hai tên trace chưa ánh xạ khớp metadata refactor của T-038; nhóm A của OM-13: trong cùng graph full có X→ts-ticketinfo-service→basic với X là preserve, preserve-other, travel, travel2, trong khi mô hình tĩnh v1.0.0 không có ticketinfo; hỗ trợ khác revision, chưa xác nhận",
+   "giai_thich_canh_tranh": [
+    "khác revision",
+    "lời gọi động/gián tiếp không trích được",
+    "bất nhất mã tham chiếu",
+    "instrumentation"
+   ],
+   "bang_chung_thieu": "Revision/image RE2-TT hoặc URL/callsite trong span",
+   "noi_cung_cap": "Chủ dataset; không thu được từ dữ liệu hiện có",
+   "quyet_dinh_phu_thuoc": [
+    "Dùng graph tĩnh TT ở P6",
+    "Diễn giải độ phủ TT"
+   ],
+   "con_tro": "results/T-040/tong-hop.json#/lan_theo/TT_trace_only_vs_intersection"
+  },
+  {
+   "id": "OM-07",
+   "cau_hoi": "checkout→currency của OB vắng ở trace vì mất ngữ cảnh, không gọi, hay lấy mẫu?",
+   "trang_thai": "HOAN_KHONG_MO_TRONG_P5",
+   "bang_chung_da_co": "Không có span phía gọi Convert của checkout ở 22 ca, trong khi có span phía gọi cho 7 RPC khác; currency Convert chỉ nối với frontend; mã dùng context.TODO() (T-039 G1)",
+   "bang_chung_thieu": "Số span Convert phía nhận không có cha trong cửa sổ dev; cấu hình sampler/instrumentation của bản đã chạy",
+   "noi_cung_cap": "Một phép đếm trên span dev Nezha-OB (cần quyền riêng; ngoài T-040)",
+   "quyet_dinh_phu_thuoc": [
+    "Yêu cầu R-09",
+    "Diễn giải cạnh thiếu ở OB"
+   ],
+   "con_tro": "results/T-040/tong-hop.json#/lan_theo/OB_static_only_every_full_graph/rows/2",
+   "quyet_dinh_minh": "Q-175: chưa mở nghiên cứu sâu OM-07 trong P5; giữ OPEN, bằng chứng còn thiếu giữ nguyên"
+  },
+  {
+   "id": "OM-08",
+   "cau_hoi": "Nghĩa cột Node của Nezha có là host không?",
+   "trang_thai": "OPEN",
+   "bang_chung_da_co": "T-035 cot-node-nezha; T-039 G7",
+   "bang_chung_thieu": "Producer/config/version của cột và định danh pod–host",
+   "noi_cung_cap": "Tác giả Nezha",
+   "quyet_dinh_phu_thuoc": [
+    "Cạnh triển khai trên dev"
+   ],
+   "con_tro": "results/T-035/cot-node-nezha.md"
+  },
+  {
+   "id": "OM-09",
+   "cau_hoi": "FlashTicket runtime có khớp mô hình thiết kế không?",
+   "trang_thai": "CHUA_CO_DU_LIEU",
+   "bang_chung_da_co": "Mô hình thiết kế T-037; bảy nhóm OPEN của T-037",
+   "bang_chung_thieu": "Trace/log/metric chạy thật, queue/scope, tên runtime, deployment",
+   "noi_cung_cap": "Nhóm hệ thống qua P9a/P9b",
+   "quyet_dinh_phu_thuoc": [
+    "Đối chiếu FT tĩnh–trace (SPEC sau)",
+    "RQ5"
+   ],
+   "con_tro": "results/T-037/bao-phu-nguon.json#/open_items"
+  },
+  {
+   "id": "OM-10",
+   "cau_hoi": "Đầu vào graph trace (T-035) và gói SMTP V2 (T-036) đã được nghiệm thu chưa?",
+   "trang_thai": "CHO_NGHIEM_THU",
+   "bang_chung_da_co": "results/T-035/manifest.json#/task_state; T-036 SMTP V2 chưa có phản biện chính thức",
+   "bang_chung_thieu": "Phản biện chính thức và nghiệm thu của Minh",
+   "noi_cung_cap": "Codex/Claude theo phân công; Minh",
+   "quyet_dinh_phu_thuoc": [
+    "Mọi số đối chiếu TT/OB trong T-040",
+    "Nghiệm thu P5"
+   ],
+   "con_tro": "results/T-040/dau-vao.json#/trang_thai_nguon"
+  },
+  {
+   "id": "OM-11",
+   "cau_hoi": "Có chuyển các yêu cầu R-01…R-10 thành yêu cầu P9a gửi nhóm hệ thống không?",
+   "trang_thai": "DA_CHUYEN_P9A",
+   "bang_chung_da_co": "yeu-cau-quan-sat-p9.md; Q-175: chuyển R-01…R-10 sang P9a làm bộ yêu cầu ban đầu, được bổ sung sau",
+   "bang_chung_thieu": "Quyết định gửi nhóm hệ thống (chưa có); bổ sung yêu cầu trong P9a",
+   "noi_cung_cap": "Minh; P9a (T-004)",
+   "quyet_dinh_phu_thuoc": [
+    "P9a",
+    "Thu dữ liệu P10"
+   ],
+   "con_tro": "results/T-040/yeu-cau-quan-sat-p9.md"
+  },
+  {
+   "id": "OM-12",
+   "cau_hoi": "Đồ thị (tĩnh hoặc quan sát) có cải thiện phát hiện, khoanh vùng, xếp hạng không?",
+   "trang_thai": "THUOC_GOI_SAU",
+   "bang_chung_da_co": "Không; T-040 chỉ tổng hợp biểu diễn và độ khớp",
+   "bang_chung_thieu": "Thiết kế khóa ở G3, đối chứng không đồ thị và đồ thị ngẫu nhiên giữ bậc, đánh giá trên test",
+   "noi_cung_cap": "P6–P7 sau quyền của Minh",
+   "quyet_dinh_phu_thuoc": [
+    "RQ3"
+   ],
+   "con_tro": "results/T-040/ban-giao-p6.md"
+  },
+  {
+   "id": "OM-13",
+   "cau_hoi": "Vì sao 13 khóa tĩnh TT có cả hai đầu quan sát được nhưng không có cạnh ở mọi graph entity/full?",
+   "trang_thai": "UNG_VIEN_THEO_NHOM_OPEN",
+   "bang_chung_da_co": "Hai đầu cùng có mặt ở 24 hoặc 30/30 ca; 11/13 cặp có thao tác nguồn chỉ là candidate của mapping chưa xác minh. Nhóm A (4 cặp →basic): đường qua ts-ticketinfo-service chưa ánh xạ trong cùng graph. Nhóm B (2 cặp →consign): callsite trong nhánh consigneeName khác rỗng; nhánh assurance, food của cùng bên gọi có cạnh. Nhóm C (4 cặp): chỉ gọi trên đường add/update của admin-travel hoặc saveUser/deleteUser của user. Nhóm D (3 cặp admin-basic-info→contacts/station/train): chưa có giải thích.",
+   "giai_thich_canh_tranh": [
+    "khác revision",
+    "nhánh hoặc đường ghi không được workload chạy",
+    "trích nguồn ra callsite không thực thi",
+    "instrumentation"
+   ],
+   "bang_chung_thieu": "Lineage RE2-TT→revision/image (nhóm A, D); payload hoặc kịch bản workload (nhóm B, C, D); nối các lời gọi trong cùng request (graph gộp không chứng minh)",
+   "noi_cung_cap": "Chủ dataset qua Minh; không thu được từ dữ liệu hiện có",
+   "quyet_dinh_phu_thuoc": [
+    "P6/P7 có dùng graph tĩnh TT làm cấu trúc cho RE2-TT không",
+    "xử lý các cạnh tĩnh chưa từng quan sát ở nhánh tĩnh của P7"
+   ],
+   "con_tro": "results/T-040/tong-hop.json#/lan_theo/TT_static_only_every_full_graph; bao-cao-p5b.md mục 4.3"
+  }
+ ]
+}

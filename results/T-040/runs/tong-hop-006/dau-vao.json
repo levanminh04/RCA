@@ -1,0 +1,281 @@
+{
+ "schema": "T040-dau-vao-v1",
+ "run": "runs/tong-hop-006",
+ "chi_tiet": "results/T-040/runs/tong-hop-006/dau-vao-kiem.json",
+ "nguyen_tac": "Trạng thái chấp nhận lấy từ DECISIONS/REVIEW/LOG; manifest chỉ để kiểm hash; không coi tệp mới nhất là bản chính thức.",
+ "trang_thai_nguon": [
+  {
+   "task": "T-034",
+   "trang_thai": "G2 đã duyệt (Q-149); task chờ Minh nghiệm thu",
+   "nguon_trang_thai": "docs/DECISIONS.md Q-149; docs/STATE.md dòng T-034",
+   "cach_dung_trong_T040": "Bản đồ hạn chế và ứng viên UV-1..UV-9 của goi-g2.md theo trạng thái đã duyệt cổng; không coi là lựa chọn P6"
+  },
+  {
+   "task": "T-035",
+   "trang_thai": "Chưa nghiệm thu; chờ phiên Codex sạch tự soát rồi phản biện chính thức",
+   "nguon_trang_thai": "results/T-035/manifest.json#/task_state",
+   "cach_dung_trong_T040": "Graph trace dev và thống kê mô tả; mọi đối chiếu TT/OB phụ thuộc trạng thái này"
+  },
+  {
+   "task": "T-036",
+   "trang_thai": "Gốc đã đóng (Q-158); gói SMTP V2 (Q-164) đã triển khai, chưa có phản biện chính thức",
+   "nguon_trang_thai": "docs/DECISIONS.md Q-158, Q-164; results/T-036/runs/doi-chieu-smtp-001/ban-giao.md",
+   "cach_dung_trong_T040": "Hợp đồng và pin chung V2 cho cả ba nhánh"
+  },
+  {
+   "task": "T-037",
+   "trang_thai": "Đã nghiệm thu và đóng (Q-167); manifest giữ trạng thái trước nghiệm thu",
+   "nguon_trang_thai": "docs/DECISIONS.md Q-167; tasks/T-037-p5b-flashticket/REVIEW.md",
+   "cach_dung_trong_T040": "Mô hình thiết kế FlashTicket chính thức trong phạm vi nguồn ghim; runtime chưa kiểm"
+  },
+  {
+   "task": "T-038",
+   "trang_thai": "Chưa nghiệm thu; người làm đã đáp REVIEW R1 và tiếp nhận bản sửa vào đầu ra chính thức (CHO_KIEM_BAN_SUA); chưa kiểm độc lập",
+   "nguon_trang_thai": "tasks/T-038-p5b-trainticket/REVIEW.md (bảng phản hồi); results/T-038/manifest.json#/state; results/T-038/runs/sua-r1-20261017-001/ban-giao-T040.json",
+   "cach_dung_trong_T040": "Dùng bản sửa của người làm cho cả phía tĩnh và phía trace, gắn nhãn có điều kiện, chưa kiểm độc lập; không dùng run reviewer-r1-fix làm số"
+  },
+  {
+   "task": "T-039",
+   "trang_thai": "Đã nghiệm thu và đóng (Q-165) với giới hạn lịch sử và phần nguồn OPEN",
+   "nguon_trang_thai": "docs/DECISIONS.md Q-165; tasks/T-039-p5b-online-boutique/REVIEW.md",
+   "cach_dung_trong_T040": "Mô hình tham chiếu và đối chiếu 132 graph chính thức có điều kiện revision"
+  }
+ ],
+ "kiem_trang_thai": {
+  "Q149_present": true,
+  "Q158_present": true,
+  "Q164_present": true,
+  "Q165_present": true,
+  "Q167_present": true,
+  "T038_R1_answered_by_producer": true,
+  "T038_state_awaiting_fix_check": true,
+  "T038_no_acceptance_decision": false,
+  "T035_no_review_file": true
+ },
+ "manifest_khop_toan_bo": 8,
+ "manifest": [
+  {
+   "id": "T-034",
+   "manifest": "results/T-034/runs/manifest-cuoi-007/manifest.json",
+   "manifest_sha256": "831a12393498793351bf8270a8e6df4b99dc25fc571fc2004b61734194ec8e1d",
+   "created_utc": "2026-10-14T08:13:13+0700",
+   "state_in_manifest": null,
+   "task_accepted_in_manifest": null,
+   "files": 318,
+   "ok": 318,
+   "bytes_checked": 27324137,
+   "mismatch": [],
+   "missing": [],
+   "mismatch_expected_by_V2": null
+  },
+  {
+   "id": "T-035",
+   "manifest": "results/T-035/manifest.json",
+   "manifest_sha256": "9041967bf9fef956f95bf4180992947be0e7dd39e788d4d20741a2a56c35d662",
+   "created_utc": "2026-10-15T08:22:46.657854+00:00",
+   "state_in_manifest": "awaiting_fresh_codex_self_audit_and_official_review",
+   "task_accepted_in_manifest": null,
+   "files": 5667,
+   "ok": 5667,
+   "bytes_checked": 350892118,
+   "mismatch": [],
+   "missing": [],
+   "mismatch_expected_by_V2": null
+  },
+  {
+   "id": "T-036-R1",
+   "manifest": "results/T-036/manifest.json",
+   "manifest_sha256": "d10bb327b2cc62334c87f3e33ac9a7c62ad6a4d78f735530604a64c3eb38d2b1",
+   "created_utc": "2026-10-15T13:45:08.305188+00:00",
+   "state_in_manifest": "awaiting_official_clean_full_review_and_Minh_acceptance",
+   "task_accepted_in_manifest": null,
+   "files": 187,
+   "ok": 184,
+   "bytes_checked": 22689938,
+   "mismatch": [
+    "src/do_thi_tinh/build.py",
+    "src/do_thi_tinh/compare.py",
+    "src/do_thi_tinh/README.md"
+   ],
+   "missing": [],
+   "mismatch_expected_by_V2": [
+    "src/do_thi_tinh/build.py",
+    "src/do_thi_tinh/compare.py",
+    "src/do_thi_tinh/README.md"
+   ]
+  },
+  {
+   "id": "T-036-V2",
+   "manifest": "results/T-036/runs/doi-chieu-smtp-001/manifest.json",
+   "manifest_sha256": "e97f2ff8f424d08120f0da01697c260471e7d1b93131c143ebe7a732ebaaec01",
+   "created_utc": "2026-10-16T04:22:36.861568+00:00",
+   "state_in_manifest": "SHARED_REGRESSION_PASS_THREE_BRANCH_ADOPTION_PENDING",
+   "task_accepted_in_manifest": null,
+   "files": 71,
+   "ok": 71,
+   "bytes_checked": 5805030,
+   "mismatch": [],
+   "missing": [],
+   "mismatch_expected_by_V2": null
+  },
+  {
+   "id": "T-036-V2-artifacts",
+   "manifest": "results/T-036/runs/doi-chieu-smtp-001/artifact-manifest.json",
+   "manifest_sha256": "6cc0956b54aaeeb478fff66a0f0e0d4d9b81ae45a53b69c60e94743fcb8ffdbc",
+   "created_utc": null,
+   "state_in_manifest": null,
+   "task_accepted_in_manifest": null,
+   "files": 152,
+   "ok": 152,
+   "bytes_checked": 19727451,
+   "mismatch": [],
+   "missing": [],
+   "mismatch_expected_by_V2": null
+  },
+  {
+   "id": "T-037",
+   "manifest": "results/T-037/manifest.json",
+   "manifest_sha256": "e4ab27e93b23c616228058258f13d82efb087e54ceaaf2f890a2fa0a519e0942",
+   "created_utc": "2026-10-16T04:32:44.549578+00:00",
+   "state_in_manifest": "SMTP_V2_ALL_BRANCHES_ADOPTED_AWAITING_CLAUDE_REVIEW_NOT_ACCEPTED",
+   "task_accepted_in_manifest": false,
+   "files": 312,
+   "ok": 312,
+   "bytes_checked": 82641302,
+   "mismatch": [],
+   "missing": [],
+   "mismatch_expected_by_V2": null
+  },
+  {
+   "id": "T-038",
+   "manifest": "results/T-038/manifest.json",
+   "manifest_sha256": "a19e67d9a2c8806429f3546682be8d5390f7f5150f373eee85701b0407d2b549",
+   "created_utc": "2026-10-17T04:47:10.884276+00:00",
+   "state_in_manifest": "CHO_KIEM_BAN_SUA",
+   "task_accepted_in_manifest": false,
+   "files": 11009,
+   "ok": 11009,
+   "bytes_checked": 833521422,
+   "mismatch": [],
+   "missing": [],
+   "mismatch_expected_by_V2": null
+  },
+  {
+   "id": "T-038-sua-r1",
+   "manifest": "results/T-038/runs/sua-r1-20261017-001/manifest.json",
+   "manifest_sha256": "cfb1c42eaa0994766b11c3625704611fd4f908c9fc86d64906760c9712cad5be",
+   "created_utc": "2026-10-17T04:47:00.510320+00:00",
+   "state_in_manifest": "PRODUCER_R1_ADOPTED_AWAITING_INDEPENDENT_CHECK",
+   "task_accepted_in_manifest": false,
+   "files": 2277,
+   "ok": 2277,
+   "bytes_checked": 187429646,
+   "mismatch": [],
+   "missing": [],
+   "mismatch_expected_by_V2": null
+  },
+  {
+   "id": "T-039",
+   "manifest": "results/T-039/manifest.json",
+   "manifest_sha256": "21e62579867af1cdf3028785bd9e0396877d62a88beac487139b0dcd50212047",
+   "created_utc": "2026-10-16T04:33:00.425432+00:00",
+   "state_in_manifest": "SMTP_V2_ALL_BRANCHES_ADOPTED_AWAITING_CLAUDE_REVIEW_NOT_ACCEPTED",
+   "task_accepted_in_manifest": false,
+   "files": 1006,
+   "ok": 1006,
+   "bytes_checked": 266408566,
+   "mismatch": [],
+   "missing": [],
+   "mismatch_expected_by_V2": null
+  }
+ ],
+ "pin_chung": {
+  "FT": {
+   "pin": "results/T-037/runs/doi-chieu-smtp-001/pin.json",
+   "manifest": "results/T-036/runs/doi-chieu-smtp-001/manifest.json",
+   "manifest_sha256_equals_file": true,
+   "created_utc_equals": true,
+   "code_hashes_equal_V2": true
+  },
+  "TT": {
+   "pin": "results/T-038/runs/doi-chieu-smtp-001/pin.json",
+   "manifest": "results/T-036/runs/doi-chieu-smtp-001/manifest.json",
+   "manifest_sha256_equals_file": true,
+   "created_utc_equals": true,
+   "code_hashes_equal_V2": true
+  },
+  "OB": {
+   "pin": "results/T-039/runs/doi-chieu-smtp-001/pin.json",
+   "manifest": "results/T-036/runs/doi-chieu-smtp-001/manifest.json",
+   "manifest_sha256_equals_file": true,
+   "created_utc_equals": true,
+   "code_hashes_equal_V2": true
+  }
+ },
+ "ma_chung_hien_hanh": {
+  "src/do_thi_tinh/__init__.py": {
+   "sha256": "905302e87dce3a740b1f3424fdcb39477f180850bc2adc5c4db3ff4dc045564b",
+   "equals_V2_pin": true
+  },
+  "src/do_thi_tinh/build.py": {
+   "sha256": "733c2d55613e9d9feb67b0bf376289466bff27f6d24bbfd6d38735478eea4fca",
+   "equals_V2_pin": true
+  },
+  "src/do_thi_tinh/compare.py": {
+   "sha256": "d35fb14911abbe1cce46e77d4d4c4c880bdc92a53ad6c9ad22a59afc967aaa5e",
+   "equals_V2_pin": true
+  }
+ },
+ "flashticket": {
+  "B16_path": "D:/Project/flash-ticket-platform/docs/architecture/B16-observability-baseline.md",
+  "B16_sha256": "12d9ab32969443e3b2bb12f8ad4d77f895ddeaf05ae325c9e4b77f72f6bdc6a8",
+  "B16_bytes": 17119,
+  "B16_equals_T037_registry": true,
+  "T037_registry_revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+  "git": {
+   "head": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+   "B16_worktree_status": ""
+  }
+ },
+ "tep_ngoai_manifest": {
+  "results/T-034": {},
+  "results/T-035": {},
+  "results/T-036": {},
+  "results/T-037": {},
+  "results/T-038": {},
+  "results/T-039": {}
+ },
+ "ban_hien_hanh_dung": {
+  "FT_mo_hinh": {
+   "entity": "results/T-037/do-thi/thuc-the.json",
+   "operation": "results/T-037/do-thi/thao-tac.json",
+   "projection": "results/T-037/do-thi/phep-chieu.json"
+  },
+  "TT_mo_hinh": {
+   "entity": "results/T-038/do-thi/thuc-the.json",
+   "operation": "results/T-038/do-thi/thao-tac.json",
+   "projection": "results/T-038/do-thi/chieu-thao-tac.json"
+  },
+  "OB_mo_hinh": {
+   "entity": "results/T-039/runs/doi-chieu-smtp-001/do-thi/thuc-the.json",
+   "operation": "results/T-039/runs/doi-chieu-smtp-001/do-thi/thao-tac.json",
+   "projection": "results/T-039/runs/doi-chieu-smtp-001/do-thi/chieu-thuc-the.json"
+  },
+  "TT_doi_chieu": "results/T-038/runs/sua-r1-20261017-001/checks/full1069-002/summary.json",
+  "OB_doi_chieu": "results/T-039/runs/doi-chieu-smtp-001/summary.json",
+  "T035_graph": "results/T-035/do-thi/ (đường dẫn từng graph ở rows của task nguồn)"
+ },
+ "tep_goc_TT_dong_bo_model_sua": {
+  "thuc-the.json": true,
+  "thao-tac.json": true,
+  "chieu-thao-tac.json": true,
+  "chi-thuc-the.json": true,
+  "all_equal": true
+ },
+ "khong_dung": [
+  "results/T-038/runs/reviewer-r1-fix-20261016-001/ (bản đề nghị sửa chưa tiếp nhận)",
+  "results/T-038/runs/doi-chieu-smtp-001/ (bản SMTP V2 trước sửa R1; chỉ còn là lịch sử)",
+  "các bảng số R1 lịch sử trong phan-tich-chenh-lech.md của T-038 và các manifest trước V2"
+ ],
+ "all_checks_pass": false
+}
