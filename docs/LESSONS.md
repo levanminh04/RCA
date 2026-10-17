@@ -37,6 +37,7 @@ Bản rút gọn để đọc nhanh. Câu chuyện đầy đủ, số liệu và
 | SL34 | T017: regex suy pod từ tên làm gộp nhầm database hợp lệ (ts-assurance-mongo→ts) | Kiểm tên bằng dữ liệu/schema, dùng alias tường minh; soi điểm trung gian và giữ/rerun lượt bị ảnh hưởng. Bằng chứng: results/T-017/kiem-dung-dan.md; run-dev-004 |
 | SL35 | Viết câu phổ quát ("30 ca đều có `inject_time.txt`") sau khi chỉ nhìn một thư mục (T-018, đã đính chính) | Câu "mọi/đều" phải có lệnh đếm trên đủ đối tượng |
 | SL36 | Kết luận "TORAI khớp" chỉ dựa vào điểm cuối khớp số công bố (T-006). Ở đúng cấu hình đó, bước nhân quả không nhận cột metric nào do lỗi giảm mẫu hai lần, và 176/184 cụm rơi nhánh dự phòng về thứ tự mức nghiêm trọng; số vẫn khớp dù bản cài đang kiểm có lỗi; chưa xác minh code hay lượt chạy nào tạo số công bố (T-016) | Trước khi gọi một phương pháp là "kiểm đúng đắn": soi đầu vào thật của từng thành phần (số cột, số dòng), đếm số lần rơi nhánh dự phòng bên trong, và so điểm với một bản bỏ thành phần đó (ví dụ chỉ SeverityScorer) |
+| SL37 | Kiểm đúng số, đúng phạm vi SPEC và viết giới hạn cẩn thận nhưng chưa chỉ rõ phần mục tiêu nghiên cứu còn thiếu và căn cứ để chuyển sang thiết kế; dùng "chưa kiểm"/"ngoài SPEC" như điểm kết thúc phân tích (thảo luận sau T-028/T-029, Q-88) | Đối chiếu mục tiêu MRP, DT18/cô khi soạn và nghiệm thu; đọc code/trung gian, so ca sai với ca đúng, lần theo bước gây mất hoặc chấm sai thông tin. Nêu phần đã xác nhận, giả thuyết khác, bằng chứng thiếu và quyết định phụ thuộc. Trình phần kiểm cần thiết thay vì tự bỏ; không dùng mô tả/cờ hoặc việc task đã đóng làm bằng chứng cơ chế. |
 
 ## Quy tắc
 
@@ -47,8 +48,8 @@ Bản rút gọn để đọc nhanh. Câu chuyện đầy đủ, số liệu và
 - **QT5 — Soi giá trị trung gian.** Điểm lớn hơn 1e6, toàn hòa, ngưỡng cực lớn, một nhóm kênh chiếm gần hết → dừng tìm nguyên nhân.
 - **QT6 — Dev để sửa, test để kiểm.** Khuyết tật thấy trên dev thì sửa, có nguyên lý. Test mở một lần sau G3.
 - **QT7 — Nhánh không đồ thị phải mạnh.** Ngang hoặc hơn baseline đơn giản đã công bố trên cùng dữ liệu.
-- **QT8 — Khẳng định về đồ thị cần ba thứ:** hơn nhánh không đồ thị; hơn đồ thị ngẫu nhiên giữ bậc; báo theo điều kiện và từng ca.
-- **QT12 — Review gọn.** Một reviewer khác model, chỉ nhận spec, diff, kết quả. Minh quyết sửa gì.
+- **QT8 — Khẳng định lợi ích do cấu trúc đồ thị thật cần ba thứ:** hơn nhánh cùng bằng chứng không dùng đồ thị; hơn đồ thị ngẫu nhiên giữ bậc; báo theo điều kiện và từng ca. Dùng khi đánh giá lợi ích, không đòi đồ thị thắng trước khi chỉ ra hạn chế baseline hoặc bắt đầu thiết kế.
+- **QT12 — Review độc lập, đúng mục tiêu.** Người phản biện khác người làm; nhận nguồn yêu cầu, SPEC, diff và kết quả, không nhận kết luận dẫn hướng trong prompt. Tự soát phần gốc trước rồi kiểm ý kiến các lượt trước. Mỗi bên bàn giao bằng prompt chuẩn để Minh chuyển thủ công; bất đồng phải có bằng chứng và quyết định bị ảnh hưởng. Minh quyết sửa, gửi tiếp hay dừng; đồng thuận không thay bằng chứng và dừng review không tự đóng task (Q-88).
 - **QT13 — Viết cho người đọc.** Tiếng Việt, câu ngắn, có "tại sao".
 - **QT15 — Tách theo ô và theo ca trước khi nêu mẫu hình.** Một ô không phải mẫu hình. Service không có cạnh không tính là bằng chứng cho hay chống đồ thị.
 - **QT16 — Hỏi "dữ liệu này phân xử nổi không" trước khi đặt giả thuyết.** Nếu kết cục dễ xảy ra nhất là "không đủ bằng chứng" thì nói ngay với Minh.

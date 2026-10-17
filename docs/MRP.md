@@ -3,10 +3,11 @@
 - Trạng thái: **đã duyệt G0 ngày 02/10/2026 (Q-36)**. Soạn ngày 02/10/2026.
 - Thay thế hoàn toàn MRP v1 và MRP-v2. Hai bản cũ chỉ còn giá trị lịch sử; không dùng khung của chúng.
 - Người quyết: Minh. Claude và Codex ngang hàng; vai trò người làm và người phản biện gắn theo từng task (Q-13).
+- Bổ sung cách phân tích hạn chế, căn cứ thiết kế và bàn giao phản biện ngày 09/10/2026 (Q-88). Giữ lịch sử duyệt G0 và các task đã đóng; không tự mở lại hoặc đổi kết quả của chúng.
 
 ## 0. Tóm tắt một đoạn
 
-Phần RCA đi đúng chuỗi cô yêu cầu, không nhảy cóc. Trước hết hiểu sâu kỹ thuật các phương pháp RCA đã có. Sau đó chạy chúng trên nhiều bộ dữ liệu công khai và chỉ ra chúng hỏng ở đâu, vì sao. Từ những chỗ hỏng đó mới thiết kế phương pháp đồ thị theo 5 bước của cô. Cuối cùng đưa phương pháp vào FlashTicket, vừa để demo vừa làm một bộ dữ liệu thực nghiệm có tiêm lỗi. Kết quả báo trung thực, kể cả khi đồ thị không thắng; cô sẽ định hướng tiếp qua các lần báo cáo tiến độ.
+Phần RCA đi đúng chuỗi cô yêu cầu, không nhảy cóc. Trước hết hiểu sâu kỹ thuật các phương pháp RCA đã có. Sau đó chạy chúng trên nhiều bộ dữ liệu công khai và chỉ ra chúng hỏng ở đâu, vì sao. Sau phân tích hạn chế, thiết kế phương pháp đồ thị theo năm bước của cô; thành phần sửa hạn chế nối với bằng chứng P4, các thành phần khác ghi đúng căn cứ DT18 hoặc nhu cầu kỹ thuật (WHY-01, Q-89). Cuối cùng đưa phương pháp vào FlashTicket, vừa để demo vừa làm một bộ dữ liệu thực nghiệm có tiêm lỗi. Kết quả báo trung thực, kể cả khi đồ thị không thắng; cô sẽ định hướng tiếp qua các lần báo cáo tiến độ.
 
 ## 1. Căn cứ
 
@@ -29,10 +30,10 @@ Bối cảnh hệ thống: FlashTicket có 5 service nghiệp vụ (event, booki
 | "mới khảo sát sơ qua..., chưa sâu kỹ thuật của từng phương pháp" | Với mỗi phương pháp đã chọn: viết lại cơ chế bằng công thức, đọc code gốc, chạy tay trên một ca, nêu giả định và điều kiện thất bại | P1 |
 | "thực nghiệm với 1 dataset → mở rộng ra các dataset public khác" | Chọn thêm dataset theo tiêu chí, chạy cùng các phương pháp trên cùng giao thức | P2, P3 |
 | "chỉ ra vấn đề còn tồn đọng, hạn chế" | Hạn chế phải có bằng chứng: ca nào hỏng, phương pháp nào, cơ chế nào gây ra | P4 |
-| "tiếp cận phương pháp đồ thị theo 5 bước" | Thiết kế phương pháp đồ thị **xuất phát từ các hạn chế ở P4** | P5–P8 |
+| "tiếp cận phương pháp đồ thị theo 5 bước" | Sau P4, thiết kế phương pháp đồ thị theo năm bước; thành phần sửa hạn chế nối với bằng chứng P4, các thành phần khác ghi đúng căn cứ DT18 hoặc nhu cầu kỹ thuật (WHY-01) | P5–P8 |
 | Phần 2: tích hợp vào hệ thống đặt vé | RCA chạy thật trên FlashTicket; demo tập trung vào phát hiện và chẩn đoán sự cố | P9, P10 |
 
-**Vì sao giữ đúng thứ tự này** (WHY-01): cô phê bản trước "chưa thể hiện rõ liên kết logic". Liên kết logic ở đây là: hiểu cơ chế → thấy cơ chế hỏng ở đâu trên dữ liệu → mỗi thành phần của phương pháp đồ thị trả lời một chỗ hỏng cụ thể. v1 và v2 thiết kế phương pháp trước rồi mới tìm chỗ nó có ích (LESSONS SL1, SL22). Làm ngược lại thì không có câu trả lời cho "tại sao phương pháp có thành phần này".
+**Vì sao giữ đúng thứ tự này** (WHY-01): cô phê bản trước "chưa thể hiện rõ liên kết logic". Liên kết logic ở đây là: hiểu cơ chế → thấy cơ chế hỏng ở đâu trên dữ liệu → thành phần đề xuất để xử lý hạn chế phải có lý do kỹ thuật nối với chỗ hỏng ấy. Thành phần đáp ứng DT18 hoặc nhu cầu kỹ thuật phải ghi đúng lý do đó, không dựng một hạn chế để hợp thức hóa. v1 và v2 thiết kế phương pháp trước rồi mới tìm chỗ nó có ích (LESSONS SL1, SL22). Làm ngược lại thì không có câu trả lời cho "tại sao phương pháp có thành phần này".
 
 ### 2.2 Năm bước phương pháp
 
@@ -81,6 +82,14 @@ Không câu nào giả định đồ thị sẽ thắng (Minh quyết 02/10: bá
 Phát hiện bất thường không phải phần phụ của RCA: nó có hồ sơ phương pháp, baseline, độ đo và phân tích hạn chế riêng ở mọi gói (Q-30).
 
 **Hoàn thành nghĩa là gì:** mỗi RQ có câu trả lời dựa trên phép thử hợp lệ, kèm điều kiện nó đúng và không đúng, và lý do (cơ chế) của kết quả, dù tốt hay xấu (Q-35). "Đồ thị không giúp ở X, vì Y" là một câu trả lời hợp lệ.
+
+Đóng một task có đầu ra mô tả không tự trả lời xong RQ2 hoặc cho đủ căn cứ chọn thiết kế. Khi dữ liệu chưa phân xử được cơ chế, nêu câu còn mở, phần bằng chứng đã có, phần thiếu, phép kiểm cần thiết hoặc giới hạn không thể khắc phục với dữ liệu hiện tại, cùng quyết định bị ảnh hưởng. Không buộc mọi ca sai phải có chứng minh nhân quả tuyệt đối; cần phân biệt các giải thích dẫn tới lựa chọn nghiên cứu khác nhau ở những nhóm quan trọng.
+
+| Mục đích dùng bằng chứng | Mức căn cứ cần có |
+|---|---|
+| Đề xuất một ứng viên để thử | Hiện tượng trên file thật, lý do kỹ thuật khả thi, giải thích khác và dự đoán có thể bác bỏ. Giả thuyết vẫn là ứng viên, chưa là nguyên nhân đã xác nhận. |
+| Chọn một thành phần thiết kế trước G3 | Căn cứ phù hợp với mục đích thành phần: bằng chứng hạn chế và đường xử lý ở P4 nếu nhằm sửa hạn chế, hoặc yêu cầu DT18/nhu cầu kỹ thuật được ghi đúng; so phương án và kiểm đầu vào, trung gian, hành vi trên dev. Không chọn chỉ vì dẫn một mã hạn chế hoặc hợp khung có sẵn. |
+| Khẳng định hiệu quả hoặc lợi ích do quan hệ thật | Đánh giá hợp lệ sau khóa thiết kế trên dữ liệu không dùng để thiết kế; đối chứng tương ứng với khẳng định, cùng giới hạn theo điều kiện. Chọn thiết kế hoặc hai agent đồng ý không thay bằng chứng này. |
 
 ## 4. Dataset: chọn theo tiêu chí, không theo tên
 
@@ -166,18 +175,29 @@ Repo mới, MRP, quy trình agent, nhật ký quyết định. Xong khi Minh duy
 
 ### P4 — Phân tích hạn chế
 
-- Chỉ dùng phần dev. Với mỗi ca mà một phương pháp xếp sai, mở dữ liệu đo ra xem vì sao, rồi xếp vào nhóm cơ chế.
+- Chỉ dùng phần dev được phép. Đọc code và trung gian đã lưu trước; với các nhóm ca sai quan trọng, lần theo đầu vào → xử lý → trung gian → đầu ra, rồi đọc đúng phần dữ liệu cần thiết trong phạm vi được duyệt. Đối chiếu cả ca đúng có điều kiện tương ứng để không gọi một đặc tính chung là nguyên nhân của mọi ca sai.
 - Làm tương tự cho phần phát hiện (Q-30): ca nào bộ phát hiện bỏ sót, báo động sai, hoặc báo trễ, và vì sao.
+- Thiếu trung gian ở nhóm quan trọng thì đề xuất chạy lại đúng phần cần biết, kèm phạm vi, chi phí và kết luận phụ thuộc. Không tự chạy vượt SPEC; không tự loại câu hỏi khỏi nghiên cứu bằng câu "ngoài SPEC". Nêu khi dữ liệu hiện có không thể phân xử và chính xác thông tin nào cần bổ sung.
 - **Giả thuyết cần kiểm** (chưa kiểm, có thể sai):
   - nhầm triệu chứng với nguyên nhân: độ trễ lan lên service gọi, nên service gọi bị xếp trên service gốc;
   - lỗi không hiện ở loại tín hiệu mà phương pháp dùng, ví dụ lỗi mã nguồn với phương pháp chỉ dùng metric;
   - service gốc không có tín hiệu, hoặc không có cạnh trong trace;
   - phải biết trước thời điểm sự cố;
   - không cho ra vùng ảnh hưởng hay lời giải thích.
-- Mỗi hạn chế ghi: bao nhiêu ca trên tổng số, ở phương pháp nào, dataset nào, bằng chứng cơ chế, và tác giả có tự nêu không.
+- **Câu cần phân xử:** trong những ca caller (dịch vụ gọi) đứng trên root (thành phần gốc), phương pháp chấm thời gian chờ dịch vụ phụ thuộc thành bất thường của caller, hay bản thân cách chấm đã ưu tiên caller? Xét thêm các khả năng như đầu vào/coverage, cách lọc ứng viên, tài nguyên chung; hai cơ chế cũng có thể cùng tồn tại. Thứ hạng caller cao hơn root một mình không chứng minh độ trễ lan hoặc xác định nguyên nhân chấm sai.
+- Mỗi hạn chế ghi: bao nhiêu ca trên tổng số, ở phương pháp nào, dataset nào, bằng chứng cơ chế và tác giả có tự nêu không. Số có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả; không cộng cờ chồng lấn thành tỷ lệ nguyên nhân.
+- Khi đủ bằng chứng, viết kết luận theo dạng: "Trong điều kiện X, bước xử lý Y làm mất hoặc đánh giá sai thông tin Z", kèm đầu vào, trung gian và đầu ra của các ca. Khi chưa xác định Y, chỉ ghi quan sát và các giải thích còn mở; không điền một nguyên nhân cho đủ mẫu.
+- Phân biệt dữ liệu/thiếu đầu vào, giao thức, adapter/cài đặt và giả định/cách tính của phương pháp. Một thất bại có thể do tương tác giữa chúng. Hạn chế dữ liệu xác nhận phải nêu hệ quả cho đánh giá và yêu cầu quan sát có thể chuyển sang P9a; collector không khôi phục được thông tin chưa từng được instrumentation ghi.
 - Tách theo ô và theo ca trước khi nêu mẫu hình (QT15). Một ô không phải là mẫu hình.
 - Nếu cơ chế "nhầm triệu chứng lan với nguyên nhân" chiếm phần đáng kể các ca sai, định nghĩa nhãn "lan" cho từng ca trên dev: ngưỡng lấy từ dữ liệu bình thường, báo độ nhạy theo vài ngưỡng, tránh định nghĩa vòng lặp kiểu "service lệch nhất không phải gốc". Định nghĩa khóa ở G3, trước khi mở test. Nhãn chỉ dùng để chấm và phân tích, không đưa vào phương pháp. Nếu cơ chế này không đáng kể thì không tách.
-- **Đầu ra:** bản đồ hạn chế. Mỗi lựa chọn thiết kế ở P5–P6 phải trỏ về một dòng trong bản đồ này.
+- **Đầu ra:** bản đồ hạn chế dẫn tới quyết định nghiên cứu, gồm:
+  1. Hạn chế nào đã xác nhận, tồn tại trong điều kiện nào.
+  2. Hạn chế nào thuộc lỗi cài đặt hoặc thiếu đầu vào; cần sửa baseline/giao thức hay cải thiện quan sát trước khi quy cho phương pháp.
+  3. Hạn chế nào thuộc giả định/cách tính của phương pháp, với chuỗi bằng chứng và giải thích cạnh tranh.
+  4. Quan hệ giữa dịch vụ có thể bổ sung thông tin gì; đây là căn cứ đề xuất ứng viên, chưa là bằng chứng đồ thị đã giúp.
+  5. Câu nào chưa trả lời, thiếu đúng bằng chứng gì, ảnh hưởng tới lựa chọn nào và bước xử lý cần Minh quyết.
+  Thành phần P5–P6 đề xuất để xử lý hạn chế phải nối với mục đã có đủ căn cứ tương ứng; không dùng mã hạn chế mô tả như bằng chứng cơ chế. Thành phần đáp ứng DT18 hoặc nhu cầu kỹ thuật ghi rõ loại lý do và phương án đã xét.
+- Đối chứng bỏ quan hệ và đồ thị ngẫu nhiên giữ bậc dùng khi đánh giá tác dụng của cơ chế đồ thị ở P6–P7. Chúng không là điều kiện trì hoãn vô hạn việc chỉ ra hạn chế của baseline ở P4; nếu một kết luận P4 thật sự cần phép kiểm bổ sung thì trình đúng phép kiểm ấy.
 - **Vì sao:** đây là việc "chỉ ra vấn đề tồn đọng" của cô, và là cầu nối logic sang phương pháp đồ thị.
 
 ### P5 — Bước 1: Mô hình đồ thị phụ thuộc
@@ -193,17 +213,17 @@ Repo mới, MRP, quy trình agent, nhật ký quyết định. Xong khi Minh duy
   - tĩnh, từ kiến trúc và cấu hình (cho bộ không có trace, và cho FlashTicket nơi biết kiến trúc).
   - So hai nguồn để đo độ phủ.
 - **Theo thời gian:** đồ thị nền từ giai đoạn bình thường, và ảnh chụp theo từng cửa sổ. Ghi độ phủ: số cạnh thấy được, span mồ côi.
-- **Đầu ra:** đặc tả hình thức của đồ thị, bộ dựng đồ thị dùng chung cho mọi dataset, thống kê đồ thị của từng dataset.
+- **Đầu ra:** đặc tả hình thức của đồ thị, bộ dựng đồ thị dùng chung cho mọi dataset, thống kê đồ thị của từng dataset. Chỉ rõ mỗi nút/cạnh đại diện cho gì, quan hệ quan sát hay tĩnh, log/trace/metric được ánh xạ lên đâu và phép tính P6 nào thực sự nhận cạnh. Hình vẽ đồ thị không thay cho đường đi thông tin này.
 - **Vì sao không chỉ dựng đồ thị gọi giữa các service:** DT18 nêu rõ ba loại cạnh. Nhiều sự cố của hệ bán vé nằm ở database, broker, cache, và các thành phần này không phải service.
 
 ### P6 — Bước 2: Phát hiện bất thường trên đồ thị
 
 Khung bốn tầng, lấy từ câu chữ của DT18 ("ánh xạ lên đồ thị để xác định vùng ảnh hưởng, phát hiện dấu hiệu bất thường và xếp hạng"). Khung này là ứng viên; DT18 yêu cầu các đầu ra, không bắt buộc kiến trúc này. Lựa chọn cụ thể trong mỗi tầng chốt trong spec P6, **sau P4**, trên phần dev.
 
-1. **Ánh xạ.** Theo từng cửa sổ thời gian, gắn tín hiệu lên phần tử của đồ thị.
+1. **Ánh xạ.** Theo từng cửa sổ thời gian, gắn tín hiệu lên phần tử của đồ thị. Các tín hiệu dưới đây là ứng viên, chưa là bộ đặc trưng đã chọn; chỉ giữ sau khi xét bằng chứng, chất lượng đầu vào và phương án khác trên dev.
    - Cạnh: số lời gọi, độ trễ đo từ phía gọi, số lỗi.
    - Nút:
-     - thời gian tự xử lý: độ trễ của span trừ phần nằm trong span con;
+     - ứng viên thời gian tự xử lý: phần thời gian span không chờ span con; phép tính phải xử lý chồng lấn, song song, bất đồng bộ và span thiếu, không mặc định trừ tổng duration con là đúng;
      - log lỗi và mẫu log: gắn vào span qua trace_id nếu có, nếu không thì theo service và thời gian;
      - metric tài nguyên.
 2. **Chấm điểm bất thường có dùng đồ thị.** So từng phần tử với mức bình thường của chính nó. Cơ chế ứng viên (**chưa kiểm**): dùng đồ thị để tách bất thường **tự sinh** (từ chính thành phần) khỏi bất thường **kế thừa** (do thành phần phía dưới truyền lên). Ứng viên này nhắm vào giả thuyết "nhầm triệu chứng với nguyên nhân" của P4; chỉ giữ nếu P4 xác nhận hạn chế đó trên dev. Phát hiện bất thường có dùng đồ thị là bắt buộc (bước 2 của cô, DT18); P4 chỉ quyết định dùng cơ chế nào.
@@ -225,16 +245,19 @@ Khung bốn tầng, lấy từ câu chữ của DT18 ("ánh xạ lên đồ th�
      - quy tắc "thành phần bất thường tự sinh nằm sâu nhất theo chiều gọi". Quy tắc này chưa định nghĩa chặt và đã bị phản biện (v2, chưa kiểm).
    - Chọn trên dev theo MRR của chính tầng này, không theo mức chênh so với nhánh không đồ thị (QT4).
 
-**Đầu ra:** spec phương pháp. Mỗi lựa chọn ghi: hạn chế nào ở P4 nó nhắm tới, vì sao chọn, đã xét phương án nào, bằng chứng trên dev.
+**Đầu ra:** spec phương pháp. Mỗi lựa chọn ghi mục đích, loại căn cứ theo §3, vì sao chọn, đã xét phương án nào, bằng chứng trên dev và điều kiện thất bại. Với lựa chọn nhằm sửa hạn chế, chỉ rõ mục P4 và thông tin được bổ sung/giữ lại; với lựa chọn đáp ứng DT18 hoặc nhu cầu kỹ thuật, ghi đúng lý do ấy. Không lấy trực giác hoặc khung có sẵn làm lựa chọn đã xác nhận rồi tìm kết quả biện minh.
+
+Trước G3, phương pháp và các đối chứng đã khai báo phải được cài và kiểm đầu vào, trung gian, hành vi trên dev, không chỉ chạy không lỗi. Khóa trước cách xử lý ca lỗi, UNSUPPORTED, nhánh dự phòng, thiếu tín hiệu/cạnh, tập ứng viên và mẫu số; không bỏ nhóm khó sau khi thấy điểm. Không đòi phương pháp đồ thị phải thắng mới được khóa; nếu bằng chứng chưa cho phép chọn một cơ chế thì giữ là ứng viên và trình phần cần phân xử.
 
 ### P7 — Bước 3 và 4: Thực nghiệm và so sánh
 
-- **Khóa trước** (cổng G3): cấu hình phương pháp, giả thuyết, bảng diễn giải kết quả, cách tính độ đo, danh sách so sánh. Khóa bằng commit. Sau đó mới chạy một lần trên phần test và dataset giữ ngoài.
+- **Khóa trước** (cổng G3): code/revision, cấu hình phương pháp và đối chứng, giả thuyết, bảng diễn giải kết quả, cách tính độ đo, danh sách so sánh, tập ca/tập ứng viên và cách xử lý lỗi/nhánh dự phòng. Khóa bằng commit khi Minh duyệt commit. Sau đó mới chạy một lần trên phần test và dataset giữ ngoài khi Minh cho phép; duyệt thiết kế không mặc nhiên là quyền mở dữ liệu.
 - **So với:**
   - các baseline của P3;
   - nhánh **cùng bằng chứng nhưng không dùng đồ thị**. Spec P7 ghi rõ cấu trúc nào được coi là đồ thị (quan hệ cha–con trong trace, đồ thị service), thông tin nào giữ chung, bước nào bị loại. Ví dụ self-time và hồi quy theo nút cha đã dùng quan hệ; nếu nhánh này giữ chúng mà chỉ bỏ bước xếp hạng trên đồ thị thì kết quả chỉ nói về bước xếp hạng (WHY-07);
   - nhánh **đồ thị ngẫu nhiên giữ bậc**;
   - nhánh đồ thị tĩnh so với đồ thị quan sát.
+- Khi so tác dụng cấu trúc, giữ cùng tín hiệu, cửa sổ, tập ứng viên, coverage, tiền xử lý, quy tắc chấm và ngân sách chọn cấu hình ở những phần không phải yếu tố đang thay. Nếu không thể giữ tương đương, khai rõ yếu tố thay cùng và giới hạn kết luận. Không gọi nhánh là "không đồ thị" chỉ vì bỏ hình hoặc bước xếp hạng trong khi vẫn dùng quan hệ ở đặc trưng/điểm.
 - **Độ đo** (WHY-06):
   - Phát hiện: Precision, Recall, F1 theo cửa sổ thời gian; số báo động sai trên mỗi giờ bình thường; độ trễ phát hiện. Ghi rõ mốc của độ trễ: nếu dataset chỉ có thời điểm tiêm thì gọi là độ trễ tính từ lúc tiêm, không gọi là độ trễ từ lúc sự cố bắt đầu biểu hiện. Kết luận RQ3a giới hạn theo loại nhãn thời gian thật sự có.
   - Xếp hạng: MRR, NDCG@5, Hit@1/3/5. Báo thêm AC@k và Avg@5 để so được với số đã công bố của RCAEval.
@@ -267,6 +290,7 @@ Khung bốn tầng, lấy từ câu chữ của DT18 ("ánh xạ lên đồ th�
   - đồng hồ các máy được đồng bộ;
   - thời gian lưu đủ dài để có dữ liệu bình thường.
   - Đối chiếu với chuẩn B16 đã duyệt (`D:/Project/flash-ticket-platform/docs/architecture/B16-observability-baseline.md`).
+- Chuyển hạn chế dữ liệu đã xác nhận ở P4 thành yêu cầu quan sát có lý do và phép kiểm tương ứng. Xác định thông tin thuộc instrumentation, collector, cấu hình hay giao thức tiêm/chấm; ghi phần chưa thể thu hoặc chưa kiểm. Không coi đề xuất bổ sung trường là đã chứng minh chất lượng RCA sẽ tăng.
 - **P9b:** dịch vụ RCA đọc Tempo, Loki, Prometheus qua API của chúng, đổi sang **cùng định dạng nội bộ** mà các bộ chuyển đổi dataset dùng. Nhờ vậy cùng một lõi RCA chạy trên dataset công khai và trên FlashTicket (WHY-08).
 
 ### P10 — Thực nghiệm trên FlashTicket và demo
@@ -289,17 +313,18 @@ Khung bốn tầng, lấy từ câu chữ của DT18 ("ánh xạ lên đồ th�
 
 1. **Dev để thiết kế, test để kiểm.** Test và dataset giữ ngoài chỉ mở một lần, sau G3, khi Minh cho phép.
 2. **Baseline phải mạnh** trước khi nói đồ thị giúp, gồm cả baseline đơn giản đã công bố (QT7).
-3. **Mỗi khẳng định về đồ thị cần đủ ba thứ** (QT8):
+3. **Khẳng định lợi ích đến từ cấu trúc đồ thị thật cần đủ ba thứ** (QT8):
    - hơn nhánh cùng bằng chứng mà không dùng đồ thị;
    - hơn đồ thị ngẫu nhiên giữ bậc;
    - báo theo điều kiện và theo từng ca, không chỉ trung bình.
    - Vì sao cần đồ thị ngẫu nhiên (WHY-07): nếu đồ thị bất kỳ cũng cho kết quả như vậy thì lợi ích không đến từ quan hệ phụ thuộc thật.
+   Điều này áp dụng cho khẳng định lợi ích sau đánh giá, không đòi đồ thị thắng trước khi nghiên cứu hoặc chỉ ra hạn chế baseline. Nếu đối chứng không hỗ trợ, báo kết quả và giới hạn trung thực.
 4. **Prior work là mặc định.** Lấy đúng quy ước của bài hoặc code gốc, ghi file và dòng. Muốn lệch thì ghi lý do vào WHY (QT2).
 5. **Kiểm chịu lực.** Mỗi lựa chọn riêng của nhóm được thay trong khoảng hợp lý trên dev. Nếu kết luận đổi dấu thì báo kèm độ nhạy (QT3).
 6. **Soi giá trị trung gian** trước khi so sánh. Điểm cực lớn, toàn hòa, hay một nhóm kênh chiếm gần hết thì dừng tìm nguyên nhân (QT5).
 7. **Kết quả quá đẹp cũng phải nghi.** Chạy phép thử giả: hai cửa sổ đều bình thường thì phương pháp không được "tìm ra" nguyên nhân.
 8. **Không đưa nhãn vào phương pháp:** tên ca, đường dẫn, file nhãn, thời điểm tiêm lỗi ở chế độ tự phát hiện, và mọi đầu vào suy ra từ chúng (ví dụ chọn SLI theo service gốc, P2).
-9. **Số trong tài liệu lấy từ file kết quả**, ghi đường dẫn (QT17). Đề xuất chưa kiểm ghi rõ là "chưa kiểm", kèm giả định và trường hợp nó sai.
+9. **Số trong tài liệu lấy từ file kết quả**, có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả (QT17); dùng đầu ra cũ phải kiểm manifest phù hợp. Đề xuất chưa kiểm ghi rõ là "chưa kiểm", kèm giả định, trường hợp nó sai, phần chưa kiểm và quyết định phụ thuộc. Không dùng nó như căn cứ đã xác nhận.
 10. **Giữ mọi lượt chạy**, kể cả lượt hỏng.
 
 ## 7. Cổng
@@ -323,6 +348,12 @@ Khung bốn tầng, lấy từ câu chữ của DT18 ("ánh xạ lên đồ th�
 | G5 | P8 | Lớp giải thích | Không bắt buộc |
 | G6 | P10 | Kết quả FlashTicket và demo | Có |
 
+**Cách dùng G2:** bản đồ phải trả lời năm mục đầu ra P4 và chỉ rõ căn cứ nào đủ để đề xuất/chọn thành phần, căn cứ nào chưa đủ. Câu còn OPEN không tự biến thành đã xác nhận khi Minh đóng một task. Nếu thiếu bằng chứng ảnh hưởng lựa chọn thiết kế, trình phần cần bổ sung hoặc giới hạn đề xuất để Minh quyết; không báo đủ căn cứ chỉ vì các task và bảng đã xong.
+
+**Cách dùng G3:** đây là khóa thiết kế sau P5–P6, không phải điểm bắt đầu dựng phương pháp. Kiểm căn cứ từng thành phần, cách dùng cạnh thực tế, đối chứng và giá trị trung gian trên dev; khóa cách đánh giá và diễn giải trước test. Không dùng test để chọn cơ chế hoặc làm rõ một lựa chọn thiết kế chưa đủ căn cứ.
+
+Mọi lượt trình SPEC, báo cáo, phản biện, đáp và kiểm sửa đều phải kèm prompt bàn giao theo AGENTS §9 (Q-88), kể cả đề xuất dừng. Cột phản biện bắt buộc ở trên nói cổng nào cần có phản biện trước duyệt; không miễn nghĩa vụ soạn prompt ở cổng khác. Minh quyết chuyển prompt hoặc dừng. Dừng phản biện không tự duyệt cổng hay mở test.
+
 **Mốc:** G2 trong khoảng 15–18/10/2026; kết quả phương pháp đồ thị (tới G4) cuối tháng 11/2026 (Q-70; thay mốc 20/10 của Q-02). Hướng đi đúng được ưu tiên hơn tốc độ. Quyển đồ án nộp 30/12/2026 (Q-23).
 
 ## 8. Khung báo cáo tiến độ cho cô
@@ -332,7 +363,7 @@ Báo cáo đi theo đúng chuỗi của cô, mỗi phần mở bằng câu "ph�
 1. Các phương pháp RCA đã có: cơ chế kỹ thuật (P1).
 2. Thực nghiệm trên nhiều dataset: chọn dataset nào, vì sao; kết quả (P2, P3).
 3. Hạn chế của các phương pháp đã có, kèm bằng chứng (P4).
-4. Phương pháp đồ thị: mỗi thành phần trả lời hạn chế nào (P5, P6).
+4. Phương pháp đồ thị: thành phần xử lý hạn chế nào, hoặc đáp ứng yêu cầu đề tài/nhu cầu kỹ thuật nào; bằng chứng và điều kiện thất bại (P5, P6).
 5. Kết quả so sánh (P7) và giải thích bằng LLM (P8).
 6. Hướng tích hợp FlashTicket (P9, P10).
 7. Câu hỏi xin cô định hướng.

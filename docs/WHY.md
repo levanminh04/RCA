@@ -11,11 +11,18 @@ Mẫu một mục: chọn gì → vì sao → đã xét phương án nào → b�
 
 ## WHY-01. Vì sao làm theo thứ tự: hiểu phương pháp → nhiều dataset → hạn chế → phương pháp đồ thị — Đã quyết (Q-36)
 
-- **Chọn:** đi đúng chuỗi cô viết.
-- **Vì sao:** cô phê bản trước "chưa rõ liên kết logic". Thiết kế phương pháp đồ thị phải trả lời được câu "thành phần này để sửa hạn chế nào". Muốn trả lời câu đó thì phải biết các hạn chế trước.
+- **Lịch sử:** Q-36 duyệt chuỗi nghiên cứu ngày 02/10/2026. Q-89 bổ sung cách phân biệt căn cứ thiết kế ngày 09/10/2026 để khớp Q-88; không đổi thứ tự gói hoặc mở lại task đã đóng.
+- **Chọn:** đi đúng chuỗi cô viết. Thành phần nhằm sửa hạn chế phải nối với bằng chứng P4. Thành phần đáp ứng DT18 hoặc nhu cầu kỹ thuật phải nêu đúng yêu cầu, lý do và phương án khác; không được suy từ sự cần thiết sang hiệu quả.
+- **Vì sao:** cô phê bản trước "chưa rõ liên kết logic". Với thành phần nhằm sửa hạn chế, phải biết hạn chế và cơ chế trước khi chọn cách xử lý. DT18 cũng yêu cầu mô hình đồ thị, ánh xạ tín hiệu và các đầu ra phát hiện, vùng ảnh hưởng, xếp hạng; không cần dựng một hạn chế baseline để hợp thức hóa những yêu cầu đó.
+- **Ba loại căn cứ:**
+  - Sửa hạn chế: chỉ rõ bằng chứng P4, thông tin thành phần bổ sung hoặc giữ lại, giải thích khác và điều kiện thất bại.
+  - Đáp ứng DT18: dẫn đúng đoạn yêu cầu; phân biệt yêu cầu đầu ra với cơ chế cụ thể do nhóm chọn.
+  - Nhu cầu kỹ thuật: điều kiện để thu, ánh xạ hoặc xử lý đầu vào và triển khai phương pháp đã đặc tả. Ví dụ: dựng đồ thị từ đầu vào, ánh xạ tín hiệu, xử lý trường hợp thiếu tín hiệu. Nêu vì sao cần và phương án khác; xử lý thiếu tín hiệu không mặc nhiên chứng minh khắc phục hạn chế RCA.
 - **Phương án đã xét:**
   - Thiết kế phương pháp đồ thị trước, chạy baseline sau. Đây là cách v1 và v2 đã làm. Hệ quả: phải đi tìm chỗ đồ thị có ích, và lựa chọn thiết kế không có lý do gốc (LESSONS SL1, SL22).
-- **Kết luận phụ thuộc:** toàn bộ phần lập luận của báo cáo.
+  - Buộc mọi thành phần nối với một hạn chế P4: dễ biến yêu cầu đề tài hoặc điều kiện triển khai thành hạn chế baseline chưa có bằng chứng. Phân biệt ba loại căn cứ vẫn phải so phương án và kiểm hành vi trên dev theo MRP §3, P6; không cho phép chọn cơ chế chỉ vì hợp khung có sẵn.
+- **Bằng chứng và giới hạn:** DT18-NV2 tại `reference/sources/DT18-de-tai-va-nhiem-vu.md` §2; chuỗi nghiên cứu và năm bước tại `reference/sources/advisor-2026-09-23.md` §1; mức căn cứ tại MRP §3. Đây là căn cứ tổ chức nghiên cứu và yêu cầu thiết kế, không phải bằng chứng một cơ chế đồ thị đã hiệu quả. Hiệu quả và lợi ích do quan hệ thật vẫn phải đánh giá ở P7.
+- **Kết luận phụ thuộc:** toàn bộ phần lập luận của báo cáo và căn cứ chọn thành phần ở G2, P5–P6. RQ3 vẫn hỏi phương pháp có khắc phục các hạn chế RQ2 hay không.
 
 ## WHY-02. Vì sao hiểu "graph-based anomaly detection" theo cả nghĩa hẹp lẫn nghĩa rộng — Đã quyết (Q-36)
 
@@ -361,3 +368,404 @@ Ghi chú 05/10/2026: P3 dùng quy ước này (Q-74), xem WHY-33. Số `results/
 - **Bằng chứng:** `results/T-031/chan-doan-diem-lon.json`; `results/T-031/k-vinf.json`; REVIEW T-031 R1; bài CIRCA mục 4.2, phương trình (3), (4); code CIRCA `0215e18` `circa/alg/common.py:46–52`, `circa/alg/ci/anm.py:21–31`.
 - **Giới hạn:** phép so trên 19 ca có cỡ mẫu nhỏ hơn. 19 ca được tách theo đầu ra CIRCA trên cửa sổ A, nên không phải mẫu ngẫu nhiên. Trên dev, luật V∞ quét mọi nút có y train hằng theo sklearn: ngoài 11 nút vượt ngưỡng, 98 nút còn lại có điểm gốc ≤ 4 (`results/T-031/k-vinf.json`). Vậy cơ chế này không ẩn dưới ngưỡng ở dev. Chưa kiểm cơ chế khác (residual cỡ ulp do hồi quy khớp gần tuyệt đối). Ở 60 ca test (khóa tới G3) tách theo cùng luật > 1e10. Ở đó nhóm vượt ngưỡng chưa được xác nhận nguyên nhân.
 - **Kết luận phụ thuộc:** so sánh với CIRCA ở RQ1, RQ3; nhận định về đồ thị ở P4.
+
+## WHY-37. Đầu vào Nezha-OB — Đã quyết (Q-85)
+
+T-026 chỉ dùng 22 ca Nezha-OB dev ở chế độ biết trước cửa sổ. Minh duyệt BARO, SimpleRCA M4, MicroRank và TraceRCA; TORAI B và CIRCA được ghi UNSUPPORTED. Các lựa chọn dưới đây được khai trước số phương pháp. Giao thức V2 giữ nguyên; phần áp dụng riêng cho Online Boutique nằm ở mục này.
+
+**Chọn và lý do.** Dùng alias pod tường minh, gồm Frontend→frontend, và universe là 10 service đã quan sát. Không dùng nhãn root để chọn service, kênh hay SLI, không áp universe 68 của Train Ticket. BARO và SimpleRCA nhận 16 kênh mỗi pod cùng 5 kênh front, giữ giá trị gốc. Ba kênh Node* bị loại vì chưa có ownership để gán tín hiệu host về service; source_50, destination_50 và dependency không được dùng vì chưa có hợp đồng thời gian và ánh xạ phù hợp. BARO dùng 5 điểm N và 5 điểm A theo thứ tự từng nguồn, với Time của front làm marker chia nhóm. SimpleRCA dùng arrays riêng từng kênh và bỏ giá trị không hữu hạn theo lõi M4. Không dedup chung; số hàng lặp không phải số quan sát độc lập.
+
+TORAI B thiếu statusCode và cadence metric khoảng 60 giây không khớp stride 15 hàng. Mỗi ca/view có một bản ghi UNSUPPORTED với seed null; không giả trường, đổi stride hoặc chạy biến thể cứu. CIRCA chỉ có 1–2 phép đo thật mỗi nguồn trong khoảng train. Code loader nội suy toàn đoạn trước chia train, nên ở 19/22 ca có khoảng đuôi train có thể lấy anchor từ A. Minh chọn UNSUPPORTED để tránh dùng nền lẫn dữ liệu sau mốc; không viết wrapper per-node hay sửa loader. Chưa gọi loader trên OB để đếm số ô hiệu lực.
+
+Giữ ba bảng inject_time của Q-84. Thêm bảng độ nhạy cho MicroRank, TraceRCA và phần trace của SimpleRCA: N chỉ nhận span có end nhỏ hơn t−41 giây ngày 22/08 và t−32 giây ngày 23/08; A giữ điều kiện chia riêng của phương pháp. Khoảng bị bỏ không chuyển sang A. Đây là phép kiểm độ nhạy với lệch trace còn OPEN, không dịch đồng hồ và không xác nhận nền sạch. Kết luận ổn định hay đổi chiều phải khai theo QT3.
+
+**Phương án đã xét.** Gói phiên 3 xét ghép union 110 Time rồi điền, bảng ordinal cho BARO, arrays native cho SimpleRCA, CIRCA per-node cùng phần điền biên và thăm dò CIRCA riêng. Minh chọn ordinal/arrays, bỏ CIRCA thay vì sửa hợp đồng biên. Nội suy metric về 1 giây, suy error từ success rate, dedup chung và cứu TORAI bằng nguồn TT không được chọn vì làm thay dữ liệu hoặc cấu hình.
+
+**Bằng chứng.** Hai khối 001/002 và khối 003 ở results/T-026/kiem-dau-vao.md giữ hash, cửa sổ và thống kê. Alias, đơn vị, độ lệch ordinal và kênh nằm ở dòng 14253–14310; CIRCA và chính sách lặp ở 14318–14332. Code Nezha data_integrate.py:254–260 lấy service từ pod; RCAEval/classes/data.py:89–104 nội suy trước chia; src/p3/torai_b.py:60–78 yêu cầu statusCode và bù bin; src/torai/torai_sua.py:102–112 dùng stride 15 hàng. Quyết định nguyên văn và phạm vi phiên 4 nằm trong LOG của T-026.
+
+**Giới hạn và kết luận phụ thuộc.** Nezha-OB đo metric khoảng 60 giây, chỉ 5 điểm mỗi phía, còn RE2-TT đo 1 giây. Khác biệt khi so T-024 không được quy riêng cho đổi hệ thống. Mọi trạng thái, thứ hạng, chi phí, bảng độ nhạy và so sánh hai dataset phụ thuộc các lựa chọn này. Nền sạch, recovery, thời điểm lỗi thật và đồng bộ tuyệt đối vẫn OPEN; mẫu dev nhỏ không chứng minh đại diện cho test.
+
+
+## WHY-38. Codebook phân tích hạn chế xếp hạng chế độ (a) — Đã quyết (Minh duyệt codebook T-028 và nội dung mục này)
+
+- **Chọn:** dùng `results/T-028/codebook.md` chốt trước lượt tính bằng chứng P4. Bảng chính là RE2-TT dev30 và Nezha-OB main, sáu phương pháp với trạng thái giữ nguyên. Ca sai OK xét riêng Hit@1/Hit@5 kỳ vọng theo hòa; mức trượt kỳ vọng và non-OK báo riêng. CIRCA dev19 chỉ dòng có điều kiện Q-82; các view Nezha độ nhạy chỉ đánh dấu status/Hit đã có. Không chạy lại phương pháp.
+
+- **Vì sao:** RQ2 và yêu cầu của cô cần chỉ ra ca nào, phương pháp nào, dấu hiệu cơ chế nào. Khóa tiêu chí trước bằng chứng mới hạn chế chọn ngưỡng theo kết quả dev, nhưng không xóa được việc người làm đã thấy bảng T-024/T-026. Thống kê mọi service được ghi trước nối nhãn. Thiếu kênh/trung gian không được biến thành không có lỗi. Đối chứng đúng/sai có các quan hệ cấu trúc: M1/M2 kéo theo sai; M3 loại Hit=1; M5 True không thể xuất hiện ở ca đúng top-1; M6 SimpleRCA kéo theo sai top-1 và M6 TraceRCA kéo theo M2. Các bảng này không tự là kiểm chứng cơ chế độc lập.
+
+- **Tiêu chí và primary:** giữ đa nhãn và thứ tự M1 → M2 → M3 → M4 → M5 → M6 → M0: rào cản tập, bất định hòa, cohort lỗi đã xác nhận, rồi dấu hiệu ứng viên. Primary chỉ để trình bày, không là nguyên nhân trội hoặc chuỗi nhân quả. TORAI giữ cờ từng seed, gộp nhãn theo ca và công khai any/all/partial; không dùng Hit trung bình seed để phát hiện hòa. M4 chưa chứng minh lỗi làm tròn gây từng thất bại. M5 mô tả ancestor quan sát được chắc chắn đứng trước root, không đo đầy đủ “độ trễ lan nên caller xếp trên root”. Proxy không đổi nhóm.
+
+- **Luật cục bộ:** giữ tham số và cửa sổ native đã quyết. CIRCA xét các metric trong diagnostics.nodes sau prune; tập phải không rỗng và mọi score hữu hạn, cờ True khi tất cả RHT<3. RHT=3 đạt ngưỡng DA; metric bị loại không được coi bình thường. BARO giữ score có dấu nhưng local_nonpositive=N/A vì không có ngưỡng hoạt hóa native; TORAI cũng N/A theo giới hạn trung gian đã lưu. Trong bản ghi TraceRCA OK, M6 kéo theo M2 nên M2 là primary; chiều ngược không đúng. M6 khác nghĩa giữa các phương pháp, không dùng tỉ lệ để so mức bất thường trên một thang chung.
+
+- **Bằng chứng dữ liệu root:** đặt score/coverage BARO cạnh các thống kê root đã khai theo quy ước SimpleRCA: từng metric với số quan sát, thiếu, μ/σ và events; trace với P95N/P95A; log với số dòng A và keyword count. Đây là trình bày lại thống kê mọi service, không là luật BARO, chuẩn chung hoặc nhãn mới. RE2 giữ cửa sổ SimpleRCA; Nezha dùng arrays riêng từng nguồn, không chia lại bằng marker BARO; trace chia start, log theo timestamp. Proxy end-split giữ riêng. Không có events không chứng minh không có tín hiệu; raw metric khác đầu vào BARO sau preprocessing; log lỗi A có thể là lỗi nền.
+
+- **Proxy độ trễ:** giữ P95A>τ·P95N, τ chính 3, độ nhạy 2 và 4, cùng số quan sát/availability. Đây là span-duration, không phải end-to-end latency. Proxy chỉ là bối cảnh; không thay luật native hoặc primary. Không chia cho nền bằng 0, không đổi đồng hồ hoặc giả nền sạch.
+
+- **Đối chiếu M5:** thêm P0 làm mức nền mô tả. Với root thuộc R và graph/mapping/ranking khả dụng, đặt n=|O|, a là số proper ancestor của root thuộc O, b là số entity chắc chắn trước root theo full key/khối. Null giữ vị trí root, cấu trúc hòa/khối và L; hoán vị đều danh tính O\{root} vào mọi vị trí còn lại, gồm vị trí không trả về. P0=1−C(n−1−a,b)/C(n−1,b). So số cờ cơ sở M5 True, không phải primary=M5, với ΣP0 trên cùng tập đủ điều kiện. TORAI báo từng seed, không OR P0 hoặc coi seed là các ca độc lập. Root ngoài R hoặc dữ kiện không khả dụng cho P0=N/A; a=0 chỉ khi graph khả dụng và không quan sát ancestor. Không p-value, không ngưỡng “đáng kể”, không dùng P0 làm nhãn lan trong T-028.
+
+- **Giải thích khác và mức kết luận:** P0 giữ n/a/b và hòa, không giữ thiên hướng điểm riêng từng entity, số kênh/operation hoặc cấu trúc phương pháp. Chênh lệch có thể do lan, caller tự bất thường, tác động chung, sự cố đồng thời, cấu trúc chấm điểm, coverage/preprocessing, sai lệch cửa sổ/clock/nền/graph/mapping/nhãn hoặc dao động hữu hạn. Thành phần cohort và phụ thuộc ca/seed hạn chế khái quát hóa và đánh giá dao động. Dùng thống kê đã khai để nêu phần hỗ trợ, đã loại được hoặc chưa kiểm; không suy hướng tác động chỉ từ P95 và graph N. Lỗi triển khai xử lý theo SPEC, không gọi là cơ chế khoa học.
+
+- **Phép đo đầu ra và schema:** giữ Dice overlap kỳ vọng top-1/top-5 trên phân phối hạng chính xác, kể cả hòa khối TORAI. D0 là hoán vị đều độc lập trên đúng O từng ca, giữ chiều dài trả về. Báo D, D0, D−D0 và 1−D; cân đều cặp ô, cùng ô riêng, seed trong ca riêng. Non-OK hoặc vi phạm điều kiện ghi N/A. 1−D gồm bất định hòa; sự tập trung không chứng minh bỏ qua dữ liệu ca. Audit schema dùng raw_column_audit T-024, chỉ bảng chéo dev; không chạy L* hoặc đưa dấu vắng vào phương pháp.
+
+- **Phương án đã xét:** uniform trên cận hạng làm sai hòa khối TORAI; top-k hiển thị bỏ qua hòa; thay O bằng U làm lẫn coverage với hành vi ranking; ngưỡng chung không phản ánh tín hiệu native; một nguyên nhân duy nhất che đa cơ chế; đổi tiêu chí theo phân biệt sai/đúng gây chọn theo kết quả. Chỉ đếm M5 mô tả là phương án hợp lệ nhưng không có mức nền theo cơ hội, nên chọn bổ sung P0 có điều kiện. Dùng proxy làm điều kiện M5 sẽ đổi đối tượng đo mà vẫn chưa xác nhận lan, nên không chọn. Thêm ngưỡng BARO quanh 0 không giải quyết bằng chứng ở kênh khác, nên giữ score liên tục và bảng dữ liệu root. Không chạy can thiệp hoặc thành phần phương pháp để điền trung gian thiếu vì ngoài SPEC.
+
+- **Bằng chứng thiết kế:** giao thức V2 T-022 §5–§8; WHY-22–33/36–37; SPEC T-028 bước 2–6; bản ghi/chấm T-024/T-026; code native và hồ sơ P1 dẫn trong codebook. Biên CIRCA đối chiếu RCAEval/graph_heads/rht.py:271–277; tập metric đối chiếu src/circa_kien_truc/scoring.py:69 và src/p3/adapters/circa.py:99–101. Bộ lọc TraceRCA đối chiếu RCAEval/e2e/tracerca.py:53–93 và src/p3/adapters/tracerca.py:43–63; score BARO đối chiếu results/T-013/ho-so-baro.md:31–36. Đây là căn cứ thiết kế; số nhãn, liên hệ và ảnh hưởng sửa chưa tính tại thời điểm chốt.
+
+- **Kết luận phụ thuộc và phần còn mở:** mọi nhóm ca sai, số nhãn, bảng tín hiệu/schema và phép đo đầu ra T-028 phụ thuộc codebook này. M5/P0 riêng lẻ không xác nhận lan đáng kể. Cuối task báo toàn bộ bằng chứng kiểm được tới đâu, không chốt trước có lan hoặc không lan. Không áp cho chế độ (b), test, dataset khác, nhãn lan chính thức hoặc kết luận giá trị đồ thị. Clock/nền sạch, coverage và tính đại diện còn OPEN; can thiệp nhân quả ngoài phạm vi.
+
+- **Đề xuất chờ Minh quyết:** xem xét đặt phần tổng hợp bằng chứng còn đủ/thiếu cho câu hỏi “lan có đáng kể” trong gói trình G2; T-029 là một lựa chọn theo PLAN. Nếu Minh chọn T-029, phạm vi được trình trong SPEC T-029 để duyệt riêng. Mục này không giao trước nhiệm vụ hoặc thực nghiệm cho T-029. Không đổi “chưa xác nhận” thành “không đáng kể” hoặc coi thành phần P6 nhắm vào lan đã được P4 xác nhận.
+
+
+## WHY-39. Phân tích hạn chế phát hiện chế độ (b) — Đã quyết (Minh duyệt SPEC T-029)
+
+- **Chọn:** phân tích 90 cặp (ca, bộ phát hiện) trên 30 ca dev RE2-TT theo thiết kế khóa trong SPEC T-029: phân loại S/E/Miss; cờ cơ chế N-Sigma N1–N4 và BOCPD B1–B4 kèm độ nhạy; ba can thiệp phân tích (I1 BOCPD trên tiền tố trước mốc, I2 như I1 với hazard 1/250, I3 RCA tại báo động đầu tiên sau mốc); định vị theo báo động đầu sau mốc của từng dịch vụ; kiểm nhãn proxy và schema; bảng chế độ (a) so với (b).
+- **Vì sao:** MRP P4 và Q-30 yêu cầu phân tích hạn chế phát hiện như phân tích xếp hạng. T-025 cho thấy báo động đầu thường trước mốc nhưng chưa kiểm cơ chế. Cờ mô tả chỉ cho liên hệ; I1/I2 tách ảnh hưởng của dữ liệu sau mốc qua tiền xử lý, và của hazard, lên báo động trước mốc, vì posterior BOCPD ở i chỉ dùng dữ liệu ≤ i. I3 cho chênh có dấu theo từng ca giữa ba điểm chạy. Phép thử giả tại điểm không báo động ngăn gọi một cờ phổ biến là lời giải thích (áp cho B1, B4).
+- **Ngưỡng:** N1 hai lần, N2 10·p0 với p0 = 0,0027, B4 bước nhảy chuẩn hóa MAD ≥ 3 với w = 30 s, đoạn MAD tối thiểu 30 điểm, dung sai điểm đổi ±5 s. Đây là quy ước phân tích, chưa kiểm; độ nhạy khai trước (N1 1,5/3; N2 5/20·p0; B4 2/5 và w 15/60; ±2/±10 s). Hazard 1/250 lấy từ giá trị có trong code tác giả, không chọn theo nhãn.
+- **Dùng nhãn:** mốc 720 giống nhau ở mọi ca nên dùng từ đầu; root, loại lỗi, ô nối sau khi đặc trưng đã lưu. I1–I3 dùng mốc để cắt dữ liệu hoặc chọn báo động: là phân tích, không là phương pháp, không thay số P3.
+- **Phương án đã xét:** chỉ đếm mô tả từ T-025 (rẻ nhưng không tách được cơ chế); chạy lại BOCPD đầy đủ với hazard mới (tách thêm ảnh hưởng lên độ trễ, nhưng khoảng 2,3 giờ EC2; để sau nếu Minh cần); chỉnh ngưỡng N-Sigma (là tinh chỉnh bộ phát hiện trên dev, không phải phân tích hạn chế); định vị BOCPD bằng bỏ từng cột (d lần chi phí, không chọn).
+- **Bằng chứng thiết kế:** giao thức V2 §4, §7, §10; `src/p3/adapters/phat_hien.py`; `results/T-013/ho-so-bocpd.md`, `ho-so-nsigma-phat-hien.md`; `results/T-025/phat-hien.md` §3–§5.
+- **Kết luận phụ thuộc:** bản đồ hạn chế phát hiện, phần phát hiện của gói G2 và mọi lựa chọn P6 trỏ về HP-n của T-029. Không áp cho test, Nezha, chế độ online hay nền khác 720 s. Thứ tự báo động đầu sau mốc không phải bằng chứng nhân quả hay nhãn lan.
+
+
+## WHY-40. Lần theo nguyên nhân thất bại xếp hạng — Đã quyết (Minh duyệt SPEC T-032 ngày 09/10/2026)
+
+**Chọn:** đọc code/trung gian trước; phát lại đúng phần thiếu tại F đóng băng; khóa nhóm bắt buộc từ cờ đa nhãn/non-OK, đọc đơn vị không trùng với đối chứng cùng điều kiện, lập trạng thái từng ca M5 và khả năng đo chờ. Đối chiếu khác phương pháp chỉ bổ sung bằng chứng kênh. A′ đã được Minh chọn trong thiết kế: giữ J0, so W-native với W-unit tại đầu vào spectrum; chưa là quyết định chạy.
+
+**Vì sao:** phải biết bước nào tạo mất thông tin hoặc chênh điểm trước khi đề xuất xử lý. Caller đứng trên root hoặc duration tăng không phân biệt chờ phụ thuộc, xử lý tại caller, coverage và cách tính điểm.
+
+**Phương án đã xét:** đọc mỗi k/cờ như ca độc lập (lặp công và dễ đếm trùng), chỉ đọc một ca rồi suy cả nhóm (thiếu coverage), dùng phương pháp khác xếp đúng thay đối chứng (khác kênh/công thức), can thiệp mọi phương pháp hoặc hạ duration/xóa caller (đổi nhiều yếu tố, dễ cho kết quả hiển nhiên), xáo trace TraceRCA giữ counts (bất biến theo công thức). Chọn ánh xạ nhóm và lõi toàn bộ, kèm A′ chỉ đổi toàn gói trọng số MicroRank trên J0. Đã xét J một cặp và batch cặp rời: điều kiện giữ số trace N/A và đổi partition giới hạn phép đổi vào sole-trigger bundle; không thay đồng bất thường giữa các operation khác nhau, nên bỏ khỏi thiết kế. B không can thiệp đã được xét nhưng không được chọn; giữ counts/nhóm gốc và đổi W cho câu hỏi trọng số cụ thể, không nhận phân xử toàn bộ caller/root. Đã xét thêm chạy toàn bộ P1/P2 trước khi hiểu bước chấm; đặt nhãn lan/tự sinh theo tỷ lệ duration; chỉ đọc đầu ra đã lưu. Lưới cửa sổ chưa tự phân xử cơ chế; tỷ lệ duration không xác định semantics chờ; chỉ đọc có thể thiếu trung gian ở bước quyết định. Phát lại giới hạn đúng phần thiếu và kiểm khớp giữ được câu hỏi mà giảm chi phí.
+
+**Bằng chứng:** MRP P4, DT18-NV2/NV3, hướng dẫn cô §1 và đường tính trong code phương pháp ở revision đã tạo P3. Chưa có kết quả task này; lựa chọn là kế hoạch kiểm, không xác nhận giả thuyết.
+
+**Kết luận phụ thuộc:** căn cứ cơ chế tính toán/ứng viên P5–P6, đầu vào K4 của tổng hợp G2 và yêu cầu quan sát FlashTicket; nguyên nhân vật lý và lợi ích đồ thị vẫn cần bằng chứng tương ứng. A′ được chọn không biến câu còn mở thành đã xác nhận. Chỉ phép so toàn gói weighting được hỗ trợ; không quy riêng cạnh/prior hoặc nguồn vật lý của counts. Có thể có tương tác với nhánh thiếu support và operation đạt max service, phải lưu trung gian. Khi phần lõi chưa phân xử caller/root, trình đúng bằng chứng/phép kiểm cần bổ sung và lựa chọn phụ thuộc; không dừng ở OPEN. Không chọn nhánh/ca theo tăng hạng root, không thêm seed/ngưỡng mới. Margin chuẩn hóa để so chênh có dấu giữa ca có thang điểm khác nhau, vẫn giữ điểm thô/mẫu số 0. Đây không là ngưỡng lan hoặc lựa chọn theo accuracy. Chỉ nối mục này vào docs/WHY.md khi Minh duyệt thực hiện đúng nội dung.
+
+
+## WHY-41. Lần theo cơ chế phát hiện — Đã quyết (Minh duyệt SPEC T-033 ngày 09/10/2026)
+
+**Chọn:** xác minh lõi native full/FF/I1 theo trạng thái nguồn, kể cả tái lập non-OK, trước; khóa nhóm/đối chứng và ánh xạ ca; phân rã mask × nguồn min/max trên tiền tố, lần theo độ trễ full và contrast ngưỡng N-Sigma cập nhật/cố định trước proxy. D chuyển sang kiem-tiep, chưa chạy. Nhánh mới là chẩn đoán; không chọn detector online hoặc đổi số P3.
+
+**Vì sao:** cờ/số CP không chỉ bước gây báo; full/I1 đổi nhiều yếu tố. Giữ mask để so scale, giữ nguồn scale để so gói cột/d/prior, báo tương tác để không gán tổng effect cho một phần. Full cần cho trạng thái sau proxy; ngưỡng cố định cùng k native kiểm tác động cập nhật lịch sử, không chứng minh nền sạch. Đặt độ lệch sau proxy cạnh mật độ báo trước và chuỗi cờ qua proxy để không gọi báo đang tiếp diễn là vừa phát hiện sự cố; không thêm ngưỡng. Giữ raw prefix/mask/d/prior thì contrast nguồn scale/fill là khác biệt xử lý, không tự là thay đổi thật của hệ thống; đo đường likelihood/posterior/CP, không buộc đầu vào khác phải đổi CP. Tái dùng FF từ full giảm chạy trùng khi invariants đạt.
+
+**Phương án đã xét:** chỉ so số CP (không chỉ bước); chỉ tiền tố (không giải thích sau proxy); thay prior ở khác chiều như cùng mô hình (không định nghĩa duy nhất); zero-padding hoặc thêm epsilon để đủ factorial (đổi phép tính và có thể tạo kết quả hiển nhiên); chạy surrogate rộng (thay nhiều thuộc tính); chọn D để báo hiệu quả (không có onset/end thật). Chọn native full + thiết kế hai yếu tố có giới hạn, giữ phần không tách được. Đã xét loại mọi range0/d0/input trùng/lỗi khỏi contrast: làm mất khác biệt xử lý hợp lệ hoặc biến không có khác biệt thành thiếu bằng chứng; thay bằng bốn trạng thái riêng, giữ output/lỗi native và mẫu số. Không chữa native để có effect. Không bắt mọi yếu tố phải tách độc lập mới cho phép báo căn cứ có điều kiện.
+
+**Bằng chứng:** MRP P4, DT18-NV2/NV3, hướng dẫn cô §1, code detector ở revision đã chạy và nguồn đóng băng T-025/T-029. Chưa có kết quả task này; đây là kế hoạch kiểm, không xác nhận giả thuyết.
+
+**Kết luận phụ thuộc:** căn cứ thành phần tiền xử lý/detector P6 và giới hạn đánh giá; mask/d/prior chưa tách, nhánh prefix/full đều còn nhìn trước, onset thật chưa biết. Các quy tắc native, factorial, ngưỡng cố định từ [:i_proxy] và chỉ số CP/m/delay là lựa chọn chẩn đoán khai trước; không có ngưỡng Late hoặc surrogate chọn từ accuracy. Cơ chế tính toán không tự xác nhận thay đổi vật lý, nền sạch hoặc ưu thế causal detector; thành phần hiệu chỉnh còn OPEN nếu chưa phân xử. Chỉ nối mục này vào docs/WHY.md khi Minh duyệt thực hiện đúng nội dung.
+
+
+## WHY-42 — Ngoại lệ phát lại MicroRank trong T-032 (Minh duyệt 10/10/2026)
+
+**Chọn:** Chỉ trong T-032/MicroRank, chấp nhận sai lệch float64 của score operation/service khi đồng thời ≤16 ULP biểu diễn và ≤16×2^-52 tương đối, không absolute floor; giữ exact trạng thái, mapping/tập ứng viên, thứ tự và partition hòa service, Hit@1..10 và toàn cờ M của T-028. Operation đảo chỉ trong cùng service, sát ngưỡng ở cả hai output và không làm đổi tổng hợp trong cùng output; không ép gần điểm thành hòa. Native–observed vẫn exact. Khóa ngưỡng trước bảng 30 RE2+22 Nezha, báo max ULP/relative từng ca; vượt thì dừng/trình, không tăng.
+
+**Vì sao:** Ca pilot đã kiểm source/hash cho thấy native–observed exact nhưng native–frozen có lệch nhỏ ở số và thứ tự operation cùng service. Khớp byte toàn điểm giữ cho phát lại khác nền tảng chưa thực hiện được; chấp nhận sai lệch rộng hoặc chỉ so top1/top5 có thể che thay đổi service/nhóm hòa/cờ dùng trong phân tích. Comparator hẹp giữ các quyết định chấm và khoảng cách định lượng tới ngưỡng, không hợp thức hóa lỗi thuật toán.
+
+**Phương án đã xét:** (1) Giữ exact và xử lý môi trường để tái lập nguồn; vẫn hợp lệ nhưng chưa xác định thành phần gây drift. (2) Phát lại laptop Windows/Python nguồn với exact; giảm khác nền tảng, cần quyền ngoại lệ EC2-only và đo RAM/thời gian capture toàn52, không bảo đảm exact. (3) Tolerance tuyệt đối chung hoặc bỏ thứ tự operation; không chọn vì có thể che thay đổi gần zero, giữa service hoặc trạng thái hòa. (4) Chỉ chấp nhận comparator hẹp khi score và các invariant đầu ra đều đạt; Minh chọn phương án này, không áp phương pháp khác.
+
+**Bằng chứng và phần chưa kiểm:** runs/tiep-tuc-003/microrank-numeric-audit.json#/native_observed_exact, /float_exact_count, /other_difference_count, /max_absolute; native_vs_frozen/differences ở diagnostic-check. Hai đầu transfer/source hash đã kiểm. Ngưỡng là lựa chọn kiểm kỹ thuật sau khi đã thấy pilot, chưa là cận sai số lý thuyết hay bằng chứng nguyên nhân nền tảng. Bảng52/comparator/benchmark và khớp Hit/cờ M chưa chạy. Frozen P3 thiếu mask/partition lịch sử; counts bằng nhau không đủ chứng minh từng membership lịch sử bằng nhau.
+
+**Kết luận phụ thuộc:** Chỉ các ca qua toàn hợp đồng được dùng trung gian mới cho phân tích MicroRank. Đạt comparator không tự xác nhận cơ chế vật lý, partition lịch sử hoặc lợi ích đồ thị; A′ vẫn cần đầy đủ lõi/khóa mẫu/nhóm N/A/invariant của SPEC. Ca đổi service order/hòa/chấm hoặc vượt số phải dừng MicroRank/A′ và trình. Các phương pháp khác giữ exact. Quyền thực hiện và kết quả kiểm tách riêng; chưa dùng lựa chọn này trong báo cáo trước Minh duyệt WHY.
+
+
+## WHY-43 — Phát lại MicroRank trên laptop bằng khớp tuyệt đối (Minh duyệt 10/10/2026, Q-124)
+
+**Chọn:** Minh đã quyết theo Q-124 ngày 10/10/2026 phát lại MicroRank đủ 30 RE2-TT và 22 Nezha-OB trên laptop nguồn bằng khớp tuyệt đối, không dung sai: một ca diagnostic đã có được audit hồi cứu, 51 ca mới; mỗi ca một native, native exact frozen mới một observed, observed exact native/frozen và toàn source/capture/mapping/count/operation/service/tie/Hit/cờ T-028 qua bridge v3. Pilot Nezha đo trước phần còn lại; mọi khác số hoặc kiểm không đạt dừng toàn nhánh. Minh đã duyệt theo Q-124 ngày 10/10/2026 mở rộng ngoại lệ EC2-only/current-thread Q-97/Q-100 chỉ cho phạm vi này, local4GiB/tổng12GiB/trần gói3giờ máy/2,5GiB mới và giữ gate RAM. Lựa chọn này đã quyết theo Q-124 ngày 10/10/2026, không thay Q-94; Q-111 đã rút Q-104, không dùng ngưỡng1e-9. Không dùng ca bị chặn và không chạy A′ trước đầy đủ lõi SPEC.
+
+**Vì sao:** Ca từng vượt ngưỡng trên EC2 nay khớp tuyệt đối native–frozen và observed–native/frozen trên laptop hiện tại. Điều đó hỗ trợ thử nhánh exact ở máy vừa tái lập được ca ấy, đồng thời giữ nguyên mọi quyết định chấm và không nới tiêu chí sau kết quả. Nó chưa xác định thành phần gây drift, chưa bảo đảm ca khác sẽ exact và không biến laptop thành môi trường lịch sử đã khôi phục đầy đủ. Cần trung gian từng ca khớp để lần theo membership/own abnormal/context-only, counts, spectrum và caller/root; không lấy thành công của phép phát lại làm lời giải cơ chế.
+
+**Phương án đã xét:** (1) Full52 laptop exact với trần local4GiB, giữ tổng12GiB, benchmark Nezha và checkpoint; Minh chọn theo Q-124 ngày 10/10/2026 vì một diagnostic cung cấp bằng chứng khả thi của exact, nhưng dự toán còn ngoại suy. (2) Giữ local2GiB, chuyển chunk đã đóng sang EC2/hash2đầu rồi đổi nơi lưu: có thể giữ dung lượng máy, nhưng cần quyền cụ thể, đo transfer và cách audit; không tự xóa lượt cũ hoặc coi bản sao không tính trần. (3) Chỉ benchmark một Nezha rồi trình dự toán lại, chưa quyền cohort còn lại: rẻ và giảm bất định trước cam kết nhưng MicroRank/G2/A′ tiếp tục thiếu lõi. (4) Tiếp EC2 bằng tiêu chí số mới hoặc bỏ ca vượt: chưa được Minh duyệt, không dùng. Giữ Q-94 không làm ca vượt ngưỡng hợp lệ. Không suy can thiệp thread/OS sẽ sửa drift khi chưa có phép phân xử thành phần ấy.
+
+**Bằng chứng và phần chưa kiểm:** `results/T-032/runs/microrank-laptop-diagnostic-verification-001/check.json#/status` là PASS_SINGLE_CASE_EXACT_DIAGNOSTIC; `/native_observed_frozen_exact` và `/source_input_import_function_hook_checks_passed` true; `/verified_files` giữ 77 artifact đã kiểm hash, `/closed_sha256` và `/controller_sha256` ràng buộc manifest/controller; `/pids_checked_gone` xác nhận kết thúc. `/wall_s=99,6289197` giây; `/mode_summaries/native/cost` là worker7,391556s/peak1.255,56640625MiB; `/mode_summaries/observed/cost` là worker31,634068s/peak1.522,27734375MiB; `/new_bytes_closed=30.669.327`. Ngoại suy riêng chi phí 51 ca là84,6846phút và1.564.135.677B mới, không là upper bound. Chưa đo Nezha/ca lớn, chưa đủ audit bridge v3 cho ca laptop hoặc52ca, chưa có toàn bảng ULP/relative/invariant. Diagnostic `/intermediates_eligible_for_report`, `/cohort_authorized`, `/a_prime_authorized` đều false; không đổi chúng bằng diễn giải.
+
+Môi trường laptop hiện tại được ghi ở `results/T-032/runs/microrank-laptop-diagnostic-001/environment.json`: Python3.12.10/package nguồn, hashseed0 và năm biến thread unset; `/threadpools_current` ghi OpenBLAS hiện16threads. `/source_thread_status=OPEN` và `/current_values_are_historical_evidence=false`; không biết thread/partition lịch sử. Khớp counts hay record không chứng minh membership lịch sử từng trace bằng nhau nếu nguồn không lưu mask. Chưa phân xử drift do Python/OS/BLAS/thứ tự số học hoặc thành phần khác; một ca laptop exact không chứng minh riêng “lỗi EC2”, “lỗi Linux” hay “lỗi thread”. Pipeline observer đã exact với native ở ca này, nhưng cơ chế và eligibility của ca khác vẫn phải kiểm riêng. Giới hạn đo peak tree theo poll có thể bỏ đỉnh ngắn; không dùng peak một ca để hạ gate RAM.
+
+LOG T-032 tại mốc16:25:58 ngày10/10 ghi local992.372.033B trước diagnostic và EC2 3.743.441.061B. Cộng diagnostic closed cho local xấp xỉ1,023GB; cộng ngoại suy51ca vượt2GiB. Đây là inventory cũ cộng chi phí, không phải đo tổng hiện tại; phải đo lại cả local/EC2/tạm/lượt hỏng trước lượt lớn. Vì vậy trần local4GiB đã được Minh duyệt theo Q-124 ngày 10/10/2026, chỉ áp trong đúng phạm vi quyết định này. Nếu pilot/dự toán mới vượt3giờ/2,5GiB mới/local4GiB/tổng12GiB hoặc gate RAM không đủ, dừng trình; không tăng ngân sách hoặc giảm kiểm để hoàn tất bảng.
+
+**Kết luận phụ thuộc:** Minh đã duyệt phạm vi chạy theo Q-124 và nội dung đoạn WHY này ngày 10/10/2026; chỉ sau từng ca đạt đầy đủ exact/source/capture/T-028/invariant, trung gian laptop mới được dùng trong phân tích MicroRank. Lõi toàn phương pháp còn phụ thuộc đủ52bảng, nhóm/đối chứng/caller-root theo SPEC; ca non-OK exact vẫn được giữ với đúng N/A, không cấp điểm/membership không tồn tại. Full52 exact, nếu đạt, chỉ xác nhận tái lập các đầu ra trong điều kiện hiện tại; không khôi phục partition lịch sử, không chứng minh nguyên nhân vật lý caller/root hoặc lợi ích quan hệ. A′ vẫn cần toàn điều kiện lõi/khóa mẫu/nhómN/A/sham/invariant của SPEC và quyền cũ, không được kích hoạt bởi một diagnostic hay một pilot. Các phương pháp khác giữ tiêu chí riêng/exact; ngoại lệ này không áp CIRCA. Nếu benchmark/cohort làm thay đổi bằng chứng hoặc dự toán, trình đoạn bổ sung cho Minh duyệt, không sửa WHY-42 hoặc tự nâng trạng thái cơ chế/RQ2/G2.
+
+Bổ sung 10/10/2026 (Q-126): trần gói đổi thành 5 giờ máy; cổng RAM 4.554.752.000 byte thay bằng quy tắc dừng khi không đủ RAM cho worker hoặc RAM hệ thống đạt 95%.
+
+
+## WHY-44 — Các phép đổi tất định của T-032 (Minh duyệt nối ngày 11/10/2026)
+
+Nguồn nguyên văn: `results/T-032/thiet-ke-phep-doi-001.md` mục 11 và `results/T-032/thiet-ke-phep-doi-002.md` mục 5; chi tiết từng phép nằm trong hai file đó.
+
+**Chọn:** ngoài A′, thêm các phép đổi tất định M-C1, M-D, T-D, B-1, K-1, K-2 như trên; SimpleRCA dùng phân rã cộng, không can thiệp; TORAI B định sau khi có trung gian.
+
+**Vì sao:** P4 đòi chỉ ra bước làm mất hoặc đánh giá sai thông tin. Quan sát chênh lệch ở một bước chưa cho biết bước đó có làm đổi hạng hay không. Đổi đúng một bước trên trung gian đã khớp, với dự đoán ghi trước, phân biệt được hai giải thích dẫn tới hai hướng thiết kế khác nhau.
+
+**Phương án đã xét:** chỉ đọc bảng và đối chứng (không phân biệt được "nơi chênh xuất hiện" với "bước gây đổi hạng"); hạ duration hoặc xóa caller theo nhãn (dùng nhãn, kết quả hiển nhiên; WHY-40 đã bác); đổi nhiều bước cùng lúc (không quy được cho bước nào); chạy lại bộ chia trace của bài MicroRank gốc (cần quyết định adapter về thời lượng của cả trace, để riêng).
+
+**Bằng chứng:** code ở các file đã dẫn; chưa có kết quả. Đây là kế hoạch kiểm, không phải xác nhận giả thuyết.
+
+**Kết luận phụ thuộc:** phần "hạn chế thuộc giả định/cách tính" của bản đồ P4 và căn cứ đề xuất ứng viên P5–P6. Nguyên nhân vật lý và lợi ích của đồ thị vẫn cần bằng chứng riêng.
+
+**Bổ sung theo bản 002.** **Chọn thêm:** B-2 (thang độ lệch chuẩn cho BARO) và S-1 (đếm theo cột cho SimpleRCA). **Vì sao:** hai bảng mô tả cùng chỉ về một ứng viên là chuẩn hóa hoặc đếm theo độ biến thiên nền; cần phép đổi để phân biệt "nơi chênh xuất hiện" với "bước làm đổi hạng". **Phương án đã xét:** đặt sàn cho IQR (phải chọn giá trị, tùy ý); bỏ hẳn cột mem (đổi tập kênh, mất cả tín hiệu của root); chỉ mô tả (không phân xử). **Giới hạn:** hai phép được nghĩ ra sau khi xem dữ liệu dev, nên kết quả chỉ là bằng chứng trên dev cho ứng viên, không phải kiểm định độc lập.
+
+
+## WHY-45 — Bảng mô tả, phép đổi thêm và gói bổ sung của T-032 (Minh duyệt ngày 11/10/2026)
+
+Nguồn nguyên văn: results/T-032/thiet-ke-bang-mo-ta-004.md, thiet-ke-phep-doi-003.md, -005.md, -006.md, goi-bo-sung-007.md.
+
+**Chọn:** (1) bốn bảng mô tả không gọi phương pháp, nối nhãn sau cùng: vị trí tín hiệu của root trong trace; xu hướng nền của cột metric; cấu tạo thời gian của lời gọi; tỷ lệ lời gọi chậm theo cạnh. (2) Mốc đếm: cờ theo mean + 3·std của nền; lời gọi chậm là vượt phân vị 95 của chính cạnh ở nền; chỉ xét cạnh có từ 20 lời gọi mỗi phía; mốc báo cáo 50% và 20%. (3) Tiêu chí mức đo được "dịch vụ gọi chờ root" theo ca: có cạnh đủ lời gọi; ở nền, span phía được gọi dài hơn span phía gọi ở không quá 1% lời gọi; mọi chỗ gọi trong mã nguồn là lời gọi chặn ở mọi phiên bản ứng viên. (4) Phép thử giả bằng mốc lùi vào đoạn nền. (5) Phép đổi thêm: bỏ cạnh theo loại ở CIRCA; bỏ cột log ở TORAI B; bộ chia trace theo bài MicroRank gốc. (6) Bảng vị trí trên chuỗi gọi của thực thể đứng trên root; bảng nối lời gọi chậm với span mang cờ; phát lại TORAI nguồn A có quan sát.
+
+**Vì sao:** P4 đòi chỉ ra thông tin của root nằm ở đâu, bước nào làm mất nó, và quan hệ giữa dịch vụ bổ sung được gì. Thứ hạng và cờ không trả lời được; cần bảng theo vị trí và phép đổi đúng một bước.
+
+**Phương án đã xét:** chỉ dùng thứ hạng và cờ (không cho biết vị trí tín hiệu); so trung vị từng phần của lời gọi (che mất ca có hai nhóm lời gọi chậm); ngưỡng cố định theo mili giây (phụ thuộc cạnh); định nghĩa nhãn lan (SPEC không cho); hỏi tác giả về phiên bản Train Ticket (Minh chọn chấp nhận giới hạn).
+
+**Bằng chứng:** results/T-032/ket-qua-phien-10.md cho phần đã chạy. Phần của gói bổ sung chưa có kết quả, là kế hoạch kiểm.
+
+**Giới hạn:** định nghĩa vị trí, mốc đếm và phép đổi thêm đều đặt sau khi đã xem kết quả dev trước đó, nên chỉ là bằng chứng trên dev cho ứng viên. Các mốc 20 lời gọi, phân vị 95, 50% do người làm đặt; số thô được lưu. Bộ chia trace theo bài gốc cần một quy ước lấy thời lượng cả trace, chưa kiểm.
+
+**Kết luận phụ thuộc:** bốn đầu ra đầu của P4 trong T-032; mức đo được theo ca; căn cứ đề xuất ứng viên P5–P6. Lợi ích của đồ thị vẫn cần đánh giá riêng.
+
+
+## WHY-46 — Bản sửa việc 4 và các bảng thêm của gói bổ sung T-032
+
+Nguồn nguyên văn: results/T-032/goi-bo-sung-007.md phần "Bản sửa việc 4"; thiet-ke-phep-doi-009.md; thiet-ke-vi-tri-chuoi-goi-008.md; thiet-ke-kenh-metric-010.md.
+
+**Chọn:** (1) Bộ chia trace gọi là "công thức của bài MicroRank gốc với span đầu do ta quy ước": span đầu là span khai báo không có cha; chạy riêng hai luật (bài: mức nền cộng 1,5 lần độ lệch chuẩn; code chia nhóm: cộng 1 lần, thêm 50 ms); mức nền theo code gốc; đếm trước, ca dưới 90% trace có đúng một span đầu ghi N/A. (2) Bảng vị trí trên chuỗi gọi báo hai mốc nền: mọi ứng viên, và chỉ thực thể có span. (3) "Span chờ root": span vượt ngưỡng bao một lời gọi chậm tới root chiếm từ 50% phần vượt. (4) Bảng tỷ lệ so với số tuyệt đối của TraceRCA. (5) Bảng cột metric thắng theo vị trí và lưu lượng.
+
+**Vì sao:** dữ liệu không có nhãn loại span nên không chạy được đúng bộ chia gốc; P4 cần biết sai lầm có nằm dọc chuỗi gọi không và span nào tạo điểm.
+
+**Phương án đã xét:** hệ số 1,5 cho cả hai luật (sai với code); trừ phần được span con che (khác code gốc, làm mất đẳng thức với thời lượng span đầu); coi mọi span mất cha là span đầu (hồ sơ P1 cấm); một mốc nền duy nhất (làm tỷ số phình vì thực thể không có span).
+
+**Bằng chứng:** results/T-032/ket-qua-phien-11.md. Hai nhánh của (1) chưa có kết quả.
+
+**Giới hạn:** (2) phần "chỉ thực thể có span" và (4) thêm sau khi đã xem kết quả; các mốc 90%, 50%, phân vị 95 do người làm đặt; mọi số là bằng chứng trên dev.
+
+**Kết luận phụ thuộc:** phân loại hạn chế của MicroRank, TraceRCA, TORAI trong bản đồ P4; căn cứ đề xuất ứng viên P5–P6.
+
+
+## WHY-47 — Hai phép kiểm ngoài gói cho TraceRCA và kết quả việc 4 của T-032
+
+Nguồn nguyên văn: results/T-032/thiet-ke-phep-doi-011.md; thiet-ke-phep-doi-009.md.
+
+**Chọn:** (1) Phép đổi công thức điểm của TraceRCA bản thư viện: giữ cờ từng span và tập ứng viên, thay điểm 2a/(n + H) bằng tỷ lệ a/n (có và không có mốc 20 span) và bằng số tuyệt đối a. (2) Bước xếp hạng của bài TraceRCA gốc, cài theo lời văn của bài: lời gọi theo cặp dịch vụ, một đặc trưng là độ trễ, nền trước mốc, ngưỡng 1 lần độ lệch chuẩn (thêm nhánh 3 lần), tập dịch vụ theo support 10% và chỉ số Jaccard, điểm trong tập là trị tuyệt đối của hiệu số trace có lời gọi bất thường vào và ra. (3) Ghi nhận hai nhánh chia trace của WHY-46 điểm (1) nay đã có kết quả.
+
+**Vì sao:** (1) biến quan sát "điểm nghiêng về số tuyệt đối" thành kết quả can thiệp; (2) kiểm phương án dùng cạnh gọi có sẵn trong tài liệu trước khi đề xuất ứng viên mới cho P5–P6.
+
+**Phương án đã xét:** chạy mã của tác giả TraceRCA (cần định dạng dữ liệu riêng, chưa dựng); thêm metric tài nguyên làm đặc trưng (hai dataset không cùng dạng); chỉ ghi quan sát, không can thiệp.
+
+**Bằng chứng:** results/T-032/ket-qua-phien-11.md mục 4.2, 8, 9.
+
+**Giới hạn:** (2) không phải mã của tác giả và không tái lập bài gốc; cả hai phép được nghĩ ra sau khi xem kết quả dev; nhánh 3 lần độ lệch chuẩn thêm sau khi thấy kết quả phép (1).
+
+**Kết luận phụ thuộc:** phân loại hạn chế của TraceRCA và MicroRank trong bản đồ P4; lập luận "phép tính dùng cạnh gọi phải giữ hướng của cạnh" khi đề xuất ứng viên P5–P6.
+
+## WHY-48 — Các phép kiểm còn lại của T-032 (bản thiết kế 012 và 013; Minh duyệt ngày 11/10/2026, Q-141)
+
+Nguồn nguyên văn: results/T-032/thiet-ke-phep-doi-012.md; results/T-032/thiet-ke-phep-doi-013.md.
+
+**Chọn:** (1) MicroRank, phép ghép: bộ chia trace theo bài gốc cùng lúc với số đếm riêng của nhóm bất thường (KT-3). (2) Bốn ca dừng vì thao tác không có ở đoạn nền: bỏ span của thao tác đó rồi chạy mã native, cho cả MicroRank và TraceRCA; đây là đổi đầu vào, kết quả không thay số đã chấm (KT-8). (3) CIRCA, bước DA: mô tả trên trung gian đã lưu phần được cộng cho từng nút và nút nguồn của nó (KT-15). (4) Mốc giả trên bảng span RE2-TT: so mốc thật với mốc giả ở cùng độ dài cửa sổ (150 giây và 100 giây, hai vị trí mốc giả), cho tỷ lệ trace bất thường và tỷ lệ span mang cờ theo thao tác (KT-1, KT-2). (5) Chuỗi cột độ trễ của root ở ba cặp ca cùng ô, lấy đúng bảng metric mà BARO nhận, đối chiếu với lời gọi chậm tới root (KT-12). (6) Bảng nối theo cây span cho nhánh ghép của MicroRank: thao tác cao nhất của thực thể đứng đầu có bao lời gọi chậm tới root hoặc span mang cờ của root không, so với mức nền của chính thao tác và với dịch vụ khác. (7) CIRCA, hai nhánh chẩn đoán cửa sổ: học trên 291 điểm thay cho 111; chấm 10 điểm ngay sau mốc thay cho 10 điểm cuối; mỗi nhánh kèm nhánh không cạnh để tính tỷ số điểm có cạnh trên không cạnh (KT-9).
+
+**Vì sao:** sau phiên 12 còn các câu "vì sao" có cách kiểm rẻ trên dữ liệu đã có: phần MicroRank chưa giải thích sau khi thay bộ chia; cờ ở trace và thao tác không gắn với root là mức tự nhiên hay do sự cố; cột độ trễ của root phản ứng không đều; việc hồi quy theo nút cha làm tăng điểm là do lựa chọn cửa sổ hay do cách tính. Trả lời được thì bản đồ hạn chế P4 tách được phần thuộc cách tính, phần thuộc giao thức và phần thuộc dữ liệu.
+
+**Phương án đã xét:** so mốc giả với mốc thật ở cửa sổ 300 giây (không làm được: trước mốc chỉ có 300 giây dữ liệu, nên dùng cửa sổ bằng nhau 150 và 100 giây); chỉ kiểm thao tác cao nhất theo tên (đã làm, không thấy lời gọi gián tiếp, nên thêm cây span và độ đặc hiệu); tính điểm TraceRCA của bốn ca từ số đếm thay vì gọi mã native (bỏ, vì gọi mã native giữ được bước lọc của adapter); chạy lại CIRCA với nhiều cặp cửa sổ (bỏ, hai nhánh đủ tách hai giải thích đã nêu); so hạng root giữa các nhánh cửa sổ của CIRCA (không dùng làm mốc, vì lỗi có thể chưa hiện trong 10 giây đầu); không chạy gì và giữ các câu ở trạng thái mở.
+
+**Bằng chứng:** results/T-032/ket-qua-phien-12.md cho (1)–(3). Các phép (4)–(7) chưa có kết quả khi ghi mục này; kết quả sẽ ở results/T-032/ket-qua-phien-13.md.
+
+**Giới hạn:** mọi phép là chẩn đoán trên 52 ca dev, nghĩ ra sau khi đã xem kết quả dev; các mốc đọc do người làm đặt trước khi chạy và không phải ngưỡng của phương pháp; (1) đổi hai bước cùng lúc; (2) và (7) đổi đầu vào hoặc cửa sổ đã khóa nên chỉ là nhánh chẩn đoán; (4) dùng cửa sổ ngắn hơn giao thức và chỉ làm được ở RE2-TT; (5) chỉ ba cặp ca; (6) dựa trên rất ít trace bất thường ở Nezha-OB. Dự đoán của (3) và (6) viết sau khi đã thấy một phần dữ kiện, ghi rõ trong file thiết kế.
+
+**Kết luận phụ thuộc:** phân loại nguồn hạn chế (cách tính, giao thức, dữ liệu) của MicroRank, TraceRCA, CIRCA và kênh metric trong bản đồ P4; cách ghi bốn ca ERROR ở bảng G2; căn cứ đề xuất ứng viên P5–P6 (tiêu chí trace bất thường, bước lan điểm, hồi quy theo cấu trúc). Không kết luận nào về hiệu quả của phương pháp mới hay về tập test phụ thuộc vào mục này.
+
+## WHY-49 — Phân xử các câu còn giá trị T-032 trong gói bổ sung chung
+
+Minh cho thực hiện theo Q-144. Thiết kế chi tiết trước kết quả: results/T-032/runs/bo-sung-toan-dien-20261012-001/t32/design.md và README gói; file cũ chỉ đọc.
+
+**Chọn:** matched windows/đại lượng nền và sau mốc cho return/exception, tính mọi dịch vụ trước nối nhãn; MicroRank lưu đầy đủ partition→graph→W→counts→DStar→service-max, can thiệp W×counts ở cùng support đủ điều kiện, đối chiếu native/M-D/nhánh ghép và ca đúng; CIRCA giữ tập nút và cha để tách độ dài học khỏi vị trí học/phân phối và giai đoạn chấm; probe định vị tín hiệu trên cạnh so owner-span, giữ dấu và báo missing; kiểm mã tác giả TraceRCA và TORAI A nếu dữ liệu cho phép. Phép cũ đã hợp lệ tái dùng.
+
+**Vì sao:** các nhánh trước đổi nhóm trace hoặc cửa sổ nên chưa quy riêng trọng số/đếm, đáp ứng do lỗi, nguyên nhân độ nhạy hoặc thông tin quan hệ. Không hạng1 không chứng minh không có tín hiệu. Mỗi phép cần chuỗi trung gian và đối chứng tương ứng; thiếu support không biến thành số0.
+
+**Phương án khác:** chỉ so hạng/đếm cờ (không phân xử); loại return hoặc ca thiếu cạnh (bỏ nhóm quan trọng); chạy baseline mới và thay bảng P3 (trái mục tiêu giữ nguồn); coi bản một đặc trưng là tái lập đầy đủ tác giả (sai đầu vào); dùng data giữ ngoài/test (chưa được phép). Các kiểm physical host/network/clock không có trường cần thiết được chứng minh giới hạn thay vì dựng nguyên nhân.
+
+**Bằng chứng trước phép mới:** SPEC, kiem-tiep hiện tại, đầu ra T032 và MRP RQ2/P4/P5/P6, DT18/cô, LESSONS. Mọi kết quả mới CHƯA KIỂM khi ghi mục này; các giả thuyết có thể sai khi tín hiệu yếu/coverage không tương đương/support đổi hoặc nhánh khác cùng tạo chênh lệch.
+
+**Kết luận phụ thuộc:** phân loại D/G/A/M; căn cứ đề xuất thành phần/quan sát P5/P6. Không khóa phương pháp mới, không chứng minh graph thắng/test hoặc định nghĩa nhãn lan vật lý. Lựa chọn chi tiết và các nhánh phát sinh được ghi thiết kế trước kết quả trong gói, cập nhật lý do chính thức khi khác nội dung này.
+
+## WHY-50 — Phân xử các câu còn giá trị T-033 trong gói bổ sung chung
+
+Minh cho thực hiện theo Q-144. Thiết kế trước kết quả nằm trong results/T-033/runs/bo-sung-toan-dien-20261012-001/t33/; nguồn/cấu hình/số P3 cũ giữ nguyên.
+
+**Chọn:** native sham từng ca trước nhánh mới; kiểm công thức NIW/Student-t và marginal nhất quán giữa các chiều bằng covariance principal submatrix, không dùng submatrix precision hay zero-padding. Fixed-X/d xét riêng dof=d+1→d+3, kappa1→4, precision I→4I như độ nhạy, không coi đó là lựa chọn tối ưu hay lời giải contrast mask cũ. Tiền xử lý causal: schema cung cấp độc lập nhãn, ffill quá khứ, fixed-scale sau100quan sát và expanding prequential, kiểm suffix invariance, zero-range/missing/state semantics. Đầu vào lặp: compress các vector lặp và ánh xạ elapsed-time, so hazard theo hàng và theo khoảng thời gian để tách đồng hồ khỏi đếm quan sát. N-Sigma đối chiếu history rolling100/expanding cùng raw/k/cột và joint flags của OR, std0/NaN; chấm đường nhạy endpointD trên cờ cũ; đọc toàn message/coverage của vùng khóa và probe vai trò quan hệ.
+
+**Vì sao:** νnative=d+1 chưa tự là prior khác ở common dimensions; cùngX/cờkhác cần xét state. Lookahead đã xác nhận không tự chọn được pipeline online. Lặp84%ô chưa chứng minh tác động. Mốc/endpointproxy không phải onset/end thật. Causal contract không tự bảo đảm nhất quán tọa độ posterior khi scale đổi; nếu không đạt thì giữ đúng lỗi mô hình/diagnostic, không chọn P6.
+
+**Phương án khác:** gán effect mask cho prior (không cô lập); zero-padding (mô hình khác); sweep tham số theo accuracy (thiên vị); gọi compressed row là một giây (sai đồng hồ); gọi INFO/success là nền sạch (không có chuẩn); đograph với feature/budget khác (không cô lập cấu trúc). Mức100/4/d+3 là diagnostic khai trước, phải nói giới hạn và kiểm độ nhạy cần thiết khi kết luận đổi dấu, không thêm ngưỡng theo điểm đẹp.
+
+**Bằng chứng trước phép mới:** nguồn BARO/code frozen, SPEC, report002/kiem-tiep, bo-sung-bao-cao hiện tại, MRP/DT18/cô/LESSONS. Các nhánh mới CHƯA KIỂM; có thể không tách tác động hoặc không đủ chuẩn vật lý. Prior/state phép tính và fixture được agent ultra kiểm độc lập trước dùng số.
+
+**Kết luận phụ thuộc:** căn cứ P6 về preprocessing/history/prior/clock và yêu cầu quan sát FlashTicket. Accuracy thật, onset/recovery, báo giả vận hành và lợi ích graph chỉ khẳng định khi có dữ liệu/đối chứng thích hợp; gói này không tự đóng RQ2/G2 hay mở test. Giữ mọi lỗi/non-OK, mẫu số/coverage riêng, không coi thời điểm phụ thuộc là quan sát độc lập.
+
+### WHY-50 — Làm rõ phép tự kiểm trước lô mới, 12/10/2026
+
+Native κ=1, predictive df=2 có predictive shape I; covariance Student-t không hữu hạn ở df=2. Trong kiểm marginal, lấy principal submatrix của Ψ=inv(scale) và của predictive shape khi cùng κ/df, không gọi đó là covariance hữu hạn. Fixturev1 nhầm shape2I đã dừng trước inference; giữ lỗi, bảnv2 sửa theo code và derivation độc lập.
+
+Nhánh causal fixedscale học từ100raw đầu, transform chính100raw ấy để initialize posterior rồi chỉ release alarm từ chỉ số100; m/cờ nội bộ trong warmup không là outputonline. Schema/hyperparameters cung cấp từđầu, không lấy root/proxy. Suffixinvariance chỉ xét prefix>=100. Expanding coordinate drift là diagnostic chưa chứng minh nhất quán mô hình; không chọn P6 từ contract hay điểm. Các mức prior vẫn là độ nhạy fixedX/d, không giải thích contrast mask bằng cách gọi dof danh nghĩa đổi là prior riêng.
+
+### WHY-49 — Hợp đồng đầu vào tác giả và cách tính giới hạn bộ nhớ, 12/10/2026
+
+TraceRCA default cần latency/http_status và lịch sử, encoder import module không có trong repo tác giả. Nhánh supported chỉlatency chạy code feature-selection/flags cùng shortreference, haiđơnvịms/us dođơnvịdefault chưa xácminh và thresholdCLI1/Makefile3 khai trước. Selectorcode gốc sort arrays và chỉ xét pair cóhistory; pairthiếunền bịloạiqua featureselector nên cachefallbackcurrent khôngkíchhoạt ởnhánh này. Không gọi đây là táilập default/bài đầyđủ.
+
+Full003 bị OOM ởPID214300 lúc12:26:24UTC; code giữ mọiFP vàtracecache. Giữkernel/script/progress, 13ca đã xử lý chỉ ởRAM nên khôngmạonhận là13đầura hợp lệ. Dùng backend streaming orderedFPgenerator nguyênversion, tracebitsets, top100unique scorevalues, top1000patternsstable trướcsingletonfilter. CôngthứcJ/inout/key giữ nguyên; không bỏ nonsingleton trước cap. Fixture32ca, trongđó4095/16383patterns, score/pattern/rank trùng từngbit mãgốc; tiếp kiểm nhánh cap1000 và ca thật trước sốfull. Đây tươngđươngphép tính được kiểm, không phải nguyêntrạngtoànpipeline tácgiả. Ghi từngbranch ngayrafile và progresspattern đểkhôngmấttrunggian khi runhỏng.
+
+TORAI A: ngoài probe trongcửasổnative, đọc rawdevfull hợp lệ để nối đúng start-bin15s của sourceA CSV; sourcesA cólệchlưới/fullfilethreshold. Maxcolumn khôngthay tổngservice trace; mọi thiếu match làN/A, không phải0quan hệ. Nguồn/scorecũgiữ nguyên.
+
+### WHY-50 — Tái dựng trạng thái theo run length và phân rã marginal, 12/10/2026
+
+Conjugatestate trướcđiểm i của runlengthr là nativeupdate trên X[i-r:i] từprior; cácrunlength cậpnhật độc lập. Tái dựng riêngstates được hỏi thay allstates/alltimes để tiếtkiệm; phải khớp storedθ/nativebatchdensity trước dùng. Pilot4nguồn đạtbitexact; giữ lượtallstates chậm/paused/terminated và timermetadata, không đổi nativeCP/mgate hay môi trường cũ.
+
+Với FF/PF cùng SF: kiểm Xcommon thật và default NIW marginalcoherence trênstate trước phân rã jointlogpdf thành logpdfcommonmarginal cộng logpdfextraconditional. Dof danhnghĩađổi không tựlà commonpriorđổi. Posteriorparent R và evidenceextra đều cóthểkhác; tách hai gói bằng intermediate/counterfactualcùngr khi đủ, giữ interaction/undefined/mẫu số. Fixed-d priorsweep trả lời độnhạy riêng, không lấy thay bằngchứng cho contrastmask.
+
+### WHY-49 — Phép dùng hướng cạnh cho KT5, trước kết quả bổ sung
+
+**Chọn:** trên các đặc trưng trace đã lưu của đủ 52 ca, xét chênh lệch có dấu giữa tỷ lệ cờ của lời gọi đến và lời gọi đi. Giữ cửa sổ, ngưỡng, tập tín hiệu và cách xử lý thiếu; đối chiếu phép gắn tín hiệu cho chủ span, bỏ quan hệ, và đổi cạnh có giữ bậc với seed định trước trong thiết kế worker. Mọi service được tính trước nối nhãn. Không có mẫu ở một vế thì giữ N/A, không thế bằng 0.
+
+**Vì sao:** KT5 hỏi thông tin phía gọi có thể đặt lên dịch vụ được gọi ở bước nào. Chỉ bảng incoming/outgoing chưa kiểm phép tính thực sự dùng cạnh. Phép nhỏ này cô lập cách ánh xạ/hướng cạnh trên bằng chứng đang có; không phải một phương pháp P6 đã khóa hoặc đánh giá hiệu quả.
+
+**Phương án khác:** dùng hạng của phương pháp cũ như giá trị đồ thị (không cô lập); đổi thêm đặc trưng/ngưỡng/cửa sổ (không phân xử cấu trúc); coi missing là im lặng (sai dữ liệu). Chênh lệch tỷ lệ không tự là tự xử lý hoặc chờ đồng bộ và có thể nhạy với support/mixture; vì vậy lưu cả tử số, mẫu số, missing và đối chứng. Kết quả mới chưa kiểm khi ghi lựa chọn này.
+
+**Kết luận phụ thuộc:** thông tin quan hệ đủ đề xuất ứng viên ánh xạ ở P5/P6, điều kiện thất bại khi cạnh/tín hiệu thiếu; không chứng minh đồ thị tăng accuracy hay xác định nguyên nhân vật lý.
+
+### WHY-49 — KT7 kiểm tổng cột của dịch vụ
+
+Probe trước chỉ cột cao nhất; TORAI cộng các cột trace của dịch vụ nên không được dùng max-column làm tổng. Chọn dựng lại mọi cột, tổng normalized share, vector root và trace/severity margin nguồn A; nối mọi operation với cây raw đúng start-bin. Thiết kế `toraiA_allcolumns_design.md` ghi trước kết quả. Phương án khác là giữ giới hạn max-only nhưng câu service sum vẫn kiểm được nên bổ sung. Không có danh tính span bật cờ trong CSV, vì vậy association cùng operation không là attribution của flagged spans hoặc thời gian chờ. Không thay baseline, không chạy lại GMM/RCD; kết luận tổng-score và hướng quan sát P5/P6 phụ thuộc phép này.
+
+### WHY-50 — Phân phối hai EC2 và tiếp tục khi chạy qua đêm
+
+Sau khi T32 giải phóng CPU, chuyển ca15–30 của T33 sang EC2 T32, giữ ca1–14 trên T33, mỗi máy hai worker. Payload nén chỉ khoảng3MB gồm X/time/schema/m/CP và raw cột causal; không chép ma trận posterior R, predictive density, nhãn hoặc raw toàn bảng. Source pins→compact hash và native full sham từng ca là điều kiện dùng nhánh mới. Wrapper chỉ đổi nơi đọc/assignment, không đổi engine/causal. Monitor dừng worker gói mới tại START ca ngoài ownership; giữ mọi output trước đó và ghi rõ phần vừa bắt đầu là interrupted, không là complete. Không đổi kết quả lịch sử hoặc dùng marker giả.
+
+Lý do là giảm chờ bằng hai EC2 đang có, không tải dữ liệu lớn hay chạy thêm vô cớ. Phương án để EC2 T32 rảnh làm ETA dài hơn; copy fullR không cần và tốn dung lượng. Thiết kế/pins/lệnh ở t33/migration-design.md và t32/t33-migration-001/.
+
+Theo quyền Minh cho chạy qua đêm và tiếp tục hoàn tất, dùng lịch45phút trong cùng chat để nhận/kiểm/tổng hợp khi hàng đợi ổn định. Không tạo task nghiên cứu hoặc chat mới. Metadata ở continuation-automation.json; tự dừng lịch khi gói hoàn tất và báo cáo. Laptop/Codex cần mở cho lượt tiếp tục, EC2 tính độc lập. Chưa lấy trạng thái detached hoặc ETA làm bằng chứng câu hỏi nghiên cứu đã xong.
+
+### WHY-49 — KT7 không bỏ phép dựng cờ còn kiểm được
+
+T016 đã có candidate encoder mean+3std ddof1, lọc theo CSV extent trước fit, chưa phải code generator tác giả. Vì vậy thiếu ID trong CSV chưa đủ kết luận không thể dựng flag. Chọn kiểm30dev TT theo thiết kế toraiA_encoder_design.md: hai scope threshold rawfull/CSVextent, cùng TT column mapping; kiểm nativeA moments trước dùng và giữ mọi cell lệch. Thêm interval-threshold feasibility dưới hợp đồng strict duration threshold cố định để kiểm tính nhận diện flagged subset có điều kiện. Không tối ưu threshold/đổi CSV, không gọi candidate exact là source lineage đã xác minh. All-column superset0 rootdesc cho bound0 của mọi flagged subset chỉ với mapping/coverage có căn cứ. Kết luận provenance khác giới hạn vật lý; cả hai được ghi đúng phần sau kiểm.
+
+### WHY-49 — KT7 kiểm ảnh hưởng của các ô dựng lại lệch
+
+Count recipe trên30ca không hoàn toàn khớp sourceA. Tỷ lệ ô khớp cao không chứng minh chênh nhỏ không ảnh hưởng severity, nhất là N ít biến thiên. Chọn một phép scalar kiểm rẻ trên cùng column support, cửa sổ và các kênh khác: thay đúng count cells của recipe đã khai, dựng lại normalized column scores/service trace sum và trace/severity margin22cặp. Không chạy lại GMM/RCD, không nhận hạngRCA mới, không chọn recipe theo sign; giữ các trường hợp source/method bất định. Phần này phân xử độ nhạy tính toán của conclusions trước provenance mismatch, không xác minh generator gốc hoặc nguyên nhân vật lý.
+
+### WHY-49 — KT7 thống nhất predicate trước kết luận bound, 13/10/2026
+
+Audit đã chỉ ra allcolumns loại descendant cùng service owner, còn encoder hasroot đếm mọi descendant root. HTTP column mapping có thể đổi prefix sang service con; fixture root→other→root phân biệt hai phép đếm. Chọn kiểm matched A superset và native conditional top-k của đủ22pairs bằng cùng hasroot, theo t32/kt7-predicate-design-001.md đã ghi trước chạy. Giữ source/count/bin/strict-threshold contract, support và N/A; không đổi baseline hoặc ngưỡng để cứu kết luận. Phương án chỉ giữ cross-owner observation không trả lời bound rộng đã viết nên phải kiểm thêm. Tạm thu hẹp kết luận trong root-probes-report-v2.md, chưa biết kết quả phép kiểm mới.
+
+### WHY-50 — K5 literal backend, bổ sung sổ ngày13/10/2026
+
+Thiết kế backend-status-design-001.md được worker ghi trước chạy; mục WHY này được nối sau lượt worker hoàn tất, không nhận đã ghi WHY trước chạy. Chọn đọc grammar Response(status=int,msg=...,data=...) và ResponseEntity literal HTTP trong đúng union vùng đã khóa, giữ row/hash/container/logger và occurrence count. Phương án chỉ UI access bỏ sót thông tin backend đã có; gán0/1 thành health hoặc gán row cho invocation khi thiếu join sẽ vượt bằng chứng. Summary đã có nhưng cần source/conservation/grammar audit trước kết luận; semantics0/1 UNKNOWN, serialized HTTP không tự là wire outcome. Kết luận K5 về vị trí/độ hạt thông tin và thiếu phép nối phụ thuộc kiểm này.
+
+### Đính chính phạm vi kết luận phụ thuộc WHY-47 — 13/10/2026
+
+Minh duyệt gói bảy file cùng N1, N2 trong bản kiểm lại Claude ngày 13/10/2026, lời duyệt: “DUYỆT SỬA NHƯ ĐỀ XUẤT:”. Đây là đính chính căn cứ, không chọn baseline hoặc cơ chế P6. Giữ nguyên WHY-47 và kết quả cũ để truy lịch sử.
+
+**Câu cũ → trạng thái hiện tại:** số 0/4 và 0/8 vẫn đúng cho bản cài theo lời văn ở nhánh to_p. Số đó không xác nhận trị tuyệt đối là nguyên nhân đủ gây thất bại, không chứng minh “phương án có sẵn trong tài liệu không đủ” hoặc “phép tính phải giữ hướng của cạnh”. Không dùng các câu này làm căn cứ đã xác nhận để chọn thiết kế G2/P5–P6. Giữ dấu còn là CANDIDATE (ứng viên) để so sánh, chưa DECIDED (đã quyết).
+
+**Bằng chứng theo cả hai cấu hình:** trong 12 cặp thuộc 10 ca có quan hệ cũ, nhánh mã tác giả latency-only, ms, ngưỡng chọn đặc trưng 1 cho root trên / hòa / dưới là RE2-TT 3/0/1, Nezha-OB 7/0/1; ngưỡng 3 là RE2-TT 1/3/0, Nezha-OB 7/0/1. Ở RE2-TT, ngưỡng 1 có hai cặp root trên vì caller có điểm mặc định −1; ngưỡng 3 có một cặp root trên vì caller có điểm −1 và ba cặp hòa đều có root/caller bằng −1. −1 nghĩa là không có singleton pattern được giữ để chấm, không phải bằng chứng vào/ra bằng nhau. Danh sách cũ thực ra liệt kê 13 cặp thuộc 11 ca: cặp thêm dev-95e164235f không có quan hệ cũ vì NO_USEFUL_FEATURE; nhánh tác giả hòa có điểm ở ngưỡng 1, NO_EVIDENCE ở ngưỡng 3. Không bỏ cặp đó hoặc gộp thiếu bằng chứng thành hòa.
+
+**Ứng viên có trung gian:** ở bảy ca Nezha-OB có quan hệ cũ, frontend đứng đầu bản theo lời văn; sáu ca lấy điểm cao nhất từ pattern 2–3 dịch vụ, một ca từ singleton. Mã tác giả chỉ chấm singleton sau các bước chọn/cap pattern. Đây là CANDIDATE giải thích việc frontend có thể thừa hưởng J của tập dịch vụ, chưa là phép đổi riêng một bước. Hai pipeline còn khác dựng invocation, chọn đặc trưng, gắn cờ và các quy tắc giữ pattern. Chưa xác định được một bước Y đủ giải thích mọi chênh lệch; chưa kết luận bản cũ sai lời văn bài báo từ riêng khác biệt code.
+
+**Nguồn và phụ thuộc:** results/T-032/runs/bo-sung-toan-dien-20261012-001/doi-chieu-dien-giai-review-001.md §2–3; closure-ledger-review-001.json#/h6_pair_audit và /pattern_candidate. Các mục đó dẫn từng ca về cases.json cũ và Full008; hash nằm ở manifest-review-001.json. Đủ căn cứ rút suy rộng cũ và đề xuất ứng viên; chưa đủ chọn một cơ chế, xác nhận chờ vật lý hoặc lợi ích đồ thị. Mọi cấu hình vẫn dùng dev đã nhìn.
+
+## WHY-51. Gói trình G2: thang mức bằng chứng chung và ứng viên P5/P6 có điều kiện bác bỏ — Đã quyết (Minh duyệt SPEC T-034 ngày 13/10/2026)
+
+- **Chọn:** hợp nhất các hạn chế của T-028, T-029, T-032, T-033 thành bản đồ G2-Hn; mỗi dòng ghi một mức bằng chứng cao nhất theo thang CT (can thiệp), ĐC (đo cơ chế), LĐ (liên hệ có đối chứng), MT (mô tả), CK (chưa kiểm), kèm mức của từng nguồn con. Câu "vì sao" ở mỗi dòng ở một trong ba trạng thái: đã xác lập ở mức X, đã loại được giải thích Y, chưa phân xử vì Z. Ứng viên P5/P6 ghi căn cứ đúng mục đích: sửa hạn chế P4, đáp ứng DT18 hoặc nhu cầu kỹ thuật. Mỗi ứng viên có mức bằng chứng thật, giải thích khác, tín hiệu dùng và dự đoán bác bỏ được trên dev; không chọn, không xếp hạng theo kỳ vọng thắng. Tách ba mức dùng bằng chứng của MRP §3: đề xuất để thử, chọn thiết kế trên dev, khẳng định hiệu quả sau đánh giá. CT/ĐC không tự đủ để chọn thiết kế; không loại ứng viên chỉ vì hiện tượng mới đạt LĐ/MT nếu có căn cứ kỹ thuật và dự đoán kiểm được.
+- **Vì sao:** cô yêu cầu chuỗi hiểu phương pháp → thực nghiệm → hạn chế → phương pháp đồ thị có liên kết logic (WHY-01). Thang chung giúp không đọc liên hệ thành nguyên nhân (SL23), nhưng không thay việc xét bằng chứng cho từng mục đích. Thành phần sửa hạn chế nối với bằng chứng P4; thành phần theo DT18 hoặc nhu cầu kỹ thuật nêu đúng lý do, không dựng một hạn chế để hợp thức hóa. Giữ ranh giới giữa đề xuất, lựa chọn và hiệu quả giúp tránh thiết kế trước rồi tìm kết quả biện minh (SL1, SL22). Điều kiện bác bỏ khai trước giữ QT4.
+- **Phương án đã xét:** giữ nguyên bốn bản đồ riêng (người đọc phải tự hợp nhất, dễ đếm trùng); xếp hạng hạn chế theo "mức đáng kể" khi chưa có định nghĩa được chọn (không đủ căn cứ); viết luôn spec P6 trong gói G2 (vượt phạm vi tổng hợp, MRP đặt lựa chọn sau G2); chỉ cho ứng viên mức CT/ĐC hoặc bắt mọi thành phần dẫn hạn chế (trộn ngưỡng đề xuất với chọn thiết kế và bỏ căn cứ DT18/nhu cầu kỹ thuật); nêu ứng viên chỉ từ mã hạn chế mà không có lý do kỹ thuật, giải thích khác và dự đoán bác bỏ (không đủ căn cứ đề xuất theo MRP §3).
+- **Bằng chứng thiết kế:** MRP §2.1, §3, §7, P4, P6; PLAN-P3-G2 §8; WHY-01, WHY-38–50, gồm phần nối ngày 13/10; LESSONS SL1, SL14, SL20, SL22, SL23, QT4, QT15.
+- **Kết luận phụ thuộc:** quyết định G2 của Minh; spec P5/P6 dẫn G2-Hn cho thành phần nhằm sửa hạn chế, và dẫn căn cứ DT18 hoặc nhu cầu kỹ thuật cho thành phần khác; câu trả lời với cô về P3/P4. Thang mức bằng chứng là quy ước của dự án, không phải chuẩn ngoài; gói tổng hợp không tự xác nhận cơ chế còn mở hoặc lợi ích đồ thị.
+
+### Bổ sung WHY-51 — Hai phép phân xử trong T-034, Minh duyệt 13/10/2026
+
+- **Chọn:** thực hiện E1 can thiệp riêng quy tắc pattern trên cùng trung gian TraceRCA và E2 tính BOCPD đầy đủ trong miền log trên hai ca underflow, gồm FF/PF liên quan; giữ native sham, fixture, nguồn và baseline cũ. Thiết kế chi tiết trước nhánh đổi theo SPEC; không tối ưu tham số hoặc chọn phương pháp P6.
+- **Vì sao:** E1 phân biệt đóng góp của quy tắc chấm với các khác biệt pipeline và giả thuyết chờ/lan; E2 phân biệt tác động tính toán số học với giới hạn của mô hình. Cả hai có kết quả có thể làm đổi mức kết luận P4 hoặc căn cứ đề xuất P6. Biết có underflow hoặc thấy thứ hạng hai pipeline khác nhau chưa trả lời tác động riêng này.
+- **Phương án đã xét:** chỉ tổng hợp OPEN (giữ kết luận trung thực nhưng không hoàn thành phép còn làm được có giá trị); dùng chênh hai pipeline hoặc frozen-normalizer lineage thay can thiệp đầy đủ (không cô lập yếu tố hoặc chưa cập nhật đầy đủ posterior); chạy lại mọi baseline/tối ưu tham số (vượt câu hỏi cần phân xử). Chọn hai phép gọn với danh sách ca từ nguồn hiện có và kết luận theo điều kiện.
+- **Bằng chứng để giao kiểm, chưa là kết quả:** `results/T-032/runs/bo-sung-toan-dien-20261012-001/closure-ledger-review-001.json#/pattern_candidate`, `/remaining_current_declared_computations`; bản đối chiếu đính chính §3 và §8; `results/T-033/runs/bo-sung-toan-dien-20261012-001/t33/zero-lineage-summary-001.json#/cases`, `/interpretation`. Quyền mới: lời Minh đưa hai phép vào T-034 trong SPEC. Số liệu mới chỉ được dùng sau kiểm tương đương và manifest của T-034.
+- **Kết luận phụ thuộc:** mức quy nguyên nhân ở K3, ứng viên K5 và câu còn mở K6; nếu một phép không phân xử, ghi đúng phần đã kiểm và phần thiếu. Không tự đổi baseline, khóa thiết kế, xác nhận lan vật lý hoặc suy detector tốt hơn/lợi ích đồ thị. Phân công máy là lựa chọn thực hiện có thể đổi trong phạm vi tài nguyên đã duyệt, không là lựa chọn khoa học.
+
+## WHY-52. Đồ thị phụ thuộc ở P5: mô hình chung hai mức, đầu vào của bộ dựng và cách tách task — Đã duyệt nội dung (14/10/2026, Q-150; SPEC T-035)
+
+- **Chọn:**
+  1. **Một mô hình chung phủ nhu cầu FlashTicket.** Nút: dịch vụ, gateway, cơ sở dữ liệu, cache, broker, nhà cung cấp danh tính, đối tác ngoài, máy. Cạnh: gọi, thông điệp, dữ liệu, triển khai. Thêm kiểu "gọi chưa phân kiểu" khi trace không có loại span. Phần dataset công khai thiếu được ghi là thiếu, không bỏ khỏi mô hình.
+  2. **Mỗi nút, mỗi cạnh ghi nguồn bằng chứng:** trace, nguồn khác của dataset, tĩnh, suy ra.
+  3. **Hai mức.** Mức thực thể là mức chính. Mức thao tác là lớp tùy chọn; mỗi thao tác thuộc về một thực thể; đặc tả v0 định nghĩa phép chiếu, cách giữ quan hệ nội bộ và thành phần không có thao tác quan sát được. Đây là phương án phải khảo sát ngay trên mọi ca dev, chưa chọn làm phương pháp P6.
+  4. **Thông điệp đi qua nút broker** (phát → broker → nhận). Cạnh logic gửi → nhận chỉ suy ra khi có bằng chứng nối một bản tin cụ thể (ngữ cảnh tạo/link có nghĩa đã xác minh hoặc định danh bản tin trong phạm vi phù hợp). Cùng correlationId giao dịch không đủ.
+  5. **Bộ dựng nhận** bảng span mở rộng, một khoảng thời gian, alias, universe; không nhận mốc tiêm, tên ca, đường dẫn, nhãn.
+  6. **P5 xuất cấu trúc, độ phủ, địa chỉ tín hiệu;** không xuất tín hiệu hay điểm.
+  7. **Tách P5** thành T-035 (từ trace) và T-036 (kiến trúc, so hai nguồn). P9a nhận danh sách thông tin cần theo từng quan hệ.
+- **Vì sao:**
+  - (1), (2): DT18 nêu ba loại cạnh và nút gồm thành phần hệ thống. FlashTicket có cơ sở dữ liệu, cache, broker, Saga, callback (MRP §1; B16 §1, §3, §5). Trace RE2-TT không có cột loại span (`results/T-002/local-inspection/run-002/cases.json`, `typed_span_kind_column`). Trace Nezha-OB chỉ có tám cột, không có loại span (`results/T-008/runs/file-audit-001/summary.json`). Bỏ khỏi mô hình mọi thứ dataset công khai thiếu thì mô hình không còn phủ đề tài. Gọi mọi cạnh cha–con là "đồng bộ" thì khẳng định điều dữ liệu không ghi. Căn cứ: đáp ứng DT18 và nhu cầu kỹ thuật, không phải sửa hạn chế P4.
+  - (3): Minh giữ phương án dựng thao tác thành nút (14/10/2026). Các ứng viên G2 mục 5 cần thông tin mức lời gọi và cây lời gọi. Lớp thao tác giữ thêm phân biệt về tên và quan hệ thao tác so với gộp theo thực thể; không thay thế cây span và thời gian của từng lần thực thi. Bảng C5 chỉ rõ ứng viên nào còn cần dữ liệu span gốc. Lợi ích của mức thao tác chỉ kiểm ở P6.
+  - (4): B16 §3 cho phép consumer dùng link thay quan hệ cha–con; bên gửi, bên nhận xử lý ở hai thời điểm. Nút broker giữ được hàng đợi làm nơi gắn metric (B16 §5: queue ready/unacked).
+  - (5): luật cứng 6; cùng một mã cho hai chế độ và cho FlashTicket (WHY-08).
+  - (6): MRP đặt việc chọn tín hiệu ở spec P6.
+  - (7): nguồn tĩnh phụ thuộc lược đồ của T-035; gộp lại thì không vừa một phiên.
+- **Phương án đã xét:**
+  - Gán "đồng bộ" cho mọi cạnh cha–con: sai khi có gọi bất đồng bộ.
+  - Suy kiểu từ tên bằng biểu thức chính quy: lặp SL34.
+  - Chỉ mức dịch vụ: mất phương án Minh muốn giữ.
+  - Chỉ mức thao tác: lệch định nghĩa nút của DT18 và tập ứng viên của baseline (WHY-26).
+  - Cạnh gửi–nhận trực tiếp có thể dựng khi nối được bằng chứng, đồng thời giữ thông tin broker và hàng đợi riêng. Mô hình hiện tại chọn broker làm nút để biểu diễn rõ tài nguyên dùng chung và nơi gắn số đo hàng đợi.
+  - Bộ dựng nhận mốc tiêm: đưa nhãn vào mã dùng chung.
+  - P5 tính luôn tín hiệu: chọn trước P6.
+- **Khảo sát Node:** bộ đọc bổ sung đặt trong `src/do_thi/`, lọc dev trước khi xuất trường, giữ kiểm nguồn và không sửa `src/p3`. Chỉ xác nhận nghĩa host khi tài liệu hoặc mã thu chứng minh nguồn định danh; ánh xạ ổn định/nhóm `Node*` không đủ. Thiếu thì OPEN.
+- **Bằng chứng và giới hạn:** G2 mục 5, 6.2; thẻ T-002, T-008; B16 §3–§7. Chưa kiểm: nghĩa phía gọi/phía được gọi ở RE2-TT; tên thao tác ổn định; nghĩa cột `Node` của Nezha-OB. Fixture chỉ kiểm bộ dựng theo đặc tả của ta, không thay trace FlashTicket thật. Trace FlashTicket chưa được cung cấp hoặc chưa kiểm trong phạm vi task; không suy ra toàn hệ thống chưa có trace.
+- **Kết luận phụ thuộc:** thống kê đồ thị P5; định nghĩa "lời gọi" và mức đồ thị P6 dùng; phạm vi T-036; danh sách yêu cầu cho P9a. Không là căn cứ cho lợi ích của đồ thị hay của mức thao tác.
+
+### Bổ sung WHY-52 — Tách địa chỉ phát, queue nhận và phạm vi định danh bản tin (15/10/2026, Q-154)
+
+- **Chọn:** tách exchange/routing phía phát, queue phía nhận và identity scope của message ID; metric queue có địa chỉ broker + phạm vi triển khai/vhost + queue. Link tạo bản tin đã xác minh có thể nối hai phía khác địa chỉ, nhưng phải kiểm nguồn và các trường phạm vi cùng hiện diện. ID fallback chỉ nhận phạm vi được xác minh và một nguồn tạo quan sát xác định; không dùng correlation hoặc che mâu thuẫn của link bằng fallback. Queue tham gia khóa cạnh và phép chiếu. Thiếu thông tin được ghi rõ, không tự suy từ destination cũ.
+- **Vì sao:** B13 §5.1–5.2 quy định exchange/routing riêng và queue theo consumer, gồm sự kiện tới nhiều consumer; B16 §3 và §5 yêu cầu nối ngữ cảnh bản tin và số đo queue riêng. Hợp đồng v1 dùng chung destination cho nối bản tin và địa chỉ queue nên không phủ trường hợp này. Đây là nhu cầu kỹ thuật/DT18 về trao đổi thông điệp và ánh xạ metric, không là hạn chế RCA đã chứng minh trên dev.
+- **Phương án đã xét:** chỉ bỏ so destination (không bảo đảm giữ địa chỉ queue khi gộp/chiếu); ép mọi phía chung destination (mất phân biệt queue); nối mọi bên cùng broker hoặc correlation (không có bằng chứng bản tin); giữ v1 và giao thiếu sót cho P9 (không đạt phạm vi mô hình chung của T-035). Chọn tách thông tin, giữ link/ID và điều kiện từ chối tường minh.
+- **Bằng chứng / phần chưa kiểm lúc chốt:** nguồn kiến trúc và luồng code v1 xác định mâu thuẫn thiết kế; fixture mới và hồi quy chưa chạy khi viết bổ sung này. Thiết kế trước code tại results/T-035/runs/sua-n1-001/design.md. Dự kiến dev không messaging giữ nguyên, phải kiểm lại; không dùng dự kiến làm số liệu. Bản trước sửa được giữ trong thư mục before/ của lượt này.
+- **Điều kiện thất bại:** namespace/ID/link được adapter diễn giải sai; source không có trong miền; nhiều lần phát không phân biệt được; địa chỉ queue thiếu deployment/vhost; routing thực khác hợp đồng. Khi đó giữ unresolved/diagnostic và không xác nhận đủ quan sát thực tế.
+- **Kết luận phụ thuộc:** tiêu chí mô hình/C9 của T-035 và hợp đồng T-036/P9; không tự xác nhận trace FlashTicket thật, lợi ích đồ thị, chọn P6 hay đóng task. Kết quả kiểm phải dẫn file sau chạy; sự đồng ý sửa không là bằng chứng thiết kế đã đúng.
+
+### Bổ sung WHY-52 — Chuẩn hóa dữ liệu thiếu, miền ID và chính sách lỗi đầu vào (15/10/2026, Q-155)
+
+- **Chọn:** tên thao tác thiếu ở dtype pandas khác nhau đều về None trước tạo khóa. Giữ ID hiện hành và từ chối rõ va chạm giữa miền ID thực thể/component với ID thao tác; kiểm cả dựng và API project. Thời gian phải không âm, nguyên và biểu diễn được an toàn trong int64 nanosecond trước ép/cộng/nhân. Kiểu unknown không thay kiểu đã biết; hai kiểu đã biết khác nhau bị từ chối, không chọn theo thứ tự dòng.
+- **Vì sao:** đặc tả đã hứa giữ tên null, địa chỉ đúng thực thể và từ chối thời gian sai; DT18-NV2 cần nút/cạnh phản ánh đúng thành phần. Phản ví dụ nhỏ đã tái lập lỗi dtype, đổi/mất đích cạnh, wrap thời gian và kiểu phụ thuộc thứ tự. Đây là sửa cài đặt/hợp đồng kỹ thuật, không là hạn chế RCA của dataset hoặc bằng chứng lợi ích đồ thị.
+- **Phương án khác:** thêm namespace vào mọi ID sẽ hỗ trợ va chạm nhưng đổi địa chỉ/schema và toàn đầu ra hợp lệ; chọn từ chối minh bạch trong gói sửa tối thiểu đã duyệt. Không suy loại đích từ chuỗi ID. Bỏ kiểm thời gian hoặc chọn kiểu cuối cùng che đầu vào mâu thuẫn. Dùng một hàm project để kiểm chính nó không đủ phát hiện lỗi chung; oracle mới phải ghi đích literal độc lập.
+- **Bằng chứng / chưa kiểm khi viết:** nhận xét Minh chuyển được lưu nguyên văn tại runs/sua-hop-dong-001/nhan-xet-duoc-minh-chuyen.txt. Thiết kế và oracle mới sẽ ghi trước code. Phương án sửa và hồi quy chưa chạy; dự kiến dữ liệu hợp lệ giữ nguyên phải được kiểm, chưa được dùng như kết quả.
+- **Điều kiện thất bại / hệ quả:** nguồn cần dùng ID va chạm bị từ chối rõ; muốn hỗ trợ phải trình đổi namespace riêng. Metadata kiểu mâu thuẫn cần chủ nguồn xác minh, không xác định kiểu nào đúng. Quyền nhận trọn bộ dựng, K1/K5/K7 và bàn giao T-036/P9 phụ thuộc kết quả; không tự trả lời RQ3, xác nhận runtime FlashTicket, chọn P6 hoặc đóng task.
+
+
+### Bổ sung WHY-52 — Làm rõ span-parent và ngoại lệ phép chiếu (15/10/2026, Q-156)
+
+- **Chọn:** ghi đúng chính sách đã cài: cặp span cha–con tìm được trong cùng khoảng, có ít nhất một đầu PRODUCER/CONSUMER, được lưu dạng span-parent ở mức thao tác; không chiếu loại quan hệ này thành cạnh phụ thuộc thực thể. Cạnh messaging cần bằng chứng riêng theo hợp đồng. cross_entity_parent_events vẫn đếm các cặp khác chủ quản thuộc nhóm này.
+- **Vì sao:** DT18-NV2/MRP P5 yêu cầu nút và cạnh có nghĩa rõ. Quan hệ cha–con của span có kind messaging chưa đủ tự xác nhận lời gọi hoặc nối bản tin. Code dựng/chiếu và bảng K5 đã có ngoại lệ, nhưng đặc tả mục 1 và câu “cặp còn lại” ở mục 3 chưa nêu nó. Đây là đồng bộ hợp đồng kỹ thuật với hành vi hiện có, không là phát hiện hạn chế RCA hoặc thay phương pháp P6.
+- **Phương án đã xét:** thêm cạnh gọi cho mọi cặp loại này sẽ đổi cách diễn giải khi chưa có bằng chứng về quan hệ; chỉ dựa bảng K5 để giải thích không sửa được mâu thuẫn trong đặc tả hình thức. Chọn làm rõ định nghĩa, phép chiếu và số đếm, giữ bộ dựng.
+- **Bằng chứng và giới hạn:** src/do_thi/builder.py tạo span-parent khi một đầu là PRODUCER/CONSUMER, bỏ loại này ở bước gộp thực thể và project; kiem-dung-dan.md/K5 đã ghi ngoại lệ. Phản ví dụ nhỏ đã tái lập trong bộ nhớ trước duyệt. Phép kiểm sau sửa sẽ lưu trong runs/dong-bo-span-parent-001/; không dùng việc được duyệt làm bằng chứng đã kiểm xong. span-parent là quan hệ đã gộp theo thao tác cùng witness, không giữ đầy đủ cây/thời gian từng lần thực thi.
+- **Kết luận phụ thuộc:** độ nhất quán đặc tả/bộ dựng và bàn giao T-036/P9. Không khẳng định nguyên nhân vật lý, đầy đủ quan sát messaging runtime, lợi ích đồ thị hoặc đã đóng task/P5/G3/RQ3.
+
+
+## WHY-53 — P5b: nguồn tĩnh, đối chiếu và chia công việc (15/10/2026, Q-157)
+
+- **Chọn:** thực thể đầy đủ, chủ động khảo sát thao tác khi có bằng chứng; tách nguồn thiết kế/code/quan sát và khả năng biểu diễn/lợi ích RCA. Hợp đồng và công cụ chung T-036 trước; FlashTicket T-037, TT T-038, OB T-039; tổng hợp T-040. Chi tiết phương án đã duyệt lưu LOG T-036 Phiên 1, phần T-036 thành SPEC.
+- **Vì sao:** DT18-NV2 và MRP P5 yêu cầu cả gọi, trao đổi thông điệp và phụ thuộc dữ liệu. Nguồn B12–B16 có các đường async, công việc nền và tài nguyên dùng chung mà trace benchmark không tự đại diện đầy đủ. Đây là căn cứ mô hình/nhu cầu kỹ thuật, chưa là bằng chứng cơ chế RCA.
+- **Phương án khác:** chỉ lấy operation có trong trace sẽ bỏ yêu cầu thiết kế chưa quan sát; dựng mọi hàm vượt câu hỏi nghiên cứu và chưa có code FT mới; làm một task toàn P5b quá rộng cho một phiên; mỗi hệ tự đặt hợp đồng dễ lệch nghĩa. Chia theo phụ thuộc cho phép ba nhánh đọc nguồn độc lập, nhưng đổi hợp đồng chung và tổng hợp tuần tự.
+- **Đối chiếu:** giữ graph trace, ánh xạ có nguồn; tách miền, kiểu và địa chỉ, báo giao/phần riêng hai phía với mẫu số rõ. Static không là runtime ground truth. Giữ DB logic khác instance dùng chung và producer/consumer là vai trò để không tạo tài nguyên/operation giả. So đầu mút khác xác minh kiểu. Không chọn mapping nhằm tăng khớp.
+- **Bằng chứng và phần chưa kiểm:** nguồn yêu cầu/thiết kế đã xác định nhu cầu; T-036 chưa cài công cụ hoặc chạy fixture. Giả định hợp đồng dùng được cho cả ba hệ còn cần fixture và đối chiếu nguồn để phân xử. FT mới chưa có code ứng dụng theo Minh; revision ứng dụng sinh TT/OB chưa xác minh. Duyệt kế hoạch không biến giả định thành FACT.
+- **Điều kiện thất bại:** mô hình không giữ được địa chỉ/ownership/instance; alias mơ hồ; nguồn sai revision; trace thiếu; mapping làm mất kiểu hoặc phạm vi. Phản ví dụ ảnh hưởng hợp đồng phải dừng phần phụ thuộc và trình sửa; không âm thầm bỏ nhóm quan trọng.
+- **Kết luận phụ thuộc:** nguồn/graph và mô tả độ khớp P5b; đầu vào P6/P9. Chưa xác nhận runtime, ích lợi đồ thị hoặc đóng RQ3/RQ5/G3. Ước lượng T-036 2–4 giờ công, toàn gói 15–24, chưa đo và chưa gồm review; không suy cần EC2. Tải nguồn phải có đề xuất dung lượng/revision riêng.
+
+
+### Bổ sung WHY-53 — Chuẩn bị ba SPEC, độ đủ nguồn và chi phí (15/10/2026)
+
+**Trạng thái:** Minh duyệt ghi tài liệu đề xuất theo Q-159–Q-163. Ba SPEC chưa được duyệt triển khai hoặc tải nguồn. Phương án P5b gốc ở LOG T-036 Phiên 1 là căn cứ phạm vi; các dự toán ở đó chưa là số đã đo.
+
+- **Chọn cho bản đề xuất:** T-037 khảo sát đầy đủ FlashTicket theo thiết kế; T-038 truy nguồn Train Ticket và so RE2-TT dev; T-039 truy nguồn Online Boutique/Nezha và so Nezha-OB dev. Thực thể đầy đủ trong snapshot đã chứng minh; thao tác khi có bằng chứng. Cùng ghim hợp đồng v1 sau sửa R1 và code T-036 theo manifest nghiệm thu, không tự chuyển sang bản mới.
+- **Vì sao kiểm cả nguồn bị loại:** inventory toàn snapshot là nhận định về phạm vi nguồn, không phải về các file đã tải. Cấu hình, template, schema/interface, mã sinh/đầu vào sinh mã, build/deployment, submodule hoặc LFS có thể chứa định danh hay quan hệ. Danh sách đuôi file chưa phân xử được chúng có liên quan hay không. Đây là nhu cầu tính đúng của mô hình DT18-NV2/MRP P5, chưa là bằng chứng hạn chế hoặc lợi ích RCA.
+- **Phương án khác:** tải cả repo chưa bảo đảm đọc đủ nguồn và có thể tốn dung lượng; chỉ whitelist một số loại file có thể bỏ quan hệ; chỉ lấy các service đã thấy trong trace sẽ thu hẹp inventory theo quan sát. Đề xuất kiểm toàn cây snapshot, phân loại phần đọc/loại trừ, lần theo tham chiếu liên quan và trình bổ sung đúng phần thiếu. Chưa chốt repository revision, tập tệp hoặc số byte; không tải trong lượt chuẩn bị.
+- **Chi phí:** giờ công lịch sử FT 4–6, TT 4–6, OB 3–5 chỉ là dự toán CANDIDATE chưa đo, chưa gồm phản biện/chờ nguồn. Truy revision và phân xử chênh lệch có thể lâu hơn phần chạy máy. Thời gian máy, peak RAM và tổng dung lượng còn OPEN; chưa chứng minh dự toán cũ tính mọi run/lượt lỗi/lặp lại/bản trung gian. Phải tách nguồn tải, kết quả và mọi lượt cần giữ khi lập tổng; đo pilot sau khi có quyền, không giảm kiểm hoặc thu hẹp câu hỏi để vừa giờ.
+- **Song song:** ba nhánh độc lập về nguồn và output sau khi từng SPEC được Minh duyệt triển khai; dùng cùng pin T-036. Sửa hợp đồng chung, ghi quyết định và tổng hợp phải thống nhất trước khi chạy phần phụ thuộc. STATE là file chung nên đọc lại và cập nhật tuần tự đúng dòng task; không tự mở/gửi chat từ quyền chuẩn bị.
+- **Bằng chứng/phần chưa kiểm:** nguồn yêu cầu DT18/cô, MRP P5/P6/P9, bàn giao T-036 và phương án gốc xác định nghĩa vụ; độ đủ nguồn TT/OB, revision sinh dataset, alias runtime, phạm vi một phiên, thời gian/RAM/đĩa và lợi ích RCA đều chưa kiểm trong ba task này. T-036 được nghiệm thu chỉ xác nhận công cụ trong phạm vi đã kiểm.
+- **Điều kiện thất bại và phụ thuộc:** nguồn bị loại chứa quan hệ; deployment không khớp revision; alias sai owner/scope; hợp đồng mất nghĩa hoặc nguồn quan trọng chưa được phép đọc. Khi đó dừng kết luận/phần xử lý phụ thuộc và trình nguồn hoặc sửa hợp đồng cần thiết. Trước duyệt triển khai phải phân xử tính khả thi một phiên; nếu quá rộng, đề xuất tách phần truy nguồn/coverage và phần dựng/đối chiếu, không tự chia mã task hoặc giảm tiêu chí. Các kết luận toàn snapshot, giải thích chênh lệch, T-040 và lựa chọn P6/P9 phụ thuộc đúng bằng chứng này.
+
+Ngoại lệ reviewer Codex phiên sạch chỉ cho lượt soát ba SPEC T-037–039. Người làm vẫn Codex; phân công phản biện kết quả theo quy tắc và chỉ định hiện hành, không suy ngoại lệ này thành quyền phản biện kết quả hoặc ghi REVIEW.
+
+### Bổ sung lý do: phân biệt protocol SMTP trong đối chiếu và hợp nhất phiên bản
+
+Chọn theo Minh duyệt Q-164 ngày16/10/2026: giữ builder SMTP T037 đã kiểm; comparator optional call channel/marker SMTP ở cả hai view; unknown giữ nguyên. Vì sao: phân biệt cùng owner nhưng khác chặng protocol khi so nguồn, đáp ứng nhu cầu kỹ thuật P5/DT18-NV2, không là bằng chứng sửa hạn chế RCA. Đã xét giữ comparator cấu trúc (hợp lệ nếu chấp nhận giới hạn hiện tại), marker SMTP và schema địa chỉ tổng quát. Gói đề nghị marker; không xác minh authority/port/TLS/delivery.
+
+Bằng chứng: T037 graph003 và delta đã duyệt; T038 nguồn MailService/config có provenance; T039 run004 có comparer132graph; preview V2 oracle29/checks và comparison-before-after chỉ chứng minh hành vi synthetic/rebuild. Full1069/132 replay và tiếp nhận chung chưa chạy ở giai đoạn đề xuất, chỉ ghi kết quả sau artifact thực. Trace thiếu channel có thể giảm giao theo thiết kế; không phải cạnh nguồn sai hoặc không có runtime. Mapping nhầm/channel suy/type tự nâng và accepted=delivered là failure. Runtime/build/instrumentation/địa chỉ vẫn OPEN cần dữ liệu chủ nguồn. Phụ thuộc: biểu diễn TT SMTP, khả năng so P5b và common pin; chưa chọn P6/khẳng định lợi ích/G3.
+
+**Bằng chứng triển khai V2 sau lựa chọn đã duyệt:** toàn hồi quy và ba nhánh đã được chạy trong cùng phiên; xem results/T-036/runs/doi-chieu-smtp-001/completion.json và final-verification.json. Comparator-only TT/OB giữ nguyên kết quả cũ; TT thêm SMTP có đúng phần thay theo oracle, FT thiếu channel tách khỏi SMTP. Đây xác nhận hợp đồng/tiếp nhận trong miền dữ liệu đã kiểm, không là lợi ích RCA hoặc runtime proof. Giữ mọi OPEN nêu trong lý do và bàn giao.

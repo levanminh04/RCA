@@ -911,3 +911,14 @@ Không bắt mọi task P4 làm xong đối chứng của phương pháp mới. 
 - Không sửa file kết quả nào sau `runs/manifest-cuoi-007/`.
 
 **Còn chờ Minh:** mười điểm ở mục 8 của `results/T-034/goi-g2.md` (gồm duyệt G2); nghiệm thu T-034; commit các file trong `docs/`.
+
+## Phiên 7 (nối 2) — 14/10/2026 — Claude — ghi quyết định duyệt cổng G2
+
+**Quyết định của Minh** (nguyên lời): “duyệt cổng, tạo prompt cho 1 phiên claude mới soạn spec cho p5 , codex sẽ là người làm, claude phản biện, tuân thủ work flow, prompt chuyên nghiệp”; rồi “duyệt đề xuất trước khi sang phiên mới”, trả lời đề xuất ghi Q-149 và dòng “Cổng hiện tại” của STATE.
+
+- Nối Q-149 vào cuối `docs/DECISIONS.md`, đúng nguyên văn đã trình.
+- Thêm vào đầu dòng “Cổng hiện tại” của `docs/STATE.md`: “G2 đã duyệt ngày 14/10/2026 (Q-149); kế tiếp là P5.”
+- Prompt cho phiên Claude mới soạn đề xuất SPEC của P5 đã đưa Minh trong chat; không ghi thành file.
+- Commit `25e71dc4` (đã push) chứa `results/T-034/` và thư mục task tới hết mục “Phiên 7 (nối)”. Mục này và các thay đổi trong `docs/` chưa commit.
+
+**Chưa có lời của Minh, tôi không tự suy:** T-034 đã nghiệm thu hay chưa (dòng task trong STATE vẫn “Chờ Minh nghiệm thu”); chín điểm còn lại ở mục 8 của `results/T-034/goi-g2.md`; có commit các file trong `docs/` không.
