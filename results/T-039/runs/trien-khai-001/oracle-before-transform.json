@@ -1,0 +1,50 @@
+{
+  "written_before_task_transform": true,
+  "purpose": "Literal independent answers for T039 owner mapping, projection and structural sets; synthetic only",
+  "fixture": {
+    "entities": ["alpha", "beta", "database", "spare"],
+    "operations": [["alpha", "invoke"], ["beta", "serve"]],
+    "relations": [
+      {"id": "call", "source": ["alpha", "invoke"], "target": ["beta", "serve"], "type": "gọi-đồng-bộ", "channel": "rpc"},
+      {"id": "storage", "source": ["beta", null], "target": ["database", null], "type": "dữ-liệu", "channel": "data"}
+    ],
+    "trace_entity_edges": [["alias-alpha", "beta", "gọi-chưa-phân-kiểu"]],
+    "entity_mapping": [["alias-alpha", "alpha"], ["beta", "beta"]]
+  },
+  "expected": {
+    "entity_endpoints": {
+      "S": [["alpha", "beta", null, null], ["beta", "database", null, null]],
+      "T": [["alpha", "beta", null, null]],
+      "intersection": [["alpha", "beta", null, null]],
+      "static_only": [["beta", "database", null, null]],
+      "trace_only": [],
+      "numerator": 1, "static_denominator": 2, "trace_denominator": 1,
+      "static_fraction": 0.5, "trace_fraction": 1.0
+    },
+    "entity_typed": {
+      "S": [["alpha", "beta", "gọi-đồng-bộ", null], ["beta", "database", "dữ-liệu", null]],
+      "T": [], "intersection": [],
+      "static_only": [["alpha", "beta", "gọi-đồng-bộ", null], ["beta", "database", "dữ-liệu", null]],
+      "trace_only": [],
+      "numerator": 0, "static_denominator": 2, "trace_denominator": 0,
+      "static_fraction": 0.0, "trace_fraction": null
+    },
+    "projection_edges": [["alpha", "beta", "gọi-đồng-bộ", "rpc"]],
+    "entity_only_record_ids": ["storage"],
+    "unverified_mapping_trace_denominator": 0,
+    "wrong_owner_exclusion": "operation_owner_conflict:source",
+    "empty_both_denominators": [0, 0],
+    "empty_both_fractions": [null, null]
+  },
+  "task_invariants": [
+    "Owner equality is mandatory even when operation text is identical",
+    "No prefix/suffix alias inference; only explicit source mappings",
+    "A missing runtime name remains unverified/unmapped, never optimized for match rate",
+    "Every current graph preserves original interval, domain dev-adapter and conditional_reference=true",
+    "All set members and original edge exclusions partition the input edge positions once per view",
+    "Type unknown never becomes sync or data by joining static source",
+    "Permutation of source input rows leaves graphs unchanged; APIs do not mutate inputs",
+    "Projectable operation graph plus reported entity-only edges accounts for entity graph",
+    "Source arguments passed to build/compare contain no case/root/fault labels"
+  ]
+}

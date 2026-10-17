@@ -1,0 +1,906 @@
+{
+  "scope": {
+    "system": "FlashTicket",
+    "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac"
+  },
+  "entities": [
+    {
+      "id": "api-gateway",
+      "name": "API Gateway",
+      "type": "gateway",
+      "granularity": "component",
+      "role": "bề mặt HTTP công bố; không route internal",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§3.1/§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B13",
+          "locator": "§2",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "broker",
+      "name": "Broker",
+      "type": "broker",
+      "granularity": "component",
+      "role": "trao đổi bản tin; runtime broker/vhost/queue chưa biết",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B13",
+          "locator": "§5.1",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "cache",
+      "name": "Cache",
+      "type": "cache",
+      "granularity": "component",
+      "role": "cache ở máy1; công nghệ và thao tác chi tiết OPEN",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B11-C-02",
+          "locator": "L25/L52",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "config-discovery",
+      "name": "Config / Discovery",
+      "type": "service",
+      "granularity": "component",
+      "role": "hỗ trợ cấu hình/khám phá; không tự tách thành process runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B11-C-02",
+          "locator": "L34/L61-L64",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "chatbot-adapter",
+      "name": "Chatbot adapter",
+      "type": "service",
+      "granularity": "component",
+      "role": "kênh bán vé, qua gateway; không là service nghiệp vụ",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§3.1/§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "web-channel",
+      "name": "Kênh web",
+      "type": "external",
+      "granularity": "component",
+      "role": "kênh ngoài gateway",
+      "provenance": [
+        {
+          "source_id": "FT-B11-C-01",
+          "locator": "L14-L15/L37",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "mobile-channel",
+      "name": "Kênh mobile",
+      "type": "external",
+      "granularity": "component",
+      "role": "tùy thời gian; không tuyên bố hiện thực",
+      "provenance": [
+        {
+          "source_id": "FT-B11-C-01",
+          "locator": "L14",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-ROLES",
+          "locator": "L13",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "vnpay",
+      "name": "Cổng thanh toán VNPay",
+      "type": "external",
+      "granularity": "component",
+      "role": "provider; chỉ có dữ liệu phía client/callback đã xác minh",
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "§5.3",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "smtp",
+      "name": "SMTP",
+      "type": "external",
+      "granularity": "component",
+      "role": "giao email ngoài transaction; channel chưa biểu diễn được trong T-036",
+      "provenance": [
+        {
+          "source_id": "FT-B14",
+          "locator": "L82",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B14-03",
+          "locator": "L9-L12",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "gemini-api",
+      "name": "Gemini API",
+      "type": "external",
+      "granularity": "component",
+      "role": "giải thích sau xếp hạng; evidence đã lọc",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§5",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "otel-collector",
+      "name": "OTel Collector",
+      "type": "service",
+      "granularity": "component",
+      "role": "nhận/xuất tín hiệu; lỗi xuất không chứng minh không có nghiệp vụ",
+      "provenance": [
+        {
+          "source_id": "FT-B16",
+          "locator": "§2/§7",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "tempo",
+      "name": "Tempo",
+      "type": "database",
+      "granularity": "component",
+      "role": "kho trace",
+      "provenance": [
+        {
+          "source_id": "FT-B16",
+          "locator": "§2",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "loki",
+      "name": "Loki",
+      "type": "database",
+      "granularity": "component",
+      "role": "kho log",
+      "provenance": [
+        {
+          "source_id": "FT-B16",
+          "locator": "§2",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "prometheus",
+      "name": "Prometheus",
+      "type": "database",
+      "granularity": "component",
+      "role": "kho/thu metric; không là nguồn quyết định giữ chỗ",
+      "provenance": [
+        {
+          "source_id": "FT-B16",
+          "locator": "§2/§5",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "grafana",
+      "name": "Grafana",
+      "type": "service",
+      "granularity": "component",
+      "role": "xem/liên kết tín hiệu; viewer không tự bảo đảm read-only API",
+      "provenance": [
+        {
+          "source_id": "FT-B16",
+          "locator": "§2/§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "rca",
+      "name": "RCA + lớp giải thích",
+      "type": "service",
+      "granularity": "component",
+      "role": "đơn vị riêng chỉ đọc kho quan sát; tập ứng viên xếp hạng chưa chọn",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§5/§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§1/§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    }
+  ],
+  "operations": [],
+  "relations": [
+    {
+      "id": "infra-placement-api-gateway",
+      "source": {
+        "entity": "api-gateway",
+        "operation": null
+      },
+      "target": {
+        "entity": "ft-design-machine-1",
+        "operation": null
+      },
+      "type": "triển-khai",
+      "channel": "deployment",
+      "messaging": null,
+      "context": "Bố trí mục tiêu theo B11-C §6; không là deployment/host ID runtime. Chi tiết các kho B16 là đề xuất thành phần trong nhóm kho quan sát.",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§2",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-placement-booking-service",
+      "source": {
+        "entity": "booking-service",
+        "operation": null
+      },
+      "target": {
+        "entity": "ft-design-machine-1",
+        "operation": null
+      },
+      "type": "triển-khai",
+      "channel": "deployment",
+      "messaging": null,
+      "context": "Bố trí mục tiêu theo B11-C §6; không là deployment/host ID runtime. Chi tiết các kho B16 là đề xuất thành phần trong nhóm kho quan sát.",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§2",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-placement-payment-service",
+      "source": {
+        "entity": "payment-service",
+        "operation": null
+      },
+      "target": {
+        "entity": "ft-design-machine-1",
+        "operation": null
+      },
+      "type": "triển-khai",
+      "channel": "deployment",
+      "messaging": null,
+      "context": "Bố trí mục tiêu theo B11-C §6; không là deployment/host ID runtime. Chi tiết các kho B16 là đề xuất thành phần trong nhóm kho quan sát.",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§2",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-placement-ticket-service",
+      "source": {
+        "entity": "ticket-service",
+        "operation": null
+      },
+      "target": {
+        "entity": "ft-design-machine-1",
+        "operation": null
+      },
+      "type": "triển-khai",
+      "channel": "deployment",
+      "messaging": null,
+      "context": "Bố trí mục tiêu theo B11-C §6; không là deployment/host ID runtime. Chi tiết các kho B16 là đề xuất thành phần trong nhóm kho quan sát.",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§2",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-placement-broker",
+      "source": {
+        "entity": "broker",
+        "operation": null
+      },
+      "target": {
+        "entity": "ft-design-machine-1",
+        "operation": null
+      },
+      "type": "triển-khai",
+      "channel": "deployment",
+      "messaging": null,
+      "context": "Bố trí mục tiêu theo B11-C §6; không là deployment/host ID runtime. Chi tiết các kho B16 là đề xuất thành phần trong nhóm kho quan sát.",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§2",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-placement-cache",
+      "source": {
+        "entity": "cache",
+        "operation": null
+      },
+      "target": {
+        "entity": "ft-design-machine-1",
+        "operation": null
+      },
+      "type": "triển-khai",
+      "channel": "deployment",
+      "messaging": null,
+      "context": "Bố trí mục tiêu theo B11-C §6; không là deployment/host ID runtime. Chi tiết các kho B16 là đề xuất thành phần trong nhóm kho quan sát.",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§2",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-placement-event-service",
+      "source": {
+        "entity": "event-service",
+        "operation": null
+      },
+      "target": {
+        "entity": "ft-design-machine-2",
+        "operation": null
+      },
+      "type": "triển-khai",
+      "channel": "deployment",
+      "messaging": null,
+      "context": "Bố trí mục tiêu theo B11-C §6; không là deployment/host ID runtime. Chi tiết các kho B16 là đề xuất thành phần trong nhóm kho quan sát.",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§2",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-placement-user-service",
+      "source": {
+        "entity": "user-service",
+        "operation": null
+      },
+      "target": {
+        "entity": "ft-design-machine-2",
+        "operation": null
+      },
+      "type": "triển-khai",
+      "channel": "deployment",
+      "messaging": null,
+      "context": "Bố trí mục tiêu theo B11-C §6; không là deployment/host ID runtime. Chi tiết các kho B16 là đề xuất thành phần trong nhóm kho quan sát.",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§2",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-placement-keycloak",
+      "source": {
+        "entity": "keycloak",
+        "operation": null
+      },
+      "target": {
+        "entity": "ft-design-machine-2",
+        "operation": null
+      },
+      "type": "triển-khai",
+      "channel": "deployment",
+      "messaging": null,
+      "context": "Bố trí mục tiêu theo B11-C §6; không là deployment/host ID runtime. Chi tiết các kho B16 là đề xuất thành phần trong nhóm kho quan sát.",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§2",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-placement-config-discovery",
+      "source": {
+        "entity": "config-discovery",
+        "operation": null
+      },
+      "target": {
+        "entity": "ft-design-machine-2",
+        "operation": null
+      },
+      "type": "triển-khai",
+      "channel": "deployment",
+      "messaging": null,
+      "context": "Bố trí mục tiêu theo B11-C §6; không là deployment/host ID runtime. Chi tiết các kho B16 là đề xuất thành phần trong nhóm kho quan sát.",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§2",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-placement-chatbot-adapter",
+      "source": {
+        "entity": "chatbot-adapter",
+        "operation": null
+      },
+      "target": {
+        "entity": "ft-design-machine-2",
+        "operation": null
+      },
+      "type": "triển-khai",
+      "channel": "deployment",
+      "messaging": null,
+      "context": "Bố trí mục tiêu theo B11-C §6; không là deployment/host ID runtime. Chi tiết các kho B16 là đề xuất thành phần trong nhóm kho quan sát.",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§2",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-placement-otel-collector",
+      "source": {
+        "entity": "otel-collector",
+        "operation": null
+      },
+      "target": {
+        "entity": "ft-design-machine-2",
+        "operation": null
+      },
+      "type": "triển-khai",
+      "channel": "deployment",
+      "messaging": null,
+      "context": "Bố trí mục tiêu theo B11-C §6; không là deployment/host ID runtime. Chi tiết các kho B16 là đề xuất thành phần trong nhóm kho quan sát.",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§2",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-placement-tempo",
+      "source": {
+        "entity": "tempo",
+        "operation": null
+      },
+      "target": {
+        "entity": "ft-design-machine-2",
+        "operation": null
+      },
+      "type": "triển-khai",
+      "channel": "deployment",
+      "messaging": null,
+      "context": "Bố trí mục tiêu theo B11-C §6; không là deployment/host ID runtime. Chi tiết các kho B16 là đề xuất thành phần trong nhóm kho quan sát.",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§2",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-placement-loki",
+      "source": {
+        "entity": "loki",
+        "operation": null
+      },
+      "target": {
+        "entity": "ft-design-machine-2",
+        "operation": null
+      },
+      "type": "triển-khai",
+      "channel": "deployment",
+      "messaging": null,
+      "context": "Bố trí mục tiêu theo B11-C §6; không là deployment/host ID runtime. Chi tiết các kho B16 là đề xuất thành phần trong nhóm kho quan sát.",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§2",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-placement-prometheus",
+      "source": {
+        "entity": "prometheus",
+        "operation": null
+      },
+      "target": {
+        "entity": "ft-design-machine-2",
+        "operation": null
+      },
+      "type": "triển-khai",
+      "channel": "deployment",
+      "messaging": null,
+      "context": "Bố trí mục tiêu theo B11-C §6; không là deployment/host ID runtime. Chi tiết các kho B16 là đề xuất thành phần trong nhóm kho quan sát.",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§2",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-placement-grafana",
+      "source": {
+        "entity": "grafana",
+        "operation": null
+      },
+      "target": {
+        "entity": "ft-design-machine-2",
+        "operation": null
+      },
+      "type": "triển-khai",
+      "channel": "deployment",
+      "messaging": null,
+      "context": "Bố trí mục tiêu theo B11-C §6; không là deployment/host ID runtime. Chi tiết các kho B16 là đề xuất thành phần trong nhóm kho quan sát.",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§2",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-placement-rca",
+      "source": {
+        "entity": "rca",
+        "operation": null
+      },
+      "target": {
+        "entity": "ft-design-machine-2",
+        "operation": null
+      },
+      "type": "triển-khai",
+      "channel": "deployment",
+      "messaging": null,
+      "context": "Bố trí mục tiêu theo B11-C §6; không là deployment/host ID runtime. Chi tiết các kho B16 là đề xuất thành phần trong nhóm kho quan sát.",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§6",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§2",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-cache-booking",
+      "source": {
+        "entity": "booking-service",
+        "operation": null
+      },
+      "target": {
+        "entity": "cache",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "B11-C-02 thể hiện phụ thuộc cache; chưa có operation/cấu hình/address runtime để bổ sung",
+      "provenance": [
+        {
+          "source_id": "FT-B11-C-02",
+          "locator": "L52",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    }
+  ],
+  "resource_bindings": [],
+  "signals": [
+    {
+      "id": "infra-resource-api-gateway",
+      "kind": "metric",
+      "entity": "api-gateway",
+      "operation": null,
+      "address": [
+        "design:entity=api-gateway",
+        "scope:service/instance/host phải xác minh bằng manifest runtime",
+        "metric:CPU/RAM/disk/pool/queue hoặc export failure theo thành phần; tên series OPEN"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "FT-B16",
+          "locator": "§5/§7",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-resource-broker",
+      "kind": "metric",
+      "entity": "broker",
+      "operation": null,
+      "address": [
+        "design:entity=broker",
+        "scope:service/instance/host phải xác minh bằng manifest runtime",
+        "metric:CPU/RAM/disk/pool/queue hoặc export failure theo thành phần; tên series OPEN"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "FT-B16",
+          "locator": "§5/§7",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-resource-cache",
+      "kind": "metric",
+      "entity": "cache",
+      "operation": null,
+      "address": [
+        "design:entity=cache",
+        "scope:service/instance/host phải xác minh bằng manifest runtime",
+        "metric:CPU/RAM/disk/pool/queue hoặc export failure theo thành phần; tên series OPEN"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "FT-B16",
+          "locator": "§5/§7",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-resource-postgresql-shared-instance",
+      "kind": "metric",
+      "entity": "postgresql-shared-instance",
+      "operation": null,
+      "address": [
+        "design:entity=postgresql-shared-instance",
+        "scope:service/instance/host phải xác minh bằng manifest runtime",
+        "metric:CPU/RAM/disk/pool/queue hoặc export failure theo thành phần; tên series OPEN"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "FT-B16",
+          "locator": "§5/§7",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-resource-mongodb-instance",
+      "kind": "metric",
+      "entity": "mongodb-instance",
+      "operation": null,
+      "address": [
+        "design:entity=mongodb-instance",
+        "scope:service/instance/host phải xác minh bằng manifest runtime",
+        "metric:CPU/RAM/disk/pool/queue hoặc export failure theo thành phần; tên series OPEN"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "FT-B16",
+          "locator": "§5/§7",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-resource-ft-design-machine-1",
+      "kind": "metric",
+      "entity": "ft-design-machine-1",
+      "operation": null,
+      "address": [
+        "design:entity=ft-design-machine-1",
+        "scope:service/instance/host phải xác minh bằng manifest runtime",
+        "metric:CPU/RAM/disk/pool/queue hoặc export failure theo thành phần; tên series OPEN"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "FT-B16",
+          "locator": "§5/§7",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-resource-ft-design-machine-2",
+      "kind": "metric",
+      "entity": "ft-design-machine-2",
+      "operation": null,
+      "address": [
+        "design:entity=ft-design-machine-2",
+        "scope:service/instance/host phải xác minh bằng manifest runtime",
+        "metric:CPU/RAM/disk/pool/queue hoặc export failure theo thành phần; tên series OPEN"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "FT-B16",
+          "locator": "§5/§7",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "infra-resource-otel-collector",
+      "kind": "metric",
+      "entity": "otel-collector",
+      "operation": null,
+      "address": [
+        "design:entity=otel-collector",
+        "scope:service/instance/host phải xác minh bằng manifest runtime",
+        "metric:CPU/RAM/disk/pool/queue hoặc export failure theo thành phần; tên series OPEN"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "FT-B16",
+          "locator": "§5/§7",
+          "condition": "Thiết kế; chưa kiểm runtime"
+        }
+      ]
+    }
+  ]
+}

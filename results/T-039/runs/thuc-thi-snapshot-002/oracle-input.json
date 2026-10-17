@@ -1,0 +1,217 @@
+{
+  "document": {
+    "scope": {
+      "system": "synthetic",
+      "revision": "1"
+    },
+    "entities": [
+      {
+        "id": "alpha",
+        "name": "alpha",
+        "type": "service",
+        "granularity": "logical",
+        "role": "fixture",
+        "provenance": [
+          {
+            "source_id": "synthetic",
+            "locator": "literal oracle",
+            "condition": "synthetic only"
+          }
+        ]
+      },
+      {
+        "id": "beta",
+        "name": "beta",
+        "type": "service",
+        "granularity": "logical",
+        "role": "fixture",
+        "provenance": [
+          {
+            "source_id": "synthetic",
+            "locator": "literal oracle",
+            "condition": "synthetic only"
+          }
+        ]
+      },
+      {
+        "id": "database",
+        "name": "database",
+        "type": "database",
+        "granularity": "logical",
+        "role": "fixture",
+        "provenance": [
+          {
+            "source_id": "synthetic",
+            "locator": "literal oracle",
+            "condition": "synthetic only"
+          }
+        ]
+      },
+      {
+        "id": "spare",
+        "name": "spare",
+        "type": "service",
+        "granularity": "logical",
+        "role": "fixture",
+        "provenance": [
+          {
+            "source_id": "synthetic",
+            "locator": "literal oracle",
+            "condition": "synthetic only"
+          }
+        ]
+      }
+    ],
+    "operations": [
+      {
+        "entity": "alpha",
+        "name": "invoke",
+        "runtime_name": "invoke",
+        "provenance": [
+          {
+            "source_id": "synthetic",
+            "locator": "literal oracle",
+            "condition": "synthetic only"
+          }
+        ]
+      },
+      {
+        "entity": "beta",
+        "name": "serve",
+        "runtime_name": "serve",
+        "provenance": [
+          {
+            "source_id": "synthetic",
+            "locator": "literal oracle",
+            "condition": "synthetic only"
+          }
+        ]
+      }
+    ],
+    "relations": [
+      {
+        "id": "call",
+        "source": {
+          "entity": "alpha",
+          "operation": "invoke"
+        },
+        "target": {
+          "entity": "beta",
+          "operation": "serve"
+        },
+        "type": "gọi-đồng-bộ",
+        "channel": "rpc",
+        "messaging": null,
+        "context": "synthetic",
+        "provenance": [
+          {
+            "source_id": "synthetic",
+            "locator": "literal oracle",
+            "condition": "synthetic only"
+          }
+        ]
+      },
+      {
+        "id": "storage",
+        "source": {
+          "entity": "beta",
+          "operation": null
+        },
+        "target": {
+          "entity": "database",
+          "operation": null
+        },
+        "type": "dữ-liệu",
+        "channel": "data",
+        "messaging": null,
+        "context": "synthetic",
+        "provenance": [
+          {
+            "source_id": "synthetic",
+            "locator": "literal oracle",
+            "condition": "synthetic only"
+          }
+        ]
+      }
+    ],
+    "resource_bindings": [],
+    "signals": []
+  },
+  "registry": {
+    "sources": [
+      {
+        "id": "synthetic",
+        "kind": "synthetic",
+        "revision": "1",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "condition": "synthetic only"
+      }
+    ]
+  },
+  "trace": {
+    "level": "entity",
+    "nodes": [
+      {
+        "id": "alias-alpha"
+      },
+      {
+        "id": "beta"
+      }
+    ],
+    "edges": [
+      {
+        "source": "alias-alpha",
+        "target": "beta",
+        "type": "gọi-chưa-phân-kiểu",
+        "evidence_source": "trace",
+        "destination": null,
+        "event_count": 1,
+        "witness": []
+      }
+    ],
+    "interval_ns": [
+      10,
+      20
+    ]
+  },
+  "mappings": [
+    {
+      "level": "entity",
+      "original": "alias-alpha",
+      "candidates": [
+        "alpha"
+      ],
+      "verified": true,
+      "provenance": [
+        {
+          "source_id": "synthetic",
+          "locator": "literal oracle",
+          "condition": "synthetic only"
+        }
+      ]
+    },
+    {
+      "level": "entity",
+      "original": "beta",
+      "candidates": [
+        "beta"
+      ],
+      "verified": true,
+      "provenance": [
+        {
+          "source_id": "synthetic",
+          "locator": "literal oracle",
+          "condition": "synthetic only"
+        }
+      ]
+    }
+  ],
+  "context": {
+    "system": "synthetic",
+    "level": "entity",
+    "domain": "synthetic",
+    "trace_revision": "fixture",
+    "revision_link_verified": false,
+    "revision_provenance": []
+  }
+}

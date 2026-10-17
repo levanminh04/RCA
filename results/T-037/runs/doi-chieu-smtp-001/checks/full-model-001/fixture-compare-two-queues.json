@@ -1,0 +1,1227 @@
+{
+  "schema_version": 1,
+  "context": {
+    "system": "synthetic-FT",
+    "level": "entity",
+    "domain": "synthetic",
+    "trace_revision": "synthetic-only",
+    "revision_link_verified": false,
+    "revision_provenance": [],
+    "relation_types": [
+      "thông-điệp"
+    ]
+  },
+  "static_scope": {
+    "system": "synthetic-FT",
+    "revision": "fixture-v2"
+  },
+  "interval_ns": null,
+  "conditional_reference": true,
+  "interpretation": "structural_agreement; not runtime ground truth or RCA benefit",
+  "views": {
+    "endpoints": {
+      "S": [
+        [
+          "broker",
+          "ticket-service",
+          null,
+          [
+            "consume",
+            {
+              "broker": "broker",
+              "broker_scope": "synthetic-vhost",
+              "queue": "q-A"
+            }
+          ]
+        ],
+        [
+          "broker",
+          "ticket-service",
+          null,
+          [
+            "consume",
+            {
+              "broker": "broker",
+              "broker_scope": "synthetic-vhost",
+              "queue": "q-B"
+            }
+          ]
+        ],
+        [
+          "payment-service",
+          "broker",
+          null,
+          [
+            "publish",
+            {
+              "broker": "broker",
+              "broker_scope": "synthetic-vhost",
+              "exchange": "flash-ticket.v1",
+              "routing_key": "event.cancelled.v1"
+            }
+          ]
+        ]
+      ],
+      "T": [
+        [
+          "broker",
+          "ticket-service",
+          null,
+          [
+            "consume",
+            {
+              "broker": "broker",
+              "broker_scope": "synthetic-vhost",
+              "queue": "q-A"
+            }
+          ]
+        ],
+        [
+          "broker",
+          "ticket-service",
+          null,
+          [
+            "consume",
+            {
+              "broker": "broker",
+              "broker_scope": "synthetic-vhost",
+              "queue": "q-B"
+            }
+          ]
+        ]
+      ],
+      "intersection": [
+        [
+          "broker",
+          "ticket-service",
+          null,
+          [
+            "consume",
+            {
+              "broker": "broker",
+              "broker_scope": "synthetic-vhost",
+              "queue": "q-A"
+            }
+          ]
+        ],
+        [
+          "broker",
+          "ticket-service",
+          null,
+          [
+            "consume",
+            {
+              "broker": "broker",
+              "broker_scope": "synthetic-vhost",
+              "queue": "q-B"
+            }
+          ]
+        ]
+      ],
+      "static_only": [
+        [
+          "payment-service",
+          "broker",
+          null,
+          [
+            "publish",
+            {
+              "broker": "broker",
+              "broker_scope": "synthetic-vhost",
+              "exchange": "flash-ticket.v1",
+              "routing_key": "event.cancelled.v1"
+            }
+          ]
+        ]
+      ],
+      "trace_only": [],
+      "numerator": 2,
+      "static_denominator": 3,
+      "trace_denominator": 2,
+      "static_fraction": 0.6666666666666666,
+      "trace_fraction": 1.0,
+      "members": {
+        "static": [
+          {
+            "key": [
+              "broker",
+              "ticket-service",
+              null,
+              [
+                "consume",
+                {
+                  "broker": "broker",
+                  "broker_scope": "synthetic-vhost",
+                  "queue": "q-A"
+                }
+              ]
+            ],
+            "members": [
+              {
+                "index": 1,
+                "original": {
+                  "source": "broker",
+                  "target": "ticket-service",
+                  "type": "thông-điệp",
+                  "channel": "consume",
+                  "messaging": {
+                    "broker": "broker",
+                    "broker_scope": "synthetic-vhost",
+                    "exchange": "flash-ticket.v1",
+                    "routing_key": "event.cancelled.v1",
+                    "queue": "q-A"
+                  },
+                  "evidence_source": "static",
+                  "destination": null,
+                  "queue_metric_address": [
+                    "broker",
+                    "synthetic-vhost",
+                    "q-A"
+                  ],
+                  "record_ids": [
+                    "consume-A"
+                  ],
+                  "provenance": [
+                    {
+                      "source_id": "FT-SYNTHETIC",
+                      "locator": "fixture requirement oracle-v2.json",
+                      "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+                    }
+                  ],
+                  "contexts": [
+                    "Synthetic, not runtime"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": [
+              "broker",
+              "ticket-service",
+              null,
+              [
+                "consume",
+                {
+                  "broker": "broker",
+                  "broker_scope": "synthetic-vhost",
+                  "queue": "q-B"
+                }
+              ]
+            ],
+            "members": [
+              {
+                "index": 2,
+                "original": {
+                  "source": "broker",
+                  "target": "ticket-service",
+                  "type": "thông-điệp",
+                  "channel": "consume",
+                  "messaging": {
+                    "broker": "broker",
+                    "broker_scope": "synthetic-vhost",
+                    "exchange": "flash-ticket.v1",
+                    "routing_key": "event.cancelled.v1",
+                    "queue": "q-B"
+                  },
+                  "evidence_source": "static",
+                  "destination": null,
+                  "queue_metric_address": [
+                    "broker",
+                    "synthetic-vhost",
+                    "q-B"
+                  ],
+                  "record_ids": [
+                    "consume-B"
+                  ],
+                  "provenance": [
+                    {
+                      "source_id": "FT-SYNTHETIC",
+                      "locator": "fixture requirement oracle-v2.json",
+                      "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+                    }
+                  ],
+                  "contexts": [
+                    "Synthetic, not runtime"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": [
+              "payment-service",
+              "broker",
+              null,
+              [
+                "publish",
+                {
+                  "broker": "broker",
+                  "broker_scope": "synthetic-vhost",
+                  "exchange": "flash-ticket.v1",
+                  "routing_key": "event.cancelled.v1"
+                }
+              ]
+            ],
+            "members": [
+              {
+                "index": 3,
+                "original": {
+                  "source": "payment-service",
+                  "target": "broker",
+                  "type": "thông-điệp",
+                  "channel": "publish",
+                  "messaging": {
+                    "broker": "broker",
+                    "broker_scope": "synthetic-vhost",
+                    "exchange": "flash-ticket.v1",
+                    "routing_key": "event.cancelled.v1",
+                    "queue": null
+                  },
+                  "evidence_source": "static",
+                  "destination": null,
+                  "queue_metric_address": null,
+                  "record_ids": [
+                    "publish"
+                  ],
+                  "provenance": [
+                    {
+                      "source_id": "FT-SYNTHETIC",
+                      "locator": "fixture requirement oracle-v2.json",
+                      "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+                    }
+                  ],
+                  "contexts": [
+                    "Synthetic, not runtime"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "trace": [
+          {
+            "key": [
+              "broker",
+              "ticket-service",
+              null,
+              [
+                "consume",
+                {
+                  "broker": "broker",
+                  "broker_scope": "synthetic-vhost",
+                  "queue": "q-A"
+                }
+              ]
+            ],
+            "members": [
+              {
+                "index": 0,
+                "original": {
+                  "source": "broker",
+                  "target": "ticket-service",
+                  "type": "thông-điệp",
+                  "evidence_source": "trace",
+                  "event_count": 1,
+                  "witness": [
+                    [
+                      "t-a",
+                      "c"
+                    ]
+                  ],
+                  "destination": null,
+                  "messaging": {
+                    "broker": "broker",
+                    "broker_scope": "synthetic-vhost",
+                    "exchange": "flash-ticket.v1",
+                    "routing_key": "event.cancelled.v1",
+                    "queue": "q-A"
+                  },
+                  "queue_metric_address": [
+                    "broker",
+                    "synthetic-vhost",
+                    "q-A"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": [
+              "broker",
+              "ticket-service",
+              null,
+              [
+                "consume",
+                {
+                  "broker": "broker",
+                  "broker_scope": "synthetic-vhost",
+                  "queue": "q-B"
+                }
+              ]
+            ],
+            "members": [
+              {
+                "index": 1,
+                "original": {
+                  "source": "broker",
+                  "target": "ticket-service",
+                  "type": "thông-điệp",
+                  "evidence_source": "trace",
+                  "event_count": 1,
+                  "witness": [
+                    [
+                      "t-b",
+                      "c"
+                    ]
+                  ],
+                  "destination": null,
+                  "messaging": {
+                    "broker": "broker",
+                    "broker_scope": "synthetic-vhost",
+                    "exchange": "flash-ticket.v1",
+                    "routing_key": "event.cancelled.v1",
+                    "queue": "q-B"
+                  },
+                  "queue_metric_address": [
+                    "broker",
+                    "synthetic-vhost",
+                    "q-B"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "exclusions": {
+        "static": [
+          {
+            "index": 0,
+            "reason": "outside_relation_domain",
+            "original": {
+              "source": "booking-service",
+              "target": "db-A",
+              "type": "dữ-liệu",
+              "channel": "data",
+              "messaging": null,
+              "evidence_source": "static",
+              "destination": null,
+              "record_ids": [
+                "data-A"
+              ],
+              "provenance": [
+                {
+                  "source_id": "FT-SYNTHETIC",
+                  "locator": "fixture requirement oracle-v2.json",
+                  "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+                }
+              ],
+              "contexts": [
+                "Synthetic, not runtime"
+              ]
+            }
+          },
+          {
+            "index": 4,
+            "reason": "outside_relation_domain",
+            "original": {
+              "source": "payment-service",
+              "target": "db-B",
+              "type": "dữ-liệu",
+              "channel": "data",
+              "messaging": null,
+              "evidence_source": "static",
+              "destination": null,
+              "record_ids": [
+                "data-B"
+              ],
+              "provenance": [
+                {
+                  "source_id": "FT-SYNTHETIC",
+                  "locator": "fixture requirement oracle-v2.json",
+                  "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+                }
+              ],
+              "contexts": [
+                "Synthetic, not runtime"
+              ]
+            }
+          }
+        ],
+        "trace": []
+      }
+    },
+    "typed": {
+      "S": [
+        [
+          "broker",
+          "ticket-service",
+          "thông-điệp",
+          [
+            "consume",
+            {
+              "broker": "broker",
+              "broker_scope": "synthetic-vhost",
+              "queue": "q-A"
+            }
+          ]
+        ],
+        [
+          "broker",
+          "ticket-service",
+          "thông-điệp",
+          [
+            "consume",
+            {
+              "broker": "broker",
+              "broker_scope": "synthetic-vhost",
+              "queue": "q-B"
+            }
+          ]
+        ],
+        [
+          "payment-service",
+          "broker",
+          "thông-điệp",
+          [
+            "publish",
+            {
+              "broker": "broker",
+              "broker_scope": "synthetic-vhost",
+              "exchange": "flash-ticket.v1",
+              "routing_key": "event.cancelled.v1"
+            }
+          ]
+        ]
+      ],
+      "T": [
+        [
+          "broker",
+          "ticket-service",
+          "thông-điệp",
+          [
+            "consume",
+            {
+              "broker": "broker",
+              "broker_scope": "synthetic-vhost",
+              "queue": "q-A"
+            }
+          ]
+        ],
+        [
+          "broker",
+          "ticket-service",
+          "thông-điệp",
+          [
+            "consume",
+            {
+              "broker": "broker",
+              "broker_scope": "synthetic-vhost",
+              "queue": "q-B"
+            }
+          ]
+        ]
+      ],
+      "intersection": [
+        [
+          "broker",
+          "ticket-service",
+          "thông-điệp",
+          [
+            "consume",
+            {
+              "broker": "broker",
+              "broker_scope": "synthetic-vhost",
+              "queue": "q-A"
+            }
+          ]
+        ],
+        [
+          "broker",
+          "ticket-service",
+          "thông-điệp",
+          [
+            "consume",
+            {
+              "broker": "broker",
+              "broker_scope": "synthetic-vhost",
+              "queue": "q-B"
+            }
+          ]
+        ]
+      ],
+      "static_only": [
+        [
+          "payment-service",
+          "broker",
+          "thông-điệp",
+          [
+            "publish",
+            {
+              "broker": "broker",
+              "broker_scope": "synthetic-vhost",
+              "exchange": "flash-ticket.v1",
+              "routing_key": "event.cancelled.v1"
+            }
+          ]
+        ]
+      ],
+      "trace_only": [],
+      "numerator": 2,
+      "static_denominator": 3,
+      "trace_denominator": 2,
+      "static_fraction": 0.6666666666666666,
+      "trace_fraction": 1.0,
+      "members": {
+        "static": [
+          {
+            "key": [
+              "broker",
+              "ticket-service",
+              "thông-điệp",
+              [
+                "consume",
+                {
+                  "broker": "broker",
+                  "broker_scope": "synthetic-vhost",
+                  "queue": "q-A"
+                }
+              ]
+            ],
+            "members": [
+              {
+                "index": 1,
+                "original": {
+                  "source": "broker",
+                  "target": "ticket-service",
+                  "type": "thông-điệp",
+                  "channel": "consume",
+                  "messaging": {
+                    "broker": "broker",
+                    "broker_scope": "synthetic-vhost",
+                    "exchange": "flash-ticket.v1",
+                    "routing_key": "event.cancelled.v1",
+                    "queue": "q-A"
+                  },
+                  "evidence_source": "static",
+                  "destination": null,
+                  "queue_metric_address": [
+                    "broker",
+                    "synthetic-vhost",
+                    "q-A"
+                  ],
+                  "record_ids": [
+                    "consume-A"
+                  ],
+                  "provenance": [
+                    {
+                      "source_id": "FT-SYNTHETIC",
+                      "locator": "fixture requirement oracle-v2.json",
+                      "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+                    }
+                  ],
+                  "contexts": [
+                    "Synthetic, not runtime"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": [
+              "broker",
+              "ticket-service",
+              "thông-điệp",
+              [
+                "consume",
+                {
+                  "broker": "broker",
+                  "broker_scope": "synthetic-vhost",
+                  "queue": "q-B"
+                }
+              ]
+            ],
+            "members": [
+              {
+                "index": 2,
+                "original": {
+                  "source": "broker",
+                  "target": "ticket-service",
+                  "type": "thông-điệp",
+                  "channel": "consume",
+                  "messaging": {
+                    "broker": "broker",
+                    "broker_scope": "synthetic-vhost",
+                    "exchange": "flash-ticket.v1",
+                    "routing_key": "event.cancelled.v1",
+                    "queue": "q-B"
+                  },
+                  "evidence_source": "static",
+                  "destination": null,
+                  "queue_metric_address": [
+                    "broker",
+                    "synthetic-vhost",
+                    "q-B"
+                  ],
+                  "record_ids": [
+                    "consume-B"
+                  ],
+                  "provenance": [
+                    {
+                      "source_id": "FT-SYNTHETIC",
+                      "locator": "fixture requirement oracle-v2.json",
+                      "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+                    }
+                  ],
+                  "contexts": [
+                    "Synthetic, not runtime"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": [
+              "payment-service",
+              "broker",
+              "thông-điệp",
+              [
+                "publish",
+                {
+                  "broker": "broker",
+                  "broker_scope": "synthetic-vhost",
+                  "exchange": "flash-ticket.v1",
+                  "routing_key": "event.cancelled.v1"
+                }
+              ]
+            ],
+            "members": [
+              {
+                "index": 3,
+                "original": {
+                  "source": "payment-service",
+                  "target": "broker",
+                  "type": "thông-điệp",
+                  "channel": "publish",
+                  "messaging": {
+                    "broker": "broker",
+                    "broker_scope": "synthetic-vhost",
+                    "exchange": "flash-ticket.v1",
+                    "routing_key": "event.cancelled.v1",
+                    "queue": null
+                  },
+                  "evidence_source": "static",
+                  "destination": null,
+                  "queue_metric_address": null,
+                  "record_ids": [
+                    "publish"
+                  ],
+                  "provenance": [
+                    {
+                      "source_id": "FT-SYNTHETIC",
+                      "locator": "fixture requirement oracle-v2.json",
+                      "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+                    }
+                  ],
+                  "contexts": [
+                    "Synthetic, not runtime"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "trace": [
+          {
+            "key": [
+              "broker",
+              "ticket-service",
+              "thông-điệp",
+              [
+                "consume",
+                {
+                  "broker": "broker",
+                  "broker_scope": "synthetic-vhost",
+                  "queue": "q-A"
+                }
+              ]
+            ],
+            "members": [
+              {
+                "index": 0,
+                "original": {
+                  "source": "broker",
+                  "target": "ticket-service",
+                  "type": "thông-điệp",
+                  "evidence_source": "trace",
+                  "event_count": 1,
+                  "witness": [
+                    [
+                      "t-a",
+                      "c"
+                    ]
+                  ],
+                  "destination": null,
+                  "messaging": {
+                    "broker": "broker",
+                    "broker_scope": "synthetic-vhost",
+                    "exchange": "flash-ticket.v1",
+                    "routing_key": "event.cancelled.v1",
+                    "queue": "q-A"
+                  },
+                  "queue_metric_address": [
+                    "broker",
+                    "synthetic-vhost",
+                    "q-A"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": [
+              "broker",
+              "ticket-service",
+              "thông-điệp",
+              [
+                "consume",
+                {
+                  "broker": "broker",
+                  "broker_scope": "synthetic-vhost",
+                  "queue": "q-B"
+                }
+              ]
+            ],
+            "members": [
+              {
+                "index": 1,
+                "original": {
+                  "source": "broker",
+                  "target": "ticket-service",
+                  "type": "thông-điệp",
+                  "evidence_source": "trace",
+                  "event_count": 1,
+                  "witness": [
+                    [
+                      "t-b",
+                      "c"
+                    ]
+                  ],
+                  "destination": null,
+                  "messaging": {
+                    "broker": "broker",
+                    "broker_scope": "synthetic-vhost",
+                    "exchange": "flash-ticket.v1",
+                    "routing_key": "event.cancelled.v1",
+                    "queue": "q-B"
+                  },
+                  "queue_metric_address": [
+                    "broker",
+                    "synthetic-vhost",
+                    "q-B"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "exclusions": {
+        "static": [
+          {
+            "index": 0,
+            "reason": "outside_relation_domain",
+            "original": {
+              "source": "booking-service",
+              "target": "db-A",
+              "type": "dữ-liệu",
+              "channel": "data",
+              "messaging": null,
+              "evidence_source": "static",
+              "destination": null,
+              "record_ids": [
+                "data-A"
+              ],
+              "provenance": [
+                {
+                  "source_id": "FT-SYNTHETIC",
+                  "locator": "fixture requirement oracle-v2.json",
+                  "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+                }
+              ],
+              "contexts": [
+                "Synthetic, not runtime"
+              ]
+            }
+          },
+          {
+            "index": 4,
+            "reason": "outside_relation_domain",
+            "original": {
+              "source": "payment-service",
+              "target": "db-B",
+              "type": "dữ-liệu",
+              "channel": "data",
+              "messaging": null,
+              "evidence_source": "static",
+              "destination": null,
+              "record_ids": [
+                "data-B"
+              ],
+              "provenance": [
+                {
+                  "source_id": "FT-SYNTHETIC",
+                  "locator": "fixture requirement oracle-v2.json",
+                  "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+                }
+              ],
+              "contexts": [
+                "Synthetic, not runtime"
+              ]
+            }
+          }
+        ],
+        "trace": []
+      }
+    }
+  },
+  "mappings": [
+    {
+      "level": "entity",
+      "original": "booking-service",
+      "candidates": [
+        "booking-service"
+      ],
+      "verified": true,
+      "provenance": [
+        {
+          "source_id": "FT-SYNTHETIC",
+          "locator": "identity explicitly declared for synthetic test",
+          "condition": "Synthetic only"
+        }
+      ]
+    },
+    {
+      "level": "entity",
+      "original": "broker",
+      "candidates": [
+        "broker"
+      ],
+      "verified": true,
+      "provenance": [
+        {
+          "source_id": "FT-SYNTHETIC",
+          "locator": "identity explicitly declared for synthetic test",
+          "condition": "Synthetic only"
+        }
+      ]
+    },
+    {
+      "level": "entity",
+      "original": "payment-service",
+      "candidates": [
+        "payment-service"
+      ],
+      "verified": true,
+      "provenance": [
+        {
+          "source_id": "FT-SYNTHETIC",
+          "locator": "identity explicitly declared for synthetic test",
+          "condition": "Synthetic only"
+        }
+      ]
+    },
+    {
+      "level": "entity",
+      "original": "smtp",
+      "candidates": [
+        "smtp"
+      ],
+      "verified": true,
+      "provenance": [
+        {
+          "source_id": "FT-SYNTHETIC",
+          "locator": "identity explicitly declared for synthetic test",
+          "condition": "Synthetic only"
+        }
+      ]
+    },
+    {
+      "level": "entity",
+      "original": "ticket-service",
+      "candidates": [
+        "ticket-service"
+      ],
+      "verified": true,
+      "provenance": [
+        {
+          "source_id": "FT-SYNTHETIC",
+          "locator": "identity explicitly declared for synthetic test",
+          "condition": "Synthetic only"
+        }
+      ]
+    }
+  ],
+  "nodes": {
+    "static": [
+      {
+        "id": "booking-service",
+        "name": "booking-service",
+        "type": "service",
+        "granularity": "logical",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "broker",
+        "name": "broker",
+        "type": "broker",
+        "granularity": "logical",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "db-A",
+        "name": "db-A",
+        "type": "database",
+        "granularity": "logical",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "db-B",
+        "name": "db-B",
+        "type": "database",
+        "granularity": "logical",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "payment-service",
+        "name": "payment-service",
+        "type": "service",
+        "granularity": "logical",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "pg",
+        "name": "pg",
+        "type": "database",
+        "granularity": "instance",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "smtp",
+        "name": "smtp",
+        "type": "external",
+        "granularity": "logical",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "ticket-service",
+        "name": "ticket-service",
+        "type": "service",
+        "granularity": "logical",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      }
+    ],
+    "trace": [
+      {
+        "original": {
+          "id": "broker",
+          "type": "broker",
+          "source": "trace"
+        },
+        "level": "entity",
+        "canonical_id": "broker",
+        "status": "mapped"
+      },
+      {
+        "original": {
+          "id": "ticket-service",
+          "type": "service",
+          "source": "trace"
+        },
+        "level": "entity",
+        "canonical_id": "ticket-service",
+        "status": "mapped"
+      }
+    ],
+    "static_inventory": [
+      {
+        "id": "booking-service",
+        "name": "booking-service",
+        "type": "service",
+        "granularity": "logical",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "broker",
+        "name": "broker",
+        "type": "broker",
+        "granularity": "logical",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "db-A",
+        "name": "db-A",
+        "type": "database",
+        "granularity": "logical",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "db-B",
+        "name": "db-B",
+        "type": "database",
+        "granularity": "logical",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "payment-service",
+        "name": "payment-service",
+        "type": "service",
+        "granularity": "logical",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "pg",
+        "name": "pg",
+        "type": "database",
+        "granularity": "instance",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "smtp",
+        "name": "smtp",
+        "type": "external",
+        "granularity": "logical",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "ticket-service",
+        "name": "ticket-service",
+        "type": "service",
+        "granularity": "logical",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      }
+    ]
+  },
+  "competing_explanations": [
+    "revision",
+    "alias",
+    "domain/window",
+    "branch_not_executed",
+    "incomplete_static_source",
+    "missing_telemetry",
+    "conversion_error"
+  ]
+}

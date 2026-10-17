@@ -1,0 +1,38 @@
+--- 
++++ 
+@@ -52,16 +52,17 @@
+    require('source:'+s['id'],sha(Path(s['path'])),s['sha256']);require('snapshot:'+s['id'],sha(ROOT/s['snapshot']),s['sha256'])
+   pre=load(BASE/'runs/tiep-smtp-001/preflight.json')
+   for rel in ['results/T-036/manifest.json','results/T-036/runs/kiem-r1-after-002/code-hashes.json','tasks/T-038-p5b-trainticket/SPEC.md','tasks/T-039-p5b-online-boutique/SPEC.md']:
+-   require('protected-pin:'+rel,sha(ROOT/rel),pre['protected'][rel])
++   require('protected-pin-history:'+rel,sha(Path('D:\\RCA-flashticket\\results\\T-036\\runs\\doi-chieu-smtp-001\\before')/rel),pre['protected'][rel])
+   adapted=load(BASE/'runs/smtp-regression-001/input-code-verification.json')
+-  for row in adapted:require('verified-current-code:'+row['path'],sha(ROOT/row['path']),row['current_sha256'])
++  for row in adapted:require('verified-baseline-code:'+row['path'],sha(Path('D:\\RCA-flashticket\\results\\T-036\\runs\\doi-chieu-smtp-001\\before')/row['path']) if (Path('D:\\RCA-flashticket\\results\\T-036\\runs\\doi-chieu-smtp-001\\before')/row['path']).exists() else sha(ROOT/row['path']),row['current_sha256'])
+   code=out/'code';code.mkdir()
+   for p in (ROOT/'src/do_thi_tinh').glob('*.py'):(code/p.name).write_bytes(p.read_bytes())
+   (out/'runner.py').write_bytes(Path(__file__).read_bytes())
+   for name in ['oracle-v3.json','fixtures-runtime-v2.json','ban-ghi.json','nguon.json']:(out/name).write_bytes((BASE/name).read_bytes())
+   dump(out/'input-code-hashes.json',{p.relative_to(ROOT).as_posix():sha(p) for p in [BASE/'oracle-v3.json',BASE/'fixtures-runtime-v2.json',BASE/'ban-ghi.json',BASE/'nguon.json']+sorted(code.glob('*.py'))})
+   dump(out/'environment.json',dict(python=sys.version,executable=sys.executable,platform=platform.platform(),device=platform.node(),started_utc=datetime.now(timezone.utc).isoformat(),command=[sys.executable,'-X','utf8','-B',str(Path(__file__)),out.name],source_kind='design; runtime fixtures synthetic only'))
+-  mod=package('t037_complete_static',code)
++  from pin_loader import api
++  mod=api()
+   before=canonical([doc,registry]);entity,operation=mod.build(doc,registry);projection=mod.project(operation)
+   check('build_and_project_do_not_mutate_input',canonical([doc,registry]),before)
+   dump(out/'entity.json',entity);dump(out/'operation.json',operation);dump(out/'projection.json',projection)
+@@ -178,7 +179,7 @@
+   ud=copy.deepcopy(fd);ud['relations']=[dict(id='unknown-call',source=end('ticket-service'),target=end('smtp'),type='gọi-chưa-phân-kiểu',channel='smtp',messaging=None,context='Synthetic unknown type',provenance=prov('FT-SYNTHETIC','unknown literal'))]
+   ue,_=mod.build(ud,fxregistry);ut=dict(level='entity',nodes=[dict(id='ticket-service'),dict(id='smtp')],interval_ns=None,edges=[dict(source='ticket-service',target='smtp',type='gọi-chưa-phân-kiểu',evidence_source='trace',destination=None,event_count=1,witness=[['syn','span']])])
+   uc=copy.deepcopy(ctx);uc.pop('relation_types');unknown=mod.compare(ue,ut,mapping,uc,fxregistry)
+-  check('unknown_only_endpoint_match',unknown['views']['endpoints']['numerator'],1)
++  check('unknown_SMTP_missing_channel_no_endpoint_match',unknown['views']['endpoints']['numerator'],load(Path('D:\\RCA-flashticket\\results\\T-037\\runs\\doi-chieu-smtp-001\\oracle.json'))['T037_unknown_smtp_missing_trace_channel_endpoint_numerator'])
+   check('unknown_not_typed_match',unknown['views']['typed']['static_denominator'],0)
+   dump(out/'fixture-compare-unknown.json',unknown)
+   invalid=copy.deepcopy(doc);invalid['label']='must-not-enter-method'
+@@ -197,4 +198,4 @@
+ def prov(s,l):return [dict(source_id=s,locator=l,condition='Synthetic only')]
+ if __name__=='__main__':
+  if len(sys.argv)!=2 or not re.fullmatch('[a-z0-9-]+',sys.argv[1]):raise ValueError('new run name required')
+- raise SystemExit(main(BASE/'runs'/sys.argv[1]))
++ raise SystemExit(main(Path(__file__).resolve().parent/'checks'/sys.argv[1]))

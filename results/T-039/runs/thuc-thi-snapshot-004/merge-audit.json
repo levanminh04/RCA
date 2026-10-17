@@ -1,0 +1,216 @@
+[
+  {
+    "collection": "entities",
+    "key": "frontend",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "entities",
+    "key": "adservice",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "entities",
+    "key": "cartservice",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "entities",
+    "key": "currencyservice",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "entities",
+    "key": "paymentservice",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "entities",
+    "key": "emailservice",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "entities",
+    "key": "recommendationservice",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "entities",
+    "key": "productcatalogservice",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "entities",
+    "key": "mysql/addatabase",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "entities",
+    "key": "redis-cart",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "entities",
+    "key": "frontend",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "entities",
+    "key": "checkoutservice",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "entities",
+    "key": "productcatalogservice",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "entities",
+    "key": "shippingservice",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "entities",
+    "key": "currencyservice",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "entities",
+    "key": "cartservice",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "entities",
+    "key": "adservice",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "entities",
+    "key": "recommendationservice",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "entities",
+    "key": "paymentservice",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "entities",
+    "key": "emailservice",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "entities",
+    "key": "mysql",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "entities",
+    "key": "mysql/Productdb",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "operations",
+    "key": "[\"productcatalogservice\",\"hipstershop.ProductCatalogService/ListProducts\"]",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "operations",
+    "key": "[\"currencyservice\",\"hipstershop.CurrencyService/GetSupportedCurrencies\"]",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "operations",
+    "key": "[\"cartservice\",\"hipstershop.CartService/GetCart\"]",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "operations",
+    "key": "[\"cartservice\",\"hipstershop.CartService/EmptyCart\"]",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "operations",
+    "key": "[\"cartservice\",\"hipstershop.CartService/AddItem\"]",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "operations",
+    "key": "[\"currencyservice\",\"hipstershop.CurrencyService/Convert\"]",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "operations",
+    "key": "[\"recommendationservice\",\"hipstershop.RecommendationService/ListRecommendations\"]",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "operations",
+    "key": "[\"adservice\",\"hipstershop.AdService/GetAds\"]",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "operations",
+    "key": "[\"paymentservice\",\"hipstershop.PaymentService/Charge\"]",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "operations",
+    "key": "[\"emailservice\",\"hipstershop.EmailService/SendOrderConfirmation\"]",
+    "action": "union_provenance"
+  },
+  {
+    "collection": "operations",
+    "key": [
+      "adservice",
+      "hipstershop.AdService/GetAds"
+    ],
+    "action": "retain explicit runtime name"
+  },
+  {
+    "collection": "signals",
+    "key": "common:trace:adservice",
+    "action": "correct endpoint variables from YAML"
+  },
+  {
+    "collection": "signals",
+    "key": "common:trace:cartservice",
+    "action": "correct endpoint variables from YAML"
+  },
+  {
+    "action": "exclude resource preconnect hint from HTTP call graph",
+    "records": [
+      {
+        "id": "common:asset:fonts.gstatic.com",
+        "source": {
+          "entity": "web-client",
+          "operation": null
+        },
+        "target": {
+          "entity": "fonts.gstatic.com",
+          "operation": null
+        },
+        "type": "gọi-đồng-bộ",
+        "channel": "http",
+        "messaging": null,
+        "context": "browser may fetch stylesheet/font when rendered; runtime unverified",
+        "provenance": [
+          {
+            "source_id": "OB:src/frontend/templates/header.html",
+            "locator": "L26–31",
+            "condition": "browser may fetch stylesheet/font when rendered; runtime unverified"
+          }
+        ]
+      }
+    ],
+    "reason": "header.html L29 only preconnect; external CSS not inspected. Entity remains inventory hint."
+  },
+  {
+    "action": "merge identical logical placement, retaining source records",
+    "record_ids": [
+      "common:hosted:Productdb",
+      "go:hosted:Productdb"
+    ],
+    "key": "[\"mysql/Productdb\",\"mysql\",\"hosted_on\"]"
+  }
+]

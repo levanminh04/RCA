@@ -1,0 +1,244 @@
+{
+  "task": "T-037",
+  "purpose": "Oracle literal SMTP bổ sung, ghi trước runner smtp-check.py; toàn bộ trường hợp dưới là dữ liệu tổng hợp kiểm hợp đồng, không là operation hoặc telemetry FlashTicket thật.",
+  "state": "ORACLE_BEFORE_SMTP_CHECKER",
+  "date_client": "2026-10-16",
+  "source_requirement": {
+    "path": "results/T-037/counterexample-smtp.json",
+    "sha256": "2a93b5c4b90f719d6efb5cac04fd8dc951854dc636467c9dd863ff596217d555",
+    "meaning": "B13 L199; B14 L82; B14-03 L9-L12: Ticket gửi SMTP. Nguồn đòi giữ transport SMTP, không ép HTTP/RPC/internal."
+  },
+  "old_pin": {
+    "manifest": "results/T-036/manifest.json",
+    "manifest_sha256": "d10bb327b2cc62334c87f3e33ac9a7c62ad6a4d78f735530604a64c3eb38d2b1",
+    "created_utc": "2026-10-15T13:45:08.305188+00:00",
+    "current_run": "runs/kiem-r1-after-002",
+    "checker_sha256": "8243eb284015419f63463fa5e13da968a7884f9a4f7697ffaca3477cdd73a9eb",
+    "build_sha256": "c2c244d0e906a880e83dc3ef86d5b18759b8585a160ffdf7c9c819b5cc39cfb0"
+  },
+  "approved_patch_shape": {
+    "file": "src/do_thi_tinh/build.py",
+    "only_change_1": "'deployment', 'internal', 'span-parent'} → 'deployment', 'internal', 'smtp', 'span-parent'}",
+    "only_change_2": "channel not in {'http', 'rpc', 'internal'} → channel not in {'http', 'rpc', 'internal', 'smtp'}",
+    "meaning": "Bổ sung smtp cho hai loại gọi; không đổi schema version, loại cạnh, comparator, namespace hoặc nghĩa các channel cũ."
+  },
+  "base_document": {
+    "scope": {
+      "system": "synthetic-smtp",
+      "revision": "smtp-oracle-v1"
+    },
+    "entities": [
+      {
+        "id": "ticket-service",
+        "name": "ticket-service",
+        "type": "service",
+        "granularity": "logical",
+        "role": "synthetic sender",
+        "provenance": [
+          {
+            "source_id": "SMTP-ORACLE",
+            "locator": "base_document/entities/0",
+            "condition": "Tổng hợp, không runtime."
+          }
+        ]
+      },
+      {
+        "id": "smtp",
+        "name": "smtp",
+        "type": "external",
+        "granularity": "component",
+        "role": "synthetic SMTP boundary",
+        "provenance": [
+          {
+            "source_id": "SMTP-ORACLE",
+            "locator": "base_document/entities/1",
+            "condition": "Tổng hợp, không runtime."
+          }
+        ]
+      }
+    ],
+    "operations": [
+      {
+        "entity": "ticket-service",
+        "name": "gửi SMTP",
+        "runtime_name": null,
+        "provenance": [
+          {
+            "source_id": "SMTP-ORACLE",
+            "locator": "base_document/operations/0",
+            "condition": "Tên tổng hợp kiểm hợp đồng; không khẳng định runtime_name."
+          }
+        ]
+      },
+      {
+        "entity": "ticket-service",
+        "name": "chuẩn bị delivery",
+        "runtime_name": null,
+        "provenance": [
+          {
+            "source_id": "SMTP-ORACLE",
+            "locator": "base_document/operations/1",
+            "condition": "Tên tổng hợp để kiểm quan hệ nội bộ."
+          }
+        ]
+      },
+      {
+        "entity": "smtp",
+        "name": "nhận tổng hợp",
+        "runtime_name": null,
+        "provenance": [
+          {
+            "source_id": "SMTP-ORACLE",
+            "locator": "base_document/operations/2",
+            "condition": "Tên tổng hợp để kiểm operation-level và span-parent; không lập operation thật cho đối tác SMTP."
+          }
+        ]
+      }
+    ],
+    "relations": [
+      {
+        "id": "smtp-call",
+        "source": {
+          "entity": "ticket-service",
+          "operation": "gửi SMTP"
+        },
+        "target": {
+          "entity": "smtp",
+          "operation": null
+        },
+        "type": "gọi-đồng-bộ",
+        "channel": "smtp",
+        "messaging": null,
+        "context": "Synthetic SMTP transport, no runtime claim.",
+        "provenance": [
+          {
+            "source_id": "SMTP-ORACLE",
+            "locator": "base_document/relations/0",
+            "condition": "Tổng hợp; giữ nguyên smtp."
+          }
+        ]
+      }
+    ],
+    "resource_bindings": [],
+    "signals": []
+  },
+  "literal_expectations": {
+    "smtp_call_types": [
+      "gọi-đồng-bộ",
+      "gọi-chưa-phân-kiểu"
+    ],
+    "entity_signature": [
+      "ticket-service",
+      "smtp",
+      "gọi-đồng-bộ",
+      "smtp",
+      null
+    ],
+    "operation_signature": [
+      "[\"ticket-service\",\"gửi SMTP\"]",
+      "smtp",
+      "gọi-đồng-bộ",
+      "smtp",
+      null
+    ],
+    "operation_to_operation_signature": [
+      "[\"ticket-service\",\"gửi SMTP\"]",
+      "[\"smtp\",\"nhận tổng hợp\"]",
+      "gọi-đồng-bộ",
+      "smtp",
+      null
+    ],
+    "entity_only": {
+      "entity_edge_count": 1,
+      "operation_edge_count": 0,
+      "projection_edge_count": 0,
+      "exclusions": [
+        {
+          "record_id": "smtp-call",
+          "reason": "no_operation_evidence"
+        }
+      ]
+    },
+    "internal_and_span_parent": {
+      "entity_record_ids": [
+        "smtp-call"
+      ],
+      "projection_record_ids": [
+        "smtp-call"
+      ],
+      "operation_record_ids": [
+        "internal-call",
+        "smtp-call",
+        "span-parent-call"
+      ]
+    },
+    "negative_cases": {
+      "data_smtp": "relation_channel",
+      "message_smtp": "relation_channel",
+      "deployment_smtp": "relation_channel",
+      "span_parent_smtp": "relation_channel",
+      "unknown_transport": "relation_type"
+    },
+    "old_build_smtp_error": "relation_type",
+    "comparison": {
+      "typed_intersection": [
+        [
+          "ticket-service",
+          "smtp",
+          "gọi-đồng-bộ",
+          null
+        ]
+      ],
+      "endpoints_intersection": [
+        [
+          "ticket-service",
+          "smtp",
+          null,
+          null
+        ]
+      ],
+      "typed_counts": [
+        1,
+        1,
+        1
+      ],
+      "unknown_type_typed_counts": [
+        0,
+        0,
+        0
+      ],
+      "unknown_type_endpoints_counts": [
+        1,
+        1,
+        1
+      ],
+      "static_original_channels": [
+        "http",
+        "smtp"
+      ],
+      "trace_has_transport_field": false,
+      "interpretation": "Khớp endpoint/type không xác nhận SMTP hoặc HTTP; static members phải giữ từng channel gốc."
+    },
+    "input_mutation": false,
+    "deterministic_seeds": [
+      0,
+      1,
+      2
+    ],
+    "original_T036_regression": {
+      "passed": 221,
+      "failed": 0,
+      "compatibility_graph_count": 312,
+      "trace_projection_pair_count": 156,
+      "old_artifact_semantics_unchanged": true
+    }
+  },
+  "not_claimed": [
+    "runtime SMTP kind/client-server đã xác minh",
+    "exactly-once email",
+    "SMTP telemetry đã có",
+    "compare typed xác nhận protocol",
+    "RCA benefit",
+    "T037 hoàn thành hoặc G3 đã đóng"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "device": "LEVANMINH",
+  "physical_memory_bytes": 16849293312,
+  "os_visible_memory_kib": 16454388,
+  "free_physical_memory_kib_at_observation": 1844044,
+  "D_free_bytes_at_observation": 39125798912,
+  "D_used_bytes_at_observation": 77045932032,
+  "source_commands": [
+    "Get-PSDrive -Name D | Select-Object Name,Used,Free",
+    "Get-CimInstance Win32_ComputerSystem | Select-Object Name,TotalPhysicalMemory | ConvertTo-Json -Compress",
+    "Get-CimInstance Win32_OperatingSystem | Select-Object TotalVisibleMemorySize,FreePhysicalMemory | ConvertTo-Json -Compress"
+  ],
+  "interpretation": "Read-only capacity snapshot during preflight; not task peak RAM or an isolated performance pilot.",
+  "benchmark_run": false,
+  "other_processes_stopped": false
+}

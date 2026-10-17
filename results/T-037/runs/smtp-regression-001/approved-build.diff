@@ -1,0 +1,20 @@
+--- pinned-T036/build.py
++++ current-src/do_thi_tinh/build.py
+@@ -8,7 +8,7 @@
+ RELATION_TYPES = {'gọi-đồng-bộ', 'gọi-chưa-phân-kiểu', 'dữ-liệu', 'thông-điệp',
+                   'triển-khai', 'span-parent'}
+ CHANNELS = {'http', 'rpc', 'data', 'publish', 'consume', 'logical-message',
+-            'deployment', 'internal', 'span-parent'}
++            'deployment', 'internal', 'smtp', 'span-parent'}
+ MESSAGE_FIELDS = {'broker', 'broker_scope', 'exchange', 'routing_key', 'queue'}
+ 
+ 
+@@ -165,7 +165,7 @@
+         if ((typ == 'dữ-liệu' and channel != 'data') or
+                 (typ == 'triển-khai' and channel != 'deployment') or
+                 (typ == 'span-parent' and channel != 'span-parent') or
+-                (typ in {'gọi-đồng-bộ', 'gọi-chưa-phân-kiểu'} and channel not in {'http', 'rpc', 'internal'})):
++                (typ in {'gọi-đồng-bộ', 'gọi-chưa-phân-kiểu'} and channel not in {'http', 'rpc', 'internal', 'smtp'})):
+             raise ValueError('relation_channel')
+         msg = message_address(row['messaging'])
+         if typ == 'thông-điệp':

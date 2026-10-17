@@ -1,0 +1,116 @@
+{
+  "scope": {
+    "system": "FlashTicket",
+    "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac"
+  },
+  "entities": [
+    {
+      "id": "ticket-service",
+      "name": "ticket-service",
+      "type": "service",
+      "granularity": "component",
+      "role": "phát/giao vé",
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "L199",
+          "condition": "Delivery job retry; SMTP timeout có thể đã gửi; không exactly-once email"
+        },
+        {
+          "source_id": "FT-B14",
+          "locator": "L82",
+          "condition": "Worker gửi SMTP ngoài transaction rồi lưu outcome"
+        },
+        {
+          "source_id": "FT-B14-03",
+          "locator": "L9-L12",
+          "condition": "Ticket -> SMTP; outcome thành công/lỗi/chưa rõ"
+        }
+      ]
+    },
+    {
+      "id": "smtp",
+      "name": "smtp",
+      "type": "external",
+      "granularity": "component",
+      "role": "đối tác SMTP",
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "L199",
+          "condition": "Delivery job retry; SMTP timeout có thể đã gửi; không exactly-once email"
+        },
+        {
+          "source_id": "FT-B14",
+          "locator": "L82",
+          "condition": "Worker gửi SMTP ngoài transaction rồi lưu outcome"
+        },
+        {
+          "source_id": "FT-B14-03",
+          "locator": "L9-L12",
+          "condition": "Ticket -> SMTP; outcome thành công/lỗi/chưa rõ"
+        }
+      ]
+    }
+  ],
+  "operations": [
+    {
+      "entity": "ticket-service",
+      "name": "gửi SMTP",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "L199",
+          "condition": "Delivery job retry; SMTP timeout có thể đã gửi; không exactly-once email"
+        },
+        {
+          "source_id": "FT-B14",
+          "locator": "L82",
+          "condition": "Worker gửi SMTP ngoài transaction rồi lưu outcome"
+        },
+        {
+          "source_id": "FT-B14-03",
+          "locator": "L9-L12",
+          "condition": "Ticket -> SMTP; outcome thành công/lỗi/chưa rõ"
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "id": "smtp-minimal",
+      "source": {
+        "entity": "ticket-service",
+        "operation": "gửi SMTP"
+      },
+      "target": {
+        "entity": "smtp",
+        "operation": null
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "smtp",
+      "messaging": null,
+      "context": "Tổng hợp kiểm channel từ nguồn B14 §6, chưa là quan sát runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "L199",
+          "condition": "Delivery job retry; SMTP timeout có thể đã gửi; không exactly-once email"
+        },
+        {
+          "source_id": "FT-B14",
+          "locator": "L82",
+          "condition": "Worker gửi SMTP ngoài transaction rồi lưu outcome"
+        },
+        {
+          "source_id": "FT-B14-03",
+          "locator": "L9-L12",
+          "condition": "Ticket -> SMTP; outcome thành công/lỗi/chưa rõ"
+        }
+      ]
+    }
+  ],
+  "resource_bindings": [],
+  "signals": []
+}

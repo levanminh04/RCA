@@ -1,0 +1,1340 @@
+[
+  {
+    "name": "callback-new-trace",
+    "entity": {
+      "level": "entity",
+      "interval_ns": null,
+      "nodes": [
+        {
+          "id": "payment-service",
+          "type": "service",
+          "source": "trace"
+        }
+      ],
+      "edges": [],
+      "inventory": {
+        "event-service": "service",
+        "payment-service": "service",
+        "booking-service": "service",
+        "ticket-service": "service",
+        "broker": "broker"
+      },
+      "coverage": {
+        "booking-service": "not_observed",
+        "broker": "not_observed",
+        "event-service": "not_observed",
+        "payment-service": "span_without_edge",
+        "ticket-service": "not_observed"
+      },
+      "outside_inventory": [],
+      "stats": {
+        "raw_spans": 2,
+        "unique_spans": 2,
+        "duplicate_rows": 0,
+        "roots": 2,
+        "parent_references": 0,
+        "resolved_parents": 0,
+        "orphans": 0,
+        "same_entity_parent_events": 0,
+        "cross_entity_parent_events": 0,
+        "parent_contains_child": 0,
+        "parent_not_contains_child": 0,
+        "cross_parent_contains_child": 0,
+        "internal_edge_events": 0,
+        "unresolved_messages": 0,
+        "missing_operation": 0
+      }
+    },
+    "operation": {
+      "level": "operation",
+      "interval_ns": null,
+      "nodes": [
+        {
+          "id": "[\"payment-service\",\"callback-synthetic\"]",
+          "entity": "payment-service",
+          "operation": "callback-synthetic",
+          "source": "trace"
+        },
+        {
+          "id": "[\"payment-service\",\"start-synthetic\"]",
+          "entity": "payment-service",
+          "operation": "start-synthetic",
+          "source": "trace"
+        }
+      ],
+      "edges": [],
+      "belongs_to": [
+        [
+          "[\"payment-service\",\"callback-synthetic\"]",
+          "payment-service"
+        ],
+        [
+          "[\"payment-service\",\"start-synthetic\"]",
+          "payment-service"
+        ]
+      ],
+      "component_context": [],
+      "stats": {
+        "raw_spans": 2,
+        "unique_spans": 2,
+        "duplicate_rows": 0,
+        "roots": 2,
+        "parent_references": 0,
+        "resolved_parents": 0,
+        "orphans": 0,
+        "same_entity_parent_events": 0,
+        "cross_entity_parent_events": 0,
+        "parent_contains_child": 0,
+        "parent_not_contains_child": 0,
+        "cross_parent_contains_child": 0,
+        "internal_edge_events": 0,
+        "unresolved_messages": 0,
+        "missing_operation": 0
+      }
+    }
+  },
+  {
+    "name": "scheduler-root",
+    "entity": {
+      "level": "entity",
+      "interval_ns": null,
+      "nodes": [
+        {
+          "id": "booking-service",
+          "type": "service",
+          "source": "trace"
+        }
+      ],
+      "edges": [],
+      "inventory": {
+        "event-service": "service",
+        "payment-service": "service",
+        "booking-service": "service",
+        "ticket-service": "service",
+        "broker": "broker"
+      },
+      "coverage": {
+        "booking-service": "span_without_edge",
+        "broker": "not_observed",
+        "event-service": "not_observed",
+        "payment-service": "not_observed",
+        "ticket-service": "not_observed"
+      },
+      "outside_inventory": [],
+      "stats": {
+        "raw_spans": 1,
+        "unique_spans": 1,
+        "duplicate_rows": 0,
+        "roots": 1,
+        "parent_references": 0,
+        "resolved_parents": 0,
+        "orphans": 0,
+        "same_entity_parent_events": 0,
+        "cross_entity_parent_events": 0,
+        "parent_contains_child": 0,
+        "parent_not_contains_child": 0,
+        "cross_parent_contains_child": 0,
+        "internal_edge_events": 0,
+        "unresolved_messages": 0,
+        "missing_operation": 0
+      }
+    },
+    "operation": {
+      "level": "operation",
+      "interval_ns": null,
+      "nodes": [
+        {
+          "id": "[\"booking-service\",\"expiry-synthetic\"]",
+          "entity": "booking-service",
+          "operation": "expiry-synthetic",
+          "source": "trace"
+        }
+      ],
+      "edges": [],
+      "belongs_to": [
+        [
+          "[\"booking-service\",\"expiry-synthetic\"]",
+          "booking-service"
+        ]
+      ],
+      "component_context": [],
+      "stats": {
+        "raw_spans": 1,
+        "unique_spans": 1,
+        "duplicate_rows": 0,
+        "roots": 1,
+        "parent_references": 0,
+        "resolved_parents": 0,
+        "orphans": 0,
+        "same_entity_parent_events": 0,
+        "cross_entity_parent_events": 0,
+        "parent_contains_child": 0,
+        "parent_not_contains_child": 0,
+        "cross_parent_contains_child": 0,
+        "internal_edge_events": 0,
+        "unresolved_messages": 0,
+        "missing_operation": 0
+      }
+    }
+  },
+  {
+    "name": "correlation-only-message",
+    "entity": {
+      "level": "entity",
+      "interval_ns": null,
+      "nodes": [
+        {
+          "id": "broker",
+          "type": "broker",
+          "source": "trace"
+        },
+        {
+          "id": "payment-service",
+          "type": "service",
+          "source": "trace"
+        },
+        {
+          "id": "ticket-service",
+          "type": "service",
+          "source": "trace"
+        }
+      ],
+      "edges": [
+        {
+          "source": "broker",
+          "target": "ticket-service",
+          "type": "thông-điệp",
+          "evidence_source": "trace",
+          "event_count": 1,
+          "witness": [
+            [
+              "t-c",
+              "c"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": "q-A"
+          },
+          "queue_metric_address": [
+            "broker",
+            "synthetic-vhost",
+            "q-A"
+          ]
+        },
+        {
+          "source": "payment-service",
+          "target": "broker",
+          "type": "thông-điệp",
+          "evidence_source": "trace",
+          "event_count": 1,
+          "witness": [
+            [
+              "t-p",
+              "p"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": null
+          },
+          "queue_metric_address": null
+        }
+      ],
+      "inventory": {
+        "event-service": "service",
+        "payment-service": "service",
+        "booking-service": "service",
+        "ticket-service": "service",
+        "broker": "broker"
+      },
+      "coverage": {
+        "booking-service": "not_observed",
+        "broker": "has_edge",
+        "event-service": "not_observed",
+        "payment-service": "has_edge",
+        "ticket-service": "has_edge"
+      },
+      "outside_inventory": [],
+      "stats": {
+        "raw_spans": 2,
+        "unique_spans": 2,
+        "duplicate_rows": 0,
+        "roots": 2,
+        "parent_references": 0,
+        "resolved_parents": 0,
+        "orphans": 0,
+        "same_entity_parent_events": 0,
+        "cross_entity_parent_events": 0,
+        "parent_contains_child": 0,
+        "parent_not_contains_child": 0,
+        "cross_parent_contains_child": 0,
+        "internal_edge_events": 0,
+        "unresolved_messages": 1,
+        "missing_operation": 0
+      },
+      "messaging_diagnostics": {
+        "identity_unverified": {
+          "count": 1,
+          "witness": [
+            [
+              "t-c",
+              "c"
+            ]
+          ]
+        }
+      }
+    },
+    "operation": {
+      "level": "operation",
+      "interval_ns": null,
+      "nodes": [
+        {
+          "id": "[\"payment-service\",\"publish-synthetic\"]",
+          "entity": "payment-service",
+          "operation": "publish-synthetic",
+          "source": "trace"
+        },
+        {
+          "id": "[\"ticket-service\",\"consume-synthetic\"]",
+          "entity": "ticket-service",
+          "operation": "consume-synthetic",
+          "source": "trace"
+        }
+      ],
+      "edges": [
+        {
+          "source": "[\"payment-service\",\"publish-synthetic\"]",
+          "target": "broker",
+          "type": "thông-điệp",
+          "evidence_source": "trace",
+          "event_count": 1,
+          "witness": [
+            [
+              "t-p",
+              "p"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": null
+          },
+          "queue_metric_address": null
+        },
+        {
+          "source": "broker",
+          "target": "[\"ticket-service\",\"consume-synthetic\"]",
+          "type": "thông-điệp",
+          "evidence_source": "trace",
+          "event_count": 1,
+          "witness": [
+            [
+              "t-c",
+              "c"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": "q-A"
+          },
+          "queue_metric_address": [
+            "broker",
+            "synthetic-vhost",
+            "q-A"
+          ]
+        }
+      ],
+      "belongs_to": [
+        [
+          "[\"payment-service\",\"publish-synthetic\"]",
+          "payment-service"
+        ],
+        [
+          "[\"ticket-service\",\"consume-synthetic\"]",
+          "ticket-service"
+        ]
+      ],
+      "component_context": [
+        {
+          "id": "broker",
+          "type": "broker",
+          "source": "trace"
+        }
+      ],
+      "stats": {
+        "raw_spans": 2,
+        "unique_spans": 2,
+        "duplicate_rows": 0,
+        "roots": 2,
+        "parent_references": 0,
+        "resolved_parents": 0,
+        "orphans": 0,
+        "same_entity_parent_events": 0,
+        "cross_entity_parent_events": 0,
+        "parent_contains_child": 0,
+        "parent_not_contains_child": 0,
+        "cross_parent_contains_child": 0,
+        "internal_edge_events": 0,
+        "unresolved_messages": 1,
+        "missing_operation": 0
+      },
+      "messaging_diagnostics": {
+        "identity_unverified": {
+          "count": 1,
+          "witness": [
+            [
+              "t-c",
+              "c"
+            ]
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "verified-fanout",
+    "entity": {
+      "level": "entity",
+      "interval_ns": null,
+      "nodes": [
+        {
+          "id": "booking-service",
+          "type": "service",
+          "source": "trace"
+        },
+        {
+          "id": "broker",
+          "type": "broker",
+          "source": "trace"
+        },
+        {
+          "id": "event-service",
+          "type": "service",
+          "source": "trace"
+        },
+        {
+          "id": "payment-service",
+          "type": "service",
+          "source": "trace"
+        },
+        {
+          "id": "ticket-service",
+          "type": "service",
+          "source": "trace"
+        }
+      ],
+      "edges": [
+        {
+          "source": "broker",
+          "target": "booking-service",
+          "type": "thông-điệp",
+          "evidence_source": "trace",
+          "event_count": 1,
+          "witness": [
+            [
+              "t-booking-service",
+              "c"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": "q-booking-service"
+          },
+          "queue_metric_address": [
+            "broker",
+            "synthetic-vhost",
+            "q-booking-service"
+          ]
+        },
+        {
+          "source": "broker",
+          "target": "payment-service",
+          "type": "thông-điệp",
+          "evidence_source": "trace",
+          "event_count": 1,
+          "witness": [
+            [
+              "t-payment-service",
+              "c"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": "q-payment-service"
+          },
+          "queue_metric_address": [
+            "broker",
+            "synthetic-vhost",
+            "q-payment-service"
+          ]
+        },
+        {
+          "source": "broker",
+          "target": "ticket-service",
+          "type": "thông-điệp",
+          "evidence_source": "trace",
+          "event_count": 1,
+          "witness": [
+            [
+              "t-ticket-service",
+              "c"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": "q-ticket-service"
+          },
+          "queue_metric_address": [
+            "broker",
+            "synthetic-vhost",
+            "q-ticket-service"
+          ]
+        },
+        {
+          "source": "event-service",
+          "target": "booking-service",
+          "type": "thông-điệp",
+          "evidence_source": "inferred",
+          "event_count": 1,
+          "witness": [
+            [
+              "t-p",
+              "p",
+              "t-booking-service",
+              "c"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": "q-booking-service"
+          },
+          "queue_metric_address": [
+            "broker",
+            "synthetic-vhost",
+            "q-booking-service"
+          ]
+        },
+        {
+          "source": "event-service",
+          "target": "broker",
+          "type": "thông-điệp",
+          "evidence_source": "trace",
+          "event_count": 1,
+          "witness": [
+            [
+              "t-p",
+              "p"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": null
+          },
+          "queue_metric_address": null
+        },
+        {
+          "source": "event-service",
+          "target": "payment-service",
+          "type": "thông-điệp",
+          "evidence_source": "inferred",
+          "event_count": 1,
+          "witness": [
+            [
+              "t-p",
+              "p",
+              "t-payment-service",
+              "c"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": "q-payment-service"
+          },
+          "queue_metric_address": [
+            "broker",
+            "synthetic-vhost",
+            "q-payment-service"
+          ]
+        },
+        {
+          "source": "event-service",
+          "target": "ticket-service",
+          "type": "thông-điệp",
+          "evidence_source": "inferred",
+          "event_count": 1,
+          "witness": [
+            [
+              "t-p",
+              "p",
+              "t-ticket-service",
+              "c"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": "q-ticket-service"
+          },
+          "queue_metric_address": [
+            "broker",
+            "synthetic-vhost",
+            "q-ticket-service"
+          ]
+        }
+      ],
+      "inventory": {
+        "event-service": "service",
+        "payment-service": "service",
+        "booking-service": "service",
+        "ticket-service": "service",
+        "broker": "broker"
+      },
+      "coverage": {
+        "booking-service": "has_edge",
+        "broker": "has_edge",
+        "event-service": "has_edge",
+        "payment-service": "has_edge",
+        "ticket-service": "has_edge"
+      },
+      "outside_inventory": [],
+      "stats": {
+        "raw_spans": 4,
+        "unique_spans": 4,
+        "duplicate_rows": 0,
+        "roots": 4,
+        "parent_references": 0,
+        "resolved_parents": 0,
+        "orphans": 0,
+        "same_entity_parent_events": 0,
+        "cross_entity_parent_events": 0,
+        "parent_contains_child": 0,
+        "parent_not_contains_child": 0,
+        "cross_parent_contains_child": 0,
+        "internal_edge_events": 0,
+        "unresolved_messages": 0,
+        "missing_operation": 0
+      },
+      "messaging_diagnostics": {}
+    },
+    "operation": {
+      "level": "operation",
+      "interval_ns": null,
+      "nodes": [
+        {
+          "id": "[\"booking-service\",\"consume-synthetic\"]",
+          "entity": "booking-service",
+          "operation": "consume-synthetic",
+          "source": "trace"
+        },
+        {
+          "id": "[\"event-service\",\"publish-synthetic\"]",
+          "entity": "event-service",
+          "operation": "publish-synthetic",
+          "source": "trace"
+        },
+        {
+          "id": "[\"payment-service\",\"consume-synthetic\"]",
+          "entity": "payment-service",
+          "operation": "consume-synthetic",
+          "source": "trace"
+        },
+        {
+          "id": "[\"ticket-service\",\"consume-synthetic\"]",
+          "entity": "ticket-service",
+          "operation": "consume-synthetic",
+          "source": "trace"
+        }
+      ],
+      "edges": [
+        {
+          "source": "[\"event-service\",\"publish-synthetic\"]",
+          "target": "[\"booking-service\",\"consume-synthetic\"]",
+          "type": "thông-điệp",
+          "evidence_source": "inferred",
+          "event_count": 1,
+          "witness": [
+            [
+              "t-p",
+              "p",
+              "t-booking-service",
+              "c"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": "q-booking-service"
+          },
+          "queue_metric_address": [
+            "broker",
+            "synthetic-vhost",
+            "q-booking-service"
+          ]
+        },
+        {
+          "source": "[\"event-service\",\"publish-synthetic\"]",
+          "target": "[\"payment-service\",\"consume-synthetic\"]",
+          "type": "thông-điệp",
+          "evidence_source": "inferred",
+          "event_count": 1,
+          "witness": [
+            [
+              "t-p",
+              "p",
+              "t-payment-service",
+              "c"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": "q-payment-service"
+          },
+          "queue_metric_address": [
+            "broker",
+            "synthetic-vhost",
+            "q-payment-service"
+          ]
+        },
+        {
+          "source": "[\"event-service\",\"publish-synthetic\"]",
+          "target": "[\"ticket-service\",\"consume-synthetic\"]",
+          "type": "thông-điệp",
+          "evidence_source": "inferred",
+          "event_count": 1,
+          "witness": [
+            [
+              "t-p",
+              "p",
+              "t-ticket-service",
+              "c"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": "q-ticket-service"
+          },
+          "queue_metric_address": [
+            "broker",
+            "synthetic-vhost",
+            "q-ticket-service"
+          ]
+        },
+        {
+          "source": "[\"event-service\",\"publish-synthetic\"]",
+          "target": "broker",
+          "type": "thông-điệp",
+          "evidence_source": "trace",
+          "event_count": 1,
+          "witness": [
+            [
+              "t-p",
+              "p"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": null
+          },
+          "queue_metric_address": null
+        },
+        {
+          "source": "broker",
+          "target": "[\"booking-service\",\"consume-synthetic\"]",
+          "type": "thông-điệp",
+          "evidence_source": "trace",
+          "event_count": 1,
+          "witness": [
+            [
+              "t-booking-service",
+              "c"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": "q-booking-service"
+          },
+          "queue_metric_address": [
+            "broker",
+            "synthetic-vhost",
+            "q-booking-service"
+          ]
+        },
+        {
+          "source": "broker",
+          "target": "[\"payment-service\",\"consume-synthetic\"]",
+          "type": "thông-điệp",
+          "evidence_source": "trace",
+          "event_count": 1,
+          "witness": [
+            [
+              "t-payment-service",
+              "c"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": "q-payment-service"
+          },
+          "queue_metric_address": [
+            "broker",
+            "synthetic-vhost",
+            "q-payment-service"
+          ]
+        },
+        {
+          "source": "broker",
+          "target": "[\"ticket-service\",\"consume-synthetic\"]",
+          "type": "thông-điệp",
+          "evidence_source": "trace",
+          "event_count": 1,
+          "witness": [
+            [
+              "t-ticket-service",
+              "c"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": "q-ticket-service"
+          },
+          "queue_metric_address": [
+            "broker",
+            "synthetic-vhost",
+            "q-ticket-service"
+          ]
+        }
+      ],
+      "belongs_to": [
+        [
+          "[\"booking-service\",\"consume-synthetic\"]",
+          "booking-service"
+        ],
+        [
+          "[\"event-service\",\"publish-synthetic\"]",
+          "event-service"
+        ],
+        [
+          "[\"payment-service\",\"consume-synthetic\"]",
+          "payment-service"
+        ],
+        [
+          "[\"ticket-service\",\"consume-synthetic\"]",
+          "ticket-service"
+        ]
+      ],
+      "component_context": [
+        {
+          "id": "broker",
+          "type": "broker",
+          "source": "trace"
+        }
+      ],
+      "stats": {
+        "raw_spans": 4,
+        "unique_spans": 4,
+        "duplicate_rows": 0,
+        "roots": 4,
+        "parent_references": 0,
+        "resolved_parents": 0,
+        "orphans": 0,
+        "same_entity_parent_events": 0,
+        "cross_entity_parent_events": 0,
+        "parent_contains_child": 0,
+        "parent_not_contains_child": 0,
+        "cross_parent_contains_child": 0,
+        "internal_edge_events": 0,
+        "unresolved_messages": 0,
+        "missing_operation": 0
+      },
+      "messaging_diagnostics": {}
+    }
+  },
+  {
+    "name": "two-queues",
+    "entity": {
+      "level": "entity",
+      "interval_ns": null,
+      "nodes": [
+        {
+          "id": "broker",
+          "type": "broker",
+          "source": "trace"
+        },
+        {
+          "id": "ticket-service",
+          "type": "service",
+          "source": "trace"
+        }
+      ],
+      "edges": [
+        {
+          "source": "broker",
+          "target": "ticket-service",
+          "type": "thông-điệp",
+          "evidence_source": "trace",
+          "event_count": 1,
+          "witness": [
+            [
+              "t-a",
+              "c"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": "q-A"
+          },
+          "queue_metric_address": [
+            "broker",
+            "synthetic-vhost",
+            "q-A"
+          ]
+        },
+        {
+          "source": "broker",
+          "target": "ticket-service",
+          "type": "thông-điệp",
+          "evidence_source": "trace",
+          "event_count": 1,
+          "witness": [
+            [
+              "t-b",
+              "c"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": "q-B"
+          },
+          "queue_metric_address": [
+            "broker",
+            "synthetic-vhost",
+            "q-B"
+          ]
+        }
+      ],
+      "inventory": {
+        "event-service": "service",
+        "payment-service": "service",
+        "booking-service": "service",
+        "ticket-service": "service",
+        "broker": "broker"
+      },
+      "coverage": {
+        "booking-service": "not_observed",
+        "broker": "has_edge",
+        "event-service": "not_observed",
+        "payment-service": "not_observed",
+        "ticket-service": "has_edge"
+      },
+      "outside_inventory": [],
+      "stats": {
+        "raw_spans": 2,
+        "unique_spans": 2,
+        "duplicate_rows": 0,
+        "roots": 2,
+        "parent_references": 0,
+        "resolved_parents": 0,
+        "orphans": 0,
+        "same_entity_parent_events": 0,
+        "cross_entity_parent_events": 0,
+        "parent_contains_child": 0,
+        "parent_not_contains_child": 0,
+        "cross_parent_contains_child": 0,
+        "internal_edge_events": 0,
+        "unresolved_messages": 2,
+        "missing_operation": 0
+      },
+      "messaging_diagnostics": {
+        "identity_unverified": {
+          "count": 2,
+          "witness": [
+            [
+              "t-a",
+              "c"
+            ],
+            [
+              "t-b",
+              "c"
+            ]
+          ]
+        }
+      }
+    },
+    "operation": {
+      "level": "operation",
+      "interval_ns": null,
+      "nodes": [
+        {
+          "id": "[\"ticket-service\",\"consume-synthetic\"]",
+          "entity": "ticket-service",
+          "operation": "consume-synthetic",
+          "source": "trace"
+        }
+      ],
+      "edges": [
+        {
+          "source": "broker",
+          "target": "[\"ticket-service\",\"consume-synthetic\"]",
+          "type": "thông-điệp",
+          "evidence_source": "trace",
+          "event_count": 1,
+          "witness": [
+            [
+              "t-a",
+              "c"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": "q-A"
+          },
+          "queue_metric_address": [
+            "broker",
+            "synthetic-vhost",
+            "q-A"
+          ]
+        },
+        {
+          "source": "broker",
+          "target": "[\"ticket-service\",\"consume-synthetic\"]",
+          "type": "thông-điệp",
+          "evidence_source": "trace",
+          "event_count": 1,
+          "witness": [
+            [
+              "t-b",
+              "c"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": "q-B"
+          },
+          "queue_metric_address": [
+            "broker",
+            "synthetic-vhost",
+            "q-B"
+          ]
+        }
+      ],
+      "belongs_to": [
+        [
+          "[\"ticket-service\",\"consume-synthetic\"]",
+          "ticket-service"
+        ]
+      ],
+      "component_context": [
+        {
+          "id": "broker",
+          "type": "broker",
+          "source": "trace"
+        }
+      ],
+      "stats": {
+        "raw_spans": 2,
+        "unique_spans": 2,
+        "duplicate_rows": 0,
+        "roots": 2,
+        "parent_references": 0,
+        "resolved_parents": 0,
+        "orphans": 0,
+        "same_entity_parent_events": 0,
+        "cross_entity_parent_events": 0,
+        "parent_contains_child": 0,
+        "parent_not_contains_child": 0,
+        "cross_parent_contains_child": 0,
+        "internal_edge_events": 0,
+        "unresolved_messages": 2,
+        "missing_operation": 0
+      },
+      "messaging_diagnostics": {
+        "identity_unverified": {
+          "count": 2,
+          "witness": [
+            [
+              "t-a",
+              "c"
+            ],
+            [
+              "t-b",
+              "c"
+            ]
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "retry-same-operation",
+    "entity": {
+      "level": "entity",
+      "interval_ns": null,
+      "nodes": [
+        {
+          "id": "broker",
+          "type": "broker",
+          "source": "trace"
+        },
+        {
+          "id": "ticket-service",
+          "type": "service",
+          "source": "trace"
+        }
+      ],
+      "edges": [
+        {
+          "source": "broker",
+          "target": "ticket-service",
+          "type": "thông-điệp",
+          "evidence_source": "trace",
+          "event_count": 2,
+          "witness": [
+            [
+              "t-r1",
+              "c1"
+            ],
+            [
+              "t-r2",
+              "c2"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": "q-A"
+          },
+          "queue_metric_address": [
+            "broker",
+            "synthetic-vhost",
+            "q-A"
+          ]
+        }
+      ],
+      "inventory": {
+        "event-service": "service",
+        "payment-service": "service",
+        "booking-service": "service",
+        "ticket-service": "service",
+        "broker": "broker"
+      },
+      "coverage": {
+        "booking-service": "not_observed",
+        "broker": "has_edge",
+        "event-service": "not_observed",
+        "payment-service": "not_observed",
+        "ticket-service": "has_edge"
+      },
+      "outside_inventory": [],
+      "stats": {
+        "raw_spans": 2,
+        "unique_spans": 2,
+        "duplicate_rows": 0,
+        "roots": 2,
+        "parent_references": 0,
+        "resolved_parents": 0,
+        "orphans": 0,
+        "same_entity_parent_events": 0,
+        "cross_entity_parent_events": 0,
+        "parent_contains_child": 0,
+        "parent_not_contains_child": 0,
+        "cross_parent_contains_child": 0,
+        "internal_edge_events": 0,
+        "unresolved_messages": 2,
+        "missing_operation": 0
+      },
+      "messaging_diagnostics": {
+        "identity_unverified": {
+          "count": 2,
+          "witness": [
+            [
+              "t-r1",
+              "c1"
+            ],
+            [
+              "t-r2",
+              "c2"
+            ]
+          ]
+        }
+      }
+    },
+    "operation": {
+      "level": "operation",
+      "interval_ns": null,
+      "nodes": [
+        {
+          "id": "[\"ticket-service\",\"consume-synthetic\"]",
+          "entity": "ticket-service",
+          "operation": "consume-synthetic",
+          "source": "trace"
+        }
+      ],
+      "edges": [
+        {
+          "source": "broker",
+          "target": "[\"ticket-service\",\"consume-synthetic\"]",
+          "type": "thông-điệp",
+          "evidence_source": "trace",
+          "event_count": 2,
+          "witness": [
+            [
+              "t-r1",
+              "c1"
+            ],
+            [
+              "t-r2",
+              "c2"
+            ]
+          ],
+          "destination": null,
+          "messaging": {
+            "broker": "broker",
+            "broker_scope": "synthetic-vhost",
+            "exchange": "flash-ticket.v1",
+            "routing_key": "event.cancelled.v1",
+            "queue": "q-A"
+          },
+          "queue_metric_address": [
+            "broker",
+            "synthetic-vhost",
+            "q-A"
+          ]
+        }
+      ],
+      "belongs_to": [
+        [
+          "[\"ticket-service\",\"consume-synthetic\"]",
+          "ticket-service"
+        ]
+      ],
+      "component_context": [
+        {
+          "id": "broker",
+          "type": "broker",
+          "source": "trace"
+        }
+      ],
+      "stats": {
+        "raw_spans": 2,
+        "unique_spans": 2,
+        "duplicate_rows": 0,
+        "roots": 2,
+        "parent_references": 0,
+        "resolved_parents": 0,
+        "orphans": 0,
+        "same_entity_parent_events": 0,
+        "cross_entity_parent_events": 0,
+        "parent_contains_child": 0,
+        "parent_not_contains_child": 0,
+        "cross_parent_contains_child": 0,
+        "internal_edge_events": 0,
+        "unresolved_messages": 2,
+        "missing_operation": 0
+      },
+      "messaging_diagnostics": {
+        "identity_unverified": {
+          "count": 2,
+          "witness": [
+            [
+              "t-r1",
+              "c1"
+            ],
+            [
+              "t-r2",
+              "c2"
+            ]
+          ]
+        }
+      }
+    }
+  }
+]

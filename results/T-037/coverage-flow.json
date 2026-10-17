@@ -1,0 +1,2201 @@
+{
+  "task": "T-037",
+  "role": "Người làm: phần hỗ trợ trích nguồn flow; không là phản biện chính thức.",
+  "state": "PARTIAL_NOT_FULL_COVERAGE_NOT_BUILT_NOT_VALIDATED",
+  "source_scope": [
+    "FT-B13",
+    "FT-B14",
+    "FT-B16",
+    "FT-B14-01",
+    "FT-B14-02",
+    "FT-B14-03"
+  ],
+  "entities_and_bindings": "Không kê ở partial này; root ghép với inventory/data/infra cùng ID, không build riêng partial.",
+  "method": "Thao tác có wording trực tiếp; messageType không tự biến thành handler operation/producer-consumer operationName; nhiều messaging edge entity-only hợp lệ. Runtime_name tất cả null. Không suy callback/message từ correlation.",
+  "unsupported_counterexample": {
+    "source": "ticket-service",
+    "source_operation": "gửi SMTP",
+    "target": "smtp",
+    "protocol_from_source": "SMTP",
+    "required_semantics": "gọi SMTP ngoài transaction; có thể timeout và gửi trùng; giữ source protocol",
+    "literal_proposed_relation_not_admitted": {
+      "id": "counterexample-smtp-call",
+      "source": {
+        "entity": "ticket-service",
+        "operation": "gửi SMTP"
+      },
+      "target": {
+        "entity": "smtp",
+        "operation": null
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "smtp",
+      "messaging": null,
+      "context": "B14 §6: delivery gửi SMTP ngoài transaction; không HTTP/RPC/internal.",
+      "provenance": [
+        {
+          "source_id": "FT-B14",
+          "locator": "§6 dòng 82",
+          "condition": "Nguồn thiết kế đã ghim; chưa xác minh thực thi hoặc tên runtime."
+        },
+        {
+          "source_id": "FT-B14-03",
+          "locator": "dòng 10–12",
+          "condition": "Nguồn thiết kế đã ghim; chưa xác minh thực thi hoặc tên runtime."
+        }
+      ]
+    },
+    "blocking_rule": "T-036 hop-dong.md §2 channel enum và build.py CHANNELS + relation_channel: gọi-đồng-bộ/gọi-chưa-phân-kiểu chỉ http/rpc/internal; smtp bị relation_type. Không tự fork chung."
+  },
+  "units": [
+    {
+      "source_id": "FT-B13",
+      "locator": "§3 dòng 48",
+      "summary": "GET /events/{eventId}",
+      "record_ids": [
+        "flow-api-01"
+      ],
+      "entity_ids": [
+        "api-gateway",
+        "event-service"
+      ],
+      "operation_names": [
+        "GET /events/{eventId}"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§3 dòng 49",
+      "summary": "GET /events/{eventId}/availability",
+      "record_ids": [
+        "flow-api-02"
+      ],
+      "entity_ids": [
+        "api-gateway",
+        "booking-service"
+      ],
+      "operation_names": [
+        "GET /events/{eventId}/availability"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§3 dòng 50",
+      "summary": "POST /orders",
+      "record_ids": [
+        "flow-api-03"
+      ],
+      "entity_ids": [
+        "api-gateway",
+        "booking-service"
+      ],
+      "operation_names": [
+        "POST /orders"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§3 dòng 51",
+      "summary": "POST /orders/{orderId}/promotion",
+      "record_ids": [
+        "flow-api-04"
+      ],
+      "entity_ids": [
+        "api-gateway",
+        "booking-service"
+      ],
+      "operation_names": [
+        "POST /orders/{orderId}/promotion"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§3 dòng 52",
+      "summary": "POST /orders/{orderId}/cancel",
+      "record_ids": [
+        "flow-api-05"
+      ],
+      "entity_ids": [
+        "api-gateway",
+        "booking-service"
+      ],
+      "operation_names": [
+        "POST /orders/{orderId}/cancel"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§3 dòng 53",
+      "summary": "GET /orders/{orderId}",
+      "record_ids": [
+        "flow-api-06"
+      ],
+      "entity_ids": [
+        "api-gateway",
+        "booking-service"
+      ],
+      "operation_names": [
+        "GET /orders/{orderId}"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§3 dòng 54",
+      "summary": "POST /orders/{orderId}/payment-attempts",
+      "record_ids": [
+        "flow-api-07"
+      ],
+      "entity_ids": [
+        "api-gateway",
+        "payment-service"
+      ],
+      "operation_names": [
+        "POST /orders/{orderId}/payment-attempts"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§3 dòng 55",
+      "summary": "GET /orders/{orderId}/payment",
+      "record_ids": [
+        "flow-api-08"
+      ],
+      "entity_ids": [
+        "api-gateway",
+        "payment-service"
+      ],
+      "operation_names": [
+        "GET /orders/{orderId}/payment"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§3 dòng 56",
+      "summary": "GET /orders/{orderId}/tickets",
+      "record_ids": [
+        "flow-api-09"
+      ],
+      "entity_ids": [
+        "api-gateway",
+        "ticket-service"
+      ],
+      "operation_names": [
+        "GET /orders/{orderId}/tickets"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§3 dòng 57",
+      "summary": "GET /tickets/{ticketId}/qr",
+      "record_ids": [
+        "flow-api-10"
+      ],
+      "entity_ids": [
+        "api-gateway",
+        "ticket-service"
+      ],
+      "operation_names": [
+        "GET /tickets/{ticketId}/qr"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§3 dòng 58",
+      "summary": "POST /orders/{orderId}/ticket-deliveries",
+      "record_ids": [
+        "flow-api-11"
+      ],
+      "entity_ids": [
+        "api-gateway",
+        "ticket-service"
+      ],
+      "operation_names": [
+        "POST /orders/{orderId}/ticket-deliveries"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§4 dòng 109–128",
+      "summary": "PurchaseSnapshot bất biến; canonical hash chỉ nhận diện retry, không chữ ký/hash chain; freeze không gia hạn",
+      "record_ids": [
+        "flow-http-freeze"
+      ],
+      "entity_ids": [
+        "booking-service",
+        "payment-service",
+        "ticket-service"
+      ],
+      "operation_names": [
+        "POST /internal/v1/orders/{id}/freeze-payment"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§5.2 dòng 185",
+      "summary": "Probe issuance giữ pending/timeout khác terminal FAILED",
+      "record_ids": [
+        "flow-http-probe"
+      ],
+      "entity_ids": [
+        "payment-service",
+        "ticket-service"
+      ],
+      "operation_names": [
+        "GET /internal/v1/orders/{id}/issuance"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§5.2 dòng 185",
+      "summary": "Event đọc summary qua API, không JOIN/đọc DB Payment",
+      "record_ids": [
+        "flow-http-financial-summary"
+      ],
+      "entity_ids": [
+        "event-service",
+        "payment-service"
+      ],
+      "operation_names": [
+        "GET /internal/v1/events/{id}/financial-summary"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§5.2 dòng 152",
+      "summary": "event.sales-configured.v1 → booking-service",
+      "record_ids": [
+        "flow-msg-01-publish",
+        "flow-msg-01-consume-1",
+        "flow-msg-01-logical-1"
+      ],
+      "entity_ids": [
+        "event-service",
+        "broker",
+        "booking-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_address_open",
+      "reason": "Giữ exchange/routing/đích theo nguồn; broker_scope và queue tên thật OPEN; không đủ khóa consume/logical để đối chiếu runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Cấu hình broker/namespace/scope/queue/binding theo deployment ghim; owner từng consumer."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§5.2 dòng 153",
+      "summary": "event.access-configured.v1 → ticket-service",
+      "record_ids": [
+        "flow-msg-02-publish",
+        "flow-msg-02-consume-1",
+        "flow-msg-02-logical-1"
+      ],
+      "entity_ids": [
+        "event-service",
+        "broker",
+        "ticket-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_address_open",
+      "reason": "Giữ exchange/routing/đích theo nguồn; broker_scope và queue tên thật OPEN; không đủ khóa consume/logical để đối chiếu runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Cấu hình broker/namespace/scope/queue/binding theo deployment ghim; owner từng consumer."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§5.2 dòng 154",
+      "summary": "event.finance-configured.v1 → payment-service",
+      "record_ids": [
+        "flow-msg-03-publish",
+        "flow-msg-03-consume-1",
+        "flow-msg-03-logical-1"
+      ],
+      "entity_ids": [
+        "event-service",
+        "broker",
+        "payment-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_address_open",
+      "reason": "Giữ exchange/routing/đích theo nguồn; broker_scope và queue tên thật OPEN; không đủ khóa consume/logical để đối chiếu runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Cấu hình broker/namespace/scope/queue/binding theo deployment ghim; owner từng consumer."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§5.2 dòng 155",
+      "summary": "event.cancelled.v1 → booking-service",
+      "record_ids": [
+        "flow-msg-04-publish",
+        "flow-msg-04-consume-1",
+        "flow-msg-04-logical-1"
+      ],
+      "entity_ids": [
+        "event-service",
+        "broker",
+        "booking-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_address_open",
+      "reason": "Giữ exchange/routing/đích theo nguồn; broker_scope và queue tên thật OPEN; không đủ khóa consume/logical để đối chiếu runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Cấu hình broker/namespace/scope/queue/binding theo deployment ghim; owner từng consumer."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§5.2 dòng 155",
+      "summary": "event.cancelled.v1 → ticket-service",
+      "record_ids": [
+        "flow-msg-04-publish",
+        "flow-msg-04-consume-2",
+        "flow-msg-04-logical-2"
+      ],
+      "entity_ids": [
+        "event-service",
+        "broker",
+        "ticket-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_address_open",
+      "reason": "Giữ exchange/routing/đích theo nguồn; broker_scope và queue tên thật OPEN; không đủ khóa consume/logical để đối chiếu runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Cấu hình broker/namespace/scope/queue/binding theo deployment ghim; owner từng consumer."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§5.2 dòng 155",
+      "summary": "event.cancelled.v1 → payment-service",
+      "record_ids": [
+        "flow-msg-04-publish",
+        "flow-msg-04-consume-3",
+        "flow-msg-04-logical-3"
+      ],
+      "entity_ids": [
+        "event-service",
+        "broker",
+        "payment-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_address_open",
+      "reason": "Giữ exchange/routing/đích theo nguồn; broker_scope và queue tên thật OPEN; không đủ khóa consume/logical để đối chiếu runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Cấu hình broker/namespace/scope/queue/binding theo deployment ghim; owner từng consumer."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§5.2 dòng 156",
+      "summary": "booking.accept-payment.v1 → booking-service",
+      "record_ids": [
+        "flow-msg-05-publish",
+        "flow-msg-05-consume-1",
+        "flow-msg-05-logical-1"
+      ],
+      "entity_ids": [
+        "payment-service",
+        "broker",
+        "booking-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_address_open",
+      "reason": "Giữ exchange/routing/đích theo nguồn; broker_scope và queue tên thật OPEN; không đủ khóa consume/logical để đối chiếu runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Cấu hình broker/namespace/scope/queue/binding theo deployment ghim; owner từng consumer."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§5.2 dòng 157",
+      "summary": "booking.payment-decision.v1 → payment-service",
+      "record_ids": [
+        "flow-msg-06-publish",
+        "flow-msg-06-consume-1",
+        "flow-msg-06-logical-1"
+      ],
+      "entity_ids": [
+        "booking-service",
+        "broker",
+        "payment-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_address_open",
+      "reason": "Giữ exchange/routing/đích theo nguồn; broker_scope và queue tên thật OPEN; không đủ khóa consume/logical để đối chiếu runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Cấu hình broker/namespace/scope/queue/binding theo deployment ghim; owner từng consumer."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§5.2 dòng 158",
+      "summary": "ticket.issue.v1 → ticket-service",
+      "record_ids": [
+        "flow-msg-07-publish",
+        "flow-msg-07-consume-1",
+        "flow-msg-07-logical-1"
+      ],
+      "entity_ids": [
+        "payment-service",
+        "broker",
+        "ticket-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_address_open",
+      "reason": "Giữ exchange/routing/đích theo nguồn; broker_scope và queue tên thật OPEN; không đủ khóa consume/logical để đối chiếu runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Cấu hình broker/namespace/scope/queue/binding theo deployment ghim; owner từng consumer."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§5.2 dòng 159",
+      "summary": "ticket.issuance-result.v1 → payment-service",
+      "record_ids": [
+        "flow-msg-08-publish",
+        "flow-msg-08-consume-1",
+        "flow-msg-08-logical-1"
+      ],
+      "entity_ids": [
+        "ticket-service",
+        "broker",
+        "payment-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_address_open",
+      "reason": "Giữ exchange/routing/đích theo nguồn; broker_scope và queue tên thật OPEN; không đủ khóa consume/logical để đối chiếu runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Cấu hình broker/namespace/scope/queue/binding theo deployment ghim; owner từng consumer."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§5.2 dòng 160",
+      "summary": "booking.issuance-result.v1 → booking-service",
+      "record_ids": [
+        "flow-msg-09-publish",
+        "flow-msg-09-consume-1",
+        "flow-msg-09-logical-1"
+      ],
+      "entity_ids": [
+        "payment-service",
+        "broker",
+        "booking-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_address_open",
+      "reason": "Giữ exchange/routing/đích theo nguồn; broker_scope và queue tên thật OPEN; không đủ khóa consume/logical để đối chiếu runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Cấu hình broker/namespace/scope/queue/binding theo deployment ghim; owner từng consumer."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§5.3 dòng 191",
+      "summary": "createPayment(attemptId,amountVnd,expiresAt)",
+      "record_ids": [
+        "flow-provider-1"
+      ],
+      "entity_ids": [
+        "payment-service",
+        "vnpay"
+      ],
+      "operation_names": [
+        "createPayment(attemptId,amountVnd,expiresAt)"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§5.3 dòng 191",
+      "summary": "queryPayment(attemptId)",
+      "record_ids": [
+        "flow-provider-2"
+      ],
+      "entity_ids": [
+        "payment-service",
+        "vnpay"
+      ],
+      "operation_names": [
+        "queryPayment(attemptId)"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§5.3 dòng 191",
+      "summary": "refund(refundId,chargeId,amountVnd,requestKey)",
+      "record_ids": [
+        "flow-provider-3"
+      ],
+      "entity_ids": [
+        "payment-service",
+        "vnpay"
+      ],
+      "operation_names": [
+        "refund(refundId,chargeId,amountVnd,requestKey)"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§5.3 dòng 189–193",
+      "summary": "Callback đã xác minh khác Return; provider unique charge; Q-07 mismatch/orphan bị loại",
+      "record_ids": [
+        "flow-callback-vnpay"
+      ],
+      "entity_ids": [
+        "vnpay",
+        "payment-service"
+      ],
+      "operation_names": [
+        "verifyNotification(rawRequest)"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§6 dòng 201–211",
+      "summary": "Check-in atomic, actor/window/owner; hai biên eventStart≤decisionAt≤eventEnd; replay khác scan mới",
+      "record_ids": [
+        "flow-api-checkin"
+      ],
+      "entity_ids": [
+        "api-gateway",
+        "ticket-service"
+      ],
+      "operation_names": [
+        "POST /api/v1/events/{eventId}/check-ins"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§7.2 dòng 239–272",
+      "summary": "GET /api/v1/organizer/events/{eventId}/seat-map",
+      "record_ids": [
+        "flow-seatmap-get"
+      ],
+      "entity_ids": [
+        "api-gateway",
+        "event-service"
+      ],
+      "operation_names": [
+        "GET /api/v1/organizer/events/{eventId}/seat-map"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§7.2 dòng 239–272",
+      "summary": "PUT /api/v1/organizer/events/{eventId}/seat-map",
+      "record_ids": [
+        "flow-seatmap-put"
+      ],
+      "entity_ids": [
+        "api-gateway",
+        "event-service"
+      ],
+      "operation_names": [
+        "PUT /api/v1/organizer/events/{eventId}/seat-map"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§9 dòng 290",
+      "summary": "User owns /api/v1/me, /organizer-applications, /admin/organizer-applications/{id}/approve|reject, /organizers/{subject}; phương thức ngoài follow chưa nêu trong nguồn này",
+      "record_ids": [],
+      "entity_ids": [
+        "user-service"
+      ],
+      "operation_names": [],
+      "status": "OPEN",
+      "reason": "Giữ path/owner/input; không bịa method, operationName hoặc route runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "OpenAPI/code và routing triển khai đã ghim; schema/role/ownership vẫn theo B13."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§9 dòng 290–294",
+      "summary": "PUT /organizers/{subject}/follow",
+      "record_ids": [
+        "flow-follow-put"
+      ],
+      "entity_ids": [
+        "api-gateway",
+        "user-service"
+      ],
+      "operation_names": [
+        "PUT /organizers/{subject}/follow"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§9 dòng 290–294",
+      "summary": "DELETE /organizers/{subject}/follow",
+      "record_ids": [
+        "flow-follow-delete"
+      ],
+      "entity_ids": [
+        "api-gateway",
+        "user-service"
+      ],
+      "operation_names": [
+        "DELETE /organizers/{subject}/follow"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§9 dòng 292–294",
+      "summary": "CAS PENDING chưa roleGrant; lưu operationId/REQUESTED trước Keycloak; reject không được sau bắt đầu grant; worker query/retry/confirm",
+      "record_ids": [
+        "flow-user-keycloak-query"
+      ],
+      "entity_ids": [
+        "user-service",
+        "keycloak"
+      ],
+      "operation_names": [
+        "Worker quét PENDING có roleGrant",
+        "query role của đúng subject"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§9 dòng 292–294",
+      "summary": "Worker ACTIVE upsert projection theo sourceApplicationId/sourceVersion; lỗi rebuild từ application; không Mongo transaction xuyên document/Saga mới",
+      "record_ids": [],
+      "entity_ids": [
+        "user-service"
+      ],
+      "operation_names": [
+        "Worker quét ACTIVE"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B14",
+      "locator": "§7 dòng 90–92",
+      "summary": "event-service: relay SKIP LOCKED, broker confirm trước published_at, ACK sau consumer commit; retry same messageId/data, hash mismatch lỗi kỹ thuật",
+      "record_ids": [],
+      "entity_ids": [
+        "event-service",
+        "broker"
+      ],
+      "operation_names": [
+        "Relay chọn unpublished theo next_attempt_at"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B14",
+      "locator": "§7 dòng 90–92",
+      "summary": "booking-service: relay SKIP LOCKED, broker confirm trước published_at, ACK sau consumer commit; retry same messageId/data, hash mismatch lỗi kỹ thuật",
+      "record_ids": [],
+      "entity_ids": [
+        "booking-service",
+        "broker"
+      ],
+      "operation_names": [
+        "Relay chọn unpublished theo next_attempt_at"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B14",
+      "locator": "§7 dòng 90–92",
+      "summary": "payment-service: relay SKIP LOCKED, broker confirm trước published_at, ACK sau consumer commit; retry same messageId/data, hash mismatch lỗi kỹ thuật",
+      "record_ids": [],
+      "entity_ids": [
+        "payment-service",
+        "broker"
+      ],
+      "operation_names": [
+        "Relay chọn unpublished theo next_attempt_at"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B14",
+      "locator": "§7 dòng 90–92",
+      "summary": "ticket-service: relay SKIP LOCKED, broker confirm trước published_at, ACK sau consumer commit; retry same messageId/data, hash mismatch lỗi kỹ thuật",
+      "record_ids": [],
+      "entity_ids": [
+        "ticket-service",
+        "broker"
+      ],
+      "operation_names": [
+        "Relay chọn unpublished theo next_attempt_at"
+      ],
+      "status": "represented_design_partial",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 78",
+      "summary": "event-service: save-draft",
+      "record_ids": [
+        "flow-signal-event-service-01-log",
+        "flow-signal-event-service-01-trace"
+      ],
+      "entity_ids": [
+        "event-service"
+      ],
+      "operation_names": [
+        "save-draft"
+      ],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Instrumentation và mapping tên thao tác thiết kế → log operation/span runtime cùng build; trace auto/manual không trùng."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 78",
+      "summary": "event-service: publish config version",
+      "record_ids": [
+        "flow-signal-event-service-02-log",
+        "flow-signal-event-service-02-trace"
+      ],
+      "entity_ids": [
+        "event-service"
+      ],
+      "operation_names": [
+        "publish config version"
+      ],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Instrumentation và mapping tên thao tác thiết kế → log operation/span runtime cùng build; trace auto/manual không trùng."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 78",
+      "summary": "event-service: approve/cancel actor và result",
+      "record_ids": [
+        "flow-signal-event-service-03-log",
+        "flow-signal-event-service-03-trace"
+      ],
+      "entity_ids": [
+        "event-service"
+      ],
+      "operation_names": [
+        "approve/cancel actor và result"
+      ],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Instrumentation và mapping tên thao tác thiết kế → log operation/span runtime cùng build; trace auto/manual không trùng."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 79",
+      "summary": "booking-service: reserve",
+      "record_ids": [
+        "flow-signal-booking-service-01-log",
+        "flow-signal-booking-service-01-trace"
+      ],
+      "entity_ids": [
+        "booking-service"
+      ],
+      "operation_names": [
+        "reserve"
+      ],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Instrumentation và mapping tên thao tác thiết kế → log operation/span runtime cùng build; trace auto/manual không trùng."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 79",
+      "summary": "booking-service: promotion",
+      "record_ids": [
+        "flow-signal-booking-service-02-log",
+        "flow-signal-booking-service-02-trace"
+      ],
+      "entity_ids": [
+        "booking-service"
+      ],
+      "operation_names": [
+        "promotion"
+      ],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Instrumentation và mapping tên thao tác thiết kế → log operation/span runtime cùng build; trace auto/manual không trùng."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 79",
+      "summary": "booking-service: freeze",
+      "record_ids": [
+        "flow-signal-booking-service-03-log",
+        "flow-signal-booking-service-03-trace"
+      ],
+      "entity_ids": [
+        "booking-service"
+      ],
+      "operation_names": [
+        "freeze"
+      ],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Instrumentation và mapping tên thao tác thiết kế → log operation/span runtime cùng build; trace auto/manual không trùng."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 79",
+      "summary": "booking-service: accept-payment deadline",
+      "record_ids": [
+        "flow-signal-booking-service-04-log",
+        "flow-signal-booking-service-04-trace"
+      ],
+      "entity_ids": [
+        "booking-service"
+      ],
+      "operation_names": [
+        "accept-payment deadline"
+      ],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Instrumentation và mapping tên thao tác thiết kế → log operation/span runtime cùng build; trace auto/manual không trùng."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 79",
+      "summary": "booking-service: expire/release",
+      "record_ids": [
+        "flow-signal-booking-service-05-log",
+        "flow-signal-booking-service-05-trace"
+      ],
+      "entity_ids": [
+        "booking-service"
+      ],
+      "operation_names": [
+        "expire/release"
+      ],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Instrumentation và mapping tên thao tác thiết kế → log operation/span runtime cùng build; trace auto/manual không trùng."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 80",
+      "summary": "payment-service: attempt tạo/query",
+      "record_ids": [
+        "flow-signal-payment-service-01-log",
+        "flow-signal-payment-service-01-trace"
+      ],
+      "entity_ids": [
+        "payment-service"
+      ],
+      "operation_names": [
+        "attempt tạo/query"
+      ],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Instrumentation và mapping tên thao tác thiết kế → log operation/span runtime cùng build; trace auto/manual không trùng."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 80",
+      "summary": "payment-service: callback validation result",
+      "record_ids": [
+        "flow-signal-payment-service-02-log",
+        "flow-signal-payment-service-02-trace"
+      ],
+      "entity_ids": [
+        "payment-service"
+      ],
+      "operation_names": [
+        "callback validation result"
+      ],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Instrumentation và mapping tên thao tác thiết kế → log operation/span runtime cùng build; trace auto/manual không trùng."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 80",
+      "summary": "payment-service: charge/confirmation",
+      "record_ids": [
+        "flow-signal-payment-service-03-log",
+        "flow-signal-payment-service-03-trace"
+      ],
+      "entity_ids": [
+        "payment-service"
+      ],
+      "operation_names": [
+        "charge/confirmation"
+      ],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Instrumentation và mapping tên thao tác thiết kế → log operation/span runtime cùng build; trace auto/manual không trùng."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 80",
+      "summary": "payment-service: Saga step",
+      "record_ids": [
+        "flow-signal-payment-service-04-log",
+        "flow-signal-payment-service-04-trace"
+      ],
+      "entity_ids": [
+        "payment-service"
+      ],
+      "operation_names": [
+        "Saga step"
+      ],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Instrumentation và mapping tên thao tác thiết kế → log operation/span runtime cùng build; trace auto/manual không trùng."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 80",
+      "summary": "payment-service: refund outcome",
+      "record_ids": [
+        "flow-signal-payment-service-05-log",
+        "flow-signal-payment-service-05-trace"
+      ],
+      "entity_ids": [
+        "payment-service"
+      ],
+      "operation_names": [
+        "refund outcome"
+      ],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Instrumentation và mapping tên thao tác thiết kế → log operation/span runtime cùng build; trace auto/manual không trùng."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 81",
+      "summary": "ticket-service: issuance toàn bộ/terminal fence",
+      "record_ids": [
+        "flow-signal-ticket-service-01-log",
+        "flow-signal-ticket-service-01-trace"
+      ],
+      "entity_ids": [
+        "ticket-service"
+      ],
+      "operation_names": [
+        "issuance toàn bộ/terminal fence"
+      ],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Instrumentation và mapping tên thao tác thiết kế → log operation/span runtime cùng build; trace auto/manual không trùng."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 81",
+      "summary": "ticket-service: delivery",
+      "record_ids": [
+        "flow-signal-ticket-service-02-log",
+        "flow-signal-ticket-service-02-trace"
+      ],
+      "entity_ids": [
+        "ticket-service"
+      ],
+      "operation_names": [
+        "delivery"
+      ],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Instrumentation và mapping tên thao tác thiết kế → log operation/span runtime cùng build; trace auto/manual không trùng."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 81",
+      "summary": "ticket-service: check-in outcome",
+      "record_ids": [
+        "flow-signal-ticket-service-03-log",
+        "flow-signal-ticket-service-03-trace"
+      ],
+      "entity_ids": [
+        "ticket-service"
+      ],
+      "operation_names": [
+        "check-in outcome"
+      ],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Instrumentation và mapping tên thao tác thiết kế → log operation/span runtime cùng build; trace auto/manual không trùng."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 82",
+      "summary": "user-service: role-grant request/result/retry",
+      "record_ids": [
+        "flow-signal-user-service-01-log",
+        "flow-signal-user-service-01-trace"
+      ],
+      "entity_ids": [
+        "user-service"
+      ],
+      "operation_names": [
+        "role-grant request/result/retry"
+      ],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Instrumentation và mapping tên thao tác thiết kế → log operation/span runtime cùng build; trace auto/manual không trùng."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 82",
+      "summary": "keycloak: login outcome tổng hợp từ nguồn identity phù hợp",
+      "record_ids": [
+        "flow-signal-keycloak-01-log"
+      ],
+      "entity_ids": [
+        "keycloak"
+      ],
+      "operation_names": [
+        "login outcome tổng hợp từ nguồn identity phù hợp"
+      ],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Instrumentation và mapping tên thao tác thiết kế → log operation/span runtime cùng build; trace auto/manual không trùng."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 78",
+      "summary": "event-service: request duration/count",
+      "record_ids": [
+        "flow-metric-event-service-01"
+      ],
+      "entity_ids": [
+        "event-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Tên series/labels allowlist, instance/host/broker deployment, scrape/exporter config và đơn vị đo thực."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 78",
+      "summary": "event-service: publish backlog/age",
+      "record_ids": [
+        "flow-metric-event-service-02"
+      ],
+      "entity_ids": [
+        "event-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Tên series/labels allowlist, instance/host/broker deployment, scrape/exporter config và đơn vị đo thực."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 79",
+      "summary": "booking-service: lock wait",
+      "record_ids": [
+        "flow-metric-booking-service-01"
+      ],
+      "entity_ids": [
+        "booking-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Tên series/labels allowlist, instance/host/broker deployment, scrape/exporter config và đơn vị đo thực."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 79",
+      "summary": "booking-service: transaction duration",
+      "record_ids": [
+        "flow-metric-booking-service-02"
+      ],
+      "entity_ids": [
+        "booking-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Tên series/labels allowlist, instance/host/broker deployment, scrape/exporter config và đơn vị đo thực."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 79",
+      "summary": "booking-service: reserve outcome",
+      "record_ids": [
+        "flow-metric-booking-service-03"
+      ],
+      "entity_ids": [
+        "booking-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Tên series/labels allowlist, instance/host/broker deployment, scrape/exporter config và đơn vị đo thực."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 79",
+      "summary": "booking-service: expiry lag",
+      "record_ids": [
+        "flow-metric-booking-service-04"
+      ],
+      "entity_ids": [
+        "booking-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Tên series/labels allowlist, instance/host/broker deployment, scrape/exporter config và đơn vị đo thực."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 79",
+      "summary": "booking-service: outbox/inbox retry",
+      "record_ids": [
+        "flow-metric-booking-service-05"
+      ],
+      "entity_ids": [
+        "booking-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Tên series/labels allowlist, instance/host/broker deployment, scrape/exporter config và đơn vị đo thực."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 80",
+      "summary": "payment-service: gateway latency/error/unknown",
+      "record_ids": [
+        "flow-metric-payment-service-01"
+      ],
+      "entity_ids": [
+        "payment-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Tên series/labels allowlist, instance/host/broker deployment, scrape/exporter config và đơn vị đo thực."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 80",
+      "summary": "payment-service: Saga pending age",
+      "record_ids": [
+        "flow-metric-payment-service-02"
+      ],
+      "entity_ids": [
+        "payment-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Tên series/labels allowlist, instance/host/broker deployment, scrape/exporter config và đơn vị đo thực."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 80",
+      "summary": "payment-service: refund backlog/age",
+      "record_ids": [
+        "flow-metric-payment-service-03"
+      ],
+      "entity_ids": [
+        "payment-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Tên series/labels allowlist, instance/host/broker deployment, scrape/exporter config và đơn vị đo thực."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 81",
+      "summary": "ticket-service: issuance latency",
+      "record_ids": [
+        "flow-metric-ticket-service-01"
+      ],
+      "entity_ids": [
+        "ticket-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Tên series/labels allowlist, instance/host/broker deployment, scrape/exporter config và đơn vị đo thực."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 81",
+      "summary": "ticket-service: delivery retry",
+      "record_ids": [
+        "flow-metric-ticket-service-02"
+      ],
+      "entity_ids": [
+        "ticket-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Tên series/labels allowlist, instance/host/broker deployment, scrape/exporter config và đơn vị đo thực."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 81",
+      "summary": "ticket-service: check-in outcome count",
+      "record_ids": [
+        "flow-metric-ticket-service-03"
+      ],
+      "entity_ids": [
+        "ticket-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Tên series/labels allowlist, instance/host/broker deployment, scrape/exporter config và đơn vị đo thực."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 82",
+      "summary": "user-service: Admin API latency/error",
+      "record_ids": [
+        "flow-metric-user-service-01"
+      ],
+      "entity_ids": [
+        "user-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Tên series/labels allowlist, instance/host/broker deployment, scrape/exporter config và đơn vị đo thực."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 82",
+      "summary": "user-service: projection retry/age",
+      "record_ids": [
+        "flow-metric-user-service-02"
+      ],
+      "entity_ids": [
+        "user-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Bản ghi giữ yêu cầu thiết kế; graph chưa dựng/kiểm, runtime chưa xác minh.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Tên series/labels allowlist, instance/host/broker deployment, scrape/exporter config và đơn vị đo thực."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§1 dòng 11–13",
+      "summary": "Wire format là thiết kế; version strict, từ chối field lạ/alias; không code ứng dụng/contract test thật",
+      "record_ids": [],
+      "entity_ids": [
+        "event-service",
+        "booking-service",
+        "payment-service",
+        "ticket-service",
+        "user-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§2 dòng 19–28",
+      "summary": "Public /api/v1 và internal /internal/v1; issuer/audience/expiry/signature + role/ownership; service caller; error code phân biệt",
+      "record_ids": [],
+      "entity_ids": [
+        "api-gateway",
+        "keycloak"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§3 dòng 60–105",
+      "summary": "CreateOrder/OrderView/PaymentStart/PaymentView/TicketView/Availability; mode/resource semantics, nonempty/unique IDs, promotion errors và URL allowlist",
+      "record_ids": [],
+      "entity_ids": [
+        "booking-service",
+        "payment-service",
+        "ticket-service",
+        "event-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§5.1 dòng 134–142",
+      "summary": "Envelope UUID/version/time/correlation/causation/traceparent; exchange flash-ticket.v1; queue riêng owner/consumer; commands chỉ bind đúng consumer",
+      "record_ids": [],
+      "entity_ids": [
+        "broker"
+      ],
+      "operation_names": [],
+      "status": "represented_design_address_open",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§5.1 dòng 144",
+      "summary": "Outbox domain effect atomic, inbox hash+dedupe+response outbox atomic; response replay terminal không làm lại effect",
+      "record_ids": [],
+      "entity_ids": [
+        "event-service",
+        "booking-service",
+        "payment-service",
+        "ticket-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§5.1 dòng 146",
+      "summary": "Confirm không là consumer processed; crash confirm/published_at gây lặp; sai cấu trúc/hash dừng; thiếu config retry; full snapshot v3 trước v2",
+      "record_ids": [],
+      "entity_ids": [
+        "broker",
+        "event-service",
+        "booking-service",
+        "payment-service",
+        "ticket-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§5.2 dòng 162–183",
+      "summary": "DTO cancellation full snapshots + monotonic marker; ACCEPTED/DUPLICATE conditions; FAILED requires terminal fence and zero valid tickets",
+      "record_ids": [],
+      "entity_ids": [
+        "booking-service",
+        "payment-service",
+        "ticket-service",
+        "event-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§6 dòng 197",
+      "summary": "CSPRNG bearer QR, hash lookup khác AEAD ciphertext reload; key version ngoài DB/repo; restore cần đúng key",
+      "record_ids": [],
+      "entity_ids": [
+        "ticket-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§6 dòng 199",
+      "summary": "Email link đăng nhập từ snapshot; delivery timeout có thể gửi trùng, không ticket/refund mới",
+      "record_ids": [],
+      "entity_ids": [
+        "ticket-service",
+        "smtp"
+      ],
+      "operation_names": [],
+      "status": "OPEN_UNSUPPORTED",
+      "reason": "SMTP là giao thức tường minh; T-036 gọi chỉ nhận channel http/rpc/internal. Không đổi nghĩa SMTP thành một channel khác; giữ phản ví dụ, dừng relation phụ thuộc.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Minh quyết phạm vi sửa hợp đồng chung sau phản ví dụ SMTP; ảnh hưởng ba nhánh T-037/T-038/T-039."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§7.1 dòng 217–235",
+      "summary": "Full SalesConfiguration version; hidden seat không type không vào supply; hidden có type UNAVAILABLE; replay không reset held/purchased",
+      "record_ids": [],
+      "entity_ids": [
+        "event-service",
+        "booking-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§7.2 dòng 241–272",
+      "summary": "Typed geometry/presentation khác nguồn cung; public lọc hidden; finite/parse allowlist; mode explicit, không editor collaboration/template clone",
+      "record_ids": [],
+      "entity_ids": [
+        "event-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§8 dòng 274–286",
+      "summary": "COMPARISON FE reuse/migration là lịch sử/hợp đồng adapter; không mở repo cũ; không dùng sinh runtime operation",
+      "record_ids": [],
+      "entity_ids": [
+        "event-service",
+        "booking-service",
+        "payment-service"
+      ],
+      "operation_names": [],
+      "status": "excluded_legacy_implementation",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§9 dòng 296",
+      "summary": "Cursor/page size/owner filtering; CRUD phụ có thể chi tiết sau, không đổi interservice contract",
+      "record_ids": [],
+      "entity_ids": [
+        "user-service",
+        "event-service"
+      ],
+      "operation_names": [],
+      "status": "OPEN",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§10.1 dòng 302–316",
+      "summary": "JSON/cột mapping; immutable purchase; local projection; outbox payload=Envelope.data; inbox typed response; validate full DTO trước ghi",
+      "record_ids": [],
+      "entity_ids": [
+        "event-service",
+        "booking-service",
+        "payment-service",
+        "ticket-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "§10 dòng 318–326",
+      "summary": "Baseline contract chưa service tests; crypto/provider ack/FE adapter chờ B15; nhật ký lịch sử không đổi header APPROVED",
+      "record_ids": [],
+      "entity_ids": [],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B13",
+      "locator": "Phụ lục dòng 328–330",
+      "summary": "R0 CANDIDATE chỉ đối chiếu; không đủ bằng chứng trace qua broker/worker/callback và không sinh API/service/invariant",
+      "record_ids": [],
+      "entity_ids": [],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B14",
+      "locator": "§1 dòng 9–16",
+      "summary": "Một transaction/DB owner; order khóa theo nguồn; HTTP/provider/SMTP ngoài transaction; inbox/outbox cùng transaction",
+      "record_ids": [],
+      "entity_ids": [
+        "event-service",
+        "booking-service",
+        "payment-service",
+        "ticket-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B14",
+      "locator": "§1 dòng 18–20",
+      "summary": "Booking decisionAt sau khóa; equality deadline là expired; check-in inclusive; snapshot lock có thể hot, tối ưu phải giữ invariant",
+      "record_ids": [],
+      "entity_ids": [
+        "booking-service",
+        "ticket-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B14",
+      "locator": "§2 dòng 24–32",
+      "summary": "Atomic idempotency/create/hold/counters, promotion transaction riêng, freeze immutable; mất response retry same key",
+      "record_ids": [],
+      "entity_ids": [
+        "booking-service",
+        "payment-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B14",
+      "locator": "§3 dòng 40–48",
+      "summary": "Chuỗi charge→WAITING_BOOKING→Booking acceptance→confirmation→WAITING_TICKETS→issuance→coordinator result",
+      "record_ids": [],
+      "entity_ids": [
+        "booking-service",
+        "payment-service",
+        "ticket-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B14",
+      "locator": "§3 dòng 49–53",
+      "summary": "Timeout/404/PENDING không cho refund; terminal FAILED fence commit trước bù trừ; promotion release và inventory eligibility khác nhau",
+      "record_ids": [],
+      "entity_ids": [
+        "booking-service",
+        "payment-service",
+        "ticket-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B14",
+      "locator": "§4 dòng 59–61",
+      "summary": "Expiry worker độc lập không caller; confirm/expire cùng khóa; reservation+generation chặn old release đụng hold mới",
+      "record_ids": [],
+      "entity_ids": [
+        "booking-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B14",
+      "locator": "§4 dòng 62",
+      "summary": "Refund reason arbitration theo charge/confirmation/event/fence/deadline; unique charge, trigger sau không thêm nghĩa vụ",
+      "record_ids": [],
+      "entity_ids": [
+        "payment-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B14",
+      "locator": "§4 dòng 63–65",
+      "summary": "Claim PROCESSING + unfinished attempt key trước call, query timeout; SUCCEEDED amount whole charge; COMPENSATED chỉ lệnh Booking bền outbox, không mọi consumer hội tụ",
+      "record_ids": [],
+      "entity_ids": [
+        "payment-service",
+        "booking-service",
+        "vnpay"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B14",
+      "locator": "§5 dòng 69–71",
+      "summary": "Event local gate CANCELLED atomically; full cancellation trước config; Payment marker trước fee; commit gate trước durable fan-out",
+      "record_ids": [],
+      "entity_ids": [
+        "event-service",
+        "booking-service",
+        "payment-service",
+        "ticket-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B14",
+      "locator": "§5 dòng 72",
+      "summary": "Booking không reopen inventory; Ticket marker chặn check-in trước batch void; không undo USED",
+      "record_ids": [],
+      "entity_ids": [
+        "booking-service",
+        "ticket-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B14",
+      "locator": "§5 dòng 73–76",
+      "summary": "Durable refund run cursor/items; selection_complete/asOf; excess charge ngoài mẫu số; callback đến trễ vẫn xử lý; accepted propagation lag/scan lọt phải công bố",
+      "record_ids": [],
+      "entity_ids": [
+        "payment-service",
+        "ticket-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B14",
+      "locator": "§6 dòng 82",
+      "summary": "Delivery job claim/lease, SMTP ngoài TX, retry same job; email failure không VOID/refund",
+      "record_ids": [],
+      "entity_ids": [
+        "ticket-service",
+        "smtp"
+      ],
+      "operation_names": [],
+      "status": "OPEN_UNSUPPORTED",
+      "reason": "SMTP là giao thức tường minh; T-036 gọi chỉ nhận channel http/rpc/internal. Không đổi nghĩa SMTP thành một channel khác; giữ phản ví dụ, dừng relation phụ thuộc.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Minh quyết phạm vi sửa hợp đồng chung sau phản ví dụ SMTP; ảnh hưởng ba nhánh T-037/T-038/T-039."
+    },
+    {
+      "source_id": "FT-B14",
+      "locator": "§6 dòng 84–86",
+      "summary": "Check-in receipts/replay atomic; QR lookup hash khác ciphertext reload; missing key lỗi không đổi token âm thầm",
+      "record_ids": [],
+      "entity_ids": [
+        "ticket-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B14",
+      "locator": "§7 dòng 90–92",
+      "summary": "Retry/backoff có trần; mọi lỗi giữ; structural poison chuyển technical error queue/replay controlled; queue address còn OPEN",
+      "record_ids": [],
+      "entity_ids": [
+        "broker"
+      ],
+      "operation_names": [],
+      "status": "represented_design_address_open",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B14",
+      "locator": "§8 dòng 96–100",
+      "summary": "Reconcile từ selected confirmation/refund; fee version không default 0; lock event finance, no UNKNOWN/PENDING; actor/time/evidence, paid once; không tự bank transfer",
+      "record_ids": [],
+      "entity_ids": [
+        "payment-service",
+        "vnpay"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B14",
+      "locator": "Phụ lục dòng 102–104",
+      "summary": "HTTP/message/transaction biên thiết kế chưa đủ span boundaries; P9 instrumentation kiểm coverage thật",
+      "record_ids": [],
+      "entity_ids": [
+        "event-service",
+        "booking-service",
+        "payment-service",
+        "ticket-service"
+      ],
+      "operation_names": [],
+      "status": "OPEN",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§1 dòng 10–12",
+      "summary": "Log+trace+metric theo DT18; năm service khác toàn node; RCA chỉ đọc kho quan sát, không DB business",
+      "record_ids": [],
+      "entity_ids": [
+        "api-gateway",
+        "keycloak",
+        "broker"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§2 dòng 16–26",
+      "summary": "OTel/Prometheus/Loki/Tempo/Grafana vai trò khác nhau; một đường export/tín hiệu; auto/manual không trùng; không bằng chứng root cause",
+      "record_ids": [],
+      "entity_ids": [
+        "event-service",
+        "booking-service",
+        "payment-service",
+        "ticket-service",
+        "user-service"
+      ],
+      "operation_names": [],
+      "status": "OPEN",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§3 dòng 30–35",
+      "summary": "correlationId giao dịch khác traceId execution/messageId/requestId; pre-order correlation tạm log link; nội bộ W3C context và correlation riêng",
+      "record_ids": [],
+      "entity_ids": [
+        "booking-service",
+        "payment-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§3 dòng 36–37",
+      "summary": "Outbox lưu correlation+trace context cùng TX; publisher/consumer retry giữ messageId, attempt riêng; span parent/link theo semantics, không giả source span",
+      "record_ids": [],
+      "entity_ids": [
+        "broker",
+        "event-service",
+        "booking-service",
+        "payment-service",
+        "ticket-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§3 dòng 38",
+      "summary": "Callback tạo trace mới, correlation từ attempt đã xác minh; không từ payload chưa kiểm; không suy parent từ correlation",
+      "record_ids": [],
+      "entity_ids": [
+        "vnpay",
+        "payment-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§3 dòng 39",
+      "summary": "Scheduler expiry/refund/delivery trace riêng; batch mỗi item giữ correlation order; không caller giả",
+      "record_ids": [],
+      "entity_ids": [
+        "booking-service",
+        "payment-service",
+        "ticket-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§3 dòng 40–43",
+      "summary": "Event cancel correlation riêng; order giữ correlation của mình thêm causation/cancellationId; span links batch, timestamp/correlation không chứng minh parent",
+      "record_ids": [],
+      "entity_ids": [
+        "event-service",
+        "booking-service",
+        "payment-service",
+        "ticket-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§4 dòng 47–64",
+      "summary": "UTF8 JSON whitelist: source UTC/observed time, severity, service/version/instance/env/host, operation/outcome, IDs, state/reason, duration/retry/config/error",
+      "record_ids": [],
+      "entity_ids": [
+        "event-service",
+        "booking-service",
+        "payment-service",
+        "ticket-service",
+        "user-service"
+      ],
+      "operation_names": [],
+      "status": "represented_design_runtime_address_open",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§4 dòng 66–72",
+      "summary": "Ví dụ là tổng hợp; SUCCESS chỉ sau commit; crash commit→log có gap, không logging exactly-once",
+      "record_ids": [],
+      "entity_ids": [],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 83",
+      "summary": "Infra logical endpoint và CPU/RAM/disk/pool/queue/restart/OOM/collector drop; root xử lý inventory/infra và signal details",
+      "record_ids": [],
+      "entity_ids": [
+        "broker",
+        "keycloak",
+        "api-gateway"
+      ],
+      "operation_names": [],
+      "status": "OPEN",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§5 dòng 85–87",
+      "summary": "Cardinality allowlist; order/buyer/trace/message/QR/email không metric/index labels; queue metric không thay business; metric inventory không quyết hold; audit chỉ bốn FR groups",
+      "record_ids": [],
+      "entity_ids": [],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§6 dòng 91–95",
+      "summary": "Mask trước ghi/export; collector dự phòng; sentinel tới sinks/Gemini; RCA readonly API allow/deny và DB CONNECT denied; management không public",
+      "record_ids": [],
+      "entity_ids": [],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§6 dòng 97",
+      "summary": "Retention log/trace7d metric14d demo; export selected run trước rotation; disk đo thật; business audit khác TTL; retention dài/RPO/RTO OPEN",
+      "record_ids": [],
+      "entity_ids": [],
+      "operation_names": [],
+      "status": "OPEN",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§7 dòng 101–110",
+      "summary": "Sampling/drop, async/callback breaks, clocks, shared-host resource, external unobservability, collector/storage failure, duplicate instrumentation/cardinality, dependency≠cause",
+      "record_ids": [],
+      "entity_ids": [],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§7 dòng 112",
+      "summary": "Sampling policy từng run lưu cùng kết quả; 100% vẫn có mất do collector",
+      "record_ids": [],
+      "entity_ids": [],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "§8 dòng 116–124",
+      "summary": "Runtime evidence order/callback/consumer/retry/expiry/security/permissions/run manifest chưa chạy; RES-039 người nhận/UI OPEN; không nghiệm thu NFR bằng dashboard",
+      "record_ids": [],
+      "entity_ids": [],
+      "operation_names": [],
+      "status": "OPEN",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B16",
+      "locator": "Phụ lục dòng 126–128",
+      "summary": "R0 nguồn CANDIDATE; timing/window/coverage cần đo từng run; không đổi stack/service/invariant hoặc duyệt nghiên cứu",
+      "record_ids": [],
+      "entity_ids": [],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Chỉ ghi yêu cầu/giới hạn thiết kế để bàn giao; chưa dựng graph/validate và chưa chứng minh runtime.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Đối chiếu chi tiết bản ghi/source còn lại; P9 runtime/code/config và phép kiểm theo nguồn; root hoàn thiện phần tích hợp."
+    },
+    {
+      "source_id": "FT-B14-01",
+      "locator": "dòng 5–38",
+      "summary": "Main sequence charge/Booking acceptance/Payment coordination/Ticket atomic issuance; alias Gateway là cổng thanh toán, không API Gateway",
+      "record_ids": [],
+      "entity_ids": [
+        "booking-service",
+        "payment-service",
+        "ticket-service",
+        "vnpay"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Diagram là thiết kế bổ trợ; các contract/message lấy B13/B14. SMTP relation giữ OPEN, không giả transport.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B14-02",
+      "locator": "dòng 4–33",
+      "summary": "Expiry/cancel/refund convergence; Payment→Gateway refund/query là VNPay; không tạo Saga thứ hai",
+      "record_ids": [],
+      "entity_ids": [
+        "event-service",
+        "booking-service",
+        "payment-service",
+        "ticket-service",
+        "vnpay"
+      ],
+      "operation_names": [],
+      "status": "represented_design_partial",
+      "reason": "Diagram là thiết kế bổ trợ; các contract/message lấy B13/B14. SMTP relation giữ OPEN, không giả transport.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    },
+    {
+      "source_id": "FT-B14-03",
+      "locator": "dòng 4–26",
+      "summary": "Delivery/QR/check-in; SMTP explicit không thể ép vào channel T-036; audit replay và no offline",
+      "record_ids": [],
+      "entity_ids": [
+        "ticket-service",
+        "smtp"
+      ],
+      "operation_names": [],
+      "status": "OPEN_UNSUPPORTED",
+      "reason": "Diagram là thiết kế bổ trợ; các contract/message lấy B13/B14. SMTP relation giữ OPEN, không giả transport.",
+      "owner": "Nhóm triển khai FlashTicket / P9",
+      "required_input": "Build/deployment/instrumentation và phép đối chiếu runtime theo SPEC sau."
+    }
+  ],
+  "open_limits": [
+    "Nguồn queue/scope/names runtime chưa có; publish/consume/logical giữ null theo hợp đồng.",
+    "Phần nguồn hỗ trợ hạ tầng/telemetry do root hoàn thiện; thiếu transport rõ không tạo quan hệ giả.",
+    "Coverage rows có thể chỉ giữ yêu cầu giao thức/state/security không tạo cạnh; chưa xác minh đủ từng yêu cầu và chưa đối chiếu graph.",
+    "Không đọc remote/legacy; không chạy converter/build/test và không có khẳng định nghiệm thu."
+  ]
+}

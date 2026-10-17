@@ -1,0 +1,1309 @@
+{
+  "scope": {
+    "system": "Nezha-OB",
+    "revision": "94a01ba4c7c79e0c0b2c9da073ba081fcedc4bf1"
+  },
+  "entities": [
+    {
+      "id": "adservice",
+      "name": "adservice",
+      "type": "service",
+      "granularity": "logical",
+      "role": "application",
+      "provenance": [
+        {
+          "source_id": "OB:src/adservice/src/main/java/hipstershop/AdService.java",
+          "locator": "L57-L84",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "cartservice",
+      "name": "cartservice",
+      "type": "service",
+      "granularity": "logical",
+      "role": "application",
+      "provenance": [
+        {
+          "source_id": "OB:src/cartservice/src/Startup.cs",
+          "locator": "L30-L51;L78-L86",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "currencyservice",
+      "name": "currencyservice",
+      "type": "service",
+      "granularity": "logical",
+      "role": "application",
+      "provenance": [
+        {
+          "source_id": "OB:src/currencyservice/server.js",
+          "locator": "L183-L192",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "paymentservice",
+      "name": "paymentservice",
+      "type": "service",
+      "granularity": "logical",
+      "role": "application",
+      "provenance": [
+        {
+          "source_id": "OB:src/paymentservice/server.js",
+          "locator": "L99-L121",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/paymentservice/index.js",
+          "locator": "L17-L29",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "emailservice",
+      "name": "emailservice",
+      "type": "service",
+      "granularity": "logical",
+      "role": "application",
+      "provenance": [
+        {
+          "source_id": "OB:src/emailservice/email_server.py",
+          "locator": "L161-L185",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime. Entrypoint cố định dummy_mode=True."
+        }
+      ]
+    },
+    {
+      "id": "recommendationservice",
+      "name": "recommendationservice",
+      "type": "service",
+      "granularity": "logical",
+      "role": "application",
+      "provenance": [
+        {
+          "source_id": "OB:src/recommendationservice/recommendation_server.py",
+          "locator": "L95-L118",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "productcatalogservice",
+      "name": "productcatalogservice",
+      "type": "service",
+      "granularity": "logical",
+      "role": "application",
+      "provenance": [
+        {
+          "source_id": "OB:src/recommendationservice/recommendation_server.py",
+          "locator": "L99-L105",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/recommendationservice/demo_pb2_grpc.py",
+          "locator": "L143-L168",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime. Đích client thật được gọi; root bổ sung registration server Go."
+        }
+      ]
+    },
+    {
+      "id": "mysql/addatabase",
+      "name": "mysql/addatabase",
+      "type": "database",
+      "granularity": "logical",
+      "role": "datastore",
+      "provenance": [
+        {
+          "source_id": "OB:src/adservice/src/main/java/hipstershop/AdService.java",
+          "locator": "L237-L257",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime. Logical database lấy từ JDBC URL; chưa gắn instance/host bằng tên môi trường."
+        }
+      ]
+    },
+    {
+      "id": "redis-cart",
+      "name": "redis-cart",
+      "type": "cache",
+      "granularity": "logical",
+      "role": "datastore",
+      "provenance": [
+        {
+          "source_id": "OB:src/cartservice/src/Startup.cs",
+          "locator": "L32-L43",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/cartservice/src/cartstore/RedisCartStore.cs",
+          "locator": "L39-L52;L128-L154",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime. Canonical ID nguồn cho cart backing store; không coi là runtime alias đã xác minh."
+        }
+      ]
+    }
+  ],
+  "operations": [
+    {
+      "entity": "adservice",
+      "name": "hipstershop.AdService/GetAds",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "OB:pb/demo.proto",
+          "locator": "L227-L229",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/adservice/src/main/java/hipstershop/AdService.java",
+          "locator": "L79-L84;L106-L163",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "entity": "adservice",
+      "name": "hipstershop.AdService/getAdsByCategory",
+      "runtime_name": "hipstershop.AdService/getAdsByCategory",
+      "provenance": [
+        {
+          "source_id": "OB:src/adservice/src/main/java/hipstershop/AdService.java",
+          "locator": "L169-L185",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime. Tên literal updateName; createAdsMap đổi span hiện tại, không chứng minh span con riêng."
+        }
+      ]
+    },
+    {
+      "entity": "adservice",
+      "name": "hipstershop.AdService/getRandomAds",
+      "runtime_name": "hipstershop.AdService/getRandomAds",
+      "provenance": [
+        {
+          "source_id": "OB:src/adservice/src/main/java/hipstershop/AdService.java",
+          "locator": "L190-L214",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime. Tên literal updateName; createAdsMap đổi span hiện tại, không chứng minh span con riêng."
+        }
+      ]
+    },
+    {
+      "entity": "adservice",
+      "name": "hipstershop.AdService/createAdsMap",
+      "runtime_name": "hipstershop.AdService/createAdsMap",
+      "provenance": [
+        {
+          "source_id": "OB:src/adservice/src/main/java/hipstershop/AdService.java",
+          "locator": "L227-L279",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime. Tên literal updateName; createAdsMap đổi span hiện tại, không chứng minh span con riêng."
+        }
+      ]
+    },
+    {
+      "entity": "adservice",
+      "name": "grpc.health.v1.Health/Check",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "OB:src/adservice/src/main/java/hipstershop/AdService.java",
+          "locator": "L75-L96",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:pb/grpc/health/v1/health.proto",
+          "locator": "L20-L26;L41-L43",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime. Registration qua HealthStatusManager trong thư viện; phiên bản binding thực ngoài repo chưa đọc."
+        }
+      ]
+    },
+    {
+      "entity": "cartservice",
+      "name": "hipstershop.CartService/AddItem",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "OB:src/cartservice/src/services/CartService.cs",
+          "locator": "L34-L38",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/cartservice/src/protos/Cart.proto",
+          "locator": "L21-L25",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/cartservice/src/Startup.cs",
+          "locator": "L78-L81",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "entity": "cartservice",
+      "name": "hipstershop.CartService/GetCart",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "OB:src/cartservice/src/services/CartService.cs",
+          "locator": "L40-L43",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/cartservice/src/protos/Cart.proto",
+          "locator": "L21-L25",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/cartservice/src/Startup.cs",
+          "locator": "L78-L81",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "entity": "cartservice",
+      "name": "hipstershop.CartService/EmptyCart",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "OB:src/cartservice/src/services/CartService.cs",
+          "locator": "L45-L48",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/cartservice/src/protos/Cart.proto",
+          "locator": "L21-L25",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/cartservice/src/Startup.cs",
+          "locator": "L78-L81",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "entity": "cartservice",
+      "name": "grpc.health.v1.Health/Check",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "OB:src/cartservice/src/services/HealthCheckService.cs",
+          "locator": "L24-L39",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/cartservice/src/Startup.cs",
+          "locator": "L78-L81",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "entity": "cartservice",
+      "name": "GET /",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "OB:src/cartservice/src/Startup.cs",
+          "locator": "L83-L86",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "entity": "currencyservice",
+      "name": "hipstershop.CurrencyService/GetSupportedCurrencies",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "OB:src/currencyservice/server.js",
+          "locator": "L118-L128;L183-L189",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:pb/demo.proto",
+          "locator": "L124-L127",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "entity": "currencyservice",
+      "name": "hipstershop.CurrencyService/Convert",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "OB:src/currencyservice/server.js",
+          "locator": "L133-L169;L183-L189",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:pb/demo.proto",
+          "locator": "L124-L127",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "entity": "currencyservice",
+      "name": "hipstershop.CurrencyService/GetCurrencyData",
+      "runtime_name": "hipstershop.CurrencyService/GetCurrencyData",
+      "provenance": [
+        {
+          "source_id": "OB:src/currencyservice/server.js",
+          "locator": "L66-L86",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "entity": "currencyservice",
+      "name": "hipstershop.CurrencyService/Carry",
+      "runtime_name": "hipstershop.CurrencyService/Carry",
+      "provenance": [
+        {
+          "source_id": "OB:src/currencyservice/server.js",
+          "locator": "L91-L113",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "entity": "currencyservice",
+      "name": "grpc.health.v1.Health/Check",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "OB:src/currencyservice/server.js",
+          "locator": "L175-L188",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/currencyservice/proto/grpc/health/v1/health.proto",
+          "locator": "L20-L26;L41-L43",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "entity": "paymentservice",
+      "name": "hipstershop.PaymentService/Charge",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "OB:src/paymentservice/server.js",
+          "locator": "L55-L72;L103-L108",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:pb/demo.proto",
+          "locator": "L161-L163",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "entity": "paymentservice",
+      "name": "grpc.health.v1.Health/Check",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "OB:src/paymentservice/server.js",
+          "locator": "L75-L77;L110-L115",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/paymentservice/proto/grpc/health/v1/health.proto",
+          "locator": "L20-L26;L41-L43",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "entity": "emailservice",
+      "name": "hipstershop.EmailService/SendOrderConfirmation",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "OB:src/emailservice/email_server.py",
+          "locator": "L134-L154;L161-L185",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime. Dummy render/log, không gửi mail thật."
+        },
+        {
+          "source_id": "OB:src/emailservice/demo_pb2_grpc.py",
+          "locator": "L389-L430",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "entity": "emailservice",
+      "name": "grpc.health.v1.Health/Check",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "OB:src/emailservice/email_server.py",
+          "locator": "L79-L86;L169-L170",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/emailservice/requirements.txt",
+          "locator": "L45-L52",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime. Health binding nằm trong dependency; Watch không được tự nhận active chỉ vì class có method."
+        }
+      ]
+    },
+    {
+      "entity": "recommendationservice",
+      "name": "hipstershop.RecommendationService/ListRecommendations",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "OB:src/recommendationservice/recommendation_server.py",
+          "locator": "L63-L84;L110-L113",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/recommendationservice/demo_pb2_grpc.py",
+          "locator": "L99-L140",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "entity": "recommendationservice",
+      "name": "grpc.health.v1.Health/Check",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "OB:src/recommendationservice/recommendation_server.py",
+          "locator": "L86-L92;L110-L113",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/recommendationservice/requirements.txt",
+          "locator": "L20-L21",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime. Binding Health từ dependency; exact telemetry naming chưa xác minh."
+        }
+      ]
+    },
+    {
+      "entity": "productcatalogservice",
+      "name": "hipstershop.ProductCatalogService/ListProducts",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "OB:src/recommendationservice/demo_pb2_grpc.py",
+          "locator": "L143-L158",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/recommendationservice/recommendation_server.py",
+          "locator": "L69-L72;L99-L105",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "id": "backend:ad-context",
+      "source": {
+        "entity": "adservice",
+        "operation": "hipstershop.AdService/GetAds"
+      },
+      "target": {
+        "entity": "adservice",
+        "operation": "hipstershop.AdService/getAdsByCategory"
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "internal",
+      "messaging": null,
+      "context": "GetAds: context_keys_count>0, lặp từng key; exception bị handler catch.",
+      "provenance": [
+        {
+          "source_id": "OB:src/adservice/src/main/java/hipstershop/AdService.java",
+          "locator": "L128-L135;L156-L163",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:ad-random",
+      "source": {
+        "entity": "adservice",
+        "operation": "hipstershop.AdService/GetAds"
+      },
+      "target": {
+        "entity": "adservice",
+        "operation": "hipstershop.AdService/getRandomAds"
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "internal",
+      "messaging": null,
+      "context": "Sau context lookup, fallback chỉ nếu allAds.isEmpty(); không suy mọi request đi cả hai nhánh.",
+      "provenance": [
+        {
+          "source_id": "OB:src/adservice/src/main/java/hipstershop/AdService.java",
+          "locator": "L131-L148",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:ad-map-getAdsByCategory",
+      "source": {
+        "entity": "adservice",
+        "operation": "hipstershop.AdService/getAdsByCategory"
+      },
+      "target": {
+        "entity": "adservice",
+        "operation": "hipstershop.AdService/createAdsMap"
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "internal",
+      "messaging": null,
+      "context": "Gọi createAdsMap mỗi lần; updateName trên span hiện tại, không suy span-parent từ call nội bộ.",
+      "provenance": [
+        {
+          "source_id": "OB:src/adservice/src/main/java/hipstershop/AdService.java",
+          "locator": "L169-L175",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:ad-map-getRandomAds",
+      "source": {
+        "entity": "adservice",
+        "operation": "hipstershop.AdService/getRandomAds"
+      },
+      "target": {
+        "entity": "adservice",
+        "operation": "hipstershop.AdService/createAdsMap"
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "internal",
+      "messaging": null,
+      "context": "Gọi createAdsMap mỗi lần; updateName trên span hiện tại, không suy span-parent từ call nội bộ.",
+      "provenance": [
+        {
+          "source_id": "OB:src/adservice/src/main/java/hipstershop/AdService.java",
+          "locator": "L190-L197",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:ad-mysql-read",
+      "source": {
+        "entity": "adservice",
+        "operation": "hipstershop.AdService/createAdsMap"
+      },
+      "target": {
+        "entity": "mysql/addatabase",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "jdbc:mysql://${MYSQL_ADDR}/addatabase, SELECT * FROM aditems; credentials SQL_USER/SQL_PASSWORD; driver/SQL error trả null; không suy instance hoặc host.",
+      "provenance": [
+        {
+          "source_id": "OB:src/adservice/src/main/java/hipstershop/AdService.java",
+          "locator": "L61-L65;L237-L279",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:cart-redis-additem",
+      "source": {
+        "entity": "cartservice",
+        "operation": "hipstershop.CartService/AddItem"
+      },
+      "target": {
+        "entity": "redis-cart",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Chỉ REDIS_ADDR không rỗng chọn RedisCartStore; LocalCartStore không có data edge ngoài. HashGetAsync rồi HashSetAsync theo cart mới/cũ; lỗi FailedPrecondition.",
+      "provenance": [
+        {
+          "source_id": "OB:src/cartservice/src/Startup.cs",
+          "locator": "L32-L49",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/cartservice/src/services/CartService.cs",
+          "locator": "L34-L48",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/cartservice/src/cartstore/RedisCartStore.cs",
+          "locator": "L111-L160",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:cart-redis-emptycart",
+      "source": {
+        "entity": "cartservice",
+        "operation": "hipstershop.CartService/EmptyCart"
+      },
+      "target": {
+        "entity": "redis-cart",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Chỉ REDIS_ADDR không rỗng chọn RedisCartStore; LocalCartStore không có data edge ngoài. HashSetAsync với emptyCartBytes; lỗi FailedPrecondition.",
+      "provenance": [
+        {
+          "source_id": "OB:src/cartservice/src/Startup.cs",
+          "locator": "L32-L49",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/cartservice/src/services/CartService.cs",
+          "locator": "L34-L48",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/cartservice/src/cartstore/RedisCartStore.cs",
+          "locator": "L162-L187",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:cart-redis-getcart",
+      "source": {
+        "entity": "cartservice",
+        "operation": "hipstershop.CartService/GetCart"
+      },
+      "target": {
+        "entity": "redis-cart",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Chỉ REDIS_ADDR không rỗng chọn RedisCartStore; LocalCartStore không có data edge ngoài. HashGetAsync; thiếu value trả cart rỗng; lỗi FailedPrecondition.",
+      "provenance": [
+        {
+          "source_id": "OB:src/cartservice/src/Startup.cs",
+          "locator": "L32-L49",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/cartservice/src/services/CartService.cs",
+          "locator": "L34-L48",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/cartservice/src/cartstore/RedisCartStore.cs",
+          "locator": "L189-L223",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:cart-health-redis",
+      "source": {
+        "entity": "cartservice",
+        "operation": "grpc.health.v1.Health/Check"
+      },
+      "target": {
+        "entity": "redis-cart",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Health Check→ICartStore.Ping; Redis mode gọi cache.Ping và lỗi trả false; Local mode trả true nội bộ.",
+      "provenance": [
+        {
+          "source_id": "OB:src/cartservice/src/services/HealthCheckService.cs",
+          "locator": "L33-L38",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/cartservice/src/cartstore/RedisCartStore.cs",
+          "locator": "L225-L236",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/cartservice/src/cartstore/LocalCartStore.cs",
+          "locator": "L84-L87",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/cartservice/src/Startup.cs",
+          "locator": "L32-L43",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:cart-startup-redis",
+      "source": {
+        "entity": "cartservice",
+        "operation": null
+      },
+      "target": {
+        "entity": "redis-cart",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Startup Redis mode: InitializeAsync→EnsureRedisConnected; Connect retry 30/exponential; StringSet(cart,OK)/StringGet(cart) ngoài request nghiệp vụ.",
+      "provenance": [
+        {
+          "source_id": "OB:src/cartservice/src/Startup.cs",
+          "locator": "L32-L46",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/cartservice/src/cartstore/RedisCartStore.cs",
+          "locator": "L27-L59;L61-L108",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:currency-getdata-getsupportedcurrencies",
+      "source": {
+        "entity": "currencyservice",
+        "operation": "hipstershop.CurrencyService/GetSupportedCurrencies"
+      },
+      "target": {
+        "entity": "currencyservice",
+        "operation": "hipstershop.CurrencyService/GetCurrencyData"
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "internal",
+      "messaging": null,
+      "context": "require JSON currency_conversion đóng gói trong image; không có bằng chứng runtime ECB/network call từ comment; require có cache tiến trình.",
+      "provenance": [
+        {
+          "source_id": "OB:src/currencyservice/server.js",
+          "locator": "L118-L127;L66-L85",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/currencyservice/data/currency_conversion.json",
+          "locator": "L1-L35",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:currency-getdata-convert",
+      "source": {
+        "entity": "currencyservice",
+        "operation": "hipstershop.CurrencyService/Convert"
+      },
+      "target": {
+        "entity": "currencyservice",
+        "operation": "hipstershop.CurrencyService/GetCurrencyData"
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "internal",
+      "messaging": null,
+      "context": "require JSON currency_conversion đóng gói trong image; không có bằng chứng runtime ECB/network call từ comment; require có cache tiến trình.",
+      "provenance": [
+        {
+          "source_id": "OB:src/currencyservice/server.js",
+          "locator": "L133-L165;L66-L85",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/currencyservice/data/currency_conversion.json",
+          "locator": "L1-L35",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:currency-carry",
+      "source": {
+        "entity": "currencyservice",
+        "operation": "hipstershop.CurrencyService/Convert"
+      },
+      "target": {
+        "entity": "currencyservice",
+        "operation": "hipstershop.CurrencyService/Carry"
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "internal",
+      "messaging": null,
+      "context": "Convert gọi _carry hai lần from→EUR và EUR→to; helper có span literal, không có data/network endpoint ngoài.",
+      "provenance": [
+        {
+          "source_id": "OB:src/currencyservice/server.js",
+          "locator": "L133-L165;L91-L113",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:recommendation-catalog",
+      "source": {
+        "entity": "recommendationservice",
+        "operation": "hipstershop.RecommendationService/ListRecommendations"
+      },
+      "target": {
+        "entity": "productcatalogservice",
+        "operation": "hipstershop.ProductCatalogService/ListProducts"
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "rpc",
+      "messaging": null,
+      "context": "Startup yêu cầu PRODUCT_CATALOG_SERVICE_ADDR; gọi ListProducts rồi lọc request.product_ids/random.sample tối đa 5; exception ghi log và trả Empty. Không suy GetProduct/SearchProducts active từ generated.",
+      "provenance": [
+        {
+          "source_id": "OB:src/recommendationservice/recommendation_server.py",
+          "locator": "L63-L84;L98-L105",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/recommendationservice/demo_pb2_grpc.py",
+          "locator": "L143-L158",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    }
+  ],
+  "resource_bindings": [],
+  "signals": [
+    {
+      "id": "backend:ad-log",
+      "kind": "log",
+      "entity": "adservice",
+      "operation": null,
+      "address": [
+        "log4j2",
+        "logger",
+        "hipstershop.AdService",
+        "message.TraceID",
+        "message.SpanID"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "OB:src/adservice/src/main/java/hipstershop/AdService.java",
+          "locator": "L59;L124-L130;L273-L278",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:ad-trace-getAdsByCategory",
+      "kind": "trace",
+      "entity": "adservice",
+      "operation": "hipstershop.AdService/getAdsByCategory",
+      "address": [
+        "opentelemetry",
+        "span.name",
+        "hipstershop.AdService/getAdsByCategory"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "OB:src/adservice/src/main/java/hipstershop/AdService.java",
+          "locator": "L169-L183",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/adservice/build.gradle",
+          "locator": "L103-L108",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime. Java agent runtime; helper có thể đổi span name hiện tại."
+        }
+      ]
+    },
+    {
+      "id": "backend:ad-trace-getRandomAds",
+      "kind": "trace",
+      "entity": "adservice",
+      "operation": "hipstershop.AdService/getRandomAds",
+      "address": [
+        "opentelemetry",
+        "span.name",
+        "hipstershop.AdService/getRandomAds"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "OB:src/adservice/src/main/java/hipstershop/AdService.java",
+          "locator": "L190-L210",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/adservice/build.gradle",
+          "locator": "L103-L108",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime. Java agent runtime; helper có thể đổi span name hiện tại."
+        }
+      ]
+    },
+    {
+      "id": "backend:ad-trace-createAdsMap",
+      "kind": "trace",
+      "entity": "adservice",
+      "operation": "hipstershop.AdService/createAdsMap",
+      "address": [
+        "opentelemetry",
+        "span.name",
+        "hipstershop.AdService/createAdsMap"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "OB:src/adservice/src/main/java/hipstershop/AdService.java",
+          "locator": "L227-L234",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/adservice/build.gradle",
+          "locator": "L103-L108",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime. Java agent runtime; helper có thể đổi span name hiện tại."
+        }
+      ]
+    },
+    {
+      "id": "backend:ad-trace-handler",
+      "kind": "trace",
+      "entity": "adservice",
+      "operation": "hipstershop.AdService/GetAds",
+      "address": [
+        "opentelemetry",
+        "span.name",
+        "hipstershop.AdServiceImpl/getAds"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "OB:src/adservice/src/main/java/hipstershop/AdService.java",
+          "locator": "L115-L126",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime. Literal đầu handler, helper có thể đổi sau đó; runtime_name RPC giữ null."
+        }
+      ]
+    },
+    {
+      "id": "backend:cart-log",
+      "kind": "log",
+      "entity": "cartservice",
+      "operation": null,
+      "address": [
+        "Console.WriteLine",
+        "TraceID",
+        "SpanID"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "OB:src/cartservice/src/cartstore/RedisCartStore.cs",
+          "locator": "L113-L122;L164-L173;L191-L200",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime. Trace/span chỉ Redis branch; Local log không có trường này."
+        },
+        {
+          "source_id": "OB:src/cartservice/src/cartstore/LocalCartStore.cs",
+          "locator": "L35-L37;L63-L74",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:cart-trace",
+      "kind": "trace",
+      "entity": "cartservice",
+      "operation": null,
+      "address": [
+        "opentelemetry",
+        "resource.service.name",
+        "${SERVICE_NAME}",
+        "OTEL_EXPORTER_OTLP_ENDPOINT",
+        "${OTEL_EXPORTER_OTLP_ENDPOINT}"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "OB:src/cartservice/src/Startup.cs",
+          "locator": "L58-L65",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:currencyservice-log",
+      "kind": "log",
+      "entity": "currencyservice",
+      "operation": null,
+      "address": [
+        "pino",
+        "name",
+        "currencyservice-server",
+        "message",
+        "TraceID",
+        "SpanID"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "OB:src/currencyservice/server.js",
+          "locator": "L37-L43",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/currencyservice/server.js",
+          "locator": "L119-L124",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:currencyservice-trace",
+      "kind": "trace",
+      "entity": "currencyservice",
+      "operation": null,
+      "address": [
+        "opentelemetry",
+        "resource.service.name",
+        "${SERVICE_NAME}",
+        "CollectorTraceExporter",
+        "grpc://${COLLECTOR_ADDR}"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "OB:src/currencyservice/tracer.js",
+          "locator": "L12-L39",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/currencyservice/server.js",
+          "locator": "L17-L22",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:paymentservice-log",
+      "kind": "log",
+      "entity": "paymentservice",
+      "operation": null,
+      "address": [
+        "pino",
+        "name",
+        "paymentservice-server",
+        "message",
+        "TraceID",
+        "SpanID"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "OB:src/paymentservice/server.js",
+          "locator": "L29-L35",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/paymentservice/server.js",
+          "locator": "L55-L69",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:paymentservice-trace",
+      "kind": "trace",
+      "entity": "paymentservice",
+      "operation": null,
+      "address": [
+        "opentelemetry",
+        "resource.service.name",
+        "${SERVICE_NAME}",
+        "CollectorTraceExporter",
+        "grpc://${COLLECTOR_ADDR}"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "OB:src/paymentservice/tracer.js",
+          "locator": "L12-L39",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/paymentservice/server.js",
+          "locator": "L15-L20",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:currency-trace-GetCurrencyData",
+      "kind": "trace",
+      "entity": "currencyservice",
+      "operation": "hipstershop.CurrencyService/GetCurrencyData",
+      "address": [
+        "opentelemetry",
+        "span.name",
+        "hipstershop.CurrencyService/GetCurrencyData"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "OB:src/currencyservice/server.js",
+          "locator": "L66-L85",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:currency-trace-Carry",
+      "kind": "trace",
+      "entity": "currencyservice",
+      "operation": "hipstershop.CurrencyService/Carry",
+      "address": [
+        "opentelemetry",
+        "span.name",
+        "hipstershop.CurrencyService/Carry"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "OB:src/currencyservice/server.js",
+          "locator": "L91-L111",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:emailservice-log",
+      "kind": "log",
+      "entity": "emailservice",
+      "operation": null,
+      "address": [
+        "stdout",
+        "python-json-logger",
+        "name",
+        "emailservice-server",
+        "message",
+        "TraceID",
+        "SpanID"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "OB:src/emailservice/logger.py",
+          "locator": "L34-L42",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/emailservice/email_server.py",
+          "locator": "L139-L153",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:emailservice-trace",
+      "kind": "trace",
+      "entity": "emailservice",
+      "operation": null,
+      "address": [
+        "opentelemetry",
+        "resource.service.name",
+        "${SERVICE_NAME}",
+        "OTLPSpanExporter",
+        "${COLLECTOR_ADDR}"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "OB:src/emailservice/email_server.py",
+          "locator": "L45-L62",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:recommendationservice-log",
+      "kind": "log",
+      "entity": "recommendationservice",
+      "operation": null,
+      "address": [
+        "stdout",
+        "python-json-logger",
+        "name",
+        "recommendationservice-server",
+        "message",
+        "TraceID",
+        "SpanID"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "OB:src/recommendationservice/logger.py",
+          "locator": "L36-L44",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/recommendationservice/recommendation_server.py",
+          "locator": "L65-L83",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:recommendationservice-trace",
+      "kind": "trace",
+      "entity": "recommendationservice",
+      "operation": null,
+      "address": [
+        "opentelemetry",
+        "resource.service.name",
+        "${SERVICE_NAME}",
+        "OTLPSpanExporter",
+        "${COLLECTOR_ADDR}"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "OB:src/recommendationservice/recommendation_server.py",
+          "locator": "L43-L60",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ]
+    },
+    {
+      "id": "backend:payment-charge-log",
+      "kind": "log",
+      "entity": "paymentservice",
+      "operation": null,
+      "address": [
+        "pino",
+        "name",
+        "paymentservice-charge",
+        "message",
+        "TraceID",
+        "SpanID"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "OB:src/paymentservice/charge.js",
+          "locator": "L25-L31;L100-L101",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime. Logger riêng của module charge, cùng owner paymentservice; không thêm operation cho hàm không có span."
+        }
+      ]
+    }
+  ]
+}

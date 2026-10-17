@@ -1,0 +1,711 @@
+{
+  "scope": {
+    "system": "Nezha-OB",
+    "revision": "94a01ba4c7c79e0c0b2c9da073ba081fcedc4bf1"
+  },
+  "entities": [
+    {
+      "id": "mysql",
+      "name": "mysql",
+      "type": "database",
+      "granularity": "instance",
+      "role": "data-instance",
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/mysql.yaml",
+          "locator": "L1–45",
+          "condition": "K8s mysql endpoint deployment candidate; runtime image/build/digest unverified"
+        }
+      ]
+    },
+    {
+      "id": "mysql/addatabase",
+      "name": "mysql/addatabase",
+      "type": "database",
+      "granularity": "logical",
+      "role": "datastore",
+      "provenance": [
+        {
+          "source_id": "OB:hack/init_mysql.sql",
+          "locator": "L1–15",
+          "condition": "SQL source candidate; actual initialization unverified"
+        }
+      ]
+    },
+    {
+      "id": "mysql/Productdb",
+      "name": "mysql/Productdb",
+      "type": "database",
+      "granularity": "logical",
+      "role": "datastore",
+      "provenance": [
+        {
+          "source_id": "OB:hack/init_mysql.sql",
+          "locator": "L91–129",
+          "condition": "SQL source candidate; actual initialization unverified"
+        }
+      ]
+    },
+    {
+      "id": "redis-cart",
+      "name": "redis-cart",
+      "type": "cache",
+      "granularity": "logical",
+      "role": "datastore",
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/redis.yaml",
+          "locator": "L15–67",
+          "condition": "Redis variant; active only if selected manifest and REDIS_ADDR configured"
+        }
+      ]
+    },
+    {
+      "id": "mysqld-exporter",
+      "name": "mysqld-exporter",
+      "type": "service",
+      "granularity": "component",
+      "role": "mysql-metrics-exporter",
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/mysql_exporter.yaml",
+          "locator": "container/exporter and service port declaration",
+          "condition": "only start_with_istio_exporter variant; exporter implementation/image not inspected"
+        }
+      ]
+    },
+    {
+      "id": "redis-exporter",
+      "name": "redis-exporter",
+      "type": "service",
+      "granularity": "component",
+      "role": "redis-metrics-exporter",
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/redis_exporter.yaml",
+          "locator": "container/exporter and service port declaration",
+          "condition": "only start_with_istio_exporter variant; exporter implementation/image not inspected"
+        }
+      ]
+    },
+    {
+      "id": "otel-collector",
+      "name": "otel-collector",
+      "type": "external",
+      "granularity": "component",
+      "role": "observability",
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/checkoutservice.yaml",
+          "locator": "env COLLECTOR_ADDR",
+          "condition": "external configured collector; implementation/export schema absent from snapshot"
+        }
+      ]
+    },
+    {
+      "id": "istio-injection",
+      "name": "istio-injection",
+      "type": "unknown",
+      "granularity": "component",
+      "role": "deployment-template",
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/start_demo_with_istio.sh",
+          "locator": "L3–28",
+          "condition": "istioctl kube-inject is an external template dependency; not a concrete sidecar instance"
+        }
+      ]
+    },
+    {
+      "id": "web-client",
+      "name": "web-client",
+      "type": "external",
+      "granularity": "logical",
+      "role": "browser",
+      "provenance": [
+        {
+          "source_id": "OB:src/frontend/templates/header.html",
+          "locator": "L19–34",
+          "condition": "browser consumes HTML/assets; no browser telemetry supplied"
+        }
+      ]
+    },
+    {
+      "id": "frontend",
+      "name": "frontend",
+      "type": "service",
+      "granularity": "logical",
+      "role": "application",
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/frontend.yaml",
+          "locator": "Deployment and Service frontend",
+          "condition": "source revision candidate; runtime not verified"
+        }
+      ]
+    },
+    {
+      "id": "stackpath.bootstrapcdn.com",
+      "name": "stackpath.bootstrapcdn.com",
+      "type": "external",
+      "granularity": "logical",
+      "role": "browser-asset-origin",
+      "provenance": [
+        {
+          "source_id": "OB:src/frontend/templates/header.html",
+          "locator": "L26–31",
+          "condition": "external resource reference in browser HTML; not frontend server egress"
+        }
+      ]
+    },
+    {
+      "id": "fonts.googleapis.com",
+      "name": "fonts.googleapis.com",
+      "type": "external",
+      "granularity": "logical",
+      "role": "browser-asset-origin",
+      "provenance": [
+        {
+          "source_id": "OB:src/frontend/templates/header.html",
+          "locator": "L26–31",
+          "condition": "external resource reference in browser HTML; not frontend server egress"
+        }
+      ]
+    },
+    {
+      "id": "fonts.gstatic.com",
+      "name": "fonts.gstatic.com",
+      "type": "external",
+      "granularity": "logical",
+      "role": "browser-asset-origin",
+      "provenance": [
+        {
+          "source_id": "OB:src/frontend/templates/header.html",
+          "locator": "L26–31",
+          "condition": "external resource reference in browser HTML; not frontend server egress"
+        }
+      ]
+    },
+    {
+      "id": "frontend",
+      "name": "frontend",
+      "type": "service",
+      "granularity": "logical",
+      "role": "application",
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/frontend.yaml",
+          "locator": "Deployment/Service and SERVICE_NAME environment",
+          "condition": "snapshot deployment candidate, not proof of dataset deployment"
+        }
+      ]
+    },
+    {
+      "id": "cartservice",
+      "name": "cartservice",
+      "type": "service",
+      "granularity": "logical",
+      "role": "application",
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/cartservice.yaml",
+          "locator": "Deployment/Service and SERVICE_NAME environment",
+          "condition": "snapshot deployment candidate, not proof of dataset deployment"
+        }
+      ]
+    },
+    {
+      "id": "checkoutservice",
+      "name": "checkoutservice",
+      "type": "service",
+      "granularity": "logical",
+      "role": "application",
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/checkoutservice.yaml",
+          "locator": "Deployment/Service and SERVICE_NAME environment",
+          "condition": "snapshot deployment candidate, not proof of dataset deployment"
+        }
+      ]
+    },
+    {
+      "id": "productcatalogservice",
+      "name": "productcatalogservice",
+      "type": "service",
+      "granularity": "logical",
+      "role": "application",
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/productcatalogservice.yaml",
+          "locator": "Deployment/Service and SERVICE_NAME environment",
+          "condition": "snapshot deployment candidate, not proof of dataset deployment"
+        }
+      ]
+    },
+    {
+      "id": "currencyservice",
+      "name": "currencyservice",
+      "type": "service",
+      "granularity": "logical",
+      "role": "application",
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/currencyservice.yaml",
+          "locator": "Deployment/Service and SERVICE_NAME environment",
+          "condition": "snapshot deployment candidate, not proof of dataset deployment"
+        }
+      ]
+    },
+    {
+      "id": "adservice",
+      "name": "adservice",
+      "type": "service",
+      "granularity": "logical",
+      "role": "application",
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/adservice.yaml",
+          "locator": "Deployment/Service and SERVICE_NAME environment",
+          "condition": "snapshot deployment candidate, not proof of dataset deployment"
+        }
+      ]
+    },
+    {
+      "id": "emailservice",
+      "name": "emailservice",
+      "type": "service",
+      "granularity": "logical",
+      "role": "application",
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/emailservice.yaml",
+          "locator": "Deployment/Service and SERVICE_NAME environment",
+          "condition": "snapshot deployment candidate, not proof of dataset deployment"
+        }
+      ]
+    },
+    {
+      "id": "paymentservice",
+      "name": "paymentservice",
+      "type": "service",
+      "granularity": "logical",
+      "role": "application",
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/paymentservice.yaml",
+          "locator": "Deployment/Service and SERVICE_NAME environment",
+          "condition": "snapshot deployment candidate, not proof of dataset deployment"
+        }
+      ]
+    },
+    {
+      "id": "recommendationservice",
+      "name": "recommendationservice",
+      "type": "service",
+      "granularity": "logical",
+      "role": "application",
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/recommendationservice.yaml",
+          "locator": "Deployment/Service and SERVICE_NAME environment",
+          "condition": "snapshot deployment candidate, not proof of dataset deployment"
+        }
+      ]
+    },
+    {
+      "id": "shippingservice",
+      "name": "shippingservice",
+      "type": "service",
+      "granularity": "logical",
+      "role": "application",
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/shippingservice.yaml",
+          "locator": "Deployment/Service and SERVICE_NAME environment",
+          "condition": "snapshot deployment candidate, not proof of dataset deployment"
+        }
+      ]
+    }
+  ],
+  "operations": [],
+  "relations": [
+    {
+      "id": "common:asset:stackpath.bootstrapcdn.com",
+      "source": {
+        "entity": "web-client",
+        "operation": null
+      },
+      "target": {
+        "entity": "stackpath.bootstrapcdn.com",
+        "operation": null
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "context": "browser may fetch stylesheet/font when rendered; runtime unverified",
+      "provenance": [
+        {
+          "source_id": "OB:src/frontend/templates/header.html",
+          "locator": "L26–31",
+          "condition": "browser may fetch stylesheet/font when rendered; runtime unverified"
+        }
+      ]
+    },
+    {
+      "id": "common:asset:fonts.googleapis.com",
+      "source": {
+        "entity": "web-client",
+        "operation": null
+      },
+      "target": {
+        "entity": "fonts.googleapis.com",
+        "operation": null
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "context": "browser may fetch stylesheet/font when rendered; runtime unverified",
+      "provenance": [
+        {
+          "source_id": "OB:src/frontend/templates/header.html",
+          "locator": "L26–31",
+          "condition": "browser may fetch stylesheet/font when rendered; runtime unverified"
+        }
+      ]
+    },
+    {
+      "id": "common:asset:fonts.gstatic.com",
+      "source": {
+        "entity": "web-client",
+        "operation": null
+      },
+      "target": {
+        "entity": "fonts.gstatic.com",
+        "operation": null
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "context": "browser may fetch stylesheet/font when rendered; runtime unverified",
+      "provenance": [
+        {
+          "source_id": "OB:src/frontend/templates/header.html",
+          "locator": "L26–31",
+          "condition": "browser may fetch stylesheet/font when rendered; runtime unverified"
+        }
+      ]
+    },
+    {
+      "id": "common:browser:frontend",
+      "source": {
+        "entity": "web-client",
+        "operation": null
+      },
+      "target": {
+        "entity": "frontend",
+        "operation": null
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "context": "frontend exposed via Service; browser interaction candidate",
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/frontend.yaml",
+          "locator": "L78–104",
+          "condition": "frontend exposed via Service; browser interaction candidate"
+        }
+      ]
+    }
+  ],
+  "resource_bindings": [
+    {
+      "id": "common:hosted:addatabase",
+      "entity": "mysql/addatabase",
+      "resource": "mysql",
+      "relation": "hosted_on",
+      "provenance": [
+        {
+          "source_id": "OB:hack/init_mysql.sql",
+          "locator": "L1–129",
+          "condition": "candidate endpoint from adservice/productcatalog config; not a runtime placement claim"
+        },
+        {
+          "source_id": "OB:kubernetes-manifests/adservice.yaml",
+          "locator": "env MYSQL_ADDR and database configuration",
+          "condition": "one mysql Service namespace hipster; no physical host inference"
+        }
+      ]
+    },
+    {
+      "id": "common:hosted:Productdb",
+      "entity": "mysql/Productdb",
+      "resource": "mysql",
+      "relation": "hosted_on",
+      "provenance": [
+        {
+          "source_id": "OB:hack/init_mysql.sql",
+          "locator": "L1–129",
+          "condition": "candidate endpoint from adservice/productcatalog config; not a runtime placement claim"
+        },
+        {
+          "source_id": "OB:kubernetes-manifests/productcatalogservice.yaml",
+          "locator": "env MYSQL_ADDR and database configuration",
+          "condition": "one mysql Service namespace hipster; no physical host inference"
+        }
+      ]
+    }
+  ],
+  "signals": [
+    {
+      "id": "common:trace:frontend",
+      "kind": "trace",
+      "entity": "frontend",
+      "operation": null,
+      "address": [
+        "candidate-config",
+        "hipster",
+        "frontend",
+        "OTLP",
+        "COLLECTOR_ADDR"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/frontend.yaml",
+          "locator": "env SERVICE_NAME/COLLECTOR_ADDR",
+          "condition": "address/config only; source schema and export to dataset unverified"
+        }
+      ]
+    },
+    {
+      "id": "common:trace:cartservice",
+      "kind": "trace",
+      "entity": "cartservice",
+      "operation": null,
+      "address": [
+        "candidate-config",
+        "hipster",
+        "cartservice",
+        "OTLP",
+        "COLLECTOR_ADDR"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/cartservice.yaml",
+          "locator": "env SERVICE_NAME/COLLECTOR_ADDR",
+          "condition": "address/config only; source schema and export to dataset unverified"
+        }
+      ]
+    },
+    {
+      "id": "common:trace:checkoutservice",
+      "kind": "trace",
+      "entity": "checkoutservice",
+      "operation": null,
+      "address": [
+        "candidate-config",
+        "hipster",
+        "checkoutservice",
+        "OTLP",
+        "COLLECTOR_ADDR"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/checkoutservice.yaml",
+          "locator": "env SERVICE_NAME/COLLECTOR_ADDR",
+          "condition": "address/config only; source schema and export to dataset unverified"
+        }
+      ]
+    },
+    {
+      "id": "common:trace:productcatalogservice",
+      "kind": "trace",
+      "entity": "productcatalogservice",
+      "operation": null,
+      "address": [
+        "candidate-config",
+        "hipster",
+        "productcatalogservice",
+        "OTLP",
+        "COLLECTOR_ADDR"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/productcatalogservice.yaml",
+          "locator": "env SERVICE_NAME/COLLECTOR_ADDR",
+          "condition": "address/config only; source schema and export to dataset unverified"
+        }
+      ]
+    },
+    {
+      "id": "common:trace:currencyservice",
+      "kind": "trace",
+      "entity": "currencyservice",
+      "operation": null,
+      "address": [
+        "candidate-config",
+        "hipster",
+        "currencyservice",
+        "OTLP",
+        "COLLECTOR_ADDR"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/currencyservice.yaml",
+          "locator": "env SERVICE_NAME/COLLECTOR_ADDR",
+          "condition": "address/config only; source schema and export to dataset unverified"
+        }
+      ]
+    },
+    {
+      "id": "common:trace:adservice",
+      "kind": "trace",
+      "entity": "adservice",
+      "operation": null,
+      "address": [
+        "candidate-config",
+        "hipster",
+        "adservice",
+        "OTLP",
+        "COLLECTOR_ADDR"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/adservice.yaml",
+          "locator": "env SERVICE_NAME/COLLECTOR_ADDR",
+          "condition": "address/config only; source schema and export to dataset unverified"
+        }
+      ]
+    },
+    {
+      "id": "common:trace:emailservice",
+      "kind": "trace",
+      "entity": "emailservice",
+      "operation": null,
+      "address": [
+        "candidate-config",
+        "hipster",
+        "emailservice",
+        "OTLP",
+        "COLLECTOR_ADDR"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/emailservice.yaml",
+          "locator": "env SERVICE_NAME/COLLECTOR_ADDR",
+          "condition": "address/config only; source schema and export to dataset unverified"
+        }
+      ]
+    },
+    {
+      "id": "common:trace:paymentservice",
+      "kind": "trace",
+      "entity": "paymentservice",
+      "operation": null,
+      "address": [
+        "candidate-config",
+        "hipster",
+        "paymentservice",
+        "OTLP",
+        "COLLECTOR_ADDR"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/paymentservice.yaml",
+          "locator": "env SERVICE_NAME/COLLECTOR_ADDR",
+          "condition": "address/config only; source schema and export to dataset unverified"
+        }
+      ]
+    },
+    {
+      "id": "common:trace:recommendationservice",
+      "kind": "trace",
+      "entity": "recommendationservice",
+      "operation": null,
+      "address": [
+        "candidate-config",
+        "hipster",
+        "recommendationservice",
+        "OTLP",
+        "COLLECTOR_ADDR"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/recommendationservice.yaml",
+          "locator": "env SERVICE_NAME/COLLECTOR_ADDR",
+          "condition": "address/config only; source schema and export to dataset unverified"
+        }
+      ]
+    },
+    {
+      "id": "common:trace:shippingservice",
+      "kind": "trace",
+      "entity": "shippingservice",
+      "operation": null,
+      "address": [
+        "candidate-config",
+        "hipster",
+        "shippingservice",
+        "OTLP",
+        "COLLECTOR_ADDR"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/shippingservice.yaml",
+          "locator": "env SERVICE_NAME/COLLECTOR_ADDR",
+          "condition": "address/config only; source schema and export to dataset unverified"
+        }
+      ]
+    },
+    {
+      "id": "common:metric:mysql",
+      "kind": "metric",
+      "entity": "mysql",
+      "operation": null,
+      "address": [
+        "candidate-exporter",
+        "hipster",
+        "mysql",
+        "9104"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/mysql_exporter.yaml",
+          "locator": "L9–16,49–55",
+          "condition": "exporter variant only; metric series not opened, schema/host not verified"
+        }
+      ]
+    },
+    {
+      "id": "common:metric:redis",
+      "kind": "metric",
+      "entity": "redis-cart",
+      "operation": null,
+      "address": [
+        "candidate-exporter",
+        "hipster",
+        "redis-cart",
+        "9121"
+      ],
+      "shared": true,
+      "provenance": [
+        {
+          "source_id": "OB:kubernetes-manifests/redis_exporter.yaml",
+          "locator": "L53–56,69–76",
+          "condition": "exporter variant only; shared resource, no operation metric duplication"
+        }
+      ]
+    }
+  ]
+}

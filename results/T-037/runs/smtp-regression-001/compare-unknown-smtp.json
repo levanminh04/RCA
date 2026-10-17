@@ -1,0 +1,312 @@
+{
+  "competing_explanations": [
+    "revision",
+    "alias",
+    "domain/window",
+    "branch_not_executed",
+    "incomplete_static_source",
+    "missing_telemetry",
+    "conversion_error"
+  ],
+  "conditional_reference": true,
+  "context": {
+    "domain": "synthetic",
+    "level": "entity",
+    "revision_link_verified": false,
+    "revision_provenance": [],
+    "system": "synthetic-smtp",
+    "trace_revision": "synthetic-only"
+  },
+  "interpretation": "structural_agreement; not runtime ground truth or RCA benefit",
+  "interval_ns": null,
+  "mappings": [
+    {
+      "candidates": [
+        "smtp"
+      ],
+      "level": "entity",
+      "original": "smtp",
+      "provenance": [
+        {
+          "condition": "Tổng hợp; giữ nguyên smtp.",
+          "locator": "base_document/relations/0",
+          "source_id": "SMTP-ORACLE"
+        }
+      ],
+      "verified": true
+    },
+    {
+      "candidates": [
+        "ticket-service"
+      ],
+      "level": "entity",
+      "original": "ticket-service",
+      "provenance": [
+        {
+          "condition": "Tổng hợp; giữ nguyên smtp.",
+          "locator": "base_document/relations/0",
+          "source_id": "SMTP-ORACLE"
+        }
+      ],
+      "verified": true
+    }
+  ],
+  "nodes": {
+    "static": [
+      {
+        "granularity": "component",
+        "id": "smtp",
+        "name": "smtp",
+        "provenance": [
+          {
+            "condition": "Tổng hợp, không runtime.",
+            "locator": "base_document/entities/1",
+            "source_id": "SMTP-ORACLE"
+          }
+        ],
+        "role": "synthetic SMTP boundary",
+        "type": "external"
+      },
+      {
+        "granularity": "logical",
+        "id": "ticket-service",
+        "name": "ticket-service",
+        "provenance": [
+          {
+            "condition": "Tổng hợp, không runtime.",
+            "locator": "base_document/entities/0",
+            "source_id": "SMTP-ORACLE"
+          }
+        ],
+        "role": "synthetic sender",
+        "type": "service"
+      }
+    ],
+    "static_inventory": [
+      {
+        "granularity": "component",
+        "id": "smtp",
+        "name": "smtp",
+        "provenance": [
+          {
+            "condition": "Tổng hợp, không runtime.",
+            "locator": "base_document/entities/1",
+            "source_id": "SMTP-ORACLE"
+          }
+        ],
+        "role": "synthetic SMTP boundary",
+        "type": "external"
+      },
+      {
+        "granularity": "logical",
+        "id": "ticket-service",
+        "name": "ticket-service",
+        "provenance": [
+          {
+            "condition": "Tổng hợp, không runtime.",
+            "locator": "base_document/entities/0",
+            "source_id": "SMTP-ORACLE"
+          }
+        ],
+        "role": "synthetic sender",
+        "type": "service"
+      }
+    ],
+    "trace": [
+      {
+        "canonical_id": "smtp",
+        "level": "entity",
+        "original": {
+          "id": "smtp"
+        },
+        "status": "mapped"
+      },
+      {
+        "canonical_id": "ticket-service",
+        "level": "entity",
+        "original": {
+          "id": "ticket-service"
+        },
+        "status": "mapped"
+      }
+    ]
+  },
+  "schema_version": 1,
+  "static_scope": {
+    "revision": "smtp-oracle-v1",
+    "system": "synthetic-smtp"
+  },
+  "views": {
+    "endpoints": {
+      "S": [
+        [
+          "ticket-service",
+          "smtp",
+          null,
+          null
+        ]
+      ],
+      "T": [
+        [
+          "ticket-service",
+          "smtp",
+          null,
+          null
+        ]
+      ],
+      "exclusions": {
+        "static": [],
+        "trace": []
+      },
+      "intersection": [
+        [
+          "ticket-service",
+          "smtp",
+          null,
+          null
+        ]
+      ],
+      "members": {
+        "static": [
+          {
+            "key": [
+              "ticket-service",
+              "smtp",
+              null,
+              null
+            ],
+            "members": [
+              {
+                "index": 0,
+                "original": {
+                  "channel": "smtp",
+                  "contexts": [
+                    "Synthetic SMTP transport, no runtime claim."
+                  ],
+                  "destination": null,
+                  "evidence_source": "static",
+                  "messaging": null,
+                  "provenance": [
+                    {
+                      "condition": "Tổng hợp; giữ nguyên smtp.",
+                      "locator": "base_document/relations/0",
+                      "source_id": "SMTP-ORACLE"
+                    }
+                  ],
+                  "record_ids": [
+                    "smtp-call"
+                  ],
+                  "source": "ticket-service",
+                  "target": "smtp",
+                  "type": "gọi-chưa-phân-kiểu"
+                }
+              }
+            ]
+          }
+        ],
+        "trace": [
+          {
+            "key": [
+              "ticket-service",
+              "smtp",
+              null,
+              null
+            ],
+            "members": [
+              {
+                "index": 0,
+                "original": {
+                  "destination": null,
+                  "event_count": 1,
+                  "evidence_source": "trace",
+                  "source": "ticket-service",
+                  "target": "smtp",
+                  "type": "gọi-chưa-phân-kiểu",
+                  "witness": [
+                    [
+                      "synthetic-trace",
+                      "synthetic-span"
+                    ]
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "numerator": 1,
+      "static_denominator": 1,
+      "static_fraction": 1.0,
+      "static_only": [],
+      "trace_denominator": 1,
+      "trace_fraction": 1.0,
+      "trace_only": []
+    },
+    "typed": {
+      "S": [],
+      "T": [],
+      "exclusions": {
+        "static": [
+          {
+            "index": 0,
+            "original": {
+              "channel": "smtp",
+              "contexts": [
+                "Synthetic SMTP transport, no runtime claim."
+              ],
+              "destination": null,
+              "evidence_source": "static",
+              "messaging": null,
+              "provenance": [
+                {
+                  "condition": "Tổng hợp; giữ nguyên smtp.",
+                  "locator": "base_document/relations/0",
+                  "source_id": "SMTP-ORACLE"
+                }
+              ],
+              "record_ids": [
+                "smtp-call"
+              ],
+              "source": "ticket-service",
+              "target": "smtp",
+              "type": "gọi-chưa-phân-kiểu"
+            },
+            "reason": "unknown_type"
+          }
+        ],
+        "trace": [
+          {
+            "index": 0,
+            "original": {
+              "destination": null,
+              "event_count": 1,
+              "evidence_source": "trace",
+              "source": "ticket-service",
+              "target": "smtp",
+              "type": "gọi-chưa-phân-kiểu",
+              "witness": [
+                [
+                  "synthetic-trace",
+                  "synthetic-span"
+                ]
+              ]
+            },
+            "reason": "unknown_type"
+          }
+        ]
+      },
+      "intersection": [],
+      "members": {
+        "static": [],
+        "trace": []
+      },
+      "numerator": 0,
+      "static_denominator": 0,
+      "static_fraction": null,
+      "static_only": [],
+      "trace_denominator": 0,
+      "trace_fraction": null,
+      "trace_only": []
+    }
+  }
+}

@@ -1,0 +1,665 @@
+{
+  "nodes": [
+    "api-gateway",
+    "booking-service",
+    "booking_db",
+    "event-service",
+    "event_db",
+    "keycloak",
+    "payment-service",
+    "payment_db",
+    "smtp",
+    "ticket-service",
+    "ticket_db",
+    "user-service",
+    "user_db",
+    "vnpay"
+  ],
+  "edges": [
+    {
+      "source": "api-gateway",
+      "target": "booking-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "flow-api-02",
+        "flow-api-03",
+        "flow-api-04",
+        "flow-api-05",
+        "flow-api-06"
+      ],
+      "provenance": [
+        {
+          "condition": "Nguồn thiết kế đã ghim; chưa xác minh thực thi hoặc tên runtime.",
+          "locator": "§2 dòng 19,25–28; §3 dòng 49",
+          "source_id": "FT-B13"
+        },
+        {
+          "condition": "Nguồn thiết kế đã ghim; chưa xác minh thực thi hoặc tên runtime.",
+          "locator": "§2 dòng 19,25–28; §3 dòng 50",
+          "source_id": "FT-B13"
+        },
+        {
+          "condition": "Nguồn thiết kế đã ghim; chưa xác minh thực thi hoặc tên runtime.",
+          "locator": "§2 dòng 19,25–28; §3 dòng 51",
+          "source_id": "FT-B13"
+        },
+        {
+          "condition": "Nguồn thiết kế đã ghim; chưa xác minh thực thi hoặc tên runtime.",
+          "locator": "§2 dòng 19,25–28; §3 dòng 52",
+          "source_id": "FT-B13"
+        },
+        {
+          "condition": "Nguồn thiết kế đã ghim; chưa xác minh thực thi hoặc tên runtime.",
+          "locator": "§2 dòng 19,25–28; §3 dòng 53",
+          "source_id": "FT-B13"
+        }
+      ],
+      "contexts": [
+        "BUYER; Idempotency-Key; một transaction giữ tài nguyên/hạn mức và tạo đơn; giá không từ FE.",
+        "Chỉ đọc; không giữ ghế; thiếu snapshot trả 503 CONFIG_NOT_READY.",
+        "Chủ đơn; PENDING_PAYMENT còn giữ chỗ; sau acceptance không buyer cancel; retry CANCELLED trả hiện trạng.",
+        "Chủ đơn; Return page không biến ISSUING thành COMPLETED.",
+        "Chủ đơn; còn giữ chỗ, chưa freeze/chưa có mã; giữ usage cùng expiry."
+      ]
+    },
+    {
+      "source": "api-gateway",
+      "target": "event-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "flow-api-01",
+        "flow-seatmap-get",
+        "flow-seatmap-put"
+      ],
+      "provenance": [
+        {
+          "condition": "Nguồn thiết kế đã ghim; chưa xác minh thực thi hoặc tên runtime.",
+          "locator": "§2 dòng 19,25–28; §3 dòng 48",
+          "source_id": "FT-B13"
+        },
+        {
+          "condition": "Nguồn thiết kế đã ghim; chưa xác minh thực thi hoặc tên runtime.",
+          "locator": "§7.2 dòng 239–272",
+          "source_id": "FT-B13"
+        }
+      ],
+      "contexts": [
+        "Chỉ public event đã công bố; không trả audit/cấu hình nháp/danh tính riêng.",
+        "Organizer owner; PUT chỉ DRAFT, full draft transaction, stable IDs; hidden khác xóa; invalid rollback; không tự đổi sales mode."
+      ]
+    },
+    {
+      "source": "api-gateway",
+      "target": "payment-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "flow-api-07",
+        "flow-api-08"
+      ],
+      "provenance": [
+        {
+          "condition": "Nguồn thiết kế đã ghim; chưa xác minh thực thi hoặc tên runtime.",
+          "locator": "§2 dòng 19,25–28; §3 dòng 54",
+          "source_id": "FT-B13"
+        },
+        {
+          "condition": "Nguồn thiết kế đã ghim; chưa xác minh thực thi hoặc tên runtime.",
+          "locator": "§2 dòng 19,25–28; §3 dòng 55",
+          "source_id": "FT-B13"
+        }
+      ],
+      "contexts": [
+        "Chủ đơn; chỉ đọc, browser không xác nhận thu tiền.",
+        "Chủ đơn; xác minh buyer qua Booking, freeze trước attempt, cùng key cùng attemptId."
+      ]
+    },
+    {
+      "source": "api-gateway",
+      "target": "ticket-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "flow-api-09",
+        "flow-api-10",
+        "flow-api-11",
+        "flow-api-checkin"
+      ],
+      "provenance": [
+        {
+          "condition": "Nguồn thiết kế đã ghim; chưa xác minh thực thi hoặc tên runtime.",
+          "locator": "§2 dòng 19,25–28; §3 dòng 56",
+          "source_id": "FT-B13"
+        },
+        {
+          "condition": "Nguồn thiết kế đã ghim; chưa xác minh thực thi hoặc tên runtime.",
+          "locator": "§2 dòng 19,25–28; §3 dòng 57",
+          "source_id": "FT-B13"
+        },
+        {
+          "condition": "Nguồn thiết kế đã ghim; chưa xác minh thực thi hoặc tên runtime.",
+          "locator": "§2 dòng 19,25–28; §3 dòng 58",
+          "source_id": "FT-B13"
+        },
+        {
+          "condition": "Nguồn thiết kế đã ghim; chưa xác minh thực thi hoặc tên runtime.",
+          "locator": "§6 dòng 201–211",
+          "source_id": "FT-B13"
+        }
+      ],
+      "contexts": [
+        "Chủ đơn; Accept ảnh/token; no-store; organizer/admin không tải QR buyer.",
+        "Chủ đơn; chỉ trả vé sau COMPLETED; pending mảng rỗng; email lỗi không chặn.",
+        "Chủ đơn; job vào email frozen, cùng Idempotency-Key không tạo hai job.",
+        "ORGANIZER owner; khóa snapshot/issuance/ticket; VALID→USED + audit nguyên tử. Mỗi receipt audit ID mới; cùng key trả gốc + replay_of/succeeded=false; request khác data 409. Chưa xác thực chỉ security log; không subject giả."
+      ]
+    },
+    {
+      "source": "api-gateway",
+      "target": "user-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "completion-user-api-01",
+        "completion-user-api-02",
+        "completion-user-api-03",
+        "completion-user-api-04",
+        "flow-follow-delete",
+        "flow-follow-put"
+      ],
+      "provenance": [
+        {
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm.",
+          "locator": "§2 L19,L25-L28; §9 L290-L296",
+          "source_id": "FT-B13"
+        },
+        {
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm.",
+          "locator": "§6 L105",
+          "source_id": "FT-B11"
+        },
+        {
+          "condition": "Nguồn thiết kế đã ghim; chưa xác minh thực thi hoặc tên runtime.",
+          "locator": "§9 dòng 290–294",
+          "source_id": "FT-B13"
+        }
+      ],
+      "contexts": [
+        "Public API User theo B13 §2/§9 và Gateway theo B11. Giữ path nguyên văn; phương thức/prefix rút gọn còn OPEN. Role/ownership, CAS application và retry role-grant theo nguồn; không runtime claim.",
+        "Subject đúng issuer; unique pair buyer/organizer; idempotent; count qua index, không dual-write followerCount."
+      ]
+    },
+    {
+      "source": "booking-service",
+      "target": "booking_db",
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "detail-data-cancel-order",
+        "detail-data-create-order",
+        "detail-data-expiry",
+        "detail-data-failed-release",
+        "detail-data-freeze",
+        "detail-data-promotion",
+        "detail-outbox-data-booking-service"
+      ],
+      "provenance": [
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "L24-L28",
+          "source_id": "FT-B14"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "L29",
+          "source_id": "FT-B14"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "L30",
+          "source_id": "FT-B14"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "L53",
+          "source_id": "FT-B14"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "L59-L61",
+          "source_id": "FT-B14"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "L90-L92",
+          "source_id": "FT-B14"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "§2",
+          "source_id": "FT-B12"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "§4",
+          "source_id": "FT-B12"
+        }
+      ],
+      "contexts": [
+        "Relay đọc outbox cùng DB owner, chọn next_attempt_at/SKIP LOCKED; publisher confirm mới published_at; crash có thể publish lại. Không ghép trace bằng correlation",
+        "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime"
+      ]
+    },
+    {
+      "source": "event-service",
+      "target": "event_db",
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "detail-data-event-cancel",
+        "detail-outbox-data-event-service"
+      ],
+      "provenance": [
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "L69",
+          "source_id": "FT-B14"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "L90-L92",
+          "source_id": "FT-B14"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "§2",
+          "source_id": "FT-B12"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "§4",
+          "source_id": "FT-B12"
+        }
+      ],
+      "contexts": [
+        "Relay đọc outbox cùng DB owner, chọn next_attempt_at/SKIP LOCKED; publisher confirm mới published_at; crash có thể publish lại. Không ghép trace bằng correlation",
+        "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime"
+      ]
+    },
+    {
+      "source": "event-service",
+      "target": "payment-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "flow-http-financial-summary"
+      ],
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "§5.2 dòng 185",
+          "condition": "Nguồn thiết kế đã ghim; chưa xác minh thực thi hoặc tên runtime."
+        }
+      ],
+      "contexts": [
+        "Event đọc API để phân loại hủy trực tiếp/yêu cầu hủy; không DB; snapshot không chặn charge đến sau đọc."
+      ]
+    },
+    {
+      "source": "payment-service",
+      "target": "booking-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "flow-http-freeze"
+      ],
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "§4 dòng 122–128",
+          "condition": "Nguồn thiết kế đã ghim; chưa xác minh thực thi hoặc tên runtime."
+        }
+      ],
+      "contexts": [
+        "Internal credential + buyerSubject đã xác thực. Booking khóa và xét deadline/state/owner; lần đầu lưu snapshot; retry cùng snapshot, không kéo dài expiry. Start mới vẫn kiểm lỗi Booking; callback attempt cũ xử lý độc lập."
+      ]
+    },
+    {
+      "source": "payment-service",
+      "target": "payment_db",
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "detail-data-attempt",
+        "detail-data-charge",
+        "detail-data-confirmation",
+        "detail-data-reconciliation",
+        "detail-data-refund-claim",
+        "detail-data-refund-run",
+        "detail-data-saga-result",
+        "detail-outbox-data-payment-service"
+      ],
+      "provenance": [
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "L31",
+          "source_id": "FT-B14"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "L39-L40",
+          "source_id": "FT-B14"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "L43",
+          "source_id": "FT-B14"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "L46",
+          "source_id": "FT-B14"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "L63",
+          "source_id": "FT-B14"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "L73-L75",
+          "source_id": "FT-B14"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "L90-L92",
+          "source_id": "FT-B14"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "L96-L98",
+          "source_id": "FT-B14"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "§2",
+          "source_id": "FT-B12"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "§4",
+          "source_id": "FT-B12"
+        }
+      ],
+      "contexts": [
+        "Relay đọc outbox cùng DB owner, chọn next_attempt_at/SKIP LOCKED; publisher confirm mới published_at; crash có thể publish lại. Không ghép trace bằng correlation",
+        "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime"
+      ]
+    },
+    {
+      "source": "payment-service",
+      "target": "ticket-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "flow-http-probe"
+      ],
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "§5.2 dòng 185",
+          "condition": "Nguồn thiết kế đã ghim; chưa xác minh thực thi hoặc tên runtime."
+        }
+      ],
+      "contexts": [
+        "Probe khi chậm; 404/PENDING/timeout không là quyền refund lỗi phát hành."
+      ]
+    },
+    {
+      "source": "payment-service",
+      "target": "vnpay",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "completion-provider-refund-query",
+        "flow-provider-1",
+        "flow-provider-2",
+        "flow-provider-3"
+      ],
+      "provenance": [
+        {
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm.",
+          "locator": "§4 L63-L64",
+          "source_id": "FT-B14"
+        },
+        {
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm.",
+          "locator": "§5.3 L191",
+          "source_id": "FT-B13"
+        },
+        {
+          "condition": "Nguồn thiết kế đã ghim; chưa xác minh thực thi hoặc tên runtime.",
+          "locator": "§5.3 dòng 189–193",
+          "source_id": "FT-B13"
+        }
+      ],
+      "contexts": [
+        "Hoàn toàn bộ charge; timeout query cùng request key, không tạo nghĩa vụ refund mới. HTTP/ack merchant cụ thể phải theo provider lúc tích hợp; không khai đã test sandbox.",
+        "Khởi tạo từ attempt đã lưu trước gọi cổng. HTTP/ack merchant cụ thể phải theo provider lúc tích hợp; không khai đã test sandbox.",
+        "Query cùng refund/request key khi timeout UNKNOWN/PROCESSING trước retry tác động tiền; không thêm nghĩa vụ hoàn logic. HTTP/ack merchant theo provider khi tích hợp, chưa test sandbox.",
+        "Timeout UNKNOWN phải query cùng attempt trước retry tác động tiền. HTTP/ack merchant cụ thể phải theo provider lúc tích hợp; không khai đã test sandbox."
+      ]
+    },
+    {
+      "source": "ticket-service",
+      "target": "smtp",
+      "type": "gọi-chưa-phân-kiểu",
+      "channel": "smtp",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "completion-ticket-smtp"
+      ],
+      "provenance": [
+        {
+          "source_id": "FT-B14-03",
+          "locator": "L9-L12",
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm."
+        },
+        {
+          "source_id": "FT-B14",
+          "locator": "§1 L9,L16; §6 L82",
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm."
+        },
+        {
+          "source_id": "FT-B13",
+          "locator": "§6 L199",
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm."
+        }
+      ],
+      "contexts": [
+        "Delivery job Ticket claim bằng khóa/lease, gửi SMTP ngoài TX, lưu outcome. Timeout có thể đã gửi; cùng deliveryId/key retry có thể email trùng nhưng không vé/refund mới. Nguồn chỉ SMTP; chưa xác minh kiểu span CLIENT/SERVER hoặc runtime operationName."
+      ]
+    },
+    {
+      "source": "ticket-service",
+      "target": "ticket_db",
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "detail-data-checkin",
+        "detail-data-delivery-claim",
+        "detail-data-qr-read",
+        "detail-data-terminal-fence",
+        "detail-outbox-data-ticket-service"
+      ],
+      "provenance": [
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "L197",
+          "source_id": "FT-B13"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "L51",
+          "source_id": "FT-B14"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "L82",
+          "source_id": "FT-B14"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "L84",
+          "source_id": "FT-B14"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "L90-L92",
+          "source_id": "FT-B14"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "§2",
+          "source_id": "FT-B12"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "§4",
+          "source_id": "FT-B12"
+        }
+      ],
+      "contexts": [
+        "Relay đọc outbox cùng DB owner, chọn next_attempt_at/SKIP LOCKED; publisher confirm mới published_at; crash có thể publish lại. Không ghép trace bằng correlation",
+        "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime"
+      ]
+    },
+    {
+      "source": "user-service",
+      "target": "keycloak",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "completion-user-keycloak-rolegrant",
+        "flow-user-keycloak-query"
+      ],
+      "provenance": [
+        {
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm.",
+          "locator": "§5 L82",
+          "source_id": "FT-B16"
+        },
+        {
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm.",
+          "locator": "§9 L292-L294",
+          "source_id": "FT-B13"
+        },
+        {
+          "condition": "Nguồn thiết kế đã ghim; chưa xác minh thực thi hoặc tên runtime.",
+          "locator": "§9 dòng 292–294",
+          "source_id": "FT-B13"
+        }
+      ],
+      "contexts": [
+        "Admin API cấp ORGANIZER sau CAS application PENDING chưa roleGrant, ghi operationId/REQUESTED trước gọi. Giữ BUYER; timeout không ACTIVE; query/retry/confirm rồi projection. Workflow User không Saga mới; method/endpoint/quyền client realm runtime OPEN.",
+        "Admin API source identity; query role trước retry/xác nhận. Chỉ ACTIVE sau xác nhận ORGANIZER, giữ BUYER. Realm/quyền client phải kiểm triển khai; chưa có exact endpoint."
+      ]
+    },
+    {
+      "source": "user-service",
+      "target": "user_db",
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "detail-data-projection",
+        "detail-data-role-worker"
+      ],
+      "provenance": [
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "L292",
+          "source_id": "FT-B13"
+        },
+        {
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime",
+          "locator": "§2",
+          "source_id": "FT-B12"
+        }
+      ],
+      "contexts": [
+        "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime"
+      ]
+    },
+    {
+      "source": "vnpay",
+      "target": "payment-service",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "flow-callback-vnpay"
+      ],
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "§5.3 dòng 189–193",
+          "condition": "Nguồn thiết kế đã ghim; chưa xác minh thực thi hoặc tên runtime."
+        }
+      ],
+      "contexts": [
+        "IPN riêng Payment; xác minh chữ ký/merchant/attempt/order/money/provider identity trước charge; không dùng JWT buyer/Return. Callback trace mới theo B16, không bịa span parent từ correlation."
+      ]
+    }
+  ]
+}

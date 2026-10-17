@@ -1,0 +1,93 @@
+[
+  {
+    "unit_id": "FT-U0577",
+    "source_id": "FT-B11",
+    "locator": "L85-L96",
+    "text": "## 5. Vị trí RCA và quyền truy cập\n\nCơ chế RCA cùng lớp giải thích chạy trong **một đơn vị triển khai riêng** (`GOV-089`):\n\n- nhận dữ liệu từ kho quan sát tập trung bằng credential chỉ đọc riêng;\n- không truy cập trực tiếp schema nghiệp vụ và không gọi đường ghi của service nghiệp vụ;\n- không tự sửa hệ thống, không tự kết luận nguyên nhân cuối cùng;\n- kết quả xếp hạng, bằng chứng và lời giải thích phải đến được người có quyền; hình thức UI/API vẫn là `RES-039` và không được chốt hộ tại đây.\n\nLớp giải thích gọi **Gemini API** sau bước xếp hạng (`GOV-093`); không chạy mô hình ngôn ngữ lớn cục bộ. Dữ liệu gửi ra ngoài phải được lọc/che trường nhạy cảm, API key không được ghi vào repository, và lỗi/quota của Gemini không được làm mất kết quả xếp hạng RCA.\n\nRCA là một node vận hành riêng nhưng không phải service nghiệp vụ. Tập node/metric mà RCA xếp hạng vẫn chờ đặc tả đồ thị và `B16`; không được mặc định bằng đúng năm service.",
+    "entities": [
+      "rca",
+      "gemini-api"
+    ],
+    "owner": "Nhóm nền tảng / owner triển khai; Minh quyết yêu cầu còn mở",
+    "required_input": "Pinned API endpoint/protocol/deployment và sanitized evidence contract; Minh quyết RES039, không bịa HTTP từ chữ API.",
+    "reason": "Architecture relation exists at its abstraction level; transport/call semantics not established. No source requirement removed."
+  },
+  {
+    "unit_id": "FT-U0578",
+    "source_id": "FT-B11",
+    "locator": "L98-L109",
+    "text": "## 6. Bố trí hai máy mục tiêu\n\n| Máy | Thành phần mục tiêu | Lý do |\n|---|---|---|\n| **Máy 1 — Transaction plane** | API Gateway; `booking-service`; `payment-service`; `ticket-service`; broker; cache | Gom đường mua vé nhạy độ trễ và luồng Saga; giảm hop cho đường nóng |\n| **Máy 2 — Control/diagnosis plane** | `event-service`; `user-service`; Keycloak; config/discovery; adapter chatbot; collector/kho quan sát; RCA + lớp giải thích gọi Gemini API | Cách ly tác vụ chẩn đoán và phần điều khiển khỏi đường giao dịch nóng |\n\nDatastore mới chỉ là **placeholder** trên sơ đồ; `B12` quyết định quyền sở hữu và vị trí vật lý. Kênh chatbot phải gọi qua gateway/hợp đồng công bố, không đi vòng vào dữ liệu. Sao chép cấu hình giữa hai máy đi theo chiều rõ ràng; không tạo vòng phụ thuộc đồng bộ.\n\nMỗi máy 8 GiB dùng ngân sách mục tiêu khoảng **6 GiB** cho các tiến trình/container, với heap và memory limit được công bố; phần còn lại dành cho hệ điều hành, bộ nhớ ngoài heap và dao động ngắn hạn (`GOV-097`). Bố trí này **không cam kết HA** (`GOV-096`). Nếu cấu hình hiện tại thiếu trong lượt kiểm thử/demo hữu hạn, nhóm nâng instance AWS tạm thời thay vì mở lại kiến trúc (`GOV-098`).\n\nSơ đồ: `docs/diagrams/src/B11-C-02-deployment-two-machines.puml`.",
+    "entities": [
+      "chatbot-adapter",
+      "api-gateway",
+      "web-channel",
+      "mobile-channel",
+      "config-discovery"
+    ],
+    "owner": "Nhóm nền tảng / owner triển khai; Minh quyết yêu cầu còn mở",
+    "required_input": "Channel route/build/transport/client instrumentation và host/limit manifest thực, không chỉ arrow khái niệm.",
+    "reason": "Architecture relation exists at its abstraction level; transport/call semantics not established. No source requirement removed."
+  },
+  {
+    "unit_id": "FT-U0579",
+    "source_id": "FT-B11-C-01",
+    "locator": "L37-L62",
+    "text": "CH --> GW\nGW --> EVT\nGW --> BKG\nGW --> TKT\nGW --> ACC\n\nACC --> IDP : xác thực / quyền\nEVT --> BKG : cấu hình bán có phiên bản\nEVT --> PAY : mốc kết thúc / tỷ lệ phí\nBKG --> PAY : nghĩa vụ thanh toán\nPAY --> PG : thu / hoàn\nPG ..> PAY : callback\nPAY ..> TKT : xác nhận thu → phát hành\\nSaga duy nhất\nTKT ..> PAY : phát hành lỗi → hoàn\nTKT ..> BKG : trả tài nguyên / lượt dùng\n\nEVT ..> COL\nBKG ..> COL\nPAY ..> COL\nTKT ..> COL\nACC ..> COL\nGW ..> COL\nCOL --> OBS\nRCA --> OBS : chỉ đọc · credential riêng\nRCA ..> GEM : bằng chứng đã lọc\\nkhông đổi thứ hạng\n",
+    "entities": [
+      "api-gateway",
+      "otel-collector",
+      "rca",
+      "gemini-api"
+    ],
+    "owner": "Nhóm nền tảng / owner triển khai; Minh quyết yêu cầu còn mở",
+    "required_input": "Exact endpoint/transport from implementation or contract; preserve responsibility vs delivery-path distinction.",
+    "reason": "Architecture relation exists at its abstraction level; transport/call semantics not established. No source requirement removed."
+  },
+  {
+    "unit_id": "FT-U0581",
+    "source_id": "FT-B11-C-02",
+    "locator": "L39-L43",
+    "text": "EXT --> GW\nEXT --> BOT\nBOT --> GW : qua bề mặt công bố\nGW --> BKG\nGW --> TKT",
+    "entities": [
+      "api-gateway",
+      "chatbot-adapter",
+      "web-channel",
+      "mobile-channel"
+    ],
+    "owner": "Nhóm nền tảng / owner triển khai; Minh quyết yêu cầu còn mở",
+    "required_input": "Separate channel entrypoint/transport/client build; mobile optional is not current app runtime.",
+    "reason": "Architecture relation exists at its abstraction level; transport/call semantics not established. No source requirement removed."
+  },
+  {
+    "unit_id": "FT-U0582",
+    "source_id": "FT-B11-C-02",
+    "locator": "L54-L59",
+    "text": "CFG ..> GW\nCFG ..> BKG\nCFG ..> PAY\nCFG ..> TKT\n\nGW ..> COL",
+    "entities": [
+      "user-service",
+      "keycloak",
+      "api-gateway",
+      "config-discovery"
+    ],
+    "owner": "Nhóm nền tảng / owner triển khai; Minh quyết yêu cầu còn mở",
+    "required_input": "JWKS/local JWT verification vs introspection/AdminAPI, config/discovery runtime protocol and receiver/caller behavior before network edge.",
+    "reason": "Architecture relation exists at its abstraction level; transport/call semantics not established. No source requirement removed."
+  },
+  {
+    "unit_id": "FT-U0583",
+    "source_id": "FT-B11-C-02",
+    "locator": "L60-L68",
+    "text": "BKG ..> COL\nPAY ..> COL\nTKT ..> COL\nEVT ..> COL\nACC ..> COL\nCOL --> OBS\nRCA --> OBS : chỉ đọc · credential riêng\nRCA ..> GEM : bằng chứng đã lọc\\ngiải thích sau xếp hạng\n",
+    "entities": [
+      "otel-collector",
+      "tempo",
+      "loki",
+      "prometheus",
+      "rca",
+      "gemini-api"
+    ],
+    "owner": "Nhóm nền tảng / owner triển khai; Minh quyết yêu cầu còn mở",
+    "required_input": "Receiver/exporter/read API exact addresses/protocol config; do not type observation arrow as broker message.",
+    "reason": "Architecture relation exists at its abstraction level; transport/call semantics not established. No source requirement removed."
+  }
+]

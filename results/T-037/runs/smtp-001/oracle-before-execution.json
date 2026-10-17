@@ -1,0 +1,44 @@
+{
+  "task": "T-037",
+  "kind": "synthetic_minimal_representation_counterexample_not_runtime",
+  "date_local": "2026-10-16",
+  "source_observation": {
+    "state": "FACT",
+    "owner": "ticket-service",
+    "target": "smtp",
+    "transport": "smtp",
+    "operation_source_name": "gửi SMTP",
+    "runtime_name": null,
+    "provenance": [
+      {"source_id": "FT-B13", "locator": "L199", "condition": "Delivery job retry; SMTP timeout có thể đã gửi; không exactly-once email"},
+      {"source_id": "FT-B14", "locator": "L82", "condition": "Worker gửi SMTP ngoài transaction rồi lưu outcome"},
+      {"source_id": "FT-B14-03", "locator": "L9-L12", "condition": "Ticket -> SMTP; outcome thành công/lỗi/chưa rõ"}
+    ]
+  },
+  "source_requirement": "Giữ Ticket→SMTP cùng transport SMTP; không đổi thành HTTP/RPC hoặc quan hệ nội bộ.",
+  "independent_expected": {
+    "current_contract_lossless_representation": false,
+    "candidate_call_types_tested": ["gọi-đồng-bộ", "gọi-chưa-phân-kiểu"],
+    "candidate_call_type_status": "Hai nhãn chỉ là biến thể tổng hợp để chứng minh chặn channel; chưa chọn loại lời gọi từ runtime.",
+    "channel": "smtp",
+    "current_build_error": "relation_type",
+    "reason": "smtp không thuộc CHANNELS; call channel được giới hạn http/rpc/internal",
+    "coercions_disallowed": ["http", "rpc", "internal"],
+    "graph_completion_claim_allowed": false,
+    "common_contract_mutation_authorized": false
+  },
+  "earlier_oracle_error": {
+    "file": "results/T-037/oracle.json",
+    "pointer": "/http_edges/5",
+    "error": "Đáp án ban đầu xếp ticket-service→smtp trong http_edges. Nguồn chỉ rõ SMTP, nên đáp án ấy sai. Giữ bản gốc để truy lịch sử; không dùng làm oracle hay sửa graph cho khớp đáp án sai.",
+    "detected_before_T037_conversion": true,
+    "status": "INVALIDATED_FOR_FULL_GRAPH_BUILD"
+  },
+  "stop_scope": "Không dựng/xác nhận graph/phép chiếu/binding/signal đầy đủ T-037; chỉ giữ phần nguồn/inventory độc lập và phản ví dụ. Không sửa/fork T-036.",
+  "affected_branches": {
+    "T-037": "Delivery là nhu cầu được SPEC giao; graph toàn phạm vi và bàn giao đủ điều kiện chưa đạt.",
+    "T-038": "Giữ pin cũ; chưa kết luận nhánh này có SMTP. Phần dùng hợp đồng nếu cần transport ngoài tập hiện tại phải dừng; không tự đổi pin.",
+    "T-039": "Giữ pin cũ; chưa kết luận nhánh này có SMTP. Phần dùng hợp đồng nếu cần transport ngoài tập hiện tại phải dừng; không tự đổi pin.",
+    "T-040_P6_P9": "Chưa thể coi hợp đồng chung phủ đủ quan hệ FT; P9 cần giữ transport và nơi ghi SMTP, không tự biến nó thành HTTP."
+  }
+}

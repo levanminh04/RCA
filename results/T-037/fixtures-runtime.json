@@ -1,0 +1,664 @@
+{
+  "task": "T-037",
+  "purpose": "synthetic-only",
+  "static_document": {
+    "scope": {
+      "system": "synthetic-FT",
+      "revision": "fixture-v2"
+    },
+    "entities": [
+      {
+        "id": "payment-service",
+        "name": "payment-service",
+        "type": "service",
+        "granularity": "logical",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "booking-service",
+        "name": "booking-service",
+        "type": "service",
+        "granularity": "logical",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "ticket-service",
+        "name": "ticket-service",
+        "type": "service",
+        "granularity": "logical",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "broker",
+        "name": "broker",
+        "type": "broker",
+        "granularity": "logical",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "smtp",
+        "name": "smtp",
+        "type": "external",
+        "granularity": "logical",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "db-A",
+        "name": "db-A",
+        "type": "database",
+        "granularity": "logical",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "db-B",
+        "name": "db-B",
+        "type": "database",
+        "granularity": "logical",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "pg",
+        "name": "pg",
+        "type": "database",
+        "granularity": "instance",
+        "role": "synthetic fixture",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      }
+    ],
+    "operations": [
+      {
+        "entity": "payment-service",
+        "name": "publish-synthetic",
+        "runtime_name": null,
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "entity": "ticket-service",
+        "name": "consume-synthetic",
+        "runtime_name": null,
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "entity": "booking-service",
+        "name": "expiry-synthetic",
+        "runtime_name": null,
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "entity": "payment-service",
+        "name": "callback-synthetic",
+        "runtime_name": null,
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      }
+    ],
+    "relations": [
+      {
+        "id": "publish",
+        "source": {
+          "entity": "payment-service",
+          "operation": "publish-synthetic"
+        },
+        "target": {
+          "entity": "broker",
+          "operation": null
+        },
+        "type": "thông-điệp",
+        "channel": "publish",
+        "messaging": {
+          "broker": "broker",
+          "broker_scope": "synthetic-vhost",
+          "exchange": "flash-ticket.v1",
+          "routing_key": "event.cancelled.v1",
+          "queue": null
+        },
+        "context": "Synthetic, not runtime",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "consume-A",
+        "source": {
+          "entity": "broker",
+          "operation": null
+        },
+        "target": {
+          "entity": "ticket-service",
+          "operation": "consume-synthetic"
+        },
+        "type": "thông-điệp",
+        "channel": "consume",
+        "messaging": {
+          "broker": "broker",
+          "broker_scope": "synthetic-vhost",
+          "exchange": "flash-ticket.v1",
+          "routing_key": "event.cancelled.v1",
+          "queue": "q-A"
+        },
+        "context": "Synthetic, not runtime",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "consume-B",
+        "source": {
+          "entity": "broker",
+          "operation": null
+        },
+        "target": {
+          "entity": "ticket-service",
+          "operation": "consume-synthetic"
+        },
+        "type": "thông-điệp",
+        "channel": "consume",
+        "messaging": {
+          "broker": "broker",
+          "broker_scope": "synthetic-vhost",
+          "exchange": "flash-ticket.v1",
+          "routing_key": "event.cancelled.v1",
+          "queue": "q-B"
+        },
+        "context": "Synthetic, not runtime",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "data-A",
+        "source": {
+          "entity": "booking-service",
+          "operation": "expiry-synthetic"
+        },
+        "target": {
+          "entity": "db-A",
+          "operation": null
+        },
+        "type": "dữ-liệu",
+        "channel": "data",
+        "messaging": null,
+        "context": "Synthetic, not runtime",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "data-B",
+        "source": {
+          "entity": "payment-service",
+          "operation": null
+        },
+        "target": {
+          "entity": "db-B",
+          "operation": null
+        },
+        "type": "dữ-liệu",
+        "channel": "data",
+        "messaging": null,
+        "context": "Synthetic, not runtime",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      }
+    ],
+    "resource_bindings": [
+      {
+        "id": "bind-db-A",
+        "entity": "db-A",
+        "resource": "pg",
+        "relation": "hosted_on",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "bind-db-B",
+        "entity": "db-B",
+        "resource": "pg",
+        "relation": "hosted_on",
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      }
+    ],
+    "signals": [
+      {
+        "id": "queue-q-A",
+        "kind": "metric",
+        "entity": "broker",
+        "operation": null,
+        "address": [
+          "broker",
+          "synthetic-vhost",
+          "q-A"
+        ],
+        "shared": true,
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "queue-q-B",
+        "kind": "metric",
+        "entity": "broker",
+        "operation": null,
+        "address": [
+          "broker",
+          "synthetic-vhost",
+          "q-B"
+        ],
+        "shared": true,
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      },
+      {
+        "id": "pg-shared",
+        "kind": "metric",
+        "entity": "pg",
+        "operation": null,
+        "address": [
+          "instance",
+          "pg"
+        ],
+        "shared": true,
+        "provenance": [
+          {
+            "source_id": "FT-SYNTHETIC",
+            "locator": "fixture requirement oracle-v2.json",
+            "condition": "Tổng hợp kiểm hợp đồng, không telemetry hay operation FT thật"
+          }
+        ]
+      }
+    ]
+  },
+  "trace_cases": {
+    "callback-new-trace": [
+      {
+        "traceID": "t-request",
+        "spanID": "s1",
+        "parentSpanID": "root",
+        "serviceName": "payment-service",
+        "operationName": "start-synthetic",
+        "startTime": 100,
+        "duration": 10,
+        "kind": "INTERNAL",
+        "attributes": {},
+        "links": []
+      },
+      {
+        "traceID": "t-callback",
+        "spanID": "s2",
+        "parentSpanID": "root",
+        "serviceName": "payment-service",
+        "operationName": "callback-synthetic",
+        "startTime": 100,
+        "duration": 10,
+        "kind": "INTERNAL",
+        "attributes": {
+          "correlationId": "same"
+        },
+        "links": []
+      }
+    ],
+    "scheduler-root": [
+      {
+        "traceID": "t-expiry",
+        "spanID": "s1",
+        "parentSpanID": "root",
+        "serviceName": "booking-service",
+        "operationName": "expiry-synthetic",
+        "startTime": 100,
+        "duration": 10,
+        "kind": "INTERNAL",
+        "attributes": {
+          "correlationId": "same"
+        },
+        "links": []
+      }
+    ],
+    "correlation-only-message": [
+      {
+        "traceID": "t-p",
+        "spanID": "p",
+        "parentSpanID": "root",
+        "serviceName": "payment-service",
+        "operationName": "publish-synthetic",
+        "startTime": 100,
+        "duration": 10,
+        "kind": "PRODUCER",
+        "attributes": {
+          "messaging.broker": "broker",
+          "messaging.broker_scope": "synthetic-vhost",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.routing_key": "event.cancelled.v1",
+          "correlationId": "synthetic-same-transaction"
+        },
+        "links": []
+      },
+      {
+        "traceID": "t-c",
+        "spanID": "c",
+        "parentSpanID": "root",
+        "serviceName": "ticket-service",
+        "operationName": "consume-synthetic",
+        "startTime": 100,
+        "duration": 10,
+        "kind": "CONSUMER",
+        "attributes": {
+          "messaging.broker": "broker",
+          "messaging.broker_scope": "synthetic-vhost",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.routing_key": "event.cancelled.v1",
+          "correlationId": "synthetic-same-transaction",
+          "messaging.queue": "q-A"
+        },
+        "links": []
+      }
+    ],
+    "verified-fanout": [
+      {
+        "traceID": "t-p",
+        "spanID": "p",
+        "parentSpanID": "root",
+        "serviceName": "payment-service",
+        "operationName": "publish-synthetic",
+        "startTime": 100,
+        "duration": 10,
+        "kind": "PRODUCER",
+        "attributes": {
+          "messaging.broker": "broker",
+          "messaging.broker_scope": "synthetic-vhost",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.routing_key": "event.cancelled.v1",
+          "correlationId": "synthetic-same-transaction",
+          "messaging.identity_scope": "synthetic-publisher",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "synthetic-message"
+        },
+        "links": []
+      },
+      {
+        "traceID": "t-booking-service",
+        "spanID": "c",
+        "parentSpanID": "root",
+        "serviceName": "booking-service",
+        "operationName": "consume-synthetic",
+        "startTime": 100,
+        "duration": 10,
+        "kind": "CONSUMER",
+        "attributes": {
+          "messaging.broker": "broker",
+          "messaging.broker_scope": "synthetic-vhost",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.routing_key": "event.cancelled.v1",
+          "correlationId": "synthetic-same-transaction",
+          "messaging.queue": "q-booking-service",
+          "messaging.identity_scope": "synthetic-publisher",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "synthetic-message"
+        },
+        "links": []
+      },
+      {
+        "traceID": "t-payment-service",
+        "spanID": "c",
+        "parentSpanID": "root",
+        "serviceName": "payment-service",
+        "operationName": "consume-synthetic",
+        "startTime": 100,
+        "duration": 10,
+        "kind": "CONSUMER",
+        "attributes": {
+          "messaging.broker": "broker",
+          "messaging.broker_scope": "synthetic-vhost",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.routing_key": "event.cancelled.v1",
+          "correlationId": "synthetic-same-transaction",
+          "messaging.queue": "q-payment-service",
+          "messaging.identity_scope": "synthetic-publisher",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "synthetic-message"
+        },
+        "links": []
+      },
+      {
+        "traceID": "t-ticket-service",
+        "spanID": "c",
+        "parentSpanID": "root",
+        "serviceName": "ticket-service",
+        "operationName": "consume-synthetic",
+        "startTime": 100,
+        "duration": 10,
+        "kind": "CONSUMER",
+        "attributes": {
+          "messaging.broker": "broker",
+          "messaging.broker_scope": "synthetic-vhost",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.routing_key": "event.cancelled.v1",
+          "correlationId": "synthetic-same-transaction",
+          "messaging.queue": "q-ticket-service",
+          "messaging.identity_scope": "synthetic-publisher",
+          "messaging.identity_scope_verified": true,
+          "messaging.message_id": "synthetic-message"
+        },
+        "links": []
+      }
+    ],
+    "two-queues": [
+      {
+        "traceID": "t-a",
+        "spanID": "c",
+        "parentSpanID": "root",
+        "serviceName": "ticket-service",
+        "operationName": "consume-synthetic",
+        "startTime": 100,
+        "duration": 10,
+        "kind": "CONSUMER",
+        "attributes": {
+          "messaging.broker": "broker",
+          "messaging.broker_scope": "synthetic-vhost",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.routing_key": "event.cancelled.v1",
+          "correlationId": "synthetic-same-transaction",
+          "messaging.queue": "q-A"
+        },
+        "links": []
+      },
+      {
+        "traceID": "t-b",
+        "spanID": "c",
+        "parentSpanID": "root",
+        "serviceName": "ticket-service",
+        "operationName": "consume-synthetic",
+        "startTime": 100,
+        "duration": 10,
+        "kind": "CONSUMER",
+        "attributes": {
+          "messaging.broker": "broker",
+          "messaging.broker_scope": "synthetic-vhost",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.routing_key": "event.cancelled.v1",
+          "correlationId": "synthetic-same-transaction",
+          "messaging.queue": "q-B"
+        },
+        "links": []
+      }
+    ],
+    "retry-same-operation": [
+      {
+        "traceID": "t-r1",
+        "spanID": "c1",
+        "parentSpanID": "root",
+        "serviceName": "ticket-service",
+        "operationName": "consume-synthetic",
+        "startTime": 100,
+        "duration": 10,
+        "kind": "CONSUMER",
+        "attributes": {
+          "messaging.broker": "broker",
+          "messaging.broker_scope": "synthetic-vhost",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.routing_key": "event.cancelled.v1",
+          "correlationId": "synthetic-same-transaction",
+          "messaging.queue": "q-A",
+          "messaging.attempt": 1
+        },
+        "links": []
+      },
+      {
+        "traceID": "t-r2",
+        "spanID": "c2",
+        "parentSpanID": "root",
+        "serviceName": "ticket-service",
+        "operationName": "consume-synthetic",
+        "startTime": 100,
+        "duration": 10,
+        "kind": "CONSUMER",
+        "attributes": {
+          "messaging.broker": "broker",
+          "messaging.broker_scope": "synthetic-vhost",
+          "messaging.exchange": "flash-ticket.v1",
+          "messaging.routing_key": "event.cancelled.v1",
+          "correlationId": "synthetic-same-transaction",
+          "messaging.queue": "q-A",
+          "messaging.attempt": 2
+        },
+        "links": []
+      }
+    ]
+  },
+  "universe": {
+    "payment-service": "service",
+    "booking-service": "service",
+    "ticket-service": "service",
+    "broker": "broker"
+  },
+  "comparison_cases": {
+    "missing_operation_mapping": {
+      "mapping": "entity identities only; deliberately no operation mapping"
+    },
+    "missing_scope_or_queue": {
+      "broker_scope": null,
+      "queue": null
+    },
+    "unknown_type": {
+      "type": "gọi-chưa-phân-kiểu"
+    }
+  }
+}

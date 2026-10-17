@@ -1,0 +1,518 @@
+{
+  "scope": {
+    "system": "FlashTicket",
+    "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac"
+  },
+  "entities": [],
+  "operations": [
+    {
+      "entity": "user-service",
+      "name": "/api/v1/me",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "L290",
+          "condition": "Path API nguyên văn owner User; method chưa nêu nên không thêm method vào name. approve|reject là nhóm path thiết kế, không endpoint runtime đã xác minh."
+        }
+      ]
+    },
+    {
+      "entity": "user-service",
+      "name": "/organizer-applications",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "L290",
+          "condition": "Path API nguyên văn owner User; method chưa nêu nên không thêm method vào name. approve|reject là nhóm path thiết kế, không endpoint runtime đã xác minh."
+        }
+      ]
+    },
+    {
+      "entity": "user-service",
+      "name": "/admin/organizer-applications/{id}/approve|reject",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "L290",
+          "condition": "Path API nguyên văn owner User; method chưa nêu nên không thêm method vào name. approve|reject là nhóm path thiết kế, không endpoint runtime đã xác minh."
+        }
+      ]
+    },
+    {
+      "entity": "user-service",
+      "name": "/organizers/{subject}",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "L290",
+          "condition": "Path API nguyên văn owner User; method chưa nêu nên không thêm method vào name. approve|reject là nhóm path thiết kế, không endpoint runtime đã xác minh."
+        }
+      ]
+    },
+    {
+      "entity": "payment-service",
+      "name": "tra cứu kết quả hoàn",
+      "runtime_name": null,
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "L191",
+          "condition": "Tên thao tác nguyên văn bên cạnh refund(...). Query refund requestKey khác queryPayment(attemptId); endpoint/name provider runtime OPEN."
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "id": "completion-user-api-01",
+      "source": {
+        "entity": "api-gateway",
+        "operation": null
+      },
+      "target": {
+        "entity": "user-service",
+        "operation": "/api/v1/me"
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "context": "Public API User theo B13 §2/§9 và Gateway theo B11. Giữ path nguyên văn; phương thức/prefix rút gọn còn OPEN. Role/ownership, CAS application và retry role-grant theo nguồn; không runtime claim.",
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "§2 L19,L25-L28; §9 L290-L296",
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm."
+        },
+        {
+          "source_id": "FT-B11",
+          "locator": "§6 L105",
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm."
+        }
+      ]
+    },
+    {
+      "id": "completion-user-api-02",
+      "source": {
+        "entity": "api-gateway",
+        "operation": null
+      },
+      "target": {
+        "entity": "user-service",
+        "operation": "/organizer-applications"
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "context": "Public API User theo B13 §2/§9 và Gateway theo B11. Giữ path nguyên văn; phương thức/prefix rút gọn còn OPEN. Role/ownership, CAS application và retry role-grant theo nguồn; không runtime claim.",
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "§2 L19,L25-L28; §9 L290-L296",
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm."
+        },
+        {
+          "source_id": "FT-B11",
+          "locator": "§6 L105",
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm."
+        }
+      ]
+    },
+    {
+      "id": "completion-user-api-03",
+      "source": {
+        "entity": "api-gateway",
+        "operation": null
+      },
+      "target": {
+        "entity": "user-service",
+        "operation": "/admin/organizer-applications/{id}/approve|reject"
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "context": "Public API User theo B13 §2/§9 và Gateway theo B11. Giữ path nguyên văn; phương thức/prefix rút gọn còn OPEN. Role/ownership, CAS application và retry role-grant theo nguồn; không runtime claim.",
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "§2 L19,L25-L28; §9 L290-L296",
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm."
+        },
+        {
+          "source_id": "FT-B11",
+          "locator": "§6 L105",
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm."
+        }
+      ]
+    },
+    {
+      "id": "completion-user-api-04",
+      "source": {
+        "entity": "api-gateway",
+        "operation": null
+      },
+      "target": {
+        "entity": "user-service",
+        "operation": "/organizers/{subject}"
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "context": "Public API User theo B13 §2/§9 và Gateway theo B11. Giữ path nguyên văn; phương thức/prefix rút gọn còn OPEN. Role/ownership, CAS application và retry role-grant theo nguồn; không runtime claim.",
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "§2 L19,L25-L28; §9 L290-L296",
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm."
+        },
+        {
+          "source_id": "FT-B11",
+          "locator": "§6 L105",
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm."
+        }
+      ]
+    },
+    {
+      "id": "completion-provider-refund-query",
+      "source": {
+        "entity": "payment-service",
+        "operation": "tra cứu kết quả hoàn"
+      },
+      "target": {
+        "entity": "vnpay",
+        "operation": null
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "context": "Query cùng refund/request key khi timeout UNKNOWN/PROCESSING trước retry tác động tiền; không thêm nghĩa vụ hoàn logic. HTTP/ack merchant theo provider khi tích hợp, chưa test sandbox.",
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "§5.3 L191",
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm."
+        },
+        {
+          "source_id": "FT-B14",
+          "locator": "§4 L63-L64",
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm."
+        }
+      ]
+    },
+    {
+      "id": "completion-user-keycloak-rolegrant",
+      "source": {
+        "entity": "user-service",
+        "operation": "role-grant request/result/retry"
+      },
+      "target": {
+        "entity": "keycloak",
+        "operation": null
+      },
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "context": "Admin API cấp ORGANIZER sau CAS application PENDING chưa roleGrant, ghi operationId/REQUESTED trước gọi. Giữ BUYER; timeout không ACTIVE; query/retry/confirm rồi projection. Workflow User không Saga mới; method/endpoint/quyền client realm runtime OPEN.",
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "§9 L292-L294",
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm."
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§5 L82",
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm."
+        }
+      ]
+    },
+    {
+      "id": "completion-ticket-smtp",
+      "source": {
+        "entity": "ticket-service",
+        "operation": "gửi SMTP"
+      },
+      "target": {
+        "entity": "smtp",
+        "operation": null
+      },
+      "type": "gọi-chưa-phân-kiểu",
+      "channel": "smtp",
+      "messaging": null,
+      "context": "Delivery job Ticket claim bằng khóa/lease, gửi SMTP ngoài TX, lưu outcome. Timeout có thể đã gửi; cùng deliveryId/key retry có thể email trùng nhưng không vé/refund mới. Nguồn chỉ SMTP; chưa xác minh kiểu span CLIENT/SERVER hoặc runtime operationName.",
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "§6 L199",
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm."
+        },
+        {
+          "source_id": "FT-B14",
+          "locator": "§1 L9,L16; §6 L82",
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm."
+        },
+        {
+          "source_id": "FT-B14-03",
+          "locator": "L9-L12",
+          "condition": "CANDIDATE — ánh xạ thiết kế đã ghim, runtime/tên span chưa kiểm."
+        }
+      ]
+    }
+  ],
+  "resource_bindings": [],
+  "signals": [
+    {
+      "id": "completion-signal-01-log",
+      "kind": "log",
+      "entity": "user-service",
+      "operation": "/api/v1/me",
+      "address": [
+        "design:service.name=user-service",
+        "design:operation=/api/v1/me",
+        "B16:log-keys=serviceName,eventName,operation,outcome,requestId,traceId,spanId",
+        "runtime-mapping:OPEN"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "L290",
+          "condition": "Path API nguyên văn owner User; method chưa nêu nên không thêm method vào name. approve|reject là nhóm path thiết kế, không endpoint runtime đã xác minh."
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§1 L10; §3 L34-L36; §4 L54-L64; §5 L80-L82",
+          "condition": "CANDIDATE địa chỉ logic cho API/adapter có nguồn; B16 không chứng minh instrumentation riêng endpoint. P9 xác minh tên log/span/build trước đối chiếu."
+        }
+      ]
+    },
+    {
+      "id": "completion-signal-01-trace",
+      "kind": "trace",
+      "entity": "user-service",
+      "operation": "/api/v1/me",
+      "address": [
+        "design:service.name=user-service",
+        "design:operation=/api/v1/me",
+        "B16:log-keys=serviceName,eventName,operation,outcome,requestId,traceId,spanId",
+        "runtime-mapping:OPEN"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "L290",
+          "condition": "Path API nguyên văn owner User; method chưa nêu nên không thêm method vào name. approve|reject là nhóm path thiết kế, không endpoint runtime đã xác minh."
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§1 L10; §3 L34-L36; §4 L54-L64; §5 L80-L82",
+          "condition": "CANDIDATE địa chỉ logic cho API/adapter có nguồn; B16 không chứng minh instrumentation riêng endpoint. P9 xác minh tên log/span/build trước đối chiếu."
+        }
+      ]
+    },
+    {
+      "id": "completion-signal-02-log",
+      "kind": "log",
+      "entity": "user-service",
+      "operation": "/organizer-applications",
+      "address": [
+        "design:service.name=user-service",
+        "design:operation=/organizer-applications",
+        "B16:log-keys=serviceName,eventName,operation,outcome,requestId,traceId,spanId",
+        "runtime-mapping:OPEN"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "L290",
+          "condition": "Path API nguyên văn owner User; method chưa nêu nên không thêm method vào name. approve|reject là nhóm path thiết kế, không endpoint runtime đã xác minh."
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§1 L10; §3 L34-L36; §4 L54-L64; §5 L80-L82",
+          "condition": "CANDIDATE địa chỉ logic cho API/adapter có nguồn; B16 không chứng minh instrumentation riêng endpoint. P9 xác minh tên log/span/build trước đối chiếu."
+        }
+      ]
+    },
+    {
+      "id": "completion-signal-02-trace",
+      "kind": "trace",
+      "entity": "user-service",
+      "operation": "/organizer-applications",
+      "address": [
+        "design:service.name=user-service",
+        "design:operation=/organizer-applications",
+        "B16:log-keys=serviceName,eventName,operation,outcome,requestId,traceId,spanId",
+        "runtime-mapping:OPEN"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "L290",
+          "condition": "Path API nguyên văn owner User; method chưa nêu nên không thêm method vào name. approve|reject là nhóm path thiết kế, không endpoint runtime đã xác minh."
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§1 L10; §3 L34-L36; §4 L54-L64; §5 L80-L82",
+          "condition": "CANDIDATE địa chỉ logic cho API/adapter có nguồn; B16 không chứng minh instrumentation riêng endpoint. P9 xác minh tên log/span/build trước đối chiếu."
+        }
+      ]
+    },
+    {
+      "id": "completion-signal-03-log",
+      "kind": "log",
+      "entity": "user-service",
+      "operation": "/admin/organizer-applications/{id}/approve|reject",
+      "address": [
+        "design:service.name=user-service",
+        "design:operation=/admin/organizer-applications/{id}/approve|reject",
+        "B16:log-keys=serviceName,eventName,operation,outcome,requestId,traceId,spanId",
+        "runtime-mapping:OPEN"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "L290",
+          "condition": "Path API nguyên văn owner User; method chưa nêu nên không thêm method vào name. approve|reject là nhóm path thiết kế, không endpoint runtime đã xác minh."
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§1 L10; §3 L34-L36; §4 L54-L64; §5 L80-L82",
+          "condition": "CANDIDATE địa chỉ logic cho API/adapter có nguồn; B16 không chứng minh instrumentation riêng endpoint. P9 xác minh tên log/span/build trước đối chiếu."
+        }
+      ]
+    },
+    {
+      "id": "completion-signal-03-trace",
+      "kind": "trace",
+      "entity": "user-service",
+      "operation": "/admin/organizer-applications/{id}/approve|reject",
+      "address": [
+        "design:service.name=user-service",
+        "design:operation=/admin/organizer-applications/{id}/approve|reject",
+        "B16:log-keys=serviceName,eventName,operation,outcome,requestId,traceId,spanId",
+        "runtime-mapping:OPEN"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "L290",
+          "condition": "Path API nguyên văn owner User; method chưa nêu nên không thêm method vào name. approve|reject là nhóm path thiết kế, không endpoint runtime đã xác minh."
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§1 L10; §3 L34-L36; §4 L54-L64; §5 L80-L82",
+          "condition": "CANDIDATE địa chỉ logic cho API/adapter có nguồn; B16 không chứng minh instrumentation riêng endpoint. P9 xác minh tên log/span/build trước đối chiếu."
+        }
+      ]
+    },
+    {
+      "id": "completion-signal-04-log",
+      "kind": "log",
+      "entity": "user-service",
+      "operation": "/organizers/{subject}",
+      "address": [
+        "design:service.name=user-service",
+        "design:operation=/organizers/{subject}",
+        "B16:log-keys=serviceName,eventName,operation,outcome,requestId,traceId,spanId",
+        "runtime-mapping:OPEN"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "L290",
+          "condition": "Path API nguyên văn owner User; method chưa nêu nên không thêm method vào name. approve|reject là nhóm path thiết kế, không endpoint runtime đã xác minh."
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§1 L10; §3 L34-L36; §4 L54-L64; §5 L80-L82",
+          "condition": "CANDIDATE địa chỉ logic cho API/adapter có nguồn; B16 không chứng minh instrumentation riêng endpoint. P9 xác minh tên log/span/build trước đối chiếu."
+        }
+      ]
+    },
+    {
+      "id": "completion-signal-04-trace",
+      "kind": "trace",
+      "entity": "user-service",
+      "operation": "/organizers/{subject}",
+      "address": [
+        "design:service.name=user-service",
+        "design:operation=/organizers/{subject}",
+        "B16:log-keys=serviceName,eventName,operation,outcome,requestId,traceId,spanId",
+        "runtime-mapping:OPEN"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "L290",
+          "condition": "Path API nguyên văn owner User; method chưa nêu nên không thêm method vào name. approve|reject là nhóm path thiết kế, không endpoint runtime đã xác minh."
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§1 L10; §3 L34-L36; §4 L54-L64; §5 L80-L82",
+          "condition": "CANDIDATE địa chỉ logic cho API/adapter có nguồn; B16 không chứng minh instrumentation riêng endpoint. P9 xác minh tên log/span/build trước đối chiếu."
+        }
+      ]
+    },
+    {
+      "id": "completion-signal-05-log",
+      "kind": "log",
+      "entity": "payment-service",
+      "operation": "tra cứu kết quả hoàn",
+      "address": [
+        "design:service.name=payment-service",
+        "design:operation=tra cứu kết quả hoàn",
+        "B16:log-keys=serviceName,eventName,operation,outcome,requestId,traceId,spanId",
+        "runtime-mapping:OPEN"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "L191",
+          "condition": "Tên thao tác nguyên văn bên cạnh refund(...). Query refund requestKey khác queryPayment(attemptId); endpoint/name provider runtime OPEN."
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§1 L10; §3 L34-L36; §4 L54-L64; §5 L80-L82",
+          "condition": "CANDIDATE địa chỉ logic cho API/adapter có nguồn; B16 không chứng minh instrumentation riêng endpoint. P9 xác minh tên log/span/build trước đối chiếu."
+        }
+      ]
+    },
+    {
+      "id": "completion-signal-05-trace",
+      "kind": "trace",
+      "entity": "payment-service",
+      "operation": "tra cứu kết quả hoàn",
+      "address": [
+        "design:service.name=payment-service",
+        "design:operation=tra cứu kết quả hoàn",
+        "B16:log-keys=serviceName,eventName,operation,outcome,requestId,traceId,spanId",
+        "runtime-mapping:OPEN"
+      ],
+      "shared": false,
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "L191",
+          "condition": "Tên thao tác nguyên văn bên cạnh refund(...). Query refund requestKey khác queryPayment(attemptId); endpoint/name provider runtime OPEN."
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§1 L10; §3 L34-L36; §4 L54-L64; §5 L80-L82",
+          "condition": "CANDIDATE địa chỉ logic cho API/adapter có nguồn; B16 không chứng minh instrumentation riêng endpoint. P9 xác minh tên log/span/build trước đối chiếu."
+        }
+      ]
+    }
+  ]
+}

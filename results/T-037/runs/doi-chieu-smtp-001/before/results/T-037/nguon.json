@@ -1,0 +1,1578 @@
+{
+  "task": "T-037",
+  "state": "DESIGN_SCOPE_REVIEWED_RUNTIME_OPEN",
+  "system": "FlashTicket",
+  "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+  "sources": [
+    {
+      "id": "FT-B11",
+      "kind": "design",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "80e9a738c16dfdea39d7354a5cb2d7f0f4ca522faa787bb157f864af770a5635",
+      "bytes": 16497,
+      "line_count": 193,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\architecture\\B11-C-target-architecture.md",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/docs/architecture/B11-C-target-architecture.md",
+      "dirty": "",
+      "headings": [
+        {
+          "line": 1,
+          "text": "# B11-C — Chốt kiến trúc đích và chuẩn bị ADR"
+        },
+        {
+          "line": 22,
+          "text": "## 1. Phạm vi quyết định"
+        },
+        {
+          "line": 28,
+          "text": "## 2. Kiểm tra điều kiện và trạng thái lựa chọn"
+        },
+        {
+          "line": 42,
+          "text": "## 3. Kiến trúc đích được chọn"
+        },
+        {
+          "line": 44,
+          "text": "### 3.1 Năm service nghiệp vụ"
+        },
+        {
+          "line": 56,
+          "text": "### 3.2 Động lực chọn `PA-6`"
+        },
+        {
+          "line": 64,
+          "text": "### 3.3 Hệ quả phải chấp nhận"
+        },
+        {
+          "line": 73,
+          "text": "## 4. Một Saga được chốt"
+        },
+        {
+          "line": 85,
+          "text": "## 5. Vị trí RCA và quyền truy cập"
+        },
+        {
+          "line": 98,
+          "text": "## 6. Bố trí hai máy mục tiêu"
+        },
+        {
+          "line": 111,
+          "text": "## 7. Tác động lên A1–A6"
+        },
+        {
+          "line": 126,
+          "text": "## 8. Phụ lục đối chiếu RCA và phép thử độc lập"
+        },
+        {
+          "line": 128,
+          "text": "### 8.1 Đối chiếu ràng buộc 1 và 3 của `R0` §3"
+        },
+        {
+          "line": 137,
+          "text": "### 8.2 Phép thử độc lập"
+        },
+        {
+          "line": 147,
+          "text": "## 9. ADR và điều kiện chấp nhận"
+        },
+        {
+          "line": 164,
+          "text": "## 10. Điểm mở còn lại"
+        },
+        {
+          "line": 174,
+          "text": "## 11. Phép tự kiểm"
+        },
+        {
+          "line": 187,
+          "text": "## 12. Nhật ký phiên bản"
+        }
+      ],
+      "links": [
+        {
+          "line": 3,
+          "target": "../evidence/project-direction/2026-09-18-de-tai-va-nhiem-vu.md"
+        },
+        {
+          "line": 3,
+          "target": "../project/roles.md"
+        }
+      ]
+    },
+    {
+      "id": "FT-B12",
+      "kind": "design",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "85ba37aa6fb911f596159621b38c5063eb3f1f258a4c9607b0fd33ca57a9ab09",
+      "bytes": 104539,
+      "line_count": 1482,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\architecture\\B12-data-ownership-and-schema.md",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/docs/architecture/B12-data-ownership-and-schema.md",
+      "dirty": "",
+      "headings": [
+        {
+          "line": 1,
+          "text": "# B12 — Thiết kế dữ liệu đích và baseline khởi tạo"
+        },
+        {
+          "line": 12,
+          "text": "## 1. Phạm vi và trạng thái bằng chứng"
+        },
+        {
+          "line": 27,
+          "text": "## 2. Topology, quyền và khả năng khôi phục"
+        },
+        {
+          "line": 42,
+          "text": "### 2.1 Ma trận quyền tối thiểu"
+        },
+        {
+          "line": 58,
+          "text": "## 3. Quy ước dữ liệu ứng viên"
+        },
+        {
+          "line": 68,
+          "text": "## 4. Danh mục dữ liệu và quy tắc ghi"
+        },
+        {
+          "line": 70,
+          "text": "### 4.1 event-service"
+        },
+        {
+          "line": 84,
+          "text": "### 4.2 booking-service"
+        },
+        {
+          "line": 98,
+          "text": "### 4.3 payment-service"
+        },
+        {
+          "line": 112,
+          "text": "### 4.4 ticket-service"
+        },
+        {
+          "line": 125,
+          "text": "### 4.5 user-service"
+        },
+        {
+          "line": 139,
+          "text": "## 5. Ma trận bản sao và xử lý thiếu dữ liệu"
+        },
+        {
+          "line": 153,
+          "text": "## 6. Danh tính và baseline realm"
+        },
+        {
+          "line": 163,
+          "text": "## 7. Baseline, lớp bảo vệ và kiểm chứng"
+        },
+        {
+          "line": 178,
+          "text": "## 8. Phụ lục đối chiếu RCA và phép thử độc lập"
+        },
+        {
+          "line": 186,
+          "text": "## 9. Quyết định đã đóng và phần còn phải kiểm"
+        },
+        {
+          "line": 201,
+          "text": "### 9.1 Các lỗi rà lại đã sửa trong đợt 2026-09-14"
+        },
+        {
+          "line": 212,
+          "text": "## 10. Tạo tác dẫn xuất và phần đưa vào báo cáo"
+        },
+        {
+          "line": 221,
+          "text": "## 11. Nhật ký phiên bản"
+        },
+        {
+          "line": 228,
+          "text": "## 12. Từ điển đầy đủ cột và ràng buộc SQL — B12-v0.2"
+        },
+        {
+          "line": 234,
+          "text": "### event_schema.categories"
+        },
+        {
+          "line": 244,
+          "text": "### event_schema.venues"
+        },
+        {
+          "line": 255,
+          "text": "### event_schema.events"
+        },
+        {
+          "line": 304,
+          "text": "### event_schema.event_images"
+        },
+        {
+          "line": 317,
+          "text": "### event_schema.event_layouts"
+        },
+        {
+          "line": 337,
+          "text": "### event_schema.event_sectors"
+        },
+        {
+          "line": 362,
+          "text": "### event_schema.event_seats"
+        },
+        {
+          "line": 388,
+          "text": "### event_schema.ticket_types"
+        },
+        {
+          "line": 416,
+          "text": "### event_schema.promotions"
+        },
+        {
+          "line": 448,
+          "text": "### event_schema.event_cancellation_requests"
+        },
+        {
+          "line": 470,
+          "text": "### event_schema.outbox_messages"
+        },
+        {
+          "line": 493,
+          "text": "### event_schema.inbox_messages"
+        },
+        {
+          "line": 507,
+          "text": "### booking_schema.event_sales_snapshots"
+        },
+        {
+          "line": 528,
+          "text": "### booking_schema.orders"
+        },
+        {
+          "line": 596,
+          "text": "### booking_schema.order_items"
+        },
+        {
+          "line": 631,
+          "text": "### booking_schema.reservations"
+        },
+        {
+          "line": 660,
+          "text": "### booking_schema.ticket_type_inventory"
+        },
+        {
+          "line": 678,
+          "text": "### booking_schema.sector_inventory"
+        },
+        {
+          "line": 699,
+          "text": "### booking_schema.seat_inventory"
+        },
+        {
+          "line": 736,
+          "text": "### booking_schema.order_item_seats"
+        },
+        {
+          "line": 758,
+          "text": "### booking_schema.reservation_allocations"
+        },
+        {
+          "line": 796,
+          "text": "### booking_schema.purchase_limits"
+        },
+        {
+          "line": 814,
+          "text": "### booking_schema.promotion_inventory"
+        },
+        {
+          "line": 838,
+          "text": "### booking_schema.promotion_usages"
+        },
+        {
+          "line": 870,
+          "text": "### booking_schema.idempotency_requests"
+        },
+        {
+          "line": 886,
+          "text": "### booking_schema.outbox_messages"
+        },
+        {
+          "line": 909,
+          "text": "### booking_schema.inbox_messages"
+        },
+        {
+          "line": 923,
+          "text": "### payment_schema.event_finance_snapshots"
+        },
+        {
+          "line": 942,
+          "text": "### payment_schema.order_payment_snapshots"
+        },
+        {
+          "line": 965,
+          "text": "### payment_schema.payment_attempts"
+        },
+        {
+          "line": 999,
+          "text": "### payment_schema.charges"
+        },
+        {
+          "line": 1026,
+          "text": "### payment_schema.payment_confirmations"
+        },
+        {
+          "line": 1044,
+          "text": "### payment_schema.refunds"
+        },
+        {
+          "line": 1071,
+          "text": "### payment_schema.refund_attempts"
+        },
+        {
+          "line": 1093,
+          "text": "### payment_schema.event_refund_runs"
+        },
+        {
+          "line": 1113,
+          "text": "### payment_schema.event_refund_items"
+        },
+        {
+          "line": 1146,
+          "text": "### payment_schema.event_payouts"
+        },
+        {
+          "line": 1178,
+          "text": "### payment_schema.payment_sagas"
+        },
+        {
+          "line": 1198,
+          "text": "### payment_schema.outbox_messages"
+        },
+        {
+          "line": 1221,
+          "text": "### payment_schema.inbox_messages"
+        },
+        {
+          "line": 1235,
+          "text": "### ticket_schema.event_access_snapshots"
+        },
+        {
+          "line": 1251,
+          "text": "### ticket_schema.issuances"
+        },
+        {
+          "line": 1285,
+          "text": "### ticket_schema.tickets"
+        },
+        {
+          "line": 1321,
+          "text": "### ticket_schema.ticket_deliveries"
+        },
+        {
+          "line": 1347,
+          "text": "### ticket_schema.checkin_attempts"
+        },
+        {
+          "line": 1377,
+          "text": "### ticket_schema.outbox_messages"
+        },
+        {
+          "line": 1400,
+          "text": "### ticket_schema.inbox_messages"
+        },
+        {
+          "line": 1414,
+          "text": "## 13. Từ điển MongoDB — giữ bốn collection riêng"
+        },
+        {
+          "line": 1418,
+          "text": "### users"
+        },
+        {
+          "line": 1431,
+          "text": "### organizer_applications"
+        },
+        {
+          "line": 1454,
+          "text": "### organizer_profiles"
+        },
+        {
+          "line": 1471,
+          "text": "### user_follows"
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "FT-B13",
+      "kind": "design",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "7c7e3999e9a549d4cae84fc1f37da49a4051093e8da524d70ba83e98d033c6b0",
+      "bytes": 38192,
+      "line_count": 330,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\architecture\\B13-api-and-event-contracts.md",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/docs/architecture/B13-api-and-event-contracts.md",
+      "dirty": "",
+      "headings": [
+        {
+          "line": 1,
+          "text": "# B13 — Hợp đồng API và thông điệp cho luồng chính"
+        },
+        {
+          "line": 9,
+          "text": "## 1. Cách đọc và mức quyết định"
+        },
+        {
+          "line": 15,
+          "text": "## 2. Quy ước chung"
+        },
+        {
+          "line": 44,
+          "text": "## 3. API giao dịch người mua"
+        },
+        {
+          "line": 107,
+          "text": "## 4. Purchase snapshot cố định và freeze tiền"
+        },
+        {
+          "line": 130,
+          "text": "## 5. Thông điệp và giao tiếp nội bộ"
+        },
+        {
+          "line": 132,
+          "text": "### 5.1 Envelope, quyền và lưu bền"
+        },
+        {
+          "line": 148,
+          "text": "### 5.2 Danh mục hợp đồng liên service"
+        },
+        {
+          "line": 187,
+          "text": "### 5.3 Cổng thanh toán"
+        },
+        {
+          "line": 195,
+          "text": "## 6. Vé, email và check-in"
+        },
+        {
+          "line": 213,
+          "text": "## 7. Hợp đồng cấu hình Event và seat map"
+        },
+        {
+          "line": 215,
+          "text": "### 7.1 Cấu hình bán liên service"
+        },
+        {
+          "line": 237,
+          "text": "### 7.2 Editor: form cố định, giữ renderer"
+        },
+        {
+          "line": 274,
+          "text": "## 8. COMPARISON — hợp đồng chuyển FE cũ sang đích"
+        },
+        {
+          "line": 288,
+          "text": "## 9. Hồ sơ organizer, follow và API hỗ trợ"
+        },
+        {
+          "line": 298,
+          "text": "## 10. Tự kiểm, giới hạn và nội dung báo cáo"
+        },
+        {
+          "line": 300,
+          "text": "### 10.1 Mapping JSON/cột không để người code tự đoán"
+        },
+        {
+          "line": 328,
+          "text": "## Phụ lục đối chiếu R0 và phép thử độc lập — 2026-09-14"
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "FT-B14",
+      "kind": "design",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "45117e230b6977bdd08dd91bdc21dc3048fdc87eb31fe3f0204ceb66c2bdf44a",
+      "bytes": 16555,
+      "line_count": 104,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\architecture\\B14-main-flow-sequences.md",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/docs/architecture/B14-main-flow-sequences.md",
+      "dirty": "",
+      "headings": [
+        {
+          "line": 1,
+          "text": "# B14 — Thứ tự giao dịch, thử lại và hội tụ luồng chính"
+        },
+        {
+          "line": 7,
+          "text": "## 1. Ranh giới nguyên tử và thứ tự khóa"
+        },
+        {
+          "line": 22,
+          "text": "## 2. Tạo đơn, áp mã và đóng băng tiền"
+        },
+        {
+          "line": 34,
+          "text": "## 3. Thu tiền → chấp nhận giữ chỗ → phát vé"
+        },
+        {
+          "line": 55,
+          "text": "## 4. Hết hạn, buyer hủy và hoàn tiền"
+        },
+        {
+          "line": 67,
+          "text": "## 5. Hủy sự kiện: cổng cục bộ trước, fan-out sau"
+        },
+        {
+          "line": 78,
+          "text": "## 6. Delivery, tải QR và check-in"
+        },
+        {
+          "line": 88,
+          "text": "## 7. Outbox/inbox và phục hồi"
+        },
+        {
+          "line": 94,
+          "text": "## 8. Đối soát, tính phí và điểm kiểm bắt buộc"
+        },
+        {
+          "line": 102,
+          "text": "## Phụ lục đối chiếu R0 và phép thử độc lập — 2026-09-14"
+        }
+      ],
+      "links": [
+        {
+          "line": 36,
+          "target": "../diagrams/src/B14-01-order-payment-ticket-sequence.puml"
+        },
+        {
+          "line": 57,
+          "target": "../diagrams/src/B14-02-expiry-refund-cancellation-sequence.puml"
+        },
+        {
+          "line": 80,
+          "target": "../diagrams/src/B14-03-ticket-delivery-checkin-sequence.puml"
+        }
+      ]
+    },
+    {
+      "id": "FT-B16",
+      "kind": "design",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "12d9ab32969443e3b2bb12f8ad4d77f895ddeaf05ae325c9e4b77f72f6bdc6a8",
+      "bytes": 17119,
+      "line_count": 128,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\architecture\\B16-observability-baseline.md",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/docs/architecture/B16-observability-baseline.md",
+      "dirty": "",
+      "headings": [
+        {
+          "line": 1,
+          "text": "# B16 — Chuẩn log, metric và trace tối thiểu"
+        },
+        {
+          "line": 8,
+          "text": "## 1. Phạm vi và căn cứ"
+        },
+        {
+          "line": 14,
+          "text": "## 2. Mỗi công cụ làm gì?"
+        },
+        {
+          "line": 28,
+          "text": "## 3. Correlation bền qua retry, callback và outbox"
+        },
+        {
+          "line": 45,
+          "text": "## 4. Hình dạng log v1"
+        },
+        {
+          "line": 74,
+          "text": "## 5. Điểm quan sát cần có từ lát cắt đầu"
+        },
+        {
+          "line": 89,
+          "text": "## 6. Bảo mật, quyền và thời gian lưu"
+        },
+        {
+          "line": 99,
+          "text": "## 7. Những trở ngại RCA thực sự cần kiểm"
+        },
+        {
+          "line": 114,
+          "text": "## 8. Bộ bằng chứng để nghiệm thu B16"
+        },
+        {
+          "line": 126,
+          "text": "## Phụ lục đối chiếu R0 — 2026-09-14"
+        }
+      ],
+      "links": [
+        {
+          "line": 10,
+          "target": "../evidence/project-direction/2026-09-18-de-tai-va-nhiem-vu.md"
+        },
+        {
+          "line": 24,
+          "target": "https://opentelemetry.io/docs/zero-code/java/spring-boot-starter/"
+        },
+        {
+          "line": 26,
+          "target": "https://docs.spring.io/spring-boot/reference/actuator/observability.html"
+        },
+        {
+          "line": 43,
+          "target": "https://opentelemetry.io/docs/specs/semconv/messaging/messaging-spans/"
+        },
+        {
+          "line": 85,
+          "target": "https://grafana.com/docs/loki/latest/get-started/labels/cardinality/"
+        },
+        {
+          "line": 112,
+          "target": "https://opentelemetry.io/docs/concepts/sampling/"
+        }
+      ]
+    },
+    {
+      "id": "FT-DATA-README",
+      "kind": "design",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "589bc3c0985b00cfae926364db9025c2dfc9225ddfdf6b054cd820dc6639518a",
+      "bytes": 6127,
+      "line_count": 54,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\architecture\\data\\README.md",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/docs/architecture/data/README.md",
+      "dirty": "",
+      "headings": [
+        {
+          "line": 1,
+          "text": "# Bộ baseline dữ liệu B12"
+        },
+        {
+          "line": 5,
+          "text": "## 1. Đọc và chạy theo thứ tự"
+        },
+        {
+          "line": 18,
+          "text": "## 2. Kiểm tĩnh không cần Docker"
+        },
+        {
+          "line": 31,
+          "text": "## 3. Kiểm trên server thật"
+        },
+        {
+          "line": 44,
+          "text": "## 4. Phục hồi và ranh giới bảo mật"
+        },
+        {
+          "line": 52,
+          "text": "## 5. Điều kiện đi tiếp"
+        }
+      ],
+      "links": [
+        {
+          "line": 3,
+          "target": "../B12-data-ownership-and-schema.md"
+        },
+        {
+          "line": 9,
+          "target": "../B12-data-ownership-and-schema.md"
+        },
+        {
+          "line": 10,
+          "target": "postgres/README.md"
+        },
+        {
+          "line": 11,
+          "target": "mongodb/README.md"
+        },
+        {
+          "line": 12,
+          "target": "keycloak/README.md"
+        },
+        {
+          "line": 13,
+          "target": "../B12-validation.md"
+        },
+        {
+          "line": 14,
+          "target": "../B12-legacy-configuration-comparison.md"
+        },
+        {
+          "line": 54,
+          "target": "../B13-api-and-event-contracts.md"
+        },
+        {
+          "line": 54,
+          "target": "../B14-main-flow-sequences.md"
+        },
+        {
+          "line": 54,
+          "target": "../B15-verification-plan.md"
+        },
+        {
+          "line": 54,
+          "target": "../B16-observability-baseline.md"
+        },
+        {
+          "line": 54,
+          "target": "../implementation-readiness.md"
+        }
+      ]
+    },
+    {
+      "id": "FT-PG-README",
+      "kind": "design",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "4610ce2ee28df029f087a68ef59aad698ffa1296b62e51c6f476bfa7f6d91b57",
+      "bytes": 8003,
+      "line_count": 42,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\architecture\\data\\postgres\\README.md",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/docs/architecture/data/postgres/README.md",
+      "dirty": "",
+      "headings": [
+        {
+          "line": 1,
+          "text": "# PostgreSQL baseline — B12-v0.2"
+        },
+        {
+          "line": 5,
+          "text": "## Phạm vi và thứ tự"
+        },
+        {
+          "line": 19,
+          "text": "## Chạy kiểm cục bộ"
+        },
+        {
+          "line": 29,
+          "text": "## Điều đã bảo vệ và khoảng hở còn lại"
+        },
+        {
+          "line": 40,
+          "text": "## Nguồn kỹ thuật"
+        }
+      ],
+      "links": [
+        {
+          "line": 3,
+          "target": "../../B12-data-ownership-and-schema.md"
+        },
+        {
+          "line": 3,
+          "target": "../../B12-validation.md"
+        },
+        {
+          "line": 42,
+          "target": "https://www.postgresql.org/docs/16/ddl-schemas.html"
+        },
+        {
+          "line": 42,
+          "target": "https://www.postgresql.org/docs/16/ddl-constraints.html"
+        },
+        {
+          "line": 42,
+          "target": "https://www.postgresql.org/docs/16/sql-alterdefaultprivileges.html"
+        }
+      ]
+    },
+    {
+      "id": "FT-MONGO-README",
+      "kind": "design",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "149c7b08985ec97fc6d65fa845a4ea9f2de5940344b62f18130b1da20cb2c93a",
+      "bytes": 4814,
+      "line_count": 41,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\architecture\\data\\mongodb\\README.md",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/docs/architecture/data/mongodb/README.md",
+      "dirty": "",
+      "headings": [
+        {
+          "line": 1,
+          "text": "# MongoDB baseline B12"
+        }
+      ],
+      "links": [
+        {
+          "line": 3,
+          "target": "../../B12-data-ownership-and-schema.md#45-user-service"
+        },
+        {
+          "line": 41,
+          "target": "https://www.mongodb.com/docs/manual/core/schema-validation/specify-json-schema/"
+        }
+      ]
+    },
+    {
+      "id": "FT-KC-README",
+      "kind": "design",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "cb6764a512587c640002a3abd8ecff380b741900a5e2169279e85e16c5a49251",
+      "bytes": 4828,
+      "line_count": 37,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\architecture\\data\\keycloak\\README.md",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/docs/architecture/data/keycloak/README.md",
+      "dirty": "",
+      "headings": [
+        {
+          "line": 1,
+          "text": "# Keycloak baseline B12"
+        }
+      ],
+      "links": [
+        {
+          "line": 3,
+          "target": "../../B12-data-ownership-and-schema.md#6-danh-tính-và-baseline-realm"
+        },
+        {
+          "line": 25,
+          "target": "https://www.keycloak.org/server/importExport"
+        },
+        {
+          "line": 35,
+          "target": "https://www.keycloak.org/docs/latest/server_admin/#_audience"
+        }
+      ]
+    },
+    {
+      "id": "FT-AGENTS",
+      "kind": "governance",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "26c07e39918a54f0d676718c970aaadbbec070b8fd37bce6921bb6823477213a",
+      "bytes": 19224,
+      "line_count": 139,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\AGENTS.md",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/AGENTS.md",
+      "dirty": "M AGENTS.md",
+      "headings": [
+        {
+          "line": 1,
+          "text": "# Flash Ticket Platform — Project Constitution"
+        },
+        {
+          "line": 3,
+          "text": "## BẮT BUỘC ĐỌC TRƯỚC — ưu tiên đồ án khi ra quyết định"
+        },
+        {
+          "line": 15,
+          "text": "## Scope and required workflow"
+        },
+        {
+          "line": 22,
+          "text": "## Java formatting and quality gate"
+        },
+        {
+          "line": 29,
+          "text": "## Đề tài và ranh giới hai bộ tài liệu"
+        },
+        {
+          "line": 80,
+          "text": "## Authority order"
+        },
+        {
+          "line": 94,
+          "text": "## Non-negotiable phase gates"
+        },
+        {
+          "line": 109,
+          "text": "## Legacy implementation quarantine"
+        },
+        {
+          "line": 118,
+          "text": "## Decision and change control"
+        },
+        {
+          "line": 130,
+          "text": "## Handoff requirements"
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "FT-SKILL",
+      "kind": "governance",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "55b535db5c0cee3a75969662fe524e96e8e6c6d9806ad63b5a2e0ecc2aae7c8b",
+      "bytes": 8385,
+      "line_count": 116,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\.agents\\skills\\govern-capstone-work\\SKILL.md",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/.agents/skills/govern-capstone-work/SKILL.md",
+      "dirty": "",
+      "headings": [
+        {
+          "line": 6,
+          "text": "# Govern Capstone Work"
+        },
+        {
+          "line": 10,
+          "text": "## Load the minimum governing context"
+        },
+        {
+          "line": 22,
+          "text": "## Execute the governance workflow"
+        },
+        {
+          "line": 24,
+          "text": "### 1. Classify intent"
+        },
+        {
+          "line": 35,
+          "text": "### 2. Build an evidence table"
+        },
+        {
+          "line": 51,
+          "text": "### 3. Check authority and phase gates"
+        },
+        {
+          "line": 75,
+          "text": "### 4. Create an impact map"
+        },
+        {
+          "line": 87,
+          "text": "### 5. Apply minimal changes"
+        },
+        {
+          "line": 95,
+          "text": "### 6. Audit and hand off"
+        },
+        {
+          "line": 108,
+          "text": "## Stop conditions"
+        }
+      ],
+      "links": [
+        {
+          "line": 15,
+          "target": "references/project-authority-and-gates.md"
+        },
+        {
+          "line": 18,
+          "target": "references/evaluation-cases.md"
+        }
+      ]
+    },
+    {
+      "id": "FT-GATES",
+      "kind": "governance",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "59c6000e69b5a4e80836a0247e993abe869d56e7234f13de895446cb92e805fc",
+      "bytes": 7259,
+      "line_count": 87,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\.agents\\skills\\govern-capstone-work\\references\\project-authority-and-gates.md",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/.agents/skills/govern-capstone-work/references/project-authority-and-gates.md",
+      "dirty": "",
+      "headings": [
+        {
+          "line": 1,
+          "text": "# Project authority and phase gates"
+        },
+        {
+          "line": 3,
+          "text": "## Contents"
+        },
+        {
+          "line": 11,
+          "text": "## 1. Authority map"
+        },
+        {
+          "line": 25,
+          "text": "## 2. Evidence states"
+        },
+        {
+          "line": 37,
+          "text": "## 3. Phase gates"
+        },
+        {
+          "line": 58,
+          "text": "## 4. Artifact classes and review gate"
+        },
+        {
+          "line": 75,
+          "text": "## 5. Legacy comparison and B11 sub-gates"
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "FT-DT18",
+      "kind": "governance",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "321bf6afda60d0ae025e7c79c590aa36fdc0a903da63922dc417a8f61cb0f680",
+      "bytes": 3453,
+      "line_count": 28,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\evidence\\project-direction\\2026-09-18-de-tai-va-nhiem-vu.md",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/docs/evidence/project-direction/2026-09-18-de-tai-va-nhiem-vu.md",
+      "dirty": "",
+      "headings": [
+        {
+          "line": 1,
+          "text": "# Đề tài và nhiệm vụ hiện hành — 2026-09-18"
+        },
+        {
+          "line": 8,
+          "text": "## 1. Tên chính thức — `DT18-TEN`"
+        },
+        {
+          "line": 12,
+          "text": "## 2. Nhiệm vụ — nguyên văn"
+        },
+        {
+          "line": 20,
+          "text": "## 3. Mã dẫn nguồn"
+        }
+      ],
+      "links": [
+        {
+          "line": 5,
+          "target": "../../project/roles.md"
+        },
+        {
+          "line": 5,
+          "target": "../../project/decision-register.md"
+        },
+        {
+          "line": 6,
+          "target": "../advisor-direction/2026-08-22-dinh-huong-de-tai.md"
+        }
+      ]
+    },
+    {
+      "id": "FT-ROLES",
+      "kind": "governance",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "e3ba9ac5459d1ef11cc5a9b0f587f83132f0a6bbd456d68923373c740969a5af",
+      "bytes": 1310,
+      "line_count": 15,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\project\\roles.md",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/docs/project/roles.md",
+      "dirty": "",
+      "headings": [
+        {
+          "line": 1,
+          "text": "# Phạm vi phụ trách của nhóm"
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "FT-B11-C-01",
+      "kind": "design",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "73816780aaae70395bf75ae8965e6781a406dc9cae04efae9962b4b77209d534",
+      "bytes": 2794,
+      "line_count": 88,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\diagrams\\src\\B11-C-01-target-container.puml",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/docs/diagrams/src/B11-C-01-target-container.puml",
+      "dirty": "",
+      "headings": [],
+      "links": []
+    },
+    {
+      "id": "FT-B11-C-02",
+      "kind": "design",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "bba2321f57760ebb2cf2a728da7905ceda873aa76a2e0f7248703802df851f5e",
+      "bytes": 2351,
+      "line_count": 84,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\diagrams\\src\\B11-C-02-deployment-two-machines.puml",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/docs/diagrams/src/B11-C-02-deployment-two-machines.puml",
+      "dirty": "",
+      "headings": [],
+      "links": []
+    },
+    {
+      "id": "FT-B12-01",
+      "kind": "design",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "1852f07768eeb7fdfd2accc057c5a4865722d07dad3efa8a38d8e026096be9d4",
+      "bytes": 2016,
+      "line_count": 79,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\diagrams\\src\\B12-01-event-erd.puml",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/docs/diagrams/src/B12-01-event-erd.puml",
+      "dirty": "",
+      "headings": [],
+      "links": []
+    },
+    {
+      "id": "FT-B12-02",
+      "kind": "design",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "8a0ee3e56530898a811f1bf61bd3d974166ea530ffec5f53774d9d4c204574ad",
+      "bytes": 3685,
+      "line_count": 131,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\diagrams\\src\\B12-02-booking-erd.puml",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/docs/diagrams/src/B12-02-booking-erd.puml",
+      "dirty": "",
+      "headings": [],
+      "links": []
+    },
+    {
+      "id": "FT-B12-03",
+      "kind": "design",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "0ebb603dc72f77f19e605e504d0d92399f151ec6d028729d6019fcf5f51b8539",
+      "bytes": 2888,
+      "line_count": 103,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\diagrams\\src\\B12-03-payment-erd.puml",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/docs/diagrams/src/B12-03-payment-erd.puml",
+      "dirty": "",
+      "headings": [],
+      "links": []
+    },
+    {
+      "id": "FT-B12-04",
+      "kind": "design",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "d30afa63e06466cf9d57871fbc03d0b4e50f028429b6503a703d1680b573d9f4",
+      "bytes": 1744,
+      "line_count": 60,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\diagrams\\src\\B12-04-ticket-erd.puml",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/docs/diagrams/src/B12-04-ticket-erd.puml",
+      "dirty": "",
+      "headings": [],
+      "links": []
+    },
+    {
+      "id": "FT-B12-05",
+      "kind": "design",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "c098d0888dfd8025cec6ad274085b87108daa4898bf2a23ad47935712fc6bfeb",
+      "bytes": 3357,
+      "line_count": 95,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\diagrams\\src\\B12-05-user-document-map.puml",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/docs/diagrams/src/B12-05-user-document-map.puml",
+      "dirty": "",
+      "headings": [],
+      "links": []
+    },
+    {
+      "id": "FT-B14-01",
+      "kind": "design",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "c7ffa0f55a04cee73c9958f1ef80ecf0b1dae348b8a8ccbf47a211bdf1b6b412",
+      "bytes": 1637,
+      "line_count": 40,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\diagrams\\src\\B14-01-order-payment-ticket-sequence.puml",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/docs/diagrams/src/B14-01-order-payment-ticket-sequence.puml",
+      "dirty": "",
+      "headings": [],
+      "links": []
+    },
+    {
+      "id": "FT-B14-02",
+      "kind": "design",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "59c74b00e137b0160dd3c5195c1e05d7e27e3c168d556a5b9748b99f33cd45b9",
+      "bytes": 1462,
+      "line_count": 35,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\diagrams\\src\\B14-02-expiry-refund-cancellation-sequence.puml",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/docs/diagrams/src/B14-02-expiry-refund-cancellation-sequence.puml",
+      "dirty": "",
+      "headings": [],
+      "links": []
+    },
+    {
+      "id": "FT-B14-03",
+      "kind": "design",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "12cacc20b2fa779e2982afcb28743e1d16d2cd03f340ad8a6c3caab45db1851c",
+      "bytes": 1116,
+      "line_count": 28,
+      "condition": "Local content pinned; design evidence, not application/runtime verification; historical passages keep their original scope",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\diagrams\\src\\B14-03-ticket-delivery-checkin-sequence.puml",
+      "snapshot": "results/T-037/runs/nguon-001/snapshot/docs/diagrams/src/B14-03-ticket-delivery-checkin-sequence.puml",
+      "dirty": "",
+      "headings": [],
+      "links": []
+    },
+    {
+      "id": "FT-PG-BOOTSTRAP",
+      "kind": "design-derived",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "d907a921b6ea71dd174099e3a16d4d80803ba5e0562c06565c2a96951066c8ba",
+      "bytes": 3578,
+      "line_count": 65,
+      "condition": "Dẫn xuất baseline local; chỉ đối chiếu định danh/owner/ràng buộc, không là runtime",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\architecture\\data\\postgres\\00-bootstrap.sql",
+      "snapshot": "results/T-037/runs/assemble-001/snapshot/docs/architecture/data/postgres/00-bootstrap.sql",
+      "dirty": "",
+      "headings": [],
+      "links": []
+    },
+    {
+      "id": "FT-PG-EVENT",
+      "kind": "design-derived",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "a7cf9774a8986559fbba77e88c434b6ced772a3a53d4807eb80d834279fbfd13",
+      "bytes": 11232,
+      "line_count": 161,
+      "condition": "Dẫn xuất baseline local; chỉ đối chiếu định danh/owner/ràng buộc, không là runtime",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\architecture\\data\\postgres\\10-event.sql",
+      "snapshot": "results/T-037/runs/assemble-001/snapshot/docs/architecture/data/postgres/10-event.sql",
+      "dirty": "",
+      "headings": [],
+      "links": []
+    },
+    {
+      "id": "FT-PG-BOOKING",
+      "kind": "design-derived",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "6edecd5b4b5cb78b97ba3c920befc8de7d1aad5d2f4fbb5607a6d6908152340b",
+      "bytes": 15775,
+      "line_count": 193,
+      "condition": "Dẫn xuất baseline local; chỉ đối chiếu định danh/owner/ràng buộc, không là runtime",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\architecture\\data\\postgres\\20-booking.sql",
+      "snapshot": "results/T-037/runs/assemble-001/snapshot/docs/architecture/data/postgres/20-booking.sql",
+      "dirty": "",
+      "headings": [],
+      "links": []
+    },
+    {
+      "id": "FT-PG-PAYMENT",
+      "kind": "design-derived",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "743ae7e327a67e3b0a0aa7dfc185d78a05a3982f8fb213e0b604774eceaf3591",
+      "bytes": 12409,
+      "line_count": 164,
+      "condition": "Dẫn xuất baseline local; chỉ đối chiếu định danh/owner/ràng buộc, không là runtime",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\architecture\\data\\postgres\\30-payment.sql",
+      "snapshot": "results/T-037/runs/assemble-001/snapshot/docs/architecture/data/postgres/30-payment.sql",
+      "dirty": "",
+      "headings": [],
+      "links": []
+    },
+    {
+      "id": "FT-PG-TICKET",
+      "kind": "design-derived",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "7e7193d304c22e2737cbc8251b542e4461f2c42fdd97d838c68d2c117cbf2705",
+      "bytes": 6955,
+      "line_count": 95,
+      "condition": "Dẫn xuất baseline local; chỉ đối chiếu định danh/owner/ràng buộc, không là runtime",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\architecture\\data\\postgres\\40-ticket.sql",
+      "snapshot": "results/T-037/runs/assemble-001/snapshot/docs/architecture/data/postgres/40-ticket.sql",
+      "dirty": "",
+      "headings": [],
+      "links": []
+    },
+    {
+      "id": "FT-PG-GRANTS",
+      "kind": "design-derived",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "f43a40b5df50d80a0849a97ff65be3776efa18a38db13cd9a2de195e0022254c",
+      "bytes": 4154,
+      "line_count": 51,
+      "condition": "Dẫn xuất baseline local; chỉ đối chiếu định danh/owner/ràng buộc, không là runtime",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\architecture\\data\\postgres\\90-grants.sql",
+      "snapshot": "results/T-037/runs/assemble-001/snapshot/docs/architecture/data/postgres/90-grants.sql",
+      "dirty": "",
+      "headings": [],
+      "links": []
+    },
+    {
+      "id": "FT-PG-RATIONALE",
+      "kind": "design-derived",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "45e8731b102fb3637e5ce35a7a663ab2ce80ce35a29da37103d6d1254e164e12",
+      "bytes": 18265,
+      "line_count": 81,
+      "condition": "Dẫn xuất baseline local; chỉ đối chiếu định danh/owner/ràng buộc, không là runtime",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\architecture\\data\\postgres\\95-design-rationale.sql",
+      "snapshot": "results/T-037/runs/assemble-001/snapshot/docs/architecture/data/postgres/95-design-rationale.sql",
+      "dirty": "",
+      "headings": [],
+      "links": []
+    },
+    {
+      "id": "FT-MONGO-SCHEMA",
+      "kind": "design-derived",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "d2566826531352378da1188b02e738ce61b6336e4987420d19b9fcbfc27a7e9e",
+      "bytes": 4328,
+      "line_count": 101,
+      "condition": "Dẫn xuất baseline local; chỉ đối chiếu định danh/owner/ràng buộc, không là runtime",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\architecture\\data\\mongodb\\schema.cjs",
+      "snapshot": "results/T-037/runs/assemble-001/snapshot/docs/architecture/data/mongodb/schema.cjs",
+      "dirty": "",
+      "headings": [],
+      "links": []
+    },
+    {
+      "id": "FT-MONGO-BOOTSTRAP",
+      "kind": "design-derived",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "9d3e32b70d2fafea2fa5c61bce93c30c5932f45cf7dc10374fb6dd728a47ceb3",
+      "bytes": 1326,
+      "line_count": 20,
+      "condition": "Dẫn xuất baseline local; chỉ đối chiếu định danh/owner/ràng buộc, không là runtime",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\architecture\\data\\mongodb\\bootstrap.js",
+      "snapshot": "results/T-037/runs/assemble-001/snapshot/docs/architecture/data/mongodb/bootstrap.js",
+      "dirty": "",
+      "headings": [],
+      "links": []
+    },
+    {
+      "id": "FT-KC-REALM",
+      "kind": "design-derived",
+      "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac",
+      "sha256": "70a2fb9a46d73ef20158f287d7821c653c78459035eb277d65ca2c6fe931e9c8",
+      "bytes": 3668,
+      "line_count": 115,
+      "condition": "Dẫn xuất baseline local; chỉ đối chiếu định danh/owner/ràng buộc, không là runtime",
+      "path": "D:\\Project\\flash-ticket-platform\\docs\\architecture\\data\\keycloak\\flash-ticket-realm.candidate.json",
+      "snapshot": "results/T-037/runs/assemble-001/snapshot/docs/architecture/data/keycloak/flash-ticket-realm.candidate.json",
+      "dirty": "",
+      "headings": [],
+      "links": []
+    }
+  ],
+  "platform_dirty_state": "M AGENTS.md\n M README.md\n M docs/research-rca/CURRENT-STATE.md\n M docs/research-rca/MASTER-RESEARCH-PROGRAM.md\n M docs/research-rca/README.md\n M docs/research-rca/RESEARCH-DECISIONS.md\n M docs/research-rca/SESSION-BOOTSTRAP.md",
+  "new_download_bytes": 0,
+  "decompressed_bytes": 0,
+  "source_closure_complete": true,
+  "derived_scope": [
+    {
+      "path": "docs/architecture/data/keycloak/flash-ticket-realm.candidate.json",
+      "bytes": 3668,
+      "status": "content_read_and_crosschecked",
+      "reason": "Read definition from local baseline against B12 ownership/dictionary; no execution",
+      "impact": "No new runtime nodes inferred from fields/client IDs or SQL FK"
+    },
+    {
+      "path": "docs/architecture/data/keycloak/test-live.mjs",
+      "bytes": 4165,
+      "status": "excluded_test_execution_material",
+      "reason": "No app/runtime or test data opened; not required to reproduce SMTP blocker; detailed source coverage remains incomplete",
+      "impact": "Cannot claim derived baseline code/config coverage or runtime readiness from this session"
+    },
+    {
+      "path": "docs/architecture/data/keycloak/test-static.cjs",
+      "bytes": 3624,
+      "status": "excluded_test_execution_material",
+      "reason": "No app/runtime or test data opened; not required to reproduce SMTP blocker; detailed source coverage remains incomplete",
+      "impact": "Cannot claim derived baseline code/config coverage or runtime readiness from this session"
+    },
+    {
+      "path": "docs/architecture/data/mongodb/bootstrap.js",
+      "bytes": 1326,
+      "status": "content_read_and_crosschecked",
+      "reason": "Read definition from local baseline against B12 ownership/dictionary; no execution",
+      "impact": "No new runtime nodes inferred from fields/client IDs or SQL FK"
+    },
+    {
+      "path": "docs/architecture/data/mongodb/schema.cjs",
+      "bytes": 4328,
+      "status": "content_read_and_crosschecked",
+      "reason": "Read definition from local baseline against B12 ownership/dictionary; no execution",
+      "impact": "No new runtime nodes inferred from fields/client IDs or SQL FK"
+    },
+    {
+      "path": "docs/architecture/data/mongodb/test-live.js",
+      "bytes": 5912,
+      "status": "excluded_test_execution_material",
+      "reason": "No app/runtime or test data opened; not required to reproduce SMTP blocker; detailed source coverage remains incomplete",
+      "impact": "Cannot claim derived baseline code/config coverage or runtime readiness from this session"
+    },
+    {
+      "path": "docs/architecture/data/mongodb/test-preflight.cjs",
+      "bytes": 2678,
+      "status": "excluded_test_execution_material",
+      "reason": "No app/runtime or test data opened; not required to reproduce SMTP blocker; detailed source coverage remains incomplete",
+      "impact": "Cannot claim derived baseline code/config coverage or runtime readiness from this session"
+    },
+    {
+      "path": "docs/architecture/data/mongodb/test-static.cjs",
+      "bytes": 2617,
+      "status": "excluded_test_execution_material",
+      "reason": "No app/runtime or test data opened; not required to reproduce SMTP blocker; detailed source coverage remains incomplete",
+      "impact": "Cannot claim derived baseline code/config coverage or runtime readiness from this session"
+    },
+    {
+      "path": "docs/architecture/data/postgres/00-bootstrap.sql",
+      "bytes": 3578,
+      "status": "content_read_and_crosschecked",
+      "reason": "Read definition from local baseline against B12 ownership/dictionary; no execution",
+      "impact": "No new runtime nodes inferred from fields/client IDs or SQL FK"
+    },
+    {
+      "path": "docs/architecture/data/postgres/10-event.sql",
+      "bytes": 11232,
+      "status": "content_read_and_crosschecked",
+      "reason": "Read definition from local baseline against B12 ownership/dictionary; no execution",
+      "impact": "No new runtime nodes inferred from fields/client IDs or SQL FK"
+    },
+    {
+      "path": "docs/architecture/data/postgres/20-booking.sql",
+      "bytes": 15775,
+      "status": "content_read_and_crosschecked",
+      "reason": "Read definition from local baseline against B12 ownership/dictionary; no execution",
+      "impact": "No new runtime nodes inferred from fields/client IDs or SQL FK"
+    },
+    {
+      "path": "docs/architecture/data/postgres/30-payment.sql",
+      "bytes": 12409,
+      "status": "content_read_and_crosschecked",
+      "reason": "Read definition from local baseline against B12 ownership/dictionary; no execution",
+      "impact": "No new runtime nodes inferred from fields/client IDs or SQL FK"
+    },
+    {
+      "path": "docs/architecture/data/postgres/40-ticket.sql",
+      "bytes": 6955,
+      "status": "content_read_and_crosschecked",
+      "reason": "Read definition from local baseline against B12 ownership/dictionary; no execution",
+      "impact": "No new runtime nodes inferred from fields/client IDs or SQL FK"
+    },
+    {
+      "path": "docs/architecture/data/postgres/90-grants.sql",
+      "bytes": 4154,
+      "status": "content_read_and_crosschecked",
+      "reason": "Read definition from local baseline against B12 ownership/dictionary; no execution",
+      "impact": "No new runtime nodes inferred from fields/client IDs or SQL FK"
+    },
+    {
+      "path": "docs/architecture/data/postgres/95-design-rationale.sql",
+      "bytes": 18265,
+      "status": "content_read_and_crosschecked",
+      "reason": "Read definition from local baseline against B12 ownership/dictionary; no execution",
+      "impact": "No new runtime nodes inferred from fields/client IDs or SQL FK"
+    },
+    {
+      "path": "docs/architecture/data/postgres/Run-LocalTests.ps1",
+      "bytes": 4780,
+      "status": "excluded_test_execution_material",
+      "reason": "No app/runtime or test data opened; not required to reproduce SMTP blocker; detailed source coverage remains incomplete",
+      "impact": "Cannot claim derived baseline code/config coverage or runtime readiness from this session"
+    },
+    {
+      "path": "docs/architecture/data/postgres/Run-PortableTests.ps1",
+      "bytes": 5235,
+      "status": "excluded_test_execution_material",
+      "reason": "No app/runtime or test data opened; not required to reproduce SMTP blocker; detailed source coverage remains incomplete",
+      "impact": "Cannot claim derived baseline code/config coverage or runtime readiness from this session"
+    },
+    {
+      "path": "docs/architecture/data/postgres/tests/assertions.sql",
+      "bytes": 536,
+      "status": "excluded_test_execution_material",
+      "reason": "No app/runtime or test data opened; not required to reproduce SMTP blocker; detailed source coverage remains incomplete",
+      "impact": "Cannot claim derived baseline code/config coverage or runtime readiness from this session"
+    },
+    {
+      "path": "docs/architecture/data/postgres/tests/booking-fixture.sql",
+      "bytes": 2228,
+      "status": "excluded_test_execution_material",
+      "reason": "No app/runtime or test data opened; not required to reproduce SMTP blocker; detailed source coverage remains incomplete",
+      "impact": "Cannot claim derived baseline code/config coverage or runtime readiness from this session"
+    },
+    {
+      "path": "docs/architecture/data/postgres/tests/catalog.sql",
+      "bytes": 4546,
+      "status": "excluded_test_execution_material",
+      "reason": "No app/runtime or test data opened; not required to reproduce SMTP blocker; detailed source coverage remains incomplete",
+      "impact": "Cannot claim derived baseline code/config coverage or runtime readiness from this session"
+    },
+    {
+      "path": "docs/architecture/data/postgres/tests/constraints.sql",
+      "bytes": 11946,
+      "status": "excluded_test_execution_material",
+      "reason": "No app/runtime or test data opened; not required to reproduce SMTP blocker; detailed source coverage remains incomplete",
+      "impact": "Cannot claim derived baseline code/config coverage or runtime readiness from this session"
+    },
+    {
+      "path": "docs/architecture/data/postgres/tests/event-fixture.sql",
+      "bytes": 1254,
+      "status": "excluded_test_execution_material",
+      "reason": "No app/runtime or test data opened; not required to reproduce SMTP blocker; detailed source coverage remains incomplete",
+      "impact": "Cannot claim derived baseline code/config coverage or runtime readiness from this session"
+    },
+    {
+      "path": "docs/architecture/data/postgres/tests/payment-fixture.sql",
+      "bytes": 2125,
+      "status": "excluded_test_execution_material",
+      "reason": "No app/runtime or test data opened; not required to reproduce SMTP blocker; detailed source coverage remains incomplete",
+      "impact": "Cannot claim derived baseline code/config coverage or runtime readiness from this session"
+    },
+    {
+      "path": "docs/architecture/data/postgres/tests/runtime.sql",
+      "bytes": 2225,
+      "status": "excluded_test_execution_material",
+      "reason": "No app/runtime or test data opened; not required to reproduce SMTP blocker; detailed source coverage remains incomplete",
+      "impact": "Cannot claim derived baseline code/config coverage or runtime readiness from this session"
+    },
+    {
+      "path": "docs/architecture/data/postgres/tests/ticket-fixture.sql",
+      "bytes": 1748,
+      "status": "excluded_test_execution_material",
+      "reason": "No app/runtime or test data opened; not required to reproduce SMTP blocker; detailed source coverage remains incomplete",
+      "impact": "Cannot claim derived baseline code/config coverage or runtime readiness from this session"
+    },
+    {
+      "path": "docs/architecture/data/test-static.cjs",
+      "bytes": 6330,
+      "status": "excluded_test_execution_material",
+      "reason": "No app/runtime or test data opened; not required to reproduce SMTP blocker; detailed source coverage remains incomplete",
+      "impact": "Cannot claim derived baseline code/config coverage or runtime readiness from this session"
+    }
+  ],
+  "exclusions": [
+    {
+      "source": "legacy repo/B5.5/B11-B/archive",
+      "reason": "Not authorized and not design-formation evidence; references in current docs remain historical, no source code inspected",
+      "impact": "No claim of legacy implementation reuse or runtime equivalence"
+    },
+    {
+      "source": "external documentation links in B16",
+      "reason": "No new source download authorized; this task uses the pinned local baseline, no new technical claims from those URLs",
+      "impact": "Instrumentation/exporter behavior still needs P9 validation"
+    },
+    {
+      "source": "B12-validation/B15/implementation-readiness",
+      "reason": "Runtime status is explicitly not verified; not used to add graph operations",
+      "impact": "No runtime acceptance claim"
+    },
+    {
+      "source": "unrelated upstream domain/research documents",
+      "reason": "B11-C/B12/B13/B14/B16 supply target design scope; no design changes or reinterpretation of requirements",
+      "impact": "If a concrete requirement needs such a source, it must be read/pinned before concluding coverage"
+    },
+    {
+      "source": "Other platform tree, build/deployment implementations not referenced as current design",
+      "reason": "This is a target-design model; no new application runtime supplied; source unit registry defines the scope explicitly",
+      "impact": "No claim of complete runtime inventory/observed deployment"
+    },
+    {
+      "source": "Other platform tree, build/deployment implementations not referenced as current design",
+      "reason": "This is a target-design model; no new application runtime supplied; source unit registry defines the scope explicitly",
+      "impact": "No claim of complete runtime inventory/observed deployment"
+    }
+  ],
+  "input_manifest": "results/T-037/runs/tu-ra-001/preflight.json",
+  "source_notes": [
+    "B11-C §1 delegates endpoints/topics/sequences to B13/B14; diagram arrows cannot independently prove transport or direct call.",
+    "B14 diagram Gateway is payment gateway by createPayment/IPN/refund context.",
+    "APPROVED design headers do not turn candidate realm or OPEN runtime readiness into observed state."
+  ],
+  "source_closure_meaning": "Closed for selected target-design B11-C/B12/B13/B14/B16 and directly relevant diagrams/baseline definitions; not entire platform tree/runtime or upstream domain re-design"
+}

@@ -1,0 +1,785 @@
+{
+  "scope": {
+    "system": "FlashTicket",
+    "revision": "98d5ad5546244e5e7e29b41dbef92d454f50a7ac"
+  },
+  "entities": [],
+  "operations": [],
+  "relations": [
+    {
+      "id": "detail-data-create-order",
+      "source": {
+        "entity": "booking-service",
+        "operation": "POST /orders"
+      },
+      "target": {
+        "entity": "booking_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B14",
+          "locator": "L24-L28",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§2",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "detail-data-promotion",
+      "source": {
+        "entity": "booking-service",
+        "operation": "POST /orders/{orderId}/promotion"
+      },
+      "target": {
+        "entity": "booking_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B14",
+          "locator": "L29",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§2",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "detail-data-cancel-order",
+      "source": {
+        "entity": "booking-service",
+        "operation": "POST /orders/{orderId}/cancel"
+      },
+      "target": {
+        "entity": "booking_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B14",
+          "locator": "L59-L61",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§2",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "detail-data-freeze",
+      "source": {
+        "entity": "booking-service",
+        "operation": "POST /internal/v1/orders/{id}/freeze-payment"
+      },
+      "target": {
+        "entity": "booking_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B14",
+          "locator": "L30",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§2",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "detail-data-expiry",
+      "source": {
+        "entity": "booking-service",
+        "operation": "Worker tìm đơn PENDING_PAYMENT đến hạn"
+      },
+      "target": {
+        "entity": "booking_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B14",
+          "locator": "L59-L61",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§2",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "detail-data-failed-release",
+      "source": {
+        "entity": "booking-service",
+        "operation": "Booking nhận FAILED"
+      },
+      "target": {
+        "entity": "booking_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B14",
+          "locator": "L53",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§2",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "detail-data-attempt",
+      "source": {
+        "entity": "payment-service",
+        "operation": "POST /orders/{orderId}/payment-attempts"
+      },
+      "target": {
+        "entity": "payment_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B14",
+          "locator": "L31",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§2",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "detail-data-charge",
+      "source": {
+        "entity": "payment-service",
+        "operation": "Chọn một candidate charge/order"
+      },
+      "target": {
+        "entity": "payment_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B14",
+          "locator": "L39-L40",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§2",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "detail-data-confirmation",
+      "source": {
+        "entity": "payment-service",
+        "operation": "tạo confirmation unique(order,charge)"
+      },
+      "target": {
+        "entity": "payment_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B14",
+          "locator": "L43",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§2",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "detail-data-refund-claim",
+      "source": {
+        "entity": "payment-service",
+        "operation": "Transaction claim refund"
+      },
+      "target": {
+        "entity": "payment_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B14",
+          "locator": "L63",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§2",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "detail-data-refund-run",
+      "source": {
+        "entity": "payment-service",
+        "operation": "tạo event_refund_run duy nhất/cancellation"
+      },
+      "target": {
+        "entity": "payment_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B14",
+          "locator": "L73-L75",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§2",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "detail-data-saga-result",
+      "source": {
+        "entity": "payment-service",
+        "operation": "Nhận COMPLETED hợp lệ"
+      },
+      "target": {
+        "entity": "payment_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B14",
+          "locator": "L46",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§2",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "detail-data-reconciliation",
+      "source": {
+        "entity": "payment-service",
+        "operation": "đối soát thủ công"
+      },
+      "target": {
+        "entity": "payment_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B14",
+          "locator": "L96-L98",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§2",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "detail-data-event-cancel",
+      "source": {
+        "entity": "event-service",
+        "operation": "chốt CANCELLED + cancellationId/outbox"
+      },
+      "target": {
+        "entity": "event_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B14",
+          "locator": "L69",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§2",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "detail-data-terminal-fence",
+      "source": {
+        "entity": "ticket-service",
+        "operation": "ghi FAILED/failed_at/failure_code và outbox FAILED"
+      },
+      "target": {
+        "entity": "ticket_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B14",
+          "locator": "L51",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§2",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "detail-data-delivery-claim",
+      "source": {
+        "entity": "ticket-service",
+        "operation": "Worker claim bằng khóa hàng/lease"
+      },
+      "target": {
+        "entity": "ticket_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B14",
+          "locator": "L82",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§2",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "detail-data-checkin",
+      "source": {
+        "entity": "ticket-service",
+        "operation": "POST /api/v1/events/{eventId}/check-ins"
+      },
+      "target": {
+        "entity": "ticket_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B14",
+          "locator": "L84",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§2",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "detail-data-qr-read",
+      "source": {
+        "entity": "ticket-service",
+        "operation": "GET /tickets/{ticketId}/qr"
+      },
+      "target": {
+        "entity": "ticket_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "L197",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§2",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "detail-data-role-worker",
+      "source": {
+        "entity": "user-service",
+        "operation": "Worker quét PENDING có roleGrant"
+      },
+      "target": {
+        "entity": "user_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "L292",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§2",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "detail-data-projection",
+      "source": {
+        "entity": "user-service",
+        "operation": "Worker quét ACTIVE"
+      },
+      "target": {
+        "entity": "user_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Thao tác đọc/ghi cục bộ được nguồn mô tả; cùng owner/DB, giữ transaction/deadline/retry/state guard tại nguồn, chưa là SQL/span runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B13",
+          "locator": "L292",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§2",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "detail-outbox-data-event-service",
+      "source": {
+        "entity": "event-service",
+        "operation": "Relay chọn unpublished theo next_attempt_at"
+      },
+      "target": {
+        "entity": "event_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Relay đọc outbox cùng DB owner, chọn next_attempt_at/SKIP LOCKED; publisher confirm mới published_at; crash có thể publish lại. Không ghép trace bằng correlation",
+      "provenance": [
+        {
+          "source_id": "FT-B14",
+          "locator": "L90-L92",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§4",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "detail-outbox-data-booking-service",
+      "source": {
+        "entity": "booking-service",
+        "operation": "Relay chọn unpublished theo next_attempt_at"
+      },
+      "target": {
+        "entity": "booking_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Relay đọc outbox cùng DB owner, chọn next_attempt_at/SKIP LOCKED; publisher confirm mới published_at; crash có thể publish lại. Không ghép trace bằng correlation",
+      "provenance": [
+        {
+          "source_id": "FT-B14",
+          "locator": "L90-L92",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§4",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "detail-outbox-data-payment-service",
+      "source": {
+        "entity": "payment-service",
+        "operation": "Relay chọn unpublished theo next_attempt_at"
+      },
+      "target": {
+        "entity": "payment_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Relay đọc outbox cùng DB owner, chọn next_attempt_at/SKIP LOCKED; publisher confirm mới published_at; crash có thể publish lại. Không ghép trace bằng correlation",
+      "provenance": [
+        {
+          "source_id": "FT-B14",
+          "locator": "L90-L92",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§4",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "detail-outbox-data-ticket-service",
+      "source": {
+        "entity": "ticket-service",
+        "operation": "Relay chọn unpublished theo next_attempt_at"
+      },
+      "target": {
+        "entity": "ticket_db",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Relay đọc outbox cùng DB owner, chọn next_attempt_at/SKIP LOCKED; publisher confirm mới published_at; crash có thể publish lại. Không ghép trace bằng correlation",
+      "provenance": [
+        {
+          "source_id": "FT-B14",
+          "locator": "L90-L92",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B12",
+          "locator": "§4",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "obs-read-tempo",
+      "source": {
+        "entity": "rca",
+        "operation": null
+      },
+      "target": {
+        "entity": "tempo",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "RCA chỉ đọc kho quan sát; data biểu diễn phụ thuộc dữ liệu, không khẳng định protocol/endpoint/operation runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§5",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§6",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "obs-read-loki",
+      "source": {
+        "entity": "rca",
+        "operation": null
+      },
+      "target": {
+        "entity": "loki",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "RCA chỉ đọc kho quan sát; data biểu diễn phụ thuộc dữ liệu, không khẳng định protocol/endpoint/operation runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§5",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§6",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "obs-read-prometheus",
+      "source": {
+        "entity": "rca",
+        "operation": null
+      },
+      "target": {
+        "entity": "prometheus",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "RCA chỉ đọc kho quan sát; data biểu diễn phụ thuộc dữ liệu, không khẳng định protocol/endpoint/operation runtime",
+      "provenance": [
+        {
+          "source_id": "FT-B11",
+          "locator": "§5",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        },
+        {
+          "source_id": "FT-B16",
+          "locator": "§6",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "obs-write-tempo",
+      "source": {
+        "entity": "otel-collector",
+        "operation": null
+      },
+      "target": {
+        "entity": "tempo",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Đường xuất baseline của collector tới kho trace/log; protocol receiver/exporter và endpoint cụ thể OPEN. Không giả định mọi log/trace đã thu đủ",
+      "provenance": [
+        {
+          "source_id": "FT-B16",
+          "locator": "L24",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    },
+    {
+      "id": "obs-write-loki",
+      "source": {
+        "entity": "otel-collector",
+        "operation": null
+      },
+      "target": {
+        "entity": "loki",
+        "operation": null
+      },
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "context": "Đường xuất baseline của collector tới kho trace/log; protocol receiver/exporter và endpoint cụ thể OPEN. Không giả định mọi log/trace đã thu đủ",
+      "provenance": [
+        {
+          "source_id": "FT-B16",
+          "locator": "L24",
+          "condition": "Thiết kế có nguồn; chưa kiểm runtime"
+        }
+      ]
+    }
+  ],
+  "resource_bindings": [],
+  "signals": []
+}

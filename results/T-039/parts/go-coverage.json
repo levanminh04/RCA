@@ -1,0 +1,1632 @@
+{
+  "task": "T-039",
+  "role": "implementation_source_fragment_not_official_review",
+  "owned_services": [
+    "frontend",
+    "checkoutservice",
+    "productcatalogservice",
+    "shippingservice",
+    "loadgenerator"
+  ],
+  "scope": {
+    "system": "Nezha-OB",
+    "revision": "94a01ba4c7c79e0c0b2c9da073ba081fcedc4bf1"
+  },
+  "input_acquisition": "results/T-039/runs/thu-nguon-001/acquisition.json",
+  "input_manifest": "results/T-039/manifest.json",
+  "pin_validation": {
+    "status": "blocked_reported_by_root",
+    "reason": "Root báo src/do_thi_tinh/build.py đã đổi ngoài pin, thêm smtp; không import/build/validate shared code sau thông báo và không tự chuyển snapshot. Fragment dùng schema T036 đã đọc trước đó; root phân xử pin trước kết quả phụ thuộc.",
+    "shared_code_executed": false
+  },
+  "source_selection_basis": "toàn nguồn đã thu của năm thư mục service + interface/generated + cấu hình endpoint; không dùng graph/trace/nhãn để chọn operation/relation",
+  "files": [
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/checkoutservice/.dockerignore",
+      "source_path": "src/checkoutservice/.dockerignore",
+      "bytes": 8,
+      "sha256": "e15b1b0e0f10012abb6f06891455da689a7a4ff323b70ce46144d8611b7d4d8a",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/checkoutservice/Dockerfile",
+      "source_path": "src/checkoutservice/Dockerfile",
+      "bytes": 2055,
+      "sha256": "66da45726f994724d1a0148dadff09d7698c8fdc18c4d53e02845fa3f04bd5df",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "source_text_scan",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/checkoutservice/README.md",
+      "source_path": "src/checkoutservice/README.md",
+      "bytes": 1111,
+      "sha256": "efb567eb1a29b0d8a1d6bbebfea220177a4ea4ba0ee282c961820f8f6fd25cc2",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/checkoutservice/binding__failpoint_binding__.go",
+      "source_path": "src/checkoutservice/binding__failpoint_binding__.go",
+      "bytes": 336,
+      "sha256": "8ea1519e98c357cea2e5264211ec9ec80a29153f088657196b0b5b2505fee549",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/checkoutservice/fault.yaml",
+      "source_path": "src/checkoutservice/fault.yaml",
+      "bytes": 699,
+      "sha256": "22f82809a928fc47d209a7396715743367ed75c8476cc38b7b23a7d7af0cf589",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/checkoutservice/genproto.sh",
+      "source_path": "src/checkoutservice/genproto.sh",
+      "bytes": 708,
+      "sha256": "cf95024fdbc282148bd22dcaf23d3f2c5221548606bdccd530de6910e855a841",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/checkoutservice/genproto/demo.pb.go",
+      "source_path": "src/checkoutservice/genproto/demo.pb.go",
+      "bytes": 90239,
+      "sha256": "9c9a4b4761a71783126eebb9bf9d4c8aa40cc2685f978a76952eefceab84f07f",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "selective_generated_method_descriptor_review",
+      "impact": "Đọc header/metadata, import/function index, Invoke literals, handlers/fullMethod/ServiceDesc; không dùng serialization boilerplate làm quan hệ; generated copies cùng hash, genproto.sh trỏ pb/demo.proto.",
+      "details": {
+        "full_rpc_literals": [
+          "/hipstershop.AdService/GetAds",
+          "/hipstershop.CartService/AddItem",
+          "/hipstershop.CartService/EmptyCart",
+          "/hipstershop.CartService/GetCart",
+          "/hipstershop.CheckoutService/PlaceOrder",
+          "/hipstershop.CurrencyService/Convert",
+          "/hipstershop.CurrencyService/GetSupportedCurrencies",
+          "/hipstershop.EmailService/SendOrderConfirmation",
+          "/hipstershop.PaymentService/Charge",
+          "/hipstershop.ProductCatalogService/GetProduct",
+          "/hipstershop.ProductCatalogService/ListProducts",
+          "/hipstershop.ProductCatalogService/SearchProducts",
+          "/hipstershop.RecommendationService/ListRecommendations",
+          "/hipstershop.ShippingService/GetQuote",
+          "/hipstershop.ShippingService/ShipOrder"
+        ],
+        "generated_by": "protoc-gen-go",
+        "input": "pb/demo.proto",
+        "serialization_boilerplate_not_line_by_line_reviewed": true
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/checkoutservice/go.mod",
+      "source_path": "src/checkoutservice/go.mod",
+      "bytes": 1399,
+      "sha256": "801206e27c7aacae1d22e4824ba52ac3b488d329452c95cd1eb372ec7c77abbd",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/checkoutservice/main.go",
+      "source_path": "src/checkoutservice/main.go",
+      "bytes": 21344,
+      "sha256": "80857f3b2488135daecb6f3c0002038c2c37badfa38a413ff3223c6ea85a3c22",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/checkoutservice/main.go__failpoint_stash__",
+      "source_path": "src/checkoutservice/main.go__failpoint_stash__",
+      "bytes": 22453,
+      "sha256": "a32f9210167f93f312d5996aca4ad776b21eff6f729f6be7674276418e158aaf",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "diff_against_live_source",
+      "impact": "Đọc diff với .go active; khác fault-injection/log và nhánh tài nguyên cục bộ. Đuôi stash không .go, Docker go build . không biên dịch như source active; không thêm operations/relations từ stash.",
+      "details": {
+        "active_source": "src/checkoutservice/main.go"
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/checkoutservice/money/money.go",
+      "source_path": "src/checkoutservice/money/money.go",
+      "bytes": 3990,
+      "sha256": "c7e81c0e8e24cafce6ccf35b9846d76cea114969998355db34d01169687e67f3",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/checkoutservice/money/money_test.go",
+      "source_path": "src/checkoutservice/money/money_test.go",
+      "bytes": 7927,
+      "sha256": "a975381b0fec7a2a83f8ec83730157f91958de7577f03a1675300d015f027055",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "unit_test_import_and_test_function_scan",
+      "impact": "Test source chỉ hỗ trợ kiểm coverage; không được go build . đưa vào binary; chưa chạy test hoặc dùng test làm bằng chứng runtime/ca dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/.dockerignore",
+      "source_path": "src/frontend/.dockerignore",
+      "bytes": 8,
+      "sha256": "e15b1b0e0f10012abb6f06891455da689a7a4ff323b70ce46144d8611b7d4d8a",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/.gitkeep",
+      "source_path": "src/frontend/.gitkeep",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/Dockerfile",
+      "source_path": "src/frontend/Dockerfile",
+      "bytes": 1842,
+      "sha256": "603323f164197369d1ae0faf7caf91beeb41cee294da9bfb2a1c9b640ec14cbf",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "source_text_scan",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/README.md",
+      "source_path": "src/frontend/README.md",
+      "bytes": 945,
+      "sha256": "2bd258ee575fe5b9de9cf349e7117b2857765ab3756193f3e8f13898692cea41",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/binding__failpoint_binding__.go",
+      "source_path": "src/frontend/binding__failpoint_binding__.go",
+      "bytes": 336,
+      "sha256": "8ea1519e98c357cea2e5264211ec9ec80a29153f088657196b0b5b2505fee549",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/fault.yaml",
+      "source_path": "src/frontend/fault.yaml",
+      "bytes": 719,
+      "sha256": "6a49fc6861cc6bdfd6e4876822712a7b6ef0b03984ed2d15fe41e8b34a11b390",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/genproto.sh",
+      "source_path": "src/frontend/genproto.sh",
+      "bytes": 708,
+      "sha256": "cf95024fdbc282148bd22dcaf23d3f2c5221548606bdccd530de6910e855a841",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/genproto/demo.pb.go",
+      "source_path": "src/frontend/genproto/demo.pb.go",
+      "bytes": 90239,
+      "sha256": "9c9a4b4761a71783126eebb9bf9d4c8aa40cc2685f978a76952eefceab84f07f",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "selective_generated_method_descriptor_review",
+      "impact": "Đọc header/metadata, import/function index, Invoke literals, handlers/fullMethod/ServiceDesc; không dùng serialization boilerplate làm quan hệ; generated copies cùng hash, genproto.sh trỏ pb/demo.proto.",
+      "details": {
+        "full_rpc_literals": [
+          "/hipstershop.AdService/GetAds",
+          "/hipstershop.CartService/AddItem",
+          "/hipstershop.CartService/EmptyCart",
+          "/hipstershop.CartService/GetCart",
+          "/hipstershop.CheckoutService/PlaceOrder",
+          "/hipstershop.CurrencyService/Convert",
+          "/hipstershop.CurrencyService/GetSupportedCurrencies",
+          "/hipstershop.EmailService/SendOrderConfirmation",
+          "/hipstershop.PaymentService/Charge",
+          "/hipstershop.ProductCatalogService/GetProduct",
+          "/hipstershop.ProductCatalogService/ListProducts",
+          "/hipstershop.ProductCatalogService/SearchProducts",
+          "/hipstershop.RecommendationService/ListRecommendations",
+          "/hipstershop.ShippingService/GetQuote",
+          "/hipstershop.ShippingService/ShipOrder"
+        ],
+        "generated_by": "protoc-gen-go",
+        "input": "pb/demo.proto",
+        "serialization_boilerplate_not_line_by_line_reviewed": true
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/go.mod",
+      "source_path": "src/frontend/go.mod",
+      "bytes": 1510,
+      "sha256": "a0a915f31dd265f58d549b8d0c9350c2c443abcef3f09d1153a51e1c677aa07a",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/handlers.go",
+      "source_path": "src/frontend/handlers.go",
+      "bytes": 21397,
+      "sha256": "6b3b0bba375694f5cfbc28ccba370e751ff55d170bc2021536e343aa1197d55f",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/handlers.go__failpoint_stash__",
+      "source_path": "src/frontend/handlers.go__failpoint_stash__",
+      "bytes": 22375,
+      "sha256": "33b16474eb76a1ffeafeb477f07f79e5b9439231e77eb5f647f125e8aeefc5b7",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "diff_against_live_source",
+      "impact": "Đọc diff với .go active; khác fault-injection/log và nhánh tài nguyên cục bộ. Đuôi stash không .go, Docker go build . không biên dịch như source active; không thêm operations/relations từ stash.",
+      "details": {
+        "active_source": "src/frontend/handlers.go"
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/main.go",
+      "source_path": "src/frontend/main.go",
+      "bytes": 7703,
+      "sha256": "52d3b97e79cffa0f406053e886805804f27e04f458e067d7d4c8e502127ad6b1",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/middleware.go",
+      "source_path": "src/frontend/middleware.go",
+      "bytes": 2921,
+      "sha256": "f1c0b6d6d915170d624e430883c1157ae3679893c42143f7e7833d889dd2e870",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/money/money.go",
+      "source_path": "src/frontend/money/money.go",
+      "bytes": 3983,
+      "sha256": "0fbc88a9b0ed94a94f22e853850b15f693c3a13b2ac1add443e2ccd70db0e83c",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/money/money_test.go",
+      "source_path": "src/frontend/money/money_test.go",
+      "bytes": 7920,
+      "sha256": "e28ed8c745887282862aee796d5266007855b28bf67871b1f37a5eb10fe02fdb",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "unit_test_import_and_test_function_scan",
+      "impact": "Test source chỉ hỗ trợ kiểm coverage; không được go build . đưa vào binary; chưa chạy test hoặc dùng test làm bằng chứng runtime/ca dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/rpc.go",
+      "source_path": "src/frontend/rpc.go",
+      "bytes": 4215,
+      "sha256": "90166fadf29d20497a3b75641b2954f7f07fb802b6a4703469e55e2cadd576c3",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/favicon.ico",
+      "source_path": "src/frontend/static/favicon.ico",
+      "bytes": 16958,
+      "sha256": "3b3566f318207ee000438575a00de50099933762f97ad20ce240f79dbf47ba29",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "hash_only_excluded_binary_asset",
+      "impact": "Asset raster/favicon chỉ được static file server phục vụ; không có executable server routing; chưa kiểm nội dung hình.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/icons/Hipster_Advert2.svg",
+      "source_path": "src/frontend/static/icons/Hipster_Advert2.svg",
+      "bytes": 19477,
+      "sha256": "a9a9e31393a612e5cfada31124f29ce4605777ceed772517284c915147565f9b",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "xml_asset_scan",
+      "impact": "Đã parse toàn XML, không thấy script/foreignObject/event handler/external href/src; không thêm server edge.",
+      "details": {
+        "xml_elements": 30,
+        "active_or_external": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/icons/Hipster_CartIcon.svg",
+      "source_path": "src/frontend/static/icons/Hipster_CartIcon.svg",
+      "bytes": 619,
+      "sha256": "187b79bcf85ab01d421ea7176e60ecab1ef7412f3dbcb3c7db40f214451fb9e5",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "xml_asset_scan",
+      "impact": "Đã parse toàn XML, không thấy script/foreignObject/event handler/external href/src; không thêm server edge.",
+      "details": {
+        "xml_elements": 7,
+        "active_or_external": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/icons/Hipster_CheckOutIcon.svg",
+      "source_path": "src/frontend/static/icons/Hipster_CheckOutIcon.svg",
+      "bytes": 462,
+      "sha256": "9f24b58eef295cbf0d3826c9549252b3f37c24644e4153c73e2034344f37c8e6",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "xml_asset_scan",
+      "impact": "Đã parse toàn XML, không thấy script/foreignObject/event handler/external href/src; không thêm server edge.",
+      "details": {
+        "xml_elements": 7,
+        "active_or_external": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/icons/Hipster_CurrencyIcon.svg",
+      "source_path": "src/frontend/static/icons/Hipster_CurrencyIcon.svg",
+      "bytes": 630,
+      "sha256": "ed8bc7b756cf255166962b142826a4483bad5f109ef90b3041e6c81b40c280fa",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "xml_asset_scan",
+      "impact": "Đã parse toàn XML, không thấy script/foreignObject/event handler/external href/src; không thêm server edge.",
+      "details": {
+        "xml_elements": 7,
+        "active_or_external": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/icons/Hipster_DownArrow.svg",
+      "source_path": "src/frontend/static/icons/Hipster_DownArrow.svg",
+      "bytes": 230,
+      "sha256": "8328d247d28637f3d4c3c849c2f7f228c7291e064284d2cee2f365adbc0f1554",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "xml_asset_scan",
+      "impact": "Đã parse toàn XML, không thấy script/foreignObject/event handler/external href/src; không thêm server edge.",
+      "details": {
+        "xml_elements": 5,
+        "active_or_external": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/icons/Hipster_FacebookIcon.svg",
+      "source_path": "src/frontend/static/icons/Hipster_FacebookIcon.svg",
+      "bytes": 750,
+      "sha256": "bafc5fe0c4da67cdb7da750ade3d569045ddcb1e1931d20dd555057b394df78e",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "xml_asset_scan",
+      "impact": "Đã parse toàn XML, không thấy script/foreignObject/event handler/external href/src; không thêm server edge.",
+      "details": {
+        "xml_elements": 7,
+        "active_or_external": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/icons/Hipster_GooglePlayIcon.svg",
+      "source_path": "src/frontend/static/icons/Hipster_GooglePlayIcon.svg",
+      "bytes": 5547,
+      "sha256": "7da1e5e9cf1517ce7c1b07f3420501706cc4a67937ba6a4a3747c38b9b22de9a",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "xml_asset_scan",
+      "impact": "Đã parse toàn XML, không thấy script/foreignObject/event handler/external href/src; không thêm server edge.",
+      "details": {
+        "xml_elements": 46,
+        "active_or_external": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/icons/Hipster_HelpIcon.svg",
+      "source_path": "src/frontend/static/icons/Hipster_HelpIcon.svg",
+      "bytes": 399,
+      "sha256": "0f87249178807420cde01ab446ef17b6223dd71adc57337491005093998edf06",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "xml_asset_scan",
+      "impact": "Đã parse toàn XML, không thấy script/foreignObject/event handler/external href/src; không thêm server edge.",
+      "details": {
+        "xml_elements": 7,
+        "active_or_external": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/icons/Hipster_HeroLogo.svg",
+      "source_path": "src/frontend/static/icons/Hipster_HeroLogo.svg",
+      "bytes": 15906,
+      "sha256": "6968fae0683b7278283b65c3c7d2baec9405a6a5d08b205e6938fac2b590ceb7",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "xml_asset_scan",
+      "impact": "Đã parse toàn XML, không thấy script/foreignObject/event handler/external href/src; không thêm server edge.",
+      "details": {
+        "xml_elements": 41,
+        "active_or_external": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/icons/Hipster_HeroLogoCyan.svg",
+      "source_path": "src/frontend/static/icons/Hipster_HeroLogoCyan.svg",
+      "bytes": 15909,
+      "sha256": "0017e011945a64466bba654f0b4f1b0ccb6626083d11129452dc4ccd18a9cdff",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "xml_asset_scan",
+      "impact": "Đã parse toàn XML, không thấy script/foreignObject/event handler/external href/src; không thêm server edge.",
+      "details": {
+        "xml_elements": 41,
+        "active_or_external": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/icons/Hipster_HotProducts.svg",
+      "source_path": "src/frontend/static/icons/Hipster_HotProducts.svg",
+      "bytes": 8810,
+      "sha256": "31d6c72740cb95fa36591b93d44d33df110ed6ed6ca66cf11ef0f3e205c6f766",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "xml_asset_scan",
+      "impact": "Đã parse toàn XML, không thấy script/foreignObject/event handler/external href/src; không thêm server edge.",
+      "details": {
+        "xml_elements": 22,
+        "active_or_external": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/icons/Hipster_InstagramIcon.svg",
+      "source_path": "src/frontend/static/icons/Hipster_InstagramIcon.svg",
+      "bytes": 1018,
+      "sha256": "9763f6d6fb86536a2850757512829666853307d356771faf71b629f58d015693",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "xml_asset_scan",
+      "impact": "Đã parse toàn XML, không thấy script/foreignObject/event handler/external href/src; không thêm server edge.",
+      "details": {
+        "xml_elements": 8,
+        "active_or_external": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/icons/Hipster_KitchenwareOffer.svg",
+      "source_path": "src/frontend/static/icons/Hipster_KitchenwareOffer.svg",
+      "bytes": 20445,
+      "sha256": "56d3599e2bd50a7134b2b5134695999d7368091a0aff53cb13bf9c6bab76305d",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "xml_asset_scan",
+      "impact": "Đã parse toàn XML, không thấy script/foreignObject/event handler/external href/src; không thêm server edge.",
+      "details": {
+        "xml_elements": 30,
+        "active_or_external": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/icons/Hipster_NavLogo.svg",
+      "source_path": "src/frontend/static/icons/Hipster_NavLogo.svg",
+      "bytes": 2516,
+      "sha256": "59cede75845b20661ed81fe6e5a07e74ab0a7af8e122bf502f5c5e52de5136f1",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "xml_asset_scan",
+      "impact": "Đã parse toàn XML, không thấy script/foreignObject/event handler/external href/src; không thêm server edge.",
+      "details": {
+        "xml_elements": 23,
+        "active_or_external": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/icons/Hipster_OtherProducts.svg",
+      "source_path": "src/frontend/static/icons/Hipster_OtherProducts.svg",
+      "bytes": 26111,
+      "sha256": "abfb402d7e7ac83fc5eb01e28caecd06343fa5b58e6ec8b75d51a3481c54a38b",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "xml_asset_scan",
+      "impact": "Đã parse toàn XML, không thấy script/foreignObject/event handler/external href/src; không thêm server edge.",
+      "details": {
+        "xml_elements": 31,
+        "active_or_external": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/icons/Hipster_PinterestIcon.svg",
+      "source_path": "src/frontend/static/icons/Hipster_PinterestIcon.svg",
+      "bytes": 539,
+      "sha256": "a993f1bc5dff3b663cad864b9c345ec6b2d3a275df10d6ac5bcf2845e001b1eb",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "xml_asset_scan",
+      "impact": "Đã parse toàn XML, không thấy script/foreignObject/event handler/external href/src; không thêm server edge.",
+      "details": {
+        "xml_elements": 7,
+        "active_or_external": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/icons/Hipster_ProfileIcon.svg",
+      "source_path": "src/frontend/static/icons/Hipster_ProfileIcon.svg",
+      "bytes": 455,
+      "sha256": "58118b4666bd6d5f57e9acd63599f12fdd13a835a7bf81d8f2366e92cd4474bc",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "xml_asset_scan",
+      "impact": "Đã parse toàn XML, không thấy script/foreignObject/event handler/external href/src; không thêm server edge.",
+      "details": {
+        "xml_elements": 7,
+        "active_or_external": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/icons/Hipster_SearchIcon.svg",
+      "source_path": "src/frontend/static/icons/Hipster_SearchIcon.svg",
+      "bytes": 322,
+      "sha256": "96a512ae403c56697fbd6fe89cd236aa8518c3209f4364c121117d61f45e547a",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "xml_asset_scan",
+      "impact": "Đã parse toàn XML, không thấy script/foreignObject/event handler/external href/src; không thêm server edge.",
+      "details": {
+        "xml_elements": 5,
+        "active_or_external": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/icons/Hipster_TwitterIcon.svg",
+      "source_path": "src/frontend/static/icons/Hipster_TwitterIcon.svg",
+      "bytes": 469,
+      "sha256": "a815ca80cef352779d6589b4671cd1316fdd9db6417490883e882f22cb4a5bc2",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "xml_asset_scan",
+      "impact": "Đã parse toàn XML, không thấy script/foreignObject/event handler/external href/src; không thêm server edge.",
+      "details": {
+        "xml_elements": 5,
+        "active_or_external": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/icons/Hipster_UpDownControl.svg",
+      "source_path": "src/frontend/static/icons/Hipster_UpDownControl.svg",
+      "bytes": 252,
+      "sha256": "e5c8124c4adeab577df76ff9023419db36961558db345397abc7b934f52338fa",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "xml_asset_scan",
+      "impact": "Đã parse toàn XML, không thấy script/foreignObject/event handler/external href/src; không thêm server edge.",
+      "details": {
+        "xml_elements": 5,
+        "active_or_external": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/icons/Hipster_YoutubeIcon.svg",
+      "source_path": "src/frontend/static/icons/Hipster_YoutubeIcon.svg",
+      "bytes": 838,
+      "sha256": "811230006164ae7f20b9dd2bcc6077ac8fd80544c0ac4a5d2fb1bde32616ce95",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "xml_asset_scan",
+      "impact": "Đã parse toàn XML, không thấy script/foreignObject/event handler/external href/src; không thêm server edge.",
+      "details": {
+        "xml_elements": 8,
+        "active_or_external": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/images/Advert2BannerImage.png",
+      "source_path": "src/frontend/static/images/Advert2BannerImage.png",
+      "bytes": 668685,
+      "sha256": "f845a43f2caf463e08b63c1633545096193a0f1c2c32cb09e3d0efa82d4de197",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "hash_only_excluded_binary_asset",
+      "impact": "Asset raster/favicon chỉ được static file server phục vụ; không có executable server routing; chưa kiểm nội dung hình.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/images/AdvertBannerImage.png",
+      "source_path": "src/frontend/static/images/AdvertBannerImage.png",
+      "bytes": 522511,
+      "sha256": "ca5257f89b3a6162413e38fb4ec67f79daf893ab8cc999b358b64c04a6add287",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "hash_only_excluded_binary_asset",
+      "impact": "Asset raster/favicon chỉ được static file server phục vụ; không có executable server routing; chưa kiểm nội dung hình.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/images/HeroBannerImage.png",
+      "source_path": "src/frontend/static/images/HeroBannerImage.png",
+      "bytes": 669300,
+      "sha256": "ccb63422295c65a609c121d9c1c32701bd59c923abd9b1f8ca37ca47ba0f3b7c",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "hash_only_excluded_binary_asset",
+      "impact": "Asset raster/favicon chỉ được static file server phục vụ; không có executable server routing; chưa kiểm nội dung hình.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/images/HeroBannerImage2.png",
+      "source_path": "src/frontend/static/images/HeroBannerImage2.png",
+      "bytes": 260426,
+      "sha256": "7aeed19593cc3c24aa780923066609e24582297739ad54873726ebe9f2a497f2",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "hash_only_excluded_binary_asset",
+      "impact": "Asset raster/favicon chỉ được static file server phục vụ; không có executable server routing; chưa kiểm nội dung hình.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/images/VRHeadsets.png",
+      "source_path": "src/frontend/static/images/VRHeadsets.png",
+      "bytes": 365167,
+      "sha256": "00e71021cae1d7c44745b48427e648109900101546b55778de9f3efddc5a75ca",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "hash_only_excluded_binary_asset",
+      "impact": "Asset raster/favicon chỉ được static file server phục vụ; không có executable server routing; chưa kiểm nội dung hình.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/img/products/air-plant.jpg",
+      "source_path": "src/frontend/static/img/products/air-plant.jpg",
+      "bytes": 90814,
+      "sha256": "58a46b0285aca26d4bbff8c4cd953ea5650dd64ec6ee1bc1a78ba5599d3c6aad",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "hash_only_excluded_binary_asset",
+      "impact": "Asset raster/favicon chỉ được static file server phục vụ; không có executable server routing; chưa kiểm nội dung hình.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/img/products/barista-kit.jpg",
+      "source_path": "src/frontend/static/img/products/barista-kit.jpg",
+      "bytes": 211009,
+      "sha256": "cec3280402c7d42f39dcf6fd06154e6403c5067526e50bf06b30643b129f9b70",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "hash_only_excluded_binary_asset",
+      "impact": "Asset raster/favicon chỉ được static file server phục vụ; không có executable server routing; chưa kiểm nội dung hình.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/img/products/camera-lens.jpg",
+      "source_path": "src/frontend/static/img/products/camera-lens.jpg",
+      "bytes": 151234,
+      "sha256": "b301b97068100378067a61e5cbdf4d3a8ef30e0816772bd74521d3cb62367d8a",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "hash_only_excluded_binary_asset",
+      "impact": "Asset raster/favicon chỉ được static file server phục vụ; không có executable server routing; chưa kiểm nội dung hình.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/img/products/camp-mug.jpg",
+      "source_path": "src/frontend/static/img/products/camp-mug.jpg",
+      "bytes": 73723,
+      "sha256": "b28eca1ac218cb1cd256bd21fd99b783a60421fbe91c0ec5ae347b439b7de0d4",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "hash_only_excluded_binary_asset",
+      "impact": "Asset raster/favicon chỉ được static file server phục vụ; không có executable server routing; chưa kiểm nội dung hình.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/img/products/city-bike.jpg",
+      "source_path": "src/frontend/static/img/products/city-bike.jpg",
+      "bytes": 143933,
+      "sha256": "e6e377707ddf97d59f54b4a323696891afab135d8b83204d3d4e3c4ed12777db",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "hash_only_excluded_binary_asset",
+      "impact": "Asset raster/favicon chỉ được static file server phục vụ; không có executable server routing; chưa kiểm nội dung hình.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/img/products/credits.txt",
+      "source_path": "src/frontend/static/img/products/credits.txt",
+      "bytes": 529,
+      "sha256": "e3d6f3dfccea6b3e1ba5775fc094894db4c2551966c6aba28eba2af8c9c79cbe",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/img/products/film-camera.jpg",
+      "source_path": "src/frontend/static/img/products/film-camera.jpg",
+      "bytes": 136686,
+      "sha256": "d13359d524e7f2fb4be4d5a779b214833429709b01cf52f5b818d62f043b72c1",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "hash_only_excluded_binary_asset",
+      "impact": "Asset raster/favicon chỉ được static file server phục vụ; không có executable server routing; chưa kiểm nội dung hình.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/img/products/record-player.jpg",
+      "source_path": "src/frontend/static/img/products/record-player.jpg",
+      "bytes": 136844,
+      "sha256": "921107b4b5ae4ff8c4f195aa8be1f48077d55100d43cf408778fa77b9e7ed69c",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "hash_only_excluded_binary_asset",
+      "impact": "Asset raster/favicon chỉ được static file server phục vụ; không có executable server routing; chưa kiểm nội dung hình.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/img/products/terrarium.jpg",
+      "source_path": "src/frontend/static/img/products/terrarium.jpg",
+      "bytes": 53521,
+      "sha256": "08031396896dd5078d56740f78c5397ad8ee105c21dfb07a68d9b62ffbbd3280",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "hash_only_excluded_binary_asset",
+      "impact": "Asset raster/favicon chỉ được static file server phục vụ; không có executable server routing; chưa kiểm nội dung hình.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/img/products/typewriter.jpg",
+      "source_path": "src/frontend/static/img/products/typewriter.jpg",
+      "bytes": 83056,
+      "sha256": "e06e68310107a71ccee74c5c3c9b12b6e6b01cee9bd3ca98d7f0713375103970",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "hash_only_excluded_binary_asset",
+      "impact": "Asset raster/favicon chỉ được static file server phục vụ; không có executable server routing; chưa kiểm nội dung hình.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/styles/cart.css",
+      "source_path": "src/frontend/static/styles/cart.css",
+      "bytes": 1953,
+      "sha256": "01af63c1d2372cfb492f98fe9cff5d7b9d58d1be4776820d2ce1568959cc9183",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "template_or_style_full_text_scan",
+      "impact": "Đọc/scan form/action/link/src/script/url trong toàn text; routes browser→frontend và external browser assets giữ ở common; không thêm server egress từ HTML.",
+      "details": {
+        "matched_lines": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/styles/order.css",
+      "source_path": "src/frontend/static/styles/order.css",
+      "bytes": 988,
+      "sha256": "dbf4e1928821d5f34ef901298f6567117e812d8c0aa47b6972a586ed04215def",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "template_or_style_full_text_scan",
+      "impact": "Đọc/scan form/action/link/src/script/url trong toàn text; routes browser→frontend và external browser assets giữ ở common; không thêm server egress từ HTML.",
+      "details": {
+        "matched_lines": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/static/styles/styles.css",
+      "source_path": "src/frontend/static/styles/styles.css",
+      "bytes": 10278,
+      "sha256": "878617b82df08d64761463265d496f31a5a7ee0d24460e321022480852d5b75f",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "template_or_style_full_text_scan",
+      "impact": "Đọc/scan form/action/link/src/script/url trong toàn text; routes browser→frontend và external browser assets giữ ở common; không thêm server egress từ HTML.",
+      "details": {
+        "matched_lines": [
+          371,
+          419,
+          424
+        ]
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/templates/ad.html",
+      "source_path": "src/frontend/templates/ad.html",
+      "bytes": 855,
+      "sha256": "c54f7f8407492d121083d6cb91dc5856194bcc6cca3d5320062cb97a98de266a",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "template_or_style_full_text_scan",
+      "impact": "Đọc/scan form/action/link/src/script/url trong toàn text; routes browser→frontend và external browser assets giữ ở common; không thêm server egress từ HTML.",
+      "details": {
+        "matched_lines": [
+          21
+        ]
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/templates/cart.html",
+      "source_path": "src/frontend/templates/cart.html",
+      "bytes": 10081,
+      "sha256": "f5a3503245a0fe2fe17f3d330cb2bb73f2b84b66a787765b6f6cbcc362bf3e02",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "template_or_style_full_text_scan",
+      "impact": "Đọc/scan form/action/link/src/script/url trong toàn text; routes browser→frontend và external browser assets giữ ở common; không thêm server egress từ HTML.",
+      "details": {
+        "matched_lines": [
+          30,
+          40,
+          42,
+          52,
+          53,
+          79
+        ]
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/templates/error.html",
+      "source_path": "src/frontend/templates/error.html",
+      "bytes": 1370,
+      "sha256": "2a62cb9e5f9373dd1f6b2143b7d491de5bdf119856148667e87138b493c7e1c7",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "template_or_style_full_text_scan",
+      "impact": "Đọc/scan form/action/link/src/script/url trong toàn text; routes browser→frontend và external browser assets giữ ở common; không thêm server egress từ HTML.",
+      "details": {
+        "matched_lines": []
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/templates/footer.html",
+      "source_path": "src/frontend/templates/footer.html",
+      "bytes": 1514,
+      "sha256": "785e8e43f3ade1116ad463dc914975e60c6d8491016416d6e6706e500ac87a90",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "template_or_style_full_text_scan",
+      "impact": "Đọc/scan form/action/link/src/script/url trong toàn text; routes browser→frontend và external browser assets giữ ở common; không thêm server egress từ HTML.",
+      "details": {
+        "matched_lines": [
+          23,
+          33
+        ]
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/templates/header.html",
+      "source_path": "src/frontend/templates/header.html",
+      "bytes": 3634,
+      "sha256": "474cc73b44d00a7f12b3a75252607fb8c81eda163b341c48f09287bcaada0d9c",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "template_or_style_full_text_scan",
+      "impact": "Đọc/scan form/action/link/src/script/url trong toàn text; routes browser→frontend và external browser assets giữ ở common; không thêm server egress từ HTML.",
+      "details": {
+        "matched_lines": [
+          26,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          48,
+          55,
+          64,
+          65,
+          68,
+          69
+        ]
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/templates/home.html",
+      "source_path": "src/frontend/templates/home.html",
+      "bytes": 2044,
+      "sha256": "68584ad884817ff7f4ae114138f09ca50f8c460d69ae28f62e50fa5ae4cd801e",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "template_or_style_full_text_scan",
+      "impact": "Đọc/scan form/action/link/src/script/url trong toàn text; routes browser→frontend và external browser assets giữ ở common; không thêm server egress từ HTML.",
+      "details": {
+        "matched_lines": [
+          28,
+          35,
+          41,
+          42
+        ]
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/templates/order.html",
+      "source_path": "src/frontend/templates/order.html",
+      "bytes": 2312,
+      "sha256": "4f290e34b12aaad2d4c04ee03fa71ac6318959769cbcfadb2c50b738d1dfdaf0",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "template_or_style_full_text_scan",
+      "impact": "Đọc/scan form/action/link/src/script/url trong toàn text; routes browser→frontend và external browser assets giữ ở common; không thêm server egress từ HTML.",
+      "details": {
+        "matched_lines": [
+          29,
+          47
+        ]
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/templates/product.html",
+      "source_path": "src/frontend/templates/product.html",
+      "bytes": 2347,
+      "sha256": "3d6258cb8dc89f940113489943348321e25b2228872caf101a121c68d935578e",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "template_or_style_full_text_scan",
+      "impact": "Đọc/scan form/action/link/src/script/url trong toàn text; routes browser→frontend và external browser assets giữ ở common; không thêm server egress từ HTML.",
+      "details": {
+        "matched_lines": [
+          29,
+          43
+        ]
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/frontend/templates/recommendations.html",
+      "source_path": "src/frontend/templates/recommendations.html",
+      "bytes": 1416,
+      "sha256": "3498764c300665464a6790150b474fa5eab914063ae90fb3efaf4361060a073f",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "template_or_style_full_text_scan",
+      "impact": "Đọc/scan form/action/link/src/script/url trong toàn text; routes browser→frontend và external browser assets giữ ở common; không thêm server egress từ HTML.",
+      "details": {
+        "matched_lines": [
+          21,
+          27,
+          28
+        ]
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/loadgenerator/Dockerfile",
+      "source_path": "src/loadgenerator/Dockerfile",
+      "bytes": 1141,
+      "sha256": "81e0e0fa63ed8604fac3fbc60fd8d1eebb5b71bb32ac4ed9763f1552b203b2b4",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/loadgenerator/locustfile.py",
+      "source_path": "src/loadgenerator/locustfile.py",
+      "bytes": 2131,
+      "sha256": "7c148402a3640b4df78a4c20d98e01f7d78ec5402d09d696d1199b34a4763828",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/loadgenerator/requirements.in",
+      "source_path": "src/loadgenerator/requirements.in",
+      "bytes": 13,
+      "sha256": "e90ed497b9027a641f30f183140bbc3d4986ce24f9561fd6c3097e94dc1f1b75",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/loadgenerator/requirements.txt",
+      "source_path": "src/loadgenerator/requirements.txt",
+      "bytes": 1207,
+      "sha256": "b99054e68cbc6132ca6519693fa5b846614895e448ff19e31186c2d58dbb222e",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/productcatalogservice/.dockerignore",
+      "source_path": "src/productcatalogservice/.dockerignore",
+      "bytes": 8,
+      "sha256": "e15b1b0e0f10012abb6f06891455da689a7a4ff323b70ce46144d8611b7d4d8a",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/productcatalogservice/Dockerfile",
+      "source_path": "src/productcatalogservice/Dockerfile",
+      "bytes": 2032,
+      "sha256": "3119a31a0d3a47f2acea1b33364c8bba6618ca7f0a2ebb1641cb35bf20086a7a",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "source_text_scan",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/productcatalogservice/README.md",
+      "source_path": "src/productcatalogservice/README.md",
+      "bytes": 1206,
+      "sha256": "138fbe011bbbf3322671767de345559c6296adb92d518edcde02d22934437691",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/productcatalogservice/binding__failpoint_binding__.go",
+      "source_path": "src/productcatalogservice/binding__failpoint_binding__.go",
+      "bytes": 336,
+      "sha256": "8ea1519e98c357cea2e5264211ec9ec80a29153f088657196b0b5b2505fee549",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/productcatalogservice/fault.yaml",
+      "source_path": "src/productcatalogservice/fault.yaml",
+      "bytes": 900,
+      "sha256": "8a7715d7b9270ee5949195994816a5a6f38ed645309b250f4756fa8d11183979",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/productcatalogservice/genproto.sh",
+      "source_path": "src/productcatalogservice/genproto.sh",
+      "bytes": 708,
+      "sha256": "cf95024fdbc282148bd22dcaf23d3f2c5221548606bdccd530de6910e855a841",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/productcatalogservice/genproto/demo.pb.go",
+      "source_path": "src/productcatalogservice/genproto/demo.pb.go",
+      "bytes": 90239,
+      "sha256": "9c9a4b4761a71783126eebb9bf9d4c8aa40cc2685f978a76952eefceab84f07f",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "selective_generated_method_descriptor_review",
+      "impact": "Đọc header/metadata, import/function index, Invoke literals, handlers/fullMethod/ServiceDesc; không dùng serialization boilerplate làm quan hệ; generated copies cùng hash, genproto.sh trỏ pb/demo.proto.",
+      "details": {
+        "full_rpc_literals": [
+          "/hipstershop.AdService/GetAds",
+          "/hipstershop.CartService/AddItem",
+          "/hipstershop.CartService/EmptyCart",
+          "/hipstershop.CartService/GetCart",
+          "/hipstershop.CheckoutService/PlaceOrder",
+          "/hipstershop.CurrencyService/Convert",
+          "/hipstershop.CurrencyService/GetSupportedCurrencies",
+          "/hipstershop.EmailService/SendOrderConfirmation",
+          "/hipstershop.PaymentService/Charge",
+          "/hipstershop.ProductCatalogService/GetProduct",
+          "/hipstershop.ProductCatalogService/ListProducts",
+          "/hipstershop.ProductCatalogService/SearchProducts",
+          "/hipstershop.RecommendationService/ListRecommendations",
+          "/hipstershop.ShippingService/GetQuote",
+          "/hipstershop.ShippingService/ShipOrder"
+        ],
+        "generated_by": "protoc-gen-go",
+        "input": "pb/demo.proto",
+        "serialization_boilerplate_not_line_by_line_reviewed": true
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/productcatalogservice/go.mod",
+      "source_path": "src/productcatalogservice/go.mod",
+      "bytes": 1139,
+      "sha256": "78cd9e33d7ce1ca3efdec906d4d53be2dd96f359e86bcb23202a53e5b6d0e357",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/productcatalogservice/products.json",
+      "source_path": "src/productcatalogservice/products.json",
+      "bytes": 3815,
+      "sha256": "6397274e3a8eaacd8fe466507ed34040f4e1b434cb42f0295e88890d6051ca31",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/productcatalogservice/server.go",
+      "source_path": "src/productcatalogservice/server.go",
+      "bytes": 12203,
+      "sha256": "558b983841d27db39eff1b003d58aaf9ab8c810ce2631e6b3fd31c2b78286dde",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/productcatalogservice/server.go__failpoint_stash__",
+      "source_path": "src/productcatalogservice/server.go__failpoint_stash__",
+      "bytes": 14146,
+      "sha256": "136b7a9fed160864f19cc40b8eeb18d9c6318d3fd9763e5141567b66e964e241",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "diff_against_live_source",
+      "impact": "Đọc diff với .go active; khác fault-injection/log và nhánh tài nguyên cục bộ. Đuôi stash không .go, Docker go build . không biên dịch như source active; không thêm operations/relations từ stash.",
+      "details": {
+        "active_source": "src/productcatalogservice/server.go"
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/productcatalogservice/server_test.go",
+      "source_path": "src/productcatalogservice/server_test.go",
+      "bytes": 2054,
+      "sha256": "caaf79917f77b9844652546205b31f6ba94afb7f95630126fd9c53f578ae746e",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "unit_test_import_and_test_function_scan",
+      "impact": "Test source chỉ hỗ trợ kiểm coverage; không được go build . đưa vào binary; chưa chạy test hoặc dùng test làm bằng chứng runtime/ca dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/shippingservice/.dockerignore",
+      "source_path": "src/shippingservice/.dockerignore",
+      "bytes": 8,
+      "sha256": "e15b1b0e0f10012abb6f06891455da689a7a4ff323b70ce46144d8611b7d4d8a",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/shippingservice/Dockerfile",
+      "source_path": "src/shippingservice/Dockerfile",
+      "bytes": 2027,
+      "sha256": "e2d9a43e4ca71c153355a074fd2f29342c216809f379b3dc74eba7f971140d02",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "source_text_scan",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/shippingservice/README.md",
+      "source_path": "src/shippingservice/README.md",
+      "bytes": 1448,
+      "sha256": "75d34a7cc83d97930eb9cd866fc92036933aa052d3091067df09b5cec8b77edb",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/shippingservice/binding__failpoint_binding__.go",
+      "source_path": "src/shippingservice/binding__failpoint_binding__.go",
+      "bytes": 336,
+      "sha256": "8ea1519e98c357cea2e5264211ec9ec80a29153f088657196b0b5b2505fee549",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/shippingservice/fault.yaml",
+      "source_path": "src/shippingservice/fault.yaml",
+      "bytes": 651,
+      "sha256": "096b064355f8aeaa0653c410d1c238ba29dfa826ee4a5419dd562fc40832fb0e",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/shippingservice/genproto.sh",
+      "source_path": "src/shippingservice/genproto.sh",
+      "bytes": 708,
+      "sha256": "cf95024fdbc282148bd22dcaf23d3f2c5221548606bdccd530de6910e855a841",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/shippingservice/genproto/demo.pb.go",
+      "source_path": "src/shippingservice/genproto/demo.pb.go",
+      "bytes": 90239,
+      "sha256": "9c9a4b4761a71783126eebb9bf9d4c8aa40cc2685f978a76952eefceab84f07f",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "selective_generated_method_descriptor_review",
+      "impact": "Đọc header/metadata, import/function index, Invoke literals, handlers/fullMethod/ServiceDesc; không dùng serialization boilerplate làm quan hệ; generated copies cùng hash, genproto.sh trỏ pb/demo.proto.",
+      "details": {
+        "full_rpc_literals": [
+          "/hipstershop.AdService/GetAds",
+          "/hipstershop.CartService/AddItem",
+          "/hipstershop.CartService/EmptyCart",
+          "/hipstershop.CartService/GetCart",
+          "/hipstershop.CheckoutService/PlaceOrder",
+          "/hipstershop.CurrencyService/Convert",
+          "/hipstershop.CurrencyService/GetSupportedCurrencies",
+          "/hipstershop.EmailService/SendOrderConfirmation",
+          "/hipstershop.PaymentService/Charge",
+          "/hipstershop.ProductCatalogService/GetProduct",
+          "/hipstershop.ProductCatalogService/ListProducts",
+          "/hipstershop.ProductCatalogService/SearchProducts",
+          "/hipstershop.RecommendationService/ListRecommendations",
+          "/hipstershop.ShippingService/GetQuote",
+          "/hipstershop.ShippingService/ShipOrder"
+        ],
+        "generated_by": "protoc-gen-go",
+        "input": "pb/demo.proto",
+        "serialization_boilerplate_not_line_by_line_reviewed": true
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/shippingservice/go.mod",
+      "source_path": "src/shippingservice/go.mod",
+      "bytes": 1366,
+      "sha256": "b83d7fa68421219be37aa9349ec3929ca28b4fcfdf92d8d05484a26f5419e1fc",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/shippingservice/go.sum",
+      "source_path": "src/shippingservice/go.sum",
+      "bytes": 12461,
+      "sha256": "8169b2fd10b1590e29d5c574fe6959cb2fb04cc15d3d2b44a808184cf6d6103c",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "hash_only_dependency_lock",
+      "impact": "Chưa đọc toàn checksum manifest; go.mod đã đọc; thư viện bên ngoài chưa tải/đọc, runtime naming/instrumentation semantics OPEN.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/shippingservice/main.go",
+      "source_path": "src/shippingservice/main.go",
+      "bytes": 10708,
+      "sha256": "aef60732d58a6d11da9ddb5a451fa4903abcc7cf0b56082e1d7214a6ef485123",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "full_source_text_read",
+      "impact": "Đã xem nguồn/build/config/helper; chỉ bản ghi có locator được đưa vào fragment; cấu hình fault là ứng viên nhánh, không dùng nhãn dataset.",
+      "details": {}
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/shippingservice/main.go__failpoint_stash__",
+      "source_path": "src/shippingservice/main.go__failpoint_stash__",
+      "bytes": 11643,
+      "sha256": "c584b3d7d14a52b6b1f75864645008fc056db8b7715063db56ecaa2cf0958f70",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "diff_against_live_source",
+      "impact": "Đọc diff với .go active; khác fault-injection/log và nhánh tài nguyên cục bộ. Đuôi stash không .go, Docker go build . không biên dịch như source active; không thêm operations/relations từ stash.",
+      "details": {
+        "active_source": "src/shippingservice/main.go"
+      }
+    },
+    {
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/src/shippingservice/shippingservice_test.go",
+      "source_path": "src/shippingservice/shippingservice_test.go",
+      "bytes": 2393,
+      "sha256": "5a84a3fc7b58f0bcebccff068e97bf4681e9f9b3b09159708f773c6eecb70101",
+      "acquisition_hash_verified": true,
+      "task_manifest_hash_verified": true,
+      "inspection": "unit_test_import_and_test_function_scan",
+      "impact": "Test source chỉ hỗ trợ kiểm coverage; không được go build . đưa vào binary; chưa chạy test hoặc dùng test làm bằng chứng runtime/ca dataset.",
+      "details": {}
+    }
+  ],
+  "not_fetched": [
+    {
+      "source_path": "src/checkoutservice/log.csv",
+      "bytes": 4394202,
+      "git_blob": "8ee7523bdb6c5002f845d45393588994adbe90c9",
+      "inspection": "excluded_not_fetched_raw_log",
+      "impact": "log.csv raw values không được quyền đọc; Dockerfile COPY cần file cho build, nên không khẳng định build tái lập/nguồn runtime đầy đủ. Không lấy nội dung để chọn quan hệ."
+    },
+    {
+      "source_path": "src/frontend/log.csv",
+      "bytes": 4394202,
+      "git_blob": "8ee7523bdb6c5002f845d45393588994adbe90c9",
+      "inspection": "excluded_not_fetched_raw_log",
+      "impact": "log.csv raw values không được quyền đọc; Dockerfile COPY cần file cho build, nên không khẳng định build tái lập/nguồn runtime đầy đủ. Không lấy nội dung để chọn quan hệ."
+    },
+    {
+      "source_path": "src/productcatalogservice/log.csv",
+      "bytes": 2197117,
+      "git_blob": "febc9ea2d1007a0bc06659315887b47e7ed6e62e",
+      "inspection": "excluded_not_fetched_raw_log",
+      "impact": "log.csv raw values không được quyền đọc; Dockerfile COPY cần file cho build, nên không khẳng định build tái lập/nguồn runtime đầy đủ. Không lấy nội dung để chọn quan hệ."
+    },
+    {
+      "source_path": "src/shippingservice/log.csv",
+      "bytes": 4394202,
+      "git_blob": "8ee7523bdb6c5002f845d45393588994adbe90c9",
+      "inspection": "excluded_not_fetched_raw_log",
+      "impact": "log.csv raw values không được quyền đọc; Dockerfile COPY cần file cho build, nên không khẳng định build tái lập/nguồn runtime đầy đủ. Không lấy nội dung để chọn quan hệ."
+    }
+  ],
+  "supporting_sources": [
+    {
+      "source_path": "pb/demo.proto",
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/pb/demo.proto",
+      "sha256": "a69bdd8615c1db2bd943a1bd385f3f9c73ebab807c66d0aa3a5420bb3c48f382",
+      "hash_verified": true
+    },
+    {
+      "source_path": "pb/grpc/health/v1/health.proto",
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/pb/grpc/health/v1/health.proto",
+      "sha256": "e3dcdb0521341163897c6b87b3c92dd559a44a7cb1330f8f3bbcc2b0027fdd67",
+      "hash_verified": true
+    },
+    {
+      "source_path": "hack/init_mysql.sql",
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/hack/init_mysql.sql",
+      "sha256": "c24a528cf3fc5bdd8a78b4e7cb82e8a98c8eb6ad662b105b912823582b5916e6",
+      "hash_verified": true
+    },
+    {
+      "source_path": "kubernetes-manifests/frontend.yaml",
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/kubernetes-manifests/frontend.yaml",
+      "sha256": "431a4121230d890536e5de6f84696830c1423a5c53cb52821407d336c0d8c10e",
+      "hash_verified": true
+    },
+    {
+      "source_path": "kubernetes-manifests/checkoutservice.yaml",
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/kubernetes-manifests/checkoutservice.yaml",
+      "sha256": "d201e8588d2af805af10f5e3e9776448514a0e03bc12be6d1997371a35bdf0b3",
+      "hash_verified": true
+    },
+    {
+      "source_path": "kubernetes-manifests/productcatalogservice.yaml",
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/kubernetes-manifests/productcatalogservice.yaml",
+      "sha256": "1e8c3b3ab693108aa12a8b7db13ae4bf14dac6cbe979facd76b1d4bde7015c80",
+      "hash_verified": true
+    },
+    {
+      "source_path": "kubernetes-manifests/shippingservice.yaml",
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/kubernetes-manifests/shippingservice.yaml",
+      "sha256": "cd3a89149a2151acc862ce38bcdef4a780cb15167ab5fc9cf8570b94aa5f41fe",
+      "hash_verified": true
+    },
+    {
+      "source_path": "kubernetes-manifests/loadgenerator.yaml",
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/kubernetes-manifests/loadgenerator.yaml",
+      "sha256": "cd14f857e9ec43cb713a11fc04390c665a715984c4f4bd4bcad844013c5ba25f",
+      "hash_verified": true
+    },
+    {
+      "source_path": "kubernetes-manifests/currencyservice.yaml",
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/kubernetes-manifests/currencyservice.yaml",
+      "sha256": "9087e5e209e63649de10e86d62e89d57cd2ab10e92187bb15792f8be6912d1c9",
+      "hash_verified": true
+    },
+    {
+      "source_path": "kubernetes-manifests/cartservice.yaml",
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/kubernetes-manifests/cartservice.yaml",
+      "sha256": "eae232ef82c66865ab50222e5bc420eac6d51f45035a3c4b6b903e66389726b4",
+      "hash_verified": true
+    },
+    {
+      "source_path": "kubernetes-manifests/adservice.yaml",
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/kubernetes-manifests/adservice.yaml",
+      "sha256": "462c34952996fc49d77daa894945c4750445ea66733b009b7ca26f815b673d21",
+      "hash_verified": true
+    },
+    {
+      "source_path": "kubernetes-manifests/recommendationservice.yaml",
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/kubernetes-manifests/recommendationservice.yaml",
+      "sha256": "2853f80d20c4cc7399c92f5cc58130967723663594990017223085f781ac4a80",
+      "hash_verified": true
+    },
+    {
+      "source_path": "kubernetes-manifests/paymentservice.yaml",
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/kubernetes-manifests/paymentservice.yaml",
+      "sha256": "17774f4c2b4857fcc802e9cce4c5e11b9ef209fa0ae9504c27cb023af8a9921c",
+      "hash_verified": true
+    },
+    {
+      "source_path": "kubernetes-manifests/emailservice.yaml",
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/kubernetes-manifests/emailservice.yaml",
+      "sha256": "913b73105619c27ceedf4407730a2ac3aa85a21f0878aac53a6948ccfa958b9d",
+      "hash_verified": true
+    },
+    {
+      "source_path": "kubernetes-manifests/mysql.yaml",
+      "path": "results/T-039/sources/augmented-ob-94a01ba4/kubernetes-manifests/mysql.yaml",
+      "sha256": "9d21290fccbfe4e6e9bdcdd2b65d2dde748ab275c0ddef36c1265b00319b6f55",
+      "hash_verified": true
+    }
+  ],
+  "counts": {
+    "fetched_files": 105,
+    "fetched_bytes": 4331248,
+    "inspection_counts": {
+      "full_source_text_read": 40,
+      "source_text_scan": 4,
+      "selective_generated_method_descriptor_review": 4,
+      "diff_against_live_source": 4,
+      "unit_test_import_and_test_function_scan": 4,
+      "hash_only_excluded_binary_asset": 15,
+      "xml_asset_scan": 21,
+      "template_or_style_full_text_scan": 12,
+      "hash_only_dependency_lock": 1
+    },
+    "entities": 13,
+    "operations": 55,
+    "relations": 63,
+    "signals": 23,
+    "resource_bindings": 1
+  },
+  "observations": [
+    {
+      "classification": "FACT",
+      "source_id": "OB:src/checkoutservice/main.go",
+      "locator": "L453–473",
+      "observation": "Manual ConvertCurrency tracer.Start nhận ctx, nhưng client Convert nhận context.TODO().",
+      "interpretation": "Code không chuyển ctx manual sang RPC. Quan hệ gọi thường vẫn có; không kết luận về trace artifact/ca lỗi, parent thực tế hoặc ảnh hưởng dataset khi chưa nối revision và thư viện."
+    },
+    {
+      "classification": "FACT",
+      "source_id": "OB:src/shippingservice/main.go",
+      "locator": "L285–301,L317–344",
+      "observation": "CreateQuoteFromCount gọi quoteByCountFloat làm đối số rồi gọi CreateQuoteFromFloat; cả hai nhận ctx của CreateQuoteFromCount.",
+      "interpretation": "Hai quan hệ gọi đồng bộ từ CreateQuoteFromCount; không bịa QuoteByCountFloat→CreateQuoteFromFloat và không dùng span-parent."
+    },
+    {
+      "classification": "FACT",
+      "source_id": "OB:src/productcatalogservice/server.go",
+      "locator": "L188–214,L217–277,L313–347",
+      "observation": "Live product code chọn DB Productdb bằng DSN và QueryContext; products.json copied nhưng không phải nguồn catalog đang đọc trong live code.",
+      "interpretation": "Logical Productdb/data edges có căn cứ source; không dựng entity cho từng JSON product."
+    },
+    {
+      "classification": "FACT",
+      "source_id": "OB:src/loadgenerator/requirements.in",
+      "locator": "L1",
+      "observation": "requirements.in ghi locust1.2.3; requirements.txt:L19 ghi1.3.1; Dockerfile:L23–26 cài requirements.txt.",
+      "interpretation": "Dùng installed candidate requirements.txt để mô tả build; chưa chứng minh image thực tế hoặc hash dependency."
+    }
+  ],
+  "open": [
+    {
+      "id": "GO-PIN",
+      "status": "OPEN",
+      "owner": "Minh/root",
+      "input_required": "phân xử shared build.py lệch pin; không tự đổi",
+      "affects": "build/validate/project/compare dưới hợp đồng ghim"
+    },
+    {
+      "id": "GO-RUNTIME-NAMING",
+      "status": "OPEN",
+      "owner": "nguồn thư viện đã ghim và deployment",
+      "input_required": "otelgrpc0.23.0/otelhttp0.23.0/otelsql0.10.0 code hoặc artifact phù hợp, cùng exporter schema",
+      "affects": "runtime_name của RPC và SQL generated spans/alias; không xác nhận từ trace similarity"
+    },
+    {
+      "id": "GO-REVISION",
+      "status": "OPEN",
+      "owner": "tác giả/deployment owner",
+      "input_required": "build/image digest + deployment record liên hệ code snapshot và dataset",
+      "affects": "mọi đối chiếu chỉ tham khảo có điều kiện"
+    },
+    {
+      "id": "GO-EXTERNAL",
+      "status": "OPEN",
+      "owner": "source/deployment owner",
+      "input_required": "collector/exporter, Istio injection, dependency source khi cần phân xử instrumentation/coverage",
+      "affects": "nghĩa Node, metadata Source/Target/Weight producer, runtime coverage"
+    },
+    {
+      "id": "GO-RAW-EXCLUSION",
+      "status": "OPEN",
+      "owner": "Minh",
+      "input_required": "không yêu cầu mở raw logs từ quyền hiện hành; nếu nghiên cứu cần nội dung phải xin phạm vi riêng",
+      "affects": "không build images tái lập bởi Dockerfile COPY log.csv; không loại nghĩa vụ này khỏi bàn giao"
+    },
+    {
+      "id": "GO-HEALTH",
+      "status": "OPEN",
+      "owner": "dependency source",
+      "input_required": "grpc health/reflection package declarations nếu cần full operation inventory library runtime",
+      "affects": "Check/Watch source handlers giữ runtime_name null; reflection registration chưa dựng operation từ dependency chưa đọc"
+    }
+  ],
+  "validation": {
+    "kind": "independent_JSON_structure_and_source_locator_checks_only",
+    "shared_build_imported": false,
+    "all_endpoint_entities_declared": true,
+    "all_endpoint_operations_declared": true,
+    "all_provenance_ids_acquired": true,
+    "all_numeric_locators_in_source_range": true,
+    "span_parent_records": 0,
+    "trace_or_label_input_used": false
+  },
+  "coverage_claim": "Chưa phải xác nhận inventory toàn snapshot hoặc telemetry đầy đủ. Mỗi file có mức inspection cụ thể; root phải hợp coverage các nhánh và nguồn ngoài; không biến hash-only/scan thành full semantic review."
+}

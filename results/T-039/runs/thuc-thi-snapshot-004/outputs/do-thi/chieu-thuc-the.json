@@ -1,0 +1,776 @@
+{
+  "nodes": [
+    "adservice",
+    "cartservice",
+    "checkoutservice",
+    "currencyservice",
+    "emailservice",
+    "frontend",
+    "loadgenerator",
+    "mysql/Productdb",
+    "mysql/addatabase",
+    "paymentservice",
+    "productcatalogservice",
+    "recommendationservice",
+    "redis-cart",
+    "shippingservice"
+  ],
+  "edges": [
+    {
+      "source": "adservice",
+      "target": "mysql/addatabase",
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "backend:ad-mysql-read"
+      ],
+      "provenance": [
+        {
+          "source_id": "OB:src/adservice/src/main/java/hipstershop/AdService.java",
+          "locator": "L61-L65;L237-L279",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ],
+      "contexts": [
+        "jdbc:mysql://${MYSQL_ADDR}/addatabase, SELECT * FROM aditems; credentials SQL_USER/SQL_PASSWORD; driver/SQL error trả null; không suy instance hoặc host."
+      ]
+    },
+    {
+      "source": "cartservice",
+      "target": "redis-cart",
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "backend:cart-health-redis",
+        "backend:cart-redis-additem",
+        "backend:cart-redis-emptycart",
+        "backend:cart-redis-getcart"
+      ],
+      "provenance": [
+        {
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime.",
+          "locator": "L111-L160",
+          "source_id": "OB:src/cartservice/src/cartstore/RedisCartStore.cs"
+        },
+        {
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime.",
+          "locator": "L162-L187",
+          "source_id": "OB:src/cartservice/src/cartstore/RedisCartStore.cs"
+        },
+        {
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime.",
+          "locator": "L189-L223",
+          "source_id": "OB:src/cartservice/src/cartstore/RedisCartStore.cs"
+        },
+        {
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime.",
+          "locator": "L225-L236",
+          "source_id": "OB:src/cartservice/src/cartstore/RedisCartStore.cs"
+        },
+        {
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime.",
+          "locator": "L32-L43",
+          "source_id": "OB:src/cartservice/src/Startup.cs"
+        },
+        {
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime.",
+          "locator": "L32-L49",
+          "source_id": "OB:src/cartservice/src/Startup.cs"
+        },
+        {
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime.",
+          "locator": "L33-L38",
+          "source_id": "OB:src/cartservice/src/services/HealthCheckService.cs"
+        },
+        {
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime.",
+          "locator": "L34-L48",
+          "source_id": "OB:src/cartservice/src/services/CartService.cs"
+        },
+        {
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime.",
+          "locator": "L84-L87",
+          "source_id": "OB:src/cartservice/src/cartstore/LocalCartStore.cs"
+        }
+      ],
+      "contexts": [
+        "Chỉ REDIS_ADDR không rỗng chọn RedisCartStore; LocalCartStore không có data edge ngoài. HashGetAsync rồi HashSetAsync theo cart mới/cũ; lỗi FailedPrecondition.",
+        "Chỉ REDIS_ADDR không rỗng chọn RedisCartStore; LocalCartStore không có data edge ngoài. HashGetAsync; thiếu value trả cart rỗng; lỗi FailedPrecondition.",
+        "Chỉ REDIS_ADDR không rỗng chọn RedisCartStore; LocalCartStore không có data edge ngoài. HashSetAsync với emptyCartBytes; lỗi FailedPrecondition.",
+        "Health Check→ICartStore.Ping; Redis mode gọi cache.Ping và lỗi trả false; Local mode trả true nội bộ."
+      ]
+    },
+    {
+      "source": "checkoutservice",
+      "target": "cartservice",
+      "type": "gọi-đồng-bộ",
+      "channel": "rpc",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "go:co:rpc:CartService/EmptyCart",
+        "go:co:rpc:CartService/GetCart"
+      ],
+      "provenance": [
+        {
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L1634",
+          "source_id": "OB:src/checkoutservice/genproto/demo.pb.go"
+        },
+        {
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L1643",
+          "source_id": "OB:src/checkoutservice/genproto/demo.pb.go"
+        },
+        {
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L41–54",
+          "source_id": "OB:kubernetes-manifests/checkoutservice.yaml"
+        },
+        {
+          "condition": "xóa cart qua ctx của EmptyUserCart span Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L379–399",
+          "source_id": "OB:src/checkoutservice/main.go"
+        },
+        {
+          "condition": "đọc cart qua ctx của GetUserCart span Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L350–369",
+          "source_id": "OB:src/checkoutservice/main.go"
+        }
+      ],
+      "contexts": [
+        "xóa cart qua ctx của EmptyUserCart span",
+        "đọc cart qua ctx của GetUserCart span"
+      ]
+    },
+    {
+      "source": "checkoutservice",
+      "target": "currencyservice",
+      "type": "gọi-đồng-bộ",
+      "channel": "rpc",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "go:co:rpc:CurrencyService/Convert"
+      ],
+      "provenance": [
+        {
+          "source_id": "OB:src/checkoutservice/main.go",
+          "locator": "L453–473",
+          "condition": "RPC dùng context.TODO(), khác ctx vừa được tracer.Start trả về; không suy parent hoặc nguyên nhân dữ liệu Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:src/checkoutservice/genproto/demo.pb.go",
+          "locator": "L2054",
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:kubernetes-manifests/checkoutservice.yaml",
+          "locator": "L41–54",
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        }
+      ],
+      "contexts": [
+        "RPC dùng context.TODO(), khác ctx vừa được tracer.Start trả về; không suy parent hoặc nguyên nhân dữ liệu"
+      ]
+    },
+    {
+      "source": "checkoutservice",
+      "target": "emailservice",
+      "type": "gọi-đồng-bộ",
+      "channel": "rpc",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "go:co:rpc:EmailService/SendOrderConfirmation"
+      ],
+      "provenance": [
+        {
+          "source_id": "OB:src/checkoutservice/main.go",
+          "locator": "L529–551",
+          "condition": "Dial thành công rồi gửi email; lỗi chỉ Warn và trả về Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:src/checkoutservice/genproto/demo.pb.go",
+          "locator": "L2205",
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:kubernetes-manifests/checkoutservice.yaml",
+          "locator": "L41–54",
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        }
+      ],
+      "contexts": [
+        "Dial thành công rồi gửi email; lỗi chỉ Warn và trả về"
+      ]
+    },
+    {
+      "source": "checkoutservice",
+      "target": "paymentservice",
+      "type": "gọi-đồng-bộ",
+      "channel": "rpc",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "go:co:rpc:PaymentService/Charge"
+      ],
+      "provenance": [
+        {
+          "source_id": "OB:src/checkoutservice/main.go",
+          "locator": "L483–512",
+          "condition": "Dial có interceptor; nhánh failpoint có thể trả lỗi trước RPC Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:src/checkoutservice/genproto/demo.pb.go",
+          "locator": "L2141",
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:kubernetes-manifests/checkoutservice.yaml",
+          "locator": "L41–54",
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        }
+      ],
+      "contexts": [
+        "Dial có interceptor; nhánh failpoint có thể trả lỗi trước RPC"
+      ]
+    },
+    {
+      "source": "checkoutservice",
+      "target": "productcatalogservice",
+      "type": "gọi-đồng-bộ",
+      "channel": "rpc",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "go:co:rpc:ProductCatalogService/GetProduct"
+      ],
+      "provenance": [
+        {
+          "source_id": "OB:src/checkoutservice/genproto/demo.pb.go",
+          "locator": "L1828",
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:kubernetes-manifests/checkoutservice.yaml",
+          "locator": "L41–54",
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:src/checkoutservice/main.go",
+          "locator": "L420–438",
+          "condition": "mỗi cart item gọi GetProduct trong vòng lặp qua ctx PrepOrderItems Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        }
+      ],
+      "contexts": [
+        "mỗi cart item gọi GetProduct trong vòng lặp qua ctx PrepOrderItems"
+      ]
+    },
+    {
+      "source": "checkoutservice",
+      "target": "shippingservice",
+      "type": "gọi-đồng-bộ",
+      "channel": "rpc",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "go:co:rpc:ShippingService/GetQuote",
+        "go:co:rpc:ShippingService/ShipOrder"
+      ],
+      "provenance": [
+        {
+          "condition": "Dial thành công rồi ShipOrder qua ctx manual span Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L561–583",
+          "source_id": "OB:src/checkoutservice/main.go"
+        },
+        {
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L1948",
+          "source_id": "OB:src/checkoutservice/genproto/demo.pb.go"
+        },
+        {
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L1957",
+          "source_id": "OB:src/checkoutservice/genproto/demo.pb.go"
+        },
+        {
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L41–54",
+          "source_id": "OB:kubernetes-manifests/checkoutservice.yaml"
+        },
+        {
+          "condition": "sau Dial thành công; truyền ctx từ QuoteShipping span Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L325–339",
+          "source_id": "OB:src/checkoutservice/main.go"
+        }
+      ],
+      "contexts": [
+        "Dial thành công rồi ShipOrder qua ctx manual span",
+        "sau Dial thành công; truyền ctx từ QuoteShipping span"
+      ]
+    },
+    {
+      "source": "frontend",
+      "target": "adservice",
+      "type": "gọi-đồng-bộ",
+      "channel": "rpc",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "go:fe:rpc:AdService/GetAds"
+      ],
+      "provenance": [
+        {
+          "source_id": "OB:src/frontend/main.go",
+          "locator": "L180–194,L233–240",
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:src/frontend/genproto/demo.pb.go",
+          "locator": "L2333",
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:kubernetes-manifests/frontend.yaml",
+          "locator": "L41–54",
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:src/frontend/rpc.go",
+          "locator": "L119–127",
+          "condition": "home/product chooseAd, timeout1000ms; lỗi quảng cáo bị bỏ qua ở handlers.go L504–534 Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        }
+      ],
+      "contexts": [
+        "home/product chooseAd, timeout1000ms; lỗi quảng cáo bị bỏ qua ở handlers.go L504–534"
+      ]
+    },
+    {
+      "source": "frontend",
+      "target": "cartservice",
+      "type": "gọi-đồng-bộ",
+      "channel": "rpc",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "go:fe:rpc:CartService/AddItem",
+        "go:fe:rpc:CartService/EmptyCart",
+        "go:fe:rpc:CartService/GetCart"
+      ],
+      "provenance": [
+        {
+          "condition": "POST /cart chỉ gọi sau form và product hợp lệ; handlers.go L240–267 Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L67–75",
+          "source_id": "OB:src/frontend/rpc.go"
+        },
+        {
+          "condition": "POST /cart/empty gọi emptyCartHandler; handlers.go L274–291 Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L62–65",
+          "source_id": "OB:src/frontend/rpc.go"
+        },
+        {
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L1625",
+          "source_id": "OB:src/frontend/genproto/demo.pb.go"
+        },
+        {
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L1634",
+          "source_id": "OB:src/frontend/genproto/demo.pb.go"
+        },
+        {
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L1643",
+          "source_id": "OB:src/frontend/genproto/demo.pb.go"
+        },
+        {
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L180–194,L233–240",
+          "source_id": "OB:src/frontend/main.go"
+        },
+        {
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L41–54",
+          "source_id": "OB:kubernetes-manifests/frontend.yaml"
+        },
+        {
+          "condition": "home/product/viewCart đọc cart; handlers.go L77,L195,L308 Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L57–60",
+          "source_id": "OB:src/frontend/rpc.go"
+        }
+      ],
+      "contexts": [
+        "POST /cart chỉ gọi sau form và product hợp lệ; handlers.go L240–267",
+        "POST /cart/empty gọi emptyCartHandler; handlers.go L274–291",
+        "home/product/viewCart đọc cart; handlers.go L77,L195,L308"
+      ]
+    },
+    {
+      "source": "frontend",
+      "target": "checkoutservice",
+      "type": "gọi-đồng-bộ",
+      "channel": "rpc",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "go:fe:rpc:CheckoutService/PlaceOrder"
+      ],
+      "provenance": [
+        {
+          "source_id": "OB:src/frontend/handlers.go",
+          "locator": "L380–418",
+          "condition": "POST /cart/checkout chuyển form và user session cho PlaceOrder Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:src/frontend/main.go",
+          "locator": "L180–194,L233–240",
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:src/frontend/genproto/demo.pb.go",
+          "locator": "L2269",
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:kubernetes-manifests/frontend.yaml",
+          "locator": "L41–54",
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        }
+      ],
+      "contexts": [
+        "POST /cart/checkout chuyển form và user session cho PlaceOrder"
+      ]
+    },
+    {
+      "source": "frontend",
+      "target": "currencyservice",
+      "type": "gọi-đồng-bộ",
+      "channel": "rpc",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "go:fe:rpc:CurrencyService/Convert",
+        "go:fe:rpc:CurrencyService/GetSupportedCurrencies"
+      ],
+      "provenance": [
+        {
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L180–194,L233–240",
+          "source_id": "OB:src/frontend/main.go"
+        },
+        {
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L2045",
+          "source_id": "OB:src/frontend/genproto/demo.pb.go"
+        },
+        {
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L2054",
+          "source_id": "OB:src/frontend/genproto/demo.pb.go"
+        },
+        {
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L41–54",
+          "source_id": "OB:kubernetes-manifests/frontend.yaml"
+        },
+        {
+          "condition": "home/product/viewCart/placeOrder đọc danh sách tiền; handler L65,L188,L302,L443 Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L29–42",
+          "source_id": "OB:src/frontend/rpc.go"
+        },
+        {
+          "condition": "đổi giá sản phẩm hoặc phí ship; avoidNoopCurrencyConversionRPC=false ở rpc.go L25–27 Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L77–85",
+          "source_id": "OB:src/frontend/rpc.go"
+        }
+      ],
+      "contexts": [
+        "home/product/viewCart/placeOrder đọc danh sách tiền; handler L65,L188,L302,L443",
+        "đổi giá sản phẩm hoặc phí ship; avoidNoopCurrencyConversionRPC=false ở rpc.go L25–27"
+      ]
+    },
+    {
+      "source": "frontend",
+      "target": "productcatalogservice",
+      "type": "gọi-đồng-bộ",
+      "channel": "rpc",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "go:fe:rpc:ProductCatalogService/GetProduct",
+        "go:fe:rpc:ProductCatalogService/ListProducts"
+      ],
+      "provenance": [
+        {
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L180–194,L233–240",
+          "source_id": "OB:src/frontend/main.go"
+        },
+        {
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L1819",
+          "source_id": "OB:src/frontend/genproto/demo.pb.go"
+        },
+        {
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L1828",
+          "source_id": "OB:src/frontend/genproto/demo.pb.go"
+        },
+        {
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L41–54",
+          "source_id": "OB:kubernetes-manifests/frontend.yaml"
+        },
+        {
+          "condition": "homeHandler gọi getProducts; handlers.go L71 Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L45–49",
+          "source_id": "OB:src/frontend/rpc.go"
+        },
+        {
+          "condition": "product/addToCart/viewCart và chi tiết recommendations gọi getProduct; handlers.go L182,L256,L337 Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L51–55,L105–111",
+          "source_id": "OB:src/frontend/rpc.go"
+        }
+      ],
+      "contexts": [
+        "homeHandler gọi getProducts; handlers.go L71",
+        "product/addToCart/viewCart và chi tiết recommendations gọi getProduct; handlers.go L182,L256,L337"
+      ]
+    },
+    {
+      "source": "frontend",
+      "target": "recommendationservice",
+      "type": "gọi-đồng-bộ",
+      "channel": "rpc",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "go:fe:rpc:RecommendationService/ListRecommendations"
+      ],
+      "provenance": [
+        {
+          "source_id": "OB:src/frontend/genproto/demo.pb.go",
+          "locator": "L1753",
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:src/frontend/main.go",
+          "locator": "L180–194,L233–240",
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:kubernetes-manifests/frontend.yaml",
+          "locator": "L41–54",
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:src/frontend/rpc.go",
+          "locator": "L99–117",
+          "condition": "product/viewCart/placeOrder truy recommendation; sau đó lần từng product, tối đa4 output Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        }
+      ],
+      "contexts": [
+        "product/viewCart/placeOrder truy recommendation; sau đó lần từng product, tối đa4 output"
+      ]
+    },
+    {
+      "source": "frontend",
+      "target": "shippingservice",
+      "type": "gọi-đồng-bộ",
+      "channel": "rpc",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "go:fe:rpc:ShippingService/GetQuote"
+      ],
+      "provenance": [
+        {
+          "source_id": "OB:src/frontend/main.go",
+          "locator": "L180–194,L233–240",
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:src/frontend/genproto/demo.pb.go",
+          "locator": "L1948",
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:kubernetes-manifests/frontend.yaml",
+          "locator": "L41–54",
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:src/frontend/rpc.go",
+          "locator": "L87–97",
+          "condition": "viewCart gọi getShippingQuote; handlers.go L322; đổi giá ship sau response Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        }
+      ],
+      "contexts": [
+        "viewCart gọi getShippingQuote; handlers.go L322; đổi giá ship sau response"
+      ]
+    },
+    {
+      "source": "loadgenerator",
+      "target": "frontend",
+      "type": "gọi-đồng-bộ",
+      "channel": "http",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "go:loadgen:http:add",
+        "go:loadgen:http:browse",
+        "go:loadgen:http:cart",
+        "go:loadgen:http:checkout",
+        "go:loadgen:http:currency",
+        "go:loadgen:http:index"
+      ],
+      "provenance": [
+        {
+          "source_id": "OB:src/loadgenerator/locustfile.py",
+          "locator": "L31–32",
+          "condition": "GET /; task có thể được Locust chọn theo UserBehavior.tasks, không xác nhận đã chạy. Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:src/loadgenerator/locustfile.py",
+          "locator": "L42–43",
+          "condition": "GET /cart; task có thể được Locust chọn theo UserBehavior.tasks, không xác nhận đã chạy. Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:src/loadgenerator/locustfile.py",
+          "locator": "L45–50",
+          "condition": "GET /product/{id}; POST /cart; task có thể được Locust chọn theo UserBehavior.tasks, không xác nhận đã chạy. Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:src/loadgenerator/locustfile.py",
+          "locator": "L39–40",
+          "condition": "GET /product/{id}; task có thể được Locust chọn theo UserBehavior.tasks, không xác nhận đã chạy. Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:src/loadgenerator/locustfile.py",
+          "locator": "L52–65",
+          "condition": "POST /cart/checkout after addToCart; task có thể được Locust chọn theo UserBehavior.tasks, không xác nhận đã chạy. Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:src/loadgenerator/locustfile.py",
+          "locator": "L34–37",
+          "condition": "POST /setCurrency; task có thể được Locust chọn theo UserBehavior.tasks, không xác nhận đã chạy. Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy."
+        },
+        {
+          "source_id": "OB:src/loadgenerator/Dockerfile",
+          "locator": "L34–40",
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy. --host=http://${FRONTEND_ADDR}"
+        },
+        {
+          "source_id": "OB:kubernetes-manifests/loadgenerator.yaml",
+          "locator": "L35–40",
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy. FRONTEND_ADDR=frontend:80"
+        },
+        {
+          "source_id": "OB:src/frontend/main.go",
+          "locator": "L196–212",
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy. routes under one literal HTTP wrapper."
+        }
+      ],
+      "contexts": [
+        "GET /; task có thể được Locust chọn theo UserBehavior.tasks, không xác nhận đã chạy.",
+        "GET /cart; task có thể được Locust chọn theo UserBehavior.tasks, không xác nhận đã chạy.",
+        "GET /product/{id}; POST /cart; task có thể được Locust chọn theo UserBehavior.tasks, không xác nhận đã chạy.",
+        "GET /product/{id}; task có thể được Locust chọn theo UserBehavior.tasks, không xác nhận đã chạy.",
+        "POST /cart/checkout after addToCart; task có thể được Locust chọn theo UserBehavior.tasks, không xác nhận đã chạy.",
+        "POST /setCurrency; task có thể được Locust chọn theo UserBehavior.tasks, không xác nhận đã chạy."
+      ]
+    },
+    {
+      "source": "productcatalogservice",
+      "target": "mysql/Productdb",
+      "type": "dữ-liệu",
+      "channel": "data",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "go:pc:data:GetProduct",
+        "go:pc:data:ReadCatalog"
+      ],
+      "provenance": [
+        {
+          "condition": "GetProduct QueryContext SELECT products JOIN price theo product_id qua request ctx Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L313–347",
+          "source_id": "OB:src/productcatalogservice/server.go"
+        },
+        {
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L188–214",
+          "source_id": "OB:src/productcatalogservice/server.go"
+        },
+        {
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L46–55",
+          "source_id": "OB:kubernetes-manifests/productcatalogservice.yaml"
+        },
+        {
+          "condition": "Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L91–129",
+          "source_id": "OB:hack/init_mysql.sql"
+        },
+        {
+          "condition": "readCatalogFile QueryContext SELECT products JOIN price qua ctx manual span Snapshot ứng dụng ứng viên; chưa nối revision/build/image/deployment với dataset; chỉ nói khả năng theo code/config, chưa xác nhận đã chạy.",
+          "locator": "L217–252",
+          "source_id": "OB:src/productcatalogservice/server.go"
+        }
+      ],
+      "contexts": [
+        "GetProduct QueryContext SELECT products JOIN price theo product_id qua request ctx",
+        "readCatalogFile QueryContext SELECT products JOIN price qua ctx manual span"
+      ]
+    },
+    {
+      "source": "recommendationservice",
+      "target": "productcatalogservice",
+      "type": "gọi-đồng-bộ",
+      "channel": "rpc",
+      "messaging": null,
+      "evidence_source": "static",
+      "destination": null,
+      "record_ids": [
+        "backend:recommendation-catalog"
+      ],
+      "provenance": [
+        {
+          "source_id": "OB:src/recommendationservice/demo_pb2_grpc.py",
+          "locator": "L143-L158",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        },
+        {
+          "source_id": "OB:src/recommendationservice/recommendation_server.py",
+          "locator": "L63-L84;L98-L105",
+          "condition": "FACT trong code ghim; revision ứng dụng/image/deployment sinh Nezha-OB chưa xác minh; không xác nhận runtime."
+        }
+      ],
+      "contexts": [
+        "Startup yêu cầu PRODUCT_CATALOG_SERVICE_ADDR; gọi ListProducts rồi lọc request.product_ids/random.sample tối đa 5; exception ghi log và trả Empty. Không suy GetProduct/SearchProducts active từ generated."
+      ]
+    }
+  ]
+}

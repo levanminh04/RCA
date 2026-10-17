@@ -1,0 +1,27 @@
+Tôi giao bạn triển khai T-037 theo SPEC hiện hành, sau khi tự rà SPEC và kiểm khả năng hoàn thành trong một phiên. Tôi đã đồng ý dừng lượt phản biện ba SPEC T-037/T-038/T-039. Đây là quyền triển khai có điều kiện trong phạm vi dưới đây; chưa duyệt tải nguồn mới.
+
+Làm việc tại D:/RCA-flashticket.\
+Task: tasks/T-037-p5b-flashticket/SPEC.md.\
+Bạn là Codex người làm. Claude phản biện kết quả. Lượt tự rà này không thay phản biện chính thức.
+
+Trước triển khai:
+
+1. Đọc AGENTS.md, docs/STATE.md, toàn bộ SPEC và mục cuối LOG của T-037. Đọc trực tiếp DT18, hướng dẫn của cô, MRP phần RQ3/RQ5/P5/P6/P9/G3, LESSONS, WHY/DECISIONS liên quan và phương án P5b gốc trong LOG T-036 Phiên 1.
+2. Tự rà từ nguồn như lần đầu. Đọc nguồn/code/đầu ra gốc và lập nhận xét trước khi mở kết luận phản biện hoặc phản hồi cũ. Đọc nguyên văn Prompt chung + khối Soát SPEC + khối G3 trong docs/review-prompt.md làm tiêu chí tự rà. Quyền của bạn theo lời giao triển khai này và SPEC, không lấy quyền chỉ đọc của prompt reviewer để thay vai trò.
+3. Kiểm manifest và hash đầu vào trước dùng. Pin chung là T-036 được SPEC liệt kê, current_run runs/kiem-r1-after-002; snapshot code tại results/T-036/runs/kiem-r1-after-002/code/, code-hashes.json tại thư mục run. Kiểm mã hiện hành khớp snapshot. Không tự đổi pin hoặc cập nhật hash để hợp thức hóa nguồn lệch.
+4. Đối chiếu toàn phạm vi với khả năng xong trong một phiên: đọc nguồn, coverage, dựng graph, oracle, tự kiểm, phân xử và bàn giao. Tách giờ công, giờ máy, RAM và tổng đĩa cho mọi lượt cần giữ. Dự toán chưa đo phải ghi đúng trạng thái. Nếu không vừa một phiên hoặc chưa đủ căn cứ phân xử, trình phương án tách và ảnh hưởng; không tự tách mã task hay giảm tiêu chí.
+5. Nguồn FlashTicket chỉ đọc ở D:/Project/flash-ticket-platform. Đọc AGENTS.md, skill .agents/skills/govern-capstone-work/SKILL.md và nguồn bắt buộc trước khảo sát. Đọc các nguồn thiết kế được SPEC giao, ghim revision/hash/dirty state. Không đọc hệ thống cũ hoặc RCA archive. Nếu phát sinh nguồn cần tải, trình nguồn/revision/tệp hoặc nhóm tệp, lý do, phần loại trừ, byte tải, dung lượng giải nén/tổng lưu và đường dẫn ghi; chờ Minh duyệt đúng phần đó.
+
+Nếu tự rà phát hiện lỗi cần sửa SPEC, mâu thuẫn nguồn/quyền hoặc phụ thuộc chặn: dừng phần phụ thuộc; báo vị trí, bằng chứng, hậu quả và đề xuất sửa theo file để Minh quyết. Không tự sửa SPEC. Nếu không có vấn đề và phạm vi khả thi, báo kết quả tự rà rồi tiếp tục triển khai ngay, không hỏi lại quyền đã có. Khi chờ duyệt nguồn, tiếp tục phần độc lập đủ nguồn và nằm trong quyền.
+
+Phạm vi ghi: results/T-037/, nối tasks/T-037-p5b-flashticket/LOG.md và chỉ dòng T-037 trong docs/STATE.md. Ghi nguyên văn lời giao, ngày, thiết bị, vai trò và kết quả tự rà vào LOG. Trạng thái ĐỀ XUẤT trong tài liệu là mốc trước lời giao này; không tự sửa SPEC. Không ghi REVIEW, DECISIONS, WHY, src/, T-035/T-036, repo platform hoặc task khác. Quyết định cần ghi sổ chính thức thì trình nội dung và phạm vi riêng.
+
+Thực hiện đủ SPEC. Inventory phải được kiểm coverage theo toàn phạm vi nguồn ghim; thao tác chỉ lập khi có bằng chứng. Rà đủ HTTP/RPC, DB logic và instance chung, cache, messaging/queue/fan-out/retry, outbox/inbox, callback/query, scheduler, Saga/bù trừ/terminal fence, delivery/check-in, role-grant/projection và hỗ trợ/vận hành. Giữ provenance, owner, điều kiện và địa chỉ tín hiệu. Tên thao tác thiết kế chưa là tên runtime.
+
+Viết oracle độc lập trước phần chuyển đổi riêng. Dùng công cụ T-036 đã ghim; kiểm bản ghi → ID/type/address → graph/phép chiếu/binding/signal. Không tạo operation giả, không nhân metric chung thành bằng chứng độc lập, không nối message/callback từ correlation. Hợp đồng thiếu biểu diễn thì giữ phản ví dụ, dừng phần phụ thuộc và trình ảnh hưởng cả ba nhánh. Không sửa hoặc fork nghĩa hợp đồng chung.
+
+T-038/T-039 có thể chạy song song. Giữ thay đổi của các phiên khác. STATE phải cập nhật tuần tự, đọc lại bản mới nhất ngay trước sửa đúng dòng task; nếu không bảo đảm được thì trình dòng cần cập nhật để Minh điều phối. Đo thời gian/RAM khi không có việc nặng khác chạy đồng thời; không tự dừng tiến trình phiên khác. Thao tác tốn kém theo AGENTS phải báo chi phí và chờ duyệt.
+
+Giữ mọi lượt kể cả lỗi, trung gian, lệnh, môi trường và thời gian. Không mở test/heldout/telemetry thô, chọn P6, làm T-040, bật EC2, commit/push hoặc tự mở/gửi chat.
+
+Cuối phiên kiểm toàn diff và đúng phạm vi; báo phần đạt, câu hỏi nguồn đã trả lời, OPEN và quyết định phụ thuộc. Nối LOG đủ bước tiếp/lệnh cuối, cập nhật đúng dòng STATE. Soạn prompt Claude bằng nguyên văn Prompt chung + khối Soát kết quả + G3 hiện hành; nếu dừng vì cần sửa SPEC thì dùng khối Soát SPEC. Minh chuyển thủ công. Không tự nghiệm thu hoặc đóng task/G3.

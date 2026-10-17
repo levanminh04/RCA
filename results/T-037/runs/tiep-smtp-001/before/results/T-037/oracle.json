@@ -1,0 +1,48 @@
+{
+  "task": "T-037",
+  "purpose": "Đáp án độc lập, viết trước mã chuyển đổi riêng T-037. Literal từ nguồn thiết kế và hợp đồng đã kiểm hash; không lấy graph do build tạo làm oracle.",
+  "state": "CANDIDATE_DESIGN_MODEL_NOT_RUNTIME",
+  "must_have_entities": ["event-service", "booking-service", "payment-service", "ticket-service", "user-service", "api-gateway", "keycloak", "broker", "cache", "event_db", "booking_db", "payment_db", "ticket_db", "keycloak_db", "user_db", "postgresql-shared-instance", "mongodb-instance", "ft-design-machine-1", "ft-design-machine-2", "vnpay", "smtp", "otel-collector", "tempo", "loki", "prometheus", "grafana", "rca", "gemini-api"],
+  "data_edges": [["event-service", "event_db"], ["booking-service", "booking_db"], ["payment-service", "payment_db"], ["ticket-service", "ticket_db"], ["user-service", "user_db"], ["keycloak", "keycloak_db"]],
+  "shared_postgresql_databases": ["event_db", "booking_db", "payment_db", "ticket_db", "keycloak_db"],
+  "http_edges": [["payment-service", "booking-service"], ["payment-service", "ticket-service"], ["event-service", "payment-service"], ["payment-service", "vnpay"], ["vnpay", "payment-service"], ["ticket-service", "smtp"], ["user-service", "keycloak"], ["rca", "gemini-api"]],
+  "business_messages": [
+    ["event.sales-configured.v1", "event-service", "booking-service"],
+    ["event.access-configured.v1", "event-service", "ticket-service"],
+    ["event.finance-configured.v1", "event-service", "payment-service"],
+    ["event.cancelled.v1", "event-service", "booking-service"],
+    ["event.cancelled.v1", "event-service", "ticket-service"],
+    ["event.cancelled.v1", "event-service", "payment-service"],
+    ["booking.accept-payment.v1", "payment-service", "booking-service"],
+    ["booking.payment-decision.v1", "booking-service", "payment-service"],
+    ["ticket.issue.v1", "payment-service", "ticket-service"],
+    ["ticket.issuance-result.v1", "ticket-service", "payment-service"],
+    ["booking.issuance-result.v1", "payment-service", "booking-service"]
+  ],
+  "business_exchange": "flash-ticket.v1",
+  "runtime_names_known": false,
+  "source_queue_names_known": false,
+  "source_broker_scope_known": false,
+  "forbidden_direct_dependency": [["ticket-service", "booking-service"]],
+  "fixture_expectations": {
+    "two_queues_same_consumer": {"consume_edge_count": 2, "metric_address_count": 2},
+    "fanout": {"logical_message_targets": ["booking-service", "ticket-service", "payment-service"]},
+    "shared_metric": {"operation": null, "shared": true, "copies_per_operation": 0},
+    "missing_operation_mapping": {"operation_comparison": "excluded", "invent_operation": false},
+    "missing_queue_or_scope": {"matching_consume": false},
+    "callback_new_trace": {"correlation_creates_parent": false},
+    "scheduler": {"requires_incoming_caller": false},
+    "retry": {"logical_message_count_from_attempts": false},
+    "projection": {"internal_and_span_parent_projected": false, "entity_only_requires_fake_operation": false},
+    "unknown_type": {"typed_match": false},
+    "input_mutation": false,
+    "deterministic_on_reorder": true
+  },
+  "sources": {
+    "topology": "B12 §2; B11-C §3/§6",
+    "http": "B13 §4/§5.2/§5.3/§6/§9; B14 §6; B11-C §5",
+    "messages": "B13 §5.1/§5.2",
+    "runtime_boundaries": "B16 §3/§5; B14 §7",
+    "diagram_interpretation": "B11-C §1 và chú thích sơ đồ giao hợp đồng endpoint/topic/sequence cho B13/B14; TKT→BKG trên sơ đồ là mức trách nhiệm, không xác minh endpoint trực tiếp"
+  }
+}

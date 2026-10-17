@@ -1,0 +1,4837 @@
+[
+  {
+    "source_id": "FT-B12",
+    "locator": "L1-L11",
+    "summary": "Metadata nguồn B12-v0.2, trạng thái/thẩm quyền/đầu vào và phạm vi thiết kế.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L12-L26",
+    "summary": "B12-v0.2 là nguồn thiết kế; PA-6 năm owner, một Saga Payment; hai máy không HA; một PostgreSQL instance, MongoDB riêng, Keycloak DB riêng; bootstrap sạch.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L27-L41",
+    "summary": "Sáu DB logic, sáu owner/principal, năm DB chung PostgreSQL máy 1 và user_db trên MongoDB máy 2. Vị trí ứng viên; dùng chung CPU/IO/roles/failure domain, endpoint môi trường chưa xác minh.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L42-L57",
+    "summary": "Phân tách app/owner/migrator/backup; RCA không CONNECT/SELECT business/Keycloak DB; DELETE giới hạn và backup/restore có điều kiện. Không sinh cạnh RCA→DB hoặc credential giả.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L58-L67",
+    "summary": "UUID/sub identity, UTC và cửa sổ nghiệp vụ riêng, VND nguyên/HALF_UP, row/source versions, snapshot bất biến, FK cục bộ, sáu trạng thái order. Giá trị/cột/constraint không là operation hoặc dependency mới.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L68-L69",
+    "summary": "Danh mục theo năm owner; chi tiết từng owner và dictionary được phủ riêng.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L70-L83",
+    "summary": "12 bảng Event; cấu hình thương mại/ghế/giá/khuyến mãi/hủy và outbox/inbox trong event_db. Không tự thêm counter tickets_sold hoặc thao tác bật/tắt.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L84-L97",
+    "summary": "15 bảng Booking; inventory/reservation/order/promotion/idempotency/outbox/inbox cục bộ, expected state/generation và trả đúng một lần. Không thêm giỏ hàng bền vững.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L98-L111",
+    "summary": "13 bảng Payment; attempt/charge/confirmation/refund/run/payout/Saga/outbox/inbox. Không gộp retry thành refund mới; mismatch/orphan ngoài workflow và tiền/vé có vòng đời riêng.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L112-L124",
+    "summary": "7 bảng Ticket; issuance/tickets/delivery/checkin audit/outbox/inbox; terminal fence và dữ liệu QR cần khóa ngoài DB; delivery lỗi không vô hiệu vé hoặc kích hoàn.",
+    "record_ids": [
+      "d-ticket-service-ticket_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db"
+    ],
+    "entity_ids": [
+      "ticket-service",
+      "ticket_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L125-L138",
+    "summary": "4 collection User; subject từ Keycloak, application nguồn và profile projection; roleGrant nhúng kỹ thuật, phục hồi từng phần; không FK/JOIN Keycloak hoặc transaction xuyên document.",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L139-L152",
+    "summary": "Ma trận bản sao Event→Booking/Payment/Ticket, Booking→Payment, input vé và thống kê, Keycloak→User. Soft IDs/snapshots không là FK/JOIN xuyên DB; transport/operation phải lấy B13/B14, không sinh cạnh gọi từ bảng này.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L153-L162",
+    "summary": "Keycloak nguồn danh tính/role, keycloak_db nội bộ; chỉ User có client Admin API; fixture còn khóa chức năng và thiếu cấu hình thật. Không khẳng định registration/organizer/SMTP vận hành.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "OPEN_RUNTIME",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L163-L177",
+    "summary": "DDL/validator khác transaction/service và hợp đồng xuyên biên; init mới không migration/seed. Đọc mô tả nguồn; không chạy hoặc đọc fixture tests. Hành vi E2E/concurrency chưa có bằng chứng service.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "OPEN_RUNTIME",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L178-L185",
+    "summary": "Nguồn RCA chỉ đối chiếu, không sinh owner/database/bảng; năm service ID từ hệ thống. Resource/log/metric thực cần B13/B16 và runtime.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L186-L200",
+    "summary": "Theo dõi B12-OPEN-01..08: các quyết định dữ liệu và persistence đã ghi; cấu hình thật/quyền/TLS/secret/backup/crash/replay/E2E còn kiểm. Câu DRAFT lịch sử không được dùng nâng trạng thái mô hình RCA.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "OPEN_RUNTIME",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L201-L211",
+    "summary": "Lịch sử đồng bộ VND/state/ghế/snapshot/finance/Saga/outbox/inbox/quyền xóa; không thêm thao tác từ tên cột hoặc coi lịch sử sửa là runtime.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L212-L220",
+    "summary": "ERD/SQL/validator dẫn xuất từ B12; legacy COMPARISON bị loại khỏi nguồn hình thành và không được đọc; báo cáo giữ ownership/trade-off/giới hạn.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L221-L227",
+    "summary": "Lịch sử v0.1/v0.2, 47 bảng/4 collection; không thay hash nội dung ghim hoặc xác minh runtime.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L228-L233",
+    "summary": "47 bảng / 467 cột: Event 12, Booking 15, Payment 13, Ticket 7; không đếm bảng Keycloak nội bộ. Mỗi dictionary table bên dưới ánh xạ DB/owner, không tạo node từng bảng.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L234-L243",
+    "summary": "event_schema.categories: 3 cột: id, name, created_at. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L244-L254",
+    "summary": "event_schema.venues: 4 cột: id, name, address, created_at. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L255-L303",
+    "summary": "event_schema.events: 22 cột: id, organizer_subject, category_id, venue_id, title, description, sales_mode, status, starts_at, ends_at, sale_starts_at, sale_ends_at, checkin_starts_at, checkin_ends_at, purchase_limit, fee_rate, approved_by, approved_at, source_config_version, row_version, created_at, updated_at. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L304-L316",
+    "summary": "event_schema.event_images: 4 cột: id, event_id, object_reference, display_order. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L317-L336",
+    "summary": "event_schema.event_layouts: 7 cột: id, event_id, name, canvas_width, canvas_height, background_image_reference, layout_data. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L337-L361",
+    "summary": "event_schema.event_sectors: 10 cột: id, event_id, layout_id, name, sector_type, configured_capacity, code, display_order, color_code, geometry. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L362-L387",
+    "summary": "event_schema.event_seats: 11 cột: id, event_id, sector_id, sector_type, seat_label, row_name, seat_number, coord_x, coord_y, ticket_type_id, is_hidden. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L388-L415",
+    "summary": "event_schema.ticket_types: 9 cột: id, event_id, name, sales_mode, sector_id, color_code, unit_price, currency, configured_quantity. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L416-L447",
+    "summary": "event_schema.promotions: 11 cột: id, event_id, code, starts_at, ends_at, discount_kind, fixed_discount, currency, discount_rate, maximum_uses, maximum_uses_per_user. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L448-L469",
+    "summary": "event_schema.event_cancellation_requests: 9 cột: id, event_id, requested_by, requested_at, reason, status, reviewed_by, reviewed_at, review_reason. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L470-L492",
+    "summary": "event_schema.outbox_messages: 14 cột: message_id, aggregate_id, aggregate_version, message_type, schema_version, payload, occurred_at, correlation_id, causation_id, traceparent, published_at, attempts, next_attempt_at, last_error_code. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L493-L506",
+    "summary": "event_schema.inbox_messages: 5 cột: consumer_name, message_id, payload_hash, processed_at, response_payload. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L507-L527",
+    "summary": "booking_schema.event_sales_snapshots: 10 cột: event_id, organizer_subject, sales_mode, event_status, sale_starts_at, sale_ends_at, purchase_limit, configuration_snapshot, source_config_version, received_at. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L528-L595",
+    "summary": "booking_schema.orders: 21 cột: id, event_id, buyer_subject, sales_mode, sector_id, lifecycle_state, customer_email, payment_frozen_at, payment_snapshot_version, frozen_purchase_snapshot, accepted_charge_id, accepted_at, subtotal, discount, total, currency, expires_at, source_config_version, row_version, created_at, updated_at. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L596-L630",
+    "summary": "booking_schema.order_items: 12 cột: id, order_id, event_id, ticket_type_id, sector_id, sales_mode, ticket_type_name, quantity, unit_price, line_subtotal, currency, selection_snapshot. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L631-L659",
+    "summary": "booking_schema.reservations: 8 cột: id, order_id, event_id, buyer_subject, state, expires_at, row_version, created_at. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L660-L677",
+    "summary": "booking_schema.ticket_type_inventory: 7 cột: ticket_type_id, event_id, configured_capacity, held, purchased, source_config_version, row_version. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L678-L698",
+    "summary": "booking_schema.sector_inventory: 8 cột: sector_id, event_id, sector_type, configured_capacity, held, purchased, source_config_version, row_version. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L699-L735",
+    "summary": "booking_schema.seat_inventory: 12 cột: seat_id, event_id, sector_id, ticket_type_id, is_hidden, sector_type, seat_label, state, current_reservation_id, reservation_generation, source_config_version, row_version. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L736-L757",
+    "summary": "booking_schema.order_item_seats: 5 cột: order_item_id, order_id, event_id, sector_id, seat_id. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L758-L795",
+    "summary": "booking_schema.reservation_allocations: 11 cột: id, reservation_id, order_id, order_item_id, event_id, resource_kind, ticket_type_id, sector_id, seat_id, quantity, state. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L796-L813",
+    "summary": "booking_schema.purchase_limits: 7 cột: event_id, buyer_subject, configured_limit, held, purchased, source_config_version, row_version. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L814-L837",
+    "summary": "booking_schema.promotion_inventory: 11 cột: promotion_id, event_id, configured_limit, per_user_limit, held, used, starts_at, ends_at, configuration_snapshot, source_config_version, row_version. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L838-L869",
+    "summary": "booking_schema.promotion_usages: 11 cột: id, promotion_id, event_id, reservation_id, buyer_subject, generation, state, discount, currency, expires_at, row_version. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L870-L885",
+    "summary": "booking_schema.idempotency_requests: 7 cột: actor_subject, operation, request_key, request_hash, resource_id, response_status, created_at. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L886-L908",
+    "summary": "booking_schema.outbox_messages: 14 cột: message_id, aggregate_id, aggregate_version, message_type, schema_version, payload, occurred_at, correlation_id, causation_id, traceparent, published_at, attempts, next_attempt_at, last_error_code. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L909-L922",
+    "summary": "booking_schema.inbox_messages: 5 cột: consumer_name, message_id, payload_hash, processed_at, response_payload. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L923-L941",
+    "summary": "payment_schema.event_finance_snapshots: 8 cột: event_id, organizer_subject, event_ends_at, fee_rate, source_fee_version, cancellation_id, cancelled_at, received_at. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L942-L964",
+    "summary": "payment_schema.order_payment_snapshots: 10 cột: order_id, event_id, buyer_subject, expected_amount, currency, expires_at, source_order_version, purchase_snapshot, snapshot_hash, received_at. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L965-L998",
+    "summary": "payment_schema.payment_attempts: 13 cột: id, order_id, provider, merchant_account, expected_amount, currency, started_at, finished_at, state, request_key, request_hash, payment_url, row_version. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L999-L1025",
+    "summary": "payment_schema.charges: 10 cột: id, attempt_id, order_id, provider, merchant_account, provider_charge_id, amount, currency, charged_at, recorded_at. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L1026-L1043",
+    "summary": "payment_schema.payment_confirmations: 5 cột: order_id, charge_id, amount, currency, confirmed_at. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L1044-L1070",
+    "summary": "payment_schema.refunds: 10 cột: id, charge_id, order_id, amount, currency, reason, state, created_at, completed_at, row_version. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L1071-L1092",
+    "summary": "payment_schema.refund_attempts: 7 cột: id, refund_id, request_key, provider_refund_id, started_at, finished_at, outcome. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L1093-L1112",
+    "summary": "payment_schema.event_refund_runs: 9 cột: id, event_id, source_cancellation_id, selection_cursor, selection_complete, selected_order_count, started_at, completed_at, row_version. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L1113-L1145",
+    "summary": "payment_schema.event_refund_items: 8 cột: run_id, order_id, event_id, confirmed_charge_id, refund_id, state, last_error_code, updated_at. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L1146-L1177",
+    "summary": "payment_schema.event_payouts: 19 cột: event_id, organizer_subject, currency, valid_gross, valid_refunds, fee_amount, net_amount, fee_rate, source_fee_version, event_ends_at, payment_pending_count, refund_pending_count, as_of, reconciled_by, reconciled_at, reconciliation_evidence, paid_by, paid_at, row_version. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L1178-L1197",
+    "summary": "payment_schema.payment_sagas: 9 cột: order_id, charge_id, state, command_id, next_attempt_at, last_error_code, row_version, created_at, updated_at. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L1198-L1220",
+    "summary": "payment_schema.outbox_messages: 14 cột: message_id, aggregate_id, aggregate_version, message_type, schema_version, payload, occurred_at, correlation_id, causation_id, traceparent, published_at, attempts, next_attempt_at, last_error_code. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L1221-L1234",
+    "summary": "payment_schema.inbox_messages: 5 cột: consumer_name, message_id, payload_hash, processed_at, response_payload. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L1235-L1250",
+    "summary": "ticket_schema.event_access_snapshots: 7 cột: event_id, organizer_subject, event_status, event_starts_at, event_ends_at, source_config_version, received_at. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-ticket-service-ticket_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db"
+    ],
+    "entity_ids": [
+      "ticket-service",
+      "ticket_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L1251-L1284",
+    "summary": "ticket_schema.issuances: 15 cột: id, order_id, event_id, buyer_subject, payment_confirmation_id, customer_email, purchase_snapshot, input_hash, expected_ticket_count, state, created_at, completed_at, failed_at, failure_code, row_version. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-ticket-service-ticket_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db"
+    ],
+    "entity_ids": [
+      "ticket-service",
+      "ticket_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L1285-L1320",
+    "summary": "ticket_schema.tickets: 17 cột: id, issuance_id, event_id, order_item_id, ordinal, holder_subject, ticket_type_id, sector_id, seat_id, display_snapshot, state, qr_token_ciphertext, qr_key_version, qr_token_hash, used_at, used_by, row_version. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-ticket-service-ticket_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db"
+    ],
+    "entity_ids": [
+      "ticket-service",
+      "ticket_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L1321-L1346",
+    "summary": "ticket_schema.ticket_deliveries: 13 cột: id, issuance_id, requested_by, channel, request_key, request_hash, recipient_email, requested_at, finished_at, outcome, failure_code, attempts, next_attempt_at. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-ticket-service-ticket_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db"
+    ],
+    "entity_ids": [
+      "ticket-service",
+      "ticket_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L1347-L1376",
+    "summary": "ticket_schema.checkin_attempts: 11 cột: id, ticket_id, request_key, replay_of, actor_subject, requested_event_id, request_hash, requested_at, result_code, succeeded, correlation_id. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-ticket-service-ticket_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db"
+    ],
+    "entity_ids": [
+      "ticket-service",
+      "ticket_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L1377-L1399",
+    "summary": "ticket_schema.outbox_messages: 14 cột: message_id, aggregate_id, aggregate_version, message_type, schema_version, payload, occurred_at, correlation_id, causation_id, traceparent, published_at, attempts, next_attempt_at, last_error_code. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-ticket-service-ticket_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db"
+    ],
+    "entity_ids": [
+      "ticket-service",
+      "ticket_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L1400-L1413",
+    "summary": "ticket_schema.inbox_messages: 5 cột: consumer_name, message_id, payload_hash, processed_at, response_payload. Phủ cả purpose/trade-off, NULL/default/CHECK/FK/UNIQUE/index trong khoảng nguồn; giữ tham chiếu cục bộ, không dựng node bảng/cột.",
+    "record_ids": [
+      "d-ticket-service-ticket_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db"
+    ],
+    "entity_ids": [
+      "ticket-service",
+      "ticket_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Dictionary thuộc DB logic đã ánh xạ; column/constraint không là operation hoặc quan hệ runtime giữa service.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L1414-L1417",
+    "summary": "4 collection; validator BSON object đóng, UUID string/date/version; thiếu FK và cần kiểm chủ thể/sourceVersion ở User. Giữ collection/field dictionary, không biến chúng thành process/operation.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L1418-L1430",
+    "summary": "users: 6 dòng field gồm nested field: _id, createdAt, updatedAt, version, identitySubject, displayName. Phủ BSON/index/điều kiện trạng thái trong khoảng; roleGrant nằm trong application, profile là projection.",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Collection/field thuộc user_db; không sinh graph node hoặc operation cho collection, field hay roleGrant.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L1431-L1453",
+    "summary": "organizer_applications: 16 dòng field gồm nested field: _id, createdAt, updatedAt, version, identitySubject, organizationName, shortDescription, status, rejectionReason, decidedBySubject, decidedAt, roleGrant, roleGrant.operationId, roleGrant.status, roleGrant.attemptedAt, roleGrant.confirmedAt. Phủ BSON/index/điều kiện trạng thái trong khoảng; roleGrant nằm trong application, profile là projection.",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Collection/field thuộc user_db; không sinh graph node hoặc operation cho collection, field hay roleGrant.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L1454-L1470",
+    "summary": "organizer_profiles: 10 dòng field gồm nested field: _id, identitySubject, sourceApplicationId, sourceVersion, organizationName, shortDescription, status, logoUrl, bannerUrl, refreshedAt. Phủ BSON/index/điều kiện trạng thái trong khoảng; roleGrant nằm trong application, profile là projection.",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Collection/field thuộc user_db; không sinh graph node hoặc operation cho collection, field hay roleGrant.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12",
+    "locator": "L1471-L1482",
+    "summary": "user_follows: 4 dòng field gồm nested field: _id, buyerSubject, organizerSubject, createdAt. Phủ BSON/index/điều kiện trạng thái trong khoảng; roleGrant nằm trong application, profile là projection.",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Collection/field thuộc user_db; không sinh graph node hoặc operation cho collection, field hay roleGrant.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L8-L10",
+    "summary": "Biểu diễn dẫn xuất: event / categories; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L11-L13",
+    "summary": "Biểu diễn dẫn xuất: event / venues; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L14-L21",
+    "summary": "Biểu diễn dẫn xuất: event / events; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L22-L25",
+    "summary": "Biểu diễn dẫn xuất: event / event_images; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L26-L29",
+    "summary": "Biểu diễn dẫn xuất: event / event_layouts; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L30-L34",
+    "summary": "Biểu diễn dẫn xuất: event / event_sectors; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L35-L41",
+    "summary": "Biểu diễn dẫn xuất: event / event_seats; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L42-L46",
+    "summary": "Biểu diễn dẫn xuất: event / ticket_types; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L47-L50",
+    "summary": "Biểu diễn dẫn xuất: event / promotions; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L51-L55",
+    "summary": "Biểu diễn dẫn xuất: event / event_cancellation_requests; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L56-L63",
+    "summary": "Biểu diễn dẫn xuất: event / outbox_messages; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L64-L66",
+    "summary": "Biểu diễn dẫn xuất: event / inbox_messages; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L67",
+    "summary": "Quan hệ hình: categories -- events",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L68",
+    "summary": "Quan hệ hình: venues -- events",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L69",
+    "summary": "Quan hệ hình: events -- event_images",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L70",
+    "summary": "Quan hệ hình: events -- event_layouts",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L71",
+    "summary": "Quan hệ hình: event_layouts -- event_sectors",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L72",
+    "summary": "Quan hệ hình: event_sectors -- event_seats",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L73",
+    "summary": "Quan hệ hình: events -- ticket_types",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L74",
+    "summary": "Quan hệ hình: event_sectors -- ticket_types",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L75",
+    "summary": "Quan hệ hình: events -- promotions",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L76",
+    "summary": "Quan hệ hình: events -- event_cancellation_requests",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L77",
+    "summary": "Quan hệ hình: ticket_types -- event_seats",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L1-L7",
+    "summary": "Header/legend/note/layout: ERD/document map chỉ dữ liệu cục bộ; FK không khẳng định bội số, roleGrant/projection chưa chứng minh thao tác Keycloak; standalone Mongo không có transaction xuyên document.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Chú giải/ràng buộc ý nghĩa được giữ; không phải operation, transport hoặc quan sát runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-01",
+    "locator": "L78-L79",
+    "summary": "Header/legend/note/layout: ERD/document map chỉ dữ liệu cục bộ; FK không khẳng định bội số, roleGrant/projection chưa chứng minh thao tác Keycloak; standalone Mongo không có transaction xuyên document.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "b-owner-event_db",
+      "b-host-event_db"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Chú giải/ràng buộc ý nghĩa được giữ; không phải operation, transport hoặc quan sát runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L8-L12",
+    "summary": "Biểu diễn dẫn xuất: booking / event_sales_snapshots; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L13-L22",
+    "summary": "Biểu diễn dẫn xuất: booking / orders; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L23-L29",
+    "summary": "Biểu diễn dẫn xuất: booking / order_items; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L30-L36",
+    "summary": "Biểu diễn dẫn xuất: booking / reservations; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L37-L42",
+    "summary": "Biểu diễn dẫn xuất: booking / ticket_type_inventory; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L43-L48",
+    "summary": "Biểu diễn dẫn xuất: booking / sector_inventory; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L49-L58",
+    "summary": "Biểu diễn dẫn xuất: booking / seat_inventory; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L59-L65",
+    "summary": "Biểu diễn dẫn xuất: booking / order_item_seats; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L66-L75",
+    "summary": "Biểu diễn dẫn xuất: booking / reservation_allocations; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L76-L80",
+    "summary": "Biểu diễn dẫn xuất: booking / purchase_limits; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L81-L86",
+    "summary": "Biểu diễn dẫn xuất: booking / promotion_inventory; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L87-L94",
+    "summary": "Biểu diễn dẫn xuất: booking / promotion_usages; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L95-L98",
+    "summary": "Biểu diễn dẫn xuất: booking / idempotency_requests; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L99-L106",
+    "summary": "Biểu diễn dẫn xuất: booking / outbox_messages; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L107-L109",
+    "summary": "Biểu diễn dẫn xuất: booking / inbox_messages; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L110",
+    "summary": "Quan hệ hình: event_sales_snapshots -- orders",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L111",
+    "summary": "Quan hệ hình: orders -- order_items",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L112",
+    "summary": "Quan hệ hình: orders -- reservations",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L113",
+    "summary": "Quan hệ hình: event_sales_snapshots -- ticket_type_inventory",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L114",
+    "summary": "Quan hệ hình: event_sales_snapshots -- sector_inventory",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L115",
+    "summary": "Quan hệ hình: sector_inventory -- seat_inventory",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L116",
+    "summary": "Quan hệ hình: reservations -- seat_inventory",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L117",
+    "summary": "Quan hệ hình: order_items -- order_item_seats",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L118",
+    "summary": "Quan hệ hình: orders -- order_item_seats",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L119",
+    "summary": "Quan hệ hình: seat_inventory -- order_item_seats",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L120",
+    "summary": "Quan hệ hình: reservations -- reservation_allocations",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L121",
+    "summary": "Quan hệ hình: order_items -- reservation_allocations",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L122",
+    "summary": "Quan hệ hình: ticket_type_inventory -- reservation_allocations",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L123",
+    "summary": "Quan hệ hình: sector_inventory -- reservation_allocations",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L124",
+    "summary": "Quan hệ hình: seat_inventory -- reservation_allocations",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L125",
+    "summary": "Quan hệ hình: event_sales_snapshots -- purchase_limits",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L126",
+    "summary": "Quan hệ hình: event_sales_snapshots -- promotion_inventory",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L127",
+    "summary": "Quan hệ hình: promotion_inventory -- promotion_usages",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L128",
+    "summary": "Quan hệ hình: reservations -- promotion_usages",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L129",
+    "summary": "Quan hệ hình: sector_inventory -- orders",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L1-L7",
+    "summary": "Header/legend/note/layout: ERD/document map chỉ dữ liệu cục bộ; FK không khẳng định bội số, roleGrant/projection chưa chứng minh thao tác Keycloak; standalone Mongo không có transaction xuyên document.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Chú giải/ràng buộc ý nghĩa được giữ; không phải operation, transport hoặc quan sát runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-02",
+    "locator": "L130-L131",
+    "summary": "Header/legend/note/layout: ERD/document map chỉ dữ liệu cục bộ; FK không khẳng định bội số, roleGrant/projection chưa chứng minh thao tác Keycloak; standalone Mongo không có transaction xuyên document.",
+    "record_ids": [
+      "d-booking-service-booking_db",
+      "b-owner-booking_db",
+      "b-host-booking_db"
+    ],
+    "entity_ids": [
+      "booking-service",
+      "booking_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Chú giải/ràng buộc ý nghĩa được giữ; không phải operation, transport hoặc quan sát runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L8-L12",
+    "summary": "Biểu diễn dẫn xuất: payment / event_finance_snapshots; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L13-L18",
+    "summary": "Biểu diễn dẫn xuất: payment / order_payment_snapshots; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L19-L25",
+    "summary": "Biểu diễn dẫn xuất: payment / payment_attempts; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L26-L32",
+    "summary": "Biểu diễn dẫn xuất: payment / charges; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L33-L37",
+    "summary": "Biểu diễn dẫn xuất: payment / payment_confirmations; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L38-L45",
+    "summary": "Biểu diễn dẫn xuất: payment / refunds; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L46-L50",
+    "summary": "Biểu diễn dẫn xuất: payment / refund_attempts; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L51-L56",
+    "summary": "Biểu diễn dẫn xuất: payment / event_refund_runs; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L57-L64",
+    "summary": "Biểu diễn dẫn xuất: payment / event_refund_items; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L65-L71",
+    "summary": "Biểu diễn dẫn xuất: payment / event_payouts; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L72-L78",
+    "summary": "Biểu diễn dẫn xuất: payment / payment_sagas; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L79-L86",
+    "summary": "Biểu diễn dẫn xuất: payment / outbox_messages; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L87-L89",
+    "summary": "Biểu diễn dẫn xuất: payment / inbox_messages; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L90",
+    "summary": "Quan hệ hình: order_payment_snapshots -- payment_attempts",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L91",
+    "summary": "Quan hệ hình: payment_attempts -- charges",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L92",
+    "summary": "Quan hệ hình: order_payment_snapshots -- payment_confirmations",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L93",
+    "summary": "Quan hệ hình: charges -- payment_confirmations",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L94",
+    "summary": "Quan hệ hình: charges -- refunds",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L95",
+    "summary": "Quan hệ hình: refunds -- refund_attempts",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L96",
+    "summary": "Quan hệ hình: event_refund_runs -- event_refund_items",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L97",
+    "summary": "Quan hệ hình: order_payment_snapshots -- event_refund_items",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L98",
+    "summary": "Quan hệ hình: payment_confirmations -- event_refund_items",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L99",
+    "summary": "Quan hệ hình: refunds -- event_refund_items",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L100",
+    "summary": "Quan hệ hình: order_payment_snapshots -- payment_sagas",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L101",
+    "summary": "Quan hệ hình: charges -- payment_sagas",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L1-L7",
+    "summary": "Header/legend/note/layout: ERD/document map chỉ dữ liệu cục bộ; FK không khẳng định bội số, roleGrant/projection chưa chứng minh thao tác Keycloak; standalone Mongo không có transaction xuyên document.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Chú giải/ràng buộc ý nghĩa được giữ; không phải operation, transport hoặc quan sát runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-03",
+    "locator": "L102-L103",
+    "summary": "Header/legend/note/layout: ERD/document map chỉ dữ liệu cục bộ; FK không khẳng định bội số, roleGrant/projection chưa chứng minh thao tác Keycloak; standalone Mongo không có transaction xuyên document.",
+    "record_ids": [
+      "d-payment-service-payment_db",
+      "b-owner-payment_db",
+      "b-host-payment_db"
+    ],
+    "entity_ids": [
+      "payment-service",
+      "payment_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Chú giải/ràng buộc ý nghĩa được giữ; không phải operation, transport hoặc quan sát runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-04",
+    "locator": "L8-L12",
+    "summary": "Biểu diễn dẫn xuất: ticket / event_access_snapshots; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-ticket-service-ticket_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db"
+    ],
+    "entity_ids": [
+      "ticket-service",
+      "ticket_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-04",
+    "locator": "L13-L21",
+    "summary": "Biểu diễn dẫn xuất: ticket / issuances; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-ticket-service-ticket_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db"
+    ],
+    "entity_ids": [
+      "ticket-service",
+      "ticket_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-04",
+    "locator": "L22-L31",
+    "summary": "Biểu diễn dẫn xuất: ticket / tickets; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-ticket-service-ticket_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db"
+    ],
+    "entity_ids": [
+      "ticket-service",
+      "ticket_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-04",
+    "locator": "L32-L36",
+    "summary": "Biểu diễn dẫn xuất: ticket / ticket_deliveries; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-ticket-service-ticket_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db"
+    ],
+    "entity_ids": [
+      "ticket-service",
+      "ticket_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-04",
+    "locator": "L37-L42",
+    "summary": "Biểu diễn dẫn xuất: ticket / checkin_attempts; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-ticket-service-ticket_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db"
+    ],
+    "entity_ids": [
+      "ticket-service",
+      "ticket_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-04",
+    "locator": "L43-L50",
+    "summary": "Biểu diễn dẫn xuất: ticket / outbox_messages; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-ticket-service-ticket_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db"
+    ],
+    "entity_ids": [
+      "ticket-service",
+      "ticket_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-04",
+    "locator": "L51-L53",
+    "summary": "Biểu diễn dẫn xuất: ticket / inbox_messages; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-ticket-service-ticket_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db"
+    ],
+    "entity_ids": [
+      "ticket-service",
+      "ticket_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-04",
+    "locator": "L54",
+    "summary": "Quan hệ hình: event_access_snapshots -- issuances",
+    "record_ids": [
+      "d-ticket-service-ticket_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db"
+    ],
+    "entity_ids": [
+      "ticket-service",
+      "ticket_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-04",
+    "locator": "L55",
+    "summary": "Quan hệ hình: issuances -- tickets",
+    "record_ids": [
+      "d-ticket-service-ticket_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db"
+    ],
+    "entity_ids": [
+      "ticket-service",
+      "ticket_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-04",
+    "locator": "L56",
+    "summary": "Quan hệ hình: issuances -- ticket_deliveries",
+    "record_ids": [
+      "d-ticket-service-ticket_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db"
+    ],
+    "entity_ids": [
+      "ticket-service",
+      "ticket_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-04",
+    "locator": "L57",
+    "summary": "Quan hệ hình: tickets -- checkin_attempts",
+    "record_ids": [
+      "d-ticket-service-ticket_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db"
+    ],
+    "entity_ids": [
+      "ticket-service",
+      "ticket_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-04",
+    "locator": "L58",
+    "summary": "Quan hệ hình: checkin_attempts -- checkin_attempts",
+    "record_ids": [
+      "d-ticket-service-ticket_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db"
+    ],
+    "entity_ids": [
+      "ticket-service",
+      "ticket_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-04",
+    "locator": "L1-L7",
+    "summary": "Header/legend/note/layout: ERD/document map chỉ dữ liệu cục bộ; FK không khẳng định bội số, roleGrant/projection chưa chứng minh thao tác Keycloak; standalone Mongo không có transaction xuyên document.",
+    "record_ids": [
+      "d-ticket-service-ticket_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db"
+    ],
+    "entity_ids": [
+      "ticket-service",
+      "ticket_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Chú giải/ràng buộc ý nghĩa được giữ; không phải operation, transport hoặc quan sát runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-04",
+    "locator": "L59-L60",
+    "summary": "Header/legend/note/layout: ERD/document map chỉ dữ liệu cục bộ; FK không khẳng định bội số, roleGrant/projection chưa chứng minh thao tác Keycloak; standalone Mongo không có transaction xuyên document.",
+    "record_ids": [
+      "d-ticket-service-ticket_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db"
+    ],
+    "entity_ids": [
+      "ticket-service",
+      "ticket_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Chú giải/ràng buộc ý nghĩa được giữ; không phải operation, transport hoặc quan sát runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-05",
+    "locator": "L16-L23",
+    "summary": "Biểu diễn dẫn xuất: Hồ sơ người dùng / users; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-05",
+    "locator": "L25-L36",
+    "summary": "Biểu diễn dẫn xuất: Đăng ký organizer / organizer_applications; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-05",
+    "locator": "L38-L43",
+    "summary": "Biểu diễn dẫn xuất: Kết quả cấp quyền / roleGrant; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-05",
+    "locator": "L45-L55",
+    "summary": "Biểu diễn dẫn xuất: Hồ sơ organizer công khai / organizer_profiles; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-05",
+    "locator": "L57-L63",
+    "summary": "Biểu diễn dẫn xuất: Theo dõi organizer / user_follows; các trường trong block được giữ ở coverage DB/owner, không là operation hoặc node độc lập.",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "ERD chọn trường chính; B12 dictionary là nguồn đầy đủ. Collection/embedded object không là service/operation.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-05",
+    "locator": "L65",
+    "summary": "Quan hệ hình: applications *-- roleGrant : nhúng trong cùng document",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-05",
+    "locator": "L66",
+    "summary": "Quan hệ hình: applications ..> profiles : dẫn xuất theo ID + version",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-05",
+    "locator": "L67",
+    "summary": "Quan hệ hình: users -[hidden]down- applications",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-05",
+    "locator": "L68",
+    "summary": "Quan hệ hình: profiles -[hidden]right- follows",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "FK/nhúng/projection hoặc layout bên trong cùng DB; không suy lời gọi giữa service, không tạo cạnh runtime từ quan hệ dữ liệu nội bộ.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-05",
+    "locator": "L1-L15",
+    "summary": "Header/legend/note/layout: ERD/document map chỉ dữ liệu cục bộ; FK không khẳng định bội số, roleGrant/projection chưa chứng minh thao tác Keycloak; standalone Mongo không có transaction xuyên document.",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Chú giải/ràng buộc ý nghĩa được giữ; không phải operation, transport hoặc quan sát runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-05",
+    "locator": "L24",
+    "summary": "Header/legend/note/layout: ERD/document map chỉ dữ liệu cục bộ; FK không khẳng định bội số, roleGrant/projection chưa chứng minh thao tác Keycloak; standalone Mongo không có transaction xuyên document.",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Chú giải/ràng buộc ý nghĩa được giữ; không phải operation, transport hoặc quan sát runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-05",
+    "locator": "L37",
+    "summary": "Header/legend/note/layout: ERD/document map chỉ dữ liệu cục bộ; FK không khẳng định bội số, roleGrant/projection chưa chứng minh thao tác Keycloak; standalone Mongo không có transaction xuyên document.",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Chú giải/ràng buộc ý nghĩa được giữ; không phải operation, transport hoặc quan sát runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-05",
+    "locator": "L44",
+    "summary": "Header/legend/note/layout: ERD/document map chỉ dữ liệu cục bộ; FK không khẳng định bội số, roleGrant/projection chưa chứng minh thao tác Keycloak; standalone Mongo không có transaction xuyên document.",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Chú giải/ràng buộc ý nghĩa được giữ; không phải operation, transport hoặc quan sát runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-05",
+    "locator": "L56",
+    "summary": "Header/legend/note/layout: ERD/document map chỉ dữ liệu cục bộ; FK không khẳng định bội số, roleGrant/projection chưa chứng minh thao tác Keycloak; standalone Mongo không có transaction xuyên document.",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Chú giải/ràng buộc ý nghĩa được giữ; không phải operation, transport hoặc quan sát runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-05",
+    "locator": "L64",
+    "summary": "Header/legend/note/layout: ERD/document map chỉ dữ liệu cục bộ; FK không khẳng định bội số, roleGrant/projection chưa chứng minh thao tác Keycloak; standalone Mongo không có transaction xuyên document.",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Chú giải/ràng buộc ý nghĩa được giữ; không phải operation, transport hoặc quan sát runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-B12-05",
+    "locator": "L69-L95",
+    "summary": "Header/legend/note/layout: ERD/document map chỉ dữ liệu cục bộ; FK không khẳng định bội số, roleGrant/projection chưa chứng minh thao tác Keycloak; standalone Mongo không có transaction xuyên document.",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Chú giải/ràng buộc ý nghĩa được giữ; không phải operation, transport hoặc quan sát runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-DATA-README",
+    "locator": "L1-L4",
+    "summary": "Baseline thiết kế APPROVED theo nguồn, chưa migration hoặc triển khai ứng dụng.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-DATA-README",
+    "locator": "L5-L17",
+    "summary": "Chỉ mục B12/47 bảng/467 cột/4 collection, SQL/Mongo/Keycloak/ERD; validation và legacy comparison được dẫn nhưng không dùng làm evidence runtime.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-DATA-README",
+    "locator": "L18-L30",
+    "summary": "Lệnh và ý nghĩa kiểm tĩnh; không chạy test, không nhận PASS nguồn như kiểm hiện tại.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-DATA-README",
+    "locator": "L31-L43",
+    "summary": "Điều kiện thử nghiệm cô lập, principal và runtime versions; Mongo provision và realm/SMTP/BUYER/Admin API chưa vận hành.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "OPEN_RUNTIME",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-DATA-README",
+    "locator": "L44-L51",
+    "summary": "Credential/restore/QR/shared failure domain; RCA chỉ đọc kho quan sát, không business/Keycloak DB.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-DATA-README",
+    "locator": "L52-L54",
+    "summary": "Điều kiện bàn giao; không nhận baseline là AWS/tải/bất biến đã đạt.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "OPEN_RUNTIME",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-PG-README",
+    "locator": "L1-L4",
+    "summary": "PostgreSQL 16 là ứng viên kiểm cú pháp, chưa image pin triển khai.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "OPEN_RUNTIME",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-PG-README",
+    "locator": "L5-L18",
+    "summary": "Bootstrap năm DB, DDL bốn owner, 47 bảng, grants và rationale; quyền/credential riêng và Keycloak tự quản schema.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-PG-README",
+    "locator": "L19-L28",
+    "summary": "Hướng dẫn runner Docker/portable thử quyền cục bộ; không chạy, không đọc fixture hoặc gọi server.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-PG-README",
+    "locator": "L29-L38",
+    "summary": "Giới hạn DDL/constraint và các state/snapshot/idempotency/Saga/outbox/inbox; thiếu transaction/service/concurrency/restore/QR thật.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "OPEN_RUNTIME",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-PG-README",
+    "locator": "L39-L42",
+    "summary": "Liên kết tài liệu PostgreSQL về schema/constraints/default privileges; không tải vì không cần phân xử topology/owner local.",
+    "record_ids": [
+      "d-event-service-event_db",
+      "d-booking-service-booking_db",
+      "d-payment-service-payment_db",
+      "d-ticket-service-ticket_db",
+      "d-keycloak-keycloak_db",
+      "d-user-service-user_db",
+      "b-owner-event_db",
+      "b-host-event_db",
+      "b-owner-booking_db",
+      "b-host-booking_db",
+      "b-owner-payment_db",
+      "b-host-payment_db",
+      "b-owner-ticket_db",
+      "b-host-ticket_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-postgresql-shared-instance",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "event-service",
+      "event_db",
+      "booking-service",
+      "booking_db",
+      "payment-service",
+      "payment_db",
+      "ticket-service",
+      "ticket_db",
+      "keycloak",
+      "keycloak_db",
+      "user-service",
+      "user_db",
+      "postgresql-shared-instance",
+      "mongodb-instance",
+      "ft-design-machine-1",
+      "ft-design-machine-2"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-MONGO-README",
+    "locator": "L1-L6",
+    "summary": "Schema thiết kế đúng 4 collection/user_db; BSON/subject/UUID/version, chưa API/runtime.",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db",
+      "mongodb-instance"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-MONGO-README",
+    "locator": "L7-L16",
+    "summary": "Bốn nguồn dữ liệu/unique keys; application nguồn, profile projection, roleGrant nhúng không xác nhận Keycloak, không transaction xuyên document.",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db",
+      "mongodb-instance"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-MONGO-README",
+    "locator": "L17-L37",
+    "summary": "Hướng dẫn kiểm và bootstrap thử; fixture tổng hợp không đọc/chạy, chưa áp vào user_db.",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db",
+      "mongodb-instance"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-MONGO-README",
+    "locator": "L38-L41",
+    "summary": "Ma trận quyền user_app/provisioner/backup; RCA không quyền user_db, principal và validator server thật còn kiểm; link kỹ thuật không cần tải cho graph.",
+    "record_ids": [
+      "d-user-service-user_db",
+      "b-owner-user_db",
+      "b-host-user_db",
+      "b-host-mongodb-instance"
+    ],
+    "entity_ids": [
+      "user-service",
+      "user_db",
+      "mongodb-instance"
+    ],
+    "operation_names": [],
+    "status": "OPEN_RUNTIME",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-KC-README",
+    "locator": "L1-L4",
+    "summary": "Realm fixture DRAFT/CANDIDATE viết mới, chưa cấu hình identity hoạt động hoàn chỉnh.",
+    "record_ids": [
+      "d-keycloak-keycloak_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db"
+    ],
+    "entity_ids": [
+      "keycloak",
+      "keycloak_db"
+    ],
+    "operation_names": [],
+    "status": "covered_design",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-KC-README",
+    "locator": "L5-L16",
+    "summary": "Giới hạn role/PKCE/audience/admin/SMTP/registration/URL/TLS; không tạo client, credential hay operation runtime giả.",
+    "record_ids": [
+      "d-keycloak-keycloak_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db"
+    ],
+    "entity_ids": [
+      "keycloak",
+      "keycloak_db"
+    ],
+    "operation_names": [],
+    "status": "OPEN_RUNTIME",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-KC-README",
+    "locator": "L17-L33",
+    "summary": "Hướng dẫn kiểm/import/read-back; không chạy/đọc test hoặc xem import là bằng chứng PKCE/role/ownership/registration.",
+    "record_ids": [
+      "d-keycloak-keycloak_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db"
+    ],
+    "entity_ids": [
+      "keycloak",
+      "keycloak_db"
+    ],
+    "operation_names": [],
+    "status": "out_of_graph_scope",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  },
+  {
+    "source_id": "FT-KC-README",
+    "locator": "L34-L37",
+    "summary": "Scope mapping khác cấp role; issuer/audience/signature/expiry và runtime image pin chưa kiểm; không dùng export lịch sử làm pin.",
+    "record_ids": [
+      "d-keycloak-keycloak_db",
+      "b-owner-keycloak_db",
+      "b-host-keycloak_db"
+    ],
+    "entity_ids": [
+      "keycloak",
+      "keycloak_db"
+    ],
+    "operation_names": [],
+    "status": "OPEN_RUNTIME",
+    "reason": "Giữ ở mức DB/owner/resource của thiết kế; chưa là quan sát hoặc kiểm runtime.",
+    "owner": "Minh / nhóm hệ thống; P9 xác minh runtime",
+    "required_input": "Deployment/export cùng revision và mapping endpoint/instance/host đã xác minh trước khi dùng như runtime."
+  }
+]

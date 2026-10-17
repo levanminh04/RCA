@@ -1,0 +1,188 @@
+--- before-write/STATE.md
++++ after/STATE.md
+@@ -47,7 +47,7 @@
+ | T-036 | P5b: hợp đồng nguồn tĩnh và đối chiếu | P5 (G3) | Codex | Claude | Xong 15/10/2026, Minh duyệt đóng (Q-158). REVIEW.md lưu phản biện chính thức Codex phiên độc lập theo ngoại lệ Minh. Nghiệm thu hợp đồng/công cụ; nghĩa vụ T-037–040/P6/P9 giữ theo bàn giao. Mô tả T-036 chưa triển khai ở mục Task đang mở là mốc cũ; hiện trạng theo dòng này. Chưa commit/push. | `tasks/T-036-p5b-hop-dong-chung/` |
+ | T-037 | P5b: FlashTicket đầy đủ theo thiết kế | P5 (G3) | Codex | Claude (kết quả) | Đang làm có điều kiện; dừng graph do chặn SMTP (16/10/2026). Pin/hash đạt; nguồn/bản ghi/coverage một phần, phản ví dụ ở results/T-037/runs/smtp-002/. Chờ Minh quyết gói sửa hợp đồng chung; chưa hoàn tất/nghiệm thu, không đổi pin. Prompt Claude tại results/T-037/prompt-claude.txt và LOG Phiên2. | `tasks/T-037-p5b-flashticket/` |
+ | T-038 | P5b: nguồn tĩnh Train Ticket và RE2-TT dev | P5 (G3) | Codex | Claude (kết quả) | Hoàn tất phần triển khai trong quyền (16/10/2026); chờ Minh duyệt gói sửa SMTP chung, chưa đủ nghiệm thu toàn task. Đã xử lý hết 27 mục nguồn cũ: 2783 read/43 excluded/1 body PDF lịch sử open, không chặn module inventory; đóng 9 cờ initializer bằng source. Đủ 1069 graph dev và kiểm hợp lệ giữ nguyên, pin T036 không đổi. Lineage/runtime vẫn có điều kiện; không chọn P6/mở test. Gói SMTP có patch thử, oracle/26 checks, filelist/ảnh hưởng/chi phí ở results/T-038/goi-sua-SMTP.md; chưa áp dụng shared. Bàn giao và prompt ở results/T-038/, LOG Phiên 2. Mục tổng quát bên dưới là mốc cũ; hiện trạng T038 theo dòng này. | `tasks/T-038-p5b-trainticket/` |
+-| T-039 | P5b: nguồn tĩnh Online Boutique và Nezha-OB dev | P5 (G3) | Codex | Codex phiên sạch (SPEC); Claude (kết quả) | Đã thu nguồn đúng danh sách Minh duyệt, kiểm 229/229 đạt (16/10/2026). Giữ toàn SPEC và pin T-036; đính chính metadata riêng T-039. Chưa đủ căn cứ một phiên, chờ Minh quyết cách tiếp tục; chưa lập mapping/dựng/đối chiếu hoặc nghiệm thu. Báo cáo/prompt ở results/T-039/, LOG Phiên 2. | `tasks/T-039-p5b-online-boutique/` |
++| T-039 | P5b: nguồn tĩnh Online Boutique và Nezha-OB dev | P5 (G3) | Codex | Codex phiên sạch (SPEC); Claude (kết quả) | Chờ gói chung và Minh duyệt lại pin (16/10/2026), theo lựa chọn Minh sau build.py thêm SMTP lệch pin. Đã có source fragments/coverage/oracle, kiểm nguồn/ref đạt; chưa validate builder, mapping/dựng/đối chiếu/phân tích. Giữ toàn SPEC, không đổi pin hoặc nghiệm thu. Checkpoint results/T-039/runs/cho-pin-001/, LOG Phiên 3. | `tasks/T-039-p5b-online-boutique/` |
+ 
+ ## Task đang mở
+ 
+--- before-close/LOG.md
++++ after/LOG.md
+@@ -116,37 +116,37 @@
+ 
+ **Nguyên lời Minh giao:**
+ 
+-Tôi giao bạn triển khai T-039 theo SPEC hiện hành, sau khi tự rà SPEC, kiểm khả năng hoàn thành trong một phiên và trình phần tải nguồn cần duyệt. Tôi đã đồng ý dừng lượt phản biện ba SPEC T-037/T-038/T-039. Đây là quyền triển khai có điều kiện; chưa duyệt tải repository hoặc nguồn mới.
+-
+-Làm việc tại D:/RCA-flashticket.
+-Task: tasks/T-039-p5b-online-boutique/SPEC.md.
+-Bạn là Codex người làm. Claude phản biện kết quả. Tự rà không thay phản biện chính thức.
+-
+-Trước triển khai:
+-1. Đọc AGENTS.md, docs/STATE.md, toàn bộ SPEC và mục cuối LOG T-039. Đọc trực tiếp DT18, hướng dẫn của cô, MRP phần RQ3/RQ5/P5/P6/P9/G3, LESSONS, WHY/DECISIONS liên quan và phương án P5b gốc trong LOG T-036 Phiên 1.
+-2. Tự rà như lần đầu từ nguồn/code/đầu ra thật; lập nhận xét trước khi mở kết luận phản biện hoặc phản hồi cũ. Đọc nguyên văn Prompt chung + Soát SPEC + G3 trong docs/review-prompt.md làm tiêu chí tự rà. Quyền người làm theo lời giao này và SPEC.
+-3. Kiểm hash trước dùng. Cùng pin T-036 được SPEC liệt kê, current_run runs/kiem-r1-after-002; snapshot code ở results/T-036/runs/kiem-r1-after-002/code/, code-hashes.json tại thư mục run. Kiểm mã hiện hành khớp snapshot. Không tự đổi pin hoặc sửa hash khi nguồn lệch.
+-4. Phân xử khả năng xong một phiên cho truy lineage/coverage, bản ghi/mapping, dựng/đối chiếu, phân tích, tự kiểm và bàn giao. Tách giờ công/giờ máy/RAM/byte tải/tổng đĩa cho mọi lượt cần giữ. Dự toán chưa đo phải ghi rõ. Không vừa một phiên hoặc chưa đủ căn cứ thì trình cách tách và ảnh hưởng, không giảm độ sâu hoặc tự chia task.
+-5. Trình sớm phần tải nguồn cần duyệt. Dùng đúng nguồn Nezha đã xác minh theo results/T-003/runs/final-review-003/artifact-manifest.json, nguồn results/T-008/sources/ và registry T-036. IntelligentDDS/Augmented-OnlineBoutique là repository ứng viên; chưa được coi là revision ứng dụng sinh dataset. Phân biệt tree object, commit code Nezha, ứng dụng, dataset, image và deployment. Không tự thay bằng upstream hoặc bản mới nhất.
+-
+-Đề xuất tải phải có nguồn/URL, revision và mức xác minh, cây snapshot hoặc metadata dùng xác định danh sách, từng nhóm tệp/đối tượng, lý do cần, phần loại trừ và ảnh hưởng, byte mạng, dung lượng giải nén/tổng lưu và đường dẫn ghi. Có thể tra metadata công khai theo quyền chỉ đọc để lập đề xuất; chưa clone, tải snapshot/code hoặc ghi nguồn mới trước khi Minh duyệt. Thiếu revision/byte thì nêu bằng chứng cần, không bịa số. Ngoài scope hoặc cần data/README.md thì trình quyền ghi riêng.
+-
+-Có lỗi cần sửa SPEC, mâu thuẫn nguồn/quyền, pin lệch hoặc phạm vi không khả thi thì dừng phần phụ thuộc; trình bằng chứng, hậu quả và sửa tối thiểu theo file. Không tự sửa SPEC. Tự rà đạt thì tiếp tục phần đủ nguồn trong quyền, không hỏi lại quyền đã có. Trong lúc chờ tải, làm phần độc lập đã có nguồn hợp lệ.
+-
+-Phạm vi ghi: results/T-039/, nối tasks/T-039-p5b-online-boutique/LOG.md và chỉ dòng T-039 trong docs/STATE.md. Ghi nguyên lời giao, ngày/thiết bị/vai trò, kết quả tự rà và khả thi vào LOG. Trạng thái ĐỀ XUẤT là mốc trước lời giao; không tự sửa SPEC. Không ghi REVIEW, DECISIONS, WHY, src/, T-035/T-036, platform hoặc task khác. Quyết định cần lưu chính thức thì trình nội dung/phạm vi riêng.
+-
+-Thực hiện đủ SPEC. Kiểm inventory theo toàn cây snapshot định danh, xét nguồn gián tiếp/config/template/build/schema/mã sinh và phần loại trừ. Không lấy phần đã tải hoặc service có trace làm toàn inventory. Không áp quy ước FT/TT sang OB.
+-
+-Bản ghi và mapping phải có provenance, owner/scope/điều kiện. Viết oracle độc lập trước biến đổi riêng; dùng T-036 đã ghim. Chọn graph Nezha-OB dev hiện hành theo manifest T-035, không lấy graph lịch sử trong runs/. So toàn graph/cửa sổ được giao ở hai mức và các ảnh chụp có sẵn; không tự tạo cửa sổ mới. Giữ miền dev-adapter, interval, endpoints/typed, members/exclusions, tập giao/phần riêng và mẫu số N/A.
+-
+-Truy lineage nguồn phụ bằng code/tài liệu trong quyền. Metadata cùng pipeline chưa là bằng chứng độc lập; metadata mức ngày chỉ dùng phạm vi mô tả đã cho phép, không chọn P6. Không mở Weight, chuỗi số hoặc Node/log/metric/trace thô để khảo sát thêm. Không suy host từ tên Node hoặc tính ổn định tên; thiếu nguồn nghĩa định danh thì giữ OPEN.
+-
+-Lần theo nhóm chênh lệch quan trọng và match tương ứng; xét revision/alias/miền/nhánh/nguồn/telemetry/chuyển đổi. Mapping không tối ưu theo tỷ lệ khớp và không nhận nhãn. Revision chưa nối được phải hiện ngay trong JSON/báo cáo dưới dạng đối chiếu tham khảo có điều kiện.
+-
+-T-037/T-038 chạy song song và giữ cùng pin T-036. Cần đổi hợp đồng chung thì dừng phần phụ thuộc, trình phản ví dụ và ảnh hưởng cả ba nhánh; không tự sửa hoặc fork nghĩa chung. STATE cập nhật tuần tự, đọc bản mới nhất trước sửa đúng dòng task; nếu không bảo đảm được thì trình dòng cần cập nhật để Minh điều phối. Không đo chi phí cùng việc nặng khác hoặc dừng tiến trình phiên khác. Thao tác tốn kém theo AGENTS phải báo chi phí và chờ duyệt.
+-
+-Giữ mọi lượt kể cả lỗi/lặp, trung gian, lệnh và môi trường. Không mở test/heldout/archive, chạy baseline/RCA, chọn P6, làm T-040, bật EC2, commit/push hoặc tự mở/gửi chat.
+-
++Tôi giao bạn triển khai T-039 theo SPEC hiện hành, sau khi tự rà SPEC, kiểm khả năng hoàn thành trong một phiên và trình phần tải nguồn cần duyệt. Tôi đã đồng ý dừng lượt phản biện ba SPEC T-037/T-038/T-039. Đây là quyền triển khai có điều kiện; chưa duyệt tải repository hoặc nguồn mới.
++
++Làm việc tại D:/RCA-flashticket.
++Task: tasks/T-039-p5b-online-boutique/SPEC.md.
++Bạn là Codex người làm. Claude phản biện kết quả. Tự rà không thay phản biện chính thức.
++
++Trước triển khai:
++1. Đọc AGENTS.md, docs/STATE.md, toàn bộ SPEC và mục cuối LOG T-039. Đọc trực tiếp DT18, hướng dẫn của cô, MRP phần RQ3/RQ5/P5/P6/P9/G3, LESSONS, WHY/DECISIONS liên quan và phương án P5b gốc trong LOG T-036 Phiên 1.
++2. Tự rà như lần đầu từ nguồn/code/đầu ra thật; lập nhận xét trước khi mở kết luận phản biện hoặc phản hồi cũ. Đọc nguyên văn Prompt chung + Soát SPEC + G3 trong docs/review-prompt.md làm tiêu chí tự rà. Quyền người làm theo lời giao này và SPEC.
++3. Kiểm hash trước dùng. Cùng pin T-036 được SPEC liệt kê, current_run runs/kiem-r1-after-002; snapshot code ở results/T-036/runs/kiem-r1-after-002/code/, code-hashes.json tại thư mục run. Kiểm mã hiện hành khớp snapshot. Không tự đổi pin hoặc sửa hash khi nguồn lệch.
++4. Phân xử khả năng xong một phiên cho truy lineage/coverage, bản ghi/mapping, dựng/đối chiếu, phân tích, tự kiểm và bàn giao. Tách giờ công/giờ máy/RAM/byte tải/tổng đĩa cho mọi lượt cần giữ. Dự toán chưa đo phải ghi rõ. Không vừa một phiên hoặc chưa đủ căn cứ thì trình cách tách và ảnh hưởng, không giảm độ sâu hoặc tự chia task.
++5. Trình sớm phần tải nguồn cần duyệt. Dùng đúng nguồn Nezha đã xác minh theo results/T-003/runs/final-review-003/artifact-manifest.json, nguồn results/T-008/sources/ và registry T-036. IntelligentDDS/Augmented-OnlineBoutique là repository ứng viên; chưa được coi là revision ứng dụng sinh dataset. Phân biệt tree object, commit code Nezha, ứng dụng, dataset, image và deployment. Không tự thay bằng upstream hoặc bản mới nhất.
++
++Đề xuất tải phải có nguồn/URL, revision và mức xác minh, cây snapshot hoặc metadata dùng xác định danh sách, từng nhóm tệp/đối tượng, lý do cần, phần loại trừ và ảnh hưởng, byte mạng, dung lượng giải nén/tổng lưu và đường dẫn ghi. Có thể tra metadata công khai theo quyền chỉ đọc để lập đề xuất; chưa clone, tải snapshot/code hoặc ghi nguồn mới trước khi Minh duyệt. Thiếu revision/byte thì nêu bằng chứng cần, không bịa số. Ngoài scope hoặc cần data/README.md thì trình quyền ghi riêng.
++
++Có lỗi cần sửa SPEC, mâu thuẫn nguồn/quyền, pin lệch hoặc phạm vi không khả thi thì dừng phần phụ thuộc; trình bằng chứng, hậu quả và sửa tối thiểu theo file. Không tự sửa SPEC. Tự rà đạt thì tiếp tục phần đủ nguồn trong quyền, không hỏi lại quyền đã có. Trong lúc chờ tải, làm phần độc lập đã có nguồn hợp lệ.
++
++Phạm vi ghi: results/T-039/, nối tasks/T-039-p5b-online-boutique/LOG.md và chỉ dòng T-039 trong docs/STATE.md. Ghi nguyên lời giao, ngày/thiết bị/vai trò, kết quả tự rà và khả thi vào LOG. Trạng thái ĐỀ XUẤT là mốc trước lời giao; không tự sửa SPEC. Không ghi REVIEW, DECISIONS, WHY, src/, T-035/T-036, platform hoặc task khác. Quyết định cần lưu chính thức thì trình nội dung/phạm vi riêng.
++
++Thực hiện đủ SPEC. Kiểm inventory theo toàn cây snapshot định danh, xét nguồn gián tiếp/config/template/build/schema/mã sinh và phần loại trừ. Không lấy phần đã tải hoặc service có trace làm toàn inventory. Không áp quy ước FT/TT sang OB.
++
++Bản ghi và mapping phải có provenance, owner/scope/điều kiện. Viết oracle độc lập trước biến đổi riêng; dùng T-036 đã ghim. Chọn graph Nezha-OB dev hiện hành theo manifest T-035, không lấy graph lịch sử trong runs/. So toàn graph/cửa sổ được giao ở hai mức và các ảnh chụp có sẵn; không tự tạo cửa sổ mới. Giữ miền dev-adapter, interval, endpoints/typed, members/exclusions, tập giao/phần riêng và mẫu số N/A.
++
++Truy lineage nguồn phụ bằng code/tài liệu trong quyền. Metadata cùng pipeline chưa là bằng chứng độc lập; metadata mức ngày chỉ dùng phạm vi mô tả đã cho phép, không chọn P6. Không mở Weight, chuỗi số hoặc Node/log/metric/trace thô để khảo sát thêm. Không suy host từ tên Node hoặc tính ổn định tên; thiếu nguồn nghĩa định danh thì giữ OPEN.
++
++Lần theo nhóm chênh lệch quan trọng và match tương ứng; xét revision/alias/miền/nhánh/nguồn/telemetry/chuyển đổi. Mapping không tối ưu theo tỷ lệ khớp và không nhận nhãn. Revision chưa nối được phải hiện ngay trong JSON/báo cáo dưới dạng đối chiếu tham khảo có điều kiện.
++
++T-037/T-038 chạy song song và giữ cùng pin T-036. Cần đổi hợp đồng chung thì dừng phần phụ thuộc, trình phản ví dụ và ảnh hưởng cả ba nhánh; không tự sửa hoặc fork nghĩa chung. STATE cập nhật tuần tự, đọc bản mới nhất trước sửa đúng dòng task; nếu không bảo đảm được thì trình dòng cần cập nhật để Minh điều phối. Không đo chi phí cùng việc nặng khác hoặc dừng tiến trình phiên khác. Thao tác tốn kém theo AGENTS phải báo chi phí và chờ duyệt.
++
++Giữ mọi lượt kể cả lỗi/lặp, trung gian, lệnh và môi trường. Không mở test/heldout/archive, chạy baseline/RCA, chọn P6, làm T-040, bật EC2, commit/push hoặc tự mở/gửi chat.
++
+ Cuối phiên kiểm toàn diff/phạm vi/manifest, phân biệt đạt task với mức trả lời mục tiêu nguồn. Nối LOG đủ báo cáo, OPEN, bước tiếp/lệnh cuối; cập nhật đúng dòng STATE. Soạn prompt Claude nguyên văn Prompt chung + Soát kết quả + G3 hiện hành; nếu dừng vì cần sửa SPEC thì dùng Soát SPEC. Minh chuyển thủ công. Không tự nghiệm thu hoặc đóng task/G3.
+ 
+ **Mở phiên:** đã đọc AGENTS, STATE, toàn SPEC và mục cuối LOG. Trạng thái ĐỀ XUẤT là mốc cũ theo lời giao; đang tự rà và kiểm nguồn, chưa tải nguồn/code hoặc chạy dựng/đối chiếu. Một nhánh hỗ trợ chỉ đọc kiểm hash và inventory graph; không là phản biện chính thức, không ghi file.
+@@ -338,8 +338,100 @@
+ 
+ **Nguyên lời Minh:** “làm trong 1 phiên, triển khai luôn giúp tôi nếu không còn vướng mắc nào”. Phân loại EXECUTE: tiếp tục toàn SPEC hiện hành trong phiên, không tự tách hoặc sửa SPEC. Quyền ghi T-039 giữ nguyên. Điều kiện khả thi trước đó là dự toán chưa đo, không phải lỗi khoa học đã chứng minh; sau kiểm nguồn/pin không có mismatch thì thực hiện phần có nguồn hợp lệ. Các OPEN revision/coverage/lineage giữ theo SPEC và báo đúng mức đạt, không suy thành đã xác nhận hoặc bỏ nghĩa vụ. Không xin lại quyền tải đã có; không tải nguồn ngoài danh sách.
+ 
+-**Mở phiên:** đọc lại AGENTS/STATE/toàn SPEC và LOG cuối; kiểm toàn manifest T-039 278/278 và T-036 187/187 khớp; current_run/pin đúng. Giữ toàn nguồn/lượt cũ. Hai nhánh hỗ trợ lập fragment source/backend và Go có provenance/coverage trong parts/; không là phản biện chính thức, không ghi REVIEW/LOG/STATE. Root soát lại, viết oracle trước mã riêng, dựng/đối chiếu và phân tích. Claude phản biện kết quả theo phân công. Nguồn metadata riêng Nezha được Minh duyệt trước; pin shared giữ nguyên.
+-
+-### Checkpoint tiếp tục và pin lệch — 16/10/2026
+-
+-Minh yêu cầu tiếp tục checkpoint, kiểm subagent và không suy giảm đầu ra. Hai subagent trước dừng usage, chưa ghi fragment; đã tiếp tục chúng với phạm vi nguồn riêng. Kiểm nguồn 229/229 còn khớp. Phát hiện build.py hiện hành thêm smtp so snapshot pin; manifest T036 chưa đổi. Bằng chứng byte/diff ở results/T-039/runs/pin-lech-001/. Dừng build/compare/validate phụ thuộc; không đổi pin/hash, không rollback hay dừng tiến trình khác. Chỉ tiếp nguồn/fragment/coverage độc lập và trình Minh cách xử lý. Các JSON fragment mới chưa được gọi đã kiểm hợp đồng.
++**Mở phiên:** đọc lại AGENTS/STATE/toàn SPEC và LOG cuối; kiểm toàn manifest T-039 278/278 và T-036 187/187 khớp; current_run/pin đúng. Giữ toàn nguồn/lượt cũ. Hai nhánh hỗ trợ lập fragment source/backend và Go có provenance/coverage trong parts/; không là phản biện chính thức, không ghi REVIEW/LOG/STATE. Root soát lại, viết oracle trước mã riêng, dựng/đối chiếu và phân tích. Claude phản biện kết quả theo phân công. Nguồn metadata riêng Nezha được Minh duyệt trước; pin shared giữ nguyên.
++
++### Checkpoint tiếp tục và pin lệch — 16/10/2026
++
++Minh yêu cầu tiếp tục checkpoint, kiểm subagent và không suy giảm đầu ra. Hai subagent trước dừng usage, chưa ghi fragment; đã tiếp tục chúng với phạm vi nguồn riêng. Kiểm nguồn 229/229 còn khớp. Phát hiện build.py hiện hành thêm smtp so snapshot pin; manifest T036 chưa đổi. Bằng chứng byte/diff ở results/T-039/runs/pin-lech-001/. Dừng build/compare/validate phụ thuộc; không đổi pin/hash, không rollback hay dừng tiến trình khác. Chỉ tiếp nguồn/fragment/coverage độc lập và trình Minh cách xử lý. Các JSON fragment mới chưa được gọi đã kiểm hợp đồng.
++
++
++Tự kiểm nguồn checkpoint lần đầu dừng vì locator common istio L3–28 vượt file 27 dòng. Đã đọc file và sửa thành L3–27, giữ bản trước/lượt lỗi tại runs/cho-pin-001/. Không phải lỗi builder; builder chưa chạy. Kiểm lại bằng chế độ resume, không ghi đè snapshot trước.
++
++
++### Kết thúc checkpoint chờ pin — 16/10/2026
++
++**Quyết định Minh:** nguyên văn “Chờ gói chung và duyệt lại pin”, trả lời câu hỏi xử lý build.py lệch snapshot. Giữ toàn SPEC, không dùng snapshot cũ để dựng/đối chiếu; không sửa/hash lại mã chung hoặc tự chuyển pin.
++
++1. Đã tiếp checkpoint mới nhất; hai subagent trước hết usage chưa ghi fragment đã chạy lại, hoàn tất fragment nguồn/coverage. Root lưu oracle trước transform, phần nguồn chung, registry và phân hoạch toàn tree; kiểm refs/source hash. Chưa hoàn tất T-039: mapping/build/project/compare/phân tích chưa chạy; semantic coverage/merge chưa nghiệm thu. Câu hỏi nguồn chỉ có bản ghi có điều kiện, chưa có độ khớp hoặc lợi ích RCA; RQ3/RQ5/P5b/G3 còn OPEN.
++2. Chỉ ghi results/T-039/, nối LOG này và đúng dòng T-039 trong STATE. Không sửa SPEC/WHY/DECISIONS/REVIEW/src/T-035/T-036/platform/task khác. Exact shared-code mismatch lưu ở pin-lech-001; không quy người sửa hoặc quyền duyệt của nhánh khác khi không có bằng chứng.
++3. Kiểm nguồn 229 file/metadata còn khớp; fragments chỉ JSON/ID/ref/locator/provenance và oracle-before-transform snapshot; không schema builder validation. Cây phân hoạch đủ, tách read/scan/hash/excluded. Kiểm cuối source set/manifest/phạm vi/prefix/prompt và mismatch expected ở runs/cho-pin-001/final-verification.json; không chạy pilot hoặc thực nghiệm. Source counters và file list ở source-checkpoint.json/manifest. Giờ/RAM máy toàn pipeline vẫn chưa đo; không dùng chi phí scan làm số pipeline.
++4. CHẶN hiện tại là mã chung không khớp pin; Minh đã chọn chờ pin mới, owner quyết pin là Minh/gói chung. Phần nguồn còn OPEN gồm deployment/image, instrumentation alias, collector/Node/nguồn phụ và external source; không coi thiếu source là nguyên nhân telemetry. Nơi nhận T-040/P6/P9 và đầu vào cụ thể ở ban-giao.md. Không giảm yêu cầu hoặc tự nghiệm thu đầu ra để xử lý thiếu token/usage.
++
++**Bước tiếp chính xác:** Minh duyệt gói chung và pin; kiểm manifest/code snapshot/current đã đồng nhất rồi rà ảnh hưởng/ghi pin T039 đúng quyền. Sau đó root soát/merge source fragments, oracle, mapping có owner/provenance, dựng/chiếu/đối chiếu toàn graph theo SPEC, lần nhóm chênh lệch và match tương ứng. Lệnh đọc: Get-Content -Raw -LiteralPath 'results/T-039/ban-giao.md'. Không tự mở/gửi chat hay dùng code changed trước Minh duyệt pin.
++
++**Lệnh cuối dự kiến:** py -3 -X utf8 -B results/T-039/checkpoint_sources.py verify. Chỉ kiểm/chốt checkpoint; không chạy shared code. **Đề xuất commit, chưa làm:** docs: checkpoint T-039 source records pending shared contract pin. Chỉ commit/push khi Minh yêu cầu/duyệt riêng.
++
++### Prompt Claude — checkpoint kết quả (Minh chọn gửi hoặc dừng)
++
++```text
++Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
++Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
++
++Thông tin lượt này:
++- Task hoặc đề xuất: T-039; tasks/T-039-p5b-online-boutique/SPEC.md; checkpoint results/T-039/runs/cho-pin-001/.
++- Công đoạn: soát kết quả.
++- Gói/cổng: P5; chuẩn bị G3.
++- Người làm và người phản biện chính thức: Codex người làm; Claude phản biện chính thức kết quả.
++- Tài liệu gốc: AGENTS.md; docs/STATE.md; SPEC và LOG T-039; docs/MRP.md, WHY.md, DECISIONS.md, LESSONS.md; DT18 và advisor-2026-09-23.md trong docs/reference/sources/; results/T-039/nguon.json, bao-phu-nguon.json và parts/. Diff/bản trước tại runs/trien-khai-001/, pin-lech-001/ và cho-pin-001/.
++- Phản biện và phản hồi trước: Không có REVIEW T-039; lịch sử quyền và checkpoint ở LOG Phiên 2–3. Lịch sử T-036 theo LOG/REVIEW của T-036.
++- Code và kết quả liên quan: results/T-039/manifest.json; runs/thu-nguon-001/acquisition.json; fixtures/oracle.json; source fragments/coverage trong parts/; results/T-036/manifest.json pin runs/kiem-r1-after-002 và code-hashes.json tại run; metadata nguồn đã thu theo registry. Windows/PowerShell, Python -X utf8 -B; checkpoint_sources.py chỉ tạo checkpoint trong T-039, chưa được tự cấp quyền chạy lại hoặc dựng graph bởi prompt này.
++- Phạm vi ghi được Minh cho phép trong lượt này: chỉ đọc và trả lời trong chat; không ghi REVIEW/LOG/STATE hoặc sửa nguồn/kết quả/pin; không chạy builder/compare/experiment ngoài quyền Minh cấp riêng.
++
++Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
++
++Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
++Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
++Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
++
++Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
++hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
++Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
++số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
++có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
++
++Bổ sung yêu cầu phản biện:
++1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
++2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
++3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
++4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
++5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
++6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
++7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
++8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
++9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
++10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
++
++Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
++Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
++
++Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
++bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
++Tiếng Việt, câu ngắn.
++
++Cuối lượt báo:
++1. Đã làm gì.
++2. File đã thay đổi, hoặc không sửa file nào.
++3. Kiểm đã chạy và kết quả.
++4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
++
++Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
++
++Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
++
++Công đoạn: soát kết quả.
++Kiểm trên đầu ra thật, code và dữ liệu được phép; không tin tóm tắt LOG. Đối chiếu tiêu chí xong với phần mục tiêu nguồn và mức căn cứ cho bước tiếp theo; chạy lại phần rẻ khi trong quyền được duyệt.
++Phân biệt hoàn thành task mô tả, xác nhận cơ chế và đủ căn cứ chọn/đánh giá thiết kế. Giới hạn đã khai không tự miễn phép kiểm cần thiết còn làm được.
++Chỉ ghi bản phản biện lượt được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ bản cũ; không sửa kết quả thay người làm.
++
++Với từng thành phần, kiểm mục đích và căn cứ: sửa hạn chế P4, đáp ứng DT18 hay nhu cầu kỹ thuật. Có lý do kỹ thuật, phương án khác, bằng chứng dev và điều kiện thất bại không; có dùng mã hạn chế mô tả như bằng chứng cơ chế hoặc chọn theo mức chênh đồ thị trừ không đồ thị không?
++Nêu rõ nút/cạnh, ánh xạ log/trace/metric và phép tính thực sự sử dụng cạnh. Lần theo thông tin quan hệ và nhãn trong phương pháp lẫn đối chứng; gọi “không đồ thị” có đúng với thông tin còn giữ không?
++Kiểm baseline và đối chứng đủ mạnh, tương đương về tín hiệu/cửa sổ/tập ứng viên/coverage/tiền xử lý/quy tắc chấm/ngân sách chọn cấu hình ở phần không chủ ý thay; yếu tố thay cùng phải giới hạn kết luận.
++Phương pháp và đối chứng đã được cài và kiểm đầu vào, trung gian, hành vi trên dev chưa, hay chỉ chạy không lỗi? Không đòi đồ thị phải thắng để khóa.
++Code/revision, cấu hình, giả thuyết, độ đo, tập ca/tập ứng viên, cách xử lý ca lỗi/UNSUPPORTED/nhánh dự phòng và bảng diễn giải đã khóa trước test chưa? Có bỏ nhóm khó sau khi nhìn điểm hoặc dùng test để chọn thiết kế không?
++Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.
++```
++
++
++Kiểm cuối checkpoint lần đầu báo prompt không khớp khi so byte newline LF với LOG ghi CRLF. Đối chiếu nội dung sau chuẩn hóa newline khớp đúng một lần; sửa checker đọc newline chuẩn, không sửa prompt/LOG để làm kiểm đạt. Lượt lỗi giữ verify-failure-001.json; chưa chạy builder.
++
++Làm rõ kiểm cuối: protected-before.json của lượt triển khai là ảnh byte live lúc mở run, không phải pin đã duyệt. build.py đã có thể đổi đồng thời khi chụp ảnh ấy. Hash chuẩn để kiểm pin luôn lấy manifest/code-hashes/snapshot T036; expected chuẩn và current actual giữ ở pin-lech-001/evidence.json. Kiểm cuối ghi riêng hai tham chiếu, không sửa ảnh cũ hoặc hợp thức hóa hash live. Lệnh chốt cuối: py -3 -X utf8 -B results/T-039/checkpoint_sources.py verify-2; giữ bản kiểm/manifest trước làm rõ.
