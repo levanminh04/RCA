@@ -922,3 +922,10 @@ Không bắt mọi task P4 làm xong đối chứng của phương pháp mới. 
 - Commit `25e71dc4` (đã push) chứa `results/T-034/` và thư mục task tới hết mục “Phiên 7 (nối)”. Mục này và các thay đổi trong `docs/` chưa commit.
 
 **Chưa có lời của Minh, tôi không tự suy:** T-034 đã nghiệm thu hay chưa (dòng task trong STATE vẫn “Chờ Minh nghiệm thu”); chín điểm còn lại ở mục 8 của `results/T-034/goi-g2.md`; có commit các file trong `docs/` không.
+
+## Phiên 8 — 20/10/2026 — Claude — LeVanMinh (Windows, D:/RCA-flashticket) — vai trò: người làm, ghi nghiệm thu
+
+- Minh nghiệm thu T-034 trong chat ngày 20/10/2026. Lời Minh: "Nghiệm thu T-034, T-038, T-040; phản biện chính thức và nghiệm thu T-035 và gói SMTP V2 của T-036"; "chọn a)". Ghi sổ tại DECISIONS Q-180.
+- Dòng T-034 trong STATE đổi thành "Xong (20/10/2026, Minh nghiệm thu, Q-180)".
+- Giữ nguyên các OPEN đã ghi: lan có đáng kể, đóng góp của chờ ở CIRCA, chênh hai bản TraceRCA, underflow ngoài hai ca, thời điểm sự cố bắt đầu; chín điểm ở mục 8 của `results/T-034/goi-g2.md` vẫn theo quyết định hiện hành. Nghiệm thu không đóng RQ2.
+- File đổi trong lượt: `docs/DECISIONS.md`, `docs/STATE.md`, LOG này. Không chạy thực nghiệm.

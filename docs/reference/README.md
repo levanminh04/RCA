@@ -9,5 +9,6 @@ Kiến thức nền đã lọc (K1 phương pháp, K2 dữ liệu RE2-TT, K3 dat
 | `sources/DT18-de-tai-va-nhiem-vu.md` | Tên đề tài và nhiệm vụ hiện hành | Nguồn chính |
 | `sources/advisor-2026-09-23.md` | Hướng dẫn của cô: chuỗi 4 việc và 5 bước | Nguồn chính |
 | `sources/advisor-2026-08-22-lich-su.md` | Thư định hướng cũ | Chỉ là lịch sử |
+| `sources/advisor-thu-dang-ky-de-tai.md` | Chuỗi thư về định hướng, quy mô nhóm và tên đề tài (lưu 20/10/2026) | Tên hiện hành nằm ở DT18, không ở chuỗi thư |
 | `sources/roles.md` | Phân công nhóm | |
 | `LESSONS-v1.md` | Bài học v1 và v2, bản đầy đủ | Bản rút gọn ở `docs/LESSONS.md` |

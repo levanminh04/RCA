@@ -748,3 +748,11 @@ Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nh�
 6. **Lệnh cuối cùng.** `py -3 -X utf8 -B results/T-040/kiem_tra.py --run tong-hop-011 --baseline-dir results/T-040/runs/tong-hop-010/baseline-phien8 --out kiem-tra-002.json`, rồi `py -3 -X utf8 -B results/T-040/runs/tong-hop-011/lap_manifest.py`.
 - kết quả lệnh cuối: `runs/tong-hop-011/kiem-tra-002.json` K1–K6 đều đạt. `lap_manifest.py` chạy ngay sau dòng này; các commit theo Q-175 thực hiện sau đó.
 - 22:27 — commit/push theo Q-175: C1 afccc149 (docs), C2 561cadde (src/do_thi, src/do_thi_tinh), C3 15bd19a5 (T-035, T-036) — push đợt 1; C4 31b7259d (T-037, T-039), C5 25e94bc8 (T-038) — push đợt 2; origin/master khớp HEAD sau mỗi đợt. C6 gồm results/T-040, tasks/T-040 (LOG này), 39 tệp cấp trên results/T-032/ và 32 lượt mới của results/T-030/work/test34-runs/; push đợt 3 ngay sau dòng này; mã C6 xem git log. Không đưa results/T-032/runs/ và data/ vào git.
+
+## Phiên 9 — 20/10/2026 — Claude — LeVanMinh (Windows, D:/RCA-flashticket) — vai trò: người làm, ghi nghiệm thu
+
+- Minh nghiệm thu T-040 trong chat ngày 20/10/2026. Lời Minh: "Nghiệm thu T-034, T-038, T-040; phản biện chính thức và nghiệm thu T-035 và gói SMTP V2 của T-036"; "chọn a)". Ghi sổ tại DECISIONS Q-180.
+- T-038 cũng được nghiệm thu cùng lượt (Q-180), nên số TT trong bàn giao không còn điều kiện chờ T-038.
+- Dòng T-040 trong STATE đổi thành "Xong (20/10/2026, Minh nghiệm thu, Q-180)". Lượt hiện hành giữ là runs/tong-hop-011.
+- Giữ nguyên các OPEN về kiểu cạnh, lineage/revision, runtime, cơ chế và lợi ích RCA; chưa G3/test.
+- File đổi trong lượt: `docs/DECISIONS.md`, `docs/STATE.md`, LOG này. Không chạy thực nghiệm.
