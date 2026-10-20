@@ -50,7 +50,7 @@ Nếu một khẳng định không có nhãn, coi đó là lời giải thích k
 | Mã | Ở đâu | Nghĩa |
 |---|---|---|
 | **DT18** | `docs/reference/sources/DT18-de-tai-va-nhiem-vu.md` | Tên và nhiệm vụ chính thức của đề tài. NV1: xây hệ bán vé và kiểm thử tải. NV2: mô hình đồ thị (nút là service hoặc thành phần; cạnh là gọi hàm, thông điệp, phụ thuộc dữ liệu); ánh xạ log, trace, metric lên đồ thị để xác định vùng ảnh hưởng, phát hiện bất thường, xếp hạng nguyên nhân. NV3: thực nghiệm trên dữ liệu công khai trước, rồi trên hệ bán vé. |
-| **Thư 22/08 của cô** | Chuỗi thư Minh dán trong chat 20/10/2026 (chưa lưu vào repo) | Mục tiêu 3: *"Đề xuất cơ chế lan truyền và xếp hạng nguyên nhân gốc dựa trên bằng chứng log/trace"*. |
+| **Thư 22/08 của cô** | `docs/reference/sources/advisor-2026-08-22-lich-su.md`; toàn bộ chuỗi thư về định hướng và tên đề tài: `docs/reference/sources/advisor-thu-dang-ky-de-tai.md` (lưu ngày 20/10/2026) | Mục tiêu 3: *"Đề xuất cơ chế lan truyền và xếp hạng nguyên nhân gốc dựa trên bằng chứng log/trace"*. |
 | **5 bước của cô** | `docs/reference/sources/advisor-2026-09-23.md` | Bước 1 dựng đồ thị; bước 2 graph-based anomaly detection; bước 3 dataset công khai; bước 4 so với baseline; bước 5 LLM giải thích. |
 | **Chế độ (a)** | MRP, G2 | Phương pháp RCA được cho biết trước mốc tiêm lỗi. Chỉ có trong thực nghiệm. |
 | **Chế độ (b)** | MRP, G2 | Bộ phát hiện tự báo động; RCA chạy tại báo động. Đây là chế độ thật khi vận hành. |

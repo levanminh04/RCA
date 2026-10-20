@@ -1,6 +1,6 @@
 # Trạng thái
 
-Cập nhật: 18/10/2026. Không quá một trang. Chi tiết từng task nằm ở `tasks/<mã>/LOG.md`.
+Cập nhật: 20/10/2026. Không quá một trang. Chi tiết từng task nằm ở `tasks/<mã>/LOG.md`.
 
 - **Cổng hiện tại:** G2 đã duyệt ngày 14/10/2026 (Q-149); P5 đã đóng theo quyết định Minh ngày 18/10/2026 (Q-176); kế hoạch P6 đã lưu theo yêu cầu Minh (Q-177–Q-178) tại [PLAN-P6.md](PLAN-P6.md): 13 phần việc chính + 15 nhánh có điều kiện; bước tiếp theo là trình SPEC M1. G1 đã duyệt ngày 05/10/2026 (Q-61–Q-69; chốt G1 ở Q-70). G0 đã duyệt ngày 02/10/2026 (Q-36). Đề xuất đổi hướng P6 (stack Grafana làm hạ tầng, RCA trên đồ thị mức thao tác) tại [DE-XUAT-HUONG-GRAFANA-RCA.md](DE-XUAT-HUONG-GRAFANA-RCA.md), chưa duyệt; phản biện định hướng dừng 20/10/2026 (Q-179); chờ ý kiến cô qua chương 5 báo cáo tiến độ trước khi soạn SPEC M1.
 - **Test và dataset giữ ngoài:** test: 60 ca RE2-TT (TX1, `data/locked/`) và phần test theo ô của Nezha-OB (Q-61, Q-63); Eadro-TT đã duyệt 3 dev/6 test ngày 05/10, danh sách tại `results/T-023/allowlist-phien.json`. Không dùng Eadro trong thực nghiệm tới G2 (Q-83); giữ ngoài: RE3-OB (chưa tải).
