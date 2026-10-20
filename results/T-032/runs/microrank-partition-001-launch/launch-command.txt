@@ -1,0 +1,8 @@
+cd D:/RCA-flashticket && D:/RCA-ext/envs/T-014-main/Scripts/python.exe -B -W ignore results/T-032/scripts/laptop_contrast_v5.py all microrank results/T-032/runs/microrank-partition-001 --branches=shamp,mo15,mo1p50
+Khởi lúc 2026-10-11T05:30:58Z; thiết kế thiet-ke-phep-doi-009.md; bước đếm runs/trace-root-census-001/summary.json đã đạt mốc (RE2-TT 29/30 ca, Nezha-OB 22/22 ca).
+Dừng driver v5 lúc 2026-10-11T05:43:46Z khi đang chờ RAM (không tiến trình con nào đang tính; 28 nhánh shamp đã xong và khớp). Lý do: xem đầu scripts/laptop_contrast_v6.py.
+Lần 2 (chỉ Nezha-OB): cd D:/RCA-flashticket && D:/RCA-ext/envs/T-014-main/Scripts/python.exe -B -W ignore results/T-032/scripts/laptop_contrast_v6.py all microrank results/T-032/runs/microrank-partition-001 --branches=shamp,mo15,mo1p50 --datasets=Nezha-OB
+Lần 2 CHƯA khởi. Driver v5 thực dừng lúc 05:44:19Z (PID 72076; không tiến trình con). Lúc đó RAM hệ thống 97,8%, còn trống 0,35 GB, do ứng dụng khác của máy; vượt mốc dừng 95% nên không chạy tiếp trên laptop.
+Khi laptop còn trống khoảng 3 GB RAM, chạy tiếp cả hai dataset (bỏ qua nhánh đã xong): cd D:/RCA-flashticket && D:/RCA-ext/envs/T-014-main/Scripts/python.exe -B -W ignore results/T-032/scripts/laptop_contrast_v6.py all microrank results/T-032/runs/microrank-partition-001 --branches=shamp,mo15,mo1p50 --datasets=Nezha-OB,RE2-TT
+Rồi tổng hợp: py -3 -B -X utf8 results/T-032/scripts/laptop_contrast_collect_v4.py results/T-032/runs/microrank-partition-001 results/T-032/runs/microrank-partition-001/collect-001
+Lần 2 khởi lúc 2026-10-11T06:25:15Z sau khi Minh đóng bớt ứng dụng (RAM 72,2%, trống 4,36 GB): lệnh v6 với --datasets=Nezha-OB,RE2-TT như dòng trên.

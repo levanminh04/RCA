@@ -1,0 +1,6340 @@
+{
+ "schema": "T032-tracerca-core-td-v1",
+ "design": "results/T-032/thiet-ke-phep-doi-001.md#5",
+ "interval_fixtures": {
+  "pass": true,
+  "checked": 8,
+  "mismatches": {}
+ },
+ "summary": {
+  "n_plan": 52,
+  "status_counts": {
+   "OK": 48,
+   "N/A": 4,
+   "TOOL_ERROR": 0
+  },
+  "sham_bit_exact": 48,
+  "identity_holds": 48,
+  "self_check_native_rank_equals_t028": 47,
+  "root_unranked": {
+   "native": 1,
+   "t_d": 1
+  },
+  "all": {
+   "n": 47,
+   "td_effect_on_root": {
+    "tăng hạng": 9,
+    "không đổi": 36,
+    "giảm hạng": 2
+   },
+   "hit1": {
+    "native": 23,
+    "t_d": 25
+   },
+   "hit5": {
+    "native": 36,
+    "t_d": 38
+   },
+   "cases_with_caller_above_root": {
+    "native": 20,
+    "t_d": 17
+   },
+   "cases_caller_leaves_above_root": 4,
+   "cases_caller_enters_above_root": 1,
+   "native_wrong_at_1": {
+    "n": 24,
+    "becomes_hit1": 2
+   },
+   "native_hit_at_1": {
+    "n": 23,
+    "loses_hit1": 0
+   }
+  },
+  "by_dataset": {
+   "RE2-TT": {
+    "n": 26,
+    "td_effect_on_root": {
+     "tăng hạng": 4,
+     "không đổi": 22,
+     "giảm hạng": 0
+    },
+    "hit1": {
+     "native": 21,
+     "t_d": 22
+    },
+    "hit5": {
+     "native": 25,
+     "t_d": 26
+    },
+    "cases_with_caller_above_root": {
+     "native": 4,
+     "t_d": 2
+    },
+    "cases_caller_leaves_above_root": 3,
+    "cases_caller_enters_above_root": 0,
+    "native_wrong_at_1": {
+     "n": 5,
+     "becomes_hit1": 1
+    },
+    "native_hit_at_1": {
+     "n": 21,
+     "loses_hit1": 0
+    }
+   },
+   "Nezha-OB": {
+    "n": 21,
+    "td_effect_on_root": {
+     "tăng hạng": 5,
+     "không đổi": 14,
+     "giảm hạng": 2
+    },
+    "hit1": {
+     "native": 2,
+     "t_d": 3
+    },
+    "hit5": {
+     "native": 11,
+     "t_d": 12
+    },
+    "cases_with_caller_above_root": {
+     "native": 16,
+     "t_d": 15
+    },
+    "cases_caller_leaves_above_root": 1,
+    "cases_caller_enters_above_root": 1,
+    "native_wrong_at_1": {
+     "n": 19,
+     "becomes_hit1": 1
+    },
+    "native_hit_at_1": {
+     "n": 2,
+     "loses_hit1": 0
+    }
+   }
+  },
+  "note": "Mẫu số n là số ca OK có sham khớp từng bit và root được xếp ở cả hai nhánh. Hit tính bi quan theo hòa. T-D là phép đổi chẩn đoán trên dev, không phải phương pháp mới và không thay số P3."
+ },
+ "cases": [
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-03d4910932",
+   "source_status": "ERROR",
+   "status": "N/A",
+   "reason": "nguồn ERROR: phương pháp không trả điểm"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-12a1a88069",
+   "status": "OK",
+   "root": "ts-order-service",
+   "fault": "disk",
+   "cell": "ts-order-service|disk",
+   "t028": {
+    "status": "OK",
+    "rank_min": 2,
+    "rank_max": 2,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 443868,
+    "spans_before": 227047,
+    "spans_after": 216821,
+    "H_native": 3369,
+    "H_u": 2396,
+    "operations_after": 152,
+    "spans_parent_resolved": 441119,
+    "spans_with_children": 288924,
+    "after_spans_with_children": 141755,
+    "covered_share_of_total_duration": 0.7247117462704069
+   },
+   "callers_of_root": [
+    "ts-inside-payment-service",
+    "ts-preserve-service",
+    "ts-seat-service",
+    "ts-security-service",
+    "ts-travel-service"
+   ],
+   "callees_of_root": [
+    "ts-station-service"
+   ],
+   "service_edges": 55,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 27,
+    "root": {
+     "score": 0.04452498058503754,
+     "operation": "ts-order-service_POST /api/v1/orderservice/order/tickets",
+     "a": 86,
+     "n": 494,
+     "rank_min": 2,
+     "rank_max": 2
+    },
+    "above_root": [
+     {
+      "entity": "ts-seat-service",
+      "relation": "caller_of_root",
+      "score": 0.055853920515574654,
+      "operation": "ts-seat-service_POST",
+      "a": 130,
+      "n": 1286,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.11286176483623632
+     }
+    ],
+    "callers_above": [
+     "ts-seat-service"
+    ]
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 27,
+    "root": {
+     "score": 0.05121107266435986,
+     "operation": "ts-order-service_POST /api/v1/orderservice/order/tickets",
+     "a": 74,
+     "n": 494,
+     "rank_min": 2,
+     "rank_max": 2
+    },
+    "above_root": [
+     {
+      "entity": "ts-seat-service",
+      "relation": "caller_of_root",
+      "score": 0.07441607821835959,
+      "operation": "ts-seat-service_POST",
+      "a": 137,
+      "n": 1286,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.18471329956104002
+     }
+    ],
+    "callers_above": [
+     "ts-seat-service"
+    ]
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {
+    "ts-seat-service": {
+     "relation": "caller_of_root",
+     "margin_native": 0.11286176483623632,
+     "margin_t_d": 0.18471329956104002,
+     "delta": -0.0718515347248037,
+     "still_above": true
+    }
+   },
+   "check_sha256": "2976aa25818922260490b70d9384105241dbf6a6aec83686b1f96e9e237dd089"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-14372e1209",
+   "status": "OK",
+   "root": "ts-route-service",
+   "fault": "mem",
+   "cell": "ts-route-service|mem",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 270358,
+    "spans_before": 134089,
+    "spans_after": 136269,
+    "H_native": 8102,
+    "H_u": 4002,
+    "operations_after": 149,
+    "spans_parent_resolved": 267639,
+    "spans_with_children": 204007,
+    "after_spans_with_children": 102617,
+    "covered_share_of_total_duration": 0.7356155931865326
+   },
+   "callers_of_root": [
+    "ts-basic-service",
+    "ts-travel-service",
+    "ts-travel2-service"
+   ],
+   "callees_of_root": [],
+   "service_edges": 55,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 26,
+    "root": {
+     "score": 0.24085692425401684,
+     "operation": "ts-route-service_GET /api/v1/routeservice/routes/{routeId}",
+     "a": 1574,
+     "n": 4968,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 26,
+    "root": {
+     "score": 0.23411371237458192,
+     "operation": "ts-route-service_GET /api/v1/routeservice/routes/{routeId}",
+     "a": 1050,
+     "n": 4968,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "6c6d1172c4914a889704479cf12849780c51caefd336ac8d1783b966c095900e"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-16597725c1",
+   "status": "OK",
+   "root": "ts-auth-service",
+   "fault": "cpu",
+   "cell": "ts-auth-service|cpu",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 339457,
+    "spans_before": 170550,
+    "spans_after": 168907,
+    "H_native": 2598,
+    "H_u": 2019,
+    "operations_after": 152,
+    "spans_parent_resolved": 336774,
+    "spans_with_children": 236762,
+    "after_spans_with_children": 117637,
+    "covered_share_of_total_duration": 0.6506519826330704
+   },
+   "callers_of_root": [],
+   "callees_of_root": [],
+   "service_edges": 55,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 24,
+    "root": {
+     "score": 0.1515353805073431,
+     "operation": "ts-auth-service_POST /api/v1/users/login",
+     "a": 227,
+     "n": 398,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 26,
+    "root": {
+     "score": 0.18700868845676458,
+     "operation": "ts-auth-service_POST /api/v1/users/login",
+     "a": 226,
+     "n": 398,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "1f0e63af0fb74e6164c5c0afa7454b8e11ea10e0f3de615e0e03cf4ef136fc06"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-16870e660c",
+   "source_status": "ERROR",
+   "status": "N/A",
+   "reason": "nguồn ERROR: phương pháp không trả điểm"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-1e6d61b5ec",
+   "status": "OK",
+   "root": "ts-order-service",
+   "fault": "disk",
+   "cell": "ts-order-service|disk",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 52220,
+    "spans_before": 26613,
+    "spans_after": 25607,
+    "H_native": 266,
+    "H_u": 208,
+    "operations_after": 74,
+    "spans_parent_resolved": 49486,
+    "spans_with_children": 39658,
+    "after_spans_with_children": 19484,
+    "covered_share_of_total_duration": 0.3871693016675575
+   },
+   "callers_of_root": [
+    "ts-inside-payment-service"
+   ],
+   "callees_of_root": [
+    "ts-station-service"
+   ],
+   "service_edges": 20,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 20,
+    "root": {
+     "score": 0.05423728813559322,
+     "operation": "ts-order-service_POST /api/v1/orderservice/order/refresh",
+     "a": 8,
+     "n": 29,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 19,
+    "root": {
+     "score": 0.06751054852320676,
+     "operation": "ts-order-service_POST /api/v1/orderservice/order/refresh",
+     "a": 8,
+     "n": 29,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "0fc614f7c0bb3a2ae71ad9d3bf26dc22b66f8545df663882b2369a512ad03e24"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-20acb4402d",
+   "status": "OK",
+   "root": "ts-order-service",
+   "fault": "loss",
+   "cell": "ts-order-service|loss",
+   "t028": {
+    "status": "OK",
+    "rank_min": 4,
+    "rank_max": 4,
+    "multi_flags": {
+     "1": [
+      "M0"
+     ],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 52712,
+    "spans_before": 25794,
+    "spans_after": 26918,
+    "H_native": 414,
+    "H_u": 324,
+    "operations_after": 74,
+    "spans_parent_resolved": 49943,
+    "spans_with_children": 40020,
+    "after_spans_with_children": 20413,
+    "covered_share_of_total_duration": 0.3974086941112466
+   },
+   "callers_of_root": [
+    "ts-inside-payment-service"
+   ],
+   "callees_of_root": [
+    "ts-station-service"
+   ],
+   "service_edges": 20,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 15,
+    "root": {
+     "score": 0.047826086956521734,
+     "operation": "ts-order-service_POST",
+     "a": 11,
+     "n": 46,
+     "rank_min": 4,
+     "rank_max": 4
+    },
+    "above_root": [
+     {
+      "entity": "ts-ticketinfo-service",
+      "relation": "other",
+      "score": 0.06486486486486487,
+      "operation": "ts-ticketinfo-service_GET /api/v1/ticketinfoservice/ticketinfo/{name}",
+      "a": 48,
+      "n": 1066,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.151199165797706
+     },
+     {
+      "entity": "ts-auth-service",
+      "relation": "other",
+      "score": 0.06466512702078521,
+      "operation": "ts-auth-service_POST /api/v1/users/login",
+      "a": 28,
+      "n": 452,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.14969204677318573
+     },
+     {
+      "entity": "ts-basic-service",
+      "relation": "other",
+      "score": 0.05,
+      "operation": "ts-basic-service_GET /api/v1/basicservice/basic/{stationName}",
+      "a": 37,
+      "n": 1066,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.02222222222222231
+     }
+    ],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 19,
+    "root": {
+     "score": 0.055137844611528826,
+     "operation": "ts-order-service_find ts.orders",
+     "a": 11,
+     "n": 75,
+     "rank_min": 2,
+     "rank_max": 2
+    },
+    "above_root": [
+     {
+      "entity": "ts-auth-service",
+      "relation": "other",
+      "score": 0.06958762886597938,
+      "operation": "ts-auth-service_POST /api/v1/users/login",
+      "a": 27,
+      "n": 452,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.11585271117095654
+     }
+    ],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "tăng hạng",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {
+    "ts-ticketinfo-service": {
+     "relation": "other",
+     "margin_native": 0.151199165797706,
+     "margin_t_d": -0.3608045567817729,
+     "delta": 0.5120037225794789,
+     "still_above": false
+    },
+    "ts-auth-service": {
+     "relation": "other",
+     "margin_native": 0.14969204677318573,
+     "margin_t_d": 0.11585271117095654,
+     "delta": 0.033839335602229195,
+     "still_above": true
+    },
+    "ts-basic-service": {
+     "relation": "other",
+     "margin_native": 0.02222222222222231,
+     "margin_t_d": -0.13845351997319544,
+     "delta": 0.16067574219541775,
+     "still_above": false
+    }
+   },
+   "check_sha256": "c78492c35a634c9105746ad4d5258ca58415cf58e2b4acbf070f414893d92ae5"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-260d332c8d",
+   "status": "OK",
+   "root": "ts-order-service",
+   "fault": "loss",
+   "cell": "ts-order-service|loss",
+   "t028": {
+    "status": "OK",
+    "rank_min": 9,
+    "rank_max": 9,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": [
+      "M5"
+     ]
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 51863,
+    "spans_before": 26207,
+    "spans_after": 25656,
+    "H_native": 445,
+    "H_u": 365,
+    "operations_after": 74,
+    "spans_parent_resolved": 49110,
+    "spans_with_children": 39324,
+    "after_spans_with_children": 19454,
+    "covered_share_of_total_duration": 0.39914028064262747
+   },
+   "callers_of_root": [
+    "ts-inside-payment-service"
+   ],
+   "callees_of_root": [
+    "ts-station-service"
+   ],
+   "service_edges": 20,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 18,
+    "root": {
+     "score": 0.024793388429752063,
+     "operation": "ts-order-service_POST /api/v1/orderservice/order/refresh",
+     "a": 6,
+     "n": 39,
+     "rank_min": 9,
+     "rank_max": 9
+    },
+    "above_root": [
+     {
+      "entity": "ts-auth-service",
+      "relation": "other",
+      "score": 0.09162011173184358,
+      "operation": "ts-auth-service_POST /api/v1/users/login",
+      "a": 41,
+      "n": 450,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.5740461648290632
+     },
+     {
+      "entity": "ts-basic-service",
+      "relation": "other",
+      "score": 0.044325050369375424,
+      "operation": "ts-basic-service_GET /api/v1/basicservice/basic/{stationName}",
+      "a": 33,
+      "n": 1044,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.28258251023849684
+     },
+     {
+      "entity": "ts-ticketinfo-service",
+      "relation": "other",
+      "score": 0.03492276695768973,
+      "operation": "ts-ticketinfo-service_GET",
+      "a": 26,
+      "n": 1044,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.16962542987266482
+     },
+     {
+      "entity": "ts-train-service",
+      "relation": "other",
+      "score": 0.030335861321776816,
+      "operation": "ts-train-service_GET /api/v1/trainservice/trains/{id}",
+      "a": 14,
+      "n": 478,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.10053597531265233
+     },
+     {
+      "entity": "ts-inside-payment-service",
+      "relation": "caller_of_root",
+      "score": 0.028925619834710745,
+      "operation": "ts-inside-payment-service_POST /api/v1/inside_pay_service/inside_payment",
+      "a": 7,
+      "n": 39,
+      "rank_min": 5,
+      "rank_max": 5,
+      "margin_vs_root": 0.07692307692307698
+     },
+     {
+      "entity": "ts-station-service",
+      "relation": "callee_of_root",
+      "score": 0.025751072961373394,
+      "operation": "ts-station-service_GET /api/v1/stationservice/stations/id/{stationNameForId}",
+      "a": 21,
+      "n": 1186,
+      "rank_min": 6,
+      "rank_max": 6,
+      "margin_vs_root": 0.018947368421052754
+     },
+     {
+      "entity": "ts-route-service",
+      "relation": "other",
+      "score": 0.025483718735252476,
+      "operation": "ts-route-service_GET /api/v1/routeservice/routes/{routeId}",
+      "a": 27,
+      "n": 1674,
+      "rank_min": 7,
+      "rank_max": 7,
+      "margin_vs_root": 0.013730509657900885
+     },
+     {
+      "entity": "ts-consign-service",
+      "relation": "other",
+      "score": 0.025,
+      "operation": "ts-consign-service_find ts.consign_record",
+      "a": 6,
+      "n": 35,
+      "rank_min": 8,
+      "rank_max": 8,
+      "margin_vs_root": 0.00414937759336108
+     }
+    ],
+    "callers_above": [
+     "ts-inside-payment-service"
+    ]
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 19,
+    "root": {
+     "score": 0.028235294117647056,
+     "operation": "ts-order-service_find ts.orders",
+     "a": 6,
+     "n": 60,
+     "rank_min": 5,
+     "rank_max": 5
+    },
+    "above_root": [
+     {
+      "entity": "ts-auth-service",
+      "relation": "other",
+      "score": 0.10061349693251534,
+      "operation": "ts-auth-service_POST /api/v1/users/login",
+      "a": 41,
+      "n": 450,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.5617297781761148
+     },
+     {
+      "entity": "ts-basic-service",
+      "relation": "other",
+      "score": 0.035486160397444996,
+      "operation": "ts-basic-service_GET",
+      "a": 25,
+      "n": 1044,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.11379003092405267
+     },
+     {
+      "entity": "ts-consign-service",
+      "relation": "other",
+      "score": 0.03,
+      "operation": "ts-consign-service_find ts.consign_record",
+      "a": 6,
+      "n": 35,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.03030303030303033
+     },
+     {
+      "entity": "ts-travel-service",
+      "relation": "other",
+      "score": 0.029723991507430998,
+      "operation": "ts-travel-service_POST /api/v1/travelservice/trips/left",
+      "a": 7,
+      "n": 106,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.02568522668505435
+     }
+    ],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "tăng hạng",
+   "callers_no_longer_above": [
+    "ts-inside-payment-service"
+   ],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {
+    "ts-auth-service": {
+     "relation": "other",
+     "margin_native": 0.5740461648290632,
+     "margin_t_d": 0.5617297781761148,
+     "delta": 0.01231638665294843,
+     "still_above": true
+    },
+    "ts-basic-service": {
+     "relation": "other",
+     "margin_native": 0.28258251023849684,
+     "margin_t_d": 0.11379003092405267,
+     "delta": 0.1687924793144442,
+     "still_above": true
+    },
+    "ts-ticketinfo-service": {
+     "relation": "other",
+     "margin_native": 0.16962542987266482,
+     "margin_t_d": -0.2095285785821589,
+     "delta": 0.3791540084548237,
+     "still_above": false
+    },
+    "ts-train-service": {
+     "relation": "other",
+     "margin_native": 0.10053597531265233,
+     "margin_t_d": -0.1960274296524,
+     "delta": 0.29656340496505235,
+     "still_above": false
+    },
+    "ts-inside-payment-service": {
+     "relation": "caller_of_root",
+     "margin_native": 0.07692307692307698,
+     "margin_t_d": -0.4807574832009773,
+     "delta": 0.5576805601240542,
+     "still_above": false
+    },
+    "ts-station-service": {
+     "relation": "callee_of_root",
+     "margin_native": 0.018947368421052754,
+     "margin_t_d": -0.21997902464604088,
+     "delta": 0.23892639306709362,
+     "still_above": false
+    },
+    "ts-route-service": {
+     "relation": "other",
+     "margin_native": 0.013730509657900885,
+     "margin_t_d": -0.20478605544339934,
+     "delta": 0.21851656510130021,
+     "still_above": false
+    },
+    "ts-consign-service": {
+     "relation": "other",
+     "margin_native": 0.00414937759336108,
+     "margin_t_d": 0.03030303030303033,
+     "delta": -0.026153652709669253,
+     "still_above": true
+    }
+   },
+   "check_sha256": "eacae4442eb5edc2423aa46b1e5b2c7111c2170996b45e2074e83c2d24504031"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-3ae0a6c15a",
+   "status": "OK",
+   "root": "ts-train-service",
+   "fault": "cpu",
+   "cell": "ts-train-service|cpu",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 438865,
+    "spans_before": 218796,
+    "spans_after": 220069,
+    "H_native": 10308,
+    "H_u": 3643,
+    "operations_after": 152,
+    "spans_parent_resolved": 436046,
+    "spans_with_children": 288323,
+    "after_spans_with_children": 143352,
+    "covered_share_of_total_duration": 0.7425611004002277
+   },
+   "callers_of_root": [
+    "ts-basic-service",
+    "ts-travel-service",
+    "ts-travel2-service"
+   ],
+   "callees_of_root": [],
+   "service_edges": 55,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 25,
+    "root": {
+     "score": 0.1857710473048954,
+     "operation": "ts-train-service_GET /api/v1/trainservice/trains/{id}",
+     "a": 1239,
+     "n": 3031,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 26,
+    "root": {
+     "score": 0.1738088103086605,
+     "operation": "ts-train-service_GET /api/v1/trainservice/trains/{id}",
+     "a": 580,
+     "n": 3031,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "30bf175fc5ff5b5a15a6fe5575a687dc0d333ba5e77a0c22745eef0cadf790e7"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-3defe3d34b",
+   "status": "OK",
+   "root": "ts-auth-service",
+   "fault": "cpu",
+   "cell": "ts-auth-service|cpu",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 484972,
+    "spans_before": 242818,
+    "spans_after": 242154,
+    "H_native": 2536,
+    "H_u": 2173,
+    "operations_after": 152,
+    "spans_parent_resolved": 482178,
+    "spans_with_children": 309975,
+    "after_spans_with_children": 153491,
+    "covered_share_of_total_duration": 0.7365440258364697
+   },
+   "callers_of_root": [],
+   "callees_of_root": [],
+   "service_edges": 55,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 24,
+    "root": {
+     "score": 0.13410091432441584,
+     "operation": "ts-auth-service_POST /api/v1/users/login",
+     "a": 198,
+     "n": 417,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 26,
+    "root": {
+     "score": 0.155984555984556,
+     "operation": "ts-auth-service_POST /api/v1/users/login",
+     "a": 202,
+     "n": 417,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "603b0f78ffc6c6a8b1963c98e917db519b2b696f64e24af7baa90c0d44d1800a"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-4e68956051",
+   "source_status": "ERROR",
+   "status": "N/A",
+   "reason": "nguồn ERROR: phương pháp không trả điểm"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-4f8a844308",
+   "status": "OK",
+   "root": "ts-route-service",
+   "fault": "mem",
+   "cell": "ts-route-service|mem",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 290168,
+    "spans_before": 150858,
+    "spans_after": 139310,
+    "H_native": 13314,
+    "H_u": 5661,
+    "operations_after": 152,
+    "spans_parent_resolved": 287757,
+    "spans_with_children": 201628,
+    "after_spans_with_children": 97017,
+    "covered_share_of_total_duration": 0.7314596142589502
+   },
+   "callers_of_root": [
+    "ts-basic-service",
+    "ts-travel-service",
+    "ts-travel2-service"
+   ],
+   "callees_of_root": [],
+   "service_edges": 55,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 27,
+    "root": {
+     "score": 0.1866237646518042,
+     "operation": "ts-route-service_GET /api/v1/routeservice/routes/{routeId}",
+     "a": 1624,
+     "n": 4090,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 27,
+    "root": {
+     "score": 0.24202645882473595,
+     "operation": "ts-route-service_GET /api/v1/routeservice/routes/{routeId}",
+     "a": 1180,
+     "n": 4090,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "ce1db147f1d63886370939a290a4a6c3cc652430336493f3472ffd252f628577"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-57546fd87b",
+   "status": "OK",
+   "root": "ts-auth-service",
+   "fault": "delay",
+   "cell": "ts-auth-service|delay",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 277413,
+    "spans_before": 140522,
+    "spans_after": 136891,
+    "H_native": 2546,
+    "H_u": 1459,
+    "operations_after": 149,
+    "spans_parent_resolved": 274654,
+    "spans_with_children": 209793,
+    "after_spans_with_children": 102999,
+    "covered_share_of_total_duration": 0.6866866794462475
+   },
+   "callers_of_root": [],
+   "callees_of_root": [],
+   "service_edges": 55,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 27,
+    "root": {
+     "score": 0.4760765550239234,
+     "operation": "ts-auth-service_UserRepository.findByUsername",
+     "a": 796,
+     "n": 798,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 27,
+    "root": {
+     "score": 0.7053610988037218,
+     "operation": "ts-auth-service_find ts-auth-mongo.user",
+     "a": 796,
+     "n": 798,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "949f71f917ab78ff39802099a13c3ebc2b27648d514e339e90db3b78bd6c60c7"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-59f696a169",
+   "status": "OK",
+   "root": "ts-auth-service",
+   "fault": "cpu",
+   "cell": "ts-auth-service|cpu",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 372524,
+    "spans_before": 194429,
+    "spans_after": 178095,
+    "H_native": 2703,
+    "H_u": 2069,
+    "operations_after": 152,
+    "spans_parent_resolved": 369805,
+    "spans_with_children": 253943,
+    "after_spans_with_children": 121789,
+    "covered_share_of_total_duration": 0.653852968098646
+   },
+   "callers_of_root": [],
+   "callees_of_root": [],
+   "service_edges": 55,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 22,
+    "root": {
+     "score": 0.13123190736571244,
+     "operation": "ts-auth-service_POST /api/v1/users/login",
+     "a": 204,
+     "n": 406,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 22,
+    "root": {
+     "score": 0.16242424242424242,
+     "operation": "ts-auth-service_POST /api/v1/users/login",
+     "a": 201,
+     "n": 406,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "8fa4437036ff6b6a9ca584259bba57032e9e6b7a6343af64ead2eb94abee2e43"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-746fd74313",
+   "status": "OK",
+   "root": "ts-auth-service",
+   "fault": "delay",
+   "cell": "ts-auth-service|delay",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 460266,
+    "spans_before": 241955,
+    "spans_after": 218311,
+    "H_native": 2966,
+    "H_u": 2210,
+    "operations_after": 152,
+    "spans_parent_resolved": 381367,
+    "spans_with_children": 240031,
+    "after_spans_with_children": 114757,
+    "covered_share_of_total_duration": 0.6223330277429482
+   },
+   "callers_of_root": [],
+   "callees_of_root": [],
+   "service_edges": 55,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 23,
+    "root": {
+     "score": 0.3598673300165838,
+     "operation": "ts-auth-service_UserRepository.findByUsername",
+     "a": 651,
+     "n": 652,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 25,
+    "root": {
+     "score": 0.4446007738304608,
+     "operation": "ts-auth-service_find ts-auth-mongo.user",
+     "a": 632,
+     "n": 633,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "c03822a89f04adc8d1809cab790906a4cb511386af1f30b548c1486bc019b30f"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-7f1b6b071d",
+   "status": "OK",
+   "root": "ts-travel-service",
+   "fault": "loss",
+   "cell": "ts-travel-service|loss",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 402907,
+    "spans_before": 209420,
+    "spans_after": 193487,
+    "H_native": 4182,
+    "H_u": 2765,
+    "operations_after": 152,
+    "spans_parent_resolved": 399916,
+    "spans_with_children": 275938,
+    "after_spans_with_children": 132514,
+    "covered_share_of_total_duration": 0.7141415695681335
+   },
+   "callers_of_root": [
+    "ts-admin-travel-service",
+    "ts-food-service",
+    "ts-preserve-service",
+    "ts-seat-service"
+   ],
+   "callees_of_root": [
+    "ts-order-service",
+    "ts-route-service",
+    "ts-seat-service",
+    "ts-ticketinfo-service",
+    "ts-train-service"
+   ],
+   "service_edges": 55,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 26,
+    "root": {
+     "score": 0.10717196414017931,
+     "operation": "ts-travel-service_POST",
+     "a": 263,
+     "n": 726,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 27,
+    "root": {
+     "score": 0.16571867794004613,
+     "operation": "ts-travel-service_GET",
+     "a": 539,
+     "n": 3740,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "f41099ae31f0f2cbc49f07db4940a0fb46ae1ae325849ed34a142b1791bf8cca"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-8017c6dc70",
+   "status": "OK",
+   "root": "ts-order-service",
+   "fault": "disk",
+   "cell": "ts-order-service|disk",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 52751,
+    "spans_before": 26425,
+    "spans_after": 26326,
+    "H_native": 277,
+    "H_u": 229,
+    "operations_after": 74,
+    "spans_parent_resolved": 49977,
+    "spans_with_children": 39988,
+    "after_spans_with_children": 19958,
+    "covered_share_of_total_duration": 0.3955014508023809
+   },
+   "callers_of_root": [
+    "ts-inside-payment-service"
+   ],
+   "callees_of_root": [
+    "ts-station-service"
+   ],
+   "service_edges": 20,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 19,
+    "root": {
+     "score": 0.138801261829653,
+     "operation": "ts-order-service_POST /api/v1/orderservice/order/refresh",
+     "a": 22,
+     "n": 40,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 17,
+    "root": {
+     "score": 0.1412639405204461,
+     "operation": "ts-order-service_POST /api/v1/orderservice/order/refresh",
+     "a": 19,
+     "n": 40,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "4346b2857d938168a0cf0541af01f676765ce7c9bf0a57600a4dd05bf1b3f43b"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-98bc73c499",
+   "status": "OK",
+   "root": "ts-train-service",
+   "fault": "cpu",
+   "cell": "ts-train-service|cpu",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 377528,
+    "spans_before": 186448,
+    "spans_after": 191080,
+    "H_native": 8713,
+    "H_u": 3034,
+    "operations_after": 152,
+    "spans_parent_resolved": 374737,
+    "spans_with_children": 256488,
+    "after_spans_with_children": 128696,
+    "covered_share_of_total_duration": 0.7258050783317286
+   },
+   "callers_of_root": [
+    "ts-basic-service",
+    "ts-travel-service",
+    "ts-travel2-service"
+   ],
+   "callees_of_root": [],
+   "service_edges": 55,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 25,
+    "root": {
+     "score": 0.18995744680851065,
+     "operation": "ts-train-service_GET /api/v1/trainservice/trains/{id}",
+     "a": 1116,
+     "n": 3037,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 26,
+    "root": {
+     "score": 0.17394169000164716,
+     "operation": "ts-train-service_GET /api/v1/trainservice/trains/{id}",
+     "a": 528,
+     "n": 3037,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "7aafce2373b63d09c138492e2d71fa6a120334ca51056833531a6b5106f1d39b"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-a505ab3f65",
+   "status": "OK",
+   "root": "ts-train-service",
+   "fault": "delay",
+   "cell": "ts-train-service|delay",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 431559,
+    "spans_before": 251834,
+    "spans_after": 179725,
+    "H_native": 21671,
+    "H_u": 8175,
+    "operations_after": 152,
+    "spans_parent_resolved": 429041,
+    "spans_with_children": 274547,
+    "after_spans_with_children": 115253,
+    "covered_share_of_total_duration": 0.8285665506863994
+   },
+   "callers_of_root": [
+    "ts-basic-service",
+    "ts-travel-service",
+    "ts-travel2-service"
+   ],
+   "callees_of_root": [],
+   "service_edges": 55,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 23,
+    "root": {
+     "score": 0.3451513185513109,
+     "operation": "ts-train-service_find ts.trainType",
+     "a": 4522,
+     "n": 4532,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 26,
+    "root": {
+     "score": 0.7117336900920751,
+     "operation": "ts-train-service_find ts.trainType",
+     "a": 4522,
+     "n": 4532,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "24ce6b3743869d9c80da5d2bf2a1f385aa3f46bbab3871d2df3a24070af5e72d"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-a5cabe5fa7",
+   "source_status": "ERROR",
+   "status": "N/A",
+   "reason": "nguồn ERROR: phương pháp không trả điểm"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-a915aa2424",
+   "status": "OK",
+   "root": "ts-travel-service",
+   "fault": "loss",
+   "cell": "ts-travel-service|loss",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 537250,
+    "spans_before": 277605,
+    "spans_after": 259645,
+    "H_native": 4330,
+    "H_u": 2563,
+    "operations_after": 152,
+    "spans_parent_resolved": 534274,
+    "spans_with_children": 340679,
+    "after_spans_with_children": 165993,
+    "covered_share_of_total_duration": 0.7326617616697052
+   },
+   "callers_of_root": [
+    "ts-admin-travel-service",
+    "ts-food-service",
+    "ts-preserve-service",
+    "ts-seat-service"
+   ],
+   "callees_of_root": [
+    "ts-order-service",
+    "ts-route-service",
+    "ts-seat-service",
+    "ts-ticketinfo-service",
+    "ts-train-service"
+   ],
+   "service_edges": 55,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 27,
+    "root": {
+     "score": 0.1047545419404716,
+     "operation": "ts-travel-service_POST",
+     "a": 271,
+     "n": 844,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 27,
+    "root": {
+     "score": 0.12551704464413066,
+     "operation": "ts-travel-service_GET",
+     "a": 440,
+     "n": 4448,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "1ec1e35519e66fb6927212d12422cf48067dbf0569b50325ccfa599627b142c9"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-b8bd0abf60",
+   "status": "OK",
+   "root": "ts-route-service",
+   "fault": "socket",
+   "cell": "ts-route-service|socket",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 644791,
+    "spans_before": 346215,
+    "spans_after": 298576,
+    "H_native": 14241,
+    "H_u": 6452,
+    "operations_after": 152,
+    "spans_parent_resolved": 641031,
+    "spans_with_children": 388075,
+    "after_spans_with_children": 181430,
+    "covered_share_of_total_duration": 0.7452263368115584
+   },
+   "callers_of_root": [
+    "ts-basic-service",
+    "ts-travel-service",
+    "ts-travel2-service"
+   ],
+   "callees_of_root": [],
+   "service_edges": 55,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 26,
+    "root": {
+     "score": 0.19975755020291994,
+     "operation": "ts-route-service_GET /api/v1/routeservice/routes/{routeId}",
+     "a": 1895,
+     "n": 4732,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 26,
+    "root": {
+     "score": 0.24749642346208875,
+     "operation": "ts-route-service_GET /api/v1/routeservice/routes/{routeId}",
+     "a": 1384,
+     "n": 4732,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "cf5fc52f77e472da622ba4929d68054d5cfe6e8a27bdafc1255024d5aee1e48c"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-ba831dbeb8",
+   "status": "OK",
+   "root": "ts-train-service",
+   "fault": "cpu",
+   "cell": "ts-train-service|cpu",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 330580,
+    "spans_before": 158494,
+    "spans_after": 172086,
+    "H_native": 9964,
+    "H_u": 3222,
+    "operations_after": 152,
+    "spans_parent_resolved": 327802,
+    "spans_with_children": 233936,
+    "after_spans_with_children": 120274,
+    "covered_share_of_total_duration": 0.716728703419818
+   },
+   "callers_of_root": [
+    "ts-basic-service",
+    "ts-travel-service",
+    "ts-travel2-service"
+   ],
+   "callees_of_root": [],
+   "service_edges": 55,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 25,
+    "root": {
+     "score": 0.185329364170674,
+     "operation": "ts-train-service_GET /api/v1/trainservice/trains/{id}",
+     "a": 1214,
+     "n": 3137,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 25,
+    "root": {
+     "score": 0.20223305551187296,
+     "operation": "ts-train-service_GET /api/v1/trainservice/trains/{id}",
+     "a": 643,
+     "n": 3137,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "c680c798719ff880a49e001c3b25e613e72191deb1104c0c6972a710e7d2a386"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-bcbd4f46ae",
+   "status": "OK",
+   "root": "ts-route-service",
+   "fault": "socket",
+   "cell": "ts-route-service|socket",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 270844,
+    "spans_before": 132708,
+    "spans_after": 138136,
+    "H_native": 7993,
+    "H_u": 3469,
+    "operations_after": 149,
+    "spans_parent_resolved": 268059,
+    "spans_with_children": 202664,
+    "after_spans_with_children": 102705,
+    "covered_share_of_total_duration": 0.7082697309135011
+   },
+   "callers_of_root": [
+    "ts-basic-service",
+    "ts-travel-service",
+    "ts-travel2-service"
+   ],
+   "callees_of_root": [],
+   "service_edges": 55,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 25,
+    "root": {
+     "score": 0.2366258334625523,
+     "operation": "ts-route-service_GET /api/v1/routeservice/routes/{routeId}",
+     "a": 1526,
+     "n": 4905,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 25,
+    "root": {
+     "score": 0.24361117745402436,
+     "operation": "ts-route-service_GET /api/v1/routeservice/routes/{routeId}",
+     "a": 1020,
+     "n": 4905,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "bf0f5bb62c1dcc4529c05ab983a3bf104acd1f7d66220799d014806f5212f53a"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-db293894ab",
+   "status": "OK",
+   "root": "ts-travel-service",
+   "fault": "disk",
+   "cell": "ts-travel-service|disk",
+   "t028": {
+    "status": "OK",
+    "rank_min": 2,
+    "rank_max": 2,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 371008,
+    "spans_before": 189133,
+    "spans_after": 181875,
+    "H_native": 4410,
+    "H_u": 3032,
+    "operations_after": 152,
+    "spans_parent_resolved": 368298,
+    "spans_with_children": 253743,
+    "after_spans_with_children": 124712,
+    "covered_share_of_total_duration": 0.7035058495306422
+   },
+   "callers_of_root": [
+    "ts-admin-travel-service",
+    "ts-food-service",
+    "ts-preserve-service",
+    "ts-seat-service"
+   ],
+   "callees_of_root": [
+    "ts-order-service",
+    "ts-route-service",
+    "ts-seat-service",
+    "ts-ticketinfo-service",
+    "ts-train-service"
+   ],
+   "service_edges": 55,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 23,
+    "root": {
+     "score": 0.09474491752972766,
+     "operation": "ts-travel-service_POST",
+     "a": 247,
+     "n": 804,
+     "rank_min": 2,
+     "rank_max": 2
+    },
+    "above_root": [
+     {
+      "entity": "ts-seat-service",
+      "relation": "caller_of_root",
+      "score": 0.13083663425759212,
+      "operation": "ts-seat-service_GET",
+      "a": 545,
+      "n": 3921,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.1599940972207339
+     }
+    ],
+    "callers_above": [
+     "ts-seat-service"
+    ]
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 24,
+    "root": {
+     "score": 0.1066883292715949,
+     "operation": "ts-travel-service_GET /api/v1/travelservice/routes/{tripId}",
+     "a": 197,
+     "n": 661,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "tăng hạng",
+   "callers_no_longer_above": [
+    "ts-seat-service"
+   ],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {
+    "ts-seat-service": {
+     "relation": "caller_of_root",
+     "margin_native": 0.1599940972207339,
+     "margin_t_d": -0.3085224322675775,
+     "delta": 0.46851652948831135,
+     "still_above": false
+    }
+   },
+   "check_sha256": "d9e3feffaa4b7c02441b9f2aff6aa0725a0ab1b945bd755692d68e65e120df5d"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-de89e2f9e9",
+   "status": "OK",
+   "root": "ts-travel-service",
+   "fault": "disk",
+   "cell": "ts-travel-service|disk",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 69408,
+    "spans_before": 34533,
+    "spans_after": 34875,
+    "H_native": 634,
+    "H_u": 443,
+    "operations_after": 74,
+    "spans_parent_resolved": 66611,
+    "spans_with_children": 48560,
+    "after_spans_with_children": 24547,
+    "covered_share_of_total_duration": 0.4331437238166257
+   },
+   "callers_of_root": [
+    "ts-admin-travel-service",
+    "ts-food-service"
+   ],
+   "callees_of_root": [
+    "ts-route-service",
+    "ts-ticketinfo-service",
+    "ts-train-service"
+   ],
+   "service_edges": 20,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 18,
+    "root": {
+     "score": 0.1393548387096774,
+     "operation": "ts-travel-service_POST /api/v1/travelservice/trips/left",
+     "a": 54,
+     "n": 141,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 20,
+    "root": {
+     "score": 0.13356164383561644,
+     "operation": "ts-travel-service_POST /api/v1/travelservice/trips/left",
+     "a": 39,
+     "n": 141,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "60e06caabe0f57fa5895614914e60edffdb7a5b0ca1adb27104bc7374cf01b42"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-f36d0647d5",
+   "status": "OK",
+   "root": "ts-order-service",
+   "fault": "loss",
+   "cell": "ts-order-service|loss",
+   "t028": {
+    "status": "OK",
+    "rank_min": 3,
+    "rank_max": 3,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 541502,
+    "spans_before": 270663,
+    "spans_after": 270839,
+    "H_native": 4511,
+    "H_u": 3015,
+    "operations_after": 152,
+    "spans_parent_resolved": 538749,
+    "spans_with_children": 339054,
+    "after_spans_with_children": 169864,
+    "covered_share_of_total_duration": 0.736450260301726
+   },
+   "callers_of_root": [
+    "ts-inside-payment-service",
+    "ts-preserve-service",
+    "ts-seat-service",
+    "ts-security-service",
+    "ts-travel-service"
+   ],
+   "callees_of_root": [
+    "ts-station-service"
+   ],
+   "service_edges": 55,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 27,
+    "root": {
+     "score": 0.03716913835179276,
+     "operation": "ts-order-service_OrderRepository.findByTravelDateAndTrainNumber",
+     "a": 99,
+     "n": 816,
+     "rank_min": 3,
+     "rank_max": 3
+    },
+    "above_root": [
+     {
+      "entity": "ts-seat-service",
+      "relation": "caller_of_root",
+      "score": 0.050593701600413016,
+      "operation": "ts-seat-service_POST /api/v1/seatservice/seats/left_tickets",
+      "a": 147,
+      "n": 1300,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.1529640934127822
+     },
+     {
+      "entity": "ts-travel-service",
+      "relation": "caller_of_root",
+      "score": 0.039223081274750146,
+      "operation": "ts-travel-service_POST",
+      "a": 104,
+      "n": 792,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.0268868077534395
+     }
+    ],
+    "callers_above": [
+     "ts-seat-service",
+     "ts-travel-service"
+    ]
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 27,
+    "root": {
+     "score": 0.045397225725094574,
+     "operation": "ts-order-service_find ts.orders",
+     "a": 90,
+     "n": 950,
+     "rank_min": 2,
+     "rank_max": 2
+    },
+    "above_root": [
+     {
+      "entity": "ts-seat-service",
+      "relation": "caller_of_root",
+      "score": 0.05840092699884125,
+      "operation": "ts-seat-service_POST /api/v1/seatservice/seats/left_tickets",
+      "a": 126,
+      "n": 1300,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.12527873504966555
+     }
+    ],
+    "callers_above": [
+     "ts-seat-service"
+    ]
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "tăng hạng",
+   "callers_no_longer_above": [
+    "ts-travel-service"
+   ],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {
+    "ts-seat-service": {
+     "relation": "caller_of_root",
+     "margin_native": 0.1529640934127822,
+     "margin_t_d": 0.12527873504966555,
+     "delta": 0.02768535836311664,
+     "still_above": true
+    },
+    "ts-travel-service": {
+     "relation": "caller_of_root",
+     "margin_native": 0.0268868077534395,
+     "margin_t_d": -0.3747401619955558,
+     "delta": 0.4016269697489953,
+     "still_above": false
+    }
+   },
+   "check_sha256": "4a44baa6fe2ac230a007213f6b953b3089be9a362d5fc150aa7c66ad2612c624"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-f81f88234e",
+   "status": "OK",
+   "root": "ts-auth-service",
+   "fault": "delay",
+   "cell": "ts-auth-service|delay",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 281610,
+    "spans_before": 139766,
+    "spans_after": 141844,
+    "H_native": 2604,
+    "H_u": 1502,
+    "operations_after": 149,
+    "spans_parent_resolved": 278689,
+    "spans_with_children": 210489,
+    "after_spans_with_children": 104971,
+    "covered_share_of_total_duration": 0.6943039975297544
+   },
+   "callers_of_root": [],
+   "callees_of_root": [],
+   "service_edges": 55,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 27,
+    "root": {
+     "score": 0.47869235259778165,
+     "operation": "ts-auth-service_UserRepository.findByUsername",
+     "a": 820,
+     "n": 822,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 27,
+    "root": {
+     "score": 0.7056798623063684,
+     "operation": "ts-auth-service_find ts-auth-mongo.user",
+     "a": 820,
+     "n": 822,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "53b6282c8c94c72616c88dc738b3536469e06a19f6901387eeb952c6bbd2af3e"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-f9a8e05ed7",
+   "status": "OK",
+   "root": "ts-travel-service",
+   "fault": "disk",
+   "cell": "ts-travel-service|disk",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 68844,
+    "spans_before": 33657,
+    "spans_after": 35187,
+    "H_native": 579,
+    "H_u": 386,
+    "operations_after": 74,
+    "spans_parent_resolved": 66132,
+    "spans_with_children": 47543,
+    "after_spans_with_children": 24120,
+    "covered_share_of_total_duration": 0.4255879752350633
+   },
+   "callers_of_root": [
+    "ts-admin-travel-service",
+    "ts-food-service"
+   ],
+   "callees_of_root": [
+    "ts-route-service",
+    "ts-ticketinfo-service",
+    "ts-train-service"
+   ],
+   "service_edges": 20,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 17,
+    "root": {
+     "score": 0.1032980709396391,
+     "operation": "ts-travel-service_GET",
+     "a": 83,
+     "n": 1028,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 19,
+    "root": {
+     "score": 0.11456859971711456,
+     "operation": "ts-travel-service_GET",
+     "a": 81,
+     "n": 1028,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "e9102000c2a8685c6246c2b79a187196dae20a6bfdecc8a47c0f0372c1edd220"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-fbc45b0c67",
+   "status": "OK",
+   "root": "ts-train-service",
+   "fault": "delay",
+   "cell": "ts-train-service|delay",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 333971,
+    "spans_before": 192214,
+    "spans_after": 141757,
+    "H_native": 20840,
+    "H_u": 7688,
+    "operations_after": 152,
+    "spans_parent_resolved": 331449,
+    "spans_with_children": 226593,
+    "after_spans_with_children": 95737,
+    "covered_share_of_total_duration": 0.8314387423696151
+   },
+   "callers_of_root": [
+    "ts-basic-service",
+    "ts-travel-service",
+    "ts-travel2-service"
+   ],
+   "callees_of_root": [],
+   "service_edges": 55,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 26,
+    "root": {
+     "score": 0.35252281796989215,
+     "operation": "ts-train-service_find ts.trainType",
+     "a": 4461,
+     "n": 4469,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 26,
+    "root": {
+     "score": 0.7338981656658716,
+     "operation": "ts-train-service_find ts.trainType",
+     "a": 4461,
+     "n": 4469,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "64d74ef77086933230b4d442cc6e64a983f0018fac815c3dab84f1a2a48f499d"
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-14701a3bbb",
+   "status": "OK",
+   "root": "shippingservice",
+   "fault": "cpu_contention",
+   "cell": "shippingservice|cpu_contention",
+   "t028": {
+    "status": "OK",
+    "rank_min": 2,
+    "rank_max": 2,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 67913,
+    "spans_before": 33470,
+    "spans_after": 34443,
+    "H_native": 896,
+    "H_u": 664,
+    "operations_after": 55,
+    "spans_parent_resolved": 66084,
+    "spans_with_children": 37242,
+    "after_spans_with_children": 18836,
+    "covered_share_of_total_duration": 0.6356393588771108
+   },
+   "callers_of_root": [
+    "checkoutservice",
+    "frontend"
+   ],
+   "callees_of_root": [],
+   "service_edges": 13,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 10,
+    "root": {
+     "score": 0.07685098406747891,
+     "operation": "shippingservice_hipstershop.ShippingService/GetQuote",
+     "a": 41,
+     "n": 171,
+     "rank_min": 2,
+     "rank_max": 2
+    },
+    "above_root": [
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.23304680038204392,
+      "operation": "frontend_hipstershop.ShippingService/GetQuote",
+      "a": 122,
+      "n": 151,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.5040236624860631
+     }
+    ],
+    "callers_above": [
+     "frontend"
+    ]
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 10,
+    "root": {
+     "score": 0.07664670658682636,
+     "operation": "shippingservice_hipstershop.ShippingService/QuoteByCountFloat",
+     "a": 32,
+     "n": 171,
+     "rank_min": 2,
+     "rank_max": 2
+    },
+    "above_root": [
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.2871165644171779,
+      "operation": "frontend_hipstershop.ShippingService/GetQuote",
+      "a": 117,
+      "n": 151,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.5785901838012522
+     }
+    ],
+    "callers_above": [
+     "frontend"
+    ]
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {
+    "frontend": {
+     "relation": "caller_of_root",
+     "margin_native": 0.5040236624860631,
+     "margin_t_d": 0.5785901838012522,
+     "delta": -0.07456652131518904,
+     "still_above": true
+    }
+   },
+   "check_sha256": "63afa89c08190a05e4af2b0015040b1f488367d2fb847d044f4568d5a54476cc"
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-1ac905bc95",
+   "status": "OK",
+   "root": "frontend",
+   "fault": "return",
+   "cell": "frontend|return",
+   "t028": {
+    "status": "OK",
+    "rank_min": 3,
+    "rank_max": 3,
+    "multi_flags": {
+     "1": [
+      "M0"
+     ],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 46510,
+    "spans_before": 19751,
+    "spans_after": 26759,
+    "H_native": 317,
+    "H_u": 266,
+    "operations_after": 55,
+    "spans_parent_resolved": 44953,
+    "spans_with_children": 24728,
+    "after_spans_with_children": 13819,
+    "covered_share_of_total_duration": 0.6056429204039445
+   },
+   "callers_of_root": [],
+   "callees_of_root": [
+    "adservice",
+    "cartservice",
+    "checkoutservice",
+    "currencyservice",
+    "productcatalogservice",
+    "recommendationservice",
+    "shippingservice"
+   ],
+   "service_edges": 13,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 9,
+    "root": {
+     "score": 0.0303030303030303,
+     "operation": "frontend_hipstershop.CurrencyService/GetSupportedCurrencies",
+     "a": 11,
+     "n": 409,
+     "rank_min": 3,
+     "rank_max": 3
+    },
+    "above_root": [
+     {
+      "entity": "checkoutservice",
+      "relation": "callee_of_root",
+      "score": 0.056338028169014086,
+      "operation": "checkoutservice_hipstershop.CartService/EmptyCart",
+      "a": 10,
+      "n": 38,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.3004926108374385
+     },
+     {
+      "entity": "currencyservice",
+      "relation": "callee_of_root",
+      "score": 0.05290581162324649,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 66,
+      "n": 2178,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.2716391767625165
+     }
+    ],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 10,
+    "root": {
+     "score": 0.02962962962962963,
+     "operation": "frontend_hipstershop.CurrencyService/GetSupportedCurrencies",
+     "a": 10,
+     "n": 409,
+     "rank_min": 3,
+     "rank_max": 3
+    },
+    "above_root": [
+     {
+      "entity": "checkoutservice",
+      "relation": "callee_of_root",
+      "score": 0.05921052631578947,
+      "operation": "checkoutservice_hipstershop.CartService/EmptyCart",
+      "a": 9,
+      "n": 38,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.3329676357652221
+     },
+     {
+      "entity": "currencyservice",
+      "relation": "callee_of_root",
+      "score": 0.05400981996726677,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 66,
+      "n": 2178,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.29149152051021876
+     }
+    ],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {
+    "checkoutservice": {
+     "relation": "callee_of_root",
+     "margin_native": 0.3004926108374385,
+     "margin_t_d": 0.3329676357652221,
+     "delta": -0.03247502492778359,
+     "still_above": true
+    },
+    "currencyservice": {
+     "relation": "callee_of_root",
+     "margin_native": 0.2716391767625165,
+     "margin_t_d": 0.29149152051021876,
+     "delta": -0.019852343747702283,
+     "still_above": true
+    }
+   },
+   "check_sha256": "50b8d7b5fb551d7e7da216afc408fcb711e54e6cdad1c4da2ccd4cfd5bedfa52"
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-27252dca60",
+   "status": "OK",
+   "root": "productcatalogservice",
+   "fault": "exception",
+   "cell": "productcatalogservice|exception",
+   "t028": {
+    "status": "OK",
+    "rank_min": 8,
+    "rank_max": 8,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": [
+      "M5"
+     ]
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 39150,
+    "spans_before": 25037,
+    "spans_after": 14113,
+    "H_native": 192,
+    "H_u": 178,
+    "operations_after": 55,
+    "spans_parent_resolved": 37171,
+    "spans_with_children": 21278,
+    "after_spans_with_children": 7637,
+    "covered_share_of_total_duration": 0.5931470987029581
+   },
+   "callers_of_root": [
+    "checkoutservice",
+    "frontend",
+    "recommendationservice"
+   ],
+   "callees_of_root": [],
+   "service_edges": 13,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 8,
+    "root": {
+     "score": 0.00468384074941452,
+     "operation": "productcatalogservice_sql.rows",
+     "a": 3,
+     "n": 1089,
+     "rank_min": 8,
+     "rank_max": 8
+    },
+    "above_root": [
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.08205128205128205,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 64,
+      "n": 1368,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.8919966768208252
+     },
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.07727272727272727,
+      "operation": "frontend_hipstershop.CartService/GetCart",
+      "a": 17,
+      "n": 248,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.8856994414859072
+     },
+     {
+      "entity": "cartservice",
+      "relation": "other",
+      "score": 0.03883495145631068,
+      "operation": "cartservice_hipstershop.CartService/EmptyCart",
+      "a": 4,
+      "n": 14,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.7847439916405434
+     },
+     {
+      "entity": "checkoutservice",
+      "relation": "caller_of_root",
+      "score": 0.02912621359223301,
+      "operation": "checkoutservice_hipstershop.EmailService/SendOrderConfirmation",
+      "a": 3,
+      "n": 14,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.7229320780094151
+     },
+     {
+      "entity": "adservice",
+      "relation": "other",
+      "score": 0.012658227848101266,
+      "operation": "adservice_hipstershop.AdService/getRandomAds",
+      "a": 2,
+      "n": 124,
+      "rank_min": 5,
+      "rank_max": 5,
+      "margin_vs_root": 0.4598290598290598
+     },
+     {
+      "entity": "paymentservice",
+      "relation": "other",
+      "score": 0.00980392156862745,
+      "operation": "paymentservice_grpc.hipstershop.PaymentService/Charge",
+      "a": 1,
+      "n": 12,
+      "rank_min": 6,
+      "rank_max": 6,
+      "margin_vs_root": 0.35340729001584786
+     },
+     {
+      "entity": "shippingservice",
+      "relation": "other",
+      "score": 0.00970873786407767,
+      "operation": "shippingservice_hipstershop.ShippingService/ShipOrder",
+      "a": 1,
+      "n": 14,
+      "rank_min": 7,
+      "rank_max": 7,
+      "margin_vs_root": 0.34913112164297
+     }
+    ],
+    "callers_above": [
+     "frontend",
+     "checkoutservice"
+    ]
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 9,
+    "root": {
+     "score": 0.018099547511312215,
+     "operation": "productcatalogservice_hipstershop.ProductCatalogService/ListProducts",
+     "a": 4,
+     "n": 264,
+     "rank_min": 7,
+     "rank_max": 7
+    },
+    "above_root": [
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.08279430789133246,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 64,
+      "n": 1368,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.6412160594105362
+     },
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.07042253521126761,
+      "operation": "frontend_hipstershop.CartService/GetCart",
+      "a": 15,
+      "n": 248,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.5910727141828653
+     },
+     {
+      "entity": "cartservice",
+      "relation": "other",
+      "score": 0.041666666666666664,
+      "operation": "cartservice_hipstershop.CartService/EmptyCart",
+      "a": 4,
+      "n": 14,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.39432176656151424
+     },
+     {
+      "entity": "checkoutservice",
+      "relation": "caller_of_root",
+      "score": 0.031249999999999997,
+      "operation": "checkoutservice_hipstershop.EmailService/SendOrderConfirmation",
+      "a": 3,
+      "n": 14,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.2664756446991404
+     },
+     {
+      "entity": "adservice",
+      "relation": "other",
+      "score": 0.025974025974025972,
+      "operation": "adservice_hipstershop.AdService/GetAds",
+      "a": 4,
+      "n": 130,
+      "rank_min": 5,
+      "rank_max": 5,
+      "margin_vs_root": 0.17866666666666667
+     },
+     {
+      "entity": "recommendationservice",
+      "relation": "caller_of_root",
+      "score": 0.025,
+      "operation": "recommendationservice_/hipstershop.RecommendationService/ListRecommendations",
+      "a": 4,
+      "n": 142,
+      "rank_min": 6,
+      "rank_max": 6,
+      "margin_vs_root": 0.1601049868766405
+     }
+    ],
+    "callers_above": [
+     "frontend",
+     "checkoutservice",
+     "recommendationservice"
+    ]
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "tăng hạng",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [
+    "recommendationservice"
+   ],
+   "pairs_above_root_native": {
+    "currencyservice": {
+     "relation": "other",
+     "margin_native": 0.8919966768208252,
+     "margin_t_d": 0.6412160594105362,
+     "delta": 0.250780617410289,
+     "still_above": true
+    },
+    "frontend": {
+     "relation": "caller_of_root",
+     "margin_native": 0.8856994414859072,
+     "margin_t_d": 0.5910727141828653,
+     "delta": 0.29462672730304185,
+     "still_above": true
+    },
+    "cartservice": {
+     "relation": "other",
+     "margin_native": 0.7847439916405434,
+     "margin_t_d": 0.39432176656151424,
+     "delta": 0.3904222250790292,
+     "still_above": true
+    },
+    "checkoutservice": {
+     "relation": "caller_of_root",
+     "margin_native": 0.7229320780094151,
+     "margin_t_d": 0.2664756446991404,
+     "delta": 0.45645643331027463,
+     "still_above": true
+    },
+    "adservice": {
+     "relation": "other",
+     "margin_native": 0.4598290598290598,
+     "margin_t_d": 0.17866666666666667,
+     "delta": 0.2811623931623931,
+     "still_above": true
+    },
+    "paymentservice": {
+     "relation": "other",
+     "margin_native": 0.35340729001584786,
+     "margin_t_d": -0.26455906821963393,
+     "delta": 0.6179663582354817,
+     "still_above": false
+    },
+    "shippingservice": {
+     "relation": "other",
+     "margin_native": 0.34913112164297,
+     "margin_t_d": -0.26942148760330575,
+     "delta": 0.6185526092462758,
+     "still_above": false
+    }
+   },
+   "check_sha256": "844b9d42e2e7e2b68603e080b5068d384bc8d6d4666734f43d2afef7e35b7db2"
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-2bfc97b01e",
+   "status": "OK",
+   "root": "checkoutservice",
+   "fault": "network_delay",
+   "cell": "checkoutservice|network_delay",
+   "t028": {
+    "status": "OK",
+    "rank_min": 6,
+    "rank_max": 6,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": [
+      "M5"
+     ]
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 69403,
+    "spans_before": 31749,
+    "spans_after": 37654,
+    "H_native": 597,
+    "H_u": 440,
+    "operations_after": 55,
+    "spans_parent_resolved": 67872,
+    "spans_with_children": 38609,
+    "after_spans_with_children": 20961,
+    "covered_share_of_total_duration": 0.6265775535328166
+   },
+   "callers_of_root": [
+    "frontend"
+   ],
+   "callees_of_root": [
+    "cartservice",
+    "emailservice",
+    "paymentservice",
+    "productcatalogservice",
+    "shippingservice"
+   ],
+   "service_edges": 13,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 9,
+    "root": {
+     "score": 0.015923566878980888,
+     "operation": "checkoutservice_hipstershop.EmailService/SendOrderConfirmation",
+     "a": 5,
+     "n": 31,
+     "rank_min": 6,
+     "rank_max": 6
+    },
+    "above_root": [
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.04210526315789474,
+      "operation": "frontend_hipstershop.Frontend/Recv.",
+      "a": 30,
+      "n": 828,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.45118428653957265
+     },
+     {
+      "entity": "recommendationservice",
+      "relation": "other",
+      "score": 0.0399002493765586,
+      "operation": "recommendationservice_/hipstershop.RecommendationService/ListRecommendations",
+      "a": 24,
+      "n": 606,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.4295063309147817
+     },
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.03872752420470263,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 56,
+      "n": 2295,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.4172644474893206
+     },
+     {
+      "entity": "productcatalogservice",
+      "relation": "callee_of_root",
+      "score": 0.02910882221227049,
+      "operation": "productcatalogservice_hipstershop.ProductCatalogService/GetProduct",
+      "a": 65,
+      "n": 3869,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.29279493269992096
+     },
+     {
+      "entity": "adservice",
+      "relation": "other",
+      "score": 0.022099447513812154,
+      "operation": "adservice_hipstershop.AdService/GetAds",
+      "a": 12,
+      "n": 489,
+      "rank_min": 5,
+      "rank_max": 5,
+      "margin_vs_root": 0.16242480333179093
+     }
+    ],
+    "callers_above": [
+     "frontend"
+    ]
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 9,
+    "root": {
+     "score": 0.021231422505307858,
+     "operation": "checkoutservice_hipstershop.EmailService/SendOrderConfirmation",
+     "a": 5,
+     "n": 31,
+     "rank_min": 5,
+     "rank_max": 5
+    },
+    "above_root": [
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.05075646656905807,
+      "operation": "frontend_hipstershop.CurrencyService/Convert",
+      "a": 52,
+      "n": 1609,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.41013904482252345
+     },
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.04095063985374771,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 56,
+      "n": 2295,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.31712067114429093
+     },
+     {
+      "entity": "recommendationservice",
+      "relation": "other",
+      "score": 0.03824091778202677,
+      "operation": "recommendationservice_/hipstershop.ProductCatalogService/ListProducts",
+      "a": 20,
+      "n": 606,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.2860068259385665
+     },
+     {
+      "entity": "productcatalogservice",
+      "relation": "callee_of_root",
+      "score": 0.0354924578527063,
+      "operation": "productcatalogservice_hipstershop.ProductCatalogService/ListProducts",
+      "a": 20,
+      "n": 687,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.2514114911989372
+     }
+    ],
+    "callers_above": [
+     "frontend"
+    ]
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "tăng hạng",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {
+    "frontend": {
+     "relation": "caller_of_root",
+     "margin_native": 0.45118428653957265,
+     "margin_t_d": 0.41013904482252345,
+     "delta": 0.04104524171704921,
+     "still_above": true
+    },
+    "recommendationservice": {
+     "relation": "other",
+     "margin_native": 0.4295063309147817,
+     "margin_t_d": 0.2860068259385665,
+     "delta": 0.14349950497621516,
+     "still_above": true
+    },
+    "currencyservice": {
+     "relation": "other",
+     "margin_native": 0.4172644474893206,
+     "margin_t_d": 0.31712067114429093,
+     "delta": 0.10014377634502969,
+     "still_above": true
+    },
+    "productcatalogservice": {
+     "relation": "callee_of_root",
+     "margin_native": 0.29279493269992096,
+     "margin_t_d": 0.2514114911989372,
+     "delta": 0.041383441500983775,
+     "still_above": true
+    },
+    "adservice": {
+     "relation": "other",
+     "margin_native": 0.16242480333179093,
+     "margin_t_d": -0.16973054646184843,
+     "delta": 0.33215534979363937,
+     "still_above": false
+    }
+   },
+   "check_sha256": "fd7e534e83a011b4e0acda3171ce2bec7e8bcdb6e5296935274e91c61b712deb"
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-396c8dbf7d",
+   "status": "OK",
+   "root": "emailservice",
+   "fault": "cpu_consumed",
+   "cell": "emailservice|cpu_consumed",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 3,
+    "multi_flags": {
+     "1": [
+      "M3"
+     ],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 72497,
+    "spans_before": 31951,
+    "spans_after": 40546,
+    "H_native": 903,
+    "H_u": 639,
+    "operations_after": 55,
+    "spans_parent_resolved": 70424,
+    "spans_with_children": 39947,
+    "after_spans_with_children": 22285,
+    "covered_share_of_total_duration": 0.6516625108315213
+   },
+   "callers_of_root": [
+    "checkoutservice"
+   ],
+   "callees_of_root": [],
+   "service_edges": 13,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 9,
+    "root": {
+     "score": 0.08076514346439957,
+     "operation": "emailservice_/hipstershop.EmailService/SendOrderConfirmation",
+     "a": 38,
+     "n": 38,
+     "rank_min": 1,
+     "rank_max": 3
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 9,
+    "root": {
+     "score": 0.11225997045790251,
+     "operation": "emailservice_/hipstershop.EmailService/SendOrderConfirmation",
+     "a": 38,
+     "n": 38,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "7508077f8c7a612bfe9c61032c2e1325cd7ac576e5b73204e992f30a2b6b34ca"
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-3b92690644",
+   "status": "OK",
+   "root": "checkoutservice",
+   "fault": "return",
+   "cell": "checkoutservice|return",
+   "t028": {
+    "status": "OK",
+    "rank_min": 7,
+    "rank_max": 7,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": [
+      "M5"
+     ]
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 70333,
+    "spans_before": 26329,
+    "spans_after": 44004,
+    "H_native": 696,
+    "H_u": 552,
+    "operations_after": 55,
+    "spans_parent_resolved": 68709,
+    "spans_with_children": 38480,
+    "after_spans_with_children": 24009,
+    "covered_share_of_total_duration": 0.60919873612408
+   },
+   "callers_of_root": [
+    "frontend"
+   ],
+   "callees_of_root": [
+    "cartservice",
+    "emailservice",
+    "paymentservice",
+    "productcatalogservice",
+    "shippingservice"
+   ],
+   "service_edges": 13,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 8,
+    "root": {
+     "score": 0.00966183574879227,
+     "operation": "checkoutservice_hipstershop.ProductCatalogService/GetProduct",
+     "a": 4,
+     "n": 132,
+     "rank_min": 7,
+     "rank_max": 7
+    },
+    "above_root": [
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.05493608920315475,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 101,
+      "n": 2981,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.7008623494956069
+     },
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.053737373737373736,
+      "operation": "frontend_hipstershop.ProductCatalogService/GetProduct",
+      "a": 133,
+      "n": 4254,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.6952064283735107
+     },
+     {
+      "entity": "productcatalogservice",
+      "relation": "callee_of_root",
+      "score": 0.03699330972058244,
+      "operation": "productcatalogservice_hipstershop.ProductCatalogService/GetProduct",
+      "a": 94,
+      "n": 4386,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.5858190709046454
+     },
+     {
+      "entity": "shippingservice",
+      "relation": "callee_of_root",
+      "score": 0.019823788546255508,
+      "operation": "shippingservice_hipstershop.ShippingService/QuoteByCountFloat",
+      "a": 9,
+      "n": 212,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.3446409238542043
+     },
+     {
+      "entity": "recommendationservice",
+      "relation": "other",
+      "score": 0.0135236664162284,
+      "operation": "recommendationservice_/hipstershop.RecommendationService/ListRecommendations",
+      "a": 9,
+      "n": 635,
+      "rank_min": 5,
+      "rank_max": 5,
+      "margin_vs_root": 0.16656230432060118
+     },
+     {
+      "entity": "cartservice",
+      "relation": "callee_of_root",
+      "score": 0.012244897959183675,
+      "operation": "cartservice_hipstershop.CartService/GetCart",
+      "a": 9,
+      "n": 774,
+      "rank_min": 6,
+      "rank_max": 6,
+      "margin_vs_root": 0.11791179117911797
+     }
+    ],
+    "callers_above": [
+     "frontend"
+    ]
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 8,
+    "root": {
+     "score": 0.02735042735042735,
+     "operation": "checkoutservice_hipstershop.CheckoutService/PrepareOrderItemsAndShippingQuoteFromCart",
+     "a": 8,
+     "n": 33,
+     "rank_min": 5,
+     "rank_max": 5
+    },
+    "above_root": [
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.057175205208038496,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 101,
+      "n": 2981,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.3528489164157575
+     },
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.049521431543903455,
+      "operation": "frontend_hipstershop.ProductCatalogService/GetProduct",
+      "a": 119,
+      "n": 4254,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.28841509119680186
+     },
+     {
+      "entity": "recommendationservice",
+      "relation": "other",
+      "score": 0.042122999157540024,
+      "operation": "recommendationservice_/hipstershop.RecommendationService/ListRecommendations",
+      "a": 25,
+      "n": 635,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.21263629202769382
+     },
+     {
+      "entity": "productcatalogservice",
+      "relation": "callee_of_root",
+      "score": 0.03442689347914135,
+      "operation": "productcatalogservice_hipstershop.ProductCatalogService/GetProduct",
+      "a": 85,
+      "n": 4386,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.11454796086474127
+     }
+    ],
+    "callers_above": [
+     "frontend"
+    ]
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "tăng hạng",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {
+    "currencyservice": {
+     "relation": "other",
+     "margin_native": 0.7008623494956069,
+     "margin_t_d": 0.3528489164157575,
+     "delta": 0.3480134330798494,
+     "still_above": true
+    },
+    "frontend": {
+     "relation": "caller_of_root",
+     "margin_native": 0.6952064283735107,
+     "margin_t_d": 0.28841509119680186,
+     "delta": 0.4067913371767088,
+     "still_above": true
+    },
+    "productcatalogservice": {
+     "relation": "callee_of_root",
+     "margin_native": 0.5858190709046454,
+     "margin_t_d": 0.11454796086474127,
+     "delta": 0.4712711100399041,
+     "still_above": true
+    },
+    "shippingservice": {
+     "relation": "callee_of_root",
+     "margin_native": 0.3446409238542043,
+     "margin_t_d": -0.07444844862441774,
+     "delta": 0.41908937247862205,
+     "still_above": false
+    },
+    "recommendationservice": {
+     "relation": "other",
+     "margin_native": 0.16656230432060118,
+     "margin_t_d": 0.21263629202769382,
+     "delta": -0.046073987707092645,
+     "still_above": true
+    },
+    "cartservice": {
+     "relation": "callee_of_root",
+     "margin_native": 0.11791179117911797,
+     "margin_t_d": -0.3366093366093366,
+     "delta": 0.4545211277884546,
+     "still_above": false
+    }
+   },
+   "check_sha256": "559be45d02e2ff936b1a3feb5854dab096f79a75f0e2d81a22a3d6a23d68f03d"
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-3e27669440",
+   "status": "OK",
+   "root": "adservice",
+   "fault": "cpu_contention",
+   "cell": "adservice|cpu_contention",
+   "t028": {
+    "status": "OK",
+    "rank_min": 2,
+    "rank_max": 2,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 63507,
+    "spans_before": 25764,
+    "spans_after": 37743,
+    "H_native": 2376,
+    "H_u": 1345,
+    "operations_after": 55,
+    "spans_parent_resolved": 61541,
+    "spans_with_children": 34856,
+    "after_spans_with_children": 20962,
+    "covered_share_of_total_duration": 0.6799922932387644
+   },
+   "callers_of_root": [
+    "frontend"
+   ],
+   "callees_of_root": [],
+   "service_edges": 13,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 10,
+    "root": {
+     "score": 0.22897033158813265,
+     "operation": "adservice_hipstershop.AdService/GetAds",
+     "a": 328,
+     "n": 489,
+     "rank_min": 2,
+     "rank_max": 2
+    },
+    "above_root": [
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.26457242582897034,
+      "operation": "frontend_hipstershop.AdService/GetAds",
+      "a": 379,
+      "n": 489,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.07213578500707211
+     }
+    ],
+    "callers_above": [
+     "frontend"
+    ]
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 10,
+    "root": {
+     "score": 0.2883468834688347,
+     "operation": "adservice_hipstershop.AdService/getAdsByCategory",
+     "a": 266,
+     "n": 500,
+     "rank_min": 2,
+     "rank_max": 2
+    },
+    "above_root": [
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.3620501635768812,
+      "operation": "frontend_hipstershop.AdService/GetAds",
+      "a": 332,
+      "n": 489,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.11332044086428017
+     }
+    ],
+    "callers_above": [
+     "frontend"
+    ]
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {
+    "frontend": {
+     "relation": "caller_of_root",
+     "margin_native": 0.07213578500707211,
+     "margin_t_d": 0.11332044086428017,
+     "delta": -0.041184655857208055,
+     "still_above": true
+    }
+   },
+   "check_sha256": "51cd3be9b6f2d8773ab9f6ec0809c9c8f047013733c9304248eeff34947e86b0"
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-515c5f2190",
+   "status": "OK",
+   "root": "recommendationservice",
+   "fault": "cpu_consumed",
+   "cell": "recommendationservice|cpu_consumed",
+   "t028": {
+    "status": "OK",
+    "rank_min": 2,
+    "rank_max": 2,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 52997,
+    "spans_before": 32892,
+    "spans_after": 20105,
+    "H_native": 1296,
+    "H_u": 1052,
+    "operations_after": 55,
+    "spans_parent_resolved": 50548,
+    "spans_with_children": 28512,
+    "after_spans_with_children": 10549,
+    "covered_share_of_total_duration": 0.5836155705804755
+   },
+   "callers_of_root": [
+    "frontend"
+   ],
+   "callees_of_root": [
+    "productcatalogservice"
+   ],
+   "service_edges": 13,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 8,
+    "root": {
+     "score": 0.38124614435533627,
+     "operation": "recommendationservice_/hipstershop.RecommendationService/ListRecommendations",
+     "a": 309,
+     "n": 325,
+     "rank_min": 2,
+     "rank_max": 2
+    },
+    "above_root": [
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.38371375694016036,
+      "operation": "frontend_hipstershop.RecommendationService/ListRecommendations",
+      "a": 311,
+      "n": 325,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.003225806451612777
+     }
+    ],
+    "callers_above": [
+     "frontend"
+    ]
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 8,
+    "root": {
+     "score": 0.4473493100944081,
+     "operation": "recommendationservice_/hipstershop.RecommendationService/ListRecommendations",
+     "a": 308,
+     "n": 325,
+     "rank_min": 2,
+     "rank_max": 2
+    },
+    "above_root": [
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.45606390704429917,
+      "operation": "frontend_hipstershop.RecommendationService/ListRecommendations",
+      "a": 314,
+      "n": 325,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.009646302250803866
+     }
+    ],
+    "callers_above": [
+     "frontend"
+    ]
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {
+    "frontend": {
+     "relation": "caller_of_root",
+     "margin_native": 0.003225806451612777,
+     "margin_t_d": 0.009646302250803866,
+     "delta": -0.006420495799191089,
+     "still_above": true
+    }
+   },
+   "check_sha256": "17f6aee38f8525a7ee0c29096bd480d3fdbc3731a477e767d0fa9b00f64c26b4"
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-5467884de4",
+   "status": "OK",
+   "root": "recommendationservice",
+   "fault": "network_delay",
+   "cell": "recommendationservice|network_delay",
+   "t028": {
+    "status": "OK",
+    "rank_min": 7,
+    "rank_max": 7,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": [
+      "M5"
+     ]
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 66094,
+    "spans_before": 37756,
+    "spans_after": 28338,
+    "H_native": 883,
+    "H_u": 774,
+    "operations_after": 55,
+    "spans_parent_resolved": 64214,
+    "spans_with_children": 36350,
+    "after_spans_with_children": 15554,
+    "covered_share_of_total_duration": 0.583985614812627
+   },
+   "callers_of_root": [
+    "frontend"
+   ],
+   "callees_of_root": [
+    "productcatalogservice"
+   ],
+   "service_edges": 13,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 10,
+    "root": {
+     "score": 0.010502625656414103,
+     "operation": "recommendationservice_/hipstershop.RecommendationService/ListRecommendations",
+     "a": 7,
+     "n": 450,
+     "rank_min": 7,
+     "rank_max": 7
+    },
+    "above_root": [
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.6586646661665416,
+      "operation": "frontend_hipstershop.RecommendationService/ListRecommendations",
+      "a": 439,
+      "n": 450,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.9686098654708519
+     },
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.04649390243902439,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 61,
+      "n": 1741,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.6314643713445892
+     },
+     {
+      "entity": "productcatalogservice",
+      "relation": "callee_of_root",
+      "score": 0.020057306590257878,
+      "operation": "productcatalogservice_hipstershop.ProductCatalogService/ListProducts",
+      "a": 14,
+      "n": 513,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.3126538650910881
+     },
+     {
+      "entity": "cartservice",
+      "relation": "other",
+      "score": 0.017204301075268817,
+      "operation": "cartservice_hipstershop.CartService/GetCart",
+      "a": 12,
+      "n": 512,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.24187725631768953
+     },
+     {
+      "entity": "checkoutservice",
+      "relation": "other",
+      "score": 0.016443987667009254,
+      "operation": "checkoutservice_hipstershop.CheckoutService/ConvertCurrency",
+      "a": 8,
+      "n": 90,
+      "rank_min": 5,
+      "rank_max": 5,
+      "margin_vs_root": 0.22048640915593715
+     },
+     {
+      "entity": "shippingservice",
+      "relation": "other",
+      "score": 0.015458937198067634,
+      "operation": "shippingservice_hipstershop.ShippingService/QuoteByCountFloat",
+      "a": 8,
+      "n": 152,
+      "rank_min": 6,
+      "rank_max": 6,
+      "margin_vs_root": 0.1909095985258809
+     }
+    ],
+    "callers_above": [
+     "frontend"
+    ]
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 10,
+    "root": {
+     "score": 0.00980392156862745,
+     "operation": "recommendationservice_/hipstershop.RecommendationService/ListRecommendations",
+     "a": 6,
+     "n": 450,
+     "rank_min": 7,
+     "rank_max": 7
+    },
+    "above_root": [
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.7173202614379085,
+      "operation": "frontend_hipstershop.RecommendationService/ListRecommendations",
+      "a": 439,
+      "n": 450,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.9730337078651686
+     },
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.04850894632206759,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 61,
+      "n": 1741,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.6637475767096731
+     },
+     {
+      "entity": "productcatalogservice",
+      "relation": "callee_of_root",
+      "score": 0.02331002331002331,
+      "operation": "productcatalogservice_hipstershop.ProductCatalogService/ReadCatalog",
+      "a": 15,
+      "n": 513,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.4078674948240166
+     },
+     {
+      "entity": "cartservice",
+      "relation": "other",
+      "score": 0.018662519440124415,
+      "operation": "cartservice_hipstershop.CartService/GetCart",
+      "a": 12,
+      "n": 512,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.31119442956614884
+     },
+     {
+      "entity": "checkoutservice",
+      "relation": "other",
+      "score": 0.01851851851851852,
+      "operation": "checkoutservice_hipstershop.CheckoutService/ConvertCurrency",
+      "a": 8,
+      "n": 90,
+      "rank_min": 5,
+      "rank_max": 5,
+      "margin_vs_root": 0.30769230769230776
+     },
+     {
+      "entity": "shippingservice",
+      "relation": "other",
+      "score": 0.017278617710583154,
+      "operation": "shippingservice_hipstershop.ShippingService/GetQuote",
+      "a": 8,
+      "n": 152,
+      "rank_min": 6,
+      "rank_max": 6,
+      "margin_vs_root": 0.2759968725566849
+     }
+    ],
+    "callers_above": [
+     "frontend"
+    ]
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {
+    "frontend": {
+     "relation": "caller_of_root",
+     "margin_native": 0.9686098654708519,
+     "margin_t_d": 0.9730337078651686,
+     "delta": -0.0044238423943167016,
+     "still_above": true
+    },
+    "currencyservice": {
+     "relation": "other",
+     "margin_native": 0.6314643713445892,
+     "margin_t_d": 0.6637475767096731,
+     "delta": -0.03228320536508389,
+     "still_above": true
+    },
+    "productcatalogservice": {
+     "relation": "callee_of_root",
+     "margin_native": 0.3126538650910881,
+     "margin_t_d": 0.4078674948240166,
+     "delta": -0.09521362973292846,
+     "still_above": true
+    },
+    "cartservice": {
+     "relation": "other",
+     "margin_native": 0.24187725631768953,
+     "margin_t_d": 0.31119442956614884,
+     "delta": -0.06931717324845932,
+     "still_above": true
+    },
+    "checkoutservice": {
+     "relation": "other",
+     "margin_native": 0.22048640915593715,
+     "margin_t_d": 0.30769230769230776,
+     "delta": -0.08720589853637062,
+     "still_above": true
+    },
+    "shippingservice": {
+     "relation": "other",
+     "margin_native": 0.1909095985258809,
+     "margin_t_d": 0.2759968725566849,
+     "delta": -0.08508727403080402,
+     "still_above": true
+    }
+   },
+   "check_sha256": "4e019a4ec781b1a27db7f9d6826f00dae1e70e309cb4a29bc89981e5edb3620b"
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-55f99f3e0a",
+   "status": "OK",
+   "root": "checkoutservice",
+   "fault": "exception",
+   "cell": "checkoutservice|exception",
+   "t028": {
+    "status": "OK",
+    "rank_min": 3,
+    "rank_max": 3,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 70723,
+    "spans_before": 16158,
+    "spans_after": 54565,
+    "H_native": 929,
+    "H_u": 745,
+    "operations_after": 44,
+    "spans_parent_resolved": 69055,
+    "spans_with_children": 38479,
+    "after_spans_with_children": 29557,
+    "covered_share_of_total_duration": 0.6092190279209763
+   },
+   "callers_of_root": [
+    "frontend"
+   ],
+   "callees_of_root": [
+    "cartservice",
+    "emailservice",
+    "paymentservice",
+    "productcatalogservice",
+    "shippingservice"
+   ],
+   "service_edges": 13,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 8,
+    "root": {
+     "score": 0.03342128408091469,
+     "operation": "checkoutservice_hipstershop.CheckoutService/ConvertCurrency",
+     "a": 19,
+     "n": 208,
+     "rank_min": 3,
+     "rank_max": 3
+    },
+    "above_root": [
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.067600193143409,
+      "operation": "frontend_hipstershop.Frontend/Recv.",
+      "a": 70,
+      "n": 1142,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.3383330951159839
+     },
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.05427525306913633,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 126,
+      "n": 3714,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.23779694918329522
+     }
+    ],
+    "callers_above": [
+     "frontend"
+    ]
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 8,
+    "root": {
+     "score": 0.03987408184679958,
+     "operation": "checkoutservice_hipstershop.CheckoutService/ConvertCurrency",
+     "a": 19,
+     "n": 208,
+     "rank_min": 3,
+     "rank_max": 3
+    },
+    "above_root": [
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.056514913657770796,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 126,
+      "n": 3714,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.1726424445431862
+     },
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.041112454655380895,
+      "operation": "frontend_hipstershop.CurrencyService/GetSupportedCurrencies",
+      "a": 34,
+      "n": 909,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.01529109481732155
+     }
+    ],
+    "callers_above": [
+     "frontend"
+    ]
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {
+    "frontend": {
+     "relation": "caller_of_root",
+     "margin_native": 0.3383330951159839,
+     "margin_t_d": 0.01529109481732155,
+     "delta": 0.32304200029866237,
+     "still_above": true
+    },
+    "currencyservice": {
+     "relation": "other",
+     "margin_native": 0.23779694918329522,
+     "margin_t_d": 0.1726424445431862,
+     "delta": 0.06515450464010902,
+     "still_above": true
+    }
+   },
+   "check_sha256": "29fb5e6ad1c6601bd33a724a51670fc5aed4a43c20861e0093fcdd346e67813f"
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-5ada15752d",
+   "status": "OK",
+   "root": "frontend",
+   "fault": "return",
+   "cell": "frontend|return",
+   "t028": {
+    "status": "OK",
+    "rank_min": 3,
+    "rank_max": 3,
+    "multi_flags": {
+     "1": [
+      "M0"
+     ],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 48211,
+    "spans_before": 18497,
+    "spans_after": 29714,
+    "H_native": 384,
+    "H_u": 399,
+    "operations_after": 55,
+    "spans_parent_resolved": 45921,
+    "spans_with_children": 25250,
+    "after_spans_with_children": 15054,
+    "covered_share_of_total_duration": 0.6109482416903105
+   },
+   "callers_of_root": [],
+   "callees_of_root": [
+    "adservice",
+    "cartservice",
+    "checkoutservice",
+    "currencyservice",
+    "productcatalogservice",
+    "recommendationservice",
+    "shippingservice"
+   ],
+   "service_edges": 13,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 9,
+    "root": {
+     "score": 0.02707930367504835,
+     "operation": "frontend_hipstershop.ProductCatalogService/GetProduct",
+     "a": 35,
+     "n": 2201,
+     "rank_min": 3,
+     "rank_max": 3
+    },
+    "above_root": [
+     {
+      "entity": "currencyservice",
+      "relation": "callee_of_root",
+      "score": 0.066407629812787,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 94,
+      "n": 2447,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.4206825988452826
+     },
+     {
+      "entity": "checkoutservice",
+      "relation": "callee_of_root",
+      "score": 0.03720930232558139,
+      "operation": "checkoutservice_hipstershop.ShippingService/ShipOrder",
+      "a": 8,
+      "n": 46,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.1575706689056815
+     }
+    ],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 10,
+    "root": {
+     "score": 0.0303951367781155,
+     "operation": "frontend_hipstershop.ShippingService/GetQuote",
+     "a": 10,
+     "n": 259,
+     "rank_min": 6,
+     "rank_max": 6
+    },
+    "above_root": [
+     {
+      "entity": "currencyservice",
+      "relation": "callee_of_root",
+      "score": 0.06605762473647224,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 94,
+      "n": 2447,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.3697404553104793
+     },
+     {
+      "entity": "productcatalogservice",
+      "relation": "callee_of_root",
+      "score": 0.048951048951048945,
+      "operation": "productcatalogservice_hipstershop.ProductCatalogService/ParseCatalog",
+      "a": 21,
+      "n": 459,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.2338601660862577
+     },
+     {
+      "entity": "shippingservice",
+      "relation": "callee_of_root",
+      "score": 0.03977272727272727,
+      "operation": "shippingservice_hipstershop.ShippingService/CreateQuoteFromCount",
+      "a": 14,
+      "n": 305,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.13364508983509726
+     },
+     {
+      "entity": "adservice",
+      "relation": "callee_of_root",
+      "score": 0.0325497287522604,
+      "operation": "adservice_hipstershop.AdServiceImpl/getAds",
+      "a": 9,
+      "n": 154,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.03422982885085582
+     },
+     {
+      "entity": "checkoutservice",
+      "relation": "callee_of_root",
+      "score": 0.03146067415730337,
+      "operation": "checkoutservice_hipstershop.ShippingService/ShipOrder",
+      "a": 7,
+      "n": 46,
+      "rank_min": 5,
+      "rank_max": 5,
+      "margin_vs_root": 0.017226148409894067
+     }
+    ],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "giảm hạng",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {
+    "currencyservice": {
+     "relation": "callee_of_root",
+     "margin_native": 0.4206825988452826,
+     "margin_t_d": 0.3697404553104793,
+     "delta": 0.05094214353480331,
+     "still_above": true
+    },
+    "checkoutservice": {
+     "relation": "callee_of_root",
+     "margin_native": 0.1575706689056815,
+     "margin_t_d": 0.017226148409894067,
+     "delta": 0.14034452049578744,
+     "still_above": true
+    }
+   },
+   "check_sha256": "a70e478f30d4e89ba139a120cf380a30b8e7f307d349c53a94c2d6c497c6802c"
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-607751ac0a",
+   "status": "OK",
+   "root": "checkoutservice",
+   "fault": "network_delay",
+   "cell": "checkoutservice|network_delay",
+   "t028": {
+    "status": "OK",
+    "rank_min": 6,
+    "rank_max": 6,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": [
+      "M5"
+     ]
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 73945,
+    "spans_before": 38966,
+    "spans_after": 34979,
+    "H_native": 644,
+    "H_u": 485,
+    "operations_after": 55,
+    "spans_parent_resolved": 71985,
+    "spans_with_children": 40735,
+    "after_spans_with_children": 19342,
+    "covered_share_of_total_duration": 0.6317672864746074
+   },
+   "callers_of_root": [
+    "frontend"
+   ],
+   "callees_of_root": [
+    "cartservice",
+    "emailservice",
+    "paymentservice",
+    "productcatalogservice",
+    "shippingservice"
+   ],
+   "service_edges": 13,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 10,
+    "root": {
+     "score": 0.011816838995568684,
+     "operation": "checkoutservice_hipstershop.ShippingService/GetQuote",
+     "a": 4,
+     "n": 33,
+     "rank_min": 6,
+     "rank_max": 6
+    },
+    "above_root": [
+     {
+      "entity": "recommendationservice",
+      "relation": "other",
+      "score": 0.05719091673675358,
+      "operation": "recommendationservice_/hipstershop.RecommendationService/ListRecommendations",
+      "a": 34,
+      "n": 545,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.6575214229135163
+     },
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.05550883095037847,
+      "operation": "frontend_hipstershop.RecommendationService/ListRecommendations",
+      "a": 33,
+      "n": 545,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.6489648300549876
+     },
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.0480225988700565,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 68,
+      "n": 2188,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.6050484624503173
+     },
+     {
+      "entity": "productcatalogservice",
+      "relation": "callee_of_root",
+      "score": 0.04272151898734178,
+      "operation": "productcatalogservice_hipstershop.ProductCatalogService/ListProducts",
+      "a": 27,
+      "n": 620,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.5666595243196915
+     },
+     {
+      "entity": "shippingservice",
+      "relation": "callee_of_root",
+      "score": 0.016431924882629106,
+      "operation": "shippingservice_hipstershop.ShippingService/QuoteByCountFloat",
+      "a": 7,
+      "n": 208,
+      "rank_min": 5,
+      "rank_max": 5,
+      "margin_vs_root": 0.16337302074383206
+     }
+    ],
+    "callers_above": [
+     "frontend"
+    ]
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 10,
+    "root": {
+     "score": 0.015444015444015446,
+     "operation": "checkoutservice_hipstershop.ShippingService/GetQuote",
+     "a": 4,
+     "n": 33,
+     "rank_min": 6,
+     "rank_max": 6
+    },
+    "above_root": [
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.11583011583011583,
+      "operation": "frontend_hipstershop.CheckoutService/PlaceOrder",
+      "a": 30,
+      "n": 33,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.7647058823529411
+     },
+     {
+      "entity": "recommendationservice",
+      "relation": "other",
+      "score": 0.06019417475728155,
+      "operation": "recommendationservice_/hipstershop.ProductCatalogService/ListProducts",
+      "a": 31,
+      "n": 545,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.5916344533650509
+     },
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.050879161990273106,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 68,
+      "n": 2188,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.5342799895461277
+     },
+     {
+      "entity": "productcatalogservice",
+      "relation": "callee_of_root",
+      "score": 0.047058823529411764,
+      "operation": "productcatalogservice_hipstershop.ProductCatalogService/ReadCatalog",
+      "a": 26,
+      "n": 620,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.5058139534883721
+     },
+     {
+      "entity": "shippingservice",
+      "relation": "callee_of_root",
+      "score": 0.020202020202020204,
+      "operation": "shippingservice_hipstershop.ShippingService/QuoteByCountFloat",
+      "a": 7,
+      "n": 208,
+      "rank_min": 5,
+      "rank_max": 5,
+      "margin_vs_root": 0.1334792122538293
+     }
+    ],
+    "callers_above": [
+     "frontend"
+    ]
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {
+    "recommendationservice": {
+     "relation": "other",
+     "margin_native": 0.6575214229135163,
+     "margin_t_d": 0.5916344533650509,
+     "delta": 0.0658869695484654,
+     "still_above": true
+    },
+    "frontend": {
+     "relation": "caller_of_root",
+     "margin_native": 0.6489648300549876,
+     "margin_t_d": 0.7647058823529411,
+     "delta": -0.1157410522979535,
+     "still_above": true
+    },
+    "currencyservice": {
+     "relation": "other",
+     "margin_native": 0.6050484624503173,
+     "margin_t_d": 0.5342799895461277,
+     "delta": 0.07076847290418964,
+     "still_above": true
+    },
+    "productcatalogservice": {
+     "relation": "callee_of_root",
+     "margin_native": 0.5666595243196915,
+     "margin_t_d": 0.5058139534883721,
+     "delta": 0.06084557083131936,
+     "still_above": true
+    },
+    "shippingservice": {
+     "relation": "callee_of_root",
+     "margin_native": 0.16337302074383206,
+     "margin_t_d": 0.1334792122538293,
+     "delta": 0.029893808490002755,
+     "still_above": true
+    }
+   },
+   "check_sha256": "2480e51d0e46fe8c4b4a4992281d1e72361cbe6a7c791547c30f9e399cafc0d3"
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-63c30faf34",
+   "status": "OK",
+   "root": "recommendationservice",
+   "fault": "network_delay",
+   "cell": "recommendationservice|network_delay",
+   "t028": {
+    "status": "OK",
+    "rank_min": 8,
+    "rank_max": 8,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": [
+      "M5"
+     ]
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 67719,
+    "spans_before": 32101,
+    "spans_after": 35618,
+    "H_native": 1086,
+    "H_u": 968,
+    "operations_after": 55,
+    "spans_parent_resolved": 65645,
+    "spans_with_children": 37266,
+    "after_spans_with_children": 19576,
+    "covered_share_of_total_duration": 0.5617093815774483
+   },
+   "callers_of_root": [
+    "frontend"
+   ],
+   "callees_of_root": [
+    "productcatalogservice"
+   ],
+   "service_edges": 13,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 8,
+    "root": {
+     "score": 0.007228915662650602,
+     "operation": "recommendationservice_/hipstershop.RecommendationService/ListRecommendations",
+     "a": 6,
+     "n": 574,
+     "rank_min": 8,
+     "rank_max": 8
+    },
+    "above_root": [
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.6686746987951807,
+      "operation": "frontend_hipstershop.RecommendationService/ListRecommendations",
+      "a": 555,
+      "n": 574,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.9786096256684492
+     },
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.03964757709251101,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 63,
+      "n": 2092,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.6915760869565216
+     },
+     {
+      "entity": "productcatalogservice",
+      "relation": "callee_of_root",
+      "score": 0.0186838281087814,
+      "operation": "productcatalogservice_hipstershop.ProductCatalogService/GetProduct",
+      "a": 45,
+      "n": 3731,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.44205710314472696
+     },
+     {
+      "entity": "checkoutservice",
+      "relation": "other",
+      "score": 0.012422360248447204,
+      "operation": "checkoutservice_hipstershop.CheckoutService/ShipOrder",
+      "a": 7,
+      "n": 41,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.2642802741812643
+     },
+     {
+      "entity": "shippingservice",
+      "relation": "other",
+      "score": 0.010711553175210406,
+      "operation": "shippingservice_hipstershop.ShippingService/QuoteByCountFloat",
+      "a": 7,
+      "n": 221,
+      "rank_min": 5,
+      "rank_max": 5,
+      "margin_vs_root": 0.19412187853252497
+     },
+     {
+      "entity": "adservice",
+      "relation": "other",
+      "score": 0.009308510638297872,
+      "operation": "adservice_hipstershop.AdService/GetAds",
+      "a": 7,
+      "n": 418,
+      "rank_min": 6,
+      "rank_max": 6,
+      "margin_vs_root": 0.12575082348382097
+     },
+     {
+      "entity": "cartservice",
+      "relation": "other",
+      "score": 0.008460236886632826,
+      "operation": "cartservice_hipstershop.CartService/AddItem",
+      "a": 5,
+      "n": 96,
+      "rank_min": 7,
+      "rank_max": 7,
+      "margin_vs_root": 0.07848232848232851
+     }
+    ],
+    "callers_above": [
+     "frontend"
+    ]
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 8,
+    "root": {
+     "score": 0.010376134889753566,
+     "operation": "recommendationservice_/hipstershop.ProductCatalogService/ListProducts",
+     "a": 8,
+     "n": 574,
+     "rank_min": 7,
+     "rank_max": 7
+    },
+    "above_root": [
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.7198443579766537,
+      "operation": "frontend_hipstershop.RecommendationService/ListRecommendations",
+      "a": 555,
+      "n": 574,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.9715808170515099
+     },
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.041176470588235294,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 63,
+      "n": 2092,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.5974544916383011
+     },
+     {
+      "entity": "adservice",
+      "relation": "other",
+      "score": 0.030303030303030304,
+      "operation": "adservice_hipstershop.AdService/GetAds",
+      "a": 21,
+      "n": 418,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.4898550724637682
+     },
+     {
+      "entity": "productcatalogservice",
+      "relation": "callee_of_root",
+      "score": 0.01787614386039583,
+      "operation": "productcatalogservice_hipstershop.ProductCatalogService/GetProduct",
+      "a": 42,
+      "n": 3731,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.26546562976278876
+     },
+     {
+      "entity": "checkoutservice",
+      "relation": "other",
+      "score": 0.011892963330029732,
+      "operation": "checkoutservice_hipstershop.ShippingService/GetQuote",
+      "a": 6,
+      "n": 41,
+      "rank_min": 5,
+      "rank_max": 5,
+      "margin_vs_root": 0.06811359963057033
+     },
+     {
+      "entity": "shippingservice",
+      "relation": "other",
+      "score": 0.011774600504625735,
+      "operation": "shippingservice_hipstershop.ShippingService/QuoteByCountFloat",
+      "a": 7,
+      "n": 221,
+      "rank_min": 6,
+      "rank_max": 6,
+      "margin_vs_root": 0.063134049049542
+     }
+    ],
+    "callers_above": [
+     "frontend"
+    ]
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "tăng hạng",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {
+    "frontend": {
+     "relation": "caller_of_root",
+     "margin_native": 0.9786096256684492,
+     "margin_t_d": 0.9715808170515099,
+     "delta": 0.0070288086169393305,
+     "still_above": true
+    },
+    "currencyservice": {
+     "relation": "other",
+     "margin_native": 0.6915760869565216,
+     "margin_t_d": 0.5974544916383011,
+     "delta": 0.09412159531822051,
+     "still_above": true
+    },
+    "productcatalogservice": {
+     "relation": "callee_of_root",
+     "margin_native": 0.44205710314472696,
+     "margin_t_d": 0.26546562976278876,
+     "delta": 0.1765914733819382,
+     "still_above": true
+    },
+    "checkoutservice": {
+     "relation": "other",
+     "margin_native": 0.2642802741812643,
+     "margin_t_d": 0.06811359963057033,
+     "delta": 0.19616667455069398,
+     "still_above": true
+    },
+    "shippingservice": {
+     "relation": "other",
+     "margin_native": 0.19412187853252497,
+     "margin_t_d": 0.063134049049542,
+     "delta": 0.130987829482983,
+     "still_above": true
+    },
+    "adservice": {
+     "relation": "other",
+     "margin_native": 0.12575082348382097,
+     "margin_t_d": 0.4898550724637682,
+     "delta": -0.3641042489799472,
+     "still_above": true
+    },
+    "cartservice": {
+     "relation": "other",
+     "margin_native": 0.07848232848232851,
+     "margin_t_d": -0.0494390334114166,
+     "delta": 0.12792136189374512,
+     "still_above": false
+    }
+   },
+   "check_sha256": "4142a889e52925fcd4077ac5aa1eef2cdb60ce760f80eccb977cdeb874dca42e"
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-6c9afc9822",
+   "status": "OK",
+   "root": "emailservice",
+   "fault": "network_delay",
+   "cell": "emailservice|network_delay",
+   "t028": {
+    "status": "OK",
+    "rank_min": 9,
+    "rank_max": 9,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": [
+      "M5"
+     ]
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 70163,
+    "spans_before": 34960,
+    "spans_after": 35203,
+    "H_native": 546,
+    "H_u": 414,
+    "operations_after": 55,
+    "spans_parent_resolved": 68026,
+    "spans_with_children": 38569,
+    "after_spans_with_children": 19398,
+    "covered_share_of_total_duration": 0.639828554335599
+   },
+   "callers_of_root": [
+    "checkoutservice"
+   ],
+   "callees_of_root": [],
+   "service_edges": 13,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 9,
+    "root": {
+     "score": 0.0034904013961605585,
+     "operation": "emailservice_/hipstershop.EmailService/SendOrderConfirmation",
+     "a": 1,
+     "n": 27,
+     "rank_min": 9,
+     "rank_max": 9
+    },
+    "above_root": [
+     {
+      "entity": "frontend",
+      "relation": "other",
+      "score": 0.09075043630017453,
+      "operation": "frontend_hipstershop.CheckoutService/PlaceOrder",
+      "a": 26,
+      "n": 27,
+      "rank_min": 1,
+      "rank_max": 2,
+      "margin_vs_root": 0.925925925925926
+     },
+     {
+      "entity": "checkoutservice",
+      "relation": "caller_of_root",
+      "score": 0.09075043630017453,
+      "operation": "checkoutservice_hipstershop.CheckoutService/PlaceOrder",
+      "a": 26,
+      "n": 27,
+      "rank_min": 1,
+      "rank_max": 2,
+      "margin_vs_root": 0.925925925925926
+     },
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.05714285714285715,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 79,
+      "n": 2219,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.8848684210526315
+     },
+     {
+      "entity": "cartservice",
+      "relation": "other",
+      "score": 0.026981450252951095,
+      "operation": "cartservice_hipstershop.CartService/GetCart",
+      "a": 16,
+      "n": 640,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.7709097933165925
+     },
+     {
+      "entity": "productcatalogservice",
+      "relation": "other",
+      "score": 0.022449975597852608,
+      "operation": "productcatalogservice_hipstershop.ProductCatalogService/GetProduct",
+      "a": 46,
+      "n": 3552,
+      "rank_min": 5,
+      "rank_max": 5,
+      "margin_vs_root": 0.730890464933018
+     },
+     {
+      "entity": "shippingservice",
+      "relation": "other",
+      "score": 0.006980802792321117,
+      "operation": "shippingservice_hipstershop.ShippingService/ShipOrder",
+      "a": 2,
+      "n": 27,
+      "rank_min": 6,
+      "rank_max": 6,
+      "margin_vs_root": 0.3333333333333333
+     },
+     {
+      "entity": "recommendationservice",
+      "relation": "other",
+      "score": 0.00544464609800363,
+      "operation": "recommendationservice_/hipstershop.RecommendationService/ListRecommendations",
+      "a": 3,
+      "n": 556,
+      "rank_min": 7,
+      "rank_max": 7,
+      "margin_vs_root": 0.21871676710386392
+     },
+     {
+      "entity": "adservice",
+      "relation": "other",
+      "score": 0.00397219463753724,
+      "operation": "adservice_hipstershop.AdService/GetAds",
+      "a": 2,
+      "n": 461,
+      "rank_min": 8,
+      "rank_max": 8,
+      "margin_vs_root": 0.0645610775661868
+     }
+    ],
+    "callers_above": [
+     "checkoutservice"
+    ]
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 9,
+    "root": {
+     "score": 0.0045351473922902496,
+     "operation": "emailservice_/hipstershop.EmailService/SendOrderConfirmation",
+     "a": 1,
+     "n": 27,
+     "rank_min": 9,
+     "rank_max": 9
+    },
+    "above_root": [
+     {
+      "entity": "checkoutservice",
+      "relation": "caller_of_root",
+      "score": 0.11791383219954649,
+      "operation": "checkoutservice_hipstershop.EmailService/SendOrderConfirmation",
+      "a": 26,
+      "n": 27,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.925925925925926
+     },
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.060007595898214965,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 79,
+      "n": 2219,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.8594684030742954
+     },
+     {
+      "entity": "frontend",
+      "relation": "other",
+      "score": 0.04673807205452775,
+      "operation": "frontend_hipstershop.CartService/GetCart",
+      "a": 24,
+      "n": 613,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.8230987856343122
+     },
+     {
+      "entity": "cartservice",
+      "relation": "other",
+      "score": 0.030360531309297913,
+      "operation": "cartservice_hipstershop.CartService/GetCart",
+      "a": 16,
+      "n": 640,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.7400739827373614
+     },
+     {
+      "entity": "recommendationservice",
+      "relation": "other",
+      "score": 0.0288659793814433,
+      "operation": "recommendationservice_/hipstershop.ProductCatalogService/ListProducts",
+      "a": 14,
+      "n": 556,
+      "rank_min": 5,
+      "rank_max": 5,
+      "margin_vs_root": 0.7284434490481523
+     },
+     {
+      "entity": "productcatalogservice",
+      "relation": "other",
+      "score": 0.020675743822491172,
+      "operation": "productcatalogservice_hipstershop.ProductCatalogService/GetProduct",
+      "a": 41,
+      "n": 3552,
+      "rank_min": 6,
+      "rank_max": 6,
+      "margin_vs_root": 0.6402231596135529
+     },
+     {
+      "entity": "shippingservice",
+      "relation": "other",
+      "score": 0.013468013468013467,
+      "operation": "shippingservice_hipstershop.ShippingService/CreateQuoteFromCount",
+      "a": 4,
+      "n": 180,
+      "rank_min": 7,
+      "rank_max": 7,
+      "margin_vs_root": 0.4961832061068701
+     },
+     {
+      "entity": "adservice",
+      "relation": "other",
+      "score": 0.004571428571428572,
+      "operation": "adservice_hipstershop.AdService/GetAds",
+      "a": 2,
+      "n": 461,
+      "rank_min": 8,
+      "rank_max": 8,
+      "margin_vs_root": 0.0039840637450199445
+     }
+    ],
+    "callers_above": [
+     "checkoutservice"
+    ]
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {
+    "frontend": {
+     "relation": "other",
+     "margin_native": 0.925925925925926,
+     "margin_t_d": 0.8230987856343122,
+     "delta": 0.10282714029161388,
+     "still_above": true
+    },
+    "checkoutservice": {
+     "relation": "caller_of_root",
+     "margin_native": 0.925925925925926,
+     "margin_t_d": 0.925925925925926,
+     "delta": 0.0,
+     "still_above": true
+    },
+    "currencyservice": {
+     "relation": "other",
+     "margin_native": 0.8848684210526315,
+     "margin_t_d": 0.8594684030742954,
+     "delta": 0.02540001797833613,
+     "still_above": true
+    },
+    "cartservice": {
+     "relation": "other",
+     "margin_native": 0.7709097933165925,
+     "margin_t_d": 0.7400739827373614,
+     "delta": 0.030835810579231127,
+     "still_above": true
+    },
+    "productcatalogservice": {
+     "relation": "other",
+     "margin_native": 0.730890464933018,
+     "margin_t_d": 0.6402231596135529,
+     "delta": 0.0906673053194651,
+     "still_above": true
+    },
+    "shippingservice": {
+     "relation": "other",
+     "margin_native": 0.3333333333333333,
+     "margin_t_d": 0.4961832061068701,
+     "delta": -0.1628498727735368,
+     "still_above": true
+    },
+    "recommendationservice": {
+     "relation": "other",
+     "margin_native": 0.21871676710386392,
+     "margin_t_d": 0.7284434490481523,
+     "delta": -0.5097266819442884,
+     "still_above": true
+    },
+    "adservice": {
+     "relation": "other",
+     "margin_native": 0.0645610775661868,
+     "margin_t_d": 0.0039840637450199445,
+     "delta": 0.060577013821166856,
+     "still_above": true
+    }
+   },
+   "check_sha256": "2ef82eaa800e6c127f1a2c93aab6e2b8271c793d4a008d3136dce40c393160ec"
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-70629373f9",
+   "status": "OK",
+   "root": "paymentservice",
+   "fault": "cpu_contention",
+   "cell": "paymentservice|cpu_contention",
+   "t028": {
+    "status": "OK",
+    "rank_min": 9,
+    "rank_max": 9,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": [
+      "M5"
+     ]
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 71888,
+    "spans_before": 23054,
+    "spans_after": 48834,
+    "H_native": 741,
+    "H_u": 700,
+    "operations_after": 55,
+    "spans_parent_resolved": 70108,
+    "spans_with_children": 39692,
+    "after_spans_with_children": 26955,
+    "covered_share_of_total_duration": 0.630752509025327
+   },
+   "callers_of_root": [
+    "checkoutservice"
+   ],
+   "callees_of_root": [],
+   "service_edges": 13,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 10,
+    "root": {
+     "score": 0.005108556832694764,
+     "operation": "paymentservice_grpc.hipstershop.PaymentService/Charge",
+     "a": 2,
+     "n": 42,
+     "rank_min": 9,
+     "rank_max": 9
+    },
+    "above_root": [
+     {
+      "entity": "checkoutservice",
+      "relation": "caller_of_root",
+      "score": 0.09195402298850576,
+      "operation": "checkoutservice_hipstershop.PaymentService/Charge",
+      "a": 36,
+      "n": 42,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.8947368421052633
+     },
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.05887075194005888,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 110,
+      "n": 2996,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.8403059698303492
+     },
+     {
+      "entity": "frontend",
+      "relation": "other",
+      "score": 0.03839009287925696,
+      "operation": "frontend_hipstershop.CurrencyService/GetSupportedCurrencies",
+      "a": 31,
+      "n": 874,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.7651165327418828
+     },
+     {
+      "entity": "cartservice",
+      "relation": "other",
+      "score": 0.030959752321981424,
+      "operation": "cartservice_hipstershop.CartService/GetCart",
+      "a": 25,
+      "n": 874,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.7167287875465906
+     },
+     {
+      "entity": "productcatalogservice",
+      "relation": "other",
+      "score": 0.024767801857585137,
+      "operation": "productcatalogservice_hipstershop.ProductCatalogService/ListProducts",
+      "a": 20,
+      "n": 874,
+      "rank_min": 5,
+      "rank_max": 5,
+      "margin_vs_root": 0.6580201164637374
+     },
+     {
+      "entity": "recommendationservice",
+      "relation": "other",
+      "score": 0.02238314680710994,
+      "operation": "recommendationservice_/hipstershop.RecommendationService/ListRecommendations",
+      "a": 17,
+      "n": 778,
+      "rank_min": 6,
+      "rank_max": 6,
+      "margin_vs_root": 0.6283564744021041
+     },
+     {
+      "entity": "shippingservice",
+      "relation": "other",
+      "score": 0.019550342130987292,
+      "operation": "shippingservice_hipstershop.ShippingService/QuoteByCountFloat",
+      "a": 10,
+      "n": 282,
+      "rank_min": 7,
+      "rank_max": 7,
+      "margin_vs_root": 0.5856622114216282
+     },
+     {
+      "entity": "adservice",
+      "relation": "other",
+      "score": 0.011985018726591759,
+      "operation": "adservice_hipstershop.AdService/GetAds",
+      "a": 8,
+      "n": 594,
+      "rank_min": 8,
+      "rank_max": 8,
+      "margin_vs_root": 0.40228341168569504
+     }
+    ],
+    "callers_above": [
+     "checkoutservice"
+    ]
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 10,
+    "root": {
+     "score": 0.005390835579514825,
+     "operation": "paymentservice_grpc.hipstershop.PaymentService/Charge",
+     "a": 2,
+     "n": 42,
+     "rank_min": 9,
+     "rank_max": 9
+    },
+    "above_root": [
+     {
+      "entity": "checkoutservice",
+      "relation": "caller_of_root",
+      "score": 0.09703504043126684,
+      "operation": "checkoutservice_hipstershop.PaymentService/Charge",
+      "a": 36,
+      "n": 42,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.8947368421052632
+     },
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.059523809523809534,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 110,
+      "n": 2996,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.8339100346020762
+     },
+     {
+      "entity": "adservice",
+      "relation": "other",
+      "score": 0.04945904173106645,
+      "operation": "adservice_hipstershop.AdService/GetAds",
+      "a": 32,
+      "n": 594,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.8034330852195049
+     },
+     {
+      "entity": "frontend",
+      "relation": "other",
+      "score": 0.03811944091486658,
+      "operation": "frontend_hipstershop.CurrencyService/GetSupportedCurrencies",
+      "a": 30,
+      "n": 874,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.7522040302267001
+     },
+     {
+      "entity": "recommendationservice",
+      "relation": "other",
+      "score": 0.03247631935047362,
+      "operation": "recommendationservice_/hipstershop.ProductCatalogService/ListProducts",
+      "a": 24,
+      "n": 778,
+      "rank_min": 5,
+      "rank_max": 5,
+      "margin_vs_root": 0.7152764399922943
+     },
+     {
+      "entity": "cartservice",
+      "relation": "other",
+      "score": 0.03176620076238882,
+      "operation": "cartservice_hipstershop.CartService/GetCart",
+      "a": 25,
+      "n": 874,
+      "rank_min": 6,
+      "rank_max": 6,
+      "margin_vs_root": 0.7098350078348235
+     },
+     {
+      "entity": "productcatalogservice",
+      "relation": "other",
+      "score": 0.030495552731893263,
+      "operation": "productcatalogservice_hipstershop.ProductCatalogService/ListProducts",
+      "a": 24,
+      "n": 874,
+      "rank_min": 7,
+      "rank_max": 7,
+      "margin_vs_root": 0.6995609849207864
+     },
+     {
+      "entity": "shippingservice",
+      "relation": "other",
+      "score": 0.020366598778004074,
+      "operation": "shippingservice_hipstershop.ShippingService/QuoteByCountFloat",
+      "a": 10,
+      "n": 282,
+      "rank_min": 8,
+      "rank_max": 8,
+      "margin_vs_root": 0.5814151747655584
+     }
+    ],
+    "callers_above": [
+     "checkoutservice"
+    ]
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {
+    "checkoutservice": {
+     "relation": "caller_of_root",
+     "margin_native": 0.8947368421052633,
+     "margin_t_d": 0.8947368421052632,
+     "delta": 1.1102230246251565e-16,
+     "still_above": true
+    },
+    "currencyservice": {
+     "relation": "other",
+     "margin_native": 0.8403059698303492,
+     "margin_t_d": 0.8339100346020762,
+     "delta": 0.006395935228272975,
+     "still_above": true
+    },
+    "frontend": {
+     "relation": "other",
+     "margin_native": 0.7651165327418828,
+     "margin_t_d": 0.7522040302267001,
+     "delta": 0.012912502515182722,
+     "still_above": true
+    },
+    "cartservice": {
+     "relation": "other",
+     "margin_native": 0.7167287875465906,
+     "margin_t_d": 0.7098350078348235,
+     "delta": 0.0068937797117671895,
+     "still_above": true
+    },
+    "productcatalogservice": {
+     "relation": "other",
+     "margin_native": 0.6580201164637374,
+     "margin_t_d": 0.6995609849207864,
+     "delta": -0.041540868457049074,
+     "still_above": true
+    },
+    "recommendationservice": {
+     "relation": "other",
+     "margin_native": 0.6283564744021041,
+     "margin_t_d": 0.7152764399922943,
+     "delta": -0.08691996559019022,
+     "still_above": true
+    },
+    "shippingservice": {
+     "relation": "other",
+     "margin_native": 0.5856622114216282,
+     "margin_t_d": 0.5814151747655584,
+     "delta": 0.004247036656069847,
+     "still_above": true
+    },
+    "adservice": {
+     "relation": "other",
+     "margin_native": 0.40228341168569504,
+     "margin_t_d": 0.8034330852195049,
+     "delta": -0.4011496735338098,
+     "still_above": true
+    }
+   },
+   "check_sha256": "505426c0f54a0fc90ac023a323e416e8f6042a6cc58b8c4fbbfeeab40107c2d0"
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-7b7c973198",
+   "status": "OK",
+   "root": "emailservice",
+   "fault": "network_delay",
+   "cell": "emailservice|network_delay",
+   "t028": {
+    "status": "OK",
+    "rank_min": null,
+    "rank_max": null,
+    "multi_flags": {
+     "1": [
+      "M2",
+      "M6"
+     ],
+     "5": [
+      "M2",
+      "M6"
+     ]
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 72236,
+    "spans_before": 27490,
+    "spans_after": 44746,
+    "H_native": 996,
+    "H_u": 714,
+    "operations_after": 55,
+    "spans_parent_resolved": 70310,
+    "spans_with_children": 39665,
+    "after_spans_with_children": 24434,
+    "covered_share_of_total_duration": 0.6278572694089599
+   },
+   "callers_of_root": [
+    "checkoutservice"
+   ],
+   "callees_of_root": [],
+   "service_edges": 13,
+   "native": {
+    "root_ranked": false,
+    "n_entities": 9
+   },
+   "t_d": {
+    "root_ranked": false,
+    "n_entities": 9
+   },
+   "check_sha256": "716ba5df897d18a25e0c7e895a86bfc5ba6e83f55d7b25616ea1022e165a31c5"
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-7d3c2fe6d1",
+   "status": "OK",
+   "root": "shippingservice",
+   "fault": "cpu_contention",
+   "cell": "shippingservice|cpu_contention",
+   "t028": {
+    "status": "OK",
+    "rank_min": 2,
+    "rank_max": 2,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 71708,
+    "spans_before": 30522,
+    "spans_after": 41186,
+    "H_native": 1013,
+    "H_u": 786,
+    "operations_after": 55,
+    "spans_parent_resolved": 70036,
+    "spans_with_children": 39510,
+    "after_spans_with_children": 22693,
+    "covered_share_of_total_duration": 0.6145791881958335
+   },
+   "callers_of_root": [
+    "checkoutservice",
+    "frontend"
+   ],
+   "callees_of_root": [],
+   "service_edges": 13,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 10,
+    "root": {
+     "score": 0.08469055374592833,
+     "operation": "shippingservice_hipstershop.ShippingService/GetQuote",
+     "a": 52,
+     "n": 215,
+     "rank_min": 2,
+     "rank_max": 2
+    },
+    "above_root": [
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.24267782426778242,
+      "operation": "frontend_hipstershop.ShippingService/GetQuote",
+      "a": 145,
+      "n": 182,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.48259783513738547
+     }
+    ],
+    "callers_above": [
+     "frontend"
+    ]
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 10,
+    "root": {
+     "score": 0.08191808191808192,
+     "operation": "shippingservice_hipstershop.ShippingService/GetQuote",
+     "a": 41,
+     "n": 215,
+     "rank_min": 2,
+     "rank_max": 2
+    },
+    "above_root": [
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.29132231404958675,
+      "operation": "frontend_hipstershop.ShippingService/GetQuote",
+      "a": 141,
+      "n": 182,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.5610438591155179
+     }
+    ],
+    "callers_above": [
+     "frontend"
+    ]
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {
+    "frontend": {
+     "relation": "caller_of_root",
+     "margin_native": 0.48259783513738547,
+     "margin_t_d": 0.5610438591155179,
+     "delta": -0.07844602397813244,
+     "still_above": true
+    }
+   },
+   "check_sha256": "d89f5de698f79462bfa106fe2ae2e6d378bf26618a6556bc138cc1c4a31beaec"
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-8ecd9880ed",
+   "status": "OK",
+   "root": "checkoutservice",
+   "fault": "return",
+   "cell": "checkoutservice|return",
+   "t028": {
+    "status": "OK",
+    "rank_min": 5,
+    "rank_max": 6,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": [
+      "M3",
+      "M5"
+     ]
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 71279,
+    "spans_before": 36362,
+    "spans_after": 34917,
+    "H_native": 438,
+    "H_u": 422,
+    "operations_after": 55,
+    "spans_parent_resolved": 69415,
+    "spans_with_children": 39139,
+    "after_spans_with_children": 19075,
+    "covered_share_of_total_duration": 0.6400335917688663
+   },
+   "callers_of_root": [
+    "frontend"
+   ],
+   "callees_of_root": [
+    "cartservice",
+    "emailservice",
+    "paymentservice",
+    "productcatalogservice",
+    "shippingservice"
+   ],
+   "service_edges": 13,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 9,
+    "root": {
+     "score": 0.008583690987124463,
+     "operation": "checkoutservice_hipstershop.PaymentService/Charge",
+     "a": 2,
+     "n": 28,
+     "rank_min": 5,
+     "rank_max": 6
+    },
+    "above_root": [
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.07792207792207793,
+      "operation": "frontend_hipstershop.CurrencyService/Convert",
+      "a": 84,
+      "n": 1718,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.8015463917525775
+     },
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.057350272232304905,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 79,
+      "n": 2317,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.7396276344390889
+     },
+     {
+      "entity": "shippingservice",
+      "relation": "callee_of_root",
+      "score": 0.01938610662358643,
+      "operation": "shippingservice_hipstershop.ShippingService/QuoteByCountFloat",
+      "a": 6,
+      "n": 181,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.3862171541893902
+     },
+     {
+      "entity": "productcatalogservice",
+      "relation": "callee_of_root",
+      "score": 0.01727642276422764,
+      "operation": "productcatalogservice_hipstershop.ProductCatalogService/GetProduct",
+      "a": 34,
+      "n": 3498,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.336144375105414
+     }
+    ],
+    "callers_above": [
+     "frontend"
+    ]
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 9,
+    "root": {
+     "score": 0.00888888888888889,
+     "operation": "checkoutservice_hipstershop.ShippingService/GetQuote",
+     "a": 2,
+     "n": 28,
+     "rank_min": 7,
+     "rank_max": 8
+    },
+    "above_root": [
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.09345794392523366,
+      "operation": "frontend_hipstershop.CurrencyService/Convert",
+      "a": 100,
+      "n": 1718,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.8262987012987013
+     },
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.05768528660094925,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 79,
+      "n": 2317,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.7329628546358584
+     },
+     {
+      "entity": "recommendationservice",
+      "relation": "other",
+      "score": 0.040554962646744935,
+      "operation": "recommendationservice_/hipstershop.ProductCatalogService/ListProducts",
+      "a": 19,
+      "n": 515,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.6404451266308518
+     },
+     {
+      "entity": "shippingservice",
+      "relation": "callee_of_root",
+      "score": 0.01990049751243781,
+      "operation": "shippingservice_hipstershop.ShippingService/QuoteByCountFloat",
+      "a": 6,
+      "n": 181,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.3824884792626727
+     },
+     {
+      "entity": "productcatalogservice",
+      "relation": "callee_of_root",
+      "score": 0.01683673469387755,
+      "operation": "productcatalogservice_hipstershop.ProductCatalogService/GetProduct",
+      "a": 33,
+      "n": 3498,
+      "rank_min": 5,
+      "rank_max": 5,
+      "margin_vs_root": 0.3089466725429704
+     },
+     {
+      "entity": "adservice",
+      "relation": "other",
+      "score": 0.009237875288683604,
+      "operation": "adservice_hipstershop.AdServiceImpl/getAds",
+      "a": 4,
+      "n": 444,
+      "rank_min": 6,
+      "rank_max": 6,
+      "margin_vs_root": 0.01925254813137032
+     }
+    ],
+    "callers_above": [
+     "frontend"
+    ]
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "giảm hạng",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {
+    "frontend": {
+     "relation": "caller_of_root",
+     "margin_native": 0.8015463917525775,
+     "margin_t_d": 0.8262987012987013,
+     "delta": -0.02475230954612384,
+     "still_above": true
+    },
+    "currencyservice": {
+     "relation": "other",
+     "margin_native": 0.7396276344390889,
+     "margin_t_d": 0.7329628546358584,
+     "delta": 0.006664779803230436,
+     "still_above": true
+    },
+    "shippingservice": {
+     "relation": "callee_of_root",
+     "margin_native": 0.3862171541893902,
+     "margin_t_d": 0.3824884792626727,
+     "delta": 0.003728674926717468,
+     "still_above": true
+    },
+    "productcatalogservice": {
+     "relation": "callee_of_root",
+     "margin_native": 0.336144375105414,
+     "margin_t_d": 0.3089466725429704,
+     "delta": 0.027197702562443582,
+     "still_above": true
+    }
+   },
+   "check_sha256": "220b2c32c74ab6926d92c6c4bc4f4e61da85d1c129bbfbf36e6e13f7f4e117c0"
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-95e164235f",
+   "status": "OK",
+   "root": "paymentservice",
+   "fault": "cpu_contention",
+   "cell": "paymentservice|cpu_contention",
+   "t028": {
+    "status": "OK",
+    "rank_min": 6,
+    "rank_max": 6,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": [
+      "M5"
+     ]
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 71310,
+    "spans_before": 34784,
+    "spans_after": 36526,
+    "H_native": 646,
+    "H_u": 430,
+    "operations_after": 55,
+    "spans_parent_resolved": 69036,
+    "spans_with_children": 39233,
+    "after_spans_with_children": 20189,
+    "covered_share_of_total_duration": 0.6232480877547513
+   },
+   "callers_of_root": [
+    "checkoutservice"
+   ],
+   "callees_of_root": [],
+   "service_edges": 13,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 10,
+    "root": {
+     "score": 0.02052785923753666,
+     "operation": "paymentservice_grpc.hipstershop.PaymentService/Charge",
+     "a": 7,
+     "n": 36,
+     "rank_min": 6,
+     "rank_max": 6
+    },
+    "above_root": [
+     {
+      "entity": "frontend",
+      "relation": "other",
+      "score": 0.0606060606060606,
+      "operation": "frontend_hipstershop.ProductCatalogService/GetProduct",
+      "a": 132,
+      "n": 3710,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.49397590361445776
+     },
+     {
+      "entity": "recommendationservice",
+      "relation": "other",
+      "score": 0.06001622060016221,
+      "operation": "recommendationservice_/hipstershop.RecommendationService/ListRecommendations",
+      "a": 37,
+      "n": 587,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.49027019046212894
+     },
+     {
+      "entity": "productcatalogservice",
+      "relation": "other",
+      "score": 0.04557761732851985,
+      "operation": "productcatalogservice_hipstershop.ProductCatalogService/GetProduct",
+      "a": 101,
+      "n": 3786,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.3789362000280263
+     },
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.03454353189989426,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 49,
+      "n": 2191,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.2545000656943897
+     },
+     {
+      "entity": "checkoutservice",
+      "relation": "caller_of_root",
+      "score": 0.029325513196480937,
+      "operation": "checkoutservice_hipstershop.PaymentService/Charge",
+      "a": 10,
+      "n": 36,
+      "rank_min": 5,
+      "rank_max": 5,
+      "margin_vs_root": 0.17647058823529405
+     }
+    ],
+    "callers_above": [
+     "checkoutservice"
+    ]
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 10,
+    "root": {
+     "score": 0.030042918454935622,
+     "operation": "paymentservice_grpc.hipstershop.PaymentService/Charge",
+     "a": 7,
+     "n": 36,
+     "rank_min": 6,
+     "rank_max": 6
+    },
+    "above_root": [
+     {
+      "entity": "recommendationservice",
+      "relation": "other",
+      "score": 0.07079646017699115,
+      "operation": "recommendationservice_/hipstershop.ProductCatalogService/ListProducts",
+      "a": 36,
+      "n": 587,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.4041431261770245
+     },
+     {
+      "entity": "productcatalogservice",
+      "relation": "other",
+      "score": 0.046015180265654654,
+      "operation": "productcatalogservice_hipstershop.ProductCatalogService/GetProduct",
+      "a": 97,
+      "n": 3786,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.21000080306234448
+     },
+     {
+      "entity": "checkoutservice",
+      "relation": "caller_of_root",
+      "score": 0.042918454935622324,
+      "operation": "checkoutservice_hipstershop.PaymentService/Charge",
+      "a": 10,
+      "n": 36,
+      "rank_min": 3,
+      "rank_max": 3,
+      "margin_vs_root": 0.1764705882352942
+     },
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.03739030904235025,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 49,
+      "n": 2191,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.10895801461839202
+     },
+     {
+      "entity": "frontend",
+      "relation": "other",
+      "score": 0.034782608695652174,
+      "operation": "frontend_hipstershop.ProductCatalogService/GetProduct",
+      "a": 72,
+      "n": 3710,
+      "rank_min": 5,
+      "rank_max": 5,
+      "margin_vs_root": 0.07311456534254462
+     }
+    ],
+    "callers_above": [
+     "checkoutservice"
+    ]
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {
+    "frontend": {
+     "relation": "other",
+     "margin_native": 0.49397590361445776,
+     "margin_t_d": 0.07311456534254462,
+     "delta": 0.42086133827191313,
+     "still_above": true
+    },
+    "recommendationservice": {
+     "relation": "other",
+     "margin_native": 0.49027019046212894,
+     "margin_t_d": 0.4041431261770245,
+     "delta": 0.08612706428510442,
+     "still_above": true
+    },
+    "productcatalogservice": {
+     "relation": "other",
+     "margin_native": 0.3789362000280263,
+     "margin_t_d": 0.21000080306234448,
+     "delta": 0.16893539696568183,
+     "still_above": true
+    },
+    "currencyservice": {
+     "relation": "other",
+     "margin_native": 0.2545000656943897,
+     "margin_t_d": 0.10895801461839202,
+     "delta": 0.14554205107599769,
+     "still_above": true
+    },
+    "checkoutservice": {
+     "relation": "caller_of_root",
+     "margin_native": 0.17647058823529405,
+     "margin_t_d": 0.1764705882352942,
+     "delta": -1.6653345369377348e-16,
+     "still_above": true
+    }
+   },
+   "check_sha256": "8638571a201348753da0383402226a53cd0b1de783a1a2e0e35a2706147d5e50"
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-9b9397a4dc",
+   "status": "OK",
+   "root": "recommendationservice",
+   "fault": "cpu_consumed",
+   "cell": "recommendationservice|cpu_consumed",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 41353,
+    "spans_before": 21736,
+    "spans_after": 19617,
+    "H_native": 284,
+    "H_u": 258,
+    "operations_after": 55,
+    "spans_parent_resolved": 37697,
+    "spans_with_children": 21376,
+    "after_spans_with_children": 10336,
+    "covered_share_of_total_duration": 0.5653113246907824
+   },
+   "callers_of_root": [
+    "frontend"
+   ],
+   "callees_of_root": [
+    "productcatalogservice"
+   ],
+   "service_edges": 13,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 9,
+    "root": {
+     "score": 0.1440536013400335,
+     "operation": "recommendationservice_/hipstershop.ProductCatalogService/ListProducts",
+     "a": 43,
+     "n": 313,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 9,
+    "root": {
+     "score": 0.14711033274956217,
+     "operation": "recommendationservice_/hipstershop.ProductCatalogService/ListProducts",
+     "a": 42,
+     "n": 313,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "7cdd951907b6a624f200ebe956f155163ff425bd173bc2440218dece62a033a8"
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-9fd793feb7",
+   "status": "OK",
+   "root": "shippingservice",
+   "fault": "cpu_consumed",
+   "cell": "shippingservice|cpu_consumed",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 70133,
+    "spans_before": 22533,
+    "spans_after": 47600,
+    "H_native": 1791,
+    "H_u": 1048,
+    "operations_after": 55,
+    "spans_parent_resolved": 67781,
+    "spans_with_children": 38213,
+    "after_spans_with_children": 25790,
+    "covered_share_of_total_duration": 0.676607691521342
+   },
+   "callers_of_root": [
+    "checkoutservice",
+    "frontend"
+   ],
+   "callees_of_root": [],
+   "service_edges": 13,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 10,
+    "root": {
+     "score": 0.20666013712047013,
+     "operation": "shippingservice_hipstershop.ShippingService/GetQuote",
+     "a": 211,
+     "n": 251,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 10,
+    "root": {
+     "score": 0.3233256351039261,
+     "operation": "shippingservice_hipstershop.ShippingService/QuoteByCountFloat",
+     "a": 210,
+     "n": 251,
+     "rank_min": 1,
+     "rank_max": 1
+    },
+    "above_root": [],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "không đổi",
+   "callers_no_longer_above": [],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {},
+   "check_sha256": "82fb98082f540b7ec7d47713d80e585f9e58d684e4689507e7ec8f0a01a46b03"
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-b0f8b2e3ac",
+   "status": "OK",
+   "root": "checkoutservice",
+   "fault": "exception",
+   "cell": "checkoutservice|exception",
+   "t028": {
+    "status": "OK",
+    "rank_min": 5,
+    "rank_max": 5,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": []
+    }
+   },
+   "sham_ji_bit_exact": true,
+   "identity_2a_over_n_plus_H": true,
+   "counts": {
+    "spans": 72815,
+    "spans_before": 20859,
+    "spans_after": 51956,
+    "H_native": 947,
+    "H_u": 719,
+    "operations_after": 44,
+    "spans_parent_resolved": 71272,
+    "spans_with_children": 39583,
+    "after_spans_with_children": 28136,
+    "covered_share_of_total_duration": 0.6200738500590004
+   },
+   "callers_of_root": [
+    "frontend"
+   ],
+   "callees_of_root": [
+    "cartservice",
+    "emailservice",
+    "paymentservice",
+    "productcatalogservice",
+    "shippingservice"
+   ],
+   "service_edges": 13,
+   "native": {
+    "root_ranked": true,
+    "n_entities": 8,
+    "root": {
+     "score": 0.03451251078515963,
+     "operation": "checkoutservice_hipstershop.ProductCatalogService/GetProduct",
+     "a": 20,
+     "n": 212,
+     "rank_min": 5,
+     "rank_max": 5
+    },
+    "above_root": [
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.06890420093354079,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 155,
+      "n": 3552,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.3325544738062122
+     },
+     {
+      "entity": "frontend",
+      "relation": "caller_of_root",
+      "score": 0.05020920502092051,
+      "operation": "frontend_hipstershop.RecommendationService/ListRecommendations",
+      "a": 42,
+      "n": 726,
+      "rank_min": 2,
+      "rank_max": 3,
+      "margin_vs_root": 0.18527356400204528
+     },
+     {
+      "entity": "recommendationservice",
+      "relation": "other",
+      "score": 0.05020920502092051,
+      "operation": "recommendationservice_/hipstershop.RecommendationService/ListRecommendations",
+      "a": 42,
+      "n": 726,
+      "rank_min": 2,
+      "rank_max": 3,
+      "margin_vs_root": 0.18527356400204528
+     },
+     {
+      "entity": "productcatalogservice",
+      "relation": "callee_of_root",
+      "score": 0.034656232532140854,
+      "operation": "productcatalogservice_hipstershop.ProductCatalogService/ParseCatalog",
+      "a": 31,
+      "n": 842,
+      "rank_min": 4,
+      "rank_max": 4,
+      "margin_vs_root": 0.0020778423907736173
+     }
+    ],
+    "callers_above": [
+     "frontend"
+    ]
+   },
+   "t_d": {
+    "root_ranked": true,
+    "n_entities": 8,
+    "root": {
+     "score": 0.04081632653061225,
+     "operation": "checkoutservice_hipstershop.ProductCatalogService/GetProduct",
+     "a": 19,
+     "n": 212,
+     "rank_min": 3,
+     "rank_max": 3
+    },
+    "above_root": [
+     {
+      "entity": "currencyservice",
+      "relation": "other",
+      "score": 0.07258253336455163,
+      "operation": "currencyservice_hipstershop.CurrencyService/GetCurrencyData",
+      "a": 155,
+      "n": 3552,
+      "rank_min": 1,
+      "rank_max": 1,
+      "margin_vs_root": 0.2801280970841058
+     },
+     {
+      "entity": "recommendationservice",
+      "relation": "other",
+      "score": 0.045674740484429065,
+      "operation": "recommendationservice_/hipstershop.ProductCatalogService/ListProducts",
+      "a": 33,
+      "n": 726,
+      "rank_min": 2,
+      "rank_max": 2,
+      "margin_vs_root": 0.056172436316133195
+     }
+    ],
+    "callers_above": []
+   },
+   "self_check_native_rank_equals_t028": true,
+   "td_effect_on_root": "tăng hạng",
+   "callers_no_longer_above": [
+    "frontend"
+   ],
+   "callers_newly_above": [],
+   "pairs_above_root_native": {
+    "currencyservice": {
+     "relation": "other",
+     "margin_native": 0.3325544738062122,
+     "margin_t_d": 0.2801280970841058,
+     "delta": 0.05242637672210643,
+     "still_above": true
+    },
+    "frontend": {
+     "relation": "caller_of_root",
+     "margin_native": 0.18527356400204528,
+     "margin_t_d": -0.04871794871794881,
+     "delta": 0.23399151271999408,
+     "still_above": false
+    },
+    "recommendationservice": {
+     "relation": "other",
+     "margin_native": 0.18527356400204528,
+     "margin_t_d": 0.056172436316133195,
+     "delta": 0.1291011276859121,
+     "still_above": true
+    },
+    "productcatalogservice": {
+     "relation": "callee_of_root",
+     "margin_native": 0.0020778423907736173,
+     "margin_t_d": -0.0644391408114559,
+     "delta": 0.06651698320222951,
+     "still_above": false
+    }
+   },
+   "check_sha256": "27b17b113ebcc8d67b3f4d3100ccc730a3efdf7226d25e09884f8c147003b446"
+  }
+ ],
+ "methods_executed": false
+}

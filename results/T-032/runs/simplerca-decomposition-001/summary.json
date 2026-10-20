@@ -1,0 +1,5157 @@
+{
+ "schema": "T032-simplerca-decomposition-v1",
+ "design": "results/T-032/thiet-ke-phep-doi-001.md#7",
+ "summary": {
+  "n_cases": 52,
+  "status_counts": {
+   "OK": 51,
+   "N/A": 0,
+   "INVALID": 1
+  },
+  "additive_identity": 51,
+  "metric_votes_equal_column_sum": 51,
+  "record_scores_equal_native": 51,
+  "self_check_rank_equals_t028": 51,
+  "all": {
+   "n": 51,
+   "hit1": 31,
+   "hit5": 46,
+   "root_score_zero": 2,
+   "root_metric_votes_zero": 4,
+   "root_trace_vote_one": 26,
+   "root_log_vote_one": 10,
+   "wrong_at_1": {
+    "n": 20,
+    "entity_pairs_above_root": 64,
+    "pairs_decided_by_metric_alone": 60,
+    "pairs_where_metric_difference_not_positive": 0,
+    "cases_all_above_decided_by_metric_alone": 16
+   }
+  },
+  "by_dataset": {
+   "RE2-TT": {
+    "n": 29,
+    "hit1": 24,
+    "hit5": 28,
+    "root_score_zero": 0,
+    "root_metric_votes_zero": 0,
+    "root_trace_vote_one": 20,
+    "root_log_vote_one": 3,
+    "wrong_at_1": {
+     "n": 5,
+     "entity_pairs_above_root": 20,
+     "pairs_decided_by_metric_alone": 19,
+     "pairs_where_metric_difference_not_positive": 0,
+     "cases_all_above_decided_by_metric_alone": 4
+    }
+   },
+   "Nezha-OB": {
+    "n": 22,
+    "hit1": 7,
+    "hit5": 18,
+    "root_score_zero": 2,
+    "root_metric_votes_zero": 4,
+    "root_trace_vote_one": 6,
+    "root_log_vote_one": 7,
+    "wrong_at_1": {
+     "n": 15,
+     "entity_pairs_above_root": 44,
+     "pairs_decided_by_metric_alone": 41,
+     "pairs_where_metric_difference_not_positive": 0,
+     "cases_all_above_decided_by_metric_alone": 12
+    }
+   }
+  },
+  "note": "Phân rã đại số chính xác của điểm, không phải thí nghiệm can thiệp. Hit tính bi quan theo hòa. Phiếu metric là số mẫu sau mốc vượt ngưỡng, cộng qua các cột của service; phiếu trace và log là 0 hoặc 1."
+ },
+ "cases": [
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-14701a3bbb",
+   "root": "shippingservice",
+   "fault": "cpu_contention",
+   "cell": "shippingservice|cpu_contention",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 10,
+   "check_sha256": "3f441b74c48693791e942f2f2193175f96f3d9582d1611975eb26c749ab6abf5",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "shippingservice",
+    "item": "shippingservice",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 27,
+    "trace": 1,
+    "log": 0,
+    "score": 28,
+    "metric_columns": 16,
+    "metric_columns_usable": 16,
+    "metric_columns_with_votes": 7,
+    "top_metric_columns": [
+     {
+      "column": "shippingservice_CpuUsage-m",
+      "vote": 5
+     },
+     {
+      "column": "shippingservice_CpuUsageRate-pct",
+      "vote": 5
+     },
+     {
+      "column": "shippingservice_PodServerLatencyP90-s",
+      "vote": 5
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-1ac905bc95",
+   "root": "frontend",
+   "fault": "return",
+   "cell": "frontend|return",
+   "t028": {
+    "status": "OK",
+    "rank_min": 5,
+    "rank_max": 6,
+    "multi_flags": {
+     "1": [
+      "M0"
+     ],
+     "5": [
+      "M3"
+     ]
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 10,
+   "check_sha256": "e4a950db434deabad04c20262dd8c826676fe89e15d25e2f0c49d8d1c6f4b764",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "frontend",
+    "item": "frontend",
+    "rank_min": 5,
+    "rank_max": 6,
+    "metric": 0,
+    "trace": 0,
+    "log": 1,
+    "score": 1,
+    "metric_columns": 21,
+    "metric_columns_usable": 21,
+    "metric_columns_with_votes": 0,
+    "top_metric_columns": [],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [
+    {
+     "entity": "checkoutservice",
+     "item": "checkoutservice",
+     "rank_min": 1,
+     "rank_max": 1,
+     "metric": 7,
+     "trace": 0,
+     "log": 0,
+     "score": 7,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 6,
+     "top_metric_columns": [
+      {
+       "column": "checkoutservice_PodServerLatencyP99-s",
+       "vote": 2
+      },
+      {
+       "column": "checkoutservice_PodClientLatencyP99-s",
+       "vote": 1
+      },
+      {
+       "column": "checkoutservice_PodServerLatencyP90-s",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 7,
+      "trace": 0,
+      "log": -1,
+      "score": 6
+     }
+    },
+    {
+     "entity": "shippingservice",
+     "item": "shippingservice",
+     "rank_min": 2,
+     "rank_max": 2,
+     "metric": 5,
+     "trace": 0,
+     "log": 0,
+     "score": 5,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 4,
+     "top_metric_columns": [
+      {
+       "column": "shippingservice_NetworkTransmitBytes",
+       "vote": 2
+      },
+      {
+       "column": "shippingservice_PodServerLatencyP90-s",
+       "vote": 1
+      },
+      {
+       "column": "shippingservice_PodServerLatencyP95-s",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 5,
+      "trace": 0,
+      "log": -1,
+      "score": 4
+     }
+    },
+    {
+     "entity": "adservice",
+     "item": "adservice",
+     "rank_min": 3,
+     "rank_max": 3,
+     "metric": 3,
+     "trace": 0,
+     "log": 0,
+     "score": 3,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 3,
+     "top_metric_columns": [
+      {
+       "column": "adservice_PodClientLatencyP90-s",
+       "vote": 1
+      },
+      {
+       "column": "adservice_PodClientLatencyP95-s",
+       "vote": 1
+      },
+      {
+       "column": "adservice_PodClientLatencyP99-s",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 3,
+      "trace": 0,
+      "log": -1,
+      "score": 2
+     }
+    },
+    {
+     "entity": "emailservice",
+     "item": "emailservice",
+     "rank_min": 4,
+     "rank_max": 4,
+     "metric": 2,
+     "trace": 0,
+     "log": 0,
+     "score": 2,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 1,
+     "top_metric_columns": [
+      {
+       "column": "emailservice_PodServerLatencyP95-s",
+       "vote": 2
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 2,
+      "trace": 0,
+      "log": -1,
+      "score": 1
+     }
+    }
+   ],
+   "n_above": 4,
+   "above_decided_by_metric_alone": 4,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-27252dca60",
+   "root": "productcatalogservice",
+   "fault": "exception",
+   "cell": "productcatalogservice|exception",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 10,
+   "check_sha256": "26da2d0262bd47765357a458d5fba42da8165bf20a00dfa74a1cc070d5bec5cf",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "productcatalogservice",
+    "item": "productcatalogservice",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 9,
+    "trace": 0,
+    "log": 1,
+    "score": 10,
+    "metric_columns": 16,
+    "metric_columns_usable": 16,
+    "metric_columns_with_votes": 3,
+    "top_metric_columns": [
+     {
+      "column": "productcatalogservice_MemoryUsage-Mi",
+      "vote": 4
+     },
+     {
+      "column": "productcatalogservice_MemoryUsageRate-pct",
+      "vote": 4
+     },
+     {
+      "column": "productcatalogservice_PodWorkload-Ops",
+      "vote": 1
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-2bfc97b01e",
+   "root": "checkoutservice",
+   "fault": "network_delay",
+   "cell": "checkoutservice|network_delay",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 10,
+   "check_sha256": "a33c89cbf74dc7b3ac6bab90819d080a126974a795df6cf461d4d7c302789aa9",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "checkoutservice",
+    "item": "checkoutservice",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 16,
+    "trace": 0,
+    "log": 0,
+    "score": 16,
+    "metric_columns": 16,
+    "metric_columns_usable": 16,
+    "metric_columns_with_votes": 5,
+    "top_metric_columns": [
+     {
+      "column": "checkoutservice_MemoryUsage-Mi",
+      "vote": 5
+     },
+     {
+      "column": "checkoutservice_MemoryUsageRate-pct",
+      "vote": 5
+     },
+     {
+      "column": "checkoutservice_CpuUsage-m",
+      "vote": 2
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-396c8dbf7d",
+   "root": "emailservice",
+   "fault": "cpu_consumed",
+   "cell": "emailservice|cpu_consumed",
+   "t028": {
+    "status": "OK",
+    "rank_min": 2,
+    "rank_max": 2,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 10,
+   "check_sha256": "8442e284f5af6552e86770ac2c699d0466511177d50385a3ff17f595302979fb",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "emailservice",
+    "item": "emailservice",
+    "rank_min": 2,
+    "rank_max": 2,
+    "metric": 31,
+    "trace": 1,
+    "log": 0,
+    "score": 32,
+    "metric_columns": 16,
+    "metric_columns_usable": 16,
+    "metric_columns_with_votes": 11,
+    "top_metric_columns": [
+     {
+      "column": "emailservice_MemoryUsage-Mi",
+      "vote": 5
+     },
+     {
+      "column": "emailservice_MemoryUsageRate-pct",
+      "vote": 5
+     },
+     {
+      "column": "emailservice_CpuUsage-m",
+      "vote": 4
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [
+    {
+     "entity": "checkoutservice",
+     "item": "checkoutservice",
+     "rank_min": 1,
+     "rank_max": 1,
+     "metric": 37,
+     "trace": 1,
+     "log": 0,
+     "score": 38,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 10,
+     "top_metric_columns": [
+      {
+       "column": "checkoutservice_MemoryUsage-Mi",
+       "vote": 5
+      },
+      {
+       "column": "checkoutservice_MemoryUsageRate-pct",
+       "vote": 5
+      },
+      {
+       "column": "checkoutservice_PodClientLatencyP95-s",
+       "vote": 4
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 6,
+      "trace": 0,
+      "log": 0,
+      "score": 6
+     }
+    }
+   ],
+   "n_above": 1,
+   "above_decided_by_metric_alone": 1,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-3b92690644",
+   "root": "checkoutservice",
+   "fault": "return",
+   "cell": "checkoutservice|return",
+   "t028": {
+    "status": "OK",
+    "rank_min": 2,
+    "rank_max": 2,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 10,
+   "check_sha256": "8af3acfa6d2cac1ac9b6c219b428e5e792e867808beaffed7bf4c02ba09bea28",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "checkoutservice",
+    "item": "checkoutservice",
+    "rank_min": 2,
+    "rank_max": 2,
+    "metric": 17,
+    "trace": 0,
+    "log": 1,
+    "score": 18,
+    "metric_columns": 16,
+    "metric_columns_usable": 16,
+    "metric_columns_with_votes": 6,
+    "top_metric_columns": [
+     {
+      "column": "checkoutservice_MemoryUsage-Mi",
+      "vote": 5
+     },
+     {
+      "column": "checkoutservice_MemoryUsageRate-pct",
+      "vote": 5
+     },
+     {
+      "column": "checkoutservice_PodServerLatencyP90-s",
+      "vote": 2
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [
+    {
+     "entity": "frontend",
+     "item": "frontend",
+     "rank_min": 1,
+     "rank_max": 1,
+     "metric": 31,
+     "trace": 0,
+     "log": 1,
+     "score": 32,
+     "metric_columns": 21,
+     "metric_columns_usable": 21,
+     "metric_columns_with_votes": 10,
+     "top_metric_columns": [
+      {
+       "column": "frontend_FrontLatencyP90-s",
+       "vote": 4
+      },
+      {
+       "column": "frontend_FrontLatencyP95-s",
+       "vote": 4
+      },
+      {
+       "column": "frontend_PodServerLatencyP90-s",
+       "vote": 4
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 14,
+      "trace": 0,
+      "log": 0,
+      "score": 14
+     }
+    }
+   ],
+   "n_above": 1,
+   "above_decided_by_metric_alone": 1,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-3e27669440",
+   "root": "adservice",
+   "fault": "cpu_contention",
+   "cell": "adservice|cpu_contention",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 10,
+   "check_sha256": "72b4ef2f7a4a8115b504dec6aabc9f0820933bdf98f661747416c03102cc2024",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "adservice",
+    "item": "adservice",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 32,
+    "trace": 1,
+    "log": 0,
+    "score": 33,
+    "metric_columns": 16,
+    "metric_columns_usable": 16,
+    "metric_columns_with_votes": 9,
+    "top_metric_columns": [
+     {
+      "column": "adservice_CpuUsage-m",
+      "vote": 5
+     },
+     {
+      "column": "adservice_CpuUsageRate-pct",
+      "vote": 5
+     },
+     {
+      "column": "adservice_MemoryUsage-Mi",
+      "vote": 5
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-515c5f2190",
+   "root": "recommendationservice",
+   "fault": "cpu_consumed",
+   "cell": "recommendationservice|cpu_consumed",
+   "t028": {
+    "status": "OK",
+    "rank_min": 2,
+    "rank_max": 2,
+    "multi_flags": {
+     "1": [
+      "M0"
+     ],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 10,
+   "check_sha256": "653667326954ed3858fd4e8c04a557d0f5d7e0b277c235a17ff47150fbc5a46d",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "recommendationservice",
+    "item": "recommendationservice",
+    "rank_min": 2,
+    "rank_max": 2,
+    "metric": 2,
+    "trace": 1,
+    "log": 0,
+    "score": 3,
+    "metric_columns": 16,
+    "metric_columns_usable": 16,
+    "metric_columns_with_votes": 1,
+    "top_metric_columns": [
+     {
+      "column": "recommendationservice_CpuUsage-m",
+      "vote": 2
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [
+    {
+     "entity": "adservice",
+     "item": "adservice",
+     "rank_min": 1,
+     "rank_max": 1,
+     "metric": 4,
+     "trace": 0,
+     "log": 0,
+     "score": 4,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 3,
+     "top_metric_columns": [
+      {
+       "column": "adservice_PodServerLatencyP95-s",
+       "vote": 2
+      },
+      {
+       "column": "adservice_PodServerLatencyP90-s",
+       "vote": 1
+      },
+      {
+       "column": "adservice_PodServerLatencyP99-s",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 2,
+      "trace": -1,
+      "log": 0,
+      "score": 1
+     }
+    }
+   ],
+   "n_above": 1,
+   "above_decided_by_metric_alone": 1,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-5467884de4",
+   "root": "recommendationservice",
+   "fault": "network_delay",
+   "cell": "recommendationservice|network_delay",
+   "t028": {
+    "status": "OK",
+    "rank_min": 5,
+    "rank_max": 5,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 10,
+   "check_sha256": "ec7b5da376b0c275408f3a05195802011526ca7d420b4e734d4a97799b65f2c6",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "recommendationservice",
+    "item": "recommendationservice",
+    "rank_min": 5,
+    "rank_max": 5,
+    "metric": 3,
+    "trace": 0,
+    "log": 0,
+    "score": 3,
+    "metric_columns": 16,
+    "metric_columns_usable": 16,
+    "metric_columns_with_votes": 2,
+    "top_metric_columns": [
+     {
+      "column": "recommendationservice_PodServerLatencyP99-s",
+      "vote": 2
+     },
+     {
+      "column": "recommendationservice_PodClientLatencyP99-s",
+      "vote": 1
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [
+    {
+     "entity": "frontend",
+     "item": "frontend",
+     "rank_min": 1,
+     "rank_max": 1,
+     "metric": 28,
+     "trace": 1,
+     "log": 0,
+     "score": 29,
+     "metric_columns": 21,
+     "metric_columns_usable": 21,
+     "metric_columns_with_votes": 8,
+     "top_metric_columns": [
+      {
+       "column": "frontend_FrontLatencyP50-s",
+       "vote": 4
+      },
+      {
+       "column": "frontend_FrontLatencyP90-s",
+       "vote": 4
+      },
+      {
+       "column": "frontend_PodClientLatencyP90-s",
+       "vote": 4
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 25,
+      "trace": 1,
+      "log": 0,
+      "score": 26
+     }
+    },
+    {
+     "entity": "cartservice",
+     "item": "cartservice",
+     "rank_min": 2,
+     "rank_max": 2,
+     "metric": 7,
+     "trace": 0,
+     "log": 0,
+     "score": 7,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 5,
+     "top_metric_columns": [
+      {
+       "column": "cartservice_PodServerLatencyP99-s",
+       "vote": 3
+      },
+      {
+       "column": "cartservice_PodClientLatencyP90-s",
+       "vote": 1
+      },
+      {
+       "column": "cartservice_PodClientLatencyP95-s",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 4,
+      "trace": 0,
+      "log": 0,
+      "score": 4
+     }
+    },
+    {
+     "entity": "checkoutservice",
+     "item": "checkoutservice",
+     "rank_min": 3,
+     "rank_max": 3,
+     "metric": 5,
+     "trace": 0,
+     "log": 0,
+     "score": 5,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 4,
+     "top_metric_columns": [
+      {
+       "column": "checkoutservice_NetworkTransmitBytes",
+       "vote": 2
+      },
+      {
+       "column": "checkoutservice_PodClientLatencyP90-s",
+       "vote": 1
+      },
+      {
+       "column": "checkoutservice_PodClientLatencyP95-s",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 2,
+      "trace": 0,
+      "log": 0,
+      "score": 2
+     }
+    },
+    {
+     "entity": "paymentservice",
+     "item": "paymentservice",
+     "rank_min": 4,
+     "rank_max": 4,
+     "metric": 4,
+     "trace": 0,
+     "log": 0,
+     "score": 4,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 2,
+     "top_metric_columns": [
+      {
+       "column": "paymentservice_MemoryUsage-Mi",
+       "vote": 2
+      },
+      {
+       "column": "paymentservice_MemoryUsageRate-pct",
+       "vote": 2
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 1,
+      "trace": 0,
+      "log": 0,
+      "score": 1
+     }
+    }
+   ],
+   "n_above": 4,
+   "above_decided_by_metric_alone": 3,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-55f99f3e0a",
+   "root": "checkoutservice",
+   "fault": "exception",
+   "cell": "checkoutservice|exception",
+   "t028": {
+    "status": "OK",
+    "rank_min": 2,
+    "rank_max": 2,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 10,
+   "check_sha256": "94174a849ebe31bd60828598ebc8535464d15656c9bf632ae3321e7d88a359d1",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "checkoutservice",
+    "item": "checkoutservice",
+    "rank_min": 2,
+    "rank_max": 2,
+    "metric": 10,
+    "trace": 0,
+    "log": 1,
+    "score": 11,
+    "metric_columns": 16,
+    "metric_columns_usable": 16,
+    "metric_columns_with_votes": 6,
+    "top_metric_columns": [
+     {
+      "column": "checkoutservice_PodClientLatencyP99-s",
+      "vote": 2
+     },
+     {
+      "column": "checkoutservice_PodServerLatencyP90-s",
+      "vote": 2
+     },
+     {
+      "column": "checkoutservice_PodServerLatencyP95-s",
+      "vote": 2
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [
+    {
+     "entity": "frontend",
+     "item": "frontend",
+     "rank_min": 1,
+     "rank_max": 1,
+     "metric": 17,
+     "trace": 0,
+     "log": 1,
+     "score": 18,
+     "metric_columns": 21,
+     "metric_columns_usable": 21,
+     "metric_columns_with_votes": 10,
+     "top_metric_columns": [
+      {
+       "column": "frontend_FrontLatencyP99-s",
+       "vote": 3
+      },
+      {
+       "column": "frontend_PodServerLatencyP99-s",
+       "vote": 3
+      },
+      {
+       "column": "frontend_FrontLatencyP90-s",
+       "vote": 2
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 7,
+      "trace": 0,
+      "log": 0,
+      "score": 7
+     }
+    }
+   ],
+   "n_above": 1,
+   "above_decided_by_metric_alone": 1,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-5ada15752d",
+   "root": "frontend",
+   "fault": "return",
+   "cell": "frontend|return",
+   "t028": {
+    "status": "OK",
+    "rank_min": 6,
+    "rank_max": 6,
+    "multi_flags": {
+     "1": [
+      "M0"
+     ],
+     "5": [
+      "M0"
+     ]
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 10,
+   "check_sha256": "4bdb03d4c9f2721f5d26a415b01f60cd71bf9af92be00747bce9f01b5a550407",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "frontend",
+    "item": "frontend",
+    "rank_min": 6,
+    "rank_max": 6,
+    "metric": 0,
+    "trace": 0,
+    "log": 1,
+    "score": 1,
+    "metric_columns": 21,
+    "metric_columns_usable": 21,
+    "metric_columns_with_votes": 0,
+    "top_metric_columns": [],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [
+    {
+     "entity": "paymentservice",
+     "item": "paymentservice",
+     "rank_min": 1,
+     "rank_max": 1,
+     "metric": 15,
+     "trace": 0,
+     "log": 0,
+     "score": 15,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 5,
+     "top_metric_columns": [
+      {
+       "column": "paymentservice_MemoryUsage-Mi",
+       "vote": 5
+      },
+      {
+       "column": "paymentservice_MemoryUsageRate-pct",
+       "vote": 5
+      },
+      {
+       "column": "paymentservice_PodServerLatencyP95-s",
+       "vote": 3
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 15,
+      "trace": 0,
+      "log": -1,
+      "score": 14
+     }
+    },
+    {
+     "entity": "productcatalogservice",
+     "item": "productcatalogservice",
+     "rank_min": 2,
+     "rank_max": 2,
+     "metric": 7,
+     "trace": 0,
+     "log": 0,
+     "score": 7,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 5,
+     "top_metric_columns": [
+      {
+       "column": "productcatalogservice_CpuUsage-m",
+       "vote": 2
+      },
+      {
+       "column": "productcatalogservice_CpuUsageRate-pct",
+       "vote": 2
+      },
+      {
+       "column": "productcatalogservice_PodClientLatencyP90-s",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 7,
+      "trace": 0,
+      "log": -1,
+      "score": 6
+     }
+    },
+    {
+     "entity": "shippingservice",
+     "item": "shippingservice",
+     "rank_min": 3,
+     "rank_max": 3,
+     "metric": 4,
+     "trace": 0,
+     "log": 0,
+     "score": 4,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 4,
+     "top_metric_columns": [
+      {
+       "column": "shippingservice_PodClientLatencyP90-s",
+       "vote": 1
+      },
+      {
+       "column": "shippingservice_PodClientLatencyP95-s",
+       "vote": 1
+      },
+      {
+       "column": "shippingservice_PodClientLatencyP99-s",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 4,
+      "trace": 0,
+      "log": -1,
+      "score": 3
+     }
+    },
+    {
+     "entity": "checkoutservice",
+     "item": "checkoutservice",
+     "rank_min": 4,
+     "rank_max": 5,
+     "metric": 3,
+     "trace": 0,
+     "log": 0,
+     "score": 3,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 3,
+     "top_metric_columns": [
+      {
+       "column": "checkoutservice_PodServerLatencyP90-s",
+       "vote": 1
+      },
+      {
+       "column": "checkoutservice_PodServerLatencyP95-s",
+       "vote": 1
+      },
+      {
+       "column": "checkoutservice_PodServerLatencyP99-s",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 3,
+      "trace": 0,
+      "log": -1,
+      "score": 2
+     }
+    },
+    {
+     "entity": "currencyservice",
+     "item": "currencyservice",
+     "rank_min": 4,
+     "rank_max": 5,
+     "metric": 3,
+     "trace": 0,
+     "log": 0,
+     "score": 3,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 2,
+     "top_metric_columns": [
+      {
+       "column": "currencyservice_NetworkTransmitBytes",
+       "vote": 2
+      },
+      {
+       "column": "currencyservice_PodClientLatencyP99-s",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 3,
+      "trace": 0,
+      "log": -1,
+      "score": 2
+     }
+    }
+   ],
+   "n_above": 5,
+   "above_decided_by_metric_alone": 5,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-607751ac0a",
+   "root": "checkoutservice",
+   "fault": "network_delay",
+   "cell": "checkoutservice|network_delay",
+   "t028": {
+    "status": "OK",
+    "rank_min": 9,
+    "rank_max": 10,
+    "multi_flags": {
+     "1": [
+      "M5",
+      "M6"
+     ],
+     "5": [
+      "M5",
+      "M6"
+     ]
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 10,
+   "check_sha256": "34ada8188b8f4561470b145a6ecbf1a94b1e3a2d3efa66dc5d01bb65b8cccb49",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "checkoutservice",
+    "item": "checkoutservice",
+    "rank_min": 9,
+    "rank_max": 10,
+    "metric": 0,
+    "trace": 0,
+    "log": 0,
+    "score": 0,
+    "metric_columns": 16,
+    "metric_columns_usable": 16,
+    "metric_columns_with_votes": 0,
+    "top_metric_columns": [],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [
+    {
+     "entity": "cartservice",
+     "item": "cartservice",
+     "rank_min": 1,
+     "rank_max": 1,
+     "metric": 14,
+     "trace": 0,
+     "log": 0,
+     "score": 14,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 6,
+     "top_metric_columns": [
+      {
+       "column": "cartservice_MemoryUsage-Mi",
+       "vote": 5
+      },
+      {
+       "column": "cartservice_MemoryUsageRate-pct",
+       "vote": 5
+      },
+      {
+       "column": "cartservice_NetworkReceiveBytes",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 14,
+      "trace": 0,
+      "log": 0,
+      "score": 14
+     }
+    },
+    {
+     "entity": "recommendationservice",
+     "item": "recommendationservice",
+     "rank_min": 2,
+     "rank_max": 2,
+     "metric": 13,
+     "trace": 0,
+     "log": 0,
+     "score": 13,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 7,
+     "top_metric_columns": [
+      {
+       "column": "recommendationservice_PodClientLatencyP90-s",
+       "vote": 3
+      },
+      {
+       "column": "recommendationservice_PodServerLatencyP90-s",
+       "vote": 3
+      },
+      {
+       "column": "recommendationservice_PodClientLatencyP95-s",
+       "vote": 2
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 13,
+      "trace": 0,
+      "log": 0,
+      "score": 13
+     }
+    },
+    {
+     "entity": "emailservice",
+     "item": "emailservice",
+     "rank_min": 3,
+     "rank_max": 4,
+     "metric": 9,
+     "trace": 0,
+     "log": 0,
+     "score": 9,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 7,
+     "top_metric_columns": [
+      {
+       "column": "emailservice_NetworkReceiveBytes",
+       "vote": 2
+      },
+      {
+       "column": "emailservice_SyscallWrite",
+       "vote": 2
+      },
+      {
+       "column": "emailservice_NetworkTransmitBytes",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 9,
+      "trace": 0,
+      "log": 0,
+      "score": 9
+     }
+    },
+    {
+     "entity": "shippingservice",
+     "item": "shippingservice",
+     "rank_min": 3,
+     "rank_max": 4,
+     "metric": 9,
+     "trace": 0,
+     "log": 0,
+     "score": 9,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 6,
+     "top_metric_columns": [
+      {
+       "column": "shippingservice_SyscallRead",
+       "vote": 3
+      },
+      {
+       "column": "shippingservice_SyscallWrite",
+       "vote": 2
+      },
+      {
+       "column": "shippingservice_NetworkReceiveBytes",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 9,
+      "trace": 0,
+      "log": 0,
+      "score": 9
+     }
+    },
+    {
+     "entity": "paymentservice",
+     "item": "paymentservice",
+     "rank_min": 5,
+     "rank_max": 5,
+     "metric": 8,
+     "trace": 0,
+     "log": 0,
+     "score": 8,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 4,
+     "top_metric_columns": [
+      {
+       "column": "paymentservice_CpuUsage-m",
+       "vote": 2
+      },
+      {
+       "column": "paymentservice_CpuUsageRate-pct",
+       "vote": 2
+      },
+      {
+       "column": "paymentservice_SyscallRead",
+       "vote": 2
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 8,
+      "trace": 0,
+      "log": 0,
+      "score": 8
+     }
+    },
+    {
+     "entity": "frontend",
+     "item": "frontend",
+     "rank_min": 6,
+     "rank_max": 6,
+     "metric": 4,
+     "trace": 0,
+     "log": 0,
+     "score": 4,
+     "metric_columns": 21,
+     "metric_columns_usable": 21,
+     "metric_columns_with_votes": 3,
+     "top_metric_columns": [
+      {
+       "column": "frontend_SyscallWrite",
+       "vote": 2
+      },
+      {
+       "column": "frontend_PodClientLatencyP99-s",
+       "vote": 1
+      },
+      {
+       "column": "frontend_SyscallRead",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 4,
+      "trace": 0,
+      "log": 0,
+      "score": 4
+     }
+    },
+    {
+     "entity": "currencyservice",
+     "item": "currencyservice",
+     "rank_min": 7,
+     "rank_max": 8,
+     "metric": 2,
+     "trace": 0,
+     "log": 0,
+     "score": 2,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 2,
+     "top_metric_columns": [
+      {
+       "column": "currencyservice_NetworkReceiveBytes",
+       "vote": 1
+      },
+      {
+       "column": "currencyservice_PodClientLatencyP99-s",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 2,
+      "trace": 0,
+      "log": 0,
+      "score": 2
+     }
+    },
+    {
+     "entity": "productcatalogservice",
+     "item": "productcatalogservice",
+     "rank_min": 7,
+     "rank_max": 8,
+     "metric": 2,
+     "trace": 0,
+     "log": 0,
+     "score": 2,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 2,
+     "top_metric_columns": [
+      {
+       "column": "productcatalogservice_PodServerLatencyP90-s",
+       "vote": 1
+      },
+      {
+       "column": "productcatalogservice_PodServerLatencyP95-s",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 2,
+      "trace": 0,
+      "log": 0,
+      "score": 2
+     }
+    }
+   ],
+   "n_above": 8,
+   "above_decided_by_metric_alone": 8,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-63c30faf34",
+   "root": "recommendationservice",
+   "fault": "network_delay",
+   "cell": "recommendationservice|network_delay",
+   "t028": {
+    "status": "OK",
+    "rank_min": 8,
+    "rank_max": 10,
+    "multi_flags": {
+     "1": [
+      "M5",
+      "M6"
+     ],
+     "5": [
+      "M5",
+      "M6"
+     ]
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 10,
+   "check_sha256": "ee54dbf320f9714e8d9f784b833d9ea40d1547f47a79e832de3343303c5f1e07",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "recommendationservice",
+    "item": "recommendationservice",
+    "rank_min": 8,
+    "rank_max": 10,
+    "metric": 0,
+    "trace": 0,
+    "log": 0,
+    "score": 0,
+    "metric_columns": 16,
+    "metric_columns_usable": 16,
+    "metric_columns_with_votes": 0,
+    "top_metric_columns": [],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [
+    {
+     "entity": "frontend",
+     "item": "frontend",
+     "rank_min": 1,
+     "rank_max": 1,
+     "metric": 26,
+     "trace": 1,
+     "log": 0,
+     "score": 27,
+     "metric_columns": 21,
+     "metric_columns_usable": 21,
+     "metric_columns_with_votes": 8,
+     "top_metric_columns": [
+      {
+       "column": "frontend_FrontLatencyP50-s",
+       "vote": 4
+      },
+      {
+       "column": "frontend_FrontLatencyP90-s",
+       "vote": 4
+      },
+      {
+       "column": "frontend_PodClientLatencyP90-s",
+       "vote": 4
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 26,
+      "trace": 1,
+      "log": 0,
+      "score": 27
+     }
+    },
+    {
+     "entity": "paymentservice",
+     "item": "paymentservice",
+     "rank_min": 2,
+     "rank_max": 2,
+     "metric": 14,
+     "trace": 0,
+     "log": 0,
+     "score": 14,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 7,
+     "top_metric_columns": [
+      {
+       "column": "paymentservice_MemoryUsage-Mi",
+       "vote": 4
+      },
+      {
+       "column": "paymentservice_MemoryUsageRate-pct",
+       "vote": 4
+      },
+      {
+       "column": "paymentservice_PodServerLatencyP90-s",
+       "vote": 2
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 14,
+      "trace": 0,
+      "log": 0,
+      "score": 14
+     }
+    },
+    {
+     "entity": "cartservice",
+     "item": "cartservice",
+     "rank_min": 3,
+     "rank_max": 3,
+     "metric": 8,
+     "trace": 0,
+     "log": 0,
+     "score": 8,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 6,
+     "top_metric_columns": [
+      {
+       "column": "cartservice_PodServerLatencyP90-s",
+       "vote": 2
+      },
+      {
+       "column": "cartservice_PodServerLatencyP95-s",
+       "vote": 2
+      },
+      {
+       "column": "cartservice_PodClientLatencyP90-s",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 8,
+      "trace": 0,
+      "log": 0,
+      "score": 8
+     }
+    },
+    {
+     "entity": "currencyservice",
+     "item": "currencyservice",
+     "rank_min": 4,
+     "rank_max": 4,
+     "metric": 5,
+     "trace": 0,
+     "log": 0,
+     "score": 5,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 5,
+     "top_metric_columns": [
+      {
+       "column": "currencyservice_MemoryUsage-Mi",
+       "vote": 1
+      },
+      {
+       "column": "currencyservice_MemoryUsageRate-pct",
+       "vote": 1
+      },
+      {
+       "column": "currencyservice_PodClientLatencyP99-s",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 5,
+      "trace": 0,
+      "log": 0,
+      "score": 5
+     }
+    },
+    {
+     "entity": "adservice",
+     "item": "adservice",
+     "rank_min": 5,
+     "rank_max": 6,
+     "metric": 4,
+     "trace": 0,
+     "log": 0,
+     "score": 4,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 4,
+     "top_metric_columns": [
+      {
+       "column": "adservice_PodClientLatencyP90-s",
+       "vote": 1
+      },
+      {
+       "column": "adservice_PodClientLatencyP95-s",
+       "vote": 1
+      },
+      {
+       "column": "adservice_PodClientLatencyP99-s",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 4,
+      "trace": 0,
+      "log": 0,
+      "score": 4
+     }
+    },
+    {
+     "entity": "emailservice",
+     "item": "emailservice",
+     "rank_min": 5,
+     "rank_max": 6,
+     "metric": 4,
+     "trace": 0,
+     "log": 0,
+     "score": 4,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 4,
+     "top_metric_columns": [
+      {
+       "column": "emailservice_NetworkTransmitBytes",
+       "vote": 1
+      },
+      {
+       "column": "emailservice_PodServerLatencyP90-s",
+       "vote": 1
+      },
+      {
+       "column": "emailservice_PodServerLatencyP95-s",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 4,
+      "trace": 0,
+      "log": 0,
+      "score": 4
+     }
+    },
+    {
+     "entity": "shippingservice",
+     "item": "shippingservice",
+     "rank_min": 7,
+     "rank_max": 7,
+     "metric": 2,
+     "trace": 0,
+     "log": 0,
+     "score": 2,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 2,
+     "top_metric_columns": [
+      {
+       "column": "shippingservice_PodServerLatencyP90-s",
+       "vote": 1
+      },
+      {
+       "column": "shippingservice_PodServerLatencyP95-s",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 2,
+      "trace": 0,
+      "log": 0,
+      "score": 2
+     }
+    }
+   ],
+   "n_above": 7,
+   "above_decided_by_metric_alone": 6,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-6c9afc9822",
+   "root": "emailservice",
+   "fault": "network_delay",
+   "cell": "emailservice|network_delay",
+   "t028": {
+    "status": "OK",
+    "rank_min": 4,
+    "rank_max": 4,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 10,
+   "check_sha256": "daf653e3d489a027600b023783772e064d77122b483f8aa4cd36816199403945",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "emailservice",
+    "item": "emailservice",
+    "rank_min": 4,
+    "rank_max": 4,
+    "metric": 5,
+    "trace": 0,
+    "log": 0,
+    "score": 5,
+    "metric_columns": 16,
+    "metric_columns_usable": 16,
+    "metric_columns_with_votes": 5,
+    "top_metric_columns": [
+     {
+      "column": "emailservice_PodClientLatencyP90-s",
+      "vote": 1
+     },
+     {
+      "column": "emailservice_PodClientLatencyP95-s",
+      "vote": 1
+     },
+     {
+      "column": "emailservice_PodClientLatencyP99-s",
+      "vote": 1
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [
+    {
+     "entity": "paymentservice",
+     "item": "paymentservice",
+     "rank_min": 1,
+     "rank_max": 1,
+     "metric": 12,
+     "trace": 0,
+     "log": 0,
+     "score": 12,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 6,
+     "top_metric_columns": [
+      {
+       "column": "paymentservice_MemoryUsage-Mi",
+       "vote": 4
+      },
+      {
+       "column": "paymentservice_MemoryUsageRate-pct",
+       "vote": 4
+      },
+      {
+       "column": "paymentservice_CpuUsage-m",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 7,
+      "trace": 0,
+      "log": 0,
+      "score": 7
+     }
+    },
+    {
+     "entity": "checkoutservice",
+     "item": "checkoutservice",
+     "rank_min": 2,
+     "rank_max": 2,
+     "metric": 10,
+     "trace": 1,
+     "log": 0,
+     "score": 11,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 2,
+     "top_metric_columns": [
+      {
+       "column": "checkoutservice_MemoryUsage-Mi",
+       "vote": 5
+      },
+      {
+       "column": "checkoutservice_MemoryUsageRate-pct",
+       "vote": 5
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 5,
+      "trace": 1,
+      "log": 0,
+      "score": 6
+     }
+    },
+    {
+     "entity": "currencyservice",
+     "item": "currencyservice",
+     "rank_min": 3,
+     "rank_max": 3,
+     "metric": 6,
+     "trace": 0,
+     "log": 0,
+     "score": 6,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 5,
+     "top_metric_columns": [
+      {
+       "column": "currencyservice_SyscallRead",
+       "vote": 2
+      },
+      {
+       "column": "currencyservice_PodClientLatencyP90-s",
+       "vote": 1
+      },
+      {
+       "column": "currencyservice_PodClientLatencyP95-s",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 1,
+      "trace": 0,
+      "log": 0,
+      "score": 1
+     }
+    }
+   ],
+   "n_above": 3,
+   "above_decided_by_metric_alone": 2,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-70629373f9",
+   "root": "paymentservice",
+   "fault": "cpu_contention",
+   "cell": "paymentservice|cpu_contention",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 10,
+   "check_sha256": "f81f7099402209be688657bc2b02bc825cf2c6f7830a9ed514d293fe4a993761",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "paymentservice",
+    "item": "paymentservice",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 38,
+    "trace": 0,
+    "log": 0,
+    "score": 38,
+    "metric_columns": 16,
+    "metric_columns_usable": 16,
+    "metric_columns_with_votes": 13,
+    "top_metric_columns": [
+     {
+      "column": "paymentservice_CpuUsage-m",
+      "vote": 4
+     },
+     {
+      "column": "paymentservice_CpuUsageRate-pct",
+      "vote": 4
+     },
+     {
+      "column": "paymentservice_MemoryUsage-Mi",
+      "vote": 4
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-7b7c973198",
+   "root": "emailservice",
+   "fault": "network_delay",
+   "cell": "emailservice|network_delay",
+   "t028": {
+    "status": "OK",
+    "rank_min": 3,
+    "rank_max": 3,
+    "multi_flags": {
+     "1": [
+      "M0"
+     ],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 10,
+   "check_sha256": "f398dd7a2baa95625f28bae79a2e0f76e9f22723222b84b35dfafce6ef9fbe9b",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "emailservice",
+    "item": "emailservice",
+    "rank_min": 3,
+    "rank_max": 3,
+    "metric": 6,
+    "trace": 0,
+    "log": 0,
+    "score": 6,
+    "metric_columns": 16,
+    "metric_columns_usable": 16,
+    "metric_columns_with_votes": 4,
+    "top_metric_columns": [
+     {
+      "column": "emailservice_PodWorkload-Ops",
+      "vote": 3
+     },
+     {
+      "column": "emailservice_PodClientLatencyP90-s",
+      "vote": 1
+     },
+     {
+      "column": "emailservice_PodClientLatencyP95-s",
+      "vote": 1
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [
+    {
+     "entity": "cartservice",
+     "item": "cartservice",
+     "rank_min": 1,
+     "rank_max": 2,
+     "metric": 9,
+     "trace": 0,
+     "log": 0,
+     "score": 9,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 6,
+     "top_metric_columns": [
+      {
+       "column": "cartservice_PodClientLatencyP90-s",
+       "vote": 2
+      },
+      {
+       "column": "cartservice_PodClientLatencyP95-s",
+       "vote": 2
+      },
+      {
+       "column": "cartservice_PodClientLatencyP99-s",
+       "vote": 2
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 3,
+      "trace": 0,
+      "log": 0,
+      "score": 3
+     }
+    },
+    {
+     "entity": "currencyservice",
+     "item": "currencyservice",
+     "rank_min": 1,
+     "rank_max": 2,
+     "metric": 9,
+     "trace": 0,
+     "log": 0,
+     "score": 9,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 7,
+     "top_metric_columns": [
+      {
+       "column": "currencyservice_MemoryUsage-Mi",
+       "vote": 2
+      },
+      {
+       "column": "currencyservice_MemoryUsageRate-pct",
+       "vote": 2
+      },
+      {
+       "column": "currencyservice_CpuUsage-m",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 3,
+      "trace": 0,
+      "log": 0,
+      "score": 3
+     }
+    }
+   ],
+   "n_above": 2,
+   "above_decided_by_metric_alone": 2,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-7d3c2fe6d1",
+   "root": "shippingservice",
+   "fault": "cpu_contention",
+   "cell": "shippingservice|cpu_contention",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 10,
+   "check_sha256": "a87e888045f78d9a41bca1df458f01b984d7460d29bece461d724441058c95ac",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "shippingservice",
+    "item": "shippingservice",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 34,
+    "trace": 1,
+    "log": 0,
+    "score": 35,
+    "metric_columns": 16,
+    "metric_columns_usable": 16,
+    "metric_columns_with_votes": 8,
+    "top_metric_columns": [
+     {
+      "column": "shippingservice_CpuUsage-m",
+      "vote": 5
+     },
+     {
+      "column": "shippingservice_CpuUsageRate-pct",
+      "vote": 5
+     },
+     {
+      "column": "shippingservice_PodServerLatencyP90-s",
+      "vote": 5
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-8ecd9880ed",
+   "root": "checkoutservice",
+   "fault": "return",
+   "cell": "checkoutservice|return",
+   "t028": {
+    "status": "OK",
+    "rank_min": 4,
+    "rank_max": 5,
+    "multi_flags": {
+     "1": [
+      "M0"
+     ],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 10,
+   "check_sha256": "27f0075957602beb8aaa2b09dd811a6873128cf4d62f5b75911ca7b9e2b0ff7d",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "checkoutservice",
+    "item": "checkoutservice",
+    "rank_min": 4,
+    "rank_max": 5,
+    "metric": 3,
+    "trace": 0,
+    "log": 1,
+    "score": 4,
+    "metric_columns": 16,
+    "metric_columns_usable": 16,
+    "metric_columns_with_votes": 2,
+    "top_metric_columns": [
+     {
+      "column": "checkoutservice_PodClientLatencyP99-s",
+      "vote": 2
+     },
+     {
+      "column": "checkoutservice_SyscallRead",
+      "vote": 1
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [
+    {
+     "entity": "adservice",
+     "item": "adservice",
+     "rank_min": 1,
+     "rank_max": 1,
+     "metric": 15,
+     "trace": 0,
+     "log": 0,
+     "score": 15,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 9,
+     "top_metric_columns": [
+      {
+       "column": "adservice_MemoryUsage-Mi",
+       "vote": 4
+      },
+      {
+       "column": "adservice_MemoryUsageRate-pct",
+       "vote": 4
+      },
+      {
+       "column": "adservice_CpuUsage-m",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 12,
+      "trace": 0,
+      "log": -1,
+      "score": 11
+     }
+    },
+    {
+     "entity": "paymentservice",
+     "item": "paymentservice",
+     "rank_min": 2,
+     "rank_max": 2,
+     "metric": 9,
+     "trace": 1,
+     "log": 0,
+     "score": 10,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 5,
+     "top_metric_columns": [
+      {
+       "column": "paymentservice_MemoryUsage-Mi",
+       "vote": 3
+      },
+      {
+       "column": "paymentservice_MemoryUsageRate-pct",
+       "vote": 3
+      },
+      {
+       "column": "paymentservice_PodClientLatencyP90-s",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 6,
+      "trace": 1,
+      "log": -1,
+      "score": 6
+     }
+    },
+    {
+     "entity": "cartservice",
+     "item": "cartservice",
+     "rank_min": 3,
+     "rank_max": 3,
+     "metric": 8,
+     "trace": 0,
+     "log": 0,
+     "score": 8,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 2,
+     "top_metric_columns": [
+      {
+       "column": "cartservice_MemoryUsage-Mi",
+       "vote": 4
+      },
+      {
+       "column": "cartservice_MemoryUsageRate-pct",
+       "vote": 4
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 5,
+      "trace": 0,
+      "log": -1,
+      "score": 4
+     }
+    }
+   ],
+   "n_above": 3,
+   "above_decided_by_metric_alone": 3,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-95e164235f",
+   "root": "paymentservice",
+   "fault": "cpu_contention",
+   "cell": "paymentservice|cpu_contention",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 10,
+   "check_sha256": "22abe157053dc823b7d5af6914fba95377e154352dc98f0bf08b4a225aa9b005",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "paymentservice",
+    "item": "paymentservice",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 34,
+    "trace": 0,
+    "log": 0,
+    "score": 34,
+    "metric_columns": 16,
+    "metric_columns_usable": 16,
+    "metric_columns_with_votes": 9,
+    "top_metric_columns": [
+     {
+      "column": "paymentservice_CpuUsage-m",
+      "vote": 5
+     },
+     {
+      "column": "paymentservice_CpuUsageRate-pct",
+      "vote": 5
+     },
+     {
+      "column": "paymentservice_MemoryUsage-Mi",
+      "vote": 5
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-9b9397a4dc",
+   "root": "recommendationservice",
+   "fault": "cpu_consumed",
+   "cell": "recommendationservice|cpu_consumed",
+   "t028": {
+    "status": "OK",
+    "rank_min": 2,
+    "rank_max": 3,
+    "multi_flags": {
+     "1": [
+      "M0"
+     ],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 10,
+   "check_sha256": "47c5af28a48dc8f2517d129cd665cd201526e83461c6539a20f7eef45dda839a",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "recommendationservice",
+    "item": "recommendationservice",
+    "rank_min": 2,
+    "rank_max": 3,
+    "metric": 6,
+    "trace": 0,
+    "log": 0,
+    "score": 6,
+    "metric_columns": 16,
+    "metric_columns_usable": 16,
+    "metric_columns_with_votes": 2,
+    "top_metric_columns": [
+     {
+      "column": "recommendationservice_CpuUsage-m",
+      "vote": 3
+     },
+     {
+      "column": "recommendationservice_CpuUsageRate-pct",
+      "vote": 3
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [
+    {
+     "entity": "cartservice",
+     "item": "cartservice",
+     "rank_min": 1,
+     "rank_max": 1,
+     "metric": 10,
+     "trace": 0,
+     "log": 0,
+     "score": 10,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 7,
+     "top_metric_columns": [
+      {
+       "column": "cartservice_PodClientLatencyP90-s",
+       "vote": 2
+      },
+      {
+       "column": "cartservice_PodClientLatencyP95-s",
+       "vote": 2
+      },
+      {
+       "column": "cartservice_PodClientLatencyP99-s",
+       "vote": 2
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 4,
+      "trace": 0,
+      "log": 0,
+      "score": 4
+     }
+    }
+   ],
+   "n_above": 1,
+   "above_decided_by_metric_alone": 1,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-9fd793feb7",
+   "root": "shippingservice",
+   "fault": "cpu_consumed",
+   "cell": "shippingservice|cpu_consumed",
+   "t028": {
+    "status": "OK",
+    "rank_min": 2,
+    "rank_max": 2,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 10,
+   "check_sha256": "7357af97c02734a66d94ba6dd6ab9a362765df356ed481cfb8d3810b85b073db",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "shippingservice",
+    "item": "shippingservice",
+    "rank_min": 2,
+    "rank_max": 2,
+    "metric": 16,
+    "trace": 1,
+    "log": 0,
+    "score": 17,
+    "metric_columns": 16,
+    "metric_columns_usable": 16,
+    "metric_columns_with_votes": 9,
+    "top_metric_columns": [
+     {
+      "column": "shippingservice_PodServerLatencyP90-s",
+      "vote": 3
+     },
+     {
+      "column": "shippingservice_PodServerLatencyP95-s",
+      "vote": 3
+     },
+     {
+      "column": "shippingservice_PodClientLatencyP90-s",
+      "vote": 2
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [
+    {
+     "entity": "checkoutservice",
+     "item": "checkoutservice",
+     "rank_min": 1,
+     "rank_max": 1,
+     "metric": 19,
+     "trace": 0,
+     "log": 0,
+     "score": 19,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 6,
+     "top_metric_columns": [
+      {
+       "column": "checkoutservice_PodClientLatencyP95-s",
+       "vote": 4
+      },
+      {
+       "column": "checkoutservice_PodClientLatencyP99-s",
+       "vote": 4
+      },
+      {
+       "column": "checkoutservice_PodServerLatencyP90-s",
+       "vote": 3
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 3,
+      "trace": -1,
+      "log": 0,
+      "score": 2
+     }
+    }
+   ],
+   "n_above": 1,
+   "above_decided_by_metric_alone": 1,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-b0f8b2e3ac",
+   "root": "checkoutservice",
+   "fault": "exception",
+   "cell": "checkoutservice|exception",
+   "t028": {
+    "status": "OK",
+    "rank_min": 3,
+    "rank_max": 3,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 10,
+   "check_sha256": "6a24d1d221ef3beacd35af24efb78feb1bf12f78869cf89e02f1dd5f5a6f7349",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "checkoutservice",
+    "item": "checkoutservice",
+    "rank_min": 3,
+    "rank_max": 3,
+    "metric": 18,
+    "trace": 0,
+    "log": 1,
+    "score": 19,
+    "metric_columns": 16,
+    "metric_columns_usable": 16,
+    "metric_columns_with_votes": 8,
+    "top_metric_columns": [
+     {
+      "column": "checkoutservice_MemoryUsage-Mi",
+      "vote": 4
+     },
+     {
+      "column": "checkoutservice_MemoryUsageRate-pct",
+      "vote": 4
+     },
+     {
+      "column": "checkoutservice_PodClientLatencyP95-s",
+      "vote": 2
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [
+    {
+     "entity": "currencyservice",
+     "item": "currencyservice",
+     "rank_min": 1,
+     "rank_max": 2,
+     "metric": 22,
+     "trace": 0,
+     "log": 0,
+     "score": 22,
+     "metric_columns": 16,
+     "metric_columns_usable": 16,
+     "metric_columns_with_votes": 7,
+     "top_metric_columns": [
+      {
+       "column": "currencyservice_PodClientLatencyP90-s",
+       "vote": 4
+      },
+      {
+       "column": "currencyservice_PodClientLatencyP95-s",
+       "vote": 4
+      },
+      {
+       "column": "currencyservice_PodClientLatencyP99-s",
+       "vote": 4
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 4,
+      "trace": 0,
+      "log": -1,
+      "score": 3
+     }
+    },
+    {
+     "entity": "frontend",
+     "item": "frontend",
+     "rank_min": 1,
+     "rank_max": 2,
+     "metric": 21,
+     "trace": 0,
+     "log": 1,
+     "score": 22,
+     "metric_columns": 21,
+     "metric_columns_usable": 21,
+     "metric_columns_with_votes": 11,
+     "top_metric_columns": [
+      {
+       "column": "frontend_FrontLatencyP50-s",
+       "vote": 4
+      },
+      {
+       "column": "frontend_FrontLatencyP90-s",
+       "vote": 2
+      },
+      {
+       "column": "frontend_FrontLatencyP95-s",
+       "vote": 2
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 3,
+      "trace": 0,
+      "log": 0,
+      "score": 3
+     }
+    }
+   ],
+   "n_above": 2,
+   "above_decided_by_metric_alone": 2,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-03d4910932",
+   "root": "ts-route-service",
+   "fault": "socket",
+   "cell": "ts-route-service|socket",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "INVALID",
+   "reason": "lượt phát lại không PASS"
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-12a1a88069",
+   "root": "ts-order-service",
+   "fault": "disk",
+   "cell": "ts-order-service|disk",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "e1c1caa8fcc167ccc6463ec9679d269d9ba10f28ebfb3ecf9e08810a3f5c4134",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-order-service",
+    "item": "ts-order-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 1374,
+    "trace": 0,
+    "log": 0,
+    "score": 1374,
+    "metric_columns": 8,
+    "metric_columns_usable": 8,
+    "metric_columns_with_votes": 5,
+    "top_metric_columns": [
+     {
+      "column": "ts-order-service_latency-50",
+      "vote": 300
+     },
+     {
+      "column": "ts-order-service_diskio",
+      "vote": 295
+     },
+     {
+      "column": "ts-order-service_mem",
+      "vote": 295
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-14372e1209",
+   "root": "ts-route-service",
+   "fault": "mem",
+   "cell": "ts-route-service|mem",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 69,
+   "check_sha256": "6912a2426eae41a481070ebae75c7d3a54aa01723ed2f035022b415304609ad9",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-route-service",
+    "item": "ts-route-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 1715,
+    "trace": 1,
+    "log": 0,
+    "score": 1716,
+    "metric_columns": 7,
+    "metric_columns_usable": 7,
+    "metric_columns_with_votes": 6,
+    "top_metric_columns": [
+     {
+      "column": "ts-route-service_diskio",
+      "vote": 294
+     },
+     {
+      "column": "ts-route-service_mem",
+      "vote": 294
+     },
+     {
+      "column": "ts-route-service_socket",
+      "vote": 294
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-16597725c1",
+   "root": "ts-auth-service",
+   "fault": "cpu",
+   "cell": "ts-auth-service|cpu",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "0d4810b254ab7253fa14967fb5de8624168d5aeb81ccb2d8bb21180ea87c3a1d",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-auth-service",
+    "item": "ts-auth-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 1392,
+    "trace": 0,
+    "log": 0,
+    "score": 1392,
+    "metric_columns": 7,
+    "metric_columns_usable": 7,
+    "metric_columns_with_votes": 5,
+    "top_metric_columns": [
+     {
+      "column": "ts-auth-service_cpu",
+      "vote": 290
+     },
+     {
+      "column": "ts-auth-service_mem",
+      "vote": 290
+     },
+     {
+      "column": "ts-auth-service_latency-50",
+      "vote": 277
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-16870e660c",
+   "root": "ts-route-service",
+   "fault": "mem",
+   "cell": "ts-route-service|mem",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "018f13f5a2d9393fd26cd41231abaab8c6d555b9db490287d6d455e3947b1c71",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-route-service",
+    "item": "ts-route-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 1754,
+    "trace": 1,
+    "log": 0,
+    "score": 1755,
+    "metric_columns": 7,
+    "metric_columns_usable": 7,
+    "metric_columns_with_votes": 6,
+    "top_metric_columns": [
+     {
+      "column": "ts-route-service_cpu",
+      "vote": 295
+     },
+     {
+      "column": "ts-route-service_diskio",
+      "vote": 295
+     },
+     {
+      "column": "ts-route-service_mem",
+      "vote": 295
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-1e6d61b5ec",
+   "root": "ts-order-service",
+   "fault": "disk",
+   "cell": "ts-order-service|disk",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "2e85f21911925848b14e5c1b968844892c9ee5a6395f7e0878d83717f6aebc7a",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-order-service",
+    "item": "ts-order-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 1441,
+    "trace": 1,
+    "log": 0,
+    "score": 1442,
+    "metric_columns": 7,
+    "metric_columns_usable": 7,
+    "metric_columns_with_votes": 6,
+    "top_metric_columns": [
+     {
+      "column": "ts-order-service_cpu",
+      "vote": 281
+     },
+     {
+      "column": "ts-order-service_diskio",
+      "vote": 279
+     },
+     {
+      "column": "ts-order-service_mem",
+      "vote": 279
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-20acb4402d",
+   "root": "ts-order-service",
+   "fault": "loss",
+   "cell": "ts-order-service|loss",
+   "t028": {
+    "status": "OK",
+    "rank_min": 15,
+    "rank_max": 15,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": [
+      "M5"
+     ]
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "7cc4d297b824a52fa1b5140f1d69d5fc0b298abf447540808d09e051f30a789d",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-order-service",
+    "item": "ts-order-service",
+    "rank_min": 15,
+    "rank_max": 15,
+    "metric": 240,
+    "trace": 1,
+    "log": 0,
+    "score": 241,
+    "metric_columns": 8,
+    "metric_columns_usable": 8,
+    "metric_columns_with_votes": 5,
+    "top_metric_columns": [
+     {
+      "column": "ts-order-service_latency-90",
+      "vote": 180
+     },
+     {
+      "column": "ts-order-service_latency-50",
+      "vote": 30
+     },
+     {
+      "column": "ts-order-service_mem",
+      "vote": 17
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [
+    {
+     "entity": "ts-consign-price-service",
+     "item": "ts-consign-price-service",
+     "rank_min": 1,
+     "rank_max": 1,
+     "metric": 449,
+     "trace": 0,
+     "log": 0,
+     "score": 449,
+     "metric_columns": 7,
+     "metric_columns_usable": 7,
+     "metric_columns_with_votes": 4,
+     "top_metric_columns": [
+      {
+       "column": "ts-consign-price-service_mem",
+       "vote": 300
+      },
+      {
+       "column": "ts-consign-price-service_latency-50",
+       "vote": 75
+      },
+      {
+       "column": "ts-consign-price-service_socket",
+       "vote": 60
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 209,
+      "trace": -1,
+      "log": 0,
+      "score": 208
+     }
+    },
+    {
+     "entity": "ts-auth-service",
+     "item": "ts-auth-service",
+     "rank_min": 2,
+     "rank_max": 2,
+     "metric": 438,
+     "trace": 0,
+     "log": 0,
+     "score": 438,
+     "metric_columns": 7,
+     "metric_columns_usable": 7,
+     "metric_columns_with_votes": 3,
+     "top_metric_columns": [
+      {
+       "column": "ts-auth-service_mem",
+       "vote": 300
+      },
+      {
+       "column": "ts-auth-service_latency-50",
+       "vote": 78
+      },
+      {
+       "column": "ts-auth-service_socket",
+       "vote": 60
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 198,
+      "trace": -1,
+      "log": 0,
+      "score": 197
+     }
+    },
+    {
+     "entity": "ts-consign-service",
+     "item": "ts-consign-service",
+     "rank_min": 3,
+     "rank_max": 3,
+     "metric": 376,
+     "trace": 0,
+     "log": 0,
+     "score": 376,
+     "metric_columns": 7,
+     "metric_columns_usable": 7,
+     "metric_columns_with_votes": 3,
+     "top_metric_columns": [
+      {
+       "column": "ts-consign-service_mem",
+       "vote": 286
+      },
+      {
+       "column": "ts-consign-service_latency-90",
+       "vote": 50
+      },
+      {
+       "column": "ts-consign-service_latency-50",
+       "vote": 40
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 136,
+      "trace": -1,
+      "log": 0,
+      "score": 135
+     }
+    },
+    {
+     "entity": "ts-admin-basic-info-service",
+     "item": "ts-admin-basic-info-service",
+     "rank_min": 4,
+     "rank_max": 4,
+     "metric": 346,
+     "trace": 0,
+     "log": 0,
+     "score": 346,
+     "metric_columns": 7,
+     "metric_columns_usable": 7,
+     "metric_columns_with_votes": 3,
+     "top_metric_columns": [
+      {
+       "column": "ts-admin-basic-info-service_mem",
+       "vote": 300
+      },
+      {
+       "column": "ts-admin-basic-info-service_cpu",
+       "vote": 31
+      },
+      {
+       "column": "ts-admin-basic-info-service_workload",
+       "vote": 15
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 106,
+      "trace": -1,
+      "log": 0,
+      "score": 105
+     }
+    },
+    {
+     "entity": "ts-travel-service",
+     "item": "ts-travel-service",
+     "rank_min": 5,
+     "rank_max": 5,
+     "metric": 317,
+     "trace": 0,
+     "log": 0,
+     "score": 317,
+     "metric_columns": 7,
+     "metric_columns_usable": 7,
+     "metric_columns_with_votes": 3,
+     "top_metric_columns": [
+      {
+       "column": "ts-travel-service_mem",
+       "vote": 280
+      },
+      {
+       "column": "ts-travel-service_cpu",
+       "vote": 36
+      },
+      {
+       "column": "ts-travel-service_workload",
+       "vote": 1
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 77,
+      "trace": -1,
+      "log": 0,
+      "score": 76
+     }
+    },
+    {
+     "entity": "ts-execute-service",
+     "item": "ts-execute-service",
+     "rank_min": 6,
+     "rank_max": 6,
+     "metric": 313,
+     "trace": 0,
+     "log": 0,
+     "score": 313,
+     "metric_columns": 4,
+     "metric_columns_usable": 4,
+     "metric_columns_with_votes": 2,
+     "top_metric_columns": [
+      {
+       "column": "ts-execute-service_mem",
+       "vote": 300
+      },
+      {
+       "column": "ts-execute-service_socket",
+       "vote": 13
+      }
+     ],
+     "trace_status": "absent",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 73,
+      "trace": -1,
+      "log": 0,
+      "score": 72
+     }
+    },
+    {
+     "entity": "ts-consign-mongo",
+     "item": "ts-consign-mongo",
+     "rank_min": 7,
+     "rank_max": 8,
+     "metric": 300,
+     "trace": 0,
+     "log": 0,
+     "score": 300,
+     "metric_columns": 4,
+     "metric_columns_usable": 4,
+     "metric_columns_with_votes": 1,
+     "top_metric_columns": [
+      {
+       "column": "ts-consign-mongo_mem",
+       "vote": 300
+      }
+     ],
+     "trace_status": "absent",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 60,
+      "trace": -1,
+      "log": 0,
+      "score": 59
+     }
+    },
+    {
+     "entity": "ts-notification-mongo",
+     "item": "ts-notification-mongo",
+     "rank_min": 7,
+     "rank_max": 8,
+     "metric": 300,
+     "trace": 0,
+     "log": 0,
+     "score": 300,
+     "metric_columns": 4,
+     "metric_columns_usable": 4,
+     "metric_columns_with_votes": 1,
+     "top_metric_columns": [
+      {
+       "column": "ts-notification-mongo_mem",
+       "vote": 300
+      }
+     ],
+     "trace_status": "absent",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 60,
+      "trace": -1,
+      "log": 0,
+      "score": 59
+     }
+    },
+    {
+     "entity": "ts-security-mongo",
+     "item": "ts-security-mongo",
+     "rank_min": 9,
+     "rank_max": 9,
+     "metric": 296,
+     "trace": 0,
+     "log": 0,
+     "score": 296,
+     "metric_columns": 4,
+     "metric_columns_usable": 4,
+     "metric_columns_with_votes": 1,
+     "top_metric_columns": [
+      {
+       "column": "ts-security-mongo_mem",
+       "vote": 296
+      }
+     ],
+     "trace_status": "absent",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 56,
+      "trace": -1,
+      "log": 0,
+      "score": 55
+     }
+    },
+    {
+     "entity": "ts-inside-payment-service",
+     "item": "ts-inside-payment-service",
+     "rank_min": 10,
+     "rank_max": 10,
+     "metric": 293,
+     "trace": 1,
+     "log": 1,
+     "score": 295,
+     "metric_columns": 7,
+     "metric_columns_usable": 7,
+     "metric_columns_with_votes": 3,
+     "top_metric_columns": [
+      {
+       "column": "ts-inside-payment-service_mem",
+       "vote": 195
+      },
+      {
+       "column": "ts-inside-payment-service_latency-90",
+       "vote": 71
+      },
+      {
+       "column": "ts-inside-payment-service_latency-50",
+       "vote": 27
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 53,
+      "trace": 0,
+      "log": 1,
+      "score": 54
+     }
+    },
+    {
+     "entity": "ts-config-service",
+     "item": "ts-config-service",
+     "rank_min": 11,
+     "rank_max": 11,
+     "metric": 292,
+     "trace": 0,
+     "log": 0,
+     "score": 292,
+     "metric_columns": 7,
+     "metric_columns_usable": 7,
+     "metric_columns_with_votes": 2,
+     "top_metric_columns": [
+      {
+       "column": "ts-config-service_mem",
+       "vote": 204
+      },
+      {
+       "column": "ts-config-service_cpu",
+       "vote": 88
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 52,
+      "trace": -1,
+      "log": 0,
+      "score": 51
+     }
+    },
+    {
+     "entity": "ts-seat-service",
+     "item": "ts-seat-service",
+     "rank_min": 12,
+     "rank_max": 12,
+     "metric": 285,
+     "trace": 0,
+     "log": 0,
+     "score": 285,
+     "metric_columns": 4,
+     "metric_columns_usable": 4,
+     "metric_columns_with_votes": 2,
+     "top_metric_columns": [
+      {
+       "column": "ts-seat-service_mem",
+       "vote": 259
+      },
+      {
+       "column": "ts-seat-service_socket",
+       "vote": 26
+      }
+     ],
+     "trace_status": "absent",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 45,
+      "trace": -1,
+      "log": 0,
+      "score": 44
+     }
+    },
+    {
+     "entity": "ts-notification-service",
+     "item": "ts-notification-service",
+     "rank_min": 13,
+     "rank_max": 13,
+     "metric": 277,
+     "trace": 0,
+     "log": 0,
+     "score": 277,
+     "metric_columns": 4,
+     "metric_columns_usable": 4,
+     "metric_columns_with_votes": 2,
+     "top_metric_columns": [
+      {
+       "column": "ts-notification-service_mem",
+       "vote": 227
+      },
+      {
+       "column": "ts-notification-service_socket",
+       "vote": 50
+      }
+     ],
+     "trace_status": "absent",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 37,
+      "trace": -1,
+      "log": 0,
+      "score": 36
+     }
+    },
+    {
+     "entity": "ts-contacts-service",
+     "item": "ts-contacts-service",
+     "rank_min": 14,
+     "rank_max": 14,
+     "metric": 244,
+     "trace": 0,
+     "log": 0,
+     "score": 244,
+     "metric_columns": 4,
+     "metric_columns_usable": 4,
+     "metric_columns_with_votes": 3,
+     "top_metric_columns": [
+      {
+       "column": "ts-contacts-service_mem",
+       "vote": 170
+      },
+      {
+       "column": "ts-contacts-service_cpu",
+       "vote": 41
+      },
+      {
+       "column": "ts-contacts-service_socket",
+       "vote": 33
+      }
+     ],
+     "trace_status": "absent",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 4,
+      "trace": -1,
+      "log": 0,
+      "score": 3
+     }
+    }
+   ],
+   "n_above": 14,
+   "above_decided_by_metric_alone": 13,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-260d332c8d",
+   "root": "ts-order-service",
+   "fault": "loss",
+   "cell": "ts-order-service|loss",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "010431ea3c33f993037b6a67d27407ed962699bd8d8c3b61969b1ca021f59f28",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-order-service",
+    "item": "ts-order-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 595,
+    "trace": 1,
+    "log": 0,
+    "score": 596,
+    "metric_columns": 8,
+    "metric_columns_usable": 8,
+    "metric_columns_with_votes": 5,
+    "top_metric_columns": [
+     {
+      "column": "ts-order-service_mem",
+      "vote": 300
+     },
+     {
+      "column": "ts-order-service_latency-90",
+      "vote": 184
+     },
+     {
+      "column": "ts-order-service_latency-50",
+      "vote": 90
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-3ae0a6c15a",
+   "root": "ts-train-service",
+   "fault": "cpu",
+   "cell": "ts-train-service|cpu",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "71891893c822d15d59c4c3f8602a8484de1cfa07bdf593632da06b5f9316bf58",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-train-service",
+    "item": "ts-train-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 1320,
+    "trace": 1,
+    "log": 0,
+    "score": 1321,
+    "metric_columns": 8,
+    "metric_columns_usable": 8,
+    "metric_columns_with_votes": 5,
+    "top_metric_columns": [
+     {
+      "column": "ts-train-service_cpu",
+      "vote": 291
+     },
+     {
+      "column": "ts-train-service_mem",
+      "vote": 291
+     },
+     {
+      "column": "ts-train-service_latency-90",
+      "vote": 288
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-3defe3d34b",
+   "root": "ts-auth-service",
+   "fault": "cpu",
+   "cell": "ts-auth-service|cpu",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "95f0ee53a3613c3a376ac48fd40a1a354a6aa601ebaf741315b7aa1978634d2c",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-auth-service",
+    "item": "ts-auth-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 1440,
+    "trace": 0,
+    "log": 0,
+    "score": 1440,
+    "metric_columns": 7,
+    "metric_columns_usable": 7,
+    "metric_columns_with_votes": 6,
+    "top_metric_columns": [
+     {
+      "column": "ts-auth-service_mem",
+      "vote": 297
+     },
+     {
+      "column": "ts-auth-service_cpu",
+      "vote": 293
+     },
+     {
+      "column": "ts-auth-service_latency-50",
+      "vote": 279
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "unavailable"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-4e68956051",
+   "root": "ts-train-service",
+   "fault": "delay",
+   "cell": "ts-train-service|delay",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "75a6060645f37cf04f341357de58c1fba642f5f9e22dbcab53718f9d25865e52",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-train-service",
+    "item": "ts-train-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 1177,
+    "trace": 1,
+    "log": 0,
+    "score": 1178,
+    "metric_columns": 7,
+    "metric_columns_usable": 7,
+    "metric_columns_with_votes": 5,
+    "top_metric_columns": [
+     {
+      "column": "ts-train-service_latency-90",
+      "vote": 287
+     },
+     {
+      "column": "ts-train-service_mem",
+      "vote": 287
+     },
+     {
+      "column": "ts-train-service_socket",
+      "vote": 287
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-4f8a844308",
+   "root": "ts-route-service",
+   "fault": "mem",
+   "cell": "ts-route-service|mem",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "4927aa97547fa655c18cafc0f13c2c2aa70331a6f1e5315ffe3f1a99fd21121b",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-route-service",
+    "item": "ts-route-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 1446,
+    "trace": 1,
+    "log": 1,
+    "score": 1448,
+    "metric_columns": 8,
+    "metric_columns_usable": 7,
+    "metric_columns_with_votes": 6,
+    "top_metric_columns": [
+     {
+      "column": "ts-route-service_cpu",
+      "vote": 295
+     },
+     {
+      "column": "ts-route-service_diskio",
+      "vote": 295
+     },
+     {
+      "column": "ts-route-service_latency-50",
+      "vote": 285
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-57546fd87b",
+   "root": "ts-auth-service",
+   "fault": "delay",
+   "cell": "ts-auth-service|delay",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "3e660bd207d7d6964da95b3a0c4d2e51996d0d9c5c3642b75c8bec41b2be2cf9",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-auth-service",
+    "item": "ts-auth-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 509,
+    "trace": 0,
+    "log": 0,
+    "score": 509,
+    "metric_columns": 7,
+    "metric_columns_usable": 7,
+    "metric_columns_with_votes": 2,
+    "top_metric_columns": [
+     {
+      "column": "ts-auth-service_latency-50",
+      "vote": 267
+     },
+     {
+      "column": "ts-auth-service_mem",
+      "vote": 242
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-59f696a169",
+   "root": "ts-auth-service",
+   "fault": "cpu",
+   "cell": "ts-auth-service|cpu",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "6a20e1769a16293b8f0cb44fe5b8874fd3dae6ad24e809d2d009d777e9f2dda1",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-auth-service",
+    "item": "ts-auth-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 1343,
+    "trace": 0,
+    "log": 0,
+    "score": 1343,
+    "metric_columns": 7,
+    "metric_columns_usable": 7,
+    "metric_columns_with_votes": 5,
+    "top_metric_columns": [
+     {
+      "column": "ts-auth-service_mem",
+      "vote": 298
+     },
+     {
+      "column": "ts-auth-service_cpu",
+      "vote": 279
+     },
+     {
+      "column": "ts-auth-service_latency-90",
+      "vote": 276
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-746fd74313",
+   "root": "ts-auth-service",
+   "fault": "delay",
+   "cell": "ts-auth-service|delay",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "c3c850dd065c471947ac5f0136b91bb7e9d0decfc989180d0b11a603da1374ff",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-auth-service",
+    "item": "ts-auth-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 870,
+    "trace": 1,
+    "log": 0,
+    "score": 871,
+    "metric_columns": 7,
+    "metric_columns_usable": 7,
+    "metric_columns_with_votes": 5,
+    "top_metric_columns": [
+     {
+      "column": "ts-auth-service_latency-50",
+      "vote": 284
+     },
+     {
+      "column": "ts-auth-service_latency-90",
+      "vote": 284
+     },
+     {
+      "column": "ts-auth-service_socket",
+      "vote": 228
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-7f1b6b071d",
+   "root": "ts-travel-service",
+   "fault": "loss",
+   "cell": "ts-travel-service|loss",
+   "t028": {
+    "status": "OK",
+    "rank_min": 3,
+    "rank_max": 3,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "47ca582f416d6c6ef476a18565b30208979852895d790ecffd2fb91e77c6b837",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-travel-service",
+    "item": "ts-travel-service",
+    "rank_min": 3,
+    "rank_max": 3,
+    "metric": 885,
+    "trace": 1,
+    "log": 1,
+    "score": 887,
+    "metric_columns": 8,
+    "metric_columns_usable": 8,
+    "metric_columns_with_votes": 5,
+    "top_metric_columns": [
+     {
+      "column": "ts-travel-service_mem",
+      "vote": 276
+     },
+     {
+      "column": "ts-travel-service_latency-50",
+      "vote": 255
+     },
+     {
+      "column": "ts-travel-service_latency-90",
+      "vote": 239
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [
+    {
+     "entity": "ts-admin-travel-service",
+     "item": "ts-admin-travel-service",
+     "rank_min": 1,
+     "rank_max": 1,
+     "metric": 954,
+     "trace": 1,
+     "log": 1,
+     "score": 956,
+     "metric_columns": 8,
+     "metric_columns_usable": 8,
+     "metric_columns_with_votes": 6,
+     "top_metric_columns": [
+      {
+       "column": "ts-admin-travel-service_latency-50",
+       "vote": 291
+      },
+      {
+       "column": "ts-admin-travel-service_latency-90",
+       "vote": 291
+      },
+      {
+       "column": "ts-admin-travel-service_mem",
+       "vote": 251
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 69,
+      "trace": 0,
+      "log": 0,
+      "score": 69
+     }
+    },
+    {
+     "entity": "ts-seat-service",
+     "item": "ts-seat-service",
+     "rank_min": 2,
+     "rank_max": 2,
+     "metric": 917,
+     "trace": 1,
+     "log": 1,
+     "score": 919,
+     "metric_columns": 8,
+     "metric_columns_usable": 7,
+     "metric_columns_with_votes": 6,
+     "top_metric_columns": [
+      {
+       "column": "ts-seat-service_latency-90",
+       "vote": 269
+      },
+      {
+       "column": "ts-seat-service_mem",
+       "vote": 263
+      },
+      {
+       "column": "ts-seat-service_latency-50",
+       "vote": 241
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 32,
+      "trace": 0,
+      "log": 0,
+      "score": 32
+     }
+    }
+   ],
+   "n_above": 2,
+   "above_decided_by_metric_alone": 2,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-8017c6dc70",
+   "root": "ts-order-service",
+   "fault": "disk",
+   "cell": "ts-order-service|disk",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "ba42abe7dd8b54102800e3c929984788a6c0dc59e218fcabf3e2d218305dc516",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-order-service",
+    "item": "ts-order-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 1670,
+    "trace": 1,
+    "log": 0,
+    "score": 1671,
+    "metric_columns": 7,
+    "metric_columns_usable": 7,
+    "metric_columns_with_votes": 6,
+    "top_metric_columns": [
+     {
+      "column": "ts-order-service_diskio",
+      "vote": 298
+     },
+     {
+      "column": "ts-order-service_mem",
+      "vote": 298
+     },
+     {
+      "column": "ts-order-service_socket",
+      "vote": 295
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-98bc73c499",
+   "root": "ts-train-service",
+   "fault": "cpu",
+   "cell": "ts-train-service|cpu",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "7717d9fb56e48cbf71aaf9e7a0c6013deda6f7d8735374ee63167987021dd01b",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-train-service",
+    "item": "ts-train-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 1290,
+    "trace": 1,
+    "log": 0,
+    "score": 1291,
+    "metric_columns": 8,
+    "metric_columns_usable": 8,
+    "metric_columns_with_votes": 5,
+    "top_metric_columns": [
+     {
+      "column": "ts-train-service_mem",
+      "vote": 299
+     },
+     {
+      "column": "ts-train-service_cpu",
+      "vote": 288
+     },
+     {
+      "column": "ts-train-service_latency-90",
+      "vote": 288
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-a505ab3f65",
+   "root": "ts-train-service",
+   "fault": "delay",
+   "cell": "ts-train-service|delay",
+   "t028": {
+    "status": "OK",
+    "rank_min": 2,
+    "rank_max": 2,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "7ff4c710fbd3b0281c4cc0f25553404e6e9f1f405b934f7566ae0ee71b282417",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-train-service",
+    "item": "ts-train-service",
+    "rank_min": 2,
+    "rank_max": 2,
+    "metric": 1104,
+    "trace": 1,
+    "log": 0,
+    "score": 1105,
+    "metric_columns": 8,
+    "metric_columns_usable": 8,
+    "metric_columns_with_votes": 4,
+    "top_metric_columns": [
+     {
+      "column": "ts-train-service_socket",
+      "vote": 284
+     },
+     {
+      "column": "ts-train-service_latency-90",
+      "vote": 283
+     },
+     {
+      "column": "ts-train-service_latency-50",
+      "vote": 281
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [
+    {
+     "entity": "ts-travel2-service",
+     "item": "ts-travel2-service",
+     "rank_min": 1,
+     "rank_max": 1,
+     "metric": 1128,
+     "trace": 1,
+     "log": 0,
+     "score": 1129,
+     "metric_columns": 8,
+     "metric_columns_usable": 8,
+     "metric_columns_with_votes": 4,
+     "top_metric_columns": [
+      {
+       "column": "ts-travel2-service_latency-50",
+       "vote": 289
+      },
+      {
+       "column": "ts-travel2-service_latency-90",
+       "vote": 289
+      },
+      {
+       "column": "ts-travel2-service_socket",
+       "vote": 280
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 24,
+      "trace": 0,
+      "log": 0,
+      "score": 24
+     }
+    }
+   ],
+   "n_above": 1,
+   "above_decided_by_metric_alone": 1,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-a5cabe5fa7",
+   "root": "ts-travel-service",
+   "fault": "loss",
+   "cell": "ts-travel-service|loss",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "135a290231f8627f7fa0ccf75b676e438c7e1f6244f56e1a78c0db1f2452e9a7",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-travel-service",
+    "item": "ts-travel-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 884,
+    "trace": 1,
+    "log": 0,
+    "score": 885,
+    "metric_columns": 8,
+    "metric_columns_usable": 7,
+    "metric_columns_with_votes": 4,
+    "top_metric_columns": [
+     {
+      "column": "ts-travel-service_latency-50",
+      "vote": 288
+     },
+     {
+      "column": "ts-travel-service_mem",
+      "vote": 274
+     },
+     {
+      "column": "ts-travel-service_latency-90",
+      "vote": 250
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-a915aa2424",
+   "root": "ts-travel-service",
+   "fault": "loss",
+   "cell": "ts-travel-service|loss",
+   "t028": {
+    "status": "OK",
+    "rank_min": 2,
+    "rank_max": 2,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "cb8d08546ee97a815eb5184934b22a81737f95ef5d8c8e002a1bc14e3c6f0c7b",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-travel-service",
+    "item": "ts-travel-service",
+    "rank_min": 2,
+    "rank_max": 2,
+    "metric": 803,
+    "trace": 1,
+    "log": 0,
+    "score": 804,
+    "metric_columns": 8,
+    "metric_columns_usable": 8,
+    "metric_columns_with_votes": 4,
+    "top_metric_columns": [
+     {
+      "column": "ts-travel-service_latency-50",
+      "vote": 300
+     },
+     {
+      "column": "ts-travel-service_latency-90",
+      "vote": 266
+     },
+     {
+      "column": "ts-travel-service_mem",
+      "vote": 229
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [
+    {
+     "entity": "ts-admin-travel-service",
+     "item": "ts-admin-travel-service",
+     "rank_min": 1,
+     "rank_max": 1,
+     "metric": 813,
+     "trace": 1,
+     "log": 0,
+     "score": 814,
+     "metric_columns": 8,
+     "metric_columns_usable": 8,
+     "metric_columns_with_votes": 3,
+     "top_metric_columns": [
+      {
+       "column": "ts-admin-travel-service_mem",
+       "vote": 296
+      },
+      {
+       "column": "ts-admin-travel-service_latency-50",
+       "vote": 281
+      },
+      {
+       "column": "ts-admin-travel-service_latency-90",
+       "vote": 236
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 10,
+      "trace": 0,
+      "log": 0,
+      "score": 10
+     }
+    }
+   ],
+   "n_above": 1,
+   "above_decided_by_metric_alone": 1,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-b8bd0abf60",
+   "root": "ts-route-service",
+   "fault": "socket",
+   "cell": "ts-route-service|socket",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "4b4d327dcc46b325ac90a48031d3bedb867a5859bb9f725e1885943eee839e8f",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-route-service",
+    "item": "ts-route-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 1503,
+    "trace": 1,
+    "log": 0,
+    "score": 1504,
+    "metric_columns": 8,
+    "metric_columns_usable": 8,
+    "metric_columns_with_votes": 6,
+    "top_metric_columns": [
+     {
+      "column": "ts-route-service_mem",
+      "vote": 296
+     },
+     {
+      "column": "ts-route-service_socket",
+      "vote": 296
+     },
+     {
+      "column": "ts-route-service_latency-90",
+      "vote": 292
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-ba831dbeb8",
+   "root": "ts-train-service",
+   "fault": "cpu",
+   "cell": "ts-train-service|cpu",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "1265953ce04da55ee7dab6631b2bddc473dd559f95ea0866355e78034ebd5d7f",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-train-service",
+    "item": "ts-train-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 1307,
+    "trace": 1,
+    "log": 1,
+    "score": 1309,
+    "metric_columns": 8,
+    "metric_columns_usable": 7,
+    "metric_columns_with_votes": 5,
+    "top_metric_columns": [
+     {
+      "column": "ts-train-service_mem",
+      "vote": 297
+     },
+     {
+      "column": "ts-train-service_cpu",
+      "vote": 294
+     },
+     {
+      "column": "ts-train-service_latency-90",
+      "vote": 286
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-bcbd4f46ae",
+   "root": "ts-route-service",
+   "fault": "socket",
+   "cell": "ts-route-service|socket",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "c0ca76f80521f5aadb08667a70d7087afc9f74cff171405fdd1038bf85679aa2",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-route-service",
+    "item": "ts-route-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 1441,
+    "trace": 1,
+    "log": 0,
+    "score": 1442,
+    "metric_columns": 7,
+    "metric_columns_usable": 7,
+    "metric_columns_with_votes": 5,
+    "top_metric_columns": [
+     {
+      "column": "ts-route-service_cpu",
+      "vote": 292
+     },
+     {
+      "column": "ts-route-service_mem",
+      "vote": 292
+     },
+     {
+      "column": "ts-route-service_socket",
+      "vote": 292
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-db293894ab",
+   "root": "ts-travel-service",
+   "fault": "disk",
+   "cell": "ts-travel-service|disk",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "f03dee56ae2ad4733fe23e50631c2388941e245d5beed07e544b8576bd3b33ab",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-travel-service",
+    "item": "ts-travel-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 1160,
+    "trace": 0,
+    "log": 0,
+    "score": 1160,
+    "metric_columns": 8,
+    "metric_columns_usable": 8,
+    "metric_columns_with_votes": 5,
+    "top_metric_columns": [
+     {
+      "column": "ts-travel-service_diskio",
+      "vote": 287
+     },
+     {
+      "column": "ts-travel-service_mem",
+      "vote": 287
+     },
+     {
+      "column": "ts-travel-service_cpu",
+      "vote": 271
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-de89e2f9e9",
+   "root": "ts-travel-service",
+   "fault": "disk",
+   "cell": "ts-travel-service|disk",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "e4953d449cfa833939c5f52becdf60f3b2826432f4de08756d6a7550453178d3",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-travel-service",
+    "item": "ts-travel-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 1428,
+    "trace": 0,
+    "log": 0,
+    "score": 1428,
+    "metric_columns": 8,
+    "metric_columns_usable": 8,
+    "metric_columns_with_votes": 7,
+    "top_metric_columns": [
+     {
+      "column": "ts-travel-service_diskio",
+      "vote": 297
+     },
+     {
+      "column": "ts-travel-service_mem",
+      "vote": 297
+     },
+     {
+      "column": "ts-travel-service_latency-90",
+      "vote": 285
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-f36d0647d5",
+   "root": "ts-order-service",
+   "fault": "loss",
+   "cell": "ts-order-service|loss",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "eff2435fea3edf076b1255791765c8073ea9a3f2eeb948b70bbd7180fa813a4c",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-order-service",
+    "item": "ts-order-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 664,
+    "trace": 1,
+    "log": 0,
+    "score": 665,
+    "metric_columns": 8,
+    "metric_columns_usable": 8,
+    "metric_columns_with_votes": 4,
+    "top_metric_columns": [
+     {
+      "column": "ts-order-service_mem",
+      "vote": 289
+     },
+     {
+      "column": "ts-order-service_latency-90",
+      "vote": 282
+     },
+     {
+      "column": "ts-order-service_diskio",
+      "vote": 48
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-f81f88234e",
+   "root": "ts-auth-service",
+   "fault": "delay",
+   "cell": "ts-auth-service|delay",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "3a268ae22eb6c8de38ef360cf1238af72469f812fd33e33a6a54c690ad225ab1",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-auth-service",
+    "item": "ts-auth-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 696,
+    "trace": 0,
+    "log": 0,
+    "score": 696,
+    "metric_columns": 7,
+    "metric_columns_usable": 7,
+    "metric_columns_with_votes": 3,
+    "top_metric_columns": [
+     {
+      "column": "ts-auth-service_latency-50",
+      "vote": 293
+     },
+     {
+      "column": "ts-auth-service_mem",
+      "vote": 245
+     },
+     {
+      "column": "ts-auth-service_latency-90",
+      "vote": 158
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-f9a8e05ed7",
+   "root": "ts-travel-service",
+   "fault": "disk",
+   "cell": "ts-travel-service|disk",
+   "t028": {
+    "status": "OK",
+    "rank_min": 1,
+    "rank_max": 1,
+    "multi_flags": {
+     "1": [],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "9f7a962d91180d11927fd21da72fe5a5accd805e6253f4e382949ddba0484277",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-travel-service",
+    "item": "ts-travel-service",
+    "rank_min": 1,
+    "rank_max": 1,
+    "metric": 1297,
+    "trace": 0,
+    "log": 0,
+    "score": 1297,
+    "metric_columns": 8,
+    "metric_columns_usable": 8,
+    "metric_columns_with_votes": 6,
+    "top_metric_columns": [
+     {
+      "column": "ts-travel-service_cpu",
+      "vote": 274
+     },
+     {
+      "column": "ts-travel-service_diskio",
+      "vote": 274
+     },
+     {
+      "column": "ts-travel-service_mem",
+      "vote": 274
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [],
+   "n_above": 0,
+   "above_decided_by_metric_alone": 0,
+   "above_where_metric_difference_not_positive": 0
+  },
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-fbc45b0c67",
+   "root": "ts-train-service",
+   "fault": "delay",
+   "cell": "ts-train-service|delay",
+   "t028": {
+    "status": "OK",
+    "rank_min": 3,
+    "rank_max": 3,
+    "multi_flags": {
+     "1": [
+      "M5"
+     ],
+     "5": []
+    }
+   },
+   "status": "OK",
+   "additive_identity": true,
+   "metric_votes_equal_column_sum": true,
+   "record_scores_equal_native": true,
+   "n_entities": 68,
+   "check_sha256": "0f42804a58687c2b467feb7ebf46440ea5169d00370f52cb7271913628c77ed8",
+   "root_ranked": true,
+   "root_parts": {
+    "entity": "ts-train-service",
+    "item": "ts-train-service",
+    "rank_min": 3,
+    "rank_max": 3,
+    "metric": 838,
+    "trace": 1,
+    "log": 0,
+    "score": 839,
+    "metric_columns": 7,
+    "metric_columns_usable": 7,
+    "metric_columns_with_votes": 3,
+    "top_metric_columns": [
+     {
+      "column": "ts-train-service_latency-90",
+      "vote": 287
+     },
+     {
+      "column": "ts-train-service_socket",
+      "vote": 279
+     },
+     {
+      "column": "ts-train-service_latency-50",
+      "vote": 272
+     }
+    ],
+    "trace_status": "ok",
+    "log_status": "ok"
+   },
+   "self_check_rank_equals_t028": true,
+   "above_root": [
+    {
+     "entity": "ts-travel2-service",
+     "item": "ts-travel2-service",
+     "rank_min": 1,
+     "rank_max": 1,
+     "metric": 1012,
+     "trace": 1,
+     "log": 0,
+     "score": 1013,
+     "metric_columns": 7,
+     "metric_columns_usable": 7,
+     "metric_columns_with_votes": 4,
+     "top_metric_columns": [
+      {
+       "column": "ts-travel2-service_latency-90",
+       "vote": 287
+      },
+      {
+       "column": "ts-travel2-service_socket",
+       "vote": 287
+      },
+      {
+       "column": "ts-travel2-service_latency-50",
+       "vote": 272
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 174,
+      "trace": 0,
+      "log": 0,
+      "score": 174
+     }
+    },
+    {
+     "entity": "ts-admin-travel-service",
+     "item": "ts-admin-travel-service",
+     "rank_min": 2,
+     "rank_max": 2,
+     "metric": 896,
+     "trace": 1,
+     "log": 0,
+     "score": 897,
+     "metric_columns": 8,
+     "metric_columns_usable": 8,
+     "metric_columns_with_votes": 5,
+     "top_metric_columns": [
+      {
+       "column": "ts-admin-travel-service_latency-90",
+       "vote": 277
+      },
+      {
+       "column": "ts-admin-travel-service_latency-50",
+       "vote": 270
+      },
+      {
+       "column": "ts-admin-travel-service_mem",
+       "vote": 263
+      }
+     ],
+     "trace_status": "ok",
+     "log_status": "ok",
+     "difference_vs_root": {
+      "metric": 58,
+      "trace": 0,
+      "log": 0,
+      "score": 58
+     }
+    }
+   ],
+   "n_above": 2,
+   "above_decided_by_metric_alone": 2,
+   "above_where_metric_difference_not_positive": 0
+  }
+ ],
+ "methods_executed": false
+}

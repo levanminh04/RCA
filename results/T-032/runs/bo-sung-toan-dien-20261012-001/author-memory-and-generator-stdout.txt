@@ -1,0 +1,84 @@
+Oct 12 12:26:24 ip-172-31-38-238 kernel: oom-kill:constraint=CONSTRAINT_NONE,nodemask=(null),cpuset=/,mems_allowed=0,global_oom,task_memcg=/user.slice/user-1000.slice/session-1918.scope,task=python,pid=214300,uid=1000
+Oct 12 12:26:24 ip-172-31-38-238 kernel: Out of memory: Killed process 214300 (python) total-vm:7888104kB, anon-rss:7173116kB, file-rss:3960kB, shmem-rss:0kB, UID:1000 pgtables:14748kB oom_score_adj:0
+Oct 12 12:26:33 ip-172-31-38-238 kernel: audit: type=1400 audit(1791807993.178:867): apparmor="DENIED" operation="open" class="file" profile="who" name="/usr/share/coreutils/locales/uucore/en-US.ftl" pid=214391 comm="who" requested_mask="r" denied_mask="r" fsuid=0 ouid=0
+Oct 12 12:31:04 ip-172-31-38-238 kernel: audit: type=1400 audit(1791808264.475:868): apparmor="DENIED" operation="open" class="file" profile="who" name="/usr/share/coreutils/locales/uucore/en-US.ftl" pid=214498 comm="who" requested_mask="r" denied_mask="r" fsuid=0 ouid=0
+Oct 12 12:32:41 ip-172-31-38-238 kernel: audit: type=1400 audit(1791808361.471:869): apparmor="DENIED" operation="open" class="file" profile="who" name="/usr/share/coreutils/locales/uucore/en-US.ftl" pid=214596 comm="who" requested_mask="r" denied_mask="r" fsuid=0 ouid=0
+Oct 12 12:35:12 ip-172-31-38-238 kernel: audit: type=1400 audit(1791808512.928:870): apparmor="DENIED" operation="open" class="file" profile="who" name="/usr/share/coreutils/locales/uucore/en-US.ftl" pid=214747 comm="who" requested_mask="r" denied_mask="r" fsuid=0 ouid=0
+Oct 12 12:36:32 ip-172-31-38-238 kernel: audit: type=1400 audit(1791808592.049:871): apparmor="DENIED" operation="open" class="file" profile="who" name="/usr/share/coreutils/locales/uucore/en-US.ftl" pid=214929 comm="who" requested_mask="r" denied_mask="r" fsuid=0 ouid=0
+Oct 12 12:38:45 ip-172-31-38-238 kernel: audit: type=1400 audit(1791808725.405:872): apparmor="DENIED" operation="open" class="file" profile="who" name="/usr/share/coreutils/locales/uucore/en-US.ftl" pid=214990 comm="who" requested_mask="r" denied_mask="r" fsuid=0 ouid=0
+Oct 12 12:40:40 ip-172-31-38-238 kernel: audit: type=1400 audit(1791808840.942:873): apparmor="DENIED" operation="open" class="file" profile="who" name="/usr/share/coreutils/locales/uucore/en-US.ftl" pid=215110 comm="who" requested_mask="r" denied_mask="r" fsuid=0 ouid=0
+Oct 12 12:43:35 ip-172-31-38-238 kernel: audit: type=1400 audit(1791809015.725:874): apparmor="DENIED" operation="open" class="file" profile="who" name="/usr/share/coreutils/locales/uucore/en-US.ftl" pid=215278 comm="who" requested_mask="r" denied_mask="r" fsuid=0 ouid=0
+Oct 12 12:45:23 ip-172-31-38-238 kernel: audit: type=1400 audit(1791809123.870:875): apparmor="DENIED" operation="open" class="file" profile="who" name="/usr/share/coreutils/locales/uucore/en-US.ftl" pid=215500 comm="who" requested_mask="r" denied_mask="r" fsuid=0 ouid=0
+Oct 12 12:48:12 ip-172-31-38-238 kernel: audit: type=1400 audit(1791809292.761:876): apparmor="DENIED" operation="open" class="file" profile="who" name="/usr/share/coreutils/locales/uucore/en-US.ftl" pid=215760 comm="who" requested_mask="r" denied_mask="r" fsuid=0 ouid=0
+   (For more info, see
+      https://docs.python.org/3.6/library/stdtypes.html#frozenset).
+
+    Examples
+    ----------
+    For usage examples, please see
+    https://rasbt.github.io/mlxtend/user_guide/frequent_patterns/fpgrowth/
+
+    """
+    fpc.valid_input_check(df)
+
+    if min_support <= 0.0:
+        raise ValueError(
+            "`min_support` must be a positive "
+            "number within the interval `(0, 1]`. "
+            "Got %s." % min_support
+        )
+
+    colname_map = None
+    if use_colnames:
+        colname_map = {idx: item for idx, item in enumerate(df.columns)}
+
+    tree, _ = fpc.setup_fptree(df, min_support)
+    minsup = math.ceil(min_support * len(df.index))  # min support as count
+    generator = fpg_step(tree, minsup, colname_map, max_len, verbose)
+
+    return fpc.generate_itemsets(generator, len(df.index), colname_map)
+
+
+def fpg_step(tree, minsup, colnames, max_len, verbose):
+    """
+    Performs a recursive step of the fpgrowth algorithm.
+
+    Parameters
+    ----------
+    tree : FPTree
+    minsup : int
+
+    Yields
+    ------
+    lists of strings
+        Set of items that has occurred in minsup itemsets.
+    """
+    count = 0
+    items = tree.nodes.keys()
+    if tree.is_path():
+        # If the tree is a path, we can combinatorally generate all
+        # remaining itemsets without generating additional conditional trees
+        size_remain = len(items) + 1
+        if max_len:
+            size_remain = max_len - len(tree.cond_items) + 1
+        for i in range(1, size_remain):
+            for itemset in itertools.combinations(items, i):
+                count += 1
+                support = min([tree.nodes[i][0].count for i in itemset])
+                yield support, tree.cond_items + list(itemset)
+    elif not max_len or max_len > len(tree.cond_items):
+        for item in items:
+            count += 1
+            support = sum([node.count for node in tree.nodes[item]])
+            yield support, tree.cond_items + [item]
+
+    if verbose:
+        tree.print_status(count, colnames)
+
+    # Generate conditional trees to generate frequent itemsets one item larger
+    if not tree.is_path() and (not max_len or max_len > len(tree.cond_items)):
+        for item in items:
+            cond_tree = tree.conditional_tree(item, minsup)
+            for sup, iset in fpg_step(cond_tree, minsup, colnames, max_len, verbose):
+                yield sup, iset
+

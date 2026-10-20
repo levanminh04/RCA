@@ -1,0 +1,86 @@
+def serializer_table_fixtures(directory):
+    """Exercise unchanged TraceRCA serialization, not a method backend change."""
+    import copy
+    import numpy as np
+    import pandas as pd
+    run = directory / "serializer_tables"
+    run.mkdir()
+    serializer = TraceRcaCapture(run / "capture")
+    serializer.np, serializer.pd = np, pd
+    serializer.directory.mkdir()
+    serializer._table_content = {}
+    checks = []
+    cases = (
+        ("string", "string", ["plain", "", "tiếng Việt"]),
+        ("string_NA", "string", ["x", pd.NA, None]),
+        ("Int64", "Int64", [1, 0, -2]),
+        ("Int64_NA", "Int64", [1, pd.NA, None]),
+        ("boolean", "boolean", [True, False, True]),
+        ("boolean_NA", "boolean", [True, pd.NA, None]),
+        ("Float64", "Float64", [1.0, -0.0, 2.5]),
+        ("Float64_NA", "Float64", [1.0, pd.NA, None]),
+        ("native_float_special", "float64", [np.nan, np.inf, -np.inf, -0.0, 1.25]),
+        ("object_missing_special", "object", [None, pd.NA, np.nan, np.inf, -np.inf, -0.0, "", "tiếng Việt"]),
+    )
+    for name, dtype, values in cases:
+        progress(directory, "FIXTURE_START", name="serializer_" + name)
+        frame = pd.DataFrame({"value": pd.Series(values, dtype=dtype)})
+        frame.index = pd.Index(list(range(100 + len(frame), 100, -1)), name="position")
+        frame.columns.name = "channel"
+        before = frame.copy(deep=True)
+        original = serializer._table_signature(frame)
+        meta = serializer._save_table(name + ".parquet", frame)
+        stored = pd.read_parquet(serializer.directory / meta["path"], use_threads=False)
+        columns = [decode(m["name"]) for m in meta["columns"]]
+        arrays = table_columns(serializer.directory, meta)
+        restored = pd.DataFrame({c: pd.Series(arrays[c], dtype=m["dtype"]) for c, m in zip(columns, meta["columns"])})
+        restored.index = pd.Index([decode(json.loads(v)) for v in stored["index_0"]], name=decode(meta["index_names"])[0])
+        restored.columns.name = decode(meta["columns_name"])
+        differences = exact_differences(original, serializer._table_signature(restored))
+        pd.testing.assert_frame_equal(frame, before, check_exact=True)
+        pd.testing.assert_frame_equal(frame, restored, check_exact=True)
+        mutations = {
+            "order_rejected": bool(exact_differences(original, serializer._table_signature(restored.iloc[::-1]))),
+            "index_rejected": bool(exact_differences(original, serializer._table_signature(restored.set_axis([int(v)+1 for v in restored.index])))),
+            "logical_dtype_rejected": True if dtype == "object" else bool(exact_differences(original, serializer._table_signature(restored.astype("object")))),
+        }
+        for key, bad_dtype in (("missing_dtype_rejected", None), ("unknown_dtype_rejected", "not_a_logical_dtype")):
+            bad = copy.deepcopy(meta)
+            if bad_dtype is None:
+                del bad["columns"][0]["dtype"]
+            else:
+                bad["columns"][0]["dtype"] = bad_dtype
+            try:
+                table_columns(serializer.directory, bad)
+                mutations[key] = False
+            except (KeyError, TypeError, ValueError):
+                mutations[key] = True
+        item = {"name": "serializer_" + name, "pass": not differences and all(mutations.values()),
+            "input_unchanged": True, "differences": differences, "invariants": mutations,
+            "capture_table": meta, "methods_executed": False,
+            "logical_dtype": dtype, "string_storage_backend_identity": "not historically recorded; OPEN"}
+        dump(run / (name + "-check.json"), item)
+        checks.append(item)
+        progress(directory, "FIXTURE_DONE", name=item["name"], status="PASS" if item["pass"] else "FAIL")
+        if not item["pass"]:
+            raise ReplayError("TraceRCA serializer fixture failed: " + name)
+    # Unknown tagged scalar and special-state bytes must not become evidence.
+    for name, dtype, values in (("unknown_missing", "object", [None]), ("unknown_nonfinite", "float64", [np.nan])):
+        frame = pd.DataFrame({"value": pd.Series(values, dtype=dtype)})
+        meta = serializer._save_table(name + "-original.parquet", frame)
+        mutated = pd.read_parquet(serializer.directory / meta["path"], use_threads=False)
+        if name == "unknown_missing":
+            mutated.loc[0, meta["columns"][0]["storage"]] = json.dumps({"__missing__": "unknown"})
+        else:
+            mutated.loc[0, meta["columns"][0]["special_state_column"]] = 9
+        bad = copy.deepcopy(meta)
+        bad["path"] = name + "-mutated.parquet"
+        mutated.to_parquet(serializer.directory / bad["path"], engine="pyarrow", index=False, compression="zstd")
+        try:
+            table_columns(serializer.directory, bad)
+        except (KeyError, ReplayError):
+            continue
+        raise ReplayError("unknown tagged scalar/state not rejected: " + name)
+    dump(run / "check.json", {"status": "PASS", "fixtures": checks, "unknown_values_rejected": True,
+        "methods_executed": False, "artifact_manifest": artifact_manifest(run), "manifest_excludes": ["check.json"]})
+    return checks

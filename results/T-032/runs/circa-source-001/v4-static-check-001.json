@@ -1,0 +1,224 @@
+{
+  "status": "PASS_STATIC_AND_SCALAR_METADATA_ONLY",
+  "script": {
+    "path": "results/T-032/scripts/replay_circa_v4.py",
+    "bytes": 90278,
+    "sha256": "83f53708941b08c8a8e138fdc796924b287b10f360046a8b2dd756b560bc2c6c"
+  },
+  "base_script": {
+    "path": "results/T-032/scripts/replay_circa_v3.py",
+    "sha256": "12f55c347ba552f4d7724f865ad8c9b173aa48d89ab6fdb24ffb32b9065b2116"
+  },
+  "authority": [
+    "Q-103",
+    "Q-108",
+    "Q-109",
+    "Q-114",
+    "Q-115",
+    "Q-121",
+    "Q-122",
+    "Q-123"
+  ],
+  "changed_original_functions": [
+    "capture_checks",
+    "one",
+    "fixtures",
+    "main"
+  ],
+  "unchanged_original_functions": [
+    "historical_snapshot",
+    "closure_path_guard",
+    "load_closure",
+    "check_imports",
+    "prepare_imports",
+    "source_for",
+    "table_columns",
+    "make_job",
+    "reconstruct",
+    "native_child",
+    "fixture_inputs",
+    "serializer_table_fixtures",
+    "nodeview_fixture",
+    "adapter_table_fixture"
+  ],
+  "new_functions": [
+    "audit_stored_fixture",
+    "da_journal_check",
+    "final_manifest",
+    "finalize_check",
+    "focused_da_fixtures",
+    "terminal_manifest_fixture",
+    "verify_final_manifest"
+  ],
+  "helper_pins": [
+    {
+      "path": "results/T-032/scripts/capture_microrank.py",
+      "bytes": 25543,
+      "sha256": "b842b4be0d92470f1fc673e2afb30b5b0b76781c211a4b99ff6518c648b00c8b",
+      "expected": "b842b4be0d92470f1fc673e2afb30b5b0b76781c211a4b99ff6518c648b00c8b",
+      "pass": true
+    },
+    {
+      "path": "results/T-032/scripts/replay_microrank.py",
+      "bytes": 30883,
+      "sha256": "193166089f7d0bf30a2f81551c374bec610f705241f6ad495aa5ff7181126562",
+      "expected": "193166089f7d0bf30a2f81551c374bec610f705241f6ad495aa5ff7181126562",
+      "pass": true
+    },
+    {
+      "path": "results/T-032/scripts/capture_circa_v2.py",
+      "bytes": 31910,
+      "sha256": "707c98617e9b61efaa4672a9f54d46d22c8d0dc0d4cd9497d6bee944960eab60",
+      "expected": "707c98617e9b61efaa4672a9f54d46d22c8d0dc0d4cd9497d6bee944960eab60",
+      "pass": true
+    }
+  ],
+  "compile": "PASS; compile only, no module import/execution",
+  "full_diff": {
+    "path": "results/T-032/runs/circa-source-001/v4-full-diff-001.patch",
+    "sha256": "8e78ef99a4179c607246352651373b0f25a0786cf7e1c60b1ff3184a4dbe6a73"
+  },
+  "closed_transport": {
+    "path": "results/T-032/runs/circa-nodeview-transport-002/file-inventory.json",
+    "sha256": "0964ddf03d4b0c0f41869136670bdc9d50d982f0ed713810811639dc090f9cf3",
+    "all_current_files_hash_pass": 77,
+    "original_full_manifest_pass": false,
+    "old_intermediates_eligible": false
+  },
+  "stored_da_call": {
+    "path": "results/T-032/runs/circa-nodeview-transport-002/verified/runs/circa-nodeview-fixture-001/adapter_extension_tables/capture/calls/0029-da.json",
+    "sha256": "a63cfd6d52bcc9919862409d3aedbbb18f24dc6aa95f02b0360fd0948d8a3aa2",
+    "journal_only_check": {
+      "pass": true,
+      "completed": true,
+      "native_outcome": "return",
+      "groups": [
+        [
+          {
+            "__node__": {
+              "entity": "caller",
+              "metric": "cpu",
+              "name": "caller_cpu"
+            }
+          },
+          {
+            "__node__": {
+              "entity": "root",
+              "metric": "cpu",
+              "name": "root_cpu"
+            }
+          }
+        ]
+      ],
+      "header_count": 2,
+      "group_count": 1,
+      "chronology_steps": 10,
+      "entry_score_order": [
+        {
+          "__node__": {
+            "entity": "caller",
+            "metric": "cpu",
+            "name": "caller_cpu"
+          }
+        },
+        {
+          "__node__": {
+            "entity": "root",
+            "metric": "cpu",
+            "name": "root_cpu"
+          }
+        }
+      ],
+      "empty_scored_candidates": false
+    }
+  },
+  "declared_journal_mutation_checks": [
+    {
+      "mutation": "missing_header",
+      "rejected": true,
+      "error": "DA header count must be exact G+1 for a completed loop"
+    },
+    {
+      "mutation": "extra_header",
+      "rejected": true,
+      "error": "DA header count must be exact G+1 for a completed loop"
+    },
+    {
+      "mutation": "changed_header_order",
+      "rejected": true,
+      "error": "DA group snapshot changed while assigning native indexes"
+    },
+    {
+      "mutation": "changed_index",
+      "rejected": true,
+      "error": "DA native index differs from its group position"
+    },
+    {
+      "mutation": "changed_exit_group_order",
+      "rejected": true,
+      "error": "DA header and native exit groups differ in node/group order"
+    },
+    {
+      "mutation": "changed_score_order",
+      "rejected": true,
+      "error": "DA chronology node differs: adjustment_before_mutation"
+    },
+    {
+      "mutation": "reordered_visit_map",
+      "rejected": true,
+      "error": "DA chronology has an extra/reordered step: descendant_visit"
+    }
+  ],
+  "synthetic_schema_only": {
+    "empty": {
+      "pass": true,
+      "completed": true,
+      "native_outcome": "return",
+      "groups": [],
+      "header_count": 1,
+      "group_count": 0,
+      "chronology_steps": 1,
+      "entry_score_order": [],
+      "empty_scored_candidates": true
+    },
+    "preloop_exception": {
+      "pass": true,
+      "completed": false,
+      "native_outcome": "pre_loop_exception",
+      "groups": null,
+      "header_count": 0,
+      "mechanism_evidence": false
+    },
+    "native_fixture_evidence": false
+  },
+  "preloop_exception_source_statement": {
+    "path": "D:/RCA-ext/src/RCAEval/RCAEval/graph_heads/rht.py",
+    "sha256": "6d408323ae3f180ea2ed171ed6f43058d202b7655f0d85ec6a4b768980998110",
+    "start_line": 254,
+    "end_line": 256
+  },
+  "fixture_plan": {
+    "preserved": 19,
+    "new": 4,
+    "total": 23,
+    "grouped_audit_fixture_wall_s": 600,
+    "grouped_audit_fixture_bytes": 52428800,
+    "pilot_wall_s": 600,
+    "pilot_bytes": 157286400
+  },
+  "current_budget": {
+    "global_new_bytes": 12884901888,
+    "laptop_new_bytes": 2147483648,
+    "actual_before_launch": "ROOT MUST MEASURE"
+  },
+  "runtime_status": "NOT_RUN; no SSH or native/array method execution by helper",
+  "pending": [
+    "Root full-read/diff review",
+    "EC2 transfer two-end hashes",
+    "Source/package/helper full audit on EC2",
+    "Posthoc old capture tables/arrays/native stage join",
+    "Fresh23 native fixtures",
+    "One exact RE2 pilot and closed manifests"
+  ],
+  "research_eligible": false
+}

@@ -1,0 +1,425 @@
+{
+ "schema": "T032-microrank-merged-link-v1",
+ "design": "results/T-032/thiet-ke-phep-doi-013.md mục 4",
+ "fixtures": {
+  "subtree": {
+   "pass": true,
+   "checks": {
+    "sâu nhất bằng 4": true,
+    "A gốc thấy B, C, D nằm dưới, không thấy E": true,
+    "span B.server thấy C nằm dưới, không thấy D": true,
+    "lời gọi chậm tới C truyền lên A gốc qua hai đường": true,
+    "span 1 (A gọi B) bao lời gọi chậm tới C với phần vượt 100": true,
+    "span 8 tự mang lời gọi chậm": true,
+    "nhánh D không bao lời gọi chậm tới C": true,
+    "span mất cha E không truyền cho ai": true,
+    "span mang cờ của C nằm dưới span 1, không tính chính span": true,
+    "span mang cờ của B nằm dưới A gốc": true,
+    "span phía gọi mang cờ của A (span 1, 8) nằm dưới A gốc nên A gốc có bit A": true,
+    "span 1 không có span mang cờ của A nằm dưới": true,
+    "span 9 không có cờ nên C dưới span 8 không có cờ": true
+   }
+  },
+  "direct": {
+   "pass": true,
+   "checks": {
+    "span 1 (A phía gọi) có con trực tiếp thuộc B": true,
+    "span 1 không có con trực tiếp thuộc C": true,
+    "span 3 (B phía gọi) có con trực tiếp thuộc C": true,
+    "span 0 (A, con cùng dịch vụ) không có lời gọi trực tiếp": true
+   }
+  }
+ },
+ "min_calls": 20,
+ "min_F": 5,
+ "sources": {
+  "rankings_sha256": "5b74ef7e48455dd678cb9670fa462524b689a7b2213a74c43f1544402d08ce32",
+  "plan_sha256": "2e26428c26ef2fd699a72abdd9e30662b7cbda61f97aec3c3eca1e33d89b2ebe",
+  "labels_sha256": "d5923b59698000370fa45b1ded8b7c3a1e39eeeef4e450d9cdc9350940fd2f53"
+ },
+ "note": "Mô tả trên dev cho một nhánh chẩn đoán; không là nhãn lan; các cột chồng lấn, không cộng thành tỷ lệ nguyên nhân.",
+ "methods_executed": [],
+ "summary": {
+  "n_cases": 1,
+  "status": {
+   "OK": 1
+  },
+  "self_check": {
+   "mo15c1": {
+    "cases": 1,
+    "pass": 1,
+    "fail": []
+   },
+   "mo1p50c1": {
+    "cases": 1,
+    "pass": 1,
+    "fail": []
+   }
+  },
+  "by_dataset": {
+   "RE2-TT": {
+    "mo15c1": {
+     "cases_usable": 0,
+     "root_rank1": 0,
+     "root_not_rank1": 0,
+     "top_entity": {},
+     "reading_all": {},
+     "by_top_entity": {}
+    },
+    "mo1p50c1": {
+     "cases_usable": 0,
+     "root_rank1": 0,
+     "root_not_rank1": 0,
+     "top_entity": {},
+     "reading_all": {},
+     "by_top_entity": {}
+    }
+   },
+   "Nezha-OB": {
+    "mo15c1": {
+     "cases_usable": 1,
+     "root_rank1": 0,
+     "root_not_rank1": 1,
+     "top_entity": {
+      "frontend": 1
+     },
+     "reading_all": {
+      "gắn với root": 1
+     },
+     "by_top_entity": {
+      "frontend": {
+       "cases": 1,
+       "reading": {
+        "gắn với root": 1
+       },
+       "operations": {
+        "frontend_hipstershop.RecommendationService/ListRecommendations": 1
+       },
+       "class_vs_root": {
+        "goi_truc_tiep": 1
+       },
+       "median_on_F": {
+        "direct": 0.9761904761904762,
+        "below": 0.9761904761904762,
+        "slow": 0.9761904761904762,
+        "flag_below": 0.011904761904761904,
+        "linked": 0.9761904761904762,
+        "r50": 0.9761904761904762
+       },
+       "median_on_nonflagged": {
+        "direct": 1.0,
+        "below": 1.0,
+        "slow": 0.0,
+        "flag_below": 0.0,
+        "linked": 0.0
+       },
+       "median_best_other_linked": 0.03571428571428571,
+       "case_list": [
+        {
+         "opaque_id": "dev-63c30faf34",
+         "cell": "recommendationservice|network_delay",
+         "root_rank": [
+          5,
+          5
+         ],
+         "operation": "frontend_hipstershop.RecommendationService/ListRecommendations",
+         "F": 84,
+         "reading": "gắn với root",
+         "on_F": {
+          "n": 84,
+          "direct": 0.9761904761904762,
+          "below": 0.9761904761904762,
+          "slow": 0.9761904761904762,
+          "flag_below": 0.011904761904761904,
+          "linked": 0.9761904761904762,
+          "r50": 0.9761904761904762
+         },
+         "edge_measurable": true,
+         "best_other": {
+          "service": "productcatalogservice",
+          "linked": 0.03571428571428571,
+          "slow": 0.03571428571428571,
+          "flag_below": 0.023809523809523808,
+          "below": 0.9761904761904762
+         },
+         "trace_level": {
+          "own_traces": 83,
+          "has_root": 83,
+          "root_flagged": 1
+         }
+        }
+       ]
+      }
+     }
+    },
+    "mo1p50c1": {
+     "cases_usable": 1,
+     "root_rank1": 0,
+     "root_not_rank1": 1,
+     "top_entity": {
+      "frontend": 1
+     },
+     "reading_all": {
+      "gắn với root": 1
+     },
+     "by_top_entity": {
+      "frontend": {
+       "cases": 1,
+       "reading": {
+        "gắn với root": 1
+       },
+       "operations": {
+        "frontend_hipstershop.RecommendationService/ListRecommendations": 1
+       },
+       "class_vs_root": {
+        "goi_truc_tiep": 1
+       },
+       "median_on_F": {
+        "direct": 0.9927536231884058,
+        "below": 0.9927536231884058,
+        "slow": 0.9927536231884058,
+        "flag_below": 0.014492753623188406,
+        "linked": 0.9927536231884058,
+        "r50": 0.9927536231884058
+       },
+       "median_on_nonflagged": {
+        "direct": 1.0,
+        "below": 1.0,
+        "slow": 0.0,
+        "flag_below": 0.0,
+        "linked": 0.0
+       },
+       "median_best_other_linked": 0.03985507246376811,
+       "case_list": [
+        {
+         "opaque_id": "dev-63c30faf34",
+         "cell": "recommendationservice|network_delay",
+         "root_rank": [
+          5,
+          5
+         ],
+         "operation": "frontend_hipstershop.RecommendationService/ListRecommendations",
+         "F": 276,
+         "reading": "gắn với root",
+         "on_F": {
+          "n": 276,
+          "direct": 0.9927536231884058,
+          "below": 0.9927536231884058,
+          "slow": 0.9927536231884058,
+          "flag_below": 0.014492753623188406,
+          "linked": 0.9927536231884058,
+          "r50": 0.9927536231884058
+         },
+         "edge_measurable": true,
+         "best_other": {
+          "service": "productcatalogservice",
+          "linked": 0.03985507246376811,
+          "slow": 0.036231884057971016,
+          "flag_below": 0.018115942028985508,
+          "below": 0.9927536231884058
+         },
+         "trace_level": {
+          "own_traces": 275,
+          "has_root": 275,
+          "root_flagged": 4
+         }
+        }
+       ]
+      }
+     }
+    }
+   }
+  },
+  "prediction_nezha_frontend": {
+   "mo15c1": {
+    "cases_frontend_top": 1,
+    "attached": 1,
+    "not_attached": 0,
+    "unclear_or_few": 0,
+    "reading": "cùng cơ chế H4, H7"
+   },
+   "mo1p50c1": {
+    "cases_frontend_top": 1,
+    "attached": 1,
+    "not_attached": 0,
+    "unclear_or_few": 0,
+    "reading": "cùng cơ chế H4, H7"
+   }
+  }
+ },
+ "cases": [
+  {
+   "dataset": "Nezha-OB",
+   "opaque_id": "dev-63c30faf34",
+   "root": "recommendationservice",
+   "fault": "network_delay",
+   "cell": "recommendationservice|network_delay",
+   "status": "OK",
+   "branches": {
+    "mo15c1": {
+     "self_check": {
+      "traces_after": true,
+      "traces_after_with_root": true,
+      "baseline_traces": true,
+      "baseline_traces_used": true,
+      "slo_operations": true,
+      "new_traces": true,
+      "new_abnormal": true,
+      "new_normal": true,
+      "new_abnormal_also_native_abnormal": true,
+      "native_traces": true,
+      "native_abnormal": true,
+      "new_abnormal_traces_by_service": true,
+      "group_traces_with_flagged_span": true,
+      "sum_own": true
+     },
+     "self_check_pass": true,
+     "new_traces": 769,
+     "new_abnormal": 83,
+     "abnormal_traces_without_flagged_span": 0,
+     "root_ranked": true,
+     "n_entities": 10,
+     "root_rank_min": 5,
+     "root_rank_max": 5,
+     "root_operation": "recommendationservice_/hipstershop.ProductCatalogService/ListProducts",
+     "root_own_count_traces": 1,
+     "root_wrong": true,
+     "top_entities": [
+      "frontend"
+     ],
+     "links": [
+      {
+       "entity": "frontend",
+       "operation": "frontend_hipstershop.RecommendationService/ListRecommendations",
+       "F": 84,
+       "flagged_spans_all_traces": 555,
+       "nonflagged_spans_after": 19,
+       "F_without_parent_share": 0.023809523809523808,
+       "own_count_traces": 83,
+       "root": {
+        "on_F": {
+         "n": 84,
+         "direct": 0.9761904761904762,
+         "below": 0.9761904761904762,
+         "slow": 0.9761904761904762,
+         "flag_below": 0.011904761904761904,
+         "linked": 0.9761904761904762,
+         "r50": 0.9761904761904762
+        },
+        "on_nonflagged": {
+         "n": 19,
+         "direct": 1.0,
+         "below": 1.0,
+         "slow": 0.0,
+         "flag_below": 0.0,
+         "linked": 0.0,
+         "r50": 0.0
+        },
+        "edge_measurable": true
+       },
+       "trace_level": {
+        "own_traces": 83,
+        "has_root": 83,
+        "root_flagged": 1
+       },
+       "best_other": {
+        "service": "productcatalogservice",
+        "linked": 0.03571428571428571,
+        "slow": 0.03571428571428571,
+        "flag_below": 0.023809523809523808,
+        "below": 0.9761904761904762
+       },
+       "best_other_flag_below": 0.023809523809523808,
+       "dist_up": 1,
+       "dist_down": null,
+       "class": "goi_truc_tiep",
+       "reading": "gắn với root"
+      }
+     ]
+    },
+    "mo1p50c1": {
+     "self_check": {
+      "traces_after": true,
+      "traces_after_with_root": true,
+      "baseline_traces": true,
+      "baseline_traces_used": true,
+      "slo_operations": true,
+      "new_traces": true,
+      "new_abnormal": true,
+      "new_normal": true,
+      "new_abnormal_also_native_abnormal": true,
+      "native_traces": true,
+      "native_abnormal": true,
+      "new_abnormal_traces_by_service": true,
+      "group_traces_with_flagged_span": true,
+      "sum_own": true
+     },
+     "self_check_pass": true,
+     "new_traces": 769,
+     "new_abnormal": 275,
+     "abnormal_traces_without_flagged_span": 0,
+     "root_ranked": true,
+     "n_entities": 10,
+     "root_rank_min": 5,
+     "root_rank_max": 5,
+     "root_operation": "recommendationservice_/hipstershop.ProductCatalogService/ListProducts",
+     "root_own_count_traces": 4,
+     "root_wrong": true,
+     "top_entities": [
+      "frontend"
+     ],
+     "links": [
+      {
+       "entity": "frontend",
+       "operation": "frontend_hipstershop.RecommendationService/ListRecommendations",
+       "F": 276,
+       "flagged_spans_all_traces": 555,
+       "nonflagged_spans_after": 19,
+       "F_without_parent_share": 0.007246376811594203,
+       "own_count_traces": 275,
+       "root": {
+        "on_F": {
+         "n": 276,
+         "direct": 0.9927536231884058,
+         "below": 0.9927536231884058,
+         "slow": 0.9927536231884058,
+         "flag_below": 0.014492753623188406,
+         "linked": 0.9927536231884058,
+         "r50": 0.9927536231884058
+        },
+        "on_nonflagged": {
+         "n": 19,
+         "direct": 1.0,
+         "below": 1.0,
+         "slow": 0.0,
+         "flag_below": 0.0,
+         "linked": 0.0,
+         "r50": 0.0
+        },
+        "edge_measurable": true
+       },
+       "trace_level": {
+        "own_traces": 275,
+        "has_root": 275,
+        "root_flagged": 4
+       },
+       "best_other": {
+        "service": "productcatalogservice",
+        "linked": 0.03985507246376811,
+        "slow": 0.036231884057971016,
+        "flag_below": 0.018115942028985508,
+        "below": 0.9927536231884058
+       },
+       "best_other_flag_below": 0.018115942028985508,
+       "dist_up": 1,
+       "dist_down": null,
+       "class": "goi_truc_tiep",
+       "reading": "gắn với root"
+      }
+     ]
+    }
+   },
+   "wall_s": 2.6
+  }
+ ]
+}

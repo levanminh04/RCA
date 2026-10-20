@@ -1,0 +1,137 @@
+{
+  "control_metadata_validation": "PASS",
+  "method_cohort_status": "FAIL_STOP",
+  "verified_transport_files": 15,
+  "table": {
+    "path": "cohort/52-cases.json",
+    "pointer": "/rows",
+    "overall": {
+      "denominator": 52,
+      "classification_counts": {
+        "exact": 3,
+        "numeric_only": 5,
+        "operation_order": 2,
+        "service_order_changed": 0,
+        "blocked": 1,
+        "not_run": 41
+      },
+      "passed": 10,
+      "blocked": 1,
+      "not_run": 41
+    },
+    "by_dataset": {
+      "RE2-TT": {
+        "denominator": 30,
+        "classification_counts": {
+          "exact": 2,
+          "numeric_only": 5,
+          "operation_order": 2,
+          "service_order_changed": 0,
+          "blocked": 1,
+          "not_run": 20
+        },
+        "passed": 9,
+        "blocked": 1,
+        "not_run": 20
+      },
+      "Nezha-OB": {
+        "denominator": 22,
+        "classification_counts": {
+          "exact": 1,
+          "numeric_only": 0,
+          "operation_order": 0,
+          "service_order_changed": 0,
+          "blocked": 0,
+          "not_run": 21
+        },
+        "passed": 1,
+        "blocked": 0,
+        "not_run": 21
+      }
+    }
+  },
+  "failed_case": {
+    "dataset": "RE2-TT",
+    "opaque_id": "dev-3defe3d34b",
+    "source_capture_hash_checks": true,
+    "native_observed_exact": {
+      "status": "PASS",
+      "pass": true,
+      "differences": [],
+      "tolerance_used": false
+    },
+    "service_order_exact": true,
+    "service_tie_partition_exact": true,
+    "hit_metrics_exact": true,
+    "outside_whitelist_differences": [],
+    "t028_flags": {
+      "status": "NOT_PERFORMED",
+      "pass": null,
+      "required": [
+        "M1-M6",
+        "M0/primary/multi",
+        "wrong_OK",
+        "P0",
+        "N/A/reason"
+      ],
+      "k": [
+        1,
+        5
+      ],
+      "reason": "pure_record_comparator_has_no_verified_T028_graph_feature_row_bridge"
+    },
+    "threshold": {
+      "max_ulp_distance": 16,
+      "relative_numerator": 16,
+      "relative_denominator": 4503599627370496,
+      "combination": "AND",
+      "absolute_floor": null,
+      "zero_and_sign": "exact"
+    },
+    "numeric_summary": {
+      "status": "COMPUTED",
+      "matched_score_count": 179,
+      "nonexact_score_count": 179,
+      "max_ulp_distance": 41,
+      "max_ulp_rows": [
+        {
+          "kind": "operation",
+          "identity": "ts-config-service_GET /api/v1/configservice/configs/{configName}"
+        }
+      ],
+      "max_relative": 4.731118408006869e-15,
+      "max_relative_exact": {
+        "numerator": 41,
+        "denominator": 8666027028749113
+      },
+      "max_relative_rows": [
+        {
+          "kind": "operation",
+          "identity": "ts-config-service_GET /api/v1/configservice/configs/{configName}"
+        }
+      ],
+      "beyond_threshold_count": 126
+    },
+    "beyond_threshold_by_kind": {
+      "operation": 107,
+      "service": 19
+    },
+    "guard": {
+      "max_wall_s": 600,
+      "max_new_bytes": 157286400,
+      "elapsed_s": 39.82388889393769,
+      "last_measured_new_bytes": 30893030,
+      "peak_measured_new_bytes": 30893030,
+      "poll_s": 0.5,
+      "per_file_RLIMIT_FSIZE": 157286400,
+      "failure": null,
+      "quota_claimed": false,
+      "note": "logical file sizes; polling can overshoot; partial failures are retained"
+    },
+    "source": "failed-case/roundoff-comparison.json"
+  },
+  "all_case_contracts_passed": false,
+  "A_prime_ready": false,
+  "no_retry_no_skip_no_tolerance_increase": true,
+  "limits": "Partial cohort; not_run means no result. T028 flags not checked for failed case. No numerical drift or physical cause identified."
+}

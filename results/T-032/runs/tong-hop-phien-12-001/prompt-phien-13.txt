@@ -1,0 +1,28 @@
+Đọc AGENTS.md, làm tiếp T-032 theo mục cuối của LOG (mục "Phiên 12 (tiếp) — Minh duyệt chạy hết; prompt cho phiên 13").
+
+Vai trò: Claude là người làm của T-032; Codex là người phản biện. T-032 đang "chờ phản biện"; phiên này chạy nốt các phép kiểm đã được Minh duyệt, đọc tay nốt, cập nhật báo cáo, rồi soạn lại prompt cho Codex.
+
+ĐÃ DUYỆT SẴN (lời Minh ngày 11/10/2026, ghi nguyên văn ở mục LOG nêu trên). Không dừng chờ duyệt cho bất kỳ việc nào dưới đây; làm được thì làm luôn, xong việc này sang việc kế:
+1. EC2 (3.26.62.217, key D:/RCA-ext/keys/key2.pem, chỉ ghi trong ~/rca/T-032/): KT-1, KT-2, KT-12, nửa TraceRCA của KT-8, và bảng nối theo cây span cho nhánh ghép của MicroRank (mo15c1, mo1p50c1) để biết thao tác cao nhất của thực thể đứng đầu có gắn với root không. Mô tả từng phép ở results/T-032/kiem-tiep.md.
+2. Laptop: KT-9 (CIRCA) với nhánh giữ nguyên và hai biến thể: học trên toàn bộ đoạn nền thay vì 111 điểm; chấm 10 điểm ngay sau mốc thay vì 10 điểm cuối cửa sổ. Đây là nhánh chẩn đoán, không đổi số đã chấm.
+3. Đọc tay hết: 68 đơn vị sai còn lại (116 chưa đọc trừ 48 đơn vị không chạy được cùng lý do; 48 đơn vị đó ghi một dòng theo lý do). Phiếu đọc sinh bằng results/T-032/scripts/tong_hop_v1.py và phieu_gon_v1.py (sửa thành bản mới để in phiếu cho mọi đơn vị sai).
+4. Sửa chữ: câu "khớp với H4, H7" về `frontend` trong ket-qua-phien-12.md, kiem-tiep.md (KT-3) và nguyen-nhan-xep-hang.md (mục 5.1), thay bằng kết quả kiểm theo tên thao tác đã có (thao tác cao nhất của `frontend` là lời gọi tới root ở 3/14 ca với luật của bài và 3/11 ca với luật của code), rồi thay tiếp bằng kết quả bảng nối theo cây span khi có.
+5. Ghi sổ, không cần trình lại chữ: nối Q-141 vào docs/DECISIONS.md (chép nguyên văn hai lời duyệt của Minh trong mục LOG nêu trên, kèm phạm vi Claude đã và sẽ chạy), nối WHY-48 vào docs/WHY.md cho thiet-ke-phep-doi-012.md và các thiết kế mới của phiên này (đủ các mục: chọn, vì sao, phương án đã xét, bằng chứng, giới hạn, kết luận phụ thuộc). Kiểm mã cuối trước khi ghi; mã đã bị dùng thì lấy mã kế.
+6. Cập nhật mọi file đầu ra của T-032 trong results/T-032/, LOG của task, riêng dòng T-032 của docs/STATE.md.
+
+THỨ TỰ (việc độc lập chạy song song, việc phụ thuộc chạy tuần tự):
+a. Mở phiên theo AGENTS mục 6. Kiểm file thật: py -3 -B -X utf8 results/T-032/scripts/self_check_phien12_v2.py results/T-032 <file kết quả mới> phải in "A: 46 claims, mismatch 0" và "D: 15 claims, mismatch 0". Kiểm EC2 kết nối được, không tiến trình T-032; đo RAM laptop.
+b. Viết MỘT file thiết kế (thiet-ke-phep-doi-013.md) cho mọi phép ở mục 1 và 2 TRƯỚC khi chạy: bước bị đổi, thứ giữ cố định, dự đoán phân biệt, mốc đọc, mẫu số, điều đã thấy trước. Rồi ghi Q-141, WHY-48.
+c. Khởi chạy nền trên EC2 các phép độc lập (KT-1, KT-2, KT-12, KT-8 nửa TraceRCA). Bảng nối cho nhánh ghép cần tập trace bất thường của nhánh ghép: dựng lại trên EC2 từ bảng span đã lưu theo đúng luật của laptop_contrast_v7.py, và kiểm số trace bất thường trùng số đã lưu ở runs/microrank-kt3-001 trước khi dùng.
+d. Song song, chạy KT-9 trên laptop (đọc src/circa_kien_truc/scoring.py và laptop_contrast_v7.py để đặt lớp bọc; nhánh giữ nguyên phải khớp bản đóng băng từng bit ở 30/30 ca).
+e. Trong lúc máy chạy: đọc tay 68 đơn vị, viết tiếp vào doc-tay.md theo từng phương pháp, ghi ngay ra file sau mỗi phương pháp.
+f. Thu kết quả, viết ket-qua-phien-13.md, cập nhật kiem-tiep.md, nguyen-nhan-xep-hang.md, doc-tay.md, bao-phu-nhom.json (chỉ trường trạng thái đọc), các JSON đầu ra nếu đổi.
+g. Tự soát số (mở rộng script tự soát thành bản mới), soát câu viết quá tay, đối chiếu năm đầu ra P4 và tiêu chí xong của SPEC, DT18 và hướng dẫn của cô (docs/reference/sources/). Cập nhật STATE "chờ phản biện", ghi mục kết thúc phiên vào LOG, soạn lại prompt cho Codex theo docs/review-prompt.md (chép nguyên văn, chỉ điền thông tin trung tính, có tên ket-qua-phien-12.md, ket-qua-phien-13.md).
+
+CHỈ DỪNG BÁO Ở CÁC TRƯỜNG HỢP SAU (ngoài ra không dừng): nhánh giữ nguyên lệch bản đóng băng (dừng riêng phép đó, làm tiếp phép khác); RAM laptop 95% (chuyển phần chỉ-đọc sang EC2, chờ rồi chạy lại phần phải chạy trên laptop); vượt 12 GiB tổng hoặc 4 GiB laptop; cùng một chỗ hỏng 3 lần (ghi lại, làm tiếp việc khác); cần mở test hoặc data/locked; cần ghi ngoài results/T-032/, LOG của task, dòng T-032 của STATE, và hai dòng sổ ở mục 5. Mốc "một lượt quá 1 giờ" áp cho từng lượt máy, không áp cho cả phiên; ước lượng phải dựa trên thời gian đã đo của lượt tương tự.
+
+KHÔNG LÀM: subagent; sửa src/, dữ liệu, môi trường, số đã chấm, SPEC; đụng T-033; mở test; commit; định nghĩa nhãn lan; đánh giá phương pháp đồ thị mới.
+
+CÁCH LÀM: mỗi phép có nhánh giữ nguyên hoặc tự kiểm với nguồn đã có; giữ mọi lượt kể cả hỏng; số trong văn bản lấy từ file kết quả kèm con trỏ. Kết quả bất lợi cho hướng đồ thị ghi đúng như thấy. Dự đoán không đạt thì ghi không đạt. Mục nào không làm được trọn: ghi đã thử gì, kết quả từng lần thử, bằng chứng còn thiếu, việc cần làm tiếp; "thiếu môi trường", "ngoài phạm vi" không phải lý do nếu chưa ghi các lần thử. Không đưa phỏng đoán chưa kiểm vào báo cáo khi có cách kiểm rẻ: kiểm trước rồi mới viết. Ưu tiên mọi hướng cho câu hỏi nghiên cứu, bảo vệ trước giảng viên tốt nhất có thể; hạn chế của dataset hay thuật toán thì chấp nhận và ghi rõ.
+
+CUỐI PHIÊN báo ngắn, dễ hiểu: đã làm gì; tích cực hay tiêu cực; còn gì tồn đọng kèm lý do cụ thể; điều cần Minh quyết kèm ưu, nhược khi đứng trước giảng viên.

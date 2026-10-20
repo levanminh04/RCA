@@ -1,0 +1,56 @@
+# MicroRank laptop exact — 52 ca
+
+| Dataset | Ca | Nguồn | Laptop | Trạng thái | Cặp điểm | max ULP | max tương đối |
+|---|---|---|---|---|---:|---:|---:|
+| Nezha-OB | dev-14701a3bbb | OK | OK | exact | 65 | 0 | 0.0 |
+| Nezha-OB | dev-1ac905bc95 | OK | OK | exact | 65 | 0 | 0.0 |
+| Nezha-OB | dev-27252dca60 | OK | OK | exact | 65 | 0 | 0.0 |
+| Nezha-OB | dev-2bfc97b01e | OK | OK | exact | 65 | 0 | 0.0 |
+| Nezha-OB | dev-396c8dbf7d | OK | OK | exact | 65 | 0 | 0.0 |
+| Nezha-OB | dev-3b92690644 | OK | OK | exact | 65 | 0 | 0.0 |
+| Nezha-OB | dev-3e27669440 | OK | OK | exact | 65 | 0 | 0.0 |
+| Nezha-OB | dev-515c5f2190 | OK | OK | exact | 65 | 0 | 0.0 |
+| Nezha-OB | dev-5467884de4 | OK | OK | exact | 65 | 0 | 0.0 |
+| Nezha-OB | dev-55f99f3e0a | OK | OK | exact | 52 | 0 | 0.0 |
+| Nezha-OB | dev-5ada15752d | OK | OK | exact | 65 | 0 | 0.0 |
+| Nezha-OB | dev-607751ac0a | OK | OK | exact | 65 | 0 | 0.0 |
+| Nezha-OB | dev-63c30faf34 | OK | N/A | other_error | N/A | N/A | N/A |
+| Nezha-OB | dev-6c9afc9822 | OK | N/A | not_run | N/A | N/A | N/A |
+| Nezha-OB | dev-70629373f9 | OK | N/A | not_run | N/A | N/A | N/A |
+| Nezha-OB | dev-7b7c973198 | OK | N/A | not_run | N/A | N/A | N/A |
+| Nezha-OB | dev-7d3c2fe6d1 | OK | N/A | not_run | N/A | N/A | N/A |
+| Nezha-OB | dev-8ecd9880ed | OK | N/A | not_run | N/A | N/A | N/A |
+| Nezha-OB | dev-95e164235f | OK | N/A | not_run | N/A | N/A | N/A |
+| Nezha-OB | dev-9b9397a4dc | OK | N/A | not_run | N/A | N/A | N/A |
+| Nezha-OB | dev-9fd793feb7 | OK | N/A | not_run | N/A | N/A | N/A |
+| Nezha-OB | dev-b0f8b2e3ac | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-03d4910932 | ERROR | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-12a1a88069 | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-14372e1209 | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-16597725c1 | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-16870e660c | ERROR | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-1e6d61b5ec | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-20acb4402d | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-260d332c8d | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-3ae0a6c15a | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-3defe3d34b | OK | OK | exact | 179 | 0 | 0.0 |
+| RE2-TT | dev-4e68956051 | ERROR | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-4f8a844308 | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-57546fd87b | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-59f696a169 | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-746fd74313 | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-7f1b6b071d | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-8017c6dc70 | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-98bc73c499 | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-a505ab3f65 | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-a5cabe5fa7 | ERROR | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-a915aa2424 | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-b8bd0abf60 | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-ba831dbeb8 | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-bcbd4f46ae | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-db293894ab | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-de89e2f9e9 | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-f36d0647d5 | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-f81f88234e | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-f9a8e05ed7 | OK | N/A | not_run | N/A | N/A | N/A |
+| RE2-TT | dev-fbc45b0c67 | OK | N/A | not_run | N/A | N/A | N/A |

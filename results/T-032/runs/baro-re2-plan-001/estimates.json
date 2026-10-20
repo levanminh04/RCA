@@ -1,0 +1,1065 @@
+{
+  "status": "ESTIMATE_NOT_MEASURED_QUEUE",
+  "basis": {
+    "pilot_check": {
+      "status": "PASS",
+      "directory": "/home/ubuntu/rca/T-032/runs/baro-re2-first-001",
+      "source": {
+        "method": "baro",
+        "variant": "native",
+        "seed": null,
+        "opaque_id": "dev-03d4910932",
+        "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-03d4910932-sNone-h0-cbbe5c/ban-ghi-0.json",
+        "sha256": "e17f6aa258571e7bfc57768207c8b7dfc2d3695e9848a68e58f25614387fe476",
+        "source_run": "results/T-024/runs/baro-30-001",
+        "source_config": "results/T-024/runs/baro-30-001/cau-hinh.json",
+        "source_config_sha256": "af9464b89c3f6c159eb8d6039716107bbdf23873a677aebce19761f31bf87006",
+        "src_p3_sha256": "8d4cc8196c87ee566d717cab184c3177a5d5d6685550b232f8b08b932420a12c"
+      },
+      "check": {
+        "path": "/home/ubuntu/rca/T-032/runs/baro-re2-first-001/check.json",
+        "sha256": "eb624864ce1cf511e9af52cf9230b3391be7b89dddc1060faf8332bfe078294b",
+        "bytes": 689050,
+        "allocated_bytes": 692224
+      },
+      "artifact_manifest_sha256": "a763505c191bec3b1842c6aa5b560cddab5cf73e3442c4041dc099b19575d4a2",
+      "n_artifacts_including_check": 2857,
+      "logical_bytes": 9832647,
+      "allocated_file_bytes": 18489344,
+      "verification_s": 0.400761058088392,
+      "capture_check": {
+        "pass": true,
+        "native_adapter_keys_exact": true,
+        "scalers_checked": 564,
+        "score_count": 282,
+        "basis": "existing worker check plus full byte-manifest verification; no duplicate restoration"
+      }
+    },
+    "pilot_monitor": {
+      "path": "/home/ubuntu/rca/T-032/runs/baro-re2-first-001-monitor/status.json",
+      "json_pointer": ""
+    },
+    "pilot_supervisor_elapsed_s": 17.202193479985,
+    "pilot_supervisor_peak_tree_rss_bytes": 556810240,
+    "controller_rss_observed_during_prepare_bytes": 508317696,
+    "source_verification_s_measured": 0.24297715758439153,
+    "pilot_scale_inputs": {
+      "raw_metric_cells": 216600,
+      "processed_metric_cells": 169200,
+      "metric_cols": 361,
+      "processed_metric_cols": 282,
+      "frozen_wall_s": 9.454
+    }
+  },
+  "formula": "time=max(1, raw/processed metric-cell ratios, kept-column ratio, frozen-cost ratio) * (pilot supervisor wall + independent artifact verification) + average source-check time; bytes/worker RSS scale by shape ratios",
+  "base_remaining": {
+    "cases": 29,
+    "wall_s": 630.4710919945304,
+    "logical_bytes": 289814291,
+    "allocated_file_bytes": 544967813,
+    "estimated_controller_plus_worker_rss_bytes": 1086721685
+  },
+  "operating_envelope_estimate": {
+    "factor": 2,
+    "wall_s": 1260.9421839890608,
+    "logical_bytes": 579628582,
+    "allocated_file_bytes": 1089935626,
+    "controller_plus_worker_rss_bytes": 2173443370,
+    "note": "A declared unverified 2x engineering allowance, not a guaranteed bound or a method threshold; root reviews before launch."
+  },
+  "limits": [
+    "One pilot cannot establish worst-case runtime/RAM or failure probability.",
+    "Captured file allocated bytes exclude directory-block overhead; controller logs/plans add bytes.",
+    "Frozen source cost was measured elsewhere and may scale differently on EC2.",
+    "Local result copies also consume the 8 GiB new-byte budget; supervisor applies root's local reservation.",
+    "No hard budget is set here; the outer run_guarded process enforces the authorized wall/disk/RAM limits."
+  ],
+  "cases": [
+    {
+      "opaque_id": "dev-12a1a88069",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-12a1a88069-sNone-h0-23307e/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-12a1a88069-sNone-h0-23307e/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-12a1a88069-sNone-h0-23307e/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-12a1a88069-sNone-h0-23307e/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 222600,
+        "processed_metric_cells": 170400,
+        "metric_cols": 371,
+        "processed_metric_cols": 284,
+        "frozen_wall_s": 9.7
+      },
+      "shape_factor": 1.0277008310249307,
+      "time_factor": 1.0277008310249307,
+      "estimated_worker_and_verification_s": 18.098670245858248,
+      "estimated_logical_bytes": 10105020,
+      "estimated_allocated_file_bytes": 19001515,
+      "estimated_worker_peak_rss_bytes": 572234347
+    },
+    {
+      "opaque_id": "dev-14372e1209",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-14372e1209-sNone-h0-9b694a/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-14372e1209-sNone-h0-9b694a/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-14372e1209-sNone-h0-9b694a/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-14372e1209-sNone-h0-9b694a/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 217800,
+        "processed_metric_cells": 169800,
+        "metric_cols": 363,
+        "processed_metric_cols": 283,
+        "frozen_wall_s": 9.832
+      },
+      "shape_factor": 1.005540166204986,
+      "time_factor": 1.0399830759466893,
+      "estimated_worker_and_verification_s": 18.314874044841446,
+      "estimated_logical_bytes": 9887122,
+      "estimated_allocated_file_bytes": 18591779,
+      "estimated_worker_peak_rss_bytes": 559895062
+    },
+    {
+      "opaque_id": "dev-16597725c1",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-16597725c1-sNone-h0-b83c52/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-16597725c1-sNone-h0-b83c52/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-16597725c1-sNone-h0-b83c52/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-16597725c1-sNone-h0-b83c52/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 220200,
+        "processed_metric_cells": 172800,
+        "metric_cols": 367,
+        "processed_metric_cols": 288,
+        "frozen_wall_s": 9.811
+      },
+      "shape_factor": 1.0212765957446808,
+      "time_factor": 1.0377617939496508,
+      "estimated_worker_and_verification_s": 18.275772918831336,
+      "estimated_logical_bytes": 10041853,
+      "estimated_allocated_file_bytes": 18882735,
+      "estimated_worker_peak_rss_bytes": 568657267
+    },
+    {
+      "opaque_id": "dev-16870e660c",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-16870e660c-sNone-h0-fab858/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-16870e660c-sNone-h0-fab858/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-16870e660c-sNone-h0-fab858/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-16870e660c-sNone-h0-fab858/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 216600,
+        "processed_metric_cells": 172200,
+        "metric_cols": 361,
+        "processed_metric_cols": 287,
+        "frozen_wall_s": 10.064
+      },
+      "shape_factor": 1.0177304964539007,
+      "time_factor": 1.0645229532473026,
+      "estimated_worker_and_verification_s": 18.74684838933404,
+      "estimated_logical_bytes": 10006985,
+      "estimated_allocated_file_bytes": 18817170,
+      "estimated_worker_peak_rss_bytes": 566682762
+    },
+    {
+      "opaque_id": "dev-1e6d61b5ec",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-1e6d61b5ec-sNone-h0-ed1564/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-1e6d61b5ec-sNone-h0-ed1564/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-1e6d61b5ec-sNone-h0-ed1564/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-1e6d61b5ec-sNone-h0-ed1564/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 204000,
+        "processed_metric_cells": 162000,
+        "metric_cols": 340,
+        "processed_metric_cols": 270,
+        "frozen_wall_s": 20.122
+      },
+      "shape_factor": 1.0,
+      "time_factor": 2.1284112544954517,
+      "estimated_worker_and_verification_s": 37.47442578979334,
+      "estimated_logical_bytes": 9832647,
+      "estimated_allocated_file_bytes": 18489344,
+      "estimated_worker_peak_rss_bytes": 556810240
+    },
+    {
+      "opaque_id": "dev-20acb4402d",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-20acb4402d-sNone-h0-22e6bd/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-20acb4402d-sNone-h0-22e6bd/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-20acb4402d-sNone-h0-22e6bd/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-20acb4402d-sNone-h0-22e6bd/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 207000,
+        "processed_metric_cells": 161400,
+        "metric_cols": 345,
+        "processed_metric_cols": 269,
+        "frozen_wall_s": 22.916
+      },
+      "shape_factor": 1.0,
+      "time_factor": 2.4239475354347366,
+      "estimated_worker_and_verification_s": 42.67673750751886,
+      "estimated_logical_bytes": 9832647,
+      "estimated_allocated_file_bytes": 18489344,
+      "estimated_worker_peak_rss_bytes": 556810240
+    },
+    {
+      "opaque_id": "dev-260d332c8d",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-260d332c8d-sNone-h0-dbdbd7/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-260d332c8d-sNone-h0-dbdbd7/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-260d332c8d-sNone-h0-dbdbd7/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-260d332c8d-sNone-h0-dbdbd7/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 207000,
+        "processed_metric_cells": 158400,
+        "metric_cols": 345,
+        "processed_metric_cols": 264,
+        "frozen_wall_s": 20.475
+      },
+      "shape_factor": 1.0,
+      "time_factor": 2.1657499471123334,
+      "estimated_worker_and_verification_s": 38.1316970984394,
+      "estimated_logical_bytes": 9832647,
+      "estimated_allocated_file_bytes": 18489344,
+      "estimated_worker_peak_rss_bytes": 556810240
+    },
+    {
+      "opaque_id": "dev-3ae0a6c15a",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-3ae0a6c15a-sNone-h0-f83ef5/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-3ae0a6c15a-sNone-h0-f83ef5/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-3ae0a6c15a-sNone-h0-f83ef5/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-3ae0a6c15a-sNone-h0-f83ef5/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 222000,
+        "processed_metric_cells": 170400,
+        "metric_cols": 370,
+        "processed_metric_cols": 284,
+        "frozen_wall_s": 21.513
+      },
+      "shape_factor": 1.0249307479224377,
+      "time_factor": 2.2755447429659403,
+      "estimated_worker_and_verification_s": 40.064409898367494,
+      "estimated_logical_bytes": 10077783,
+      "estimated_allocated_file_bytes": 18950298,
+      "estimated_worker_peak_rss_bytes": 570691936
+    },
+    {
+      "opaque_id": "dev-3defe3d34b",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-3defe3d34b-sNone-h0-dfc9c4/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-3defe3d34b-sNone-h0-dfc9c4/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-3defe3d34b-sNone-h0-dfc9c4/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-3defe3d34b-sNone-h0-dfc9c4/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 221400,
+        "processed_metric_cells": 171600,
+        "metric_cols": 369,
+        "processed_metric_cols": 286,
+        "frozen_wall_s": 11.476
+      },
+      "shape_factor": 1.0221606648199446,
+      "time_factor": 1.2138777237148297,
+      "estimated_worker_and_verification_s": 21.375933623918307,
+      "estimated_logical_bytes": 10050545,
+      "estimated_allocated_file_bytes": 18899081,
+      "estimated_worker_peak_rss_bytes": 569149526
+    },
+    {
+      "opaque_id": "dev-4e68956051",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-4e68956051-sNone-h0-70526f/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-4e68956051-sNone-h0-70526f/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-4e68956051-sNone-h0-70526f/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-4e68956051-sNone-h0-70526f/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 214800,
+        "processed_metric_cells": 172800,
+        "metric_cols": 358,
+        "processed_metric_cols": 288,
+        "frozen_wall_s": 11.294
+      },
+      "shape_factor": 1.0212765957446808,
+      "time_factor": 1.1946266130738312,
+      "estimated_worker_and_verification_s": 21.03705719849739,
+      "estimated_logical_bytes": 10041853,
+      "estimated_allocated_file_bytes": 18882735,
+      "estimated_worker_peak_rss_bytes": 568657267
+    },
+    {
+      "opaque_id": "dev-4f8a844308",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-4f8a844308-sNone-h0-05dc03/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-4f8a844308-sNone-h0-05dc03/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-4f8a844308-sNone-h0-05dc03/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-4f8a844308-sNone-h0-05dc03/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 223800,
+        "processed_metric_cells": 171600,
+        "metric_cols": 373,
+        "processed_metric_cols": 286,
+        "frozen_wall_s": 9.876
+      },
+      "shape_factor": 1.0332409972299168,
+      "time_factor": 1.0446371906071503,
+      "estimated_worker_and_verification_s": 18.396800213624523,
+      "estimated_logical_bytes": 10159494,
+      "estimated_allocated_file_bytes": 19103949,
+      "estimated_worker_peak_rss_bytes": 575319168
+    },
+    {
+      "opaque_id": "dev-57546fd87b",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-57546fd87b-sNone-h0-3fb7f2/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-57546fd87b-sNone-h0-3fb7f2/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-57546fd87b-sNone-h0-3fb7f2/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-57546fd87b-sNone-h0-3fb7f2/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 214800,
+        "processed_metric_cells": 172200,
+        "metric_cols": 358,
+        "processed_metric_cols": 287,
+        "frozen_wall_s": 9.373
+      },
+      "shape_factor": 1.0177304964539007,
+      "time_factor": 1.0177304964539007,
+      "estimated_worker_and_verification_s": 17.923162899675024,
+      "estimated_logical_bytes": 10006985,
+      "estimated_allocated_file_bytes": 18817170,
+      "estimated_worker_peak_rss_bytes": 566682762
+    },
+    {
+      "opaque_id": "dev-59f696a169",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-59f696a169-sNone-h0-db76fe/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-59f696a169-sNone-h0-db76fe/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-59f696a169-sNone-h0-db76fe/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-59f696a169-sNone-h0-db76fe/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 220200,
+        "processed_metric_cells": 169800,
+        "metric_cols": 367,
+        "processed_metric_cols": 283,
+        "frozen_wall_s": 8.611
+      },
+      "shape_factor": 1.0166204986149585,
+      "time_factor": 1.0166204986149585,
+      "estimated_worker_and_verification_s": 17.903623658178766,
+      "estimated_logical_bytes": 9996071,
+      "estimated_allocated_file_bytes": 18796647,
+      "estimated_worker_peak_rss_bytes": 566064704
+    },
+    {
+      "opaque_id": "dev-746fd74313",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-746fd74313-sNone-h0-7cac1b/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-746fd74313-sNone-h0-7cac1b/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-746fd74313-sNone-h0-7cac1b/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-746fd74313-sNone-h0-7cac1b/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 222600,
+        "processed_metric_cells": 170400,
+        "metric_cols": 371,
+        "processed_metric_cols": 284,
+        "frozen_wall_s": 9.069
+      },
+      "shape_factor": 1.0277008310249307,
+      "time_factor": 1.0277008310249307,
+      "estimated_worker_and_verification_s": 18.098670245858248,
+      "estimated_logical_bytes": 10105020,
+      "estimated_allocated_file_bytes": 19001515,
+      "estimated_worker_peak_rss_bytes": 572234347
+    },
+    {
+      "opaque_id": "dev-7f1b6b071d",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-7f1b6b071d-sNone-h0-b833aa/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-7f1b6b071d-sNone-h0-b833aa/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-7f1b6b071d-sNone-h0-b833aa/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-7f1b6b071d-sNone-h0-b833aa/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 216600,
+        "processed_metric_cells": 171000,
+        "metric_cols": 361,
+        "processed_metric_cols": 285,
+        "frozen_wall_s": 9.286
+      },
+      "shape_factor": 1.0106382978723405,
+      "time_factor": 1.0106382978723405,
+      "estimated_worker_and_verification_s": 17.798319250468833,
+      "estimated_logical_bytes": 9937250,
+      "estimated_allocated_file_bytes": 18686040,
+      "estimated_worker_peak_rss_bytes": 562733754
+    },
+    {
+      "opaque_id": "dev-8017c6dc70",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-8017c6dc70-sNone-h0-b7d8f1/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-8017c6dc70-sNone-h0-b7d8f1/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-8017c6dc70-sNone-h0-b7d8f1/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-8017c6dc70-sNone-h0-b7d8f1/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 204000,
+        "processed_metric_cells": 161400,
+        "metric_cols": 340,
+        "processed_metric_cols": 269,
+        "frozen_wall_s": 9.193
+      },
+      "shape_factor": 1.0,
+      "time_factor": 1.0,
+      "estimated_worker_and_verification_s": 17.61105377665954,
+      "estimated_logical_bytes": 9832647,
+      "estimated_allocated_file_bytes": 18489344,
+      "estimated_worker_peak_rss_bytes": 556810240
+    },
+    {
+      "opaque_id": "dev-98bc73c499",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-98bc73c499-sNone-h0-de6480/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-98bc73c499-sNone-h0-de6480/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-98bc73c499-sNone-h0-de6480/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-98bc73c499-sNone-h0-de6480/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 221400,
+        "processed_metric_cells": 171600,
+        "metric_cols": 369,
+        "processed_metric_cols": 286,
+        "frozen_wall_s": 10.078
+      },
+      "shape_factor": 1.0221606648199446,
+      "time_factor": 1.066003807911995,
+      "estimated_worker_and_verification_s": 18.772915806674114,
+      "estimated_logical_bytes": 10050545,
+      "estimated_allocated_file_bytes": 18899081,
+      "estimated_worker_peak_rss_bytes": 569149526
+    },
+    {
+      "opaque_id": "dev-a505ab3f65",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-a505ab3f65-sNone-h0-2075b5/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-a505ab3f65-sNone-h0-2075b5/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-a505ab3f65-sNone-h0-2075b5/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-a505ab3f65-sNone-h0-2075b5/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 222600,
+        "processed_metric_cells": 169800,
+        "metric_cols": 371,
+        "processed_metric_cols": 283,
+        "frozen_wall_s": 11.037
+      },
+      "shape_factor": 1.0277008310249307,
+      "time_factor": 1.16744235244341,
+      "estimated_worker_and_verification_s": 20.558533894468948,
+      "estimated_logical_bytes": 10105020,
+      "estimated_allocated_file_bytes": 19001515,
+      "estimated_worker_peak_rss_bytes": 572234347
+    },
+    {
+      "opaque_id": "dev-a5cabe5fa7",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-a5cabe5fa7-sNone-h0-5a663b/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-a5cabe5fa7-sNone-h0-5a663b/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-a5cabe5fa7-sNone-h0-5a663b/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-a5cabe5fa7-sNone-h0-5a663b/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 215400,
+        "processed_metric_cells": 170400,
+        "metric_cols": 359,
+        "processed_metric_cols": 284,
+        "frozen_wall_s": 8.539
+      },
+      "shape_factor": 1.0070921985815602,
+      "time_factor": 1.0070921985815602,
+      "estimated_worker_and_verification_s": 17.73589742586573,
+      "estimated_logical_bytes": 9902383,
+      "estimated_allocated_file_bytes": 18620475,
+      "estimated_worker_peak_rss_bytes": 560759249
+    },
+    {
+      "opaque_id": "dev-a915aa2424",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-a915aa2424-sNone-h0-714b10/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-a915aa2424-sNone-h0-714b10/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-a915aa2424-sNone-h0-714b10/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-a915aa2424-sNone-h0-714b10/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 220800,
+        "processed_metric_cells": 169800,
+        "metric_cols": 368,
+        "processed_metric_cols": 283,
+        "frozen_wall_s": 10.191
+      },
+      "shape_factor": 1.0193905817174516,
+      "time_factor": 1.0779564205627248,
+      "estimated_worker_and_verification_s": 18.983317103776113,
+      "estimated_logical_bytes": 10023308,
+      "estimated_allocated_file_bytes": 18847864,
+      "estimated_worker_peak_rss_bytes": 567607115
+    },
+    {
+      "opaque_id": "dev-b8bd0abf60",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-b8bd0abf60-sNone-h0-b7738b/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-b8bd0abf60-sNone-h0-b7738b/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-b8bd0abf60-sNone-h0-b7738b/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-b8bd0abf60-sNone-h0-b7738b/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 225000,
+        "processed_metric_cells": 170400,
+        "metric_cols": 375,
+        "processed_metric_cols": 284,
+        "frozen_wall_s": 11.36
+      },
+      "shape_factor": 1.0387811634349031,
+      "time_factor": 1.2016077850645228,
+      "estimated_worker_and_verification_s": 21.159946451672006,
+      "estimated_logical_bytes": 10213969,
+      "estimated_allocated_file_bytes": 19206383,
+      "estimated_worker_peak_rss_bytes": 578403989
+    },
+    {
+      "opaque_id": "dev-ba831dbeb8",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-ba831dbeb8-sNone-h0-3d9c16/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-ba831dbeb8-sNone-h0-3d9c16/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-ba831dbeb8-sNone-h0-3d9c16/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-ba831dbeb8-sNone-h0-3d9c16/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 220800,
+        "processed_metric_cells": 171000,
+        "metric_cols": 368,
+        "processed_metric_cols": 285,
+        "frozen_wall_s": 9.523
+      },
+      "shape_factor": 1.0193905817174516,
+      "time_factor": 1.0193905817174516,
+      "estimated_worker_and_verification_s": 17.952385305098634,
+      "estimated_logical_bytes": 10023308,
+      "estimated_allocated_file_bytes": 18847864,
+      "estimated_worker_peak_rss_bytes": 567607115
+    },
+    {
+      "opaque_id": "dev-bcbd4f46ae",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-bcbd4f46ae-sNone-h0-05442c/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-bcbd4f46ae-sNone-h0-05442c/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-bcbd4f46ae-sNone-h0-05442c/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-bcbd4f46ae-sNone-h0-05442c/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 216600,
+        "processed_metric_cells": 169200,
+        "metric_cols": 361,
+        "processed_metric_cols": 282,
+        "frozen_wall_s": 9.134
+      },
+      "shape_factor": 1.0,
+      "time_factor": 1.0,
+      "estimated_worker_and_verification_s": 17.61105377665954,
+      "estimated_logical_bytes": 9832647,
+      "estimated_allocated_file_bytes": 18489344,
+      "estimated_worker_peak_rss_bytes": 556810240
+    },
+    {
+      "opaque_id": "dev-db293894ab",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-db293894ab-sNone-h0-56c980/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-db293894ab-sNone-h0-56c980/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-db293894ab-sNone-h0-56c980/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-db293894ab-sNone-h0-56c980/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 216000,
+        "processed_metric_cells": 172200,
+        "metric_cols": 360,
+        "processed_metric_cols": 287,
+        "frozen_wall_s": 9.219
+      },
+      "shape_factor": 1.0177304964539007,
+      "time_factor": 1.0177304964539007,
+      "estimated_worker_and_verification_s": 17.923162899675024,
+      "estimated_logical_bytes": 10006985,
+      "estimated_allocated_file_bytes": 18817170,
+      "estimated_worker_peak_rss_bytes": 566682762
+    },
+    {
+      "opaque_id": "dev-de89e2f9e9",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-de89e2f9e9-sNone-h0-bb8481/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-de89e2f9e9-sNone-h0-bb8481/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-de89e2f9e9-sNone-h0-bb8481/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-de89e2f9e9-sNone-h0-bb8481/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 219600,
+        "processed_metric_cells": 160200,
+        "metric_cols": 366,
+        "processed_metric_cols": 267,
+        "frozen_wall_s": 9.256
+      },
+      "shape_factor": 1.0138504155124655,
+      "time_factor": 1.0138504155124655,
+      "estimated_worker_and_verification_s": 17.854862011258895,
+      "estimated_logical_bytes": 9968834,
+      "estimated_allocated_file_bytes": 18745430,
+      "estimated_worker_peak_rss_bytes": 564522294
+    },
+    {
+      "opaque_id": "dev-f36d0647d5",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-f36d0647d5-sNone-h0-d73bb4/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-f36d0647d5-sNone-h0-d73bb4/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-f36d0647d5-sNone-h0-d73bb4/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-f36d0647d5-sNone-h0-d73bb4/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 223800,
+        "processed_metric_cells": 170400,
+        "metric_cols": 373,
+        "processed_metric_cols": 284,
+        "frozen_wall_s": 9.689
+      },
+      "shape_factor": 1.0332409972299168,
+      "time_factor": 1.0332409972299168,
+      "estimated_worker_and_verification_s": 18.196193539697987,
+      "estimated_logical_bytes": 10159494,
+      "estimated_allocated_file_bytes": 19103949,
+      "estimated_worker_peak_rss_bytes": 575319168
+    },
+    {
+      "opaque_id": "dev-f81f88234e",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-f81f88234e-sNone-h0-ed16f9/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-f81f88234e-sNone-h0-ed16f9/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-f81f88234e-sNone-h0-ed16f9/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-f81f88234e-sNone-h0-ed16f9/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 215400,
+        "processed_metric_cells": 169800,
+        "metric_cols": 359,
+        "processed_metric_cols": 283,
+        "frozen_wall_s": 9.888
+      },
+      "shape_factor": 1.00354609929078,
+      "time_factor": 1.045906494605458,
+      "estimated_worker_and_verification_s": 18.419143714201727,
+      "estimated_logical_bytes": 9867515,
+      "estimated_allocated_file_bytes": 18554910,
+      "estimated_worker_peak_rss_bytes": 558784745
+    },
+    {
+      "opaque_id": "dev-f9a8e05ed7",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-f9a8e05ed7-sNone-h0-43732b/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-f9a8e05ed7-sNone-h0-43732b/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-f9a8e05ed7-sNone-h0-43732b/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-f9a8e05ed7-sNone-h0-43732b/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 219000,
+        "processed_metric_cells": 162600,
+        "metric_cols": 365,
+        "processed_metric_cols": 271,
+        "frozen_wall_s": 11.629
+      },
+      "shape_factor": 1.0110803324099722,
+      "time_factor": 1.2300613496932513,
+      "estimated_worker_and_verification_s": 21.660813256277645,
+      "estimated_logical_bytes": 9941596,
+      "estimated_allocated_file_bytes": 18694213,
+      "estimated_worker_peak_rss_bytes": 562979883
+    },
+    {
+      "opaque_id": "dev-fbc45b0c67",
+      "source_pointers": {
+        "input_shape": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-fbc45b0c67-sNone-h0-c1d73b/ban-ghi-0.json",
+          "json_pointer": "/input_shape"
+        },
+        "window": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-fbc45b0c67-sNone-h0-c1d73b/ban-ghi-0.json",
+          "json_pointer": "/window"
+        },
+        "cost": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-fbc45b0c67-sNone-h0-c1d73b/ban-ghi-0.json",
+          "json_pointer": "/cost"
+        },
+        "input_sha256": {
+          "path": "results/T-024/runs/baro-30-001/luot/baro-a-dev-fbc45b0c67-sNone-h0-c1d73b/ban-ghi-0.json",
+          "json_pointer": "/input_sha256"
+        }
+      },
+      "scale_inputs": {
+        "raw_metric_cells": 214800,
+        "processed_metric_cells": 171600,
+        "metric_cols": 358,
+        "processed_metric_cols": 286,
+        "frozen_wall_s": 11.658
+      },
+      "shape_factor": 1.0141843971631206,
+      "time_factor": 1.233128834355828,
+      "estimated_worker_and_verification_s": 21.71481004933922,
+      "estimated_logical_bytes": 9972118,
+      "estimated_allocated_file_bytes": 18751605,
+      "estimated_worker_peak_rss_bytes": 564708258
+    }
+  ]
+}

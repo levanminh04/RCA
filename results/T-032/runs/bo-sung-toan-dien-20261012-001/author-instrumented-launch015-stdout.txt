@@ -1,0 +1,156 @@
+218636
+# T-016: bản sửa TORAI. Chép nguyên văn RCAEval/e2e/torai.py ở RCAEval 259ea4167160256a74ad30004aa3d96a998c846e
+# (giấy phép MIT, tác giả Luan Pham và cộng sự), chỉ đổi đúng hai chỗ, đánh dấu "T-016 sửa":
+#   (A) bỏ lần giảm mẫu metric thứ hai trong _rcd_multimodal (dòng 29 bản gốc);
+#   (B) ghép metric với logts theo vị trí trong từng nửa normal/anomal, thay cho concat theo chỉ số (dòng 47-48 bản gốc).
+# Hai cờ sua_giam_mau, sua_ghep (mặc định True) để chạy biến thể chỉ (A). Đặt cả hai False thì giống hệt bản gốc.
+# Mọi hàm khác (preprocess, run_multi_phase, ...) vẫn import từ RCAEval, không chép.
+import warnings
+
+warnings.filterwarnings("ignore")
+
+import numpy as np
+import pandas as pd
+from sklearn.mixture import GaussianMixture
+from sklearn.preprocessing import StandardScaler
+
+from RCAEval.io.time_series import convert_mem_mb, drop_constant, drop_time, preprocess
+
+from RCAEval.e2e.rcd import (
+    _match_columns,
+    add_fnode_and_concat,
+    run_multi_phase,
+)
+
+
+F_NODE = "F-node"
+
+
+def _rcd_multimodal(data, inject_time, dataset=None, gamma=5, localized=True, bins=5, verbose=False,
+                    sua_giam_mau=True, sua_ghep=True, **kwargs):
+    """RCD variant that accepts multimodal dict input (metric + logts).
+    Ported from cfm/e2e/rcd.py multimodal branch."""
+    metric = data["metric"]
+    logts = data["logts"]
+
+    # === metric ===
+    # T-016 sửa (A): torai() đã giảm mẫu metric còn 15 s (dòng 81 bản gốc) và truyền metric đã giảm vào đây
+    # (dòng 295 bản gốc); bản gốc giảm thêm một lần nữa ở đây (dòng 29), còn một điểm mỗi 225 s.
+    if not sua_giam_mau:
+        metric = metric.iloc[::15, :]
+
+    normal_metric = metric[metric["time"] < inject_time]
+    anomal_metric = metric[metric["time"] >= inject_time]
+    normal_metric = preprocess(data=normal_metric, dataset=dataset, dk_select_useful=False)
+    anomal_metric = preprocess(data=anomal_metric, dataset=dataset, dk_select_useful=False)
+    intersect = [x for x in normal_metric.columns if x in anomal_metric.columns]
+    normal_metric = normal_metric[intersect]
+    anomal_metric = anomal_metric[intersect]
+
+    normal_data = normal_metric
+    anomal_data = anomal_metric
+
+    # == logts ==
+    logts = drop_constant(logts)
+    normal_logts = logts[logts["time"] < inject_time].drop(columns=["time"])
+    anomal_logts = logts[logts["time"] >= inject_time].drop(columns=["time"])
+
+    if sua_ghep:
+        # T-016 sửa (B): metric giữ chỉ số dòng gốc (0, 15, 30, ...), logts có chỉ số 0..n-1, nên concat(axis=1)
+        # của bản gốc ghép sai dòng và thêm dòng giả (điền 0 ở dưới). Ghép theo vị trí trong từng nửa:
+        # nửa normal giữ các dòng sát mốc (tail), nửa anomal giữ các dòng đầu (head), như main.py cắt cửa sổ.
+        n_n = min(len(normal_data), len(normal_logts))
+        n_a = min(len(anomal_data), len(anomal_logts))
+        normal_data = normal_data.tail(n_n).reset_index(drop=True)
+        normal_logts = normal_logts.tail(n_n).reset_index(drop=True)
+        anomal_data = anomal_data.head(n_a).reset_index(drop=True)
+        anomal_logts = anomal_logts.head(n_a).reset_index(drop=True)
+
+    normal_data = pd.concat([normal_data, normal_logts], axis=1)
+    anomal_data = pd.concat([anomal_data, anomal_logts], axis=1)
+
+    normal_data = normal_data.loc[:, ~normal_data.columns.duplicated()]
+    normal_data = normal_data.fillna(0)
+
+    anomal_data = anomal_data.loc[:, ~anomal_data.columns.duplicated()]
+    anomal_data = anomal_data.fillna(0)
+
+    normal_df = drop_constant(convert_mem_mb(drop_time(normal_data)))
+    anomal_df = drop_constant(convert_mem_mb(drop_time(anomal_data)))
+
+    normal_df, anomal_df = _match_columns(normal_df, anomal_df)
+
+    df = add_fnode_and_concat(normal_df, anomal_df)
+    normal_df = df[df[F_NODE] == "0"].drop(columns=[F_NODE])
+    anomal_df = df[df[F_NODE] == "1"].drop(columns=[F_NODE])
+
+    rc = run_multi_phase(normal_df, anomal_df, gamma, localized, bins, verbose)
+    return {"ranks": rc}
+
+
+def torai(data, inject_time=None, dataset=None, num_loop=None, sli=None, anomalies=None, normalize=True, addup=False, borda=False, service=None, fault_type=None, case=None, rank=None,
+          sua_giam_mau=True, sua_ghep=True, **kwargs):
+    scaler_function = kwargs.get("scaler_function", StandardScaler)
+
+    metric = data["metric"]
+    logts = data["logts"]
+    traces_err = data.get("tracets_err", pd.DataFrame())
+    traces_lat = data.get("tracets_lat", pd.DataFrame())
+
+    has_traces = traces_err is not None and len(traces_err) > 0
+
+    # ==== PREPARE DATA ====
+    # the metric is sampled every second, resample for 15s
+    metric = metric.iloc[::15, :]
+
+    # == metric ==
+    normal_metric = metric[metric["time"] < inject_time]
+    anomal_metric = metric[metric["time"] >= inject_time]
+    normal_metric = preprocess(data=normal_metric, dataset=dataset, dk_select_useful=kwargs.get("dk_select_useful", False))
+    anomal_metric = preprocess(data=anomal_metric, dataset=dataset, dk_select_useful=kwargs.get("dk_select_useful", False))
+    intersect = [x for x in normal_metric.columns if x in anomal_metric.columns]
+    normal_metric = normal_metric[intersect]
+    anomal_metric = anomal_metric[intersect]
+
+    # == logts ==
+    logts = drop_constant(logts)
+    normal_logts = logts[logts["time"] < inject_time].drop(columns=["time"])
+    anomal_logts = logts[logts["time"] >= inject_time].drop(columns=["time"])
+
+    # == traces_err ==
+    if has_traces:
+        traces_err = traces_err.ffill()
+        traces_err = traces_err.fillna(0)
+        traces_err = drop_constant(traces_err)
+
+        normal_traces_err = traces_err[traces_err["time"] < inject_time].drop(columns=["time"])
+        anomal_traces_err = traces_err[traces_err["time"] >= inject_time].drop(columns=["time"])
+
+    # == traces_lat ==
+    if has_traces:
+        traces_lat = traces_lat.ffill()
+        traces_lat = traces_lat.fillna(0)
+        traces_lat = drop_constant(traces_lat)
+        normal_traces_lat = traces_lat[traces_lat["time"] < inject_time].drop(columns=["time"])
+        anomal_traces_lat = traces_lat[traces_lat["time"] >= inject_time].drop(columns=["time"])
+
+    # ==== PROCESS ====
+    ranks = []
+    metric_ranks = []
+    log_ranks = []
+    trace_err_ranks = []
+    trace_lat_ranks = []
+
+    # == metric ==
+    for col in normal_metric.columns:
+        a = normal_metric[col].to_numpy()
+        b = anomal_metric[col].to_numpy()
+
+        scaler = scaler_function().fit(a.reshape(-1, 1))
+        zscores = scaler.transform(b.reshape(-1, 1))[:, 0]
+        zscores = np.abs(zscores)
+        score = max(zscores)
+        metric_ranks.append((col, score))
+    metric_ranks = sorted(metric_ranks, key=lambda x: x[1], reverse=True)
+    metric_ranks = [(x[0], x[1] / sum([x[1] for x in metric_ranks])) for x in metric_ranks]
+    ranks = metric_ranks.copy()
