@@ -260,3 +260,237 @@ Phương pháp và đối chứng đã được cài và kiểm đầu vào, tru
 Code/revision, cấu hình, giả thuyết, độ đo, tập ca/tập ứng viên, cách xử lý ca lỗi/UNSUPPORTED/nhánh dự phòng và bảng diễn giải đã khóa trước test chưa? Có bỏ nhóm khó sau khi nhìn điểm hoặc dùng test để chọn thiết kế không?
 Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.
 ```
+
+---
+
+### Lượt 2 (phiên 1) — đề xuất chi tiết theo yêu cầu của Minh
+
+**Lời Minh:** "đã cập nhật quyền cho github, các đề xuất bên trên tôi muốn nghe đề xuất chi tiết của bạn, tôi không muốn đi theo hướng chọn dễ bỏ khó, chỉ bỏ khi chúng ít mang lại giá trị".
+
+**Đã làm thêm:**
+- Push branch thành công (`895a76bc` lên `origin/claude/sweet-hawking-dy078d`).
+- Đọc code gốc của Nezha (github.com/IntelligentDDS/nezha, commit `d8140101fdb4`): `log_parsing.py`, `log_template/drain3_hipster.ini`, `log_template/drain3_ts.ini`. Bản clone không blob nằm ngoài repo, ở `/home/user/intelligentdds/nezha`. Lệnh `git ls-tree -l` đã lỡ kéo khoảng 295 MB blob trước khi tôi dừng nó; không đụng repo RCA.
+- Đọc mã TrainTicket (github.com/FudanSELab/train-ticket, commit `313886e99bef`): `RouteServiceImpl.java`, `SeatServiceImpl.java`. Bản clone không blob ở `/home/user/fudanselab/train-ticket`, ngoài repo.
+- Thử drain3 0.9.11 trong bộ nhớ, trên 2 ví dụ đồ chơi, ngưỡng 0,4, độ sâu 4:
+  - N gồm 20 dòng "TraceID: <HEX> SpanID: <HEX> conversion request successful". Dòng A "… conversion request failed": `match` (khớp hoàn toàn) trả không khớp; `tree_search` (ngưỡng 0,4) gán vào mẫu "successful".
+  - N có "order <NUM> placed by alice" một lần. Dòng A "… placed by bob": `match` trả không khớp; `tree_search` gán đúng mẫu "alice".
+
+**Nguyên tắc chọn ở lượt này:**
+- prior work là mặc định (QT2);
+- khi nguồn không phân xử được mà phép đo không nhãn rẻ, thì đo trên dev trước khi chốt;
+- đổi thiết kế đã đóng băng thì ghi rõ là đổi thiết kế;
+- chỉ bỏ phần ít giá trị, và nói vì sao ít giá trị.
+
+**R1 — kiểm hash T-043 trên bản clone.**
+- Đề xuất: viết `results/T-044/scripts/kiem_hash_t043.py`:
+  - chép `results/T-043` vào thư mục tạm;
+  - tạo lại thư mục của lượt có trong `manifest.json#/luot_chay` mà không có trên đĩa, chỉ khi manifest không ghi file nào dưới đường dẫn đó (tức thư mục vốn rỗng);
+  - chạy nguyên `tao_manifest.py --kiem` trên bản sao; in danh sách thư mục đã dựng; mọi lệch khác vẫn FAIL.
+- Dùng lại được ở mọi phiên cloud và ở T-045 nếu T-045 chạy trên clone mới.
+- Không sửa T-043: thêm `.gitkeep` sẽ làm manifest báo "thừa" và buộc mở lại T-043, trái Q-209 mục 7.
+- Sửa SPEC dòng 118: "PASS ở đầu phiên, chạy trực tiếp, hoặc qua `results/T-044/scripts/kiem_hash_t043.py` khi bản clone thiếu thư mục rỗng của lượt hỏng (git không lưu thư mục rỗng)."
+
+**R2 — E1-CP.**
+- Đề xuất: cài E1-CP đủ như một chế độ của E1 (`params.bat_tat.E1 = "CP"`; hợp đồng đã có giá trị này), theo CRISP §5.1–5.2 (`the-doc/crisp.md`):
+  - con kết thúc cuối (LFC) nằm trên đường găng; lùi dần theo happensBefore với 1 ms, khi không có sự kiện của con khác trong vùng chồng lấn;
+  - con cắt về [s₀, s₁) của cha;
+  - u = d − |hợp các con trên đường găng|.
+- Kiểm: fixture 2, 3, và một ca span tự lập (cha có ba con, hai con song song).
+- Không đưa E1-CP vào ma trận dev; giữ quyết định K-b không chạy E1-CP (Q2).
+- Vì sao làm đủ, không chỉ viết một hàm rời: Đ21 ghi khác biệt E1-CP so với E1-U trên 444 cha chồng lấn ở Nezha-OB "chưa được kiểm"; có chế độ CP thì T-045 đo được khác biệt này gần như không tốn (D4); chặng 2 (FlashTicket có gọi song song) dùng lại được.
+- Sửa SPEC dòng 131: "E1-CP không thuộc ma trận dev (khai trước KHÔNG ĐỦ CA, chặng 2); chế độ E1 = CP vẫn được cài và kiểm bằng fixture 2, 3." Sửa dòng 96: "E1-U, E1-CP (2–5)".
+
+**R3 — UV-6.**
+- Căn cứ chọn định nghĩa:
+  - codebook T-028 (WHY-38) coi ca "đúng tại k" là ca có Hit@k = 1 theo phân phối chính xác; ca có 0 < Hit@k < 1 mang nhãn riêng M3 (hòa cắt biên);
+  - LOG T-043 dòng 4580 và 4814 dùng "ca đúng" theo Hit@1.
+- Định nghĩa đề xuất, cho cặp (c bỏ E3, c):
+  - ca đang đúng: Hit@1(c bỏ E3) = 1;
+  - ca bị hỏng: ca đang đúng mà Hit@1(c) < 1, kể cả khi root rơi vào hòa ở đầu;
+  - ca lỗi mã được sửa: loại lỗi return hoặc exception (nhãn dev, chỉ đọc ở pha 2), Hit@1(c bỏ E3) < 1 và Hit@1(c) = 1;
+  - vi phạm khi số ca bị hỏng lớn hơn số ca được sửa; đếm trên 52 ca; tính riêng trong P, S_lo, S_hi;
+  - ca không OK có Hit@1 = 0 (WHY-28), nên không thể là ca đang đúng.
+- Báo kèm, không dùng để quyết định: bản tính theo phần chênh của Hit@1 kỳ vọng; số ca lỗi mã có root lên hạng.
+- Chỉ áp cho cặp một thành phần; xem R7 (vii) về cặp (R0, c).
+- Đáp án tự lập: một ca hỏng do hòa ở đầu; một ca return được sửa; một ca exception lên hạng 3 → 2 (không tính là sửa); một phép đếm vi phạm và một phép đếm không vi phạm.
+
+**R4 — nhóm vòng (SCC) của E5.**
+- Ba cách đọc:
+  - (A) giữ kề cạnh: e ∈ S chỉ được bên được gọi trực tiếp b giải thích; nếu b ∈ S thì b phải có kênh không lan;
+  - (B) như (A), nhưng bên gọi ngoài S không giải thích được kênh lan xuôi (đọc chữ "chỉ" theo nghĩa đen);
+  - (C′) co vòng: coi S như một nút.
+    - Kênh lan ngược của e ∈ S là kế thừa khi có thành viên m ≠ e có kênh F_raw không lan (E1, E2, tài nguyên tăng), hoặc có b ∉ S được một thành viên nào đó của S gọi và b có kênh F_raw thuộc lớp giải thích được của luật chung.
+    - Kênh lan xuôi của e ∈ S là kế thừa khi có thành viên m ≠ e có kênh không lan, hoặc có a ∉ S gọi một thành viên của S và a có kênh F_raw bất kỳ.
+- Khuyến nghị (C′):
+  - luật chung đã "bắc cầu theo F_raw". Với chuỗi travel → seat → config mà config chậm, không có vòng thì travel được giải thích qua seat;
+  - có vòng seat ↔ travel (RE2-TT có vòng ở 24/30 ca) thì (A) chặn mất chuỗi đó, vì seat chỉ có kênh lan ngược. travel thành nghi phạm giả chỉ vì có vòng;
+  - (C′) giữ chuỗi tới nguyên nhân ngoài vòng, mà vẫn không cho hai triệu chứng trong vòng giải thích lẫn nhau. Câu SCC dùng chữ "thành viên", không kèm điều kiện kề cạnh; trong SCC mọi thành viên tới được nhau.
+- Mặt trái: một cờ không lan yếu ở một thành viên xa vẫn xóa được bằng chứng mạnh của root nằm trong vòng. Đây là cùng loại điều kiện thất bại với fixture 57, nhưng tầm rộng hơn; ghi vào điều kiện thất bại của E5.
+- Fixture 8 đúng ở cả ba cách đọc. Đáp án tự lập để phân biệt các cách: vòng 3 nút như RE2-TT với (a) nguyên nhân ngoài vòng gọi qua seat; (b) cờ CPU ở travel2; (c) kênh lan xuôi của seat, có bên gọi ngoài vòng; (d) vòng 2 nút chỉ có kênh lan ngược.
+
+**R5 — đường xử lý log của E3 (Drain).**
+1. Chuỗi đưa vào Drain:
+   - Nezha `log_parsing.py`, hàm `pod_to_service` (dòng 94–127): adservice và cartservice dùng chuỗi `log` của JSON ngoài; tám dịch vụ còn lại giải mã `log` thêm một lần rồi lấy `message`. Điều này khớp với KS-16: adservice và cartservice không có severity xác định (Đ15).
+   - Đề xuất cho Nezha-OB, viết thành một quy tắc chung không gọi tên dịch vụ: lấy `log`; nếu `log` giải mã được thành JSON có khóa `message` kiểu chuỗi thì dùng `message`, không thì dùng `log`; JSON ngoài không giải mã được thì dùng nguyên chuỗi. Adapter làm việc này, không phải lõi. `severity_raw` giữ đường đọc cũ.
+   - RE2-TT dùng cột `message` nguyên văn. Cấu hình TrainTicket của Nezha thuộc một triển khai khác, nên chưa có căn cứ áp cho RCAEval.
+2. Khớp dòng A:
+   - Hai cách hỏng theo hai kiểu, như ví dụ đồ chơi ở trên.
+   - Khớp theo ngưỡng 0,4 hỏng im lặng: dòng lỗi mới bị gộp vào mẫu thường. Khi đó E3 ra KHÔNG TÁC DỤNG hoặc KHÔNG ĐỦ CA, rồi được giữ bật theo D2a mà không làm gì.
+   - Khớp hoàn toàn hỏng lộ ra được: tín hiệu giả hiện qua vế mốc giả và UV-6, và giảm được bằng che token.
+   - Nezha học trên toàn bộ dữ liệu với ngưỡng cao (OB 0,9; TT 0,8), nên dòng thông điệp mới thường thành cụm mới, gần với khớp hoàn toàn.
+   - Đề xuất: cài cả hai cách khớp, chọn bằng `params.tham_so_E3.khop`; mặc định khớp hoàn toàn (`TemplateMiner.match`, `full_search_strategy="fallback"`); T-045 đo cả hai bằng phép không nhãn (D3) trước khối K, trình ở điểm dừng D17 để Minh chốt.
+3. Che token (**đổi thiết kế**: bỏ "chuỗi trong ngoặc" khỏi SPEC T-043 B2 E3):
+   - TrainTicket ghi log dạng `"[getRouteById][Find route error][Route not found][RouteId: {}]"` (`RouteServiceImpl.java` dòng 84). Che chuỗi trong ngoặc biến dòng này thành `[<*>][<*>][<*>][<*>]`, một token. Mọi thông điệp có cùng số nhóm ngoặc gộp làm một mẫu, gộp cả dòng lỗi với dòng thường.
+   - Chưa kiểm RE2-TT có dùng đúng bản TrainTicket này không (T-002 không ghi phiên bản). Nezha không che ngoặc ở cả hai cấu hình.
+   - Đề xuất: che theo thứ tự, với ranh giới không dính chữ hoặc số như Nezha: UUID → `<UUID>`; IPv4, cổng tùy chọn → `<IP>`; `0x…` và chuỗi hex dài ≥ 8 có ít nhất một chữ số và một chữ a–f → `<HEX>`; số nguyên hoặc thập phân có dấu → `<NUM>`. Tắt phần che sẵn của drain3.
+   - Không lấy các mẫu che riêng của Nezha cho OB (ITEM, PRODUCTID…), vì chúng gắn với từng câu log của Online Boutique, trái WHY-08.
+4. Thứ tự học: sắp dòng N theo (mốc ns, thực thể, nội dung) rồi mới đưa vào Drain.
+5. Ngưỡng 0,4:
+   - Lệch prior work (Nezha dùng 0,9 và 0,8) và chưa có WHY.
+   - Căn cứ có trong repo: `results/T-016/dung-logts-tracets.md` dòng 60 — với log OB chưa che, ngưỡng 0,4 cho 95 mẫu so với 73 của tác giả TORAI, còn ngưỡng cao hơn tách tới 1.398 mẫu.
+   - Đề xuất: giữ 0,4 và ghi WHY; D3 báo thêm số đo ở ngưỡng của Nezha để thấy độ nhạy; chỉ đổi khi Minh quyết.
+
+**R6 — hồ sơ nguồn (đính chính hợp đồng, như cách Đ19 làm).**
+- `params.ho_so_nguon` gồm ba khóa:
+  - `kenh_metric`: {kiểu "hậu tố" hoặc "tên kênh", bảng → lớp};
+  - `quy_tac_log`: {kiểu "từ khóa", danh sách, không phân biệt hoa thường} hoặc {kiểu "severity", danh sách lỗi, danh sách không lỗi};
+  - `nguon_khoi_phat`: danh sách nguồn dùng cho khởi phát E9.
+- Giá trị:
+  - RE2-TT: 8 hậu tố (`hop-dong.json` dòng 55); từ khóa ERROR, FAIL, EXCEPTION, tìm chuỗi con (`src/simplerca/core.py:87`); khởi phát từ trace và metric;
+  - Nezha-OB: 21 tên kênh (dòng 61); severity theo dòng 69; khởi phát chỉ từ trace (đặc tả v1 dòng 379).
+- Runner điền từ `hop-dong.json`. Thiếu khóa hoặc gặp lớp lạ thì bản ghi ERROR; không suy từ dữ liệu. Bảng lớp → hướng → lớp lan (`lop_huong`) như nhau cho mọi dataset, nên nằm trong lõi.
+- Thêm `params.tham_so_E3` = {khop, sim_th = 0,4, do_sau = 4} cho R5.
+
+**R7 — đáp án tự lập cho các phần thiếu.**
+- Mở rộng N1 (Q-212) sang: (i) đếm cờ M5, dùng G_N theo codebook §4 (cả hai span trong N); (ii) phụ thuộc quan sát; (iii) bước 8 luật khối; (iv) E7; (v) E9; (vi) T4c; (vii) cặp (R0, c).
+- Định nghĩa đề xuất cho (iii): thành phần đang bật mà phép đảo cho HẠI, hoặc KHÔNG TÁC DỤNG trong khi nó không phải thành phần cuối còn đáp ứng tầng 2, thì là xung đột; thành phần đang tắt mà phép đảo cho GIÚP thì là xung đột; còn TRÁI CHIỀU thì báo để Minh quyết.
+- Định nghĩa đề xuất cho (vii): với cặp (R0, c) ở bước 4 luật khối, chỉ áp các vế không gắn với thành phần nào (mốc giả; M + M′ ≥ 3 và P + P′ = 0; TRÁI CHIỀU; HẠI gộp). UV-6 và điều kiện M5 chỉ áp cho cặp một thành phần, vì:
+  - Phụ lục C định nghĩa chúng cho một thành phần ("So cặp (c bỏ E5, c)");
+  - mọi c có E3 hoặc E5 đều đã qua cặp một thành phần, nên không mất phép chặn nào.
+  - Nhãn kết cục của (R0, c) dùng hợp các E_X của thành phần trong c.
+- Ghi vào `results/T-044/fixture/dap-an-thanh-phan.json`, đánh dấu như N1.
+- Sửa SPEC dòng 89 tương ứng; tiêu chí 2 (dòng 119) thêm "và các ca trong `dap-an-doi-chung.json`, `dap-an-thanh-phan.json`".
+
+**R9 — bốn định nghĩa.**
+- **T4c:** K′ = (max s, max m, số kênh, Σs), tức m đứng ngay sau max s.
+  - Lý do: nhánh z (phép so của T4b) để độ lớn đứng đầu trong tầng; T4c là bản không phụ thuộc đơn vị của đúng ý đó. Đặt m ở cuối chỉ phá hòa tuyệt đối, nên gần như không đổi gì; giá trị thấp, không làm.
+  - max m lấy trên các kênh có cờ của chính khóa đó; r_u là hiệu dương nhỏ nhất giữa hai giá trị khác nhau trong N ∪ A; nếu mọi giá trị bằng nhau thì m = 0.
+  - Xếp lại trên lượt R0 mặc định (ε = 0,05; α = 0,01), không chấm lại; T4 vẫn là 9 cấu hình.
+- **E7, cách 1**, trên đồ thị con F_raw: R_r = {r} ∪ Lên ∪ Xuống.
+  - Lên = {a có đường a → … → r, và mọi kênh F_raw của a có giải thích theo luật E5}. "Có giải thích" gồm trạng thái "đề xuất" khi E5 tắt và "áp dụng" khi E5 bật; kênh bị E9 phủ quyết không tính.
+  - Xuống = {b có đường r → … → b, và có ít nhất một kênh F_raw lớp lan xuôi có giải thích}.
+  - Dùng cả trạng thái "đề xuất" để vùng không rỗng chỉ vì E5 tắt.
+- **E9:**
+  - ô 10 giây đặt từ t; mẫu vào ô theo end của span, hoặc theo mốc thật của nguồn metric; ô không có mẫu thì bỏ qua; khởi phát tính theo hướng có cờ;
+  - đơn vị đã có cờ thì luôn có khởi phát, vì r_d(A) > r_d(N) buộc ít nhất một ô vượt r_d(N);
+  - "tắt trên cạnh có E2 bất thường" chỉ áp khi E2 bật. Không tính E2 riêng để chặn E9 khi E2 tắt, vì làm vậy sẽ bỏ mất lần phủ quyết đúng khi bên được gọi chỉ có nhiễu.
+- **C-d1:**
+  - nhóm 1: thực thể có cờ mà không bên được gọi nào có cờ; nhóm 2: các thực thể có cờ còn lại; nhóm 3: tầng 3. Trong nhóm xếp theo K_raw;
+  - tính lại trên kết quả chấm của từng cấu hình, không phải cấu hình riêng.
+
+**R13 — test bổ sung.**
+- Chạy đầu-cuối từ span cho cả bảy ca S1–S7. Bộ sinh trace dùng `#/trace_mau_S`: 20 request ở N và 20 ở A, con nối tiếp nhau, khoảng ngoài span 1 ms.
+- Đầu vào người làm bổ sung, đánh dấu rõ:
+  - S3: R trả lỗi nhanh (R.handle 31 → 5 ms), không gọi X; mỗi request một dòng lỗi ở F, A, R trong A; thêm dòng INFO ở cả N và A. Không có dòng INFO ở N thì H của log bắt đầu ở A, làm T_N^chắc = 0 và kênh log ra NO_BASELINE; ca này cho thấy giá trị của phép đầu-cuối;
+  - S6: 20 span R.newop là span gốc riêng, chỉ có ở A;
+  - S7: R không có span; span X.handle thành span mồ côi.
+- Đáp án vẫn là của fixture 1. Lệch thì ghi đính chính.
+- Đáp án trong văn bản: Đ10 (hai ví dụ), đặc tả v1 dòng 349, SPEC T-043 dòng 392, Đ17 (người làm bổ sung dataset của từng ca và |E_X|).
+
+**R8 — adapter.**
+- Thêm bộ dữ liệu tổng hợp nhỏ, do test sinh ra trong thư mục tạm, đi đúng đường đọc `src/p3/selector.py` (RE2-TT, parquet) và `src/p3/nezha.py` (allowlist, sha256, 11 nguồn metric, 165 kênh, 5 + 5 điểm).
+- Mục đích: kiểm adapter → M1 → bản ghi trên chính bộ đọc của P3, trước T-045. Cần pyarrow (bước 1).
+
+**Đề xuất cho T-045** (cần sửa SPEC T-045; Minh quyết riêng):
+- D1: đối chiếu số trung gian của M1 với KS-16 từng ca. Rẻ, không nhãn, kiểm adapter trên dữ liệu thật.
+- D2: tái lập MRR và số ca M5 của sáu baseline bằng `src/m1_danh_gia`. G_N lấy từ `call_rows` của KS-16; đích so là `results/T-034/bang-baseline.json` và `ks16/dem-sau-ghep-nhan.json#/hinh_dang_xep_hang_baseline`.
+- D3 (mới): đo E3 không nhãn trước khối K:
+  - số mẫu theo thực thể; tỷ lệ dòng A vào "mẫu mới" và số thực thể có cờ mẫu mới, ở cả hai cách khớp;
+  - ở Nezha-OB: số dòng A severity lỗi bị gán vào mẫu không phải lỗi;
+  - ở mốc giả RE2-TT: số thực thể có cờ mẫu mới;
+  - in năm mẫu đầu của hai ca mỗi dataset;
+  - tùy chọn: số đo ở ngưỡng của Nezha.
+  - Trình ở điểm dừng D17. Chi phí vài phút máy.
+- D4 (mới): mô tả khác biệt u_CP − u_U trên 444 cha chồng lấn ở Nezha-OB. Chỉ mô tả.
+
+**Cần Minh duyệt:** SPEC T-044 dòng 89, 96, 118, 119, 131; các đính chính sẽ ghi vào `results/T-044/dinh-chinh-cai-dat.md` (UV-6, SCC, E3 kèm đổi thiết kế che token, hồ sơ nguồn, cặp (R0, c), T4c, E7, E9, C-d1); WHY cho các lựa chọn E3 và SCC (soạn sau khi Minh chốt); SPEC T-045 cho D1–D4.
+
+**Tác dụng phụ ngoài repo trong phiên:** bản sao `results/T-043` trong scratchpad (`…/scratchpad/manifest-check`); hai bản clone chỉ đọc `/home/user/intelligentdds/nezha` (khoảng 295 MB) và `/home/user/fudanselab/train-ticket`. Đề xuất xóa ba thư mục này khi Minh đồng ý; nội dung cần dẫn đã ghi bằng commit và số dòng ở trên.
+
+**Kết thúc lượt 2 (AGENTS mục 7):**
+1. Đã làm gì: push; đọc code gốc Nezha và TrainTicket; thử drain3; soạn đề xuất chi tiết.
+2. File đã thay đổi: LOG này (ghi thêm). Ngoài repo: như mục trên.
+3. Kiểm: như mục "Đã làm thêm".
+4. Cần Minh quyết: như mục "Cần Minh duyệt". Các khuyến nghị đều **chưa kiểm** trên dữ liệu thật. Riêng giả định RE2-TT ghi log theo kiểu ngoặc của TrainTicket bản `313886e` chưa xác nhận; D3 sẽ cho thấy.
+5. Bước tiếp theo chính xác: chờ Minh trả lời. Sau khi duyệt: sửa SPEC đã duyệt; ghi `dinh-chinh-cai-dat.md`; làm bước 1 (`$HOME/m1env/bin/python -m pip install pyarrow==18.1.0`), rồi đi tiếp các bước của SPEC.
+6. Lệnh cuối: đọc dòng log của `SeatServiceImpl.java` bằng `git show` (chỉ đọc).
+
+#### Prompt bàn giao của lượt 2 cho agent đối phương
+
+```text
+Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
+Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
+
+Thông tin lượt này:
+- Task hoặc đề xuất: T-044, tasks/T-044-cai-dat-m1/SPEC.md; các đề xuất sửa SPEC và đính chính do người làm trình sau khi tự rà SPEC, ghi ở tasks/T-044-cai-dat-m1/LOG.md, phiên 1: mục "Tự rà SPEC", "Kết luận giai đoạn 1" và "Lượt 2 (phiên 1) — đề xuất chi tiết theo yêu cầu của Minh".
+- Công đoạn: soát SPEC (các đề xuất sửa SPEC T-044, đính chính và đề xuất cho T-045, trước khi viết code).
+- Gói/cổng: P6 (M1); chuẩn bị G3.
+- Người làm và người phản biện chính thức: Claude là người làm; Codex là người phản biện.
+- Tài liệu gốc: tasks/T-044-cai-dat-m1/SPEC.md; tasks/T-043-thiet-ke-rca-m1/SPEC.md Phụ lục B, C, D; results/T-043/dac-ta-phuong-phap-v1.md, hop-dong.json, ma-tran-thu.json, dinh-nghia-pha2.json, fixture-dac-ta.json, fixture/fixture-bo-sung.json, fixture/ket-qua-kiem.json, dinh-chinh-phien8.md, dinh-chinh-phien9.md, dinh-chinh-phien10.md, bao-cao.md, the-doc/crisp.md, ks16/dem-khong-nhan.json; results/T-028/codebook.md; results/T-016/dung-logts-tracets.md; tasks/T-045-chay-khoi-k-dev/SPEC.md; src/p3/; mã nguồn ngoài: github.com/IntelligentDDS/nezha commit d8140101fdb4 (log_parsing.py, log_template/*.ini), github.com/FudanSELab/train-ticket commit 313886e99bef. Branch claude/sweet-hawking-dy078d trên remote github.com/levanminh04/RCA; điểm gốc của branch là commit 6b2f6ac6 (trùng master); xem git diff 6b2f6ac6..origin/claude/sweet-hawking-dy078d.
+- Phản biện và phản hồi trước: lượt rà SPEC T-044 của Codex trong chat ngày 29/10/2026, đã nhập vào SPEC theo Q-212; ngoài ra không có.
+- Code và kết quả liên quan: chưa có code. Lệnh kiểm hash T-043: py -3 -B results/T-043/scripts/tao_manifest.py --kiem.
+- Phạm vi ghi được Minh cho phép trong lượt này: chỉ trả lời trong chat.
+
+Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
+
+Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
+Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
+Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
+
+Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
+hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
+Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
+số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
+có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
+
+Bổ sung yêu cầu phản biện:
+1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
+2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
+3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
+4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
+5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
+6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
+7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
+8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
+9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
+10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
+
+Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
+Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
+
+Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
+bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
+Tiếng Việt, câu ngắn.
+
+Cuối lượt báo:
+1. Đã làm gì.
+2. File đã thay đổi, hoặc không sửa file nào.
+3. Kiểm đã chạy và kết quả.
+4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
+
+Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
+
+Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
+
+Công đoạn: soát SPEC.
+Kiểm câu hỏi nguồn, phần mục tiêu được bao phủ, giả thuyết khác, khả năng phân xử của dữ liệu, phép kiểm dự kiến, phụ thuộc bước, chi phí, phạm vi và tiêu chí xong. Phần không làm phải có lý do, hệ quả và quyết định phụ thuộc.
+Đánh giá kế hoạch và bằng chứng đã có; không đòi có kết quả của thực nghiệm chưa được duyệt. Phân biệt ứng viên để thử với lựa chọn đã chốt.
+Chỉ ghi bản phản biện được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat nếu chưa có quyền ghi. Không tự sửa SPEC.
+
+Với từng thành phần, kiểm mục đích và căn cứ: sửa hạn chế P4, đáp ứng DT18 hay nhu cầu kỹ thuật. Có lý do kỹ thuật, phương án khác, bằng chứng dev và điều kiện thất bại không; có dùng mã hạn chế mô tả như bằng chứng cơ chế hoặc chọn theo mức chênh đồ thị trừ không đồ thị không?
+Nêu rõ nút/cạnh, ánh xạ log/trace/metric và phép tính thực sự sử dụng cạnh. Lần theo thông tin quan hệ và nhãn trong phương pháp lẫn đối chứng; gọi “không đồ thị” có đúng với thông tin còn giữ không?
+Kiểm baseline và đối chứng đủ mạnh, tương đương về tín hiệu/cửa sổ/tập ứng viên/coverage/tiền xử lý/quy tắc chấm/ngân sách chọn cấu hình ở phần không chủ ý thay; yếu tố thay cùng phải giới hạn kết luận.
+Phương pháp và đối chứng đã được cài và kiểm đầu vào, trung gian, hành vi trên dev chưa, hay chỉ chạy không lỗi? Không đòi đồ thị phải thắng để khóa.
+Code/revision, cấu hình, giả thuyết, độ đo, tập ca/tập ứng viên, cách xử lý ca lỗi/UNSUPPORTED/nhánh dự phòng và bảng diễn giải đã khóa trước test chưa? Có bỏ nhóm khó sau khi nhìn điểm hoặc dùng test để chọn thiết kế không?
+Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.
+```
