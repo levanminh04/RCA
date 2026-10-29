@@ -409,6 +409,35 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
               so_span_goc_A=sum(1 for s in spans_A if s['parent'] is None))
     dc = {'C-d1': doi_chung.cd1(kenh_P_U, canh, co_OK_P), 'C-d2': doi_chung.cd2_tu_kenh(kenh_P_U, co_OK_P),
           'C-d3': d3}
+    # ---- T4c (CĐ7): thứ tự thứ hai trên cùng phép chấm, chỉ khi E6a; thế giới P; không chấm lại
+    F_I_P = e5_w['P']['F_I']
+    T4c = None
+    if E6 != 'b':
+        m_dv = {}
+        for u, kq in worlds['P']['don_vi']:
+            if not (kq.get('F_raw_len') or kq.get('F_raw_xuong')):
+                continue
+            if u['loai'] == 'phan_vi':
+                m_dv[u['ma']] = e4.m_T4c_phan_vi(u['N'], u['A'])
+            else:
+                m_dv[u['ma']] = e4.m_T4c_dem(kq['n_N'], kq['n_A'], kq['T_N'], kq['T_A'])
+        kT = {}
+        for k in kenh_P_U:
+            if k.co:
+                m = m_dv.get(k.don_vi, 0.0)
+                a, b = kT.get(k.thuc_the, (0.0, 0.0))
+                kT[k.thuc_the] = (max(a, m), max(b, m) if F_I_P.get(k.ma, 1) == 1 else b)
+        x4 = xep_hang.xep(kenh_P_U, F_I=F_I_P, thuc_the_co_kenh_OK=co_OK_P, che_do='E6a', canh=canh, khoa_T4c=kT)
+        T4c = {'blocks': x4['blocks'], 'm_thuc_the': {e: list(v) for e, v in sorted(kT.items())},
+               'm_don_vi': dict(sorted(m_dv.items()))}
+    kenh_co = [{'thuc_the': k.thuc_the, 'ten': k.ten, 'huong': k.huong, 'lop': k.lop, 's': k.s,
+                'F_I': F_I_P.get(k.ma, 1), 'don_vi': k.don_vi, 'khoi_phat': k.khoi_phat}
+               for k in sorted(kenh_P_U, key=lambda x: x.ma) if k.co]
+    # G_N (codebook T-028 §4; CĐ6.1): cạnh cha–con khác chủ khi cả hai span thuộc N; chỉ để bộ đánh giá đếm M5
+    sp = prep['spans']
+    G_N = sorted({(sp[s['cha']]['chu'], s['chu']) for s in sp.values()
+                  if s['cha'] is not None and s['phia'] == 'N' and sp[s['cha']]['phia'] == 'N'
+                  and sp[s['cha']]['chu'] != s['chu']})
     classes = {}
     for e in O:
         if e not in co_OK_P:
@@ -458,7 +487,7 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
                   'K_I_P': {e: list(v) for e, v in xP['K_I'].items()},
                   'K_raw_P': {e: list(v) for e, v in xP['K_raw'].items()},
                   'canh': [list(c) for c in canh], 'nhom_vong_P': e5_w['P']['nhom_vong'],
-                  'doi_chung': dc},
+                  'doi_chung': dc, 'T4c': T4c, 'kenh_co': kenh_co, 'G_N': [list(c) for c in G_N]},
     }
     hop_dong.kiem_ban_ghi(rec)
     return rec

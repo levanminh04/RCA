@@ -7,7 +7,7 @@ from math import comb
 
 import pytest
 
-from conftest import fx, mau, gan_bang, gan_lam_tron
+from conftest import fx, mau, gan_bang, gan_lam_tron, tu_lap, DAP_AN_THANH_PHAN
 
 TS = {'m_span': 20, 'm_metric': 5, 'alpha': 0.01, 'epsilon': 0.05, 'q_hi': 0.95, 'q_lo': 0.05,
       'n_exact_max': 100, 'count_min': 10}
@@ -216,3 +216,34 @@ def test_D5_quyet_dinh_doi_khi_T_lech(ma):
             doi_oracle |= ((_p_nhi_thuc_chinh_xac(n_A, n_N + n_A, p0) < Fraction(1, 100)) != goc)
     assert e4.doi_quyet_dinh_khi_T_lech(n_N, n_A, T, T, TS, ty_le=0.01) == doi_oracle
     assert e4.doi_quyet_dinh_khi_T_lech(10, 40, T, T, TS, ty_le=0.01) is False
+
+
+@pytest.mark.parametrize('muc', ['T4C-1', 'T4C-2', 'T4C-3', 'T4C-4', 'T4C-5'])
+def test_T4c_m(muc, ma):
+    """CĐ7: m của đơn vị phân vị và đơn vị đếm (đáp án tự lập)."""
+    from m1 import e4
+    m = tu_lap(DAP_AN_THANH_PHAN, muc)
+    ma(muc)
+    d = m['dau_vao']
+    if 'N' in d:
+        got = e4.m_T4c_phan_vi(d['N'], d['A'])
+    else:
+        got = e4.m_T4c_dem(d['n_N'], d['n_A'], d['T_N'], d['T_A'])
+    assert abs(got - m['dap_an']['m']) <= 1e-12
+
+
+def test_T4c_khoa(ma):
+    """CĐ7: khóa T4c (max s, max m, số kênh, Σs) so với E6a."""
+    from m1 import xep_hang
+    from m1.kieu import Kenh
+    m = tu_lap(DAP_AN_THANH_PHAN, 'T4C-6')
+    ma('T4C-6')
+    kenh = [Kenh(e, t, 'len', 'lan_nguoc', s) for e, t, s, _ in m['dau_vao']['kenh']]
+    mm = {}
+    for e, _, _, x in m['dau_vao']['kenh']:
+        mm[e] = max(mm.get(e, 0.0), x)
+    kT = {e: (v, v) for e, v in mm.items()}
+    a = xep_hang.xep(kenh, thuc_the_co_kenh_OK=set(mm))
+    b = xep_hang.xep(kenh, thuc_the_co_kenh_OK=set(mm), khoa_T4c=kT)
+    assert [g for bl in a['blocks'] for g in bl['groups']] == m['dap_an']['E6a']
+    assert [g for bl in b['blocks'] for g in bl['groups']] == m['dap_an']['T4c']

@@ -119,3 +119,19 @@ def test_1_dau_cuoi_tu_span(ma_s, ma):
         assert sorted(blocks[0]['groups'][0]) == da['dau'], ten_ch
         r = rr.rr_ca(blocks, ca['root'])
         assert abs(float(r) - da['rr']) <= 1e-12, ten_ch
+
+
+def test_T4c_qua_chuoi(ma):
+    """CĐ7: T4c là thứ tự thứ hai trong cùng bản ghi (S1, C0; đáp án tự lập)."""
+    from m1 import chuoi
+    import sinh_trace_S
+    from conftest import tu_lap, DAP_AN_THANH_PHAN
+    m = tu_lap(DAP_AN_THANH_PHAN, 'T4C-S1')
+    ma('T4C-S1')
+    d, da = m['dau_vao'], m['dap_an']
+    spans, logs = sinh_trace_S.sinh(d['S'], t=1000, mau=FIXTURE['trace_mau_S'])
+    rec = chuoi.chay(spans, [], logs, ['A', 'B', 'F', 'I', 'R', 'X'], {}, 1000, sinh_trace_S.params(CAU_HINH_S[d['cau_hinh']]))
+    t4 = rec['extra']['T4c']
+    assert [g for b in t4['blocks'] for g in b['groups']] == da['T4c']
+    for e, v in da['m'].items():
+        assert abs(t4['m_thuc_the'][e][0] - v) <= 1e-12, e
