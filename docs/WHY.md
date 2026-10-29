@@ -60,7 +60,7 @@ Mẫu một mục: chọn gì → vì sao → đã xét phương án nào → b�
 - **Vì sao:** tự cài lại thì dễ đơn giản hóa đúng chỗ tạo ra giá trị của phương pháp. v1 làm vậy với MicroRCA (SL7). RCAEval cũng đã nhận rằng các baseline PageRank và CIRCA của họ âm thầm trả về thứ tự cột khi lỗi. Bản mới chỉ in thêm cảnh báo; đường trả thứ tự cột vẫn còn, nên adapter của nhóm phải tự đánh dấu ca lỗi (MRP P3). Dùng bản mới không tự bảo đảm số đúng.
 - **Phương án đã xét:** dùng lại số công bố mà không chạy. Cách này không so được trên cùng giao thức, và không làm được phân tích từng ca ở P4.
 
-## WHY-06. Vì sao đánh giá ba đầu ra bằng các độ đo khác nhau, và vì sao MRR là độ đo chính của xếp hạng — Một phần đã quyết: độ đo chính và biên E-04 (M-30, M-44, M-45); phép thống kê P7 chốt ở A4 (G3)
+## WHY-06. Vì sao đánh giá ba đầu ra bằng các độ đo khác nhau, và vì sao MRR là độ đo chính của xếp hạng — Một phần đã quyết: độ đo chính và biên E-04 (M-30, M-44, M-45); phép thống kê P7 theo A4 (Q-211)
 
 - **Chọn:**
   - Phát hiện: Precision, Recall, F1 theo cửa sổ thời gian; số báo động giả mỗi giờ bình thường; độ trễ phát hiện (MRP P7). Độ đo chính của phát hiện chốt ở SPEC phát hiện (D3 của T-043).
@@ -74,9 +74,16 @@ Mẫu một mục: chọn gì → vì sao → đã xét phương án nào → b�
   - Cách đọc: khoảng tin cậy 95% của chênh MRR (phương pháp mới trừ TORAI B). Báo đồng thời hai câu. (1) Cận dưới lớn hơn −Δ thì đạt E-04; ngược lại "chưa chứng minh được". (2) Khoảng nằm trọn trên 0 là hơn; trọn dưới 0 là kém; chứa 0 là "chưa phân biệt được". E-04 chỉ xét câu (1).
   - Điểm ước lượng chênh không vượt Δ chỉ báo kèm; không gọi là phép kiểm không thua.
   - Sức phân biệt thấp: power của câu (1) khoảng 0,19 theo giả định ở KE-HOACH D.1 (công thức ở Phụ lục C của `docs/KHAO-SAT-SAU-K1-K6.md`). Vì vậy "chưa chứng minh được" là khả năng lớn và phải báo đúng như vậy.
-  - Khi không đạt: chọn một trong ba phương án (a), (b), (c) ở KE-HOACH D.1 khi soạn giao thức A4.
+  - Khi không đạt (Q-211): làm phương án (b) của KE-HOACH D.1 trong hồ sơ G3, tức suy biên từ mức TORAI B hơn một phương pháp đơn giản trên dev. Nếu biên suy ra khác 0,05 thì Minh chọn trước G3; chưa chọn thì 0,05 giữ hiệu lực. Nếu không làm (b) thì dùng (c) (cỡ hiệu ứng kèm khoảng tin cậy), và câu đầu của báo cáo bắt buộc là "không đạt E-04". Lý do không chọn (c) làm mặc định: (c) không bao giờ "trượt", nên dễ làm mềm một kết quả không đạt.
   - Nezha-OB không đặt Δ.
-- **Phép thống kê** (KE-HOACH D.6; chốt ở A4, trước G3, theo D9): McNemar cho Hit@1; kiểm định hoán vị hoặc Wilcoxon trên nghịch đảo hạng; khoảng tin cậy bootstrap theo ô; khoảng chứa 0 thì ghi "chưa phân biệt được"; gộp dataset theo tầng hay không thì khai trong giao thức. KS-08 đề xuất đổi phép kiểm, chưa duyệt.
+- **Phép thống kê** (A4, Q-211; khóa trước G3):
+  - Một giả thuyết chính: E-04 trên 60 ca test RE2-TT, đo bằng MRR. Một giả thuyết phụ: Hit@5 trên test Nezha-OB. Hiệu chỉnh Holm cho hai giả thuyết. Không đặt giả thuyết Hit@5 trên RE2-TT, vì TORAI B đã đạt Hit@5 = 1,0 trên dev (`results/T-034/bang-baseline.json`, mục `ranking_mode_a`).
+  - Phép kiểm chính: đảo dấu chính xác theo ô trên chênh nghịch đảo hạng (KS-08). Phép phụ: hoán vị theo ca; McNemar cho Hit@1. Bỏ Wilcoxon.
+  - Khoảng tin cậy bootstrap theo ô, 10.000 mẫu, kèm cảnh báo khi số ô ít. Khoảng chứa 0 thì ghi "chưa phân biệt được".
+  - Các phép so khác (Nezha-OB, RE3-OB, T13, đối chứng): chỉ báo cỡ chênh kèm khoảng tin cậy. Không gộp dataset.
+  - Ca lỗi tính là trượt; báo thêm bản loại ca lỗi để xem độ nhạy. Ghi sổ mỗi lần xem test.
+  - Vì sao một giả thuyết chính: thử nhiều giả thuyết rồi chọn cái đạt dễ cho kết quả may. Cái giá: kết luận chính hẹp.
+  - Chế độ (b) ở P7 và dataset giữ ngoài RE3-OB: Minh hoãn quyết (Q-211).
 - **Vì sao:**
   - DT18 yêu cầu ba đầu ra. Cô nêu năm độ đo. Mỗi độ đo chỉ có nghĩa với một loại đầu ra: Precision, Recall, F1 cần nhãn đúng/sai cho từng đơn vị; MRR và NDCG cần một danh sách xếp hạng và đáp án (K1 §J).
   - MRR có trong danh sách của cô, MRP P6 đã khai từ trước, và dùng toàn bộ thứ hạng.

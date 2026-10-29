@@ -4,6 +4,8 @@ Cập nhật: 29/10/2026. Mốc quyết định ở [DECISIONS.md](DECISIONS.md)
 
 ## Hiện tại
 
+- **T-044 — cài chuỗi M1 và kiểm đặc tả:** SPEC đã duyệt (29/10/2026), chưa bắt đầu; Claude làm (phiên cloud, branch riêng), Codex phản biện. Không đọc dữ liệu. [SPEC](../tasks/T-044-cai-dat-m1/SPEC.md).
+- **T-045 — chạy T1, T4, T4b, khối K trên dev:** SPEC đã duyệt (29/10/2026), chờ T-044 nghiệm thu; Codex làm (local), Claude phản biện. [SPEC](../tasks/T-045-chay-khoi-k-dev/SPEC.md).
 - **T-043 — M1: thiết kế chuỗi chẩn đoán RCA:** **xong — đã đóng** (29/10/2026, Q-209; nghiệm thu trong phạm vi thiết kế); Claude làm, Codex phản biện. Đính chính [phiên 9](../results/T-043/dinh-chinh-phien9.md), [phiên 10](../results/T-043/dinh-chinh-phien10.md) (Đ15–Đ22); WHY-55–65. Không xác nhận hiệu quả hay cơ chế; OPEN ở [báo cáo](../results/T-043/bao-cao.md) §11. Lỗi đặc tả khi cài đặt ghi đính chính trong task cài đặt, không mở lại T-043 (Q-209). [SPEC](../tasks/T-043-thiet-ke-rca-m1/SPEC.md), [LOG](../tasks/T-043-thiet-ke-rca-m1/LOG.md).
 - **T-042 — Đối chiếu baseline Nezha-OB:** **xong — đã đóng** (24/10/2026, Q-193); Codex làm, Claude phản biện. Minh đã dừng tìm nguyên nhân lệch OB và chấp nhận giới hạn (Q-192). [Báo cáo](../results/T-042/runs/normal-source-001/bao-cao.md), [LOG đóng task](../tasks/T-042-doi-chieu-baseline-nezha-ob/LOG.md). Giữ kết quả và các câu hỏi khoa học OPEN; không tự mở lại; chưa chọn baseline hoặc mở test/G3.
 - **T-041 đã nghiệm thu và đóng** theo Q-186 sau gói sửa Q-185. [Báo cáo](../results/T-041/bao-cao.md), [bàn giao thiết kế](../results/T-041/ban-giao-phien-2.md), [LOG đóng task](../tasks/T-041-ra-soat-nen-p3-p5/LOG.md). Claude chưa kiểm lại bản sửa; không ghi thêm lượt phản biện đã hoàn tất.
@@ -14,7 +16,7 @@ Cập nhật: 29/10/2026. Mốc quyết định ở [DECISIONS.md](DECISIONS.md)
 
 ## Việc kế tiếp và chờ Minh
 
-- M1: T-043 đã đóng (Q-209). Bước kế tiếp: người làm soạn SPEC task cài đặt (1) (T1, T4, T4b, khối K; D1 của SPEC T-043) và trình Minh; tiêu chí đầu tiên là mọi đáp án đặc tả (109 phép kiểm, B1–B8, U1–U6, H1–H6) thành phép kiểm chạy được trước khi chạy dữ liệu dev. Nối log–span hoãn sang chặng 2 (Q-209). Phần thiết kế RCA không chờ ý kiến cô (Q-187); chỉ nhánh G/H chờ cô.
+- M1: task cài đặt (1) tách thành T-044 và T-045 (Minh chốt 29/10/2026). Bước kế tiếp: mở phiên cloud làm T-044. Sau T-045 còn task (2) (K-b, T6–T12, KB) và (3) (T13, hồ sơ G3 theo A4, Q-211). Nhãn lan hoãn sang P10 (Q-210). Hoãn quyết: chế độ (b) ở P7 và RE3-OB, cả hai chặn G3. Nối log–span hoãn sang chặng 2 (Q-209). Phần thiết kế RCA không chờ ý kiến cô (Q-187); chỉ nhánh G/H chờ cô.
 - Các phần chưa phân xử/thiếu nguồn giữ tại báo cáo T-041 §8 O01–O12 và [OPEN P5](../results/T-040/con-mo.json); nghiệm thu không xác nhận cơ chế hay lợi ích đồ thị. Không tự lấy lại nguồn EC2.
 - P9a/T-004 chưa triển khai: nhận [R-01–R-10](../results/T-040/yeu-cau-quan-sat-p9.md), được bổ sung sau; OM-11 đã chuyển P9a, OM-07 hoãn ngoài P5 (Q-175); chưa gửi nhóm hệ thống.
 - Việc hồ sơ cũ: ghi sổ Q-75 của T-022; ghi chú scratchpad T-030 ngoài repo; T-007 dọn marker sudo khi EC2 được bật lại. Giữ theo LOG liên quan, không mở lại nghiên cứu của task đã đóng.
