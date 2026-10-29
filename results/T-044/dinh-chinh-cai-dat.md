@@ -153,6 +153,59 @@ pyarrow 18.1.0 (bản T-043 đã dùng, `results/T-043/manifest.json#/runtime/pa
 - Khi E3 bật, kênh mẫu Drain thay kênh log lỗi cơ bản (`hop-dong.json` dòng 51).
 - `params.coverage`: `khoang` = [mốc bản ghi đầu, mốc bản ghi cuối] của từng file; M1 cộng r_ns; danh sách rỗng là XÁC NHẬN THIẾU THU; thiếu khóa là UNSUPPORTED (Đ19 điểm 4).
 
-## Phần II — chỗ lệch lộ ra khi cài
+## Phần II — chỗ lệch lộ ra khi cài (ghi 29/10/2026, chờ Minh quyết)
 
-Chưa có.
+**Tóm tắt.** Không có fixture hay đáp án nào của T-043 lệch với code: 97/97 phép kiểm trong phạm vi qua mà không sửa đáp án. Không có đáp án đặc tả nào cần đính chính. Phần này gồm các chỗ đặc tả không nói hoặc nói chưa đủ, nơi người làm phải chọn một cách hiểu để viết code (mục A, cần Minh quyết), các quy ước biểu diễn không đổi kết quả (mục B, để người phản biện kiểm), các sửa đã làm trong phiên theo đúng nguồn (mục C) và giới hạn (mục D). Theo tiêu chí 8 của SPEC, task ở trạng thái "chờ Minh" cho tới khi Minh quyết mục A.
+
+### A. Cách hiểu đã cài ở chỗ đặc tả không nói (cần Minh quyết)
+
+Mỗi mục: chỗ; đã cài; phương án khác; ảnh hưởng. Đề xuất chung: giữ cách đã cài, trừ khi Minh chọn khác.
+
+- **PII-01. Cổng qua khi p < α (chặt).** Đặc tả v1 và SPEC T-043 B1.3 không ghi ≤ hay <. Đã cài `<` cho đơn vị phân vị và đơn vị đếm, như KS-16 pha 2 (`results/T-043/ks16/ks16_pha2_v11.py` dòng 160) và E3b ở `dinh-nghia-pha2.json`. Phương án khác: ≤. Ảnh hưởng: chỉ khi p đúng bằng α; không fixture nào rơi vào biên, nên đột biến ≤ không bị test bắt (mục D).
+- **PII-02. E9 tắt trên cạnh có E2 bất thường.** SPEC T-043 B2 E9 ghi "tắt trên cạnh có E2 bất thường". Đã cài: khi E2 bật, nếu bất kỳ cạnh nào trên bất kỳ đường giải thích nào của kênh (theo cả hai chiều) là cạnh có F_raw,lên = 1 ở đơn vị E2, thì không phủ quyết; `inherited_by` ghi lý do `tat_tren_canh_E2`. Phương án khác: chỉ xét cạnh trực tiếp giữa e và bên giải thích. Ảnh hưởng: chỉ khi E2 và E9 cùng bật (T11).
+- **PII-03. Khởi phát của kênh E2-VC.** Đặc tả chỉ định nghĩa khởi phát cho đơn vị phân vị. Kênh `E2VC:v` gộp nhiều cạnh; đã cài khởi phát là khởi phát của cạnh có điểm lớn nhất (hòa theo tên cạnh), như cách lấy điểm của kênh. Phương án khác: khởi phát sớm nhất trong các cạnh đỉnh phủ. Ảnh hưởng: E9 và C-d2 khi E2-VC bật.
+- **PII-04. Phá hòa của đường găng CRISP.** Thẻ CRISP không nói khi hai con cùng kết thúc. Đã cài: LFC là con kết thúc muộn nhất, hòa thì con bắt đầu muộn hơn; trong các ứng viên happensBefore chọn con kết thúc muộn nhất, rồi bắt đầu muộn nhất. Ảnh hưởng: chỉ E1-CP (không vào ma trận dev).
+- **PII-05. Đếm con vượt biên cha.** Đã cài: đếm khi con bắt đầu trước cha hoặc kết thúc sau cha quá τ = 1 ms, ở một đầu bất kỳ (fixture 4, 5 chỉ có một đầu). Chỉ là chẩn đoán, không đổi điểm.
+- **PII-06. Trạng thái NO_DATA của đơn vị phân vị.** `hop-dong.json#/trang_thai/don_vi` chỉ có OK, LOW_SUPPORT, NO_BASELINE, NO_A. Đơn vị không có giá trị hữu hạn nào ở cả N và A được ghi NO_DATA. Không đổi xếp hạng (không hợp lệ như các trạng thái khác OK).
+- **PII-07. Vùng E7 của ứng viên không có kênh cờ.** Khi ứng viên r thuộc nhóm hòa đầu nhưng không có kênh F_raw = 1 (ví dụ mọi thực thể ở tầng 3), r không nằm trong đồ thị con nút có cờ; đã cài R_r = ∅. Phương án khác: R_r = {r}. Ảnh hưởng: chỉ mô tả ở T10.
+- **PII-08. Cờ M5 "đứng trước hẳn" trên khối của M1.** Codebook T-028 §4 định nghĩa cho từng loại phương pháp; đã cài theo luật của TORAI vì M1 cũng ghi khối: khối của e có khóa lớn hơn khối của root, hoặc cùng khối và nhóm của e đứng trước. Khối khác nhưng cùng khóa, hay cùng nhóm, không tính. Root không được trả về thì không có cờ.
+- **PII-09. Giá trị metric không hữu hạn.** Đặc tả v1 dòng 110 chỉ nói hỗ trợ tính trên giá trị hữu hạn. Đã cài: bỏ giá trị không hữu hạn ngay khi gom mẫu, nên cũng không vào khởi phát E9, T4c, nhánh z. Adapter đổi NaN, ±inf thành None.
+- **PII-10. Đích của C-d3.** SPEC T-043 B2 ghi "span gốc của trace trong A". Đã cài: span gốc (parent rỗng) có end ≥ t, cùng luật chia N/A của span. Phương án khác: trace có ít nhất một span ở A.
+- **PII-11. C-d1, C-d2, C-d3 tính trên thế giới P của từng cấu hình** và ghi vào `extra.doi_chung` của bản ghi (CĐ10 nói "tính lại trên kết quả chấm của từng cấu hình"). Khởi phát cho C-d2 luôn được tính; E5 chỉ dùng khi E9 bật. Phương án khác: chỉ tính ở chuỗi cuối.
+- **PII-12. C-g với phiếu ngoài tập trả về.** SPEC ghi "không thêm thực thể ngoài đầu ra gốc". Đã cài: thực thể có phiếu nhưng không nằm trong danh sách SimpleRCA đã trả thì bị bỏ; nhóm điểm 0 là mọi thực thể đã trả có 0 phiếu, nối ở cuối thành một khối.
+- **PII-13. Mẫu số C-e khi bản ghi lỗi.** SPEC: mẫu số là cặp mà cả hai nhánh khác INSUFFICIENT_EVIDENCE. Bản ghi ERROR không có verdict; đã cài loại cặp đó khỏi mẫu số và đếm vào số bị loại (`pha2.dem_moc_gia`). Phương án khác: giữ cặp, coi là không báo. Ảnh hưởng: chỉ khi lượt mốc giả có bản ghi lỗi.
+- **PII-14. Danh sách T13 và C-e.** `ma-tran-thu.json#/buoc/<T13>` có 9 mục với "+ 8 đối chứng"; Đ16 bỏ C-h và đổi thành "+ 7 đối chứng" nhưng vẫn còn 8 mục. Đã cài: 7 đối chứng là C-a0, C-a1, C-d1, C-d2, C-d3, C-c, C-g; C-e là vế mốc giả, không là cấu hình riêng (căn cứ: `dinh-chinh-phien10.md` dòng 73 tách "vế mốc giả C-e"). C-a0, C-a1 chạy M1; C-d1, C-d2, C-d3 đọc từ bản ghi chuỗi cuối; C-c, C-g tính từ bản ghi P3. Ảnh hưởng: số cấu hình của T13 (RUN1: 13).
+- **PII-15. Nền của T6, T9, T11, T12 và KB.** Runner không biết quyết định của bước trước khi sinh cấu hình. Mặc định đã cài: T6 dựa trên cấu hình thắng sau K-b; T9 thêm E3b theo chuỗi cuối; T11 thêm E6; T12 thêm E9; có tham số `nen` để T-045 truyền nền thật. KB bật lại một thành phần đang tắt bằng biến thể của khối K (E1-U, E2-C). K-b: cấu hình thắng không có E2 thì chỉ còn biến thể của cấu hình đầy đủ; trùng nhau thì giữ một.
+- **PII-16. δ_d khi có trọng số ca.** Mặc định δ_d = 1/n_d với n_d là số ca của dataset trong danh sách đưa vào (không trọng số). Khi dùng trọng số, T-045 phải truyền δ_d cố định (CĐ13); test trọng số dùng cách này.
+- **PII-17. Cờ trái chiều theo dataset trong luật chọn khối.** Bước 6 nói cờ "nằm ở cấu hình". Đã cài: cờ của cặp (a, b) gắn cho b, cấu hình có thêm thành phần, như lượt một gắn HẠI cho b. Cặp đảo tại cấu hình thắng đã được bước 8 xét riêng (TRÁI CHIỀU thì trình Minh). Phá hòa "E1, E2, E5, E3" với tên thành phần khác bốn tên này: xếp sau, theo thứ tự khai báo. Cấu hình có đồ thị tốt nhất (bước 8): MRR cao nhất, rồi ít thành phần.
+- **PII-18. Lỗi mã của UV-6** đọc là: dataset Nezha-OB và loại lỗi thuộc {return, exception} (`dinh-nghia-pha2.json#/o_kich_hoat/E3`: RE2-TT không có loại lỗi mã). "Lên hạng" là hạng kỳ vọng giảm.
+- **PII-19. Cột metric không khai nguồn.** Đ19 điểm 3 chỉ cho dùng `metrics.time` khi adapter xác nhận. Đã cài: cột không có trong `params.nguon_metric` không được chấm và ghi vào `diagnostics.cot_metric_chua_khai_nguon`. Phương án khác: bản ghi ERROR.
+- **PII-20. Adapter.** RE2-TT: span có parent rỗng hoặc vắng là span gốc; mốc log giữ nguyên số; `message` đổi sang chuỗi. Nezha-OB: trace guard 0 như KS-16 pha 1; mã nguồn metric là `metric:<dịch vụ>`, riêng file front là `metric:front_service` (không đưa đường dẫn vào params, luật cứng 6); F của metric theo từng file (metric không tham gia T). Chuỗi cấm của runner gồm mã mờ, case_dir, tên thư mục ca, mọi đường dẫn tệp và tên file phút của Nezha-OB.
+
+### B. Quy ước biểu diễn (không đổi kết quả; để người phản biện kiểm)
+
+- Tên kênh E2: `E2:a->b` (E2-C, cạnh không định danh) và `E2VC:v` (đỉnh định danh). Cạnh nối hai đỉnh định danh ghi gán cho bên được gọi; cả hai đỉnh tính cạnh này vào điểm của mình (`src/m1/e2.py`).
+- `inherited_by`: một mục cho mỗi kênh giải thích; đường là đường ngắn nhất (BFS, láng giềng theo tên) trong nhóm vòng.
+- Khóa khối: E6a (3 − tầng, K); E6b (π làm tròn 12 chữ số có nghĩa, K_I, K_raw); T4c (3 − tầng, max s, max m, số kênh, Σs); C-d1 (3 − nhóm, K_raw); C-d2 (1, −khởi phát, K_raw) hoặc (0, 0, K_raw); C-d3 (điểm); C-c (điểm RRF); C-g nhóm điểm 0 có khóa (0, 0), Σs_g = 0 dùng khóa giảm dần theo vị trí. Khóa chỉ để `src/p3/danh_gia` đọc thứ tự và hòa.
+- Nguyên nhân của WORLD_DEPENDENT (fixture 29) ghi dạng cấu trúc: loại (cổng đổi hay chỉ điểm đổi) và cặp (thực thể, kênh mạnh nhất).
+- Trong test luật C, khi đáp án không phụ thuộc ô nào thuộc E_X, hàm dựng E_X đưa các ô có ca đổi vào trước rồi thêm ô khác cho đủ số.
+- Bản ghi NO_EVIDENCE khi không có thực thể nào được xếp, như quy ước của `ban_ghi.tao` (OK cần danh sách khác rỗng).
+- Bản ghi thêm `extra.doi_chung`, `extra.T4c`, `extra.kenh_co`, `extra.G_N`, `extra.don_vi_phan_vi`, `worlds.*.don_vi_dem.*.loai_thay_doi` (tên `nhan` là trường cấm). Không trường nào chứa nhãn.
+- Mã ô của luật C phải duy nhất giữa hai dataset (hàm báo lỗi nếu trùng).
+
+### C. Sửa đã làm trong phiên (theo đúng nguồn; ghi để kiểm)
+
+- Chuỗi trước đây dùng `metrics.time` cho cột không khai nguồn: trái Đ19 điểm 3; đã đổi như PII-19.
+- Bản đầu của adapter đưa đường dẫn tệp metric Nezha-OB vào `params.nguon_metric`: trái luật cứng 6; đã đổi như PII-20. Tệp front và tệp pod frontend từng cùng mã nguồn; đã tách.
+- Phép tất định lộ hai phụ thuộc thứ tự: `e2.gan_canh` trả danh sách theo thứ tự đầu vào; `e5.phan_loai` ghi `inherited_by` theo thứ tự kênh đầu vào. Đã sắp theo (bên gọi, bên được gọi) và theo mã kênh (`runs/tat-dinh-000-truoc-sua/ghi-chu.md`).
+- Thiếu đáp án tự lập cho T4c (SPEC bước 3) và thứ tự T4c trong bản ghi (CĐ7): đã thêm 7 mục T4C và gắn T4c vào chuỗi.
+- Phép đột biến lộ hai lỗ hổng test (cắt con qua `chuan_bi`; cách đọc nhóm vòng mặc định): đã thêm test (`runs/dot-bien-001`, `runs/dot-bien-002`).
+
+### D. Giới hạn và phần chưa kiểm
+
+- Biên p = α không có fixture (PII-01).
+- Luật C chưa tính khoảng tin cậy bootstrap theo ô (báo kèm, không dùng để quyết); T-045 dùng `p3.danh_gia.bootstrap`.
+- Adapter chỉ kiểm trên bộ dữ liệu tổng hợp đúng schema của `src/p3`; chưa chạy trên dữ liệu dev (T-045 bước 0).
+- C-g, C-c chỉ kiểm bằng fixture và đáp án tự lập; chưa nối với bản ghi P3 thật.
+- Cạnh tĩnh T12 chỉ kiểm bằng ca giả; chưa đọc mô hình T-038, T-039.
+- Thời gian và RAM trên ca thật chưa đo (T-045 T1).
