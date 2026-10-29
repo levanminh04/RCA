@@ -1,0 +1,448 @@
+{
+  "schema": "T042-adjudication-v1",
+  "status": "maker_results_awaiting_review",
+  "hypotheses": [
+    {
+      "id": "H01",
+      "question": "Cùng đại lượng, đối tượng và evaluator?",
+      "observed": {
+        "S0": {
+          "n": 22,
+          "status": {
+            "OK": 22
+          },
+          "hit@1": 0.3181818181818182,
+          "hit@3": 0.6818181818181818,
+          "hit@5": 0.8409090909090909,
+          "mrr": 0.5375420875420875,
+          "ndcg@5": 0.5972651861919177,
+          "native_top1": 7,
+          "optimistic_top1": 7,
+          "pessimistic_top1": 7,
+          "candidate_sizes": [
+            10
+          ],
+          "cases_with_ties": 22
+        },
+        "all_four_main_baselines_OK": 22
+      },
+      "classification": "Khác/chưa định danh giao thức",
+      "conclusion": "AS@k và Top@k gần nhau ở định nghĩa service, chưa chứng minh cùng cohort/program/ties. Trên chính S0, top1 native/opt/pes cùng7; đổi phá hòa không đủ giải thích gap.",
+      "evidence": [
+        "doi-chieu.md#4",
+        "runs/evaluate-001/summary.json#/summary/S0",
+        "results/T-008/sources/FSE2023_Nezha.pdf pp8–9"
+      ],
+      "alternatives": [
+        "different prediction lists",
+        "different candidate granularity",
+        "different author preprocessing"
+      ],
+      "missing": [
+        "author per-case predictions and evaluator/config"
+      ],
+      "dependent": [
+        "direct paper comparison",
+        "P7 baseline"
+      ],
+      "decision": "OPEN; Minh quyết sau phản biện"
+    },
+    {
+      "id": "H02",
+      "question": "Chỉ khác cohort có giải thích SimpleRCA?",
+      "observed": {
+        "assumptions": [
+          "same full56",
+          "dev22 is subset",
+          "same Top@1"
+        ],
+        "dev_expected_correct": 7.0,
+        "upper": 0.7321428571428571,
+        "paper_top1": 0.91,
+        "test_cases_read": 0
+      },
+      "classification": "Phép bác bỏ có điều kiện",
+      "conclusion": "Cận41/56 <0.91 loại cohort-only khi các giả định đúng; không đọc34test, không xác nhận cohort tác giả. MicroRank cohort-only vẫn khả thi số học.",
+      "evidence": [
+        "runs/evaluate-001/summary.json#/conditional_cohort_bound"
+      ],
+      "alternatives": [
+        "release/preprocessing/program/evaluator differences"
+      ],
+      "missing": [
+        "full author cohort identity"
+      ],
+      "dependent": [
+        "source of paper gap"
+      ],
+      "decision": "OPEN; Minh quyết sau phản biện"
+    },
+    {
+      "id": "H03",
+      "question": "Adapter vi phạm Q84/Q85?",
+      "observed": {
+        "input_audits": 22,
+        "S0_exact_records": 22,
+        "independent_arithmetic": 88,
+        "fixtures": 22
+      },
+      "classification": "Chưa phát hiện lỗi cài đặt trong miền đã kiểm",
+      "conclusion": "Đủ22dev khớp hợp đồng cửa sổ/unit/mapping/cột và đầu ra S0 cũ. Không phải bằng chứng mọi adapter hoặc mọi ca đều đúng; khác pipeline tác giả không tự là bug.",
+      "evidence": [
+        "runs/fixtures-001/checks.json",
+        "runs/full-001/diagnosis-list.json",
+        "runs/*/*-input-audit.json",
+        "nguon.json"
+      ],
+      "alternatives": [
+        "intentional protocol differences",
+        "author pipeline different"
+      ],
+      "missing": [
+        "author input contract for direct equivalence"
+      ],
+      "dependent": [
+        "no patch src currently proposed",
+        "interpretation of P4"
+      ],
+      "decision": "OPEN; Minh quyết sau phản biện"
+    },
+    {
+      "id": "H04",
+      "question": "Metric threshold/count có đủ sửa gap M4?",
+      "observed": {
+        "summary": {
+          "S0": {
+            "n": 22,
+            "status": {
+              "OK": 22
+            },
+            "hit@1": 0.3181818181818182,
+            "hit@3": 0.6818181818181818,
+            "hit@5": 0.8409090909090909,
+            "mrr": 0.5375420875420875,
+            "ndcg@5": 0.5972651861919177,
+            "native_top1": 7,
+            "optimistic_top1": 7,
+            "pessimistic_top1": 7,
+            "candidate_sizes": [
+              10
+            ],
+            "cases_with_ties": 22
+          },
+          "S1": {
+            "n": 22,
+            "status": {
+              "OK": 22
+            },
+            "hit@1": 0.2424242424242424,
+            "hit@3": 0.6666666666666666,
+            "hit@5": 0.8484848484848485,
+            "mrr": 0.5002946127946127,
+            "ndcg@5": 0.5725095571275708,
+            "native_top1": 5,
+            "optimistic_top1": 6,
+            "pessimistic_top1": 5,
+            "candidate_sizes": [
+              10
+            ],
+            "cases_with_ties": 22
+          },
+          "S2": {
+            "n": 22,
+            "status": {
+              "OK": 22
+            },
+            "hit@1": 0.18181818181818182,
+            "hit@3": 0.6136363636363636,
+            "hit@5": 0.6590909090909091,
+            "mrr": 0.417775974025974,
+            "ndcg@5": 0.4460642477505116,
+            "native_top1": 4,
+            "optimistic_top1": 4,
+            "pessimistic_top1": 4,
+            "candidate_sizes": [
+              10
+            ],
+            "cases_with_ties": 16
+          },
+          "S3": {
+            "n": 22,
+            "status": {
+              "OK": 22
+            },
+            "hit@1": 0.20454545454545456,
+            "hit@3": 0.5,
+            "hit@5": 0.6931818181818182,
+            "mrr": 0.4099942881192881,
+            "ndcg@5": 0.4508233724775082,
+            "native_top1": 5,
+            "optimistic_top1": 5,
+            "pessimistic_top1": 4,
+            "candidate_sizes": [
+              10
+            ],
+            "cases_with_ties": 21
+          }
+        },
+        "contrasts": {
+          "S1-S0": {
+            "delta": {
+              "hit@1": -0.07575757575757577,
+              "hit@3": -0.015151515151515138,
+              "hit@5": 0.007575757575757569,
+              "mrr": -0.03724747474747481,
+              "ndcg@5": -0.024755629064346918
+            },
+            "improves": 7,
+            "same": 9,
+            "worsens": 6,
+            "loses_certain_top1": [
+              "dev-27252dca60",
+              "dev-2bfc97b01e",
+              "dev-3e27669440",
+              "dev-7d3c2fe6d1"
+            ],
+            "gains_certain_top1": [
+              "dev-396c8dbf7d",
+              "dev-9fd793feb7"
+            ]
+          },
+          "S2-S0": {
+            "delta": {
+              "hit@1": -0.13636363636363635,
+              "hit@3": -0.06818181818181812,
+              "hit@5": -0.18181818181818188,
+              "mrr": -0.11976611351611355,
+              "ndcg@5": -0.15120093844140609
+            },
+            "improves": 1,
+            "same": 6,
+            "worsens": 15,
+            "loses_certain_top1": [
+              "dev-14701a3bbb",
+              "dev-27252dca60",
+              "dev-70629373f9"
+            ],
+            "gains_certain_top1": []
+          },
+          "S3-S2": {
+            "delta": {
+              "hit@1": 0.022727272727272735,
+              "hit@3": -0.11363636363636365,
+              "hit@5": 0.03409090909090917,
+              "mrr": -0.007781685906685876,
+              "ndcg@5": 0.0047591247269965775
+            },
+            "improves": 8,
+            "same": 5,
+            "worsens": 9,
+            "loses_certain_top1": [
+              "dev-3e27669440",
+              "dev-7d3c2fe6d1",
+              "dev-95e164235f"
+            ],
+            "gains_certain_top1": [
+              "dev-14701a3bbb",
+              "dev-396c8dbf7d",
+              "dev-9fd793feb7"
+            ]
+          },
+          "S3-S1": {
+            "delta": {
+              "hit@1": -0.037878787878787845,
+              "hit@3": -0.16666666666666663,
+              "hit@5": -0.15530303030303028,
+              "mrr": -0.09030032467532462,
+              "ndcg@5": -0.12168618465006259
+            },
+            "improves": 3,
+            "same": 4,
+            "worsens": 15,
+            "loses_certain_top1": [
+              "dev-70629373f9",
+              "dev-95e164235f"
+            ],
+            "gains_certain_top1": [
+              "dev-2bfc97b01e"
+            ]
+          },
+          "S3-S0": {
+            "delta": {
+              "hit@1": -0.11363636363636362,
+              "hit@3": -0.18181818181818177,
+              "hit@5": -0.1477272727272727,
+              "mrr": -0.12754779942279942,
+              "ndcg@5": -0.1464418137144095
+            },
+            "improves": 4,
+            "same": 2,
+            "worsens": 16,
+            "loses_certain_top1": [
+              "dev-27252dca60",
+              "dev-3e27669440",
+              "dev-70629373f9",
+              "dev-7d3c2fe6d1",
+              "dev-95e164235f"
+            ],
+            "gains_certain_top1": [
+              "dev-396c8dbf7d",
+              "dev-9fd793feb7"
+            ]
+          }
+        },
+        "interaction": {
+          "hit@1": 0.09848484848484851,
+          "hit@3": -0.09848484848484851,
+          "hit@5": 0.026515151515151603,
+          "mrr": 0.029465788840788987,
+          "ndcg@5": 0.029514753791343495
+        },
+        "mechanism": {
+          "cases": 22,
+          "channels_per_case": 165,
+          "n_normal_distribution": {
+            "5": 3630
+          },
+          "P95_vs_sigma_threshold": {
+            "lower": 3030,
+            "equal": 600
+          },
+          "P95_vs_sigma_count": {
+            "increase": 1202,
+            "same": 2428
+          },
+          "total_metric_votes": {
+            "S0": 1201,
+            "S1": 631,
+            "S2": 3058,
+            "S3": 1581
+          },
+          "trace_log_unchanged_all": true,
+          "evidence": "diagnosis-list paths -> diagnosis.metrics and diagnosis.scores",
+          "interpretation": "computational sensitivity on M4 dev, not the paper-generating pipeline"
+        }
+      },
+      "classification": "Tác động tính toán đã xác nhận trong M4; bác ứng viên sửa chung",
+      "conclusion": "S1/S2/S3 đều thấp hơn S0 ở Hit1/MRR trên22dev; có ca tăng và ca hỏng. Ngưỡng và đếm góp phần vào điểm/hạng nhưng không xác nhận program0.91. Không chọn winner.",
+      "evidence": [
+        "runs/evaluate-001/summary.json",
+        "runs/reuse-audit-001/m4-mechanism.json",
+        "runs/full-001/*-S*.json"
+      ],
+      "alternatives": [
+        "short/unclean baseline",
+        "signal position/coverage",
+        "log/trace rules",
+        "different author program"
+      ],
+      "missing": [
+        "same author program and input; held-out evaluation after design lock"
+      ],
+      "dependent": [
+        "M4 P4 limitations",
+        "P6 component choice",
+        "P7 baseline"
+      ],
+      "decision": "OPEN; Minh quyết sau phản biện"
+    },
+    {
+      "id": "H05",
+      "question": "MicroRank khác chương trình công bố ở đâu?",
+      "observed": {
+        "reused_checked_files": 465,
+        "local_dev_cases": 22,
+        "reruns": 0
+      },
+      "classification": "Can thiệp repo đã xác nhận; provenance whole pipeline OPEN",
+      "conclusion": "Đã có tác động partition/coverage/weight từ T032/G2, nên không nói chưa có xử lý nào. Không cộng hiệu ứng khác nhóm trace; bộ chia span đầu không phải MicroRank gốc. Table3 vẫn chưa tái lập.",
+      "evidence": [
+        "runs/reuse-audit-001/micro-source-checks.json",
+        "results/T-034/ban-do-g2.json#/rows",
+        "src/microrank/PROVENANCE.json"
+      ],
+      "alternatives": [
+        "partition",
+        "spectrum coverage",
+        "PageRank weight",
+        "operation/service pooling",
+        "normal source"
+      ],
+      "missing": [
+        "full upstream clone no longer local",
+        "code/config/preprocessing/normal source and predictions that created Table3"
+      ],
+      "dependent": [
+        "extent of method-specific P4 claims",
+        "P7 comparator"
+      ],
+      "decision": "OPEN; Minh quyết sau phản biện"
+    },
+    {
+      "id": "H06",
+      "question": "Nền/cửa sổ/kênh/ứng viên có khác có chủ đích?",
+      "observed": {
+        "metric_sources": 11,
+        "channels": 165,
+        "samples_normal_each": 5,
+        "universe": 10
+      },
+      "classification": "Khác biệt giao thức xác nhận; tác động riêng chưa đo",
+      "conclusion": "Q84/Q85/WHY37 định trước. Không gọi bỏNode/ordinal/start-end là lỗi cài đặt. Normal-control thật vẫn có metric alerts; N ngắn/không sạch chưa phân xử, không quy gap cho chúng.",
+      "evidence": [
+        "doi-chieu.md#2",
+        "runs/pilot-001/normal-control.json",
+        "results/T-026/config/adapter-config.json"
+      ],
+      "alternatives": [
+        "normal variability",
+        "clock/recovery/load",
+        "source selection at collection",
+        "M4 noncalibrated log rule"
+      ],
+      "missing": [
+        "author normal/preprocessing",
+        "longer verified dev normal domains if available and approved"
+      ],
+      "dependent": [
+        "P6 calibration",
+        "P7 fairness",
+        "P9 observability"
+      ],
+      "decision": "OPEN; Minh quyết sau phản biện"
+    },
+    {
+      "id": "H07",
+      "question": "Có thể quy gap cho dữ liệu/release?",
+      "observed": {
+        "hash_checks": "all passed within declared manifest scopes"
+      },
+      "classification": "Thiếu đầu vào xác nhận riêng; nguyên nhân gap còn OPEN",
+      "conclusion": "Thiếu statusCode/cadence/clock provenance có bằng chứng và hệ quả. Không có phép giữ program đổi release hoặc ngược lại để quy gap cho dataset. Hash khớp xác nhận file nguồn, không xác nhận đồng hồ hay vật lý.",
+      "evidence": [
+        "nguon.json",
+        "doi-chieu.md",
+        "results/T-034/ban-do-g2.json G2-H19"
+      ],
+      "alternatives": [
+        "program/protocol choices",
+        "version/preprocessing"
+      ],
+      "missing": [
+        "exact release/preprocessing and matched author dev output"
+      ],
+      "dependent": [
+        "dataset limitation claims",
+        "additional source request"
+      ],
+      "decision": "OPEN; Minh quyết sau phản biện"
+    }
+  ],
+  "assumptions": [
+    "Only22 allowlisted dev",
+    "No author program equivalence assumed",
+    "P3 tie expectation",
+    "No physical propagation inferred from ranks"
+  ],
+  "new_research_decisions": []
+}

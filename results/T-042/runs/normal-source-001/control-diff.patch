@@ -1,0 +1,213 @@
+--- before/docs/DECISIONS.md
++++ docs/DECISIONS.md
+@@ -260,3 +260,5 @@
+ | Q-190 | 24/10/2026 | “duyệt làm luôn trong phiên này, làm cho đến khi không phân xử được nữa thì thôi” | Minh duyệt tiếp tục phần nối tiếp đối chiếu Nezha-OB ngay trong phiên T-042: xác định code/config và chuyển đổi đầu vào tạo số công bố; dựng đường chạy chỉ trên22dev sau khi chốt hợp đồng; so cùng đầu vào với repo rồi thay từng khác biệt để phân xử. Không dùng việc hoàn tất2×2 làm lý do dừng câu hỏi nguồn. Lời duyệt này cho phép thực hiện phần nối tiếp đã được trình, thay việc chỉ bàn giao/chờ ở lượt trước; không tự sửa SPEC đã khóa hoặc thay bảng baseline cũ. Lưu bổ sung theo lượt mới trong results/T-042/runs/, nối LOG/WHY về phép phân xử trước kết quả, cập nhật đúng dòng T-042 STATE; giữ Codex làm, Claude phản biện. Giữ khóa test/giữ ngoài, không commit/push, không tự gửi tin tác giả/Claude. Ưu tiên nguồn/môi trường local; giới hạn phát sinh nguồn, thao tác tốn kém và kết luận khoa học vẫn phải được nêu đúng bằng chứng, không được bịa hợp đồng để chạy. Nguồn: lời Minh trong chat ngay sau đề xuất ba bước tiếp tục của Codex. |
+ 
+ | Q-189 | 23/10/2026 | “duyệt claude làm thiết kế” | Phiên thiết kế RCA (soạn SPEC M1 trong chat) do Claude làm, trong phiên mới do Minh mở. Codex phản biện SPEC M1, vì người phản biện phải khác người làm. Nguồn: chat 23/10/2026. |
++
++| Q-191 | 24/10/2026 | “DUYỆT LÀM NGAY BÂY GIỜ” | Minh duyệt gói bổ sung T-042 vừa được Codex trình sau lượt đáp phản biện: bổ sung SPEC về quyền đọc hai khoảng normal OB theo converter trong construct_data; đổi riêng nền N trên 22 ca dev với M4 S0, main M0 và MicroRank đã sửa, giữ A=300 giây và các yếu tố còn lại; kiểm đầu–cuối nền N hiện có. Kiểm số mẫu và nhánh dự phòng trước khi diễn giải; thiếu mẫu ghi UNSUPPORTED hoặc giới hạn, không tự kéo dài/nội suy. Được sửa đúng SPEC T-042, nối DECISIONS/WHY/LOG, cập nhật dòng T-042 STATE và ghi đầu ra mới tại results/T-042/runs/normal-source-001/. Giữ code/kết quả cũ; chưa duyệt kéo dài A, mở test/giữ ngoài, sửa code dùng chung, tải/cài, commit/push hoặc gửi Claude. Dự toán chưa kiểm: dưới 30 phút máy sau thăm dò, 2–4 giờ chuẩn bị/phân tích; đầu ra mới tối đa 20 MB; dừng trình nếu dự kiến vượt ngân sách hoặc một lượt vượt một giờ. Codex làm, Claude phản biện; chưa nghiệm thu/chọn baseline. Nguồn: lời Minh trong chat ngày 24/10/2026, ngay sau bảng phạm vi và đề xuất phép thử N của Codex. |
+--- before/docs/WHY.md
++++ docs/WHY.md
+@@ -804,3 +804,19 @@
+ Cả hai bổ sung phân xử mất thông tin ở converter/công thức, chưa định danh script sinh bảng công bố. Kết luận lợi ích phương pháp, lựa chọn thiết kế và G3 giữ OPEN.
+ 
+ **Tiếp tục sau probe:** severity đã lưu histogram đủ22ca; dùng lại output hợp lệ. Cây sau end split đủ19.080 trace, không cycle/missingparent/multiroot; cây identity bỏ bản lặp chỉ để định kind, giữ occurrence trong scope/PageRank. Phân biệt coverage-tree kind với coverage-set có thể chạy bằng map hash, không cần thêm dữ liệu. Bổ sung prospective: giữ Eq7 và đổi riêng kind A; rồi đổi kind N; sau đó đổi scope occurrence sang unique operation như hai nghĩa có thể của bài. Không chọn winner. Timestamp metric:9ca có TimeStamp của adservice lệch khoảng200.000.000giây so với Time; kiểm projection trên chính hàng dev đã chọn, không nhập hàng khác ngoài allowlist. Mọi can thiệp là diagnostic, chưa xác nhận tác giả dùng chính nó.
++
++
++### Bổ sung WHY-54 — Đổi riêng nguồn normal N và kiểm đầu–cuối N (24/10/2026, Q-191; trước kết quả)
++
++Chọn thử N theo hai phút converter đã xác định, giữ A300 và chương trình/cấu hình/kênh/clock/evaluator. Lý do: có khác biệt đầu vào cụ thể còn chưa được trình phép phân xử, đáp ứng RQ1/RQ2 và kiểm độ lệch baseline P3 trước P7. Phương án kéo dài A chưa được duyệt, đổi đồng thời N/A sẽ trộn tác động; chạy sweep để khớp bài không cung cấp provenance. Dùng lại đối chứng hợp lệ, không chạy lại toàn bộ.
++
++N thay thế là ứng viên normal, chưa được chứng minh sạch; inventory có metric trùng byte với cây dữ liệu lỗi nên không suy tên thư mục thành trạng thái khỏe. Một phút có thể chỉ có một mẫu metric. Giữ min_normal_metric=2 của M4; kênh thiếu ghi unavailable. Main native có fallback theo pool; đếm rõ, không coi giá trị fallback A là ước lượng độc lập từ N. MicroRank thiếu operation/SLO hữu hạn ghi lỗi đúng, không fill. N ngày23 nằm sau một số ca: bộ bọc truyền hai nhóm trực tiếp, giữ timestamp, kiểm tương đương trên dữ liệu mà phép chia gốc hợp lệ; không sửa core dùng chung.
++
++Đổi N thay cùng nguồn, độ dài và số mẫu/phủ nên chỉ quy kết cho gói lựa chọn nền trong cấu hình đã kiểm. Thêm kiểm hai mẫu đầu/cuối N metric và hai nửa trace/log đủ dữ liệu để phát hiện sự thay đổi, không dùng nhãn để chọn kênh. Nó không tự xác nhận hồi phục lỗi trước; không khẳng định TT có nền sạch chỉ từ điểm cao. Giữ các giải thích cạnh tranh là CANDIDATE cho tới khi có chuỗi đầu vào -> xử lý -> trung gian -> đầu ra. Exact metric-normal, bridge và chương trình lịch sử sinh bảng vẫn OPEN dù N làm tăng điểm.
++
++Chưa kiểm khi ghi: số mẫu/phủ thật trong hai phút, độ lớn/tác động đổi N, trạng thái đầu–cuối N và khả năng chạy MicroRank. Nếu thiếu dữ liệu, không kéo dài/nội suy hoặc đổi A để hoàn thành bảng; báo đúng phần thiếu và quyết định phụ thuộc. Không chọn thiết kế/baseline hay khẳng định lợi ích đồ thị từ phép này.
++
++
++### Bổ sung WHY-54 — Kiểm số học F2 trước diễn giải (Q-191, 24/10/2026)
++
++F2 NumPy trên một số kênh gần hằng tạo |chênh mean hai cặp|/std5 vượt cận Cauchy sqrt(5), do làm tròn mean khi tín hiệu chênh ở vài ULP. Không gọi đây là biến động vật lý. Giữ output ban đầu, tính lại riêng thống kê F2 trên đúng22dev/kênh/cửa sổ, không chạy lại method: Fraction.from_float giữ chính xác giá trị binary64 đã vào pipeline, tính mean/delta/variance bằng hữu tỷ rồi mới chuyển float cho hiển thị/std. Không epsilon/floor, không đổi ngưỡng/phương pháp hay chọn kênh. Đối chiếu counts/timestamps/min/max với F2 cũ; cận sqrt(5) là phép kiểm số học, không là ngưỡng nhận định recovery. Báo cáo dùng F2-stable-001 thay thống kê chuẩn hóa ban đầu. Lựa chọn này chỉ sửa độ ổn định số học của phần mô tả, không đổi diagnosis/score đã freeze.
+--- before/docs/STATE.md
++++ docs/STATE.md
+@@ -4,7 +4,7 @@
+ 
+ ## Hiện tại
+ 
+-- **T-042 — Đối chiếu baseline Nezha-OB:** **chờ phản biện** (24/10/2026); Codex làm, Claude phản biện. [Báo cáo bổ sung](../results/T-042/runs/continuation-001/bao-cao-bo-sung.md), [báo cáo gốc](../results/T-042/bao-cao.md), [SPEC](../tasks/T-042-doi-chieu-baseline-nezha-ob/SPEC.md), [LOG/prompt](../tasks/T-042-doi-chieu-baseline-nezha-ob/LOG.md). Đã thực hiện phần nối tiếp được Minh duyệt; chưa nghiệm thu, chưa chọn baseline. Giữ kết quả cũ và khóa test; tham chiếu T-042 hạ tầng chờ lượt riêng.
++- **T-042 — Đối chiếu baseline Nezha-OB:** **chờ phản biện** (24/10/2026); Codex làm, Claude phản biện. Đã chạy bổ sung N-only và kiểm đầu–cuối N theo quyền được duyệt. [Báo cáo mới](../results/T-042/runs/normal-source-001/bao-cao.md), [SPEC](../tasks/T-042-doi-chieu-baseline-nezha-ob/SPEC.md), [LOG/prompt](../tasks/T-042-doi-chieu-baseline-nezha-ob/LOG.md). Giữ A300, kết quả cũ và khóa test; chưa nghiệm thu/chọn baseline; phần A theo converter và nguồn lịch sử còn OPEN.
+ - **T-041 đã nghiệm thu và đóng** theo Q-186 sau gói sửa Q-185. [Báo cáo](../results/T-041/bao-cao.md), [bàn giao thiết kế](../results/T-041/ban-giao-phien-2.md), [LOG đóng task](../tasks/T-041-ra-soat-nen-p3-p5/LOG.md). Claude chưa kiểm lại bản sửa; không ghi thêm lượt phản biện đã hoàn tất.
+ - **G0/G1/G2 đã duyệt** (Q-36/Q-70/Q-149); **P5 đã đóng** (Q-176). RQ2/RQ3/RQ5 và G3 vẫn OPEN.
+ - **P6:** [kế hoạch đã lưu](PLAN-P6.md), chưa chọn phương pháp hoặc duyệt triển khai M1. [Đề xuất hướng Grafana](DE-XUAT-HUONG-GRAFANA-RCA.md) không duyệt nguyên văn (Q-188). Phần hạ tầng Grafana và báo động bằng luật đã quyết hướng trong [kế hoạch giai đoạn tới](KE-HOACH-GIAI-DOAN-TOI.md) (M-16, M-36, M-38). Phần còn lại là tài liệu tham khảo, quyết trong SPEC M1 và SPEC hạ tầng.
+--- before/tasks/T-042-doi-chieu-baseline-nezha-ob/SPEC.md
++++ tasks/T-042-doi-chieu-baseline-nezha-ob/SPEC.md
+@@ -1,6 +1,6 @@
+ # T-042 — Đối chiếu baseline Nezha-OB với số công bố
+ 
+-- **Trạng thái:** đã duyệt tạo ngày 23/10/2026 theo Q-189. Phiên Codex mới tự soát SPEC với nguồn gốc trước; nếu có điểm bất hợp lý thì dừng, báo Minh và không tự sửa SPEC; nếu không có thì triển khai ngay trong phạm vi đã duyệt. Tự soát không thay phản biện chính thức của Claude; chưa có lượt phản biện chính thức.
++- **Trạng thái:** đã duyệt tạo ngày 23/10/2026; Minh duyệt bổ sung phạm vi normal N ngày 24/10/2026 theo Q-191, sau phản biện kết quả trong chat. Phần bổ sung ở cuối file là quyền hiện hành cho lượt này; các phần trước giữ lịch sử. Codex làm, Claude phản biện; chưa nghiệm thu.
+ - **Người làm:** Codex.
+ - **Người phản biện:** Claude.
+ - **Thuộc gói MRP:** P3–P4, bổ sung căn cứ trước thiết kế P6 và đánh giá P7.
+@@ -288,3 +288,27 @@
+ ## Prompt bàn giao
+ 
+ Dùng Prompt chung + khối Soát SPEC + khối G2 trong `D:/RCA-flashticket/docs/review-prompt.md`. Bản prompt cho Claude nằm ở mục “Prompt Claude” trong `D:/RCA-flashticket/tasks/T-042-doi-chieu-baseline-nezha-ob/LOG.md`; Minh chọn chuyển. Chưa có quyền ghi bản phản biện; Claude chỉ trả lời trong chat. Prompt phiên Codex mới cũng nằm trong LOG: giữ vai trò người làm, tự soát trước theo Q-189; bất hợp lý thì dừng báo Minh, không tự sửa SPEC; nếu không có thì triển khai ngay trong phạm vi, không cần chờ Claude soát SPEC. Tự soát không thay phản biện chính thức.
++
++## Bổ sung đã được Minh duyệt ngày 24/10/2026 — Q-191
++
++Đây là sửa SPEC có quyền mới, sau lượt đáp phản biện; không suy quyền từ Q-190. Bản SPEC trước bổ sung nằm tại results/T-042/runs/normal-source-001/before/tasks/T-042-doi-chieu-baseline-nezha-ob/SPEC.md. Không đổi code hoặc kết quả cũ, không tự nghiệm thu.
++
++### Câu hỏi và phép phân xử bổ sung
++
++- H-N (CANDIDATE): nguồn nền trước tiêm của P3 góp phần gây kết quả OB thấp. So riêng nguồn N theo phút normal do converter xác định, giữ A=[t,t+300s), native clock Time của metric P3, kênh, mapping, cấu hình và evaluator. Đây là phép đổi nguồn/độ dài/độ phủ N cùng nhau, không chứng minh riêng độ sạch, số mẫu hoặc đúng toàn bộ pipeline lịch sử. Chạy M4 S0, main M0 literal Duration và repaired MicroRank sham; không chọn nhánh theo điểm.
++- H-F2 (CANDIDATE): N trước tiêm không ổn định, có thể do phần hồi phục lỗi trước. So hai mẫu đầu với hai mẫu cuối của mỗi kênh trong năm mẫu N của 22 ca; bỏ mẫu giữa theo kế hoạch trước chạy. Nếu log/trace đủ cả hai nửa thời gian thì lưu thống kê hai nửa, nếu không ghi thiếu. Kết quả chỉ cho thấy thay đổi, chưa phân biệt hồi phục với tải/nhịp đo/giải thích khác.
++- H-N được hỗ trợ trong cấu hình kiểm khi chuỗi N -> thống kê/ngưỡng -> nhóm/phiếu/điểm -> hạng đổi theo dự đoán. Không đổi trên đầu vào đủ điều kiện thì loại tác động ở cấu hình đó; thiếu mẫu/operation hoặc fallback thì giữ phần tương ứng OPEN, không coi là bác bỏ.
++- MicroRank nhận N/A tách riêng trong bộ bọc task; không đổi timestamp để ép N trước mốc. Kiểm tương đương bộ bọc với hàm gốc trên fixture và một ca dev trước khi dùng kết quả. Không sửa lõi dùng chung, không mở sweep.
++
++### Quyền dữ liệu bổ sung
++
++Chỉ thêm hai khoảng UTC: [2022-08-22T03:51:00Z,03:52:00Z] và [2022-08-23T17:00:00Z,17:01:00Z] trong online-boutique/construct_data. Đây là miền normal ứng viên theo filename loader, chưa xác nhận sạch.
++
++Allowlist riêng chỉ gồm metric front_service và các pod có alias P3 theo ngày, log 03_51/17_00 và trace 03_51/17_00, ghim hash/size từ manifest tải T-008. Không mở toàn bộ ngày để phân tích; đọc timestamp trước, chỉ giải mã giá trị đo trong miền được phép. Không dùng dependency, traceid hoặc nguồn/dataset khác. Metric giữ Time; TimeStamp converter khác được nêu là giới hạn, không âm thầm đổi clock. Trace/log giữ timestamp và Duration nguồn, duplicates và alias P3; trace giữ giới hạn end của reader P3 trong miền N, A giữ đúng membership đã duyệt. Không dịch, nội suy, kéo dài, bổ sung dữ liệu A cho N hoặc giả severity. Nhánh native main fallback A do thiếu N phải được giữ và đếm rõ; không gọi nó là bằng chứng độc lập về nền N.
++
++### Phạm vi ghi, chi phí và tiêu chí xong bổ sung
++
++- Được sửa SPEC này đúng bổ sung trên; nối DECISIONS Q-191, WHY-54 và LOG; chỉ cập nhật dòng T-042 STATE.
++- Đầu ra bổ sung duy nhất: results/T-042/runs/normal-source-001/ gồm bản trước, nguồn/allowlist/plan, script riêng, fixture, mọi lượt kể cả hỏng, audit, trung gian, diagnosis trước nhãn, evaluator, đính chính/phản hồi, báo cáo, manifest và prompt. Không lưu payload telemetry thô.
++- Ước lượng chưa kiểm: dưới 30 phút máy sau thăm dò; 2–4 giờ chuẩn bị và phân tích. Đầu ra mới tối đa 20.000.000 byte. Dừng trình nếu dự kiến vượt ngân sách hoặc một lượt vượt một giờ; không tải/cài hoặc sửa môi trường.
++- Tiêu chí xong: kiểm nguồn/hash; kiểm số mẫu/phủ và fallback; fixture/bộ bọc đạt; có kết quả từng ca/kênh/pool/operation đủ để lần cơ chế, giữ mọi trạng thái lỗi; chấm sau freeze bằng evaluator P3 và đối chiếu độc lập; diễn giải từng giả thuyết và phần nguồn còn thiếu, không chọn baseline. Kiểm diff/file set; LOG đủ bàn giao, dòng T-042 chờ phản biện và prompt chuẩn cho Claude. Không đóng task/G3/test.
+--- before/tasks/T-042-doi-chieu-baseline-nezha-ob/LOG.md
++++ tasks/T-042-doi-chieu-baseline-nezha-ob/LOG.md
+@@ -407,3 +407,131 @@
+ Đầu ra có nêu: hạn chế đã xác nhận và điều kiện; lỗi cài đặt/thiếu đầu vào; hạn chế giả định/phép tính; quan hệ có thể bổ sung thông tin gì; câu chưa trả lời và bằng chứng còn thiếu? Căn cứ nào đủ đề xuất ứng viên, căn cứ nào đủ lựa chọn thiết kế?
+ Không bắt mọi task P4 làm xong đối chứng của phương pháp mới. Đối chứng bỏ quan hệ và quy tắc đơn giản trên cùng đồ thị dùng khi đánh giá tác dụng của việc dùng quan hệ; không là điều kiện trì hoãn mọi phân tích hạn chế baseline.
+ ```
++
++
++## Phiên 24/10/2026 — Codex, LEVANMINH, người làm T-042 — bổ sung normal N (Q-191)
++
++### Quyết định của Minh trong phiên
++
++Minh: “DUYỆT LÀM NGAY BÂY GIỜ”, duyệt đúng gói đã trình sau đáp phản biện: sửa SPEC bổ sung normal N, ghi DECISIONS/WHY/LOG/STATE và đầu ra normal-source-001; thử N-only trên22dev và kiểm đầu–cuối N. Giữ A300, code/kết quả cũ, khóa test/giữ ngoài, không commit/push/gửi Claude. Đã lưu Q-191 trước dùng lựa chọn. Không sửa Q-189 trùng mã của công việc khác.
++
++### Tự soát trước chạy
++
++Đọc AGENTS/STATE, SPEC và mục cuối LOG; đối chiếu DT18/cô, MRP RQ1/RQ2/P3/P4/P7, WHY/DECISIONS/LESSONS và source/manifest thật. Đã có lượt phản biện Claude trong chat và đáp phản biện chỉ đọc; chưa có file REVIEW được Minh duyệt ghi. Nhận thiếu sót phải trình phép đổi N trước khi dừng; không nhận suy luận N/A đã được xác nhận là nguyên nhân. Main chia Duration/1000, NezhaRCA/1e6; không gán nhầm hệ quả100s cho main. MRR TT công bố0.85, không0.80. Đính chính và phản hồi đầy đủ sẽ nằm trong đầu ra bổ sung.
++
++Phạm vi mới đủ kiểm tác động nguồn N trên A cố định; chưa phân xử riêng sạch/số mẫu/độ dài, chưa nối kín historical pipeline. Hai miền normal được allowlist, chỉ timestamp-scanning trước lọc; không mở telemetry ngoài miền. N ngày23 có thể sau ca dev; không dịch timestamp hoặc để MicroRank tự chia nhầm. Một phút có thể thiếu mẫu; phải ghi unavailable/fallback/error, không tạo dữ liệu. Các giới hạn này đã được trình và được Minh duyệt, không tự là lỗi SPEC mới. Code/giấy phép/môi trường dùng lại nội bộ như lượt trước, không vendoring/phát hành.
++
++Bản đồ ảnh hưởng đã được Minh duyệt: SPEC/DECISIONS/WHY là nguồn quyền và lý do; normal-source-001 là đầu ra mới; LOG/đúng dòng STATE là tiến độ. Đã chụp byte/hash mọi1284file kết quả T042 cũ và9control trước thay đổi tại before.json/before/. Giữ nguyên các thay đổi không thuộc task. Hai trợ lý nội bộ chỉ đọc code/metadata độc lập, không phải phản biện Claude.
++
++Lỗi thao tác chuẩn bị: hai lần đọc nhầm tên core.py không tồn tại (đã tìm đúng inventory); một patch header SPEC có anchor dư không tồn tại nên bị từ chối toàn bộ, sau đó sửa đúng một dòng. Không đổi file/đầu ra khoa học trong các lần lỗi. Không dùng kết quả hỏng làm bằng chứng.
++
++**Tiếp theo:** kiểm hash nguồn/kết quả, tạo allowlist và kế hoạch cụ thể, reader fixture, đếm mẫu normal trước method. Giữ mọi lượt và chi phí ngay từ đầu.
++
++### Tiến độ bổ sung Q-191, trước chấm nhãn
++
++- prepare-001:1282output khoa học cũ khớp manifest;26file normal (41.268.767byte) khớp inventory/hash. allowlist và plan được ghi trước method. Các control hash cũ không được tự cập nhật; bản trước giữ trong before/.
++- fixtures-001:2kiểm adapter Micro explicit N/A đạt, gồm N nằm sau A mà không dịch thời gian.
++- pilot-001:ca nhỏ nhất dev-27252dca60; M4 cũ và main M0 cũ replay khớp chính xác, explicit Micro chia N/A khớp toàn kết quả core gốc; N mới chạy3method được. Normal ngày23 có165kênh mỗi kênh1mẫu hữu hạn; lưu audit và mọi output trước đọc nhãn.
++- full-001:đang chạy, dùng lại pilot đúng hash/script; normal ngày22 cũng165kênh×1mẫu. M4 metric sẽ unavailable đúng min2, không fill; main pool fallback giữ đúng code. Từngca/F2/audit/method_s/stdout/stderr ghi ngay từ đầu. Chưa chấm/đọc nhãn ở lượt này. Không xem một phút normal là nền sạch hoặc nhiều mẫu.
++- Bước tiếp:đợi full-001 freeze66record rồi mới chạy evaluate.py; đọc score/intermediate theo từngca vàô. Lệnh đang chạy: Python -B results/T-042/runs/normal-source-001/run.py full full-001, PYTHONHASHSEED=0.
++
++### Sau freeze và chấm Q-191
++
++full-001 hoàn tất66record, reuse3pilot,261giây full; cả22Micro cóstatusok, không kích hoạt nhánh no_anomalous/no_normal/missingwindow. Trợ lý đọc code nêu wrapper sẽ dừng nếu các trạng thái ấy xuất hiện; đây là giới hạn nhánh chưa dùng, không mấtca hiện tại. Không tổng quát runner ngoài22inputđãduyệt; giữ sourceđúnghashđãchạy.
++
++evaluate-001 hỏng vì khóa root trùng với trường root trong chuỗi; giữ source/failure. evaluate-002 hỏng khi bảng trace không có emailservice do không có A trace; giữ source/failure. evaluate-003 dùng get rõ trường thiếu, đạt toàn66record và chấm P3/độc lập. Không chạy lại method, không đổi diagnosis hoặc mẫu số. Đã sửa native Micro baseline theo thứ tự full operation API lưu trong scores trước chấm, tách khỏi thứ tự hiển thị hòa.
++
++Tự kiểm F2 phát hiện5channel–case gần hằng có standardized delta vượt cận số họcsqrt5 do mean/variance làm tròn. Không dùng các số này làm cơ chế. Ghi WHY trước tính lại riêng thống kê F2 bằng hữu tỷ trên binary64 cùng đầu vào; không rerun method, không floor/epsilon hoặc mở thêm telemetry ngoài dev. Kết quả cũ giữ nguyên; báo cáo dùng F2-stable-001 sau kiểmcounts/timestamp/minmax.
++
++### Kết thúc gói bổ sung Q-191 — bàn giao chờ phản biện
++
++1. **Đã làm:** đã hoàn tất đúng gói N-only + F2 được Minh duyệt. Nguồn/hash/allowlist/plan trước method, normal60s chỉ có1mẫu mỗi165kênh/ngày, trace/log giữ capture19–28giây thực. Giữ A300 và source clock P3; Micro nhận N/A explicit, không shift thời gian.66diagnosis mới trên22dev freeze trước nhãn, dùng lại đối chứng cũ/pilot. Báo cáo hiện hành và đính chính/đáp F1–F3 tại results/T-042/runs/normal-source-001/bao-cao.md; phân xử từng giả thuyết tại phan-xu.json, toàn ô/ca tại evaluate-003/evaluation.json và tables.md.
++
++   Kết quả chính P3 kỳ vọng hòa: M4 Hit1 0,318182→0,367424, MRR0,537542→0,555250; MAIN Hit1 0,681818→0,500000, MRR0,782147→0,684222; Micro Hit1 0→0, MRR0,170139→0,163059. Native tương ứng7→6,15→12,0→0 trên22. M4 chấm20OK+2NO_EVIDENCE, không loại ca rỗng. Chuỗi xác nhận: M4 usablemetric165→0 mỗi ca; MAIN440poolCPU/network fallback sangA và0alert, latency5giá trị khác metric tại1mốc vẫn chạy; Micro nhóm trace đổi22/22nhưngroot không lên1. Không suy một cờ thành nguyên nhân mọi ca; đã đối chiếu cả đúng/sai cùng ô và lưu mọi trung gian. N này không khôi phục kết quả chung; không chứng minh nền cũ nhiễm lỗi hay normal mới sạch.
++
++   F2 cùng3630kênh–ca, tính hữu tỷ cho thống kê sau phát hiện5tỷ số gần hằng vượt cận do làm tròn. F2-stable-001 counts/timestamp/minmax khớp toàn bộ, cận đạt; không đổi method/score.3042tỷ số xác định,588không xác định; medianabs1,093941 vàP901,866629. Dấu delta chỉ mô tả, không tự là biến động vật lý; tên field normalized_lastbit_changes chỉ đếm số tỷ số đổi, không hàm ý chỉ bit cuối. Chưa phân xử nguyên nhân hồi phục; 7cặp dev kề không là toàn lịch tiêm.
++
++2. **File thay đổi:** đúng5control được duyệt: SPEC T-042 (header và phụ lụcQ-191), nối DECISIONS Q-191, WHY-54 và LOG này; chỉ dòng T-042 STATE thành chờ phản biện. Mọi đầu ra mới nằm trong results/T-042/runs/normal-source-001/; file-set/diff/hash cuối tại manifest.json và control-diff.patch.1284file T042 cũ, các control không thuộc lượt và src giữ nguyên. Không sửa mã hạ tầng/tham chiếu kế hoạch hoặc Q-189 trùng mã của công việc khác. Không commit/push, mở test/giữ ngoài, tải/cài hoặc gửi Claude.
++
++3. **Kiểm:** verification-001/checks.json PASS:170JSON/gzip tại mốc kiểm đọc được;66record+baseline hash, tổng P3/độc lập, F2stable, source snapshots, pin T034 và2nguồn công bố,1284kết quả cũ và control ngoài quyền không đổi; git diff --check đạt. Đã đọc toàn báo cáo, từng ô/ca và trung gian. Hai trợ lý nội bộ chỉ đọc code/output, kiểm độc lập component/fusion/spectrum66record và F2, không là Claude hoặc phản biện chính thức. Method full261giây, pilot12giây, F2stable6giây; peak sampled RSS~456MiB, không là đỉnh liên tục. Tổng byte thực tại manifest, dưới20MB. F2stable không capture stdout/stderr riêng, giữ progress/summary/exit0; không giả null là0.
++
++   Giữ evaluate-001/002 hỏng (khóa root trùng, thiếu trace emailservice hợp lệ), source/failure đầy đủ; evaluate-003 đạt. Không rerun method. Một patch bổ sung báo cáo bị từ chối vì hunk ngược thứ tự; không file đổi ở lượt đó, đã cập nhật theo đúng dòng. Giới hạn wrapper Micro: trạng thái core khôngok nhưng không thiếu baseline sẽ dừng lô; không kích hoạt ở22input này (tất cảok), không tuyên bố runner đã xử lý mọi input khả dĩ.
++
++4. **Câu hỏi nguồn và phần cần Minh quyết:** gói đã duyệt đã có đủ đầu ra và kiểm, chưa nghiệm thu. RQ1/P3 vàRQ2/P4 có thêm chuỗi tác động N→mất phiếu/fallback/nhóm trace→rank ở điều kiện kiểm; chưa xác định độc nhất nguyên nhân chênh công bố, sạch/nhiễm normal hoặc lịch sử chương trình. Exact normal_metric/bridge/revision/config/cohort/per-case prediction/aggregation vẫn OPEN. Phần A theo converter chưa chạy: cần nguồn đúng lần tiêm kế toàn lịch và quyền miền mới nếu giao test/giữ ngoài; không tự lấy ca dev kế làm mốc và không chạy vượt Q-191. Phép N cũng thay nguồn/độ dài/số mẫu/phủ cùng nhau, không tách riêng “sạch”. Không nói đã hết phép phân xử; bước A/source-history cần giao riêng. P6/P7/baseline/G3 và hiệu quả đồ thị vẫn phụ thuộc. Đề xuất tiếp tục Claude kiểm độc lập lượt bổ sung; Minh quyết nghiệm thu, nguồn/miền tiếp theo hoặc chấp nhận giới hạn.
++
++**Bước tiếp theo chính xác:** đọc bao-cao.md, phan-xu.json, evaluate-003/evaluation.json, mechanism-summary.json, F2-stable-001/summary.json và manifest trong normal-source-001. Dùng D:/RCA-ext/envs/T-014-main/Scripts/python.exe -B, PYTHONHASHSEED=0 nếu cần kiểm. Trước dùng output, chạy verify.py seal chỉ đọc; không chạy lại method hợp lệ. Prompt Claude nguyên mẫu nằm ngay dưới và prompt-claude.txt; Minh chuyển thủ công. Người làm không tự đóng task.
++
++**Lệnh đã chạy:** run.py prepare prepare-001; fixtures fixtures-001; pilot pilot-001; full full-001; evaluate.py (hỏng001), evaluate.py evaluate-002 (hỏng), evaluate.py evaluate-003 (đạt); f2_stable.py; report.py; verify.py check. Tất cả script ở results/T-042/runs/normal-source-001/, Python hiện có -B; hashseed0 ở method. Các lượt method có stdout/stderr, invocation và source-at-start. Sau report.py có hai chỉnh phần giải thích bằng chứng/F2 trong bao-cao.md, không đổi số JSON. Lệnh cuối phiên: D:/RCA-ext/envs/T-014-main/Scripts/python.exe -B results/T-042/runs/normal-source-001/verify.py seal (chỉ đọc sau manifest; PASS thể hiện trên tool output). Không có method còn cần chạy tự động trong gói này.
++
++**Đề xuất nội dung commit khi Minh yêu cầu:** research: test Nezha-OB normal-source contrast and document baseline limits (T-042). Chưa commit/push.
++
++### Prompt Claude — kiểm lại phản hồi và bổ sung T-042
++
++Minh chọn chuyển hoặc dừng; chưa tự gửi. Chép nguyên văn common + công đoạn kiểm lại + G2, chỉ điền metadata.
++
++```text
++Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
++Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
++
++Thông tin lượt này:
++- Task hoặc đề xuất: T-042; D:/RCA-flashticket/tasks/T-042-doi-chieu-baseline-nezha-ob/SPEC.md.
++- Công đoạn: kiểm lại phản hồi và sửa.
++- Gói/cổng: P3–P4, trọng tâm G2.
++- Người làm và người phản biện chính thức: Codex làm; Claude phản biện.
++- Tài liệu gốc: D:/RCA-flashticket/tasks/T-042-doi-chieu-baseline-nezha-ob/SPEC.md và LOG.md; D:/RCA-flashticket/docs/DECISIONS.md, WHY.md; D:/RCA-flashticket/results/T-042/bao-cao.md, doi-chieu.md, phan-xu.json, nguon.json, ke-hoach-chay.json, manifest.json; D:/RCA-flashticket/results/T-042/runs/continuation-001/bao-cao-bo-sung.md, phan-xu-bo-sung.json, manifest.json; D:/RCA-flashticket/results/T-042/runs/normal-source-001/bao-cao.md, phan-xu.json, source-contract.json, plan.json, manifest.json, verification-001/checks.json; bản chưa commit, không có commit gốc riêng.
++- Phản biện và phản hồi trước: phản biện Claude ngày 24/10/2026 lưu nguyên văn tại D:/RCA-flashticket/results/T-042/runs/normal-source-001/phan-bien-trong-chat.txt; phản hồi Codex trong chat do Minh chuyển; bản ghi phản hồi và bổ sung tại D:/RCA-flashticket/results/T-042/runs/normal-source-001/bao-cao.md và LOG T-042.
++- Code và kết quả liên quan: D:/RCA-flashticket/results/T-042/scripts/ và runs/; D:/RCA-flashticket/results/T-042/runs/normal-source-001/run.py, evaluate.py, f2_stable.py, evaluate-003/, F2-stable-001/, mechanism-summary.json, cost-and-runs.json, before.json; D:/RCA-flashticket/src/p3/, src/simplerca/, src/microrank/; nguồn ngoài repo theo pin tại D:/RCA-flashticket/results/T-017/sources/download-manifest.json; môi trường D:/RCA-ext/envs/T-014-main/Scripts/python.exe, dùng -B; lệnh và hướng dẫn tại LOG.
++- Phạm vi ghi được Minh cho phép trong lượt này: chỉ trả lời trong chat; chưa có quyền ghi bản phản biện, sửa file hoặc chạy thực nghiệm mới.
++
++Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
++
++Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
++Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
++Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
++
++Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
++hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
++Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
++số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
++có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
++
++Bổ sung yêu cầu phản biện:
++1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
++2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
++3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
++4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
++5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
++6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
++7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
++8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
++9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
++10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
++
++Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
++Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
++
++Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
++bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
++Tiếng Việt, câu ngắn.
++
++Cuối lượt báo:
++1. Đã làm gì.
++2. File đã thay đổi, hoặc không sửa file nào.
++3. Kiểm đã chạy và kết quả.
++4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
++
++Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
++
++Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
++
++Công đoạn: người phản biện kiểm lại phản hồi và sửa.
++Tự soát yêu cầu và đầu ra gốc trước; sau đó đọc phản biện, phản hồi và các thay đổi được duyệt. Kiểm cả ý kiến phản bác reviewer; không mặc định phản hồi hoặc bản sửa đúng.
++Đối chiếu từng điểm với bằng chứng hiện tại, quyền sửa và hậu quả. Có điểm đúng nhưng chưa được Minh duyệt sửa thì ghi đúng trạng thái; không tự coi đã xử lý hoặc ép người làm sửa.
++Chỉ ghi bản phản biện lượt mới được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ lịch sử, không ghi LOG/STATE hay sửa thay người làm. Nêu bất đồng còn lại và soạn prompt để người làm đáp.
++
++Kiểm chuỗi đầu vào → xử lý → trung gian → đầu ra ở các nhóm quan trọng. Đọc code và trung gian đã lưu trước, đối chiếu ca sai với ca đúng có điều kiện tương ứng. Thiếu trung gian thì nêu đúng phần cần chạy/thu thêm, chi phí và quyết định phụ thuộc; không tự chạy ngoài quyền hoặc bỏ câu hỏi bằng “ngoài SPEC”.
++Kết luận cơ chế phải chỉ được: trong điều kiện X, bước Y làm mất hoặc đánh giá sai thông tin Z. Nếu chưa xác định Y, giữ đúng quan sát, giải thích khác và bằng chứng thiếu.
++Phân biệt dữ liệu/thiếu đầu vào, giao thức, adapter/cài đặt và giả định/cách tính; không cộng cờ chồng lấn thành tỷ lệ nguyên nhân. Hạn chế dữ liệu xác nhận có hệ quả đánh giá và yêu cầu quan sát FlashTicket có thể rút ra không?
++Đầu ra có nêu: hạn chế đã xác nhận và điều kiện; lỗi cài đặt/thiếu đầu vào; hạn chế giả định/phép tính; quan hệ có thể bổ sung thông tin gì; câu chưa trả lời và bằng chứng còn thiếu? Căn cứ nào đủ đề xuất ứng viên, căn cứ nào đủ lựa chọn thiết kế?
++Không bắt mọi task P4 làm xong đối chứng của phương pháp mới. Đối chứng bỏ quan hệ và quy tắc đơn giản trên cùng đồ thị dùng khi đánh giá tác dụng của việc dùng quan hệ; không là điều kiện trì hoãn mọi phân tích hạn chế baseline.
++```

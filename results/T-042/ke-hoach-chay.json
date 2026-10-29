@@ -1,0 +1,98 @@
+{
+  "schema": "T042-plan-v1",
+  "frozen_before_method": true,
+  "dev_ids": [
+    "dev-14701a3bbb",
+    "dev-1ac905bc95",
+    "dev-27252dca60",
+    "dev-2bfc97b01e",
+    "dev-396c8dbf7d",
+    "dev-3b92690644",
+    "dev-3e27669440",
+    "dev-515c5f2190",
+    "dev-5467884de4",
+    "dev-55f99f3e0a",
+    "dev-5ada15752d",
+    "dev-607751ac0a",
+    "dev-63c30faf34",
+    "dev-6c9afc9822",
+    "dev-70629373f9",
+    "dev-7b7c973198",
+    "dev-7d3c2fe6d1",
+    "dev-8ecd9880ed",
+    "dev-95e164235f",
+    "dev-9b9397a4dc",
+    "dev-9fd793feb7",
+    "dev-b0f8b2e3ac"
+  ],
+  "branches": {
+    "S0": {
+      "metric_rule": "sigma",
+      "metric_aggregation": "events"
+    },
+    "S1": {
+      "metric_rule": "sigma",
+      "metric_aggregation": "channels"
+    },
+    "S2": {
+      "metric_rule": "p95",
+      "metric_aggregation": "events"
+    },
+    "S3": {
+      "metric_rule": "p95",
+      "metric_aggregation": "channels"
+    }
+  },
+  "fixed": {
+    "sigma": 3,
+    "ddof": 0,
+    "quantile": 0.95,
+    "quantile_method": "linear",
+    "trace_factor": 3,
+    "log_threshold": 0,
+    "keywords": [
+      "ERROR",
+      "FAIL",
+      "EXCEPTION"
+    ],
+    "trace_guard_s": 0,
+    "view": "main",
+    "window_s": 300,
+    "duplicates": "retain",
+    "filling": "none",
+    "scoring": "P3 exact ties"
+  },
+  "predictions": {
+    "threshold": "P95 can change the per-channel count while all other inputs stay fixed",
+    "aggregation": "channels replaces each positive count by one, changing relative metric/modal weight",
+    "alternative": "neither change need repair errors; true positives can be lost",
+    "interaction": "S3 identifies combined sensitivity, not the author program"
+  },
+  "reuse": {
+    "frozen_baseline": "results/T-026/ban-ghi-dua-vao-cham.json",
+    "previous_channels": "results/T-032/runs/simplerca-s1-001/summary.json",
+    "policy": "reuse full valid intermediates if available; replay S0 only for missing thresholds/counts",
+    "microrank": "read saved interventions only; do not rerun"
+  },
+  "budget": {
+    "max_case_branches": 88,
+    "estimated_machine_minutes": [
+      20,
+      60
+    ],
+    "max_single_run_s": 3600,
+    "expected_rss_mb": 2000,
+    "expected_output_mb": 300,
+    "downloads": 0
+  },
+  "dependencies": [
+    "verified sources",
+    "WHY-54 written",
+    "fixtures",
+    "independent window audit",
+    "unlabeled pilot cost",
+    "serialize diagnoses and list",
+    "join dev labels",
+    "P3 and independent evaluator"
+  ]
+}
