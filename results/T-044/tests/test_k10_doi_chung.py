@@ -145,3 +145,30 @@ def test_Cd2_khoi_phat_thuc_the(ma):
     kenh = [Kenh(k[0], k[1], 'len', 'lan_nguoc', k[2], loai=k[3], khoi_phat=k[4]) for k in m['dau_vao']['kenh']]
     kq = doi_chung.cd2_tu_kenh(kenh, set(m['dau_vao']['quan_sat']))
     assert [g for b in kq['blocks'] for g in b['groups']] == m['dap_an']['danh_sach']
+
+
+@pytest.mark.parametrize('muc', ['CD1-S3', 'CD3-S1', 'CD3-S7', 'CD3-KG'])
+def test_doi_chung_trong_chuoi(muc, ma):
+    """CĐ10: C-d1, C-d3 tính lại trên kết quả chấm của cấu hình, đi qua chuỗi từ span (đáp án tự lập)."""
+    from m1 import chuoi
+    import sinh_trace_S
+    from conftest import FIXTURE
+    from test_k09_chuoi import CAU_HINH_S
+    m = tu_lap(DAP_AN_DOI_CHUNG, muc)
+    ma(muc)
+    d, da = m['dau_vao'], m['dap_an']
+    spans, logs = sinh_trace_S.sinh(d['S'], t=1000, mau=FIXTURE['trace_mau_S'])
+    if d.get('bien_doi'):
+        spans = [dict(s, parentSpanID='khong-resolve') if s['parentSpanID'] == '' else s for s in spans]
+    rec = chuoi.chay(spans, [], logs, ['A', 'B', 'F', 'I', 'R', 'X'], {}, 1000,
+                     sinh_trace_S.params(CAU_HINH_S[d['cau_hinh']]))
+    assert rec['error'] is None, rec['error']
+    dc = rec['extra']['doi_chung']
+    if m['doi_chung'] == 'C-d1':
+        assert dc['C-d1']['blocks'][0]['groups'][0] == da['dau']
+    else:
+        kq = dc['C-d3']
+        assert kq['trang_thai'] == da['trang_thai']
+        for k in ('dich', 'diem_ung_vien', 'so_span_goc_A'):
+            if k in da:
+                assert kq[k] == da[k], k

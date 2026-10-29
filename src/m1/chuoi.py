@@ -2,11 +2,13 @@
 (hop-dong.json#/vao/tham_so_duy_nhat). Không nhận tên ca, đường dẫn, mã mờ, nhãn (luật cứng 6).
 
 Thứ tự: hợp đồng → thời gian về ns (Đ19) → miền → span → trạng thái quan sát → đơn vị theo cấu hình → E4 (ba thế
-giới cho đơn vị đếm) → kênh → E2 gán → E5 (+ E9) → xếp hạng E6a/E6b mỗi thế giới → verdict (P) → E7 (P) → bản ghi.
+giới cho đơn vị đếm) → kênh → E2 gán → E5 (+ E9) → xếp hạng E6a/E6b mỗi thế giới → verdict (P) → E7 (P) →
+đối chứng C-d1, C-d2, C-d3 trên kết quả chấm của cấu hình (P; CĐ10, chỉ báo cáo) → bản ghi.
+Khởi phát (Đ11) luôn tính cho đơn vị phân vị có cờ, vì C-d2 cần; E5 chỉ dùng khi E9 bật.
 """
 import math
 
-from m1 import e2, e4, e5, e7, hop_dong, kenh as kenh_mod, quan_sat, span, xep_hang
+from m1 import doi_chung, e2, e4, e5, e7, hop_dong, kenh as kenh_mod, quan_sat, span, xep_hang
 from m1.kieu import Kenh
 
 PHIEN_BAN = 'M1-T044-1'
@@ -308,7 +310,7 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
         for u in don_vi:
             if u['loai'] == 'phan_vi':
                 kq = kq_pv[u['ma']]
-                kp = _khoi_phat_phan_vi(u, kq, t_ns, o_s_ns) if E9 else {}
+                kp = _khoi_phat_phan_vi(u, kq, t_ns, o_s_ns)
             else:
                 T = T_cua(u['nguon'], w)
                 if T is None:
@@ -333,10 +335,8 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
             co_canh = [(u, kq) for u, kq in don_vi_w if u['nhom'] == 'canh' and kq.get('F_raw_len')]
             canh_co = [(u['ben_goi'], u['ben_duoc_goi'], kq['e_len']) for u, kq in co_canh]
             canh_E2_bat_thuong = {(u['ben_goi'], u['ben_duoc_goi']) for u, _ in co_canh}
-            kp_canh = {}
-            if E9:
-                for u, kq in co_canh:
-                    kp_canh[(u['ben_goi'], u['ben_duoc_goi'])] = _khoi_phat_phan_vi(u, kq, t_ns, o_s_ns).get('len')
+            kp_canh = {(u['ben_goi'], u['ben_duoc_goi']): _khoi_phat_phan_vi(u, kq, t_ns, o_s_ns).get('len')
+                       for u, kq in co_canh}
             if canh_co:
                 g = e2.gan_canh(canh_co, che_do=E2)
                 chan_doan.setdefault('E2_du_phong', 0)
@@ -398,6 +398,17 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
             if u['loai'] == 'dem':
                 nhan_dem.setdefault(u['ma'], {})[w] = kq.get('nhan')
     obs_dep = sorted(m for m, v in nhan_dem.items() if e4.obs_dependent(v))
+    # ---- đối chứng trên kết quả chấm của cấu hình (CĐ10; Đ11; Đ12), thế giới P, chỉ báo cáo
+    kenh_P_U = [k for k in worlds['P']['kenh'] if k.thuc_the in set(U)]
+    diem_d3 = {e: xep_hang.khoa(ds)[0] for e, ds in doi_chung._theo_e(kenh_P_U).items()}
+    lan_nguoc = sorted({k.thuc_the for k in kenh_P_U if k.co and k.lop == 'lan_nguoc'})
+    spans_A = [{'parent': None if (s['cha'] is None and not s['mo_coi']) else 'co', 'chu': s['chu']}
+               for s in prep['spans'].values() if s['phia'] == 'A']
+    dich = doi_chung.dich_cd3(spans_A, lan_nguoc)
+    d3 = dict(doi_chung.cd3(canh, diem_d3, dich), dich=dich,
+              so_span_goc_A=sum(1 for s in spans_A if s['parent'] is None))
+    dc = {'C-d1': doi_chung.cd1(kenh_P_U, canh, co_OK_P), 'C-d2': doi_chung.cd2_tu_kenh(kenh_P_U, co_OK_P),
+          'C-d3': d3}
     classes = {}
     for e in O:
         if e not in co_OK_P:
@@ -428,6 +439,7 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
         'worlds': {w: {'thu_tu': xh_w[w]['thu_tu'], 'blocks': xh_w[w]['blocks'],
                        'don_vi_dem': [{'ma': u['ma'], 'n_N': kq.get('n_N'), 'n_A': kq.get('n_A'),
                                        'T_N': kq.get('T_N'), 'T_A': kq.get('T_A'), 'trang_thai': kq['trang_thai'],
+                                       'loai_thay_doi': kq.get('nhan'),
                                        'p_len': kq.get('p_len'), 'p_xuong': kq.get('p_xuong'),
                                        'e_len': kq.get('e_len'), 'e_xuong': kq.get('e_xuong'),
                                        'F_raw_len': kq.get('F_raw_len'), 'F_raw_xuong': kq.get('F_raw_xuong')}
@@ -445,7 +457,8 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
         'extra': {'blocks_P': blocks, 'tang_P': xP['tang'],
                   'K_I_P': {e: list(v) for e, v in xP['K_I'].items()},
                   'K_raw_P': {e: list(v) for e, v in xP['K_raw'].items()},
-                  'canh': [list(c) for c in canh], 'nhom_vong_P': e5_w['P']['nhom_vong']},
+                  'canh': [list(c) for c in canh], 'nhom_vong_P': e5_w['P']['nhom_vong'],
+                  'doi_chung': dc},
     }
     hop_dong.kiem_ban_ghi(rec)
     return rec
