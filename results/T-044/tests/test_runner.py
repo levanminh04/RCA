@@ -132,6 +132,9 @@ def test_pha2_M5_va_luat_C(ma, tmp_path):
     r0, c1 = kq['cau_hinh']['R0']['ca']['gia-001'], kq['cau_hinh']['C1']['ca']['gia-001']
     assert r0['theo_the_gioi']['P']['RR'] == Fraction(1, 3) and r0['theo_the_gioi']['P']['M5'] is True
     assert c1['theo_the_gioi']['P']['RR'] == 1 and c1['theo_the_gioi']['P']['M5'] is False
+    # MRR giữ phân số chính xác (CĐ16; TS6)
+    assert kq['cau_hinh']['R0']['MRR']['gop'] == Fraction(1, 3) and isinstance(kq['cau_hinh']['R0']['MRR']['gop'], Fraction)
+    assert all(isinstance(v, Fraction) for w in kq['cau_hinh']['C1']['MRR_the_gioi'].values() for v in w.values())
     cap = pha2.ket_cuc_cap(kq, 'R0', 'C1', E_X={'o1'}, thanh_phan='E1', buoc='khoi_K')
     for w in ('P', 'S_lo', 'S_hi'):
         assert cap['theo_the_gioi'][w]['ket_cuc'] == 'KHONG_DU_CA'

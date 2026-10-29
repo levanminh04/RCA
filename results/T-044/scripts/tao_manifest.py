@@ -51,6 +51,14 @@ LUOT = [
     {'duong_dan': 'runs/manifest-crlf-001', 'script': 'tao_manifest.py --kiem trên checkout CRLF giả lập (commit 57234546)',
      'ket_qua': 'thiếu .gitattributes: FAIL (lượt hỏng); có .gitattributes: PASS, 29 file khớp git_blob',
      'ghi_chu': 'N1; xem ghi-chu.md'},
+    {'duong_dan': 'runs/test-xanh-003', 'script': 'pytest -v, PYTHONHASHSEED=0', 'ket_qua': '254/254 qua',
+     'ghi_chu': 'sau gói sửa phản biện lượt 2; tổng hợp ở bang-phep-kiem.json'},
+    {'duong_dan': 'runs/tat-dinh-004', 'script': 'scripts/tat_dinh.py; pytest 3 hash seed × 4 thứ tự; so_ban_ghi_truoc_sau.py',
+     'ket_qua': 'PASS (104 bản ghi, 254 phép); bỏ trường mới thì giống 9206eaa6', 'ghi_chu': 'sau gói sửa phản biện lượt 2'},
+    {'duong_dan': 'runs/dot-bien-004', 'script': 'scripts/dot_bien.py (35 đột biến)', 'ket_qua': '35/35 bị bắt',
+     'ghi_chu': 'sau gói sửa phản biện lượt 2; D28–D35 mới; D26, D27 đổi chỗ theo code mới'},
+    {'duong_dan': 'runs/kiem-hash-t043-004', 'script': 'scripts/kiem_hash_t043.py', 'ket_qua': 'PASS 69/69, 10/10',
+     'ghi_chu': 'sau gói sửa phản biện lượt 2'},
 ]
 
 
@@ -97,9 +105,12 @@ def tao():
                           ['giai_doan_2', 'lời Minh trong chat ngày 29/10/2026: "duyệt toàn bộ các đề xuất bên trên của bạn"; '
                                           'ghi ở LOG T-044, giai đoạn 2; dòng DECISIONS chờ Minh duyệt'],
                           ['sua_sau_phan_bien_1', 'lời Minh trong chat ngày 29/10/2026: "DUYỆT SỬA LUÔN"; ghi ở LOG T-044, '
-                                                  'mục "Phản hồi phản biện lượt 1 và gói sửa"']],
+                                                  'mục "Phản hồi phản biện lượt 1 và gói sửa"'],
+                          ['sua_sau_phan_bien_2', 'lời Minh trong chat ngày 29/10/2026: "NẾU KHÔNG CÓ ĐIỂM NÀO XUNG '
+                                                  'ĐỘT THÌ SỬA NGAY"; ghi ở LOG T-044, mục "Phản hồi phản biện lượt 2 '
+                                                  'và gói sửa"']],
         'trang_thai': 'xong các bước 0–9 trong phạm vi SPEC; Phần II mục A của dinh-chinh-cai-dat.md đã được Minh duyệt '
-                      '(29/10/2026); đã sửa sau phản biện lượt 1 (Phần II mục C2); chờ phản biện lượt 2',
+                      '(29/10/2026); đã sửa sau phản biện lượt 1 (Phần II mục C2) và lượt 2 (mục C3; E1-CP và bước 5 chờ Minh); chờ phản biện kiểm lại',
         'outputs': [dict({'path': str(p.relative_to(ROOT)).replace('\\', '/'), 'sha256': sha(p),
                           'bytes': p.stat().st_size}, **({'git_blob': gb[p]} if p in gb else {}))
                     for p in ds],

@@ -1,6 +1,6 @@
 # T-044 — Cài chuỗi M1 và kiểm đặc tả (báo cáo)
 
-- **Người làm:** Claude, phiên cloud, branch `claude/sweet-hawking-dy078d`. **Người phản biện:** Codex (lượt 1 trong chat 29/10/2026: 3 CHẶN, 1 KHÔNG CHẶN; đã sửa theo duyệt của Minh, chờ kiểm lại).
+- **Người làm:** Claude, phiên cloud, branch `claude/sweet-hawking-dy078d`. **Người phản biện:** Codex (lượt 1 trong chat 29/10/2026: 3 CHẶN, 1 KHÔNG CHẶN; lượt 2: 7 CHẶN, 1 KHÔNG CHẶN, rồi kiểm phản hồi; đã sửa phần không còn bất đồng, chờ kiểm lại).
 - **Ngày:** 29/10/2026. **SPEC:** `tasks/T-044-cai-dat-m1/SPEC.md` (đã duyệt; sửa theo các mục Minh duyệt ngày 29/10/2026, LOG giai đoạn 2).
 - **Quyền dữ liệu:** không đọc `data/`, không tải dữ liệu, không đọc bản ghi P3 có nhãn. Mọi phép kiểm dùng ca giả.
 
@@ -8,23 +8,24 @@
 
 **Task đạt gì (trong phạm vi fixture):**
 - Code `src/m1/` (phương pháp, đối chứng, runner, adapter) và `src/m1_danh_gia/` (bộ đánh giá) theo đặc tả v1, ba bản đính chính T-043 và Phần I của `dinh-chinh-cai-dat.md`.
-- 246/246 phép kiểm qua (`bang-phep-kiem.json#/tong`). Trong đó 97/97 phép của T-043 trong phạm vi (`#/T043/qua_trong_pham_vi`); 12 phép của fixture D13 loại theo ngoại lệ đã duyệt (`#/T043/loai_tru_D13`); B1–B8, U1–U6, H1–H6 và 78 mục đáp án tự lập qua (`#/theo_nhom`).
+- 254/254 phép kiểm qua (`bang-phep-kiem.json#/tong`). Trong đó 97/97 phép của T-043 trong phạm vi (`#/T043/qua_trong_pham_vi`); 12 phép của fixture D13 loại theo ngoại lệ đã duyệt (`#/T043/loai_tru_D13`); B1–B8, U1–U6, H1–H6 và 86 mục đáp án tự lập qua (`#/theo_nhom`).
 - Không sửa đáp án nào; không có đáp án đặc tả nào lệch với code.
-- Tất định: 104 bản ghi và 246 phép kiểm giống hệt qua 4 thứ tự hàng × PYTHONHASHSEED 0, 1, 2 (`runs/tat-dinh-003/tong-hop.json#/ket_luan`).
-- Đột biến: 27/27 bị bắt (`runs/dot-bien-003/tong-hop.json#/so_bi_bat`), sau khi lượt đầu lộ 2 lỗ hổng test và đã vá (`runs/dot-bien-001/tong-hop.json#/song_sot`). D22–D27 thêm sau phản biện lượt 1.
+- Tất định: 104 bản ghi và 254 phép kiểm giống hệt qua 4 thứ tự hàng × PYTHONHASHSEED 0, 1, 2 (`runs/tat-dinh-004/tong-hop.json#/ket_luan`).
+- Đột biến: 35/35 bị bắt (`runs/dot-bien-004/tong-hop.json#/so_bi_bat`), sau khi lượt đầu lộ 2 lỗ hổng test và đã vá (`runs/dot-bien-001/tong-hop.json#/song_sot`). D22–D27 thêm sau phản biện lượt 1; D28–D35 sau lượt 2.
 - Sau phản biện lượt 1: đã sửa ba lỗi CHẶN (bội số ô trong luật C, M5, UV-6, mốc giả; trạng thái quan sát của nguồn metric; cặp giải thích WORLD_DEPENDENT), thu hẹp lập luận E3 trong đề xuất WHY, và cho manifest kiểm được trên checkout CRLF (giả lập trên Linux, `runs/manifest-crlf-001`; chưa chạy trên Windows thật) (`dinh-chinh-cai-dat.md` Phần II mục C2).
+- Sau phản biện lượt 2: đã sửa MRR chính xác tới hết luật chọn, ô bội số 0, bước 8 với cặp phụ thuộc quan sát, kiểm khai báo bắt buộc, thống kê severity và cặp Drain trong bản ghi, giải thích WORLD_DEPENDENT khi hòa hoặc vắng, trạng thái nguồn metric rỗng (mục C3). Chưa sửa, chờ Minh: quy tắc E1-CP; cách đọc cặp phụ thuộc quan sát ở bước 5 (mục D).
 - Runner sinh đúng số cấu hình theo `ma-tran-thu.json` sau Đ16; hai pha tách được; hash pha 1 ổn định.
 
 **Câu hỏi của SPEC trả lời tới đâu:**
 - A1 (code đúng đặc tả?): đúng trên mọi ca giả có đáp án; kết luận chỉ trong phạm vi fixture.
-- A2 (test có sức bắt lỗi?): 27/27 đột biến bị bắt. Lượt 1 của phản biện vẫn tìm được ba lỗi mà 235 phép và 21 đột biến cũ không bắt: phép kiểm và đột biến chỉ mạnh tới đâu đáp án và câu hỏi đặt ra tới đó. Chỗ không có fixture thì đột biến tương ứng không thể bị bắt (biên p = α, mục 9).
+- A2 (test có sức bắt lỗi?): 35/35 đột biến bị bắt. Hai lượt phản biện vẫn tìm được lỗi mà bộ test và đột biến lúc đó không bắt (lượt 1: ba lỗi với 235 phép, 21 đột biến; lượt 2: tám điểm với 246 phép, 27 đột biến): phép kiểm và đột biến chỉ mạnh tới đâu đáp án và câu hỏi đặt ra tới đó. Chỗ không có fixture thì đột biến tương ứng không thể bị bắt (biên p = α, mục 9).
 - A3 (nhãn có lọt?): kiểm tĩnh qua; fixture 74 qua; chặn rò ở mức giá trị (CĐ12) có test và đột biến D06–D08.
 - A4 (tất định?): PASS trên ca giả. Trên dữ liệu thật: T-045 T1.
 - A5 (đặc tả có chỗ sai hay mơ hồ?): không chỗ sai; 20 chỗ đặc tả không nói, người làm đã chọn cách hiểu (`dinh-chinh-cai-dat.md` Phần II, mục A); Minh duyệt giữ cả 20 ngày 29/10/2026.
 
 **Không trả lời:** hiệu quả của M1 (RQ3b, RQ3c, RQ3d); hành vi, thời gian, RAM trên dữ liệu thật (T-045).
 
-**Trạng thái:** Phần II mục A đã được Minh duyệt (29/10/2026); đã sửa sau phản biện lượt 1; chờ phản biện lượt 2.
+**Trạng thái:** Phần II mục A đã được Minh duyệt (29/10/2026); đã sửa sau phản biện lượt 1 và lượt 2 (trừ hai mục chờ Minh); chờ phản biện kiểm lại.
 
 ## 2. Đầu vào, môi trường, kiểm hash
 
@@ -38,7 +39,7 @@
 
 ## 3. Kết quả phép kiểm
 
-Nguồn: `runs/test-xanh-002/ket-qua.json` (từng phép), tổng hợp ở `bang-phep-kiem.json` (`scripts/tao_bang_phep_kiem.py`). Lượt trước gói sửa: `runs/test-xanh-001` (235/235).
+Nguồn: `runs/test-xanh-003/ket-qua.json` (từng phép), tổng hợp ở `bang-phep-kiem.json` (`scripts/tao_bang_phep_kiem.py`). Các lượt trước: `runs/test-xanh-001` (235/235), `runs/test-xanh-002` (246/246).
 
 | Nhóm | Số phép | Qua | Con trỏ |
 |---|---|---|---|
@@ -46,11 +47,11 @@ Nguồn: `runs/test-xanh-002/ket-qua.json` (từng phép), tổng hợp ở `ban
 | Fixture bổ sung B1–B8 | 8 | 8 | `#/theo_nhom/B` |
 | U1–U6 (Đ15), H1–H6 (Đ19) | 12 | 12 | `#/theo_nhom/U`, `#/theo_nhom/H` |
 | H1–H3 chạy qua chuỗi (trạng thái quan sát của nguồn metric) | 3 | 3 | `#/theo_nhom/H_qua_chuoi` |
-| Đáp án tự lập, thành phần (58 mục) | 72 | 72 | `#/theo_nhom/tu_lap_thanh_phan` |
+| Đáp án tự lập, thành phần (66 mục) | 80 | 80 | `#/theo_nhom/tu_lap_thanh_phan` |
 | Đáp án tự lập, đối chứng (15 mục) | 15 | 15 | `#/theo_nhom/tu_lap_doi_chung` |
 | Đáp án từ văn bản đặc tả (5 mục) | 5 | 5 | `#/theo_nhom/tu_lap_van_ban` |
 | Phép bổ sung của người làm (đầu-cuối từ span, runner, adapter, kiểm tĩnh, cache…) | 34 | 34 | `#/theo_nhom/bo_sung_nguoi_lam` |
-| **Tổng** | **246** | **246** | `#/tong` |
+| **Tổng** | **254** | **254** | `#/tong` |
 
 - Đáp án tự lập ở `fixture/dap-an-thanh-phan.json`, `dap-an-doi-chung.json`, `dap-an-van-ban.json` mang dấu "đáp án của người làm T-044, chưa qua phản biện". Codex cần kiểm từng mục (Q-212).
 - `fixture/dap-an-u-h.json`: U1–U6, H1–H6 chép từ `results/T-043/dinh-chinh-phien10.md` dòng 42–47 và 144–149; cột `van_ban` tách nguyên văn, cột `may_doc` chép tay; chờ người phản biện đối chiếu.
@@ -103,10 +104,11 @@ Nguồn: `runs/test-xanh-002/ket-qua.json` (từng phép), tổng hợp ở `ban
 - Lượt đầu (`runs/tat-dinh-000-truoc-sua/`): 6 phép trượt khi xáo, do `e2.gan_canh` và `e5.phan_loai` giữ thứ tự đầu vào trong đầu ra. Đã chuẩn hóa thứ tự.
 - Lượt `runs/tat-dinh-002/tong-hop.json` (trước gói sửa): 0 sha256 lệch; 235 phép.
 - Lượt cuối `runs/tat-dinh-003/tong-hop.json`: 0 sha256 lệch trong 12 biến thể; 246 phép qua và giống hệt ở cả 12 biến thể. Cả 104 bản ghi khác lượt 002 vì gói sửa thêm trường (`coverage` của nguồn metric, `extra.kenh_co_the_gioi`). Bỏ hai trường này thì 104 bản ghi giống hệt bản trước gói sửa (`runs/tat-dinh-003/tong-hop.json#/so_voi_truoc_sua`).
+- Lượt cuối `runs/tat-dinh-004/tong-hop.json` (sau gói sửa lượt 2): 0 sha256 lệch; 254 phép giống hệt ở 12 biến thể. Bỏ các trường mới (`coverage` của nguồn metric, `extra.kenh_co_the_gioi`, `extra.thong_ke_log`) thì 104 bản ghi giống hệt bản ở 9206eaa6 (`#/so_voi_truoc_sua`).
 
 ## 8. Đột biến
 
-Nguồn: `runs/dot-bien-003/tong-hop.json`. Mỗi đột biến thay đúng một chuỗi trong bản sao tạm của `src/`; lượt đối chứng không đột biến xanh 246/246. Số phép trượt dưới đây theo lượt 003.
+Nguồn: `runs/dot-bien-004/tong-hop.json`. Mỗi đột biến thay đúng một chuỗi trong bản sao tạm của `src/`; lượt đối chứng không đột biến xanh 254/254. Số phép trượt dưới đây theo lượt 004. D26, D27 đổi chỗ đột biến theo code mới của lượt 2 (cùng ý).
 
 | Mã | Đột biến | Tệp | Phép trượt |
 |---|---|---|---|
@@ -131,12 +133,20 @@ Nguồn: `runs/dot-bien-003/tong-hop.json`. Mỗi đột biến thay đúng mộ
 | D19 | E5 bỏ thứ tự chuẩn (chạy với `M1_XAO=1`) | `m1/e5.py` | 1 |
 | D20 | Cột metric không khai nguồn vẫn được chấm | `m1/chuoi.py` | 1 |
 | D21 | Chuỗi thiếu `tham_so_E5` dùng cách đọc A | `m1/chuoi.py` | 1 |
-| D22 | Luật C: P, M đếm mỗi ô một lần dù ô lấy k lần | `m1_danh_gia/luat_c.py` | 2 |
+| D22 | Luật C: P, M đếm mỗi ô một lần dù ô lấy k lần | `m1_danh_gia/luat_c.py` | 3 |
 | D23 | Cờ M5 nhánh tắt bỏ bội số | `m1_danh_gia/pha2.py` | 1 |
 | D24 | UV-6 bỏ bội số | `m1_danh_gia/uv6.py` | 2 |
 | D25 | Mẫu số mốc giả không theo bội số | `m1_danh_gia/pha2.py` | 1 |
-| D26 | Chuỗi không xuất trạng thái quan sát của nguồn metric | `m1/chuoi.py` | 3 |
-| D27 | WORLD_DEPENDENT lấy mọi thực thể đứng trước root | `m1_danh_gia/the_gioi.py` | 2 |
+| D26 | Chuỗi không xuất trạng thái quan sát của nguồn metric | `m1/chuoi.py` | 4 |
+| D27 | WORLD_DEPENDENT lấy mọi thực thể đứng trước root | `m1_danh_gia/the_gioi.py` | 3 |
+| D28 | Pha 2: MRR đổi sang số thực | `m1_danh_gia/pha2.py` | 1 |
+| D29 | RR_o: ô bội số 0 vẫn chia | `m1_danh_gia/rr.py` | 1 |
+| D30 | Bước 8: đọc kết cục tại P của cặp phụ thuộc quan sát | `m1_danh_gia/chon_khoi.py` | 1 |
+| D31 | T12: thiếu khóa con của `canh_tinh` không ra UNSUPPORTED | `m1/chuoi.py` | 1 |
+| D32 | Bản ghi bỏ thống kê severity và cặp Drain | `m1/chuoi.py` | 1 |
+| D33 | WORLD_DEPENDENT coi hòa là đứng sau | `m1_danh_gia/the_gioi.py` | 1 |
+| D34 | WORLD_DEPENDENT chỉ xét thực thể có ở cả hai thế giới | `m1_danh_gia/the_gioi.py` | 1 |
+| D35 | Không xuất trạng thái nguồn metric khi không có hàng | `m1/chuoi.py` | 1 |
 
 - Gồm đủ sáu ví dụ của SPEC bước 7 (D01, D02, D03, D04, D05; rò nhãn D06–D08).
 - Lượt `runs/dot-bien-001` (20 đột biến) có 2 đột biến sống sót: D02 vì fixture 4, 5 chỉ gọi `cat_con` trực tiếp, không đi qua `chuan_bi`; D10 vì test nhóm vòng luôn truyền cách đọc. Đã thêm test, không thêm đáp án.
@@ -144,12 +154,14 @@ Nguồn: `runs/dot-bien-003/tong-hop.json`. Mỗi đột biến thay đúng mộ
 ## 9. Tự diễn giải, giới hạn, phần chưa kiểm
 
 - Tự diễn giải đã duyệt: Phần I của `dinh-chinh-cai-dat.md` (CĐ1–CĐ16).
-- Tự diễn giải lộ ra khi cài: Phần II mục A (PII-01…PII-20), Minh duyệt giữ cả 20 ngày 29/10/2026. Quy ước biểu diễn: mục B. Sửa trong phiên: mục C. Sửa sau phản biện lượt 1: mục C2.
+- Tự diễn giải lộ ra khi cài: Phần II mục A (PII-01…PII-20), Minh duyệt giữ cả 20 ngày 29/10/2026. Quy ước biểu diễn: mục B. Sửa trong phiên: mục C. Sửa sau phản biện lượt 1: mục C2. Sửa sau lượt 2: mục C3.
 - Chưa kiểm (Phần II mục D):
   - biên p = α không có fixture; đột biến ≤ thay < sẽ không bị bắt (PII-01);
   - khoảng tin cậy bootstrap theo ô chưa nằm trong `luat_c` (báo kèm; T-045 dùng `p3.danh_gia.bootstrap`);
   - adapter chưa chạy trên dữ liệu dev; C-g, C-c chưa nối bản ghi P3 thật; cạnh tĩnh T12 chưa đọc mô hình T-038, T-039;
-  - thời gian, RAM, giá trị trung gian trên ca thật (T-045 bước 0, T1).
+  - thời gian, RAM, giá trị trung gian trên ca thật (T-045 bước 0, T1);
+  - quy tắc E1-CP (ngưỡng, biên, sibling, phá hòa) chưa thống nhất giữa CĐ1, bài CRISP và code CRISP; code hiện cho 2000 ở ca phản ví dụ, chờ Minh quyết (OPEN; ảnh hưởng D4 của T-045);
+  - bước 5 luật chọn khối đọc cặp phụ thuộc quan sát theo kết cục tại P; có nên đọc là KHÔNG ĐỦ CA không, chờ Minh quyết (OPEN; đổi được cấu hình thắng).
 - Kết luận "code đúng" chỉ trong phạm vi fixture. Đáp án tự lập chưa qua phản biện; nếu một đáp án tự lập sai thì code đang khớp cùng cách hiểu sai đó.
 
 ## 10. Các lượt chạy (giữ cả lượt hỏng)
@@ -168,6 +180,10 @@ Nguồn: `runs/dot-bien-003/tong-hop.json`. Mỗi đột biến thay đúng mộ
 | `runs/test-xanh-002` | sau gói sửa: 246/246 qua |
 | `runs/tat-dinh-003` | sau gói sửa: PASS (246 phép, 104 bản ghi) |
 | `runs/dot-bien-003` | sau gói sửa: 27/27 bị bắt |
+| `runs/test-xanh-003` | sau gói sửa lượt 2: 254/254 qua |
+| `runs/tat-dinh-004` | sau gói sửa lượt 2: PASS (254 phép, 104 bản ghi) |
+| `runs/dot-bien-004` | sau gói sửa lượt 2: 35/35 bị bắt |
+| `runs/kiem-hash-t043-004` | sau gói sửa lượt 2: PASS |
 | `runs/kiem-hash-t043-003` | sau gói sửa: PASS |
 | `runs/manifest-crlf-001` | manifest trên checkout CRLF giả lập: thiếu `.gitattributes` FAIL (lượt hỏng); có `.gitattributes` PASS, 29 file `src/` khớp `git_blob` |
 

@@ -2,6 +2,8 @@
 MRR theo dataset và gộp, WORLD_DEPENDENT kèm giải thích (cặp thực thể đổi thứ tự với root; SPEC T-044 bước 5;
 SPEC T-043 B1.3b, Phụ lục C; CĐ2, CĐ6).
 Chỉ package này đọc nhãn. Ca không OK có RR = 0 (WHY-28).
+MRR giữ phân số chính xác tới hết luật chọn (CĐ16); chỉ đổi sang số thập phân khi trình bày. Lưu ra JSON dùng
+`ma_hoa_json` (phân số thành {"phan_so": [tử, mẫu]}) và đọc lại bằng `giai_ma_json`.
 """
 import hashlib
 import json
@@ -72,7 +74,7 @@ def cham(thu_muc, sha256, nhan):
             m = {'gop': rr.mrr(r)}
             for d in sorted({c['dataset'] for c in ca.values()}):
                 m[d] = rr.mrr(r, {oid for oid, c in ca.items() if c['dataset'] == d})
-            kq['MRR_the_gioi'][w] = {k: float(v) for k, v in m.items()}
+            kq['MRR_the_gioi'][w] = m
         kq['MRR'] = kq['MRR_the_gioi']['P']
         kq['WORLD_DEPENDENT'] = sorted(oid for oid, c in ca.items() if c['WORLD_DEPENDENT'])
     return {'cau_hinh': out, 'sha256': sha256, 'so_ban_ghi': meta['so_ban_ghi']}
@@ -105,6 +107,32 @@ def ket_cuc_cap(kq, cid_tat, cid_bat, E_X, thanh_phan, buoc, moc_gia=None, trong
                                  delta_d_co_dinh=delta_d_co_dinh, **them)
     return {'theo_the_gioi': theo,
             'ket_hop': luat_c.ket_hop_the_gioi({w: theo[w]['ket_cuc'] for w in WORLDS}, buoc)}
+
+
+def ma_hoa_json(obj):
+    """Đổi cấu trúc kết quả sang dạng ghi JSON được mà không mất độ chính xác: Fraction → {"phan_so": [tử, mẫu]};
+    tuple → list; khóa dict phải là chuỗi."""
+    if isinstance(obj, Fraction):
+        return {'phan_so': [obj.numerator, obj.denominator]}
+    if isinstance(obj, dict):
+        if not all(isinstance(k, str) for k in obj):
+            raise TypeError('khóa dict phải là chuỗi')
+        return {k: ma_hoa_json(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [ma_hoa_json(v) for v in obj]
+    return obj  # số thực còn lại chỉ là giá trị trình bày (ví dụ tỷ lệ mốc giả); phép quyết định dùng Fraction
+
+
+def giai_ma_json(obj):
+    """Ngược của `ma_hoa_json` (tuple trở thành list)."""
+    if isinstance(obj, dict):
+        if set(obj) == {'phan_so'}:
+            p, q = obj['phan_so']
+            return Fraction(p, q)
+        return {k: giai_ma_json(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [giai_ma_json(v) for v in obj]
+    return obj
 
 
 def _w(trong_so, ma):

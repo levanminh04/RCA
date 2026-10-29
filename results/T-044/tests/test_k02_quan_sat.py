@@ -115,7 +115,8 @@ def test_29_the_gioi_doi_thu_tu(ma):
     # da['nguyen_nhan'] = "chỉ điểm đổi (cổng qua ở cả ba thế giới); cặp (U1 của A, U2 của B)", viết thành cấu trúc.
     nn = the_gioi.nguyen_nhan(kenh_w, d['root'], khoi)
     assert nn['loai'] == 'chi_diem_doi' and nn['cap'] == (('A', 'U1'), ('B', 'U2'))
-    assert nn['theo_the_gioi'] == {'S_hi': {'vuot': ['B'], 'bi_vuot': [], 'cap': [(('A', 'U1'), ('B', 'U2'))]}}
+    assert nn['theo_the_gioi'] == {'S_hi': {'doi': [{'thuc_the': 'B', 'P': 'sau', 'S_hi': 'truoc'}], 'vuot': ['B'],
+                                            'bi_vuot': [], 'cap': [(('A', 'U1'), ('B', 'U2'))]}}
 
 
 def test_30_thu_tu_khong_doi(ma):
@@ -284,3 +285,120 @@ def test_WD1_cap_dao_thu_tu(ma):
     assert {w: {'vuot': v['vuot'], 'bi_vuot': v['bi_vuot']} for w, v in nn['theo_the_gioi'].items()} == da['theo_the_gioi']
     nn2 = the_gioi.nguyen_nhan(k, d['root'], {w: b(d['P']) for w in ('P', 'S_lo', 'S_hi')})
     assert nn2['cap'] == da['khong_doi']['cap'] and nn2['theo_the_gioi'] == da['khong_doi']['theo_the_gioi']
+
+
+def _ca_hd1(sua):
+    from m1 import chuoi
+    p = _params(nguon_metric={'S_cpu': 'S'}, thoi_gian_nguon={'S': 'metrics.time'})
+    p['don_vi_thoi_gian'] = {'spans.start_us': 'us', 'metrics.time': 'ns', 'logs.timestamp': 's'}
+    p['coverage'] = dict(p['coverage'], S={'khoang': [[0, 2000 * 10 ** 9]], 'r_ns': 10 ** 9})
+    sua(p)
+    t = 1000
+    m = [{'time': (t - 60 + 10 * i) * 10 ** 9, 'S_cpu': 0.0} for i in range(5)] + \
+        [{'time': (t + 10 + 10 * i) * 10 ** 9, 'S_cpu': 10.0} for i in range(5)]
+    return chuoi.chay([], m, [], ['S'], {}, t, p)
+
+
+def _e3(k):
+    def f(p):
+        p['bat_tat']['E3'] = True
+        p['tham_so_E3'].pop(k)
+    return f
+
+
+def _t12(ct):
+    def f(p):
+        p['bat_tat']['T12'] = True
+        if ct is not None:
+            p['canh_tinh'] = ct
+    return f
+
+
+def test_HD1_khai_bao_bat_buoc(ma):
+    m = tu_lap(DAP_AN_THANH_PHAN, 'HD1')
+    ma('HD1')
+    bien_the = [lambda p: None,
+                lambda p: p['don_vi_thoi_gian'].pop('metrics.time'),
+                lambda p: p.__setitem__('don_vi_thoi_gian', {}),
+                lambda p: p['don_vi_thoi_gian'].__setitem__('metrics.time', 'ms'),
+                lambda p: p['ho_so_nguon'].pop('nguon_khoi_phat'),
+                lambda p: p['ho_so_nguon'].pop('quy_tac_log'),
+                lambda p: p['ho_so_nguon'].pop('kenh_metric'),
+                _e3('khop'), _e3('sim_th'), _e3('do_sau'),
+                _t12(None), _t12({}), _t12({'revision': 'thu'}), _t12({'canh': []}),
+                _t12({'revision': 'thu', 'canh': 'x'})]
+    assert len(bien_the) == len(m['dau_vao']['bien_the'])
+    ra = [_ca_hd1(f)['status'] for f in bien_the]
+    assert ra == m['dap_an']['status']
+    assert _ca_hd1(bien_the[0])['verdict'] == 'CAUSE_FOUND'
+
+
+def _ca_log1(doi, E3):
+    from m1 import chuoi
+    p = _params(bat_tat={'E3': E3})
+    p['ho_so_nguon']['quy_tac_log'] = {'kieu': 'severity', 'loi': ['ERROR'], 'khong_loi': ['INFO']}
+    p['coverage']['log'] = {'khoang': [[0, 2000 * 10 ** 9]], 'r_ns': 10 ** 9}
+    t, logs = 1000, []
+    for goc in (t - 200, t + 10):
+        for i in range(30):
+            sv = 'ERROR' if i < 10 else ('INFO' if i < 20 else 'x')
+            if doi and sv == 'INFO':
+                sv = 'x'
+            logs.append({'timestamp': goc + 5 * i, 'entity': 'P', 'message': 'request done', 'severity_raw': sv})
+    return chuoi.chay(_ca_nho(), [], logs, ['P', 'Q'], {}, t, p)
+
+
+def test_LOG1_thong_ke_severity(ma):
+    m = tu_lap(DAP_AN_THANH_PHAN, 'LOG1')
+    ma('LOG1')
+    da = m['dap_an']
+    for E3 in (False, True):
+        r0, r1 = _ca_log1(False, E3), _ca_log1(True, E3)
+        assert r0['status'] == r1['status'] != 'ERROR', (r0['error'], r1['error'])
+        assert (r0 != r1) is da['ban_ghi_khac_nhau']
+        for r, k in ((r0, 'goc'), (r1, 'bien_the')):
+            tk = r['extra']['thong_ke_log']
+            assert tk['theo_thuc_the']['P']['N'] == da[k]['N'] == tk['theo_thuc_the']['P']['A']
+            if E3:
+                (c,) = [c for c in tk['cap_drain'] if c['thuc_the'] == 'P']
+                assert {x: c[x] for x in da[k]['cap']} == da[k]['cap']
+            else:
+                assert tk['cap_drain'] is None
+
+
+def _wd(dau_vao, kenh_S_lo=None):
+    from m1_danh_gia import the_gioi
+    b = {w: [{'key': [len(dau_vao[w]) - i], 'groups': [list(g)]} for i, g in enumerate(dau_vao[w])]
+         for w in ('P', 'S_lo', 'S_hi')}
+    tt = sorted({e for w in b for x in dau_vao[w] for e in x})
+    k = {w: [{'thuc_the': e, 'ten': 'k' + e, 'huong': 'len', 'lop': 'lan_nguoc', 's': 1.0, 'F_I': 1}
+             for e in (kenh_S_lo if (w == 'S_lo' and kenh_S_lo) else tt)] for w in b}
+    return the_gioi.world_dependent(b, dau_vao['root']), the_gioi.nguyen_nhan(k, dau_vao['root'], b)
+
+
+@pytest.mark.parametrize('ma_wd', ['WD2', 'WD3'])
+def test_WD2_WD3_hoa_va_vang(ma_wd, ma):
+    from fractions import Fraction
+    m = tu_lap(DAP_AN_THANH_PHAN, ma_wd)
+    ma(ma_wd)
+    d, da = m['dau_vao'], m['dap_an']
+    wd, nn = _wd(d, ['R'] if ma_wd == 'WD3' else None)
+    assert wd['WORLD_DEPENDENT'] is True
+    assert wd['hang_ky_vong'] == {w: Fraction(v) for w, v in da['hang_ky_vong'].items()}
+    assert {k: nn['theo_the_gioi']['S_lo'][k] for k in ('doi', 'vuot', 'bi_vuot')} == da['S_lo']
+    assert set(nn['theo_the_gioi']) == {'S_lo'}
+    assert [list(x) for x in nn['cap']] == da['cap']
+
+
+def test_MET2_nguon_metric_khong_co_hang(ma):
+    from m1 import chuoi
+    m = tu_lap(DAP_AN_THANH_PHAN, 'MET2')
+    ma('MET2')
+    bt = m['dau_vao']['bien_the']
+    p = _params(nguon_metric=m['dau_vao']['nguon_metric'], thoi_gian_nguon=bt['co_moc_rong']['thoi_gian_nguon'])
+    p['coverage'] = dict(p['coverage'], S=bt['co_moc_rong']['coverage_S'])
+    r = chuoi.chay(_ca_nho(), [], [], ['P', 'Q'], {}, 1000, p)
+    assert {k: r['coverage']['S'].get(k) for k in ('trang_thai', 'F', 'H')} == m['dap_an']['co_moc_rong']
+    p = _params(nguon_metric=m['dau_vao']['nguon_metric'], **bt['khong_moc'])
+    r = chuoi.chay(_ca_nho(), [], [], ['P', 'Q'], {}, 1000, p)
+    assert r['coverage']['S'] == m['dap_an']['khong_moc']

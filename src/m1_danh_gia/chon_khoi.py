@@ -48,7 +48,11 @@ def _khoa_thu_tu(s, thanh_phan, thu_tu):
 
 def chon(thanh_phan, it_ca, do_thi, MRR, cap, thu_tu=THU_TU, nguong=GAN_TOT_NHAT):
     thanh_phan = list(thanh_phan)
-    MRR = {k: (v if isinstance(v, Fraction) else Fraction(v)) for k, v in MRR.items()}
+    for k, v in MRR.items():
+        # số thực làm sai phép so tại biên 0,01 (CĐ16): không tự đổi, báo lỗi
+        if isinstance(v, bool) or not isinstance(v, (Fraction, int)):
+            raise TypeError(f'MRR của {k} phải là phân số chính xác, nhận {type(v).__name__}')
+    MRR = {k: Fraction(v) for k, v in MRR.items()}
     cfg = sorted(MRR)
     thieu = set()
 
@@ -111,7 +115,9 @@ def chon(thanh_phan, it_ca, do_thi, MRR, cap, thu_tu=THU_TU, nguong=GAN_TOT_NHAT
 
 
 def kiem_cau_hinh_thang(thang, thanh_phan, cap):
-    """Bước 8 (CĐ6.3): đảo từng thành phần x của khối tại cấu hình thắng; xét cặp (thắng không x, thắng có x)."""
+    """Bước 8 (CĐ6.3): đảo từng thành phần x của khối tại cấu hình thắng; xét cặp (thắng không x, thắng có x).
+    Cặp phụ thuộc quan sát xử lý như KHÔNG ĐỦ CA (CĐ6.3, D2f), kể cả khi `cap` là kết quả khối K (giữ kết cục tại P).
+    Chỉ áp ở bước này; các bước khác của khối K vẫn đọc `ket_cuc_dung` (cách áp ở bước 5 chờ Minh quyết)."""
     w = tap(thang)
     out = {'xung_dot': [], 'trinh_Minh': [], 'nhat_quan': [], 'thieu_cap': []}
     for x in thanh_phan:
@@ -119,7 +125,8 @@ def kiem_cau_hinh_thang(thang, thanh_phan, cap):
         if k not in cap:
             out['thieu_cap'].append(x)
             continue
-        v = _kc(cap[k])
+        v = cap[k]
+        v = 'KHONG_DU_CA' if isinstance(v, dict) and v['phu_thuoc_quan_sat'] else _kc(v)
         if v in ('TRAI_CHIEU_DATASET', 'TRAI_CHIEU_O'):
             out['trinh_Minh'].append(x)
         elif x in w:

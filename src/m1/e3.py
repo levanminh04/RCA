@@ -108,11 +108,11 @@ def _khop(drain, tokens, ung_vien, khop, sim_th):
 def hoc_va_dem(dong_N, dong_A, tham_so_E3, quy_tac):
     """dong_*: [{'moc', 'thuc_the', 'noi_dung', 'lop' (LOI | KHONG_LOI | UNKNOWN | None), 'severity_raw'?}].
     Trả cặp (thực thể, mã mẫu) với lớp, phiếu, số dòng N/A; số dòng A vào ô mẫu mới theo thực thể."""
-    khop = tham_so_E3.get('khop', 'hoan_toan')
+    khop = tham_so_E3['khop']  # CĐ5: không có mặc định; chuoi._kiem_params kiểm trước
     if khop not in ('hoan_toan', 'nguong', 'nguong_cung_lop'):
         raise ValueError(f'cách khớp lạ: {khop}')
-    sim_th = float(tham_so_E3.get('sim_th', 0.4))
-    drain = Drain(depth=int(tham_so_E3.get('do_sau', 4)), sim_th=sim_th, max_children=100, max_clusters=None,
+    sim_th = float(tham_so_E3['sim_th'])
+    drain = Drain(depth=int(tham_so_E3['do_sau']), sim_th=sim_th, max_children=100, max_clusters=None,
                   extra_delimiters=(), parametrize_numeric_tokens=True)
     cap = {}
     biet = {}

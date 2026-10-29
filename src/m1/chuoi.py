@@ -8,7 +8,7 @@ Khởi phát (Đ11) luôn tính cho đơn vị phân vị có cờ, vì C-d2 c�
 """
 import math
 
-from m1 import doi_chung, e2, e4, e5, e7, hop_dong, kenh as kenh_mod, quan_sat, span, xep_hang
+from m1 import doi_chung, e2, e3 as e3_mod, e4, e5, e7, hop_dong, kenh as kenh_mod, quan_sat, span, xep_hang
 from m1.kieu import Kenh
 
 PHIEN_BAN = 'M1-T044-1'
@@ -82,19 +82,53 @@ def xep_tu_kenh_fixture(kenh_dict, canh, bat_E5):
 
 # ---------------------------------------------------------------- API 7 tham số
 
+DON_VI_HOP_LE = {'spans.start_us': ('us',), 'metrics.time': ('s', 'ns'), 'logs.timestamp': ('s', 'ns')}
+
+
 def _kiem_params(params):
     for k in ('config_id', 'bat_tat', 'tham_so_E4'):
         if k not in params:
             raise LoiHopDong('ERROR', f'thiếu params.{k}')
-    if 'don_vi_thoi_gian' not in params:
+    # Đ19 điểm 1: đủ ba khóa, giá trị trong tập cho phép; thiếu hay sai là ERROR (không tự lấy mặc định)
+    dv = params.get('don_vi_thoi_gian')
+    if not isinstance(dv, dict):
         raise LoiHopDong('ERROR', 'thiếu params.don_vi_thoi_gian (Đ19 điểm 1)')
-    if 'ho_so_nguon' not in params:
+    for k, cho_phep in DON_VI_HOP_LE.items():
+        if dv.get(k) not in cho_phep:
+            raise LoiHopDong('ERROR', f'params.don_vi_thoi_gian.{k} thiếu hoặc sai: {dv.get(k)!r} (Đ19 điểm 1)')
+    # CĐ5: hồ sơ nguồn đủ khóa; thiếu khóa là ERROR
+    ho = params.get('ho_so_nguon')
+    if not isinstance(ho, dict):
         raise LoiHopDong('ERROR', 'thiếu params.ho_so_nguon (CĐ5)')
+    km = ho.get('kenh_metric')
+    if not isinstance(km, dict) or km.get('kieu') not in ('hau_to', 'ten_kenh') or not isinstance(km.get('bang'), dict):
+        raise LoiHopDong('ERROR', 'params.ho_so_nguon.kenh_metric thiếu hoặc sai (CĐ5)')
+    ql = ho.get('quy_tac_log')
+    if not isinstance(ql, dict) or not (
+            (ql.get('kieu') == 'tu_khoa' and isinstance(ql.get('tu_khoa'), list))
+            or (ql.get('kieu') == 'severity' and isinstance(ql.get('loi'), list)
+                and isinstance(ql.get('khong_loi'), list))):
+        raise LoiHopDong('ERROR', 'params.ho_so_nguon.quy_tac_log thiếu hoặc sai (CĐ5)')
+    if not isinstance(ho.get('nguon_khoi_phat'), list):
+        raise LoiHopDong('ERROR', 'params.ho_so_nguon.nguon_khoi_phat thiếu hoặc sai (CĐ5)')
     bt = params['bat_tat']
-    if bt.get('T12') and 'canh_tinh' not in params:
-        raise LoiHopDong('UNSUPPORTED', 'T12 bật nhưng thiếu params.canh_tinh (Đ19 điểm 5)')
-    if bt.get('E3') and 'tham_so_E3' not in params:
-        raise LoiHopDong('ERROR', 'E3 bật nhưng thiếu params.tham_so_E3 (CĐ5)')
+    if bt.get('T12'):
+        # Đ19 điểm 5: thiếu khóa khi T12 bật là UNSUPPORTED; khóa có mặt nhưng sai kiểu là ERROR
+        ct = params.get('canh_tinh')
+        if not isinstance(ct, dict) or 'revision' not in ct or 'canh' not in ct:
+            raise LoiHopDong('UNSUPPORTED', 'T12 bật nhưng params.canh_tinh thiếu khóa revision/canh (Đ19 điểm 5)')
+        if not isinstance(ct['revision'], str) or not isinstance(ct['canh'], list) or not all(
+                isinstance(c, (list, tuple)) and len(c) == 2 for c in ct['canh']):
+            raise LoiHopDong('ERROR', 'params.canh_tinh sai kiểu (Đ19 điểm 5)')
+    if bt.get('E3'):
+        # CĐ5: tham_so_E3 = {khop, sim_th, do_sau}; thiếu khóa là ERROR
+        t3 = params.get('tham_so_E3')
+        if not isinstance(t3, dict):
+            raise LoiHopDong('ERROR', 'E3 bật nhưng thiếu params.tham_so_E3 (CĐ5)')
+        if t3.get('khop') not in ('hoan_toan', 'nguong', 'nguong_cung_lop') or \
+                isinstance(t3.get('sim_th'), bool) or not isinstance(t3.get('sim_th'), (int, float)) or \
+                isinstance(t3.get('do_sau'), bool) or not isinstance(t3.get('do_sau'), int):
+            raise LoiHopDong('ERROR', 'params.tham_so_E3 thiếu hoặc sai khóa khop/sim_th/do_sau (CĐ5)')
 
 
 def _he_so_ns(dv):
@@ -177,9 +211,9 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
     lo_ns, hi_ns = t_ns - 300 * NS, t_ns + 300 * NS
     o_s_ns = 10 * NS
     tau_ns = 10 ** 6
-    he_span = _he_so_ns(dv.get('spans.start_us', 'us'))
-    he_m = _he_so_ns(dv.get('metrics.time', 's'))
-    he_l = _he_so_ns(dv.get('logs.timestamp', 's'))
+    he_span = _he_so_ns(dv['spans.start_us'])
+    he_m = _he_so_ns(dv['metrics.time'])
+    he_l = _he_so_ns(dv['logs.timestamp'])
 
     # ---- span: miền theo start >= t−300 và end < t+300 (cua_so.cat_span), chia N/A theo end (B1.1)
     rows = []
@@ -240,21 +274,22 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
                            'huong_cham': ['len'], 'lop': {'len': 'khong_lan'}})
     chan_doan = {'span': prep['chan_doan'], 'nguon_metric_unsupported': [], 'cot_chua_khai_nguon': []}
     # metric
+    # trạng thái quan sát của từng nguồn metric đã khai, kể cả khi không có hàng metric nào: chỉ báo, không tham gia T
+    # (đặc tả v1 §2.2 điểm 8; Đ19 điểm 3, 4)
+    tg = quan_sat.thoi_gian_nguon_metric(
+        dict(params, nguon_metric=(params.get('nguon_metric') or {})),
+        [int(r['time'] * he_m) for r in metrics])
+    for ng_s in sorted(tg):
+        if ng_s in ('trace', 'log'):
+            raise LoiHopDong('ERROR', f'tên nguồn metric trùng nguồn trace/log: {ng_s}')
+        if tg[ng_s]['trang_thai'] != 'OK':
+            qs[ng_s] = {'trang_thai': 'UNSUPPORTED', 'ly_do': 'khong_co_moc_rieng',
+                        'cham_NA': tg[ng_s]['cham_NA']}
+        else:
+            qs[ng_s] = _nguon(ng_s, [m for m in tg[ng_s]['moc'] if lo_ns <= m < hi_ns])
     if metrics:
-        tg = quan_sat.thoi_gian_nguon_metric(
-            dict(params, nguon_metric=(params.get('nguon_metric') or {})),
-            [int(r['time'] * he_m) for r in metrics])
         cols = sorted({k for r in metrics for k in r if k != 'time'})
         nguon_cua = params.get('nguon_metric') or {}
-        # trạng thái quan sát của từng nguồn metric: chỉ báo, không tham gia T (đặc tả v1 §2.2 điểm 8; Đ19 điểm 3, 4)
-        for ng_s in sorted(tg):
-            if ng_s in ('trace', 'log'):
-                raise LoiHopDong('ERROR', f'tên nguồn metric trùng nguồn trace/log: {ng_s}')
-            if tg[ng_s]['trang_thai'] != 'OK':
-                qs[ng_s] = {'trang_thai': 'UNSUPPORTED', 'ly_do': 'khong_co_moc_rieng',
-                            'cham_NA': tg[ng_s]['cham_NA']}
-            else:
-                qs[ng_s] = _nguon(ng_s, [m for m in tg[ng_s]['moc'] if lo_ns <= m < hi_ns])
         for cot in cols:
             lop_m = kenh_mod.lop_metric(cot, ho_so)
             if lop_m is None:
@@ -282,7 +317,7 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
                     A.append(v)
                     mocA.append(mc)
             e, duoi = _ten_metric(cot, aliases)
-            dung_kp = thong_tin['trang_thai'] == 'OK' and 'metric' in ho_so.get('nguon_khoi_phat', [])
+            dung_kp = thong_tin['trang_thai'] == 'OK' and 'metric' in ho_so['nguon_khoi_phat']
             don_vi.append({'ma': f'metric|{cot}', 'thuc_the': e, 'ten': duoi, 'nhom': 'metric', 'loai': 'phan_vi',
                            'N': N, 'A': A, 'moc_A_ns': mocA if dung_kp else [], 'm': ts['m_metric'],
                            'nguon': 'metric', 'huong_cham': hc,
@@ -291,7 +326,27 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
     quy_tac = ho_so['quy_tac_log']
     dongN = [d for d in dong if d['moc'] < t_ns]
     dongA = [d for d in dong if d['moc'] >= t_ns]
-    for u in kenh_mod.don_vi_log(dongN, dongA, quy_tac, E3, params.get('tham_so_E3')):
+    # thống kê log lưu vào bản ghi (SPEC T-043 dòng 641; Đ15 điểm 3, 6): theo thực thể và phía N/A luôn có; khi E3
+    # bật thêm từng cặp (thực thể, mẫu), kể cả cặp lớp không xác định (không có kênh)
+    tk_N = kenh_mod.dem_log_theo_thuc_the(dongN, quy_tac)
+    tk_A = kenh_mod.dem_log_theo_thuc_the(dongA, quy_tac)
+    rong = {'dong': 0, 'xac_dinh': 0, 'loi': 0, 'unknown': 0}
+    thong_ke_log = {'theo_thuc_the': {e: {'N': dict(tk_N.get(e, rong)), 'A': dict(tk_A.get(e, rong))}
+                                      for e in sorted(set(tk_N) | set(tk_A))},
+                    'cap_drain': None, 'mau_moi': None}
+    if E3:
+        kq_drain = e3_mod.hoc_va_dem(dongN, dongA, params['tham_so_E3'], quy_tac)
+        dv_log = kenh_mod.don_vi_mau_drain(kq_drain)
+        thong_ke_log['cap_drain'] = [
+            dict({'thuc_the': e, 'mau': cid, 'khuon': kq_drain['mau'].get(cid)},
+                 **{k: c[k] for k in ('lop', 'n_N', 'n_A', 'phieu_loi', 'phieu_khong', 'unknown_N', 'unknown_A',
+                                      'loi_xac_dinh_N', 'loi_xac_dinh_A')})
+            for (e, cid), c in sorted(kq_drain['cap'].items())]
+        thong_ke_log['mau_moi'] = {e: kq_drain['mau_moi'].get(e, 0)
+                                   for e in sorted(set(kq_drain['thuc_the_N']) | set(kq_drain['mau_moi']))}
+    else:
+        dv_log = kenh_mod.don_vi_log(dongN, dongA, quy_tac, False)
+    for u in dv_log:
         u = dict(u, ma=f"log|{u['thuc_the']}|{u['ten']}", loai='dem', nguon='log')
         don_vi.append(u)
     if E3b:
@@ -374,7 +429,7 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
     canh = set(canh_qs)
     if T12:
         ct = params['canh_tinh']
-        tinh = {(_alias(aliases, a), _alias(aliases, b)) for a, b in ct.get('canh', [])}
+        tinh = {(_alias(aliases, a), _alias(aliases, b)) for a, b in ct['canh']}
         so_canh_tinh = len(tinh)
         canh |= tinh
     canh = sorted(canh)
@@ -504,6 +559,7 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
                   'K_raw_P': {e: list(v) for e, v in xP['K_raw'].items()},
                   'canh': [list(c) for c in canh], 'nhom_vong_P': e5_w['P']['nhom_vong'],
                   'doi_chung': dc, 'T4c': T4c, 'kenh_co': kenh_co, 'kenh_co_the_gioi': kenh_co_w,
+                  'thong_ke_log': thong_ke_log,
                   'G_N': [list(c) for c in G_N],
                   'don_vi_phan_vi': [_gon_pv(u['ma'], kq_pv[u['ma']]) for u in don_vi if u['loai'] == 'phan_vi']},
     }

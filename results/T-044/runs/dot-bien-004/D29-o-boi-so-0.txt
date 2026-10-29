@@ -1,0 +1,46 @@
+........................................................................ [ 28%]
+........................................................................ [ 56%]
+........................................................................ [ 85%]
+.........................F............                                   [100%]
+=================================== FAILURES ===================================
+______________________________ test_TS7_boi_so_0 _______________________________
+
+ma = <function ma.<locals>._gan at 0x7fb1ec1a7100>
+
+    def test_TS7_boi_so_0(ma):
+        from m1_danh_gia import luat_c
+        m = tu_lap(DAP_AN_THANH_PHAN, 'TS7')
+        ma('TS7')
+        d, da = m['dau_vao'], m['dap_an']
+        ds = [{'ma': a, 'dataset': b, 'o': c} for a, b, c in d['ca']]
+        dd = {k: Fraction(v) for k, v in d['delta_d'].items()}
+>       kq = luat_c.ap_dung(ds, {k: Fraction(v) for k, v in d['RR_tat'].items()},
+                            {k: Fraction(v) for k, v in d['RR_bat'].items()}, set(d['E_X']), thanh_phan='X',
+                            trong_so=d['boi_so'], delta_d_co_dinh=dd)
+
+test_k11_danh_gia.py:442: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../src/m1_danh_gia/luat_c.py:115: in ap_dung
+    t = tong_hop(ds, tat, bat, E_X, trong_so)
+../../../src/m1_danh_gia/luat_c.py:52: in tong_hop
+    o_t, o_b = rr.rr_o(rt, o_cua, trong_so), rr.rr_o(rb, o_cua, trong_so)
+../../../src/m1_danh_gia/rr.py:42: in rr_o
+    return {o: tong[o] / dem[o] for o in tong}
+/usr/lib/python3.12/fractions.py:615: in forward
+    return monomorphic_operator(a, b)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+a = Fraction(0, 1), b = Fraction(0, 1)
+
+    def _div(a, b):
+        """a / b"""
+        # Same as _mul(), with inversed b.
+        nb, db = b._numerator, b._denominator
+        if nb == 0:
+>           raise ZeroDivisionError('Fraction(%s, 0)' % db)
+E           ZeroDivisionError: Fraction(1, 0)
+
+/usr/lib/python3.12/fractions.py:763: ZeroDivisionError
+=========================== short test summary info ============================
+FAILED test_k11_danh_gia.py::test_TS7_boi_so_0 - ZeroDivisionError: Fraction(...
+1 failed, 253 passed in 3.30s

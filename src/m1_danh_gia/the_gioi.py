@@ -40,13 +40,28 @@ def _truoc_han(a, r):
     return a[2] > r[2]
 
 
+def _quan_he(v, e, root):
+    """Quan hệ của e với root trong một thế giới: 'truoc' (chắc chắn đứng trước), 'sau', 'hoa' (không bên nào chắc
+    chắn đứng trước), 'vang' (e không được xếp)."""
+    if e not in v:
+        return 'vang'
+    if _truoc_han(v[e], v[root]):
+        return 'truoc'
+    if _truoc_han(v[root], v[e]):
+        return 'sau'
+    return 'hoa'
+
+
 def nguyen_nhan(kenh_theo_the_gioi, root, blocks_theo_the_gioi):
     """Giải thích WORLD_DEPENDENT (SPEC T-043 B1.3b, dòng 464). kenh_theo_the_gioi: {thế giới: [kênh]}.
     - 'loai': 'cong_doi' khi cờ của một kênh đổi giữa các thế giới, ngược lại 'chi_diem_doi'.
-    - 'theo_the_gioi'[w]: 'vuot' = thực thể chắc chắn đứng trước root ở w mà không chắc chắn đứng trước ở P;
-      'bi_vuot' = ngược lại; 'cap' = [((root, kênh mạnh nhất của root ở w), (e, kênh mạnh nhất của e ở w))].
+    - 'theo_the_gioi'[w]: 'doi' = [{'thuc_the', 'P': quan hệ ở P, w: quan hệ ở w}] cho mọi thực thể (xếp ở P hoặc ở w)
+      mà quan hệ với root đổi; quan hệ là 'truoc', 'hoa', 'sau', 'vang' (`_quan_he`), nên gồm cả đảo thứ tự, vào/ra
+      nhóm hòa, xuất hiện/vắng. 'vuot' = thực thể thành 'truoc' ở w mà ở P không 'truoc'; 'bi_vuot' = ngược lại;
+      'cap' = [((root, kênh mạnh nhất của root ở w), (e, kênh mạnh nhất của e ở w))] cho các thực thể trong 'doi'.
       Root vắng ở một trong hai thế giới thì ghi 'root_vang'. Không có thay đổi thì không có mục.
-    - 'cap': cặp đầu tiên (thế giới theo tên, rồi thực thể theo tên), hoặc None."""
+    - 'cap': cặp đầu tiên (thế giới theo tên, rồi thực thể theo tên), hoặc None.
+    Quy tắc "đứng trước hẳn" của cờ M5 (m5.py) giữ riêng."""
     co = {w: {_g(k, 'ma'): _g(k, 'F_raw') for k in ks if _g(k, 'co')} for w, ks in kenh_theo_the_gioi.items()}
     ma_all = set().union(*[set(v) for v in co.values()]) if co else set()
     cong_doi = any(len({co[w].get(m, 0) for w in co}) > 1 for m in ma_all)
@@ -64,17 +79,21 @@ def nguyen_nhan(kenh_theo_the_gioi, root, blocks_theo_the_gioi):
             continue
         vw = _vi_tri(blocks_theo_the_gioi[w])
         if (root in vP) != (root in vw):
-            theo[w] = {'root_vang': 'P' if root not in vP else w, 'vuot': [], 'bi_vuot': [], 'cap': []}
+            theo[w] = {'root_vang': 'P' if root not in vP else w, 'doi': [], 'vuot': [], 'bi_vuot': [], 'cap': []}
             continue
         if root not in vP:
             continue
-        chung = sorted((set(vP) & set(vw)) - {root})
-        vuot = [e for e in chung if _truoc_han(vw[e], vw[root]) and not _truoc_han(vP[e], vP[root])]
-        bi_vuot = [e for e in chung if _truoc_han(vP[e], vP[root]) and not _truoc_han(vw[e], vw[root])]
-        if not (vuot or bi_vuot):
+        doi = []
+        for e in sorted((set(vP) | set(vw)) - {root}):
+            qp, qw = _quan_he(vP, e, root), _quan_he(vw, e, root)
+            if qp != qw:
+                doi.append({'thuc_the': e, 'P': qp, w: qw})
+        if not doi:
             continue
-        c = [((root, manh(w, root)), (e, manh(w, e))) for e in sorted(vuot + bi_vuot)]
-        theo[w] = {'vuot': vuot, 'bi_vuot': bi_vuot, 'cap': c}
+        vuot = [d['thuc_the'] for d in doi if d[w] == 'truoc']
+        bi_vuot = [d['thuc_the'] for d in doi if d['P'] == 'truoc']
+        c = [((root, manh(w, root)), (d['thuc_the'], manh(w, d['thuc_the']))) for d in doi]
+        theo[w] = {'doi': doi, 'vuot': vuot, 'bi_vuot': bi_vuot, 'cap': c}
         if cap is None and c:
             cap = c[0]
     return {'loai': 'cong_doi' if cong_doi else 'chi_diem_doi', 'cap': cap, 'theo_the_gioi': theo}

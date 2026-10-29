@@ -410,3 +410,55 @@ def test_D17_van_ban(ma):
     assert (kq['P'], kq['M']) == tuple(m['dap_an']['P_M'])
     assert gan_bang(kq['dMRR']['gop'], m['dap_an']['dMRR_gop'])
     assert kq['ket_cuc'] == m['dap_an']['ket_cuc']
+
+
+def test_TS6_mrr_chinh_xac(ma):
+    """Luật chọn khối dùng MRR chính xác; số thực bị từ chối; lưu/đọc JSON giữ phân số."""
+    import json
+    from m1_danh_gia import chon_khoi, pha2
+    m = tu_lap(DAP_AN_THANH_PHAN, 'TS6')
+    ma('TS6')
+    d, da = m['dau_vao'], m['dap_an']
+    mrr = {k: Fraction(v) for k, v in d['MRR'].items()}
+    assert mrr['E1'] - mrr['R0'] == Fraction(da['chenh'])
+    kq = chon_khoi.chon(d['thanh_phan'], it_ca=[], do_thi=d['do_thi'], MRR=mrr, cap=d['cap'])
+    assert kq['gan_tot_nhat'] == da['gan_tot_nhat'] and kq['chon'] == da['chon']
+    with pytest.raises(TypeError):
+        chon_khoi.chon(d['thanh_phan'], it_ca=[], do_thi=d['do_thi'], MRR={k: float(v) for k, v in mrr.items()},
+                       cap=d['cap'])
+    doc_lai = pha2.giai_ma_json(json.loads(json.dumps(pha2.ma_hoa_json({'MRR': mrr}))))['MRR']
+    assert doc_lai == mrr and all(isinstance(v, Fraction) for v in doc_lai.values())
+    assert chon_khoi.chon(d['thanh_phan'], it_ca=[], do_thi=d['do_thi'], MRR=doc_lai, cap=d['cap'])['chon'] == \
+        da['luu_doc_json_chon']
+
+
+def test_TS7_boi_so_0(ma):
+    from m1_danh_gia import luat_c
+    m = tu_lap(DAP_AN_THANH_PHAN, 'TS7')
+    ma('TS7')
+    d, da = m['dau_vao'], m['dap_an']
+    ds = [{'ma': a, 'dataset': b, 'o': c} for a, b, c in d['ca']]
+    dd = {k: Fraction(v) for k, v in d['delta_d'].items()}
+    kq = luat_c.ap_dung(ds, {k: Fraction(v) for k, v in d['RR_tat'].items()},
+                        {k: Fraction(v) for k, v in d['RR_bat'].items()}, set(d['E_X']), thanh_phan='X',
+                        trong_so=d['boi_so'], delta_d_co_dinh=dd)
+    assert gan_bang(kq['dMRR']['gop'], da['dMRR_gop']) and (kq['P'], kq['M']) == (da['P'], da['M'])
+    assert kq['so_o_E_X'] == da['so_o_E_X'] and sorted(kq['huong_o']) == da['o_co_huong']
+    assert (kq['ket_cuc'], kq['buoc']) == (da['ket_cuc'], da['buoc'])
+    # bỏ hẳn ca b (giữ E_X) cho cùng kết quả
+    kq2 = luat_c.ap_dung(ds[:1], {'a': Fraction(1, 2)}, {'a': Fraction(1)}, set(d['E_X']), thanh_phan='X',
+                         trong_so={'a': 2}, delta_d_co_dinh=dd)
+    assert (kq2['dMRR'], kq2['P'], kq2['M'], kq2['ket_cuc']) == (kq['dMRR'], kq['P'], kq['M'], kq['ket_cuc'])
+
+
+def test_CK8_buoc8_phu_thuoc_quan_sat(ma):
+    from m1_danh_gia import chon_khoi, luat_c
+    m = tu_lap(DAP_AN_THANH_PHAN, 'CK8')
+    ma('CK8')
+    d = m['dau_vao']
+    ra = []
+    for c in d['ca']:
+        cap = {'R0|E1': luat_c.ket_hop_the_gioi(c['ket_cuc'], 'khoi_K')}
+        kq = chon_khoi.kiem_cau_hinh_thang(c['thang'], d['thanh_phan'], cap)
+        ra.append(next(k for k in ('nhat_quan', 'xung_dot', 'trinh_Minh') if kq[k] == ['E1']))
+    assert ra == m['dap_an']['ket_qua']

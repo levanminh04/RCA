@@ -1,0 +1,138 @@
+........................................................................ [ 28%]
+.......................F..................FFFFF......................... [ 56%]
+........................................................................ [ 85%]
+......................................                                   [100%]
+=================================== FAILURES ===================================
+_____________________________ test_73_huong_xuong ______________________________
+
+ma = <function ma.<locals>._gan at 0x7fdbe855c5e0>
+
+    def test_73_huong_xuong(ma):
+        from m1 import kenh
+        from m1.kieu import Kenh
+        from m1 import xep_hang
+        f = fx(73)
+        ma('73')
+        d, da = f['dau_vao'], f['dap_an']
+        (ten, huong, s), = d['kenh']['A']
+        for e3_bat, nhanh in ((True, 'E3_bat'), (False, 'E3_tat')):
+            huong_cham = kenh.huong_cham('op_full', E3_bat=e3_bat)
+            cham = huong in huong_cham
+            assert cham == da[nhanh]['cham']
+            ds = [Kenh('A', ten, huong, kenh.lop('op_full', huong), s)] if cham else []
+            if cham:
+                assert ds[0].lop == da[nhanh]['lop']
+            xh = xep_hang.xep(ds, thuc_the_co_kenh_OK={'A'})
+>           assert list(xh['K_raw']['A']) == da[nhanh]['K_raw']
+E           assert [0.6, 0.6, 1] == [0.6, 1, 0.6]
+E             
+E             At index 1 diff: 0.6 != 1
+E             Use -v to get more diff
+
+test_k07_e3.py:49: AssertionError
+________________________________ test_8_scc[8a] ________________________________
+
+ma_ca = '8a', ma = <function ma.<locals>._gan at 0x7fdbe855dc60>
+
+    @pytest.mark.parametrize('ma_ca', ['8a', '8b'])
+    def test_8_scc(ma_ca, ma):
+        ca = next(c for c in fx(8)['ca'] if c['ma'] == ma_ca)
+        ma(f'8-{ma_ca}')
+        p, xh = _chay_E5(ca)
+        da = ca['dap_an']
+        assert xh['thu_tu'] == da['thu_tu']
+>       assert {e: list(v) for e, v in xh['K_I'].items()} == da['K_I']
+E       AssertionError: assert {'A': [0.9, 0...[0.8, 0.8, 1]} == {'A': [0.9, 1...[0.8, 1, 0.8]}
+E         
+E         Differing items:
+E         {'B': [0.8, 0.8, 1]} != {'B': [0.8, 1, 0.8]}
+E         {'A': [0.9, 0.9, 1]} != {'A': [0.9, 1, 0.9]}
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:37: AssertionError
+________________________________ test_8_scc[8b] ________________________________
+
+ma_ca = '8b', ma = <function ma.<locals>._gan at 0x7fdbe855e660>
+
+    @pytest.mark.parametrize('ma_ca', ['8a', '8b'])
+    def test_8_scc(ma_ca, ma):
+        ca = next(c for c in fx(8)['ca'] if c['ma'] == ma_ca)
+        ma(f'8-{ma_ca}')
+        p, xh = _chay_E5(ca)
+        da = ca['dap_an']
+        assert xh['thu_tu'] == da['thu_tu']
+>       assert {e: list(v) for e, v in xh['K_I'].items()} == da['K_I']
+E       AssertionError: assert {'A': [0.0, 0...[0.8, 1.3, 2]} == {'A': [0, 0, ...[0.8, 2, 1.3]}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'B': [0.8, 1.3, 2]} != {'B': [0.8, 2, 1.3]}
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:37: AssertionError
+_____________________________ test_chuoi_kenh[57] ______________________________
+
+i = 57, ma = <function ma.<locals>._gan at 0x7fdbe855ea20>
+
+    @pytest.mark.parametrize('i', [57, 71])
+    def test_chuoi_kenh(i, ma):
+        ca = fx(i)['ca'][0]
+        ma(f'{i}-{ca["ma"]}')
+        p, xh = _chay_E5(ca)
+        da = ca['dap_an']
+        assert xh['thu_tu'] == da['thu_tu']
+>       assert {e: list(v) for e, v in xh['K_I'].items()} == da['K_I']
+E       AssertionError: assert {'Payment': [....05, 0.05, 1]} == {'Payment': [....05, 1, 0.05]}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'payment_db': [0.05, 0.05, 1]} != {'payment_db': [0.05, 1, 0.05]}
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:48: AssertionError
+_____________________________ test_chuoi_kenh[71] ______________________________
+
+i = 71, ma = <function ma.<locals>._gan at 0x7fdbe855ed40>
+
+    @pytest.mark.parametrize('i', [57, 71])
+    def test_chuoi_kenh(i, ma):
+        ca = fx(i)['ca'][0]
+        ma(f'{i}-{ca["ma"]}')
+        p, xh = _chay_E5(ca)
+        da = ca['dap_an']
+        assert xh['thu_tu'] == da['thu_tu']
+>       assert {e: list(v) for e, v in xh['K_I'].items()} == da['K_I']
+E       AssertionError: assert {'A': [0.0, 0...[0.6, 0.6, 1]} == {'A': [0, 0, ...[0.6, 1, 0.6]}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'R': [0.6, 0.6, 1]} != {'R': [0.6, 1, 0.6]}
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:48: AssertionError
+_________________________________ test_58_d19 __________________________________
+
+ma = <function ma.<locals>._gan at 0x7fdbe855ef20>
+
+    def test_58_d19(ma):
+        ca = fx(58)['ca'][0]
+        ma('58-58')
+        p, xh = _chay_E5(ca)
+        assert xh['thu_tu'] == ca['dap_an']['thu_tu']
+>       assert {e: list(v) for e, v in xh['K_I'].items()} == ca['dap_an']['K_I']
+E       AssertionError: assert {'A': [0.8, 0...[0.0, 0, 0.0]} == {'A': [0.8, 1...B': [0, 0, 0]}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'A': [0.8, 0.8, 1]} != {'A': [0.8, 1, 0.8]}
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:59: AssertionError
+=========================== short test summary info ============================
+FAILED test_k07_e3.py::test_73_huong_xuong - assert [0.6, 0.6, 1] == [0.6, 1,...
+FAILED test_k08_e5_e6_e7_e9.py::test_8_scc[8a] - AssertionError: assert {'A':...
+FAILED test_k08_e5_e6_e7_e9.py::test_8_scc[8b] - AssertionError: assert {'A':...
+FAILED test_k08_e5_e6_e7_e9.py::test_chuoi_kenh[57] - AssertionError: assert ...
+FAILED test_k08_e5_e6_e7_e9.py::test_chuoi_kenh[71] - AssertionError: assert ...
+FAILED test_k08_e5_e6_e7_e9.py::test_58_d19 - AssertionError: assert {'A': [0...
+6 failed, 248 passed in 3.68s

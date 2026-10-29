@@ -192,7 +192,7 @@ Mỗi mục: chỗ; đã cài; phương án khác; ảnh hưởng. Đề xuất 
 - Nguyên nhân của WORLD_DEPENDENT (fixture 29) ghi dạng cấu trúc: loại (cổng đổi hay chỉ điểm đổi) và cặp (thực thể, kênh mạnh nhất).
 - Trong test luật C, khi đáp án không phụ thuộc ô nào thuộc E_X, hàm dựng E_X đưa các ô có ca đổi vào trước rồi thêm ô khác cho đủ số.
 - Bản ghi NO_EVIDENCE khi không có thực thể nào được xếp, như quy ước của `ban_ghi.tao` (OK cần danh sách khác rỗng).
-- Bản ghi thêm `extra.doi_chung`, `extra.T4c`, `extra.kenh_co`, `extra.kenh_co_the_gioi` (kênh có cờ trong U theo từng thế giới, cho giải thích WORLD_DEPENDENT ở pha 2), `extra.G_N`, `extra.don_vi_phan_vi`, `worlds.*.don_vi_dem.*.loai_thay_doi` (tên `nhan` là trường cấm). Không trường nào chứa nhãn.
+- Bản ghi thêm `extra.doi_chung`, `extra.T4c`, `extra.kenh_co`, `extra.kenh_co_the_gioi` (kênh có cờ trong U theo từng thế giới, cho giải thích WORLD_DEPENDENT ở pha 2), `extra.thong_ke_log` (C3, S9), `extra.G_N`, `extra.don_vi_phan_vi`, `worlds.*.don_vi_dem.*.loai_thay_doi` (tên `nhan` là trường cấm). Không trường nào chứa nhãn.
 - Mã ô của luật C phải duy nhất giữa hai dataset (hàm báo lỗi nếu trùng).
 
 ### C. Sửa đã làm trong phiên (theo đúng nguồn; ghi để kiểm)
@@ -213,6 +213,18 @@ Mỗi mục: lỗi; nguồn; đã sửa; phép kiểm mới. Chi tiết và ph�
 - **S4. Lập luận E3 trong đề xuất WHY quá mạnh (KHÔNG CHẶN).** Khớp hoàn toàn cũng có thể gộp dòng ERROR mới qua token `<*>`. Đã sửa câu trong `de-xuat-why.md` đề xuất 1: lý do chọn (a) chỉ là bám hàm suy luận gốc; cách khớp nào giữ bằng chứng log lỗi tốt hơn là chưa kiểm, T-045 đo bằng D3. Không đổi code.
 - **N1. Manifest lệch trên Windows (người làm tự thêm, Minh duyệt cùng gói).** `.gitattributes` chỉ đặt `-text` cho `results/**`, nên git đổi `src/*.py` sang CRLF khi checkout trên Windows và sha256 lệch dù nội dung cam kết không đổi. Không sửa `.gitattributes` (ngoài phạm vi). Đã sửa `scripts/tao_manifest.py`: ghi thêm `git_blob` cho file ngoài `results/`; `--kiem` chấp nhận file lệch sha256 nhưng khớp `git_blob`, liệt kê riêng ở `khop_git_blob`. File trong `results/` vẫn so sha256. Kiểm trên checkout CRLF giả lập (`runs/manifest-crlf-001`): PASS, 29 file `src/` khớp `git_blob`; chưa chạy trên Windows thật.
 
+### C3. Sửa sau phản biện lượt 2 (Codex, chat 29/10/2026; Minh: "NẾU KHÔNG CÓ ĐIỂM NÀO XUNG ĐỘT THÌ SỬA NGAY")
+
+Phạm vi: các điểm hai bên không còn bất đồng. E1-CP và bước 5 luật chọn khối không sửa, chờ Minh quyết (mục D). Chi tiết ở LOG T-044, mục "Phản hồi phản biện lượt 2 và gói sửa".
+
+- **S5. MRR mất độ chính xác tại biên 0,01 (CHẶN).** CĐ16; SPEC T-043 B4 bước 7. `pha2.cham` đổi MRR sang số thực; chênh 1/100 thành 0,010000000000000009 nên loại nhầm cấu hình ít thành phần. Đã sửa: `pha2` giữ phân số; `chon_khoi.chon` từ chối số thực (không đổi ngầm); lưu/đọc JSON qua `pha2.ma_hoa_json` / `giai_ma_json`, phân số ghi thành `{"phan_so": [tử, mẫu]}`. Số thực còn lại trong kết quả (tỷ lệ mốc giả, dấu vết E5) chỉ để trình bày; phép quyết định dùng phân số. Đáp án TS6. Đột biến D28.
+- **S6. Ô bội số 0 làm chia cho 0 (CHẶN).** SPEC T-045 bước 7. `rr.rr_o` bỏ ô có tổng trọng số 0 (không đóng góp vào RR_o, P, M); `rr.mrr` báo lỗi khi tổng trọng số của tập ca bằng 0 (lấy mẫu trong từng dataset giữ số ô nên không xảy ra). E_X, |E_X|, δ_d giữ từ T0. Đáp án TS7. Đột biến D29.
+- **S7. Bước 8 đọc kết cục tại P của cặp phụ thuộc quan sát (CHẶN).** CĐ6.3. `chon_khoi.kiem_cau_hinh_thang` đọc cặp có `phu_thuoc_quan_sat` là KHÔNG ĐỦ CA. Chỉ sửa bước 8; bước 5 giữ nguyên (mục D). Đáp án CK8. Đột biến D30.
+- **S8. Thiếu khai báo bắt buộc vẫn chạy với mặc định (CHẶN).** Đ19 điểm 1, 5; CĐ5. `chuoi._kiem_params` kiểm đủ khóa và giá trị: ba khóa `don_vi_thoi_gian` (span "us"; metric, log "s" hoặc "ns"), ba khóa `ho_so_nguon`, ba khóa `tham_so_E3` khi E3 bật: thiếu hay sai là ERROR. T12 bật mà `canh_tinh` thiếu hoặc thiếu `revision`/`canh`: UNSUPPORTED (Đ19 điểm 5); có khóa nhưng sai kiểu: ERROR. Bỏ các mặc định ngầm trong `chuoi.py`, `e3.py`. `tham_so_E5` vẫn mặc định "co_vong" vì CĐ5 ghi đó là mặc định. Đáp án HD1 (15 biến thể). Đột biến D31. Các khóa được kiểm hai lớp (kiểm trước, rồi đọc không mặc định), nên đột biến bỏ một lớp vẫn cho ERROR; chỉ đột biến của T12 đổi được trạng thái.
+- **S9. Bản ghi mất thống kê severity và cặp mẫu Drain (CHẶN).** SPEC T-043 dòng 641; Đ15 điểm 3, 6. Bản ghi thêm `extra.thong_ke_log`: `theo_thuc_the[e][N|A]` = {dong, xac_dinh, loi, unknown} (luôn có); khi E3 bật thêm `cap_drain` (mỗi cặp thực thể–mẫu, kể cả lớp không xác định: lop, n_N, n_A, phieu_loi, phieu_khong, unknown_N, unknown_A, loi_xac_dinh_N, loi_xac_dinh_A, khuôn mẫu) và `mau_moi` theo thực thể. Không đổi kênh. Đáp án LOG1. Đột biến D32.
+- **S10. Giải thích WORLD_DEPENDENT bỏ sót hòa và thực thể vắng (CHẶN phần giải thích).** `the_gioi.nguyen_nhan` so quan hệ của từng thực thể với root ở P và ở w theo bốn trạng thái: trước, hòa, sau, vắng (`_quan_he`); mọi thay đổi vào `doi`, kèm `vuot`, `bi_vuot`, `cap`. Cờ M5 giữ quy tắc riêng. Đáp án WD2, WD3; phép kiểm cấu trúc của fixture 29 thêm `doi`. Đột biến D33, D34; D27 đổi chỗ đột biến cho khớp code mới (cùng ý: lấy cả thực thể đã đứng trước ở P).
+- **S11. Nguồn metric rỗng mất trạng thái (KHÔNG CHẶN).** Chuỗi xuất trạng thái mọi nguồn metric đã khai, kể cả khi không có hàng metric. Đáp án MET2. Đột biến D35; D26 đổi chỗ theo thụt dòng mới.
+
 ### D. Giới hạn và phần chưa kiểm
 
 - Biên p = α không có fixture (PII-01).
@@ -221,3 +233,5 @@ Mỗi mục: lỗi; nguồn; đã sửa; phép kiểm mới. Chi tiết và ph�
 - C-g, C-c chỉ kiểm bằng fixture và đáp án tự lập; chưa nối với bản ghi P3 thật.
 - Cạnh tĩnh T12 chỉ kiểm bằng ca giả; chưa đọc mô hình T-038, T-039.
 - Thời gian và RAM trên ca thật chưa đo (T-045 T1).
+- **E1-CP (OPEN, chờ Minh; phản biện lượt 2 điểm 7).** Với cha [0; 5000), τ = 1 ms, con (0,1500), (600,1500), (0,2100), (1000,3000): code M1 cho u_CP = 2000 vì `span.duong_gang` chỉ xét con còn lại, không xét con đã chọn khi kiểm vùng chồng lấn. Theo CĐ1 (xét mọi con khác cùng cha) và PII-04 thì 2600. Codex chạy code CRISP chính thức (revision trước ATC) cho 3000; code nguồn dùng ngưỡng 1% thời lượng cha, biên đóng, xét mọi sibling, khác bài báo (1 ms). Chưa sửa code và đáp án: cần Minh duyệt quy tắc (ngưỡng, biên, sibling, phá hòa). E1-CP không vào ma trận dev (CĐ1); ảnh hưởng mô tả D4 của T-045.
+- **Bước 5 luật chọn khối với cặp phụ thuộc quan sát (OPEN, chờ Minh).** `chon_khoi.chon` lượt hai đọc `ket_cuc_dung` (kết cục tại P trong khối K). D2f nói phụ thuộc quan sát xử lý như KHÔNG ĐỦ CA; SPEC T-043 dòng 898 chỉ nói cặp đó không là căn cứ loại ở bước 4. Phản ví dụ của Codex: giữ kết cục P chọn E1; đọc là KHÔNG ĐỦ CA chọn E1+E3. Chưa sửa.

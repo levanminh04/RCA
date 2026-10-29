@@ -31,14 +31,15 @@ def hang_ky_vong(blocks, root):
 
 
 def rr_o(rr_theo_ca, o_cua_ca, trong_so=None):
-    """RR_o = trung bình (có trọng số) RR_ca trên các ca của ô."""
+    """RR_o = trung bình (có trọng số) RR_ca trên các ca của ô. Ô có tổng trọng số 0 (không được lấy vào mẫu, SPEC
+    T-045 bước 7) không có RR_o và không đóng góp vào P, M; tập E_X và số ô của E_X do luật C giữ từ T0."""
     tong, dem = {}, {}
     for ma, r in rr_theo_ca.items():
         o = o_cua_ca[ma]
         w = Fraction(trong_so.get(ma, 1)) if trong_so else Fraction(1)
         tong[o] = tong.get(o, Fraction(0)) + w * r
         dem[o] = dem.get(o, Fraction(0)) + w
-    return {o: tong[o] / dem[o] for o in tong}
+    return {o: tong[o] / dem[o] for o in tong if dem[o] != 0}
 
 
 def mrr(rr_theo_ca, chon=None, trong_so=None):
@@ -47,4 +48,7 @@ def mrr(rr_theo_ca, chon=None, trong_so=None):
     if not ds:
         return Fraction(0)
     w = {m: Fraction(trong_so.get(m, 1)) if trong_so else Fraction(1) for m in ds}
+    if sum(w.values()) == 0:
+        # lấy mẫu trong từng dataset giữ số ô nên không xảy ra; xảy ra là lỗi của bên gọi
+        raise ValueError('tổng trọng số của các ca được chọn bằng 0')
     return sum((w[m] * rr_theo_ca[m] for m in ds), Fraction(0)) / sum(w.values())
