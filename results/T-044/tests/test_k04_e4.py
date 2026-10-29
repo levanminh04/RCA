@@ -183,3 +183,36 @@ def test_cache_theo_noi_dung(ma):
     assert p1 == p2 and c.trung == 1 and c.moi == 1
     c.p(('op', 'A', 'x'), mau('14x0+6x1'), N, 'len', TS)
     assert c.moi == 2
+
+
+def test_VB_392_dem_tai_tang(ma):
+    """Đáp án trong văn bản: SPEC T-043 dòng 392 — 100 → 200 sự kiện, hai khoảng bằng nhau: e_up = 0,5; p ≈ 4,0 × 10⁻⁹."""
+    from m1 import e4
+    from conftest import tu_lap, DAP_AN_VAN_BAN
+    m = tu_lap(DAP_AN_VAN_BAN, 'VB-392')
+    ma('VB-392')
+    d = m['dau_vao']
+    kq = e4.cham_dem(d['n_N'], d['n_A'], d['T_N'], d['T_A'], TS)
+    assert gan_bang(kq['e_len'], m['dap_an']['e_up'])
+    assert gan_lam_tron(kq['p_len'], m['dap_an']['p'])
+
+
+def _p_nhi_thuc_chinh_xac(k, n, p0):
+    """Oracle phân số: P(X >= k), X ~ Bin(n, p0)."""
+    p0 = Fraction(p0).limit_denominator(10 ** 12)
+    return sum(Fraction(comb(n, j)) * p0 ** j * (1 - p0) ** (n - j) for j in range(k, n + 1))
+
+
+def test_D5_quyet_dinh_doi_khi_T_lech(ma):
+    """Đ5 (Q-209 mục 2): báo đơn vị đếm có quyết định cổng đổi khi T lệch ±1%. Oracle: nhị thức phân số."""
+    from m1 import e4
+    ma('D5-1')
+    n_N, n_A, T = 100, 135, 300.0
+    doi_oracle = False
+    goc = _p_nhi_thuc_chinh_xac(n_A, n_N + n_A, Fraction(1, 2)) < Fraction(1, 100)
+    for fN in (Fraction(99, 100), 1, Fraction(101, 100)):
+        for fA in (Fraction(99, 100), 1, Fraction(101, 100)):
+            p0 = (T * fA) / (T * fN + T * fA)
+            doi_oracle |= ((_p_nhi_thuc_chinh_xac(n_A, n_N + n_A, p0) < Fraction(1, 100)) != goc)
+    assert e4.doi_quyet_dinh_khi_T_lech(n_N, n_A, T, T, TS, ty_le=0.01) == doi_oracle
+    assert e4.doi_quyet_dinh_khi_T_lech(10, 40, T, T, TS, ty_le=0.01) is False
