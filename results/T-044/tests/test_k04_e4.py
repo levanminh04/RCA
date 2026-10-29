@@ -1,0 +1,185 @@
+"""Khối 4: E4 — ngưỡng, tỷ lệ vượt, cổng chính xác/xấp xỉ, cache, nhánh z.
+
+Fixture 25–27, 41, 75, 76, 81. Cổng chính xác so oracle phân số, sai số ≤ 1e−12 (SPEC T-044 bước 3).
+"""
+from fractions import Fraction
+from math import comb
+
+import pytest
+
+from conftest import fx, mau, gan_bang, gan_lam_tron
+
+TS = {'m_span': 20, 'm_metric': 5, 'alpha': 0.01, 'epsilon': 0.05, 'q_hi': 0.95, 'q_lo': 0.05,
+      'n_exact_max': 100, 'count_min': 10}
+
+
+def _m(loai):
+    return TS['m_metric'] if loai == 'metric' else TS['m_span']
+
+
+def _oracle(da):
+    if 'p' in da and isinstance(da['p'], list):
+        return Fraction(da['p'][0], da['p'][1])
+    if 'p_ti_so_to_hop' in da:
+        (a, b), (c, d) = da['p_ti_so_to_hop']
+        return Fraction(comb(a, b), comb(c, d))
+    if 'p_dem' in da:
+        k, (n, r) = da['p_dem']
+        return Fraction(k, comb(n, r))
+    return None
+
+
+@pytest.mark.parametrize('i', [25, 26, 27])
+def test_cong_oracle(i, ma):
+    from m1 import e4
+    f = fx(i)
+    ma(f'{i}-cong-oracle')
+    d = f['dau_vao']
+    N = mau(d['N']) if isinstance(d['N'], str) else d['N']
+    A = mau(d['A']) if isinstance(d['A'], str) else d['A']
+    p = e4.exact_tied_greater(A, N)
+    assert abs(p - float(_oracle(f['dap_an']))) <= 1e-12
+
+
+@pytest.mark.parametrize('i', [25, 26, 27])
+def test_cong_nguong_diem(i, ma):
+    from m1 import e4
+    f = fx(i)
+    ma(f'{i}-{i}')
+    d, da = f['dau_vao'], f['dap_an']
+    N = mau(d['N']) if isinstance(d['N'], str) else d['N']
+    A = mau(d['A']) if isinstance(d['A'], str) else d['A']
+    kq = e4.cham_phan_vi(N, A, _m(d['loai_don_vi']), TS, huong_cham=('len',))
+    assert gan_bang(kq['h'], da['h'])
+    assert gan_bang(kq['r_len_A'], da['r_up_A'])
+    assert gan_bang(kq['r_len_N'], da['r_up_N'])
+    assert abs(kq['p_len'] - float(_oracle(da))) <= 1e-12
+    assert gan_bang(kq['e_len'], da['e_up'])
+    assert kq['F_raw_len'] == da['F_raw_len']
+
+
+def test_41a(ma):
+    from m1 import e4
+    ca = fx(41)['ca'][0]
+    ma('41-41a')
+    N, A = mau(ca['N']), mau(ca['A'])
+    kq = e4.cham_phan_vi(N, A, TS['m_span'], TS, huong_cham=('len',))
+    assert abs(kq['p_len'] - 1.0) <= 1e-12 and ca['dap_an']['p'] == [1, 1]
+    assert gan_bang(kq['e_len'], ca['dap_an']['e_up'])
+
+
+def test_41_oracle(ma):
+    """41a: p = 1 (A = N = 50 số 0), so oracle phân số 1/1."""
+    from m1 import e4
+    ca = fx(41)['ca'][0]
+    ma('41-cong-oracle')
+    assert abs(e4.exact_tied_greater(mau(ca['A']), mau(ca['N'])) - float(Fraction(*ca['dap_an']['p']))) <= 1e-12
+
+
+def test_41b_oracle(ma):
+    from m1 import e4
+    ca = fx(41)['ca'][1]
+    ma('41-41b-oracle')
+    assert abs(e4.exact_tied_greater(mau(ca['A']), mau(ca['N'])) - float(_oracle(ca['dap_an']))) <= 1e-12
+
+
+def test_41b(ma):
+    from m1 import e4
+    ca = fx(41)['ca'][1]
+    ma('41-41b')
+    kq = e4.cham_phan_vi(mau(ca['N']), mau(ca['A']), TS['m_span'], TS, huong_cham=('len',))
+    assert gan_lam_tron(kq['p_len'], ca['dap_an']['p_thap_phan'])
+    assert gan_bang(kq['e_len'], ca['dap_an']['e_up'])
+
+
+def test_75_oracle(ma):
+    from m1 import e4
+    d, da = fx(75)['dau_vao'], fx(75)['dap_an']
+    ma('75-oracle')
+    assert abs(e4.exact_tied_greater(mau(d['A']), mau(d['N'])) - float(_oracle(da))) <= 1e-12
+
+
+def test_75_co_va_diem(ma):
+    from m1 import e4
+    d, da = fx(75)['dau_vao'], fx(75)['dap_an']
+    ma('75-75')
+    kq = e4.cham_phan_vi(mau(d['N']), mau(d['A']), TS['m_span'], TS, huong_cham=('len',))
+    assert gan_bang(kq['h'], da['h'])
+    assert gan_lam_tron(kq['p_len'], da['p_thap_phan'])
+    assert gan_bang(kq['e_len'], da['e_up']) and kq['F_raw_len'] == da['F_raw_len']
+    z = e4.diem_z(mau(d['N']), mau(d['A']))
+    assert gan_bang(z['z_len'], da['z_max'])
+    assert (kq['F_raw_len'] == 1) == da['z_dung']
+
+
+def test_76a_z_tho(ma):
+    from m1 import e4
+    ca = fx(76)['ca'][0]
+    ma('76-76a')
+    dv, da = ca['don_vi'], ca['dap_an']
+    z = {k: e4.diem_z(mau(v['N']), mau(v['A']))['z_len'] for k, v in dv.items()}
+    assert gan_bang(z['A_ms'], da['z_A_ms']) and gan_bang(z['A_us'], da['z_A_us']) and gan_bang(z['B'], da['z_B'])
+    ms = sorted(['A', 'B'], key=lambda k: -z['A_ms' if k == 'A' else 'B'])
+    us = sorted(['A', 'B'], key=lambda k: -z['A_us' if k == 'A' else 'B'])
+    assert ms == da['thu_tu_ms'] and us == da['thu_tu_us']
+
+
+def test_76b_e4_khong_doi_don_vi(ma):
+    """76b dùng đơn vị của 76a: E4 cho e = 1 và cùng p ở cả A_ms, A_us, B, nên hòa."""
+    from m1 import e4
+    ca_a, ca_b = fx(76)['ca'][0], fx(76)['ca'][1]
+    ma('76-76b')
+    dv, da = ca_a['don_vi'], ca_b['dap_an']
+    kq = {k: e4.cham_phan_vi(mau(v['N']), mau(v['A']), TS['m_span'], TS, huong_cham=('len',)) for k, v in dv.items()}
+    p_oracle = float(Fraction(*da['p']))
+    for k in ('A_ms', 'A_us', 'B'):
+        assert abs(kq[k]['p_len'] - p_oracle) <= 1e-12
+    assert gan_bang(kq['A_ms']['e_len'], da['e_A']) and gan_bang(kq['A_us']['e_len'], da['e_A'])
+    assert gan_bang(kq['B']['e_len'], da['e_B'])
+    assert (kq['A_ms']['e_len'] == kq['B']['e_len']) == da['hoa']
+
+
+def test_76c_iqr_nho(ma):
+    from m1 import e4
+    ca = fx(76)['ca'][2]
+    ma('76-76c')
+    z = e4.diem_z(mau(ca['don_vi']['N']), mau(ca['don_vi']['A']))
+    da = ca['dap_an']
+    assert gan_lam_tron(z['IQR'], da['IQR'])
+    assert z['c'] == da['c']
+    assert gan_lam_tron(z['z_len'], da['z'])
+
+
+def test_81_p_xap_xi(ma):
+    from m1 import e4
+    d, da = fx(81)['dau_vao'], fx(81)['dap_an']
+    ma('81-p')
+    kq = e4.cham_phan_vi(mau(d['N']), mau(d['A']), TS['m_metric'], TS, huong_cham=('len',))
+    assert kq['cach_cong_len'] == 'xap_xi'
+    assert abs(kq['p_len'] / da['p_xap_xi'] - 1) <= 0.01
+
+
+def test_81_e_theo_bien_doi(ma):
+    from m1 import e4
+    d, da = fx(81)['dau_vao'], fx(81)['dap_an']
+    ma('81-e')
+    N0, A0 = mau(d['N']), mau(d['A'])
+    bien_doi = {'eps_0.05': (lambda x: x, 0.05), 'eps_0': (lambda x: x, 0.0), 'nhan_10': (lambda x: 10 * x, 0.05),
+                'tru_2000': (lambda x: x - 2000, 0.05), 'cong_10000': (lambda x: x + 10000, 0.05)}
+    for ten, (f, eps) in bien_doi.items():
+        ts = dict(TS, epsilon=eps)
+        kq = e4.cham_phan_vi([f(x) for x in N0], [f(x) for x in A0], TS['m_metric'], ts, huong_cham=('len',))
+        assert gan_lam_tron(kq['e_len'], da['e_up'][ten]), ten
+
+
+def test_cache_theo_noi_dung(ma):
+    """B1.3: cache cổng theo khóa nội dung, không phụ thuộc config_id; mẫu đổi thì là đơn vị khác."""
+    from m1 import e4
+    ma('cache')
+    c = e4.CacheCong()
+    N, A = mau('20x0'), mau('13x0+7x1')
+    p1 = c.p(('op', 'A', 'x'), A, N, 'len', TS)
+    p2 = c.p(('op', 'A', 'x'), list(reversed(A)), list(reversed(N)), 'len', TS)
+    assert p1 == p2 and c.trung == 1 and c.moi == 1
+    c.p(('op', 'A', 'x'), mau('14x0+6x1'), N, 'len', TS)
+    assert c.moi == 2
