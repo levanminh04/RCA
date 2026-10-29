@@ -636,3 +636,26 @@ Phương pháp và đối chứng đã được cài và kiểm đầu vào, tru
 Code/revision, cấu hình, giả thuyết, độ đo, tập ca/tập ứng viên, cách xử lý ca lỗi/UNSUPPORTED/nhánh dự phòng và bảng diễn giải đã khóa trước test chưa? Có bỏ nhóm khó sau khi nhìn điểm hoặc dùng test để chọn thiết kế không?
 Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.
 ```
+
+---
+
+### Giai đoạn 2 (phiên 1) — Minh duyệt các đề xuất; bắt đầu triển khai
+
+**Quyết định của Minh trong phiên** (lời Minh trong chat ngày 29/10/2026): "duyệt toàn bộ các đề xuất bên trên của bạn, nếu không còn vướng mắc gì thì hãy tiếp tục t-044 giúp tôi". Phạm vi duyệt là 11 mục "Cần anh duyệt" trong chat, theo các khuyến nghị của người làm, đã ghi ở mục lượt 2 và phần bổ sung:
+1. R1: script `results/T-044/scripts/kiem_hash_t043.py`; sửa SPEC T-044 dòng 44, 86, 118.
+2. R2: cài đủ chế độ E1-CP, không vào ma trận dev; sửa SPEC T-044 dòng 64, 96, 131.
+3. R3: định nghĩa UV-6 theo Hit@1 = 1; đếm **gộp** 52 ca; báo kèm số theo dataset, bản Hit@1 kỳ vọng và số ca lên hạng.
+4. R4: nhóm vòng E5 theo cách đọc (C′).
+5. R5: chuỗi vào Drain theo quy tắc chung; cài ba cách khớp (a), (b), (c), mặc định (a); **đổi thiết kế**: bỏ che "chuỗi trong ngoặc"; bộ che UUID → IP → HEX → NUM; thứ tự học; giữ ngưỡng 0,4; tham số drain3 còn lại theo mặc định 0.9.11.
+6. R6: `params.ho_so_nguon`, `params.tham_so_E3`.
+7. R7: mở rộng N1; định nghĩa bước 8 luật chọn khối và cặp (R0, c); sửa SPEC T-044 dòng 89, 119.
+8. R8–R14 như đã trình; R13 có đầu vào người làm bổ sung cho S3, S6, S7.
+9. Ghi các đính chính vào `results/T-044/dinh-chinh-cai-dat.md`. WHY cho E3 và nhóm vòng: người làm soạn, trình riêng (WHY ngoài phạm vi ghi).
+10. Sửa SPEC T-045 cho D1–D5. D5 là mục "tùy chọn" trong đề xuất; lời duyệt "toàn bộ các đề xuất" được hiểu là duyệt cả D5. Vì D5 cần cách đọc (A) của nhóm vòng, `src/m1` cài thêm cách đọc này như một tùy chọn chẩn đoán, không vào ma trận.
+11. Xóa ba thư mục ngoài repo đã liệt kê.
+
+Dòng ghi DECISIONS cho các duyệt này: người làm đề xuất ở cuối phiên (AGENTS mục 4); chưa ghi.
+
+**Kế hoạch giai đoạn 2:** áp mục 1, 2, 7, 10 vào SPEC; ghi `dinh-chinh-cai-dat.md` (mục 3–9); xóa thư mục ngoài repo (mục 11); rồi làm bước 0–9 của SPEC T-044. Mỗi bước con ghi một dòng ở đây và commit.
+- Mục 11 (xóa thư mục ngoài repo): đã xóa bản sao `manifest-check` trong scratchpad (9,1 MB), `/home/user/intelligentdds/nezha` (295 MB), `/home/user/fudanselab/train-ticket` (396 KB) và hai thư mục cha rỗng. Repo RCA không đổi.
+- Áp mục 1, 2, 7 vào SPEC T-044 (dòng 44, 64, 86, 89, 96, 118, 119, 131) và mục 10 vào SPEC T-045 (nguồn hash cho D2; đầu ra 9; D1, D4 trong bước 2; bước 2b cho D3, D5; D17 chốt cách khớp E3; D2 đầu bước 6; một dòng bảng mặc định; tiêu chí 6). Không sửa dòng nào khác.

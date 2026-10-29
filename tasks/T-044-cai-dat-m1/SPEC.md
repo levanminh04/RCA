@@ -41,7 +41,7 @@
 - `results/T-043/fixture-dac-ta.json` (82 fixture; 109 phép kiểm theo `fixture/ket-qua-kiem.json#/so_phep_kiem`), `results/T-043/fixture/fixture-bo-sung.json` (B1–B8).
 - Đính chính có hiệu lực: `dinh-chinh-phien8.md` (theo Q-209 mục 2), `dinh-chinh-phien9.md` (Q-207), `dinh-chinh-phien10.md` (Đ15–Đ22, Q-208, Q-209). Đáp án U1–U6 (Đ15) và H1–H6 (Đ19) nằm dạng bảng viết tay trong `dinh-chinh-phien10.md`.
 - SPEC T-043 Phụ lục B (B1–B6), Phụ lục C, Phụ lục D.
-- Lệnh kiểm hash: `python -B results/T-043/scripts/tao_manifest.py --kiem` (trên Windows dùng `py -3 -B`). Phải PASS trước bước 1.
+- Lệnh kiểm hash: `python -B results/T-043/scripts/tao_manifest.py --kiem` (trên Windows dùng `py -3 -B`). Phải PASS trước bước 1. Trên bản clone thiếu thư mục rỗng của lượt hỏng (git không lưu thư mục rỗng), chạy qua `results/T-044/scripts/kiem_hash_t043.py`: script chép `results/T-043` ra thư mục tạm, chỉ dựng lại thư mục lượt mà manifest không ghi file nào bên trong, rồi chạy nguyên `--kiem`.
 
 **Code dùng lại, chỉ đọc:** `src/p3/cua_so.py`, `src/p3/danh_gia.py`, `src/p3/ban_ghi.py` (chỉ lấy danh sách `CAM`; không dùng `ban_ghi.kiem`, vì không duyệt list/tuple, SPEC T-043 dòng 157), danh sách khóa cấm của `src/p3/nezha.py`, `src/p3/selector.py`, `src/do_thi/builder.py`. Không sửa `src/p3`.
 
@@ -61,7 +61,7 @@
    - tiền xử lý span (B1.2; đặc tả §3);
    - E4: thống kê chung, cổng chính xác/xấp xỉ, cache theo nội dung, nhánh z (B1.3, B1.8; đặc tả §4);
    - danh mục kênh, severity, lớp tín hiệu (đặc tả §5);
-   - thành phần E1-U, E2-C, E2-VC, E3 (kể cả nhánh tắt phương án A, D2d), E3b, E5, E6a, E6b, E7 (hai cách dựng, D19, D20), E9, cạnh tĩnh T12 (D8);
+   - thành phần E1-U, E1-CP (chế độ `params.bat_tat.E1 = "CP"`, chỉ kiểm bằng fixture, không vào ma trận dev), E2-C, E2-VC, E3 (kể cả nhánh tắt phương án A, D2d), E3b, E5, E6a, E6b, E7 (hai cách dựng, D19, D20), E9, cạnh tĩnh T12 (D8);
    - `verdict`, xếp hạng, khóa hòa;
    - đối chứng C-a0, C-a1, C-d1, C-d2, C-d3, C-c, C-g, C-e (đặc tả §8);
    - runner đọc `ma-tran-thu.json`, sinh mã cấu hình, ghi bản ghi theo `hop-dong.json` kèm hash.
@@ -83,17 +83,17 @@ Không ghi `src/p3`, `results/T-043/`, `requirements.txt` ở gốc, DECISIONS, 
 
 ## Các bước
 
-0. **Mở phiên.** Đọc AGENTS, STATE, SPEC này, SPEC T-043 Phụ lục B–D, đặc tả v1, ba file đính chính. Chạy lệnh kiểm hash T-043 (PASS). Đếm 82 fixture, 8 fixture B. Ghi dòng mở phiên vào LOG.
+0. **Mở phiên.** Đọc AGENTS, STATE, SPEC này, SPEC T-043 Phụ lục B–D, đặc tả v1, ba file đính chính. Chạy lệnh kiểm hash T-043 (PASS, trực tiếp hoặc qua `kiem_hash_t043.py` như mục Đầu vào). Đếm 82 fixture, 8 fixture B. Ghi dòng mở phiên vào LOG.
 1. **Môi trường.** Tạo `requirements-m1.txt`, cài, ghi phiên bản thực tế vào LOG. Kiểm: `python -c` in phiên bản từng gói khớp file.
 2. **Chép đáp án U và H.** Chép U1–U6 (Đ15) và H1–H6 (Đ19) sang `dap-an-u-h.json`, kèm số dòng nguồn. Không tự sửa đáp án. Kiểm: người phản biện đối chiếu từng dòng.
-3. **Khung test.** Viết test cho mọi fixture trong phạm vi trước khi viết thành phần; chạy để thấy đỏ. Sai số: theo fixture (cổng so với oracle phân số: ≤ 1e−12); thứ hạng và trạng thái: khớp tuyệt đối. Đối chứng chưa có fixture đáp án (C-a1, C-d2, C-c; C-d1 nếu fixture 1 không phủ) thì người làm tự lập ca giả có đáp án tính tay, ghi vào `results/T-044/fixture/dap-an-doi-chung.json`, đánh dấu "đáp án của người làm T-044, chưa qua phản biện"; Codex kiểm các đáp án này khi phản biện (Q-212).
+3. **Khung test.** Viết test cho mọi fixture trong phạm vi trước khi viết thành phần; chạy để thấy đỏ. Sai số: theo fixture (cổng so với oracle phân số: ≤ 1e−12); thứ hạng và trạng thái: khớp tuyệt đối. Đối chứng chưa có fixture đáp án (C-a1, C-d2, C-c; C-d1 nếu fixture 1 không phủ) thì người làm tự lập ca giả có đáp án tính tay, ghi vào `results/T-044/fixture/dap-an-doi-chung.json`, đánh dấu "đáp án của người làm T-044, chưa qua phản biện"; Codex kiểm các đáp án này khi phản biện (Q-212). Cũng làm như vậy cho các phần chưa có đáp án: đếm cờ M5, phụ thuộc quan sát, bước 8 luật chọn khối, cặp (R0, c), UV-6, nhóm vòng E5 (kể cả cách đọc chẩn đoán cho D5 của T-045), khớp và che token E3, E1-CP, vùng E7, khởi phát E9, T4c; ghi vào `results/T-044/fixture/dap-an-thanh-phan.json`, cùng cách đánh dấu. Đáp án nằm trong văn bản đặc tả (Đ10, đặc tả v1 dòng 349, SPEC T-043 dòng 392, Đ17) ghi vào `results/T-044/fixture/dap-an-van-ban.json`, kèm dòng nguồn.
 4. **Cài theo thứ tự phụ thuộc,** mỗi khối xong thì chạy test của khối đó và ghi một dòng LOG:
    1. hợp đồng, bộ kiểm trường cấm (fixture 74);
    2. cửa sổ, trạng thái quan sát, đếm, ba thế giới (21–24, 28–30, 82; H1–H6);
    3. tiền xử lý span (6, 7, 44, 72);
    4. E4, cổng, cache, nhánh z (25–27, 41, 75, 76, 81; B1–B8 phần liên quan);
    5. kênh, severity, lớp (77–79; U1–U6);
-   6. E1-U (2–5); E2-C, E2-VC (9–13);
+   6. E1-U, E1-CP (2–5); E2-C, E2-VC (9–13);
    7. E3 và nhánh tắt (55, 73); E3b;
    8. E5 (8, 57, 58, 71, 80); E6a, E6b (14–16, 69); E7 (70); E9; cạnh tĩnh (58);
    9. `verdict` (31, 42); chuỗi S1–S7 (1);
@@ -115,8 +115,8 @@ Không ghi `src/p3`, `results/T-043/`, `requirements.txt` ở gốc, DECISIONS, 
 
 ## Tiêu chí xong
 
-1. `python -B results/T-043/scripts/tao_manifest.py --kiem` PASS ở đầu phiên.
-2. Mọi phép kiểm của 82 fixture qua trên code `src/m1`/`src/m1_danh_gia`, **trừ** các phép thuộc fixture D13 (59, 61–67) đã nêu ở "Không làm"; B1–B8, U1–U6, H1–H6 qua. Số phép kiểm qua/tổng ghi bằng con trỏ JSON trong file kết quả test.
+1. Kiểm hash T-043 PASS ở đầu phiên: `python -B results/T-043/scripts/tao_manifest.py --kiem`, hoặc qua `results/T-044/scripts/kiem_hash_t043.py` khi bản clone thiếu thư mục rỗng của lượt hỏng.
+2. Mọi phép kiểm của 82 fixture qua trên code `src/m1`/`src/m1_danh_gia`, **trừ** các phép thuộc fixture D13 (59, 61–67) đã nêu ở "Không làm"; B1–B8, U1–U6, H1–H6 và các ca trong `dap-an-doi-chung.json`, `dap-an-thanh-phan.json`, `dap-an-van-ban.json` qua. Số phép kiểm qua/tổng ghi bằng con trỏ JSON trong file kết quả test.
 3. Test đọc đáp án từ JSON; không fixture nào bị sửa đáp án ngoài đính chính đã được Minh duyệt.
 4. Kiểm tĩnh: không module nào trong `src/m1` import `src/m1_danh_gia` hoặc đọc đường dẫn nhãn; fixture 74 qua.
 5. Tất định: đầu ra giống hệt qua 3 seed xáo hàng × 3 hash seed.
@@ -128,7 +128,7 @@ Không ghi `src/p3`, `results/T-043/`, `requirements.txt` ở gốc, DECISIONS, 
 ## Không làm
 
 - **Fixture D13 (59, 61–67)** và biến thể nền lùi: thuộc task sau SPEC phát hiện (`ma-tran-thu.json#/khong_lam_trong_ma_tran`). Đây là ngoại lệ so với câu chữ "mọi đáp án đặc tả" của Q-209 mục 9; cần Minh duyệt ngoại lệ này cùng SPEC. Lý do: đầu vào (định nghĩa luật Grafana, lịch sử trạng thái) chưa có và hợp đồng có thể đổi theo SPEC phát hiện. Hệ quả: khi làm chế độ (b) phải cài và kiểm D13 trước khi chạy.
-- E1-CP (khai trước KHÔNG ĐỦ CA, chặng 2), E8, C-f (FlashTicket), C-h (ứng viên, Đ16), nối log–span (Q-209 mục 6), nhánh không quan hệ chọn riêng (D23), đồ thị ngẫu nhiên (M-25).
+- Chạy E1-CP trên dev (khai trước KHÔNG ĐỦ CA; K-b không chạy E1-CP; chặng 2). Chế độ E1-CP vẫn được cài và kiểm bằng fixture 2, 3 và một ca tự lập. E8, C-f (FlashTicket), C-h (ứng viên, Đ16), nối log–span (Q-209 mục 6), nhánh không quan hệ chọn riêng (D23), đồ thị ngẫu nhiên (M-25).
 - Chế độ (b): không chạy. Hợp đồng cửa sổ nhận mốc t theo B1.1, không gắn chặt với mốc tiêm, để chế độ (b) không phải sửa code lõi.
 - Đọc dữ liệu dev, bản ghi P3 có nhãn, `data/locked/`.
 - Sửa `src/p3`, sửa hướng dẫn môi trường ở AGENTS §12 (đề xuất riêng sau task).
