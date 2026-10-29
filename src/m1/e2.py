@@ -26,9 +26,9 @@ def _co_phu_nho_nhat(canh):
 
 
 def gan_canh(canh_co, che_do='VC', toi_da_dinh=TOI_DA_DINH):
-    """canh_co: [(a, b, s)] theo thứ tự đầu vào. Trả dinh_danh, gan [(a, b, nhận, nhãn)], kenh [(thực thể, tên, s)],
-    du_phong."""
-    canh_co = [(a, b, float(s)) for a, b, s in canh_co]
+    """canh_co: [(a, b, s)]. Trả dinh_danh, gan [(a, b, nhận, nhãn)], kenh [(thực thể, tên, s)], du_phong.
+    Đầu ra sắp theo (bên gọi, bên được gọi), không phụ thuộc thứ tự đầu vào."""
+    canh_co = sorted((a, b, float(s)) for a, b, s in canh_co)
     dinh = sorted({x for a, b, _ in canh_co for x in (a, b)})
     if che_do == 'C' or (che_do == 'VC' and len(dinh) > toi_da_dinh):
         gan = [(a, b, b, 'khong_dinh_danh') for a, b, _ in canh_co]

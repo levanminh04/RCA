@@ -148,3 +148,72 @@ def ma(record_property):
     def _gan(x):
         record_property('ma', x)
     return _gan
+
+
+# ---- phép tất định (SPEC T-044 bước 6) ----
+# M1_XAO=<số nguyên dương>: mọi đầu vào dạng danh sách mà thứ tự không mang nghĩa được xáo (bản sao, không sửa dữ
+# liệu test) trước khi vào hàm, ở mọi tầng gọi. Metric của chuoi.chay chỉ xáo khi mọi nguồn dùng "metrics.time",
+# vì mốc riêng của nguồn ghép với hàng theo thứ tự (Đ19 điểm 3). Không xáo danh sách có thứ tự mang nghĩa
+# (thứ tự SimpleRCA của C-g, danh sách của C-c, thứ tự thành phần của luật chọn khối).
+XAO = {
+    'm1.chuoi': {'chay': (0, 2, 3)},
+    'm1.span': {'chuan_bi': (0,)},
+    'm1.e2': {'gan_canh': (0,)},
+    'm1.e3': {'hoc_va_dem': (0, 1)},
+    'm1.e4': {'cham_phan_vi': (0, 1)},
+    'm1.e5': {'phan_loai': (0, 1)},
+    'm1.e7': {'vung': (1, 2, 3)},
+    'm1.kenh': {'don_vi_log': (0, 1)},
+    'm1.xep_hang': {'xep': (0,)},
+    'm1.doi_chung': {'cd1': (0, 1), 'cd3': (0,), 'cd2_tu_kenh': (0,), 'cg': (2,)},
+    'm1_danh_gia.luat_c': {'ap_dung': (0,)},
+    'm1_danh_gia.uv6': {'dem': (0,)},
+    'm1_danh_gia.m5': {'G_N_tu_span': (0,)},
+    'm1_danh_gia.moc_gia': {'ve_moc_gia': (0,)},
+}
+TEN_KW = {'canh': True, 'kenh': True}
+
+
+@pytest.fixture(autouse=True)
+def xao_hang(monkeypatch):
+    seed = os.environ.get('M1_XAO')
+    if not seed or seed == '0':
+        yield
+        return
+    import functools
+    import importlib
+    import random
+    dem = {'n': 0}
+
+    def boc(ten, f, vi_tri):
+        @functools.wraps(f)
+        def g(*args, **kw):
+            dem['n'] += 1
+            rng = random.Random(f'{seed}|{ten}|{dem["n"]}')
+            args = list(args)
+            for i in vi_tri:
+                if i < len(args) and isinstance(args[i], list):
+                    if ten == 'm1.chuoi.chay' and i == 1:
+                        continue
+                    x = list(args[i])
+                    rng.shuffle(x)
+                    args[i] = x
+            for k in list(kw):
+                if k in TEN_KW and isinstance(kw[k], list):
+                    x = list(kw[k])
+                    rng.shuffle(x)
+                    kw[k] = x
+            if ten == 'm1.chuoi.chay' and len(args) >= 7 and isinstance(args[1], list):
+                tg = (args[6] or {}).get('thoi_gian_nguon') or {}
+                if all(v == 'metrics.time' for v in tg.values()):
+                    x = list(args[1])
+                    rng.shuffle(x)
+                    args[1] = x
+            return f(*args, **kw)
+        return g
+
+    for mod, ham in XAO.items():
+        m = importlib.import_module(mod)
+        for h, vi_tri in ham.items():
+            monkeypatch.setattr(m, h, boc(f'{mod}.{h}', getattr(m, h), vi_tri))
+    yield

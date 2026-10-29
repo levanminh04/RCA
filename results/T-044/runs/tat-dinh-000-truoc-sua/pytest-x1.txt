@@ -1,0 +1,135 @@
+........................................................................ [ 31%]
+.F.FFFF................................................................. [ 63%]
+........................................................................ [ 95%]
+..F.......                                                               [100%]
+=================================== FAILURES ===================================
+_______________________________ test_phu_dinh[9] _______________________________
+
+i = 9, ma = <function ma.<locals>._gan at 0x7f13b1188860>
+
+    @pytest.mark.parametrize('i', [9, 10, 11, 12, 13])
+    def test_phu_dinh(i, ma):
+        from m1 import e2
+        f = fx(i)
+        ma(str(i))
+        kq = e2.gan_canh([tuple(c) for c in f['dau_vao']['canh_co']], che_do='VC')
+        assert kq['dinh_danh'] == f['dap_an']['dinh_danh']
+>       assert [list(g) for g in kq['gan']] == f['dap_an']['gan']
+E       AssertionError: assert [['B', 'C', '...g_dinh_danh']] == [['A', 'B', '...g_dinh_danh']]
+E         
+E         At index 0 diff: ['B', 'C', 'C', 'khong_dinh_danh'] != ['A', 'B', 'B', 'khong_dinh_danh']
+E         Use -v to get more diff
+
+test_k06_e1_e2.py:47: AssertionError
+______________________________ test_phu_dinh[11] _______________________________
+
+i = 11, ma = <function ma.<locals>._gan at 0x7f13b118b240>
+
+    @pytest.mark.parametrize('i', [9, 10, 11, 12, 13])
+    def test_phu_dinh(i, ma):
+        from m1 import e2
+        f = fx(i)
+        ma(str(i))
+        kq = e2.gan_canh([tuple(c) for c in f['dau_vao']['canh_co']], che_do='VC')
+        assert kq['dinh_danh'] == f['dap_an']['dinh_danh']
+>       assert [list(g) for g in kq['gan']] == f['dap_an']['gan']
+E       AssertionError: assert [['B', 'R', '... 'dinh_danh']] == [['A', 'R', '... 'dinh_danh']]
+E         
+E         At index 0 diff: ['B', 'R', 'R', 'dinh_danh'] != ['A', 'R', 'R', 'dinh_danh']
+E         Use -v to get more diff
+
+test_k06_e1_e2.py:47: AssertionError
+______________________________ test_phu_dinh[12] _______________________________
+
+i = 12, ma = <function ma.<locals>._gan at 0x7f13b1188900>
+
+    @pytest.mark.parametrize('i', [9, 10, 11, 12, 13])
+    def test_phu_dinh(i, ma):
+        from m1 import e2
+        f = fx(i)
+        ma(str(i))
+        kq = e2.gan_canh([tuple(c) for c in f['dau_vao']['canh_co']], che_do='VC')
+        assert kq['dinh_danh'] == f['dap_an']['dinh_danh']
+>       assert [list(g) for g in kq['gan']] == f['dap_an']['gan']
+E       AssertionError: assert [['R', 'Y', '... 'dinh_danh']] == [['R', 'X', '... 'dinh_danh']]
+E         
+E         At index 0 diff: ['R', 'Y', 'R', 'dinh_danh'] != ['R', 'X', 'R', 'dinh_danh']
+E         Use -v to get more diff
+
+test_k06_e1_e2.py:47: AssertionError
+______________________________ test_phu_dinh[13] _______________________________
+
+i = 13, ma = <function ma.<locals>._gan at 0x7f13b118b880>
+
+    @pytest.mark.parametrize('i', [9, 10, 11, 12, 13])
+    def test_phu_dinh(i, ma):
+        from m1 import e2
+        f = fx(i)
+        ma(str(i))
+        kq = e2.gan_canh([tuple(c) for c in f['dau_vao']['canh_co']], che_do='VC')
+        assert kq['dinh_danh'] == f['dap_an']['dinh_danh']
+>       assert [list(g) for g in kq['gan']] == f['dap_an']['gan']
+E       AssertionError: assert [['R', 'X', '... 'dinh_danh']] == [['A', 'R', '...g_dinh_danh']]
+E         
+E         At index 0 diff: ['R', 'X', 'R', 'dinh_danh'] != ['A', 'R', 'R', 'dinh_danh']
+E         Use -v to get more diff
+
+test_k06_e1_e2.py:47: AssertionError
+__________________________ test_E2C_gan_ben_duoc_goi ___________________________
+
+ma = <function ma.<locals>._gan at 0x7f13b118bc40>
+
+    def test_E2C_gan_ben_duoc_goi(ma):
+        """E2-C: mọi cạnh gán cho bên được gọi (SPEC B2 E2); dùng lại đầu vào fixture 13."""
+        from m1 import e2
+        ma('E2C1')
+        m = tu_lap(DAP_AN_THANH_PHAN, 'E2C1')
+        kq = e2.gan_canh([tuple(c) for c in m['dau_vao']['canh_co']], che_do='C')
+>       assert [list(g) for g in kq['gan']] == m['dap_an']['gan']
+E       AssertionError: assert [['R', 'X', '...g_dinh_danh']] == [['A', 'R', '...g_dinh_danh']]
+E         
+E         At index 0 diff: ['R', 'X', 'X', 'khong_dinh_danh'] != ['A', 'R', 'R', 'khong_dinh_danh']
+E         Use -v to get more diff
+
+test_k06_e1_e2.py:56: AssertionError
+__________________________ test_hai_pha_hash_on_dinh ___________________________
+
+ma = <function ma.<locals>._gan at 0x7f13b02cd440>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-30/test_hai_pha_hash_on_dinh0')
+
+    def test_hai_pha_hash_on_dinh(ma, tmp_path):
+        """Pha 1 không đọc nhãn, ghi bản ghi và hash; chạy lại cho cùng hash. Pha 2 đọc bản ghi đã băm và nhãn."""
+        from m1 import runner
+        from m1_danh_gia import pha2
+        import sinh_trace_S
+        from conftest import FIXTURE
+        ma('runner-hai-pha')
+        spans, logs = sinh_trace_S.sinh('S1', t=1000, mau=FIXTURE['trace_mau_S'])
+        ca = [{'opaque_id': 'gia-001', 'dataset': 'RE2-TT', 'spans': spans, 'metrics': [], 'logs': logs,
+               'inventory': ['A', 'B', 'F', 'I', 'R', 'X'], 'aliases': {}}]
+        moc = {'gia-001': 1000}
+        cau_hinh = [{'config_id': 'R0', 'params': sinh_trace_S.params({})},
+                    {'config_id': 'C1', 'params': sinh_trace_S.params({'E1': 'U'})}]
+        h1 = runner.pha1(ca, moc, cau_hinh, tmp_path / 'l1')
+        h2 = runner.pha1(ca, moc, cau_hinh, tmp_path / 'l2')
+>       assert h1['sha256'] == h2['sha256']
+E       AssertionError: assert '167effd84a56...2243e22686672' == '63555448a8e8...ce2be416561a3'
+E         
+E         - 63555448a8e830e99087dc6abac033b34536e927c9e04dd2928ce2be416561a3
+E         + 167effd84a569266e3ae8d4dd01320e80b2ada22dd9c764d94f2243e22686672
+
+test_runner.py:66: AssertionError
+=============================== warnings summary ===============================
+test_adapter.py::test_adapter_re2tt
+  /root/m1env/lib/python3.12/site-packages/networkx/release.py:130: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+    date_info = datetime.datetime.utcfromtimestamp(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED test_k06_e1_e2.py::test_phu_dinh[9] - AssertionError: assert [['B', 'C...
+FAILED test_k06_e1_e2.py::test_phu_dinh[11] - AssertionError: assert [['B', '...
+FAILED test_k06_e1_e2.py::test_phu_dinh[12] - AssertionError: assert [['R', '...
+FAILED test_k06_e1_e2.py::test_phu_dinh[13] - AssertionError: assert [['R', '...
+FAILED test_k06_e1_e2.py::test_E2C_gan_ben_duoc_goi - AssertionError: assert ...
+FAILED test_runner.py::test_hai_pha_hash_on_dinh - AssertionError: assert '16...
+6 failed, 220 passed, 1 warning in 3.25s

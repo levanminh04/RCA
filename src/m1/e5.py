@@ -86,7 +86,7 @@ def phan_loai(kenh, canh, bat=True, doc_nhom_vong='co_vong', pham_vi_nhom_vong='
     e9: {'bat': bool, 'o_s', 'tau', 'canh_E2_bat_thuong': set cạnh} hoặc None."""
     if doc_nhom_vong not in ('co_vong', 'ke_canh'):
         raise ValueError(doc_nhom_vong)
-    co = [k for k in kenh if k.co]
+    co = sorted((k for k in kenh if k.co), key=lambda k: k.ma)  # thứ tự chuẩn: đầu ra không phụ thuộc thứ tự vào
     theo_e = {}
     for k in co:
         theo_e.setdefault(k.thuc_the, []).append(k)
