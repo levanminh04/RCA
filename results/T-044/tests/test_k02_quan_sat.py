@@ -211,9 +211,23 @@ def test_H5_T12_canh_rong(ma):
     r0 = chuoi.chay(_ca_nho(), [], [], ['P', 'Q'], {}, 1000, _params())
     r1 = chuoi.chay(_ca_nho(), [], [], ['P', 'Q'], {}, 1000,
                     _params(bat_tat={'T12': True}, canh_tinh={'revision': 'thu', 'canh': []}))
-    assert r1['status'] == 'OK'
+    assert r1['status'] == r0['status'] and r1['error'] is None
     assert r1['entity_ranking'] == r0['entity_ranking']
     assert r1['diagnostics']['so_canh_tinh'] == 0
+    # Ca có bằng chứng và E5 dùng cạnh (S2, cấu hình C4): T12 với cạnh rỗng cho đúng kết quả cạnh quan sát.
+    import sinh_trace_S
+    from conftest import FIXTURE
+    spans, logs = sinh_trace_S.sinh('S2', t=1000, mau=FIXTURE['trace_mau_S'])
+    ch = {'E1': 'U', 'E2': 'VC', 'E5': True}
+    U = ['A', 'B', 'F', 'I', 'R', 'X']
+    s0 = chuoi.chay(spans, [], logs, U, {}, 1000, sinh_trace_S.params(ch))
+    p1 = sinh_trace_S.params(dict(ch, T12=True))
+    p1['canh_tinh'] = {'revision': 'thu', 'canh': []}
+    s1 = chuoi.chay(spans, [], logs, U, {}, 1000, p1)
+    assert s0['status'] == s1['status'] == 'OK'
+    for k in ('blocks', 'entity_ranking', 'classes', 'inherited_by', 'region', 'verdict'):
+        assert s1[k] == s0[k], k
+    assert s1['diagnostics']['so_canh_tinh'] == 0
 
 
 def test_H6_thieu_don_vi_thoi_gian(ma):
