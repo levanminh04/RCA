@@ -12,7 +12,7 @@
 - Không sửa đáp án nào; không có đáp án đặc tả nào lệch với code.
 - Tất định: 104 bản ghi và 246 phép kiểm giống hệt qua 4 thứ tự hàng × PYTHONHASHSEED 0, 1, 2 (`runs/tat-dinh-003/tong-hop.json#/ket_luan`).
 - Đột biến: 27/27 bị bắt (`runs/dot-bien-003/tong-hop.json#/so_bi_bat`), sau khi lượt đầu lộ 2 lỗ hổng test và đã vá (`runs/dot-bien-001/tong-hop.json#/song_sot`). D22–D27 thêm sau phản biện lượt 1.
-- Sau phản biện lượt 1: đã sửa ba lỗi CHẶN (bội số ô trong luật C, M5, UV-6, mốc giả; trạng thái quan sát của nguồn metric; cặp giải thích WORLD_DEPENDENT), thu hẹp lập luận E3 trong đề xuất WHY, và cho manifest kiểm được trên Windows (`dinh-chinh-cai-dat.md` Phần II mục C2).
+- Sau phản biện lượt 1: đã sửa ba lỗi CHẶN (bội số ô trong luật C, M5, UV-6, mốc giả; trạng thái quan sát của nguồn metric; cặp giải thích WORLD_DEPENDENT), thu hẹp lập luận E3 trong đề xuất WHY, và cho manifest kiểm được trên checkout CRLF (giả lập trên Linux, `runs/manifest-crlf-001`; chưa chạy trên Windows thật) (`dinh-chinh-cai-dat.md` Phần II mục C2).
 - Runner sinh đúng số cấu hình theo `ma-tran-thu.json` sau Đ16; hai pha tách được; hash pha 1 ổn định.
 
 **Câu hỏi của SPEC trả lời tới đâu:**
@@ -28,7 +28,7 @@
 
 ## 2. Đầu vào, môi trường, kiểm hash
 
-- Kiểm hash T-043: PASS 69/69 file, 10/10 hash đóng băng, ở đầu giai đoạn 2 (`runs/kiem-hash-t043-001/stdout.txt`), cuối phiên 2 (`runs/kiem-hash-t043-002/stdout.txt`) và sau gói sửa (`runs/kiem-hash-t043-003/stdout.txt`), qua `scripts/kiem_hash_t043.py` vì bản clone thiếu thư mục rỗng `runs/khe-open-001`. Chạy trực tiếp `tao_manifest.py --kiem` FAIL chỉ vì `luot_thieu` (`runs/kiem-hash-t043-001/truc-tiep.txt`).
+- Kiểm hash T-043: PASS 69/69 file, 10/10 hash đóng băng, ở đầu giai đoạn 2 (`runs/kiem-hash-t043-001/stdout.txt`), cuối giai đoạn 2 (`runs/kiem-hash-t043-002/stdout.txt`) và sau gói sửa (`runs/kiem-hash-t043-003/stdout.txt`), qua `scripts/kiem_hash_t043.py` vì bản clone thiếu thư mục rỗng `runs/khe-open-001`. Chạy trực tiếp `tao_manifest.py --kiem` FAIL chỉ vì `luot_thieu` (`runs/kiem-hash-t043-001/truc-tiep.txt`).
 - Môi trường: Python 3.12.3 (T-043 dùng 3.12.10 trên Windows); `requirements-m1.txt`: numpy 1.26.4, pandas 2.2.3, scipy 1.14.1, networkx 2.5, pytest 8.3.4, drain3 0.9.11, pyarrow 18.1.0; gói gián tiếp ở `freeze-m1.txt`.
 - Hàm thư viện dùng ngoài phần tự viết:
   - networkx 2.5: `is_directed_acyclic_graph`, `all_simple_paths`, chỉ trong C-d3 (như mã PetShop; networkx 2.5 cũng trả bộ sinh rỗng khi nguồn trùng đích, như 2.8.8 của PetShop). PageRank, SCC (Tarjan), phủ đỉnh nhỏ nhất tự viết.
@@ -169,6 +169,7 @@ Nguồn: `runs/dot-bien-003/tong-hop.json`. Mỗi đột biến thay đúng mộ
 | `runs/tat-dinh-003` | sau gói sửa: PASS (246 phép, 104 bản ghi) |
 | `runs/dot-bien-003` | sau gói sửa: 27/27 bị bắt |
 | `runs/kiem-hash-t043-003` | sau gói sửa: PASS |
+| `runs/manifest-crlf-001` | manifest trên checkout CRLF giả lập: thiếu `.gitattributes` FAIL (lượt hỏng); có `.gitattributes` PASS, 29 file `src/` khớp `git_blob` |
 
 Lượt chạy thử đầu tiên của `scripts/tat_dinh.py` dừng vì ca metric thiếu lớp `latency-90` trong hồ sơ của bộ sinh S; đầu ra lỗi bị ghi đè, chỉ còn ghi ở LOG.
 

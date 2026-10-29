@@ -39,7 +39,7 @@ LUOT = [
     {'duong_dan': 'runs/tat-dinh-002', 'script': 'scripts/tat_dinh.py; pytest 3 hash seed × 4 thứ tự',
      'ket_qua': 'PASS (104 bản ghi, 235 phép)', 'ghi_chu': 'lượt dùng cho tiêu chí 5'},
     {'duong_dan': 'runs/kiem-hash-t043-002', 'script': 'scripts/kiem_hash_t043.py', 'ket_qua': 'PASS 69/69, 10/10',
-     'ghi_chu': 'cuối phiên 2'},
+     'ghi_chu': 'cuối giai đoạn 2'},
     {'duong_dan': 'runs/test-xanh-002', 'script': 'pytest -v, PYTHONHASHSEED=0', 'ket_qua': '246/246 qua',
      'ghi_chu': 'sau gói sửa phản biện lượt 1; tổng hợp ở bang-phep-kiem.json (scripts/tao_bang_phep_kiem.py)'},
     {'duong_dan': 'runs/tat-dinh-003', 'script': 'scripts/tat_dinh.py; pytest 3 hash seed × 4 thứ tự',
@@ -48,6 +48,9 @@ LUOT = [
      'ghi_chu': 'sau gói sửa phản biện lượt 1; D22–D27 mới'},
     {'duong_dan': 'runs/kiem-hash-t043-003', 'script': 'scripts/kiem_hash_t043.py', 'ket_qua': 'PASS 69/69, 10/10',
      'ghi_chu': 'sau gói sửa phản biện lượt 1'},
+    {'duong_dan': 'runs/manifest-crlf-001', 'script': 'tao_manifest.py --kiem trên checkout CRLF giả lập (commit 57234546)',
+     'ket_qua': 'thiếu .gitattributes: FAIL (lượt hỏng); có .gitattributes: PASS, 29 file khớp git_blob',
+     'ghi_chu': 'N1; xem ghi-chu.md'},
 ]
 
 
