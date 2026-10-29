@@ -1,0 +1,102 @@
+{
+ "schema": "T043-dinh-nghia-pha2-v1",
+ "task": "T-043",
+ "buoc": "2 (viết trước pha 2 của KS-16; băm vào LOG trước khi ghép nhãn; không sửa sau khi thấy số ô)",
+ "trang_thai": "Định nghĩa do người làm T-043 đặt theo SPEC bước 2. Chưa có nguồn quyết định trước; Codex phản biện, Minh duyệt cùng kết quả task.",
+ "nguyen_tac": [
+  "Ô là cặp (root, loại lỗi) theo nhãn dev: trường `cell` của results/T-022/nhan-dev.json (RE2-TT, 10 ô) và results/T-026/nhan-dev.json (Nezha-OB, 13 ô).",
+  "Một ô được kích hoạt cho thành phần X khi ít nhất một ca của ô thỏa điều kiện ca của X.",
+  "Điều kiện ca chỉ dùng: số đếm không nhãn đã chốt ở ks16/dem-khong-nhan.json; nhãn root, loại lỗi của chính ca; bản ghi baseline P3 đã đóng băng (chỉ cho E5 và hình dạng xếp hạng); mô hình tĩnh T-038, T-039 (chỉ cho T12). Không dùng đầu ra M1, vì M1 chưa cài.",
+  "Điều kiện ca là điều kiện cần để cơ chế của X có thể đổi hạng root. Không là bằng chứng X sẽ giúp.",
+  "Số ô kích hoạt dùng ở luật C (|E_X| < 6 thì KHÔNG ĐỦ CA) và để đếm P, M, P', M'."
+ ],
+ "do_thi_quan_sat": {
+  "canh_goi": "cặp cha–con khác chủ trong miền chế độ (a) [t-300, t+300): cạnh a -> b khi span cha thuộc a, span con thuộc b (ks16 `call_rows`: [a, b, n_N, n_A, med_dc_N, med_dc_A, med_gap_N, med_gap_A]; chia N/A theo end của span cha)",
+  "G_N": "cạnh có n_N > 0",
+  "G_NA": "cạnh có n_N + n_A > 0",
+  "duong_di": "đường có hướng theo cạnh gọi (bên gọi -> bên được gọi)"
+ },
+ "o_kich_hoat": {
+  "E1": {
+   "dieu_kien_ca": "có cạnh gọi a -> root với a khác root, n_N >= 20 và n_A >= 20",
+   "co_che": "bên gọi chờ root: thời lượng span của bên gọi chứa thời gian của root (G2-H03, UV-2)",
+   "ghi_chu": "Trùng định nghĩa số xem trước 8/11 của SPEC (call-interval-001, `/cases/*/incoming_to_root/*/before/n`, `/after/n`). Áp cho gói E1 và E1-U."
+  },
+  "E1-CP": {
+   "quy_tac_bo_du_lieu": "Q2 của SPEC: tỷ lệ cha có cặp con chồng lấn > 1 ms (ks16 `tong_hop/<ds>/overlap_share_parents_ge2`) dưới 5% ở cả hai dataset thì khai trước KHÔNG ĐỦ CA; K-b không chạy E1-CP",
+   "dieu_kien_ca": "ca có ít nhất một span cha có cặp con chồng lấn > 1 ms (ks16 `trace/parents_with_overlap` > 0) và thỏa điều kiện ca của E1",
+   "co_che": "CP khác U chỉ khi con của cùng cha chồng lấn nhau"
+  },
+  "E2": {
+   "dieu_kien_ca": "có cạnh gọi a -> root với n_N >= 20, n_A >= 20, med_gap_N > 0 và med_gap_A / med_gap_N >= 2",
+   "co_che": "phần ngoài span của root (đường truyền, hàng đợi, xử lý phía gọi quanh lời gọi) dài ra (G2-H06, UV-1)",
+   "ghi_chu": "Trùng định nghĩa số xem trước 2/6 (`ratio_after_over_before/median_gap_us`). Áp cho E2-C."
+  },
+  "E2-VC": {
+   "dieu_kien_ca": "root là một đầu của ít nhất hai cạnh span bọc (ks16 `edge_rows`) mà mỗi cạnh có n_N >= 20 và n_A >= 20",
+   "co_che": "phủ đỉnh nhỏ nhất chỉ định danh được root khi root là đầu chung của từ hai cạnh trở lên (fixture 11, 12)"
+  },
+  "E3": {
+   "dieu_kien_ca": "loại lỗi của ca thuộc nhóm lỗi mã: Nezha-OB {return, exception}; RE2-TT không có loại lỗi mã",
+   "co_che": "lỗi mã nguồn ít hiện ở độ trễ; hiện ở log, giảm tỷ lệ thành công hoặc thời lượng ngắn đi (G2-H07, UV-6)"
+  },
+  "E3b": {
+   "dieu_kien_ca": "root có ít nhất một thao tác NEW_OP (n_N = 0, n_A > 0) hoặc STOPPED (n_N > 0, n_A = 0) trong ks16 `op_rows`, hoặc một thao tác có tổng n_N + n_A >= 10 mà phép nhị thức chính xác hai phía tách theo hướng (lên hoặc xuống, p < 0,01) với p0 = T_A / (T_N + T_A) của thế giới P (ks16 `quan_sat/trace/worlds/P`)",
+   "co_che": "cấu trúc trace của root đổi: thao tác mới, thao tác ngừng, tần suất đổi (KS-10)",
+   "ghi_chu": "Phép nhị thức một phía cho từng hướng, như cổng của đơn vị đếm (B1.3); ô kích hoạt khi một hướng qua."
+  },
+  "E5": {
+   "dieu_kien_ca": "trong ít nhất một bản ghi baseline P3 đã đóng băng của dataset (danh sách ở `ban_ghi_baseline`), bản ghi OK, root có trong thứ hạng, và có thực thể e khác root có đường e -> root trong G_N mà khóa khối của e lớn hơn hẳn khóa khối của root (cờ M5 cơ sở tại k = 1, `results/T-028/codebook.md:95`)",
+   "co_che": "bên gọi hoặc tổ tiên đứng trên root, tức kiểu nhầm triệu chứng với nguyên nhân mà E5 nhắm (MRP P6 tầng 2; G2-H17)",
+   "ghi_chu": "Hòa không tính. Root vắng khỏi thứ hạng là M2, không tính ở đây. TORAI nhiều seed: ca có cờ khi ít nhất một seed có cờ."
+  },
+  "E6b": {
+   "dieu_kien_ca": "root là một đầu của ít nhất một cạnh trong G_NA",
+   "co_che": "PageRank chỉ đổi điểm của nút có cạnh (KS-10)"
+  },
+  "E7": {
+   "dieu_kien_ca": "không áp; E7 chỉ mô tả (T10)",
+   "co_che": "vùng nghi ngờ"
+  },
+  "E8": {
+   "dieu_kien_ca": "không áp trên dev (UNSUPPORTED); số ô = 0",
+   "co_che": "cạnh dữ liệu, thông điệp, triển khai"
+  },
+  "E9": {
+   "dieu_kien_ca": "root có ít nhất một cạnh đi ra root -> b trong G_NA",
+   "co_che": "E9 chỉ có việc khi kênh của root có thể bị bên được gọi giải thích (E5)"
+  },
+  "T12": {
+   "dieu_kien_ca": "có cạnh tĩnh (results/T-038/do-thi/thuc-the.json cho RE2-TT, results/T-039/do-thi/thuc-the.json cho Nezha-OB; mọi kiểu cạnh) có hai đầu trùng đúng tên với hai thực thể khác nhau có dữ liệu trong ca (span, metric hoặc log), chạm root, và chưa có cạnh cùng hướng trong G_NA",
+   "co_che": "phép hợp cạnh chỉ đổi E5, E6b, E7, C-d1, C-d3 khi thêm cạnh chạm root (D8)",
+   "ghi_chu": "Ghép tên chính xác, không suy alias (theo chính sách mapping của T-039). Nút chỉ có trong mô hình tĩnh không tính."
+  }
+ },
+ "ban_ghi_baseline": {
+  "RE2-TT": {"index": "results/T-024/ban-ghi-dua-vao-cham.json#/records", "chon": [["baro", "native"], ["simplerca", "native"], ["microrank", "full"], ["tracerca", "native"], ["circa", "ols+rht_da"], ["torai", "B"]], "ghi_chu": "sáu baseline của bảng G2 RE2-TT_dev30 (results/T-034/bang-baseline.json#/ranking_mode_a/RE2-TT_dev30/methods); TORAI B có seed 0, 1, 2"},
+  "Nezha-OB": {"index": "results/T-026/ban-ghi-dua-vao-cham.json#/unique_records", "chon_view": "main", "ghi_chu": "sáu baseline của bảng chính Nezha-OB (#/tables/main), 6 x 22 = 132 bản ghi"},
+  "kiem_hash": "mỗi bản ghi kiểm sha256 theo index trước khi đọc; lệch thì ca đó ghi ERROR_HASH, không dùng"
+ },
+ "kieu_quan_sat_root": {
+  "nguon_dinh_nghia": "SPEC chỉ nêu tên O1–O4, không định nghĩa (LOG phiên 7, R7-2). Người làm đặt theo các điều kiện thất bại của B2 (S7, G2-H19) và luật quan sát được của B1.9.",
+  "O1": "root có span của chính nó trong miền, và có ít nhất một cạnh gọi đi vào root trong G_NA",
+  "O2": "root có span của chính nó, nhưng không có cạnh gọi đi vào (điểm vào hoặc không được gọi trong cửa sổ)",
+  "O3": "root không có span của chính nó, nhưng có metric hoặc log",
+  "O4": "root không có span, metric hay log trong miền (UNOBSERVED; RR = 0 theo WHY-28)",
+  "anh_xa_metric": "RE2-TT: tiền tố trước '_' đầu tiên của tên cột (ban_ghi.thuc_the_metric); Nezha-OB: tiền tố trước '_' đầu tiên của tên kênh adapter",
+  "vai_tro": "chỉ mô tả; không luật quyết định nào dùng"
+ },
+ "hinh_dang_xep_hang_baseline": {
+  "moi_ban_ghi": ["status", "số thực thể trả về", "hạng nhỏ nhất và lớn nhất có thể của root (danh_gia.phan_bo_hang)", "RR kỳ vọng (danh_gia.cham_ca)", "cỡ nhóm hòa đầu", "root có trong nhóm hòa đầu", "cờ M5 cơ sở tại k = 1"],
+  "tong_hop": "theo dataset, phương pháp và ô: MRR; số ca root chắc chắn hạng 1; số ca hòa ở đầu; số ca có M5",
+  "vai_tro": "chỉ mô tả; số MRR phải khớp bảng G2 (results/T-034/bang-baseline.json) — dùng làm phép kiểm cách đọc bản ghi"
+ },
+ "rr_theo_o": {
+  "RR_ca": "danh_gia.cham_ca: kỳ vọng theo phân bố hạng khi hòa; ca không OK có RR = 0",
+  "RR_o": "trung bình RR_ca trên các ca của ô",
+  "tang_giam": "ΔRR_o = RR_o(bật) - RR_o(tắt); tăng khi ΔRR_o > 1e-12; giảm khi ΔRR_o < -1e-12; còn lại không đổi",
+  "MRR_dataset": "trung bình RR_ca trên các ca của dataset (30 hoặc 22)",
+  "MRR_gop": "trung bình RR_ca trên 52 ca",
+  "P_M": "P, M: số ô trong E_X có RR_o tăng, giảm; P', M': số ô ngoài E_X có RR_o tăng, giảm (Phụ lục C)"
+ }
+}

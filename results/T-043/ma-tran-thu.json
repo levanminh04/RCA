@@ -1,0 +1,53 @@
+{
+ "schema": "T043-ma-tran-thu-v1",
+ "task": "T-043, bước 5",
+ "trang_thai": "Đóng băng trước mọi code thành phần. Hash ghi ở LOG phiên 7 trước bước 6. Sửa sau thời điểm này là thay đổi thiết kế, phải trình Minh.",
+ "can_cu": ["SPEC T-043 B4 và Phụ lục C (D1–D24)", "dac-ta-phuong-phap-v1.md", "dinh-nghia-pha2.json", "ks16/dem-khong-nhan.json", "ks16/dem-sau-ghep-nhan.json"],
+ "co_dinh_moi_buoc": {
+  "ca": "52 ca dev: RE2-TT 30 (results/T-022/allowlist-dev.json), Nezha-OB 22 (results/T-026/allowlist-dev.json); chế độ (a)",
+  "cua_so": "N = [t-300, t), A = [t, t+300); span thuộc A khi end >= t",
+  "ung_vien": "U của dataset; UNOBSERVED và NO_VALID_CHANNEL không trả về, RR = 0",
+  "tham_so_E4": {"m_span": 20, "m_metric": 5, "alpha": 0.01, "epsilon": 0.05, "n_exact_max": 100, "count_min": 10},
+  "bang_lop": "SPEC B1.4; hop-dong.json#/kenh",
+  "trang_thai_quan_sat": "đặc tả v1 mục 2.2",
+  "danh_gia": "danh_gia.cham_ca; hòa theo kỳ vọng; ERROR tính trượt; MRR là độ đo chính (WHY-06); báo kèm Hit@1/3/5, NDCG@5, Retrieval@5, Rerank@1",
+  "the_gioi": "P quyết định; S_lo, S_hi chạy cho mọi ca có phần thời gian OPEN. KS-16: mọi ca dev có ô biên chứa phần OPEN dưới 1,4 giây, nên chạy ba thế giới cho cả 52 ca; điểm đơn vị phân vị không đổi giữa các thế giới"
+ },
+ "chuoi_goc_R0": {
+  "dinh_nghia": "E1 tắt (thời lượng cả span, giữ span bọc), E2 tắt, E3 tắt (một kênh log lỗi cơ bản mỗi thực thể), E5 tắt, E3b tắt, E6a, E9 tắt, T12 tắt; cạnh quan sát được dựng nhưng không thành phần nào dùng; điểm E4",
+  "dung_quan_he": false
+ },
+ "ket_cuc_khai_truoc_T0": {
+  "nguon": "ks16/dem-sau-ghep-nhan.json#/o_kich_hoat; ks16/dem-khong-nhan.json#/tong_hop",
+  "so_o_kich_hoat": {"E1": 19, "E1-CP": 11, "E2": 8, "E2-VC": 17, "E3": 4, "E3b": 12, "E5": 20, "E6b": 21, "E9": 10, "T12": 13, "E8": 0},
+  "khong_du_ca": {
+   "E3": "4 ô < 6 (chỉ Nezha-OB, lỗi return và exception): thành phần ít ca của khối K (luật chọn khối bước 3, 5)",
+   "E1-CP": "tỷ lệ cha có cặp con chồng lấn > 1 ms: RE2-TT 0/494.815, Nezha-OB 444/277.534 (0,16%), cả hai < 5% (Q2): K-b không chạy E1-CP; kiểm trên FlashTicket",
+   "E8": "0 ô trên dev: chỉ FlashTicket"
+  },
+  "du_o": ["E1", "E2", "E2-VC", "E3b", "E5", "E6b", "E9", "T12"]
+ },
+ "buoc": [
+  {"ma": "T0", "noi_dung": "KS-16 chỉ đọc", "vai_tro": "đã xong trong T-043", "so_cau_hinh": 0},
+  {"ma": "T1", "co": "R0 với điểm E4", "do": ["phân bố điểm", "QT5", "tỷ lệ qua cổng ở mốc giả RE2-TT theo loại đơn vị và nguồn", "bất biến theo thứ tự hàng", "hash seed 0/1/2"], "vai_tro": "kiểm cài đặt: sai thì sửa cài đặt", "so_cau_hinh": 1, "so_luot_cham": "1 × 52 × 3 hash seed + 30 mốc giả"},
+  {"ma": "D17", "noi_dung": "Mức tuyệt đối của tỷ lệ CAUSE_FOUND ở mốc giả, nếu đặt: Minh quyết sau T1, trước T4b; ghi rõ đặt sau khi xem dev T1", "vai_tro": "quyết định của Minh", "so_cau_hinh": 0},
+  {"ma": "T4", "co": "ε ∈ {0; 0,05; 0,2} × α ∈ {0,001; 0,01; 0,05}; T4c", "khong": "R0", "vai_tro": "chỉ báo cáo (QT3)", "so_cau_hinh": 9},
+  {"ma": "T4b", "co": "nhánh z (cùng cờ E4)", "khong": "R0 với điểm E4", "vai_tro": "chỉ báo cáo; Q5 vế (1) kiểm công thức, vế (2) mô tả; không đổi nền khối K (D24)", "so_cau_hinh": 1},
+  {"ma": "K", "co": "16 cấu hình E1-U × E2-C × E3 × E5", "khong": "R0", "vai_tro": "quyết định theo luật chọn khối; C-d1, C-d3 chỉ báo cáo", "thanh_phan_it_ca": ["E3"], "so_cau_hinh": 16,
+   "do": ["ΔRR theo ca và ô", "ca đúng bị hỏng, ca được sửa", "cờ M5", "mốc giả theo verdict", "dấu vết E5 theo kênh", "bộ đánh giá: root mất kênh nào, còn tự sinh không, hạng trước/sau E5", "tỷ lệ kênh lan bị coi là kế thừa ở mốc giả"]},
+  {"ma": "K-b", "co": "E2-VC thay E2-C tại cấu hình thắng và tại cấu hình đầy đủ", "khong": "cấu hình thắng của K", "vai_tro": "luật chọn khối bước 9: chỉ thay khi luật C cho GIÚP tại cấu hình thắng", "so_cau_hinh": 2, "ghi_chu": "E1-CP không chạy (khai trước KHÔNG ĐỦ CA); tối đa 2 thay vì 4"},
+  {"ma": "T6", "co": "E3b", "khong": "chuỗi tới K-b", "vai_tro": "quyết định theo luật C", "so_cau_hinh": 1},
+  {"ma": "T9", "co": "E6b", "khong": "E6a", "vai_tro": "quyết định theo luật C; KHÔNG ĐỦ CA thì giữ bật (D2a); C-g, C-c chỉ báo cáo", "so_cau_hinh": 1},
+  {"ma": "T10", "co": "E7, hai cách dựng", "vai_tro": "mô tả: p root thuộc vùng, |R| kỳ vọng, |hợp|", "so_cau_hinh": 0},
+  {"ma": "T11", "co": "E9", "khong": "E9 tắt", "vai_tro": "quyết định theo luật C", "so_cau_hinh": 1},
+  {"ma": "T12", "co": "cạnh quan sát ∪ cạnh tĩnh (T-038, T-039)", "khong": "cạnh quan sát", "vai_tro": "quyết định theo luật C; ghi điều kiện revision", "so_cau_hinh": 1},
+  {"ma": "KB", "co": "chuỗi cuối, đảo trạng thái từng thành phần E1, E2, E3, E5", "khong": "chuỗi cuối", "vai_tro": "luật chọn khối bước 11: kết cục khác lúc chọn thì ghi 'phụ thuộc bối cảnh' và trình Minh", "so_cau_hinh": 4},
+  {"ma": "T13", "co": "chuỗi cuối bỏ lần lượt từng thành phần đang bật", "so_sanh": ["C-a0", "C-a1", "C-d1", "C-d2", "C-d3", "C-c", "C-g", "C-h", "C-e"], "vai_tro": "chỉ báo cáo; bảng theo ca; bootstrap theo ô của ΔMRR so với TORAI B; E-04 phân xử ở P7; phạm vi theo B3 (D23)", "so_cau_hinh": "số thành phần đang bật + 8 đối chứng"}
+ ],
+ "luat_C": {"delta": 0.01, "delta_d": {"RE2-TT": 0.03333333333333333, "Nezha-OB": 0.045454545454545456}, "o_toi_thieu": 6, "moc_gia_tang": 0.1, "M_cong_M_phay_toi_thieu": 3, "thu_tu": ["HẠI riêng (UV-6 với E3; điều kiện riêng E5; mốc giả; M + M' >= 3 và P + P' = 0)", "TRÁI CHIỀU theo dataset → Minh", "HẠI gộp (< -δ)", "KHÔNG ĐỦ CA (|E_X| < 6)", "GIÚP (> δ, P > M, không dataset < -δ_d)", "KHÔNG TÁC DỤNG (|Δ| <= δ)", "TRÁI CHIỀU theo ô → Minh"], "nguon": "SPEC Phụ lục C; fixture 34–40, 51–54, 56, 60"},
+ "luat_chon_khoi": {"nguon": "SPEC B4, bước 1–12; fixture 45–50", "gan_tot_nhat": 0.01, "thu_tu_hoa": ["ít thành phần", "MRR cao hơn", "E1, E2, E5, E3"], "kiem_cau_hinh_thang": "không có E1, E2, E5 thì trình Minh kèm cấu hình có đồ thị tốt nhất và mức chênh"},
+ "dieu_kien_rieng": {"E3": "UV-6: số ca đang đúng bị hỏng không vượt số ca lỗi mã (return, exception) được sửa", "E5": "HẠI khi số ca có cờ M5 (k = 1, đường trong G_N, đứng trước hẳn) của c lớn hơn của c bỏ E5"},
+ "ngan_sach": {"K_Kb_KB": "(16 + 2 + 4) × 52 = 1.144 lượt chấm, dưới trần 1.300 của SPEC", "T4": "9 × 52", "T1_T4b_T6_T9_T11_T12": "khoảng 9 × 52", "the_gioi": "đơn vị đếm tính ba lần; đơn vị phân vị một lần", "thoi_gian": "chưa đo; ước lượng ở bao-cao.md mục 6"},
+ "khong_lam_trong_ma_tran": ["chế độ (b) và biến thể nền lùi D13 (task sau SPEC phát hiện, D16)", "E5 có tương quan (ứng viên, chưa có hợp đồng khả thi)", "E1-CP (khai trước KHÔNG ĐỦ CA)", "E8, C-f (FlashTicket)", "C-c6 (Minh không chọn, D5)", "đồ thị ngẫu nhiên (M-25)", "nhánh không quan hệ chọn riêng (D23)"],
+ "ghi_lai_moi_lan_nhin_so": true
+}

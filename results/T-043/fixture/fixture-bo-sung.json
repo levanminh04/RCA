@@ -1,0 +1,113 @@
+{
+ "schema": "T043-fixture-bo-sung-v1",
+ "nguon": "Q-207; dinh-chinh-phien9.md Đ9 (luật F phương án (a)), Đ11 (E9, C-d2), Đ12 (C-d3); B8 theo dinh-chinh-phien10.md Đ20. Bổ sung cho fixture-dac-ta.json (đóng băng, không sửa).",
+ "quy_uoc": {
+  "thoi_gian": "giây tính từ đầu cửa sổ; ô 10 giây; khởi phát là đầu ô nên là bội của 10",
+  "tau_s": 0.001,
+  "nguong_phu_quyet": "khởi phát của b trừ khởi phát của e lớn hơn hẳn 2 ô + τ = 20,001 s, với mọi b ∈ B(e)",
+  "khoi_phat": "chỉ đơn vị phân vị có khởi phát; đơn vị đếm có khoi_phat = null"
+ },
+ "fixtures": [
+  {
+   "id": "B1",
+   "loai": "quan_sat_khe",
+   "ten": "Khe dương giữa hai file là OPEN",
+   "dau_vao": {
+    "r_s": 1,
+    "file": [[0, 5, 10], [12, 15, 20]],
+    "cua_so": [0, 30],
+    "phia": {"N": [0, 15], "A": [15, 30]}
+   },
+   "dap_an": {
+    "khe": [[11, 12]],
+    "T_chac": {"N": 14, "A": 6},
+    "T_max": {"N": 15, "A": 6},
+    "thieu_thu_s": 9,
+    "the_gioi": {"P": [14, 6], "S_lo": [15, 6], "S_hi": [14, 6]}
+   },
+   "loi_giai": "File 1 phủ [0, 11), file 2 phủ [12, 21); khe [11, 12) là OPEN. H = [0, 21). N: (F ∩ H) bỏ khe = [0, 11) ∪ [12, 15) = 14; T^max gồm khe = 15. A: [15, 21) = 6. Ngoài bao [0, 21) là thiếu thu: [21, 30) = 9."
+  },
+  {
+   "id": "B2",
+   "loai": "E9",
+   "ten": "Ví dụ của Codex: một bên giải thích chưa biết khởi phát",
+   "dau_vao": {"e": {"khoi_phat": 30}, "B": [{"ten": "b1", "khoi_phat": 70}, {"ten": "b2", "khoi_phat": null}]},
+   "dap_an": {"phu_quyet": false, "ly_do": "không đủ khởi phát"},
+   "loi_giai": "b2 là đơn vị đếm, không có khởi phát. Thiếu khởi phát không là bằng chứng b2 xuất hiện muộn, nên không phủ quyết."
+  },
+  {
+   "id": "B3",
+   "loai": "E9",
+   "ten": "Mọi bên giải thích có khởi phát và đều muộn hơn quá 2 ô",
+   "dau_vao": {"e": {"khoi_phat": 30}, "B": [{"ten": "b1", "khoi_phat": 70}]},
+   "dap_an": {"phu_quyet": true, "ly_do": "đã xét, phủ quyết"},
+   "loi_giai": "70 − 30 = 40 > 20,001."
+  },
+  {
+   "id": "B4",
+   "loai": "E9",
+   "ten": "Kênh bị giải thích là đơn vị đếm",
+   "dau_vao": {"e": {"khoi_phat": null}, "B": [{"ten": "b1", "khoi_phat": 70}]},
+   "dap_an": {"phu_quyet": false, "ly_do": "không đủ khởi phát"},
+   "loi_giai": "e không có khởi phát."
+  },
+  {
+   "id": "B5",
+   "loai": "E9",
+   "ten": "Cách nhau đúng 2 ô",
+   "dau_vao": {"e": {"khoi_phat": 30}, "B": [{"ten": "b1", "khoi_phat": 50}]},
+   "dap_an": {"phu_quyet": false, "ly_do": "đã xét, không phủ quyết"},
+   "loi_giai": "50 − 30 = 20, không lớn hơn 20,001."
+  },
+  {
+   "id": "B6",
+   "loai": "Cd2",
+   "ten": "Thực thể không có khởi phát xếp sau cùng",
+   "dau_vao": {
+    "thuc_the": [
+     {"ten": "V", "khoi_phat": 20, "K_raw": 0.6},
+     {"ten": "X", "khoi_phat": 20, "K_raw": 0.3},
+     {"ten": "Y", "khoi_phat": 40, "K_raw": 0.9},
+     {"ten": "Z", "khoi_phat": null, "K_raw": 0.95},
+     {"ten": "W", "khoi_phat": null, "K_raw": 0.5}
+    ]
+   },
+   "dap_an": {"thu_tu": ["V", "X", "Y", "Z", "W"]},
+   "loi_giai": "Sớm hơn đứng trước; cùng khởi phát thì K_raw lớn hơn đứng trước. Z, W chỉ có đơn vị đếm bất thường, nên không có khởi phát và xếp sau mọi thực thể có khởi phát, hòa theo K_raw."
+  },
+  {
+   "id": "B7",
+   "loai": "Cd3",
+   "ten": "Không có span gốc vì mọi span có parent",
+   "dau_vao": {
+    "spans_A": [
+     {"span": "s1", "parent": "p0", "chu": "frontend"},
+     {"span": "s2", "parent": "s1", "chu": "cartservice"}
+    ],
+    "bat_thuong_lan_nguoc": ["frontend", "cartservice"],
+    "root": "cartservice"
+   },
+   "dap_an": {"dich": [], "trang_thai": "NO_TARGET", "RR": 0},
+   "loi_giai": "Span gốc là span có parent rỗng. s1 có parent p0 không resolve, nên là span mồ côi, không là span gốc. Không có đích; tính trượt. Đây là tình trạng của Nezha-OB dev (0 span gốc ở 22/22 ca)."
+  },
+  {
+   "id": "B8",
+   "loai": "quan_sat_khe",
+   "ten": "File lồng nhau không tạo khe (phiên 10, Đ20; phản ví dụ F2 của Codex)",
+   "dau_vao": {
+    "r_s": 1,
+    "file": [[0, 99], [10, 19], [30, 39]],
+    "cua_so": [0, 100],
+    "phia": {"N": [0, 50], "A": [50, 100]}
+   },
+   "dap_an": {
+    "khe": [],
+    "T_chac": {"N": 50, "A": 50},
+    "T_max": {"N": 50, "A": 50},
+    "thieu_thu_s": 0,
+    "the_gioi": {"P": [50, 50], "S_lo": [50, 50], "S_hi": [50, 50]}
+   },
+   "loi_giai": "Ba file phủ [0, 100), [10, 20), [30, 40). Hợp là [0, 100), không có khe. H = [0, 100) vì bản ghi 99 nằm trong cửa sổ. N = 50, A = 50. Bản hàm cũ so hai khoảng kề nhau sau khi sắp xếp, nên sinh khe giả [20, 30) và cho T_chắc N = 40."
+  }
+ ]
+}
