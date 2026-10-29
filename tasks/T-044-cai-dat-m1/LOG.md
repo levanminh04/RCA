@@ -681,3 +681,120 @@ Dòng ghi DECISIONS cho các duyệt này: người làm đề xuất ở cuối
 - Bước 6 (tất định): thêm cơ chế xáo hàng vào `tests/conftest.py` (`M1_XAO=<seed>` xáo mọi danh sách đầu vào mà thứ tự không mang nghĩa, ở mọi tầng gọi; metric của chuỗi chỉ xáo khi mọi nguồn dùng `metrics.time`) và script `results/T-044/scripts/tat_dinh.py` (104 bản ghi: trace S1–S7 và ca metric với 13 cấu hình gồm E1-CP, E3, E6b, E9, T12, nhánh z, cách đọc A; băm JSON chuẩn hóa; cache cổng mới mỗi lượt). Lượt xáo đầu tiên đỏ 6 test (dựng lại và lưu ở `runs/tat-dinh-000-truoc-sua/`): `e2.gan_canh` trả danh sách theo thứ tự đầu vào; `e5.phan_loai` duyệt kênh giải thích theo thứ tự đầu vào nên thứ tự mục `inherited_by` đổi (F_I không đổi, hash pha 1 đổi). Sửa: sắp cạnh theo (bên gọi, bên được gọi), sắp kênh theo mã. Lượt chạy script đầu tiên dừng vì ca metric thiếu lớp `latency-90` trong hồ sơ của bộ sinh S (chỉ có cpu); đổi sang hồ sơ RE2-TT của `hop-dong.json`; đầu ra lỗi của lượt đó bị ghi đè, chỉ còn ghi lại ở đây. Kết quả `runs/tat-dinh-001/tong-hop.json`: 104 bản ghi giống hệt qua 4 thứ tự × PYTHONHASHSEED 0, 1, 2 (0 sha256 lệch); 226 phép kiểm qua và giống hệt ở cả 12 biến thể. Tổng thời gian khoảng 90 giây.
 - Bước 7 (đột biến): script `results/T-044/scripts/dot_bien.py` chép `src/`, `results/T-043` (trừ runs), tests và fixture của T-044 vào thư mục tạm; mỗi đột biến thay đúng một chuỗi (kiểm xuất hiện đúng một lần), chạy toàn bộ test; không sửa repo. Lượt `runs/dot-bien-001`: 20 đột biến, đối chứng không đột biến xanh, 18 bị bắt, **2 sống sót**: D02 (bỏ cắt con về cha trong `span.chuan_bi`) vì fixture 4, 5 chỉ gọi `cat_con`, `doc_quyen_U` trực tiếp, không đi qua đường chuỗi dùng thật; D10 (mặc định cách đọc nhóm vòng của `e5.phan_loai` thành A) vì test nhóm vòng luôn truyền cách đọc. Vá bằng test, không thêm đáp án mới: fixture 2–5 đi qua `chuan_bi` (U, CP, đếm con vượt biên); SCC1–SCC4 gọi không truyền cách đọc phải cho đáp án C′; chuỗi thiếu `tham_so_E5` phải gọi E5 với 'co_vong' (thêm D21 cho chỗ này). Lượt `runs/dot-bien-002`: 21 đột biến, đối chứng xanh 235/235, **21/21 bị bắt** (D19 bỏ thứ tự chuẩn của E5 chỉ lộ khi xáo hàng nên chạy với M1_XAO=1). Gồm sáu ví dụ của SPEC: đảo lớp lan (D01), bỏ cắt con E1 (D02), đổi khóa hòa (D03), bỏ duyệt list ở bộ kiểm trường cấm (D04), đổi δ luật C (D05), rò nhãn vào pha 1 (D06 mã mờ vào params, D07 import bộ đánh giá, D08 trỏ file nhãn). Mỗi lượt khoảng 85 giây.
 - Bước 8 (đính chính): ghi `results/T-044/dinh-chinh-cai-dat.md` Phần II. Không fixture hay đáp án nào của T-043 lệch với code (97/97 qua, không sửa đáp án), nên không có đáp án đặc tả cần đính chính. Phần II gồm: A. 20 cách hiểu ở chỗ đặc tả không nói (PII-01…PII-20, ví dụ cổng p < α chặt, E9 tắt trên cạnh E2, khởi phát của kênh E2-VC, vùng E7 rỗng khi ứng viên không có cờ, M5 "đứng trước hẳn" trên khối, giá trị metric không hữu hạn, đích C-d3, mẫu số C-e khi bản ghi lỗi, danh sách T13 và C-e, nền của các bước sau K-b, cờ trái chiều trong luật khối, cột metric không khai nguồn, quy ước adapter), **chờ Minh quyết**; B. quy ước biểu diễn; C. các sửa đã làm trong phiên; D. giới hạn và phần chưa kiểm. Soạn `results/T-044/de-xuat-why.md`: ba đề xuất WHY (đường xử lý log của E3; nhóm vòng C′; ngưỡng Drain 0,4), chưa ghi `docs/WHY.md` vì ngoài phạm vi ghi. Kiểm lại trích dẫn: KS-16 pha 2 dòng 160 dùng `<`; `dinh-nghia-pha2.json` dòng 44 ghi "p < 0,01"; `results/T-016/dung-logts-tracets.md` dòng 60 và bảng dòng 44–53; `RouteServiceImpl.java` dòng 84.
+
+### Kết thúc phiên — giai đoạn 2, phiên 1 (29/10/2026; Claude; cloud, branch `claude/sweet-hawking-dy078d`; người làm)
+
+**1. Đã làm gì.** Bước 0–9 của SPEC, không dừng giữa chừng (không gặp trường hợp dừng bắt buộc: không có đáp án lệch code, không cần ghi ngoài phạm vi, không cần gói ngoài danh sách ghim, không dùng subagent):
+- bước 0–2: kiểm hash T-043 (PASS qua script), môi trường, chép U1–U6, H1–H6;
+- bước 3: khung test và đáp án tự lập, thấy đỏ 206/208;
+- bước 4: cài 11 khối `src/m1`, `src/m1_danh_gia`; bổ sung T4c (thiếu ở bước 3);
+- bước 5: runner hai pha, pha 2, adapter RE2-TT và Nezha-OB;
+- bước 6: tất định PASS (sau khi chuẩn hóa thứ tự đầu ra của E2, E5);
+- bước 7: đột biến 21/21 (sau khi vá hai lỗ hổng test);
+- bước 8: Phần II của `dinh-chinh-cai-dat.md`; bản nháp WHY;
+- bước 9: `bao-cao.md`, `bang-phep-kiem.json`, lượt xác nhận cuối, `manifest.json`.
+
+**2. File đã thay đổi trong giai đoạn 2** (commit từ c6a29315 tới commit chứa mục này):
+- mới: `src/m1/` (17 tệp), `src/m1_danh_gia/` (12 tệp), `results/T-044/` (đáp án, tests, scripts, runs, báo cáo, bảng phép kiểm, đính chính, đề xuất WHY, requirements, freeze, manifest);
+- sửa theo các mục Minh duyệt đầu giai đoạn 2: `tasks/T-044-cai-dat-m1/SPEC.md`, `tasks/T-045-chay-khoi-k-dev/SPEC.md`;
+- `tasks/T-044-cai-dat-m1/LOG.md` (nối thêm); dòng T-044 trong `docs/STATE.md`.
+- Không sửa `src/p3`, `results/T-043`, `requirements.txt` gốc, DECISIONS, WHY, MRP, KE-HOACH, task cũ.
+
+**3. Kiểm đã chạy và kết quả** (số lấy từ file):
+- 235/235 phép kiểm qua (`results/T-044/bang-phep-kiem.json#/tong`); 97/97 phép T-043 trong phạm vi (`#/T043/qua_trong_pham_vi`), 12 phép D13 loại theo ngoại lệ đã duyệt.
+- Tất định: `results/T-044/runs/tat-dinh-002/tong-hop.json#/ket_luan` PASS (104 bản ghi, 4 thứ tự × 3 hash seed; 235 phép giống hệt ở 12 biến thể).
+- Đột biến: `results/T-044/runs/dot-bien-002/tong-hop.json#/so_bi_bat` = 21/21; đối chứng xanh.
+- Hash T-043: `results/T-044/runs/kiem-hash-t043-002/stdout.txt` PASS 69/69, 10/10. Manifest T-044: `tao_manifest.py --kiem` PASS 218/218.
+
+**4. Điều chưa chắc hoặc cần Minh quyết.**
+- **Task đã đạt** (trong phạm vi fixture): code làm đúng đặc tả trên mọi ca giả có đáp án; test có sức bắt lỗi với 21 đột biến; nhãn không lọt (kiểm tĩnh, fixture 74, CĐ12); tất định trên ca giả.
+- **Câu hỏi nguồn trả lời tới đâu:** A1–A4 trả lời trong phạm vi fixture. A5: không chỗ sai; 20 chỗ đặc tả không nói, người làm đã chọn cách hiểu. Task không trả lời câu hỏi hiệu quả nào (RQ3b–d) và không kiểm hành vi trên dữ liệu thật; MRP P7 "kiểm đầu vào, trung gian, hành vi trên dev" mới đạt phần code và ca giả, phần dev thuộc T-045.
+- **Cần Minh quyết:**
+  1. 20 cách hiểu ở `results/T-044/dinh-chinh-cai-dat.md` Phần II mục A (PII-01…PII-20). Theo tiêu chí 8, task ở trạng thái "chờ Minh" tới khi quyết. Đề xuất: giữ cách đã cài.
+  2. Ghi dòng DECISIONS cho các duyệt đầu giai đoạn 2 (đề xuất nguyên văn ở dưới).
+  3. Ba đề xuất WHY ở `results/T-044/de-xuat-why.md` (E3, nhóm vòng C′, ngưỡng Drain); ghi vào `docs/WHY.md` cần duyệt riêng.
+  4. Chuyển prompt phản biện dưới đây cho Codex và chọn phạm vi ghi của lượt phản biện.
+  5. Dòng "Git remote … đã push tới `bc686d80`" trong `docs/STATE.md` đã cũ (branch này đã push tới commit chứa mục này); dòng đó ngoài quyền ghi của T-044. Đề xuất sửa khi Minh duyệt merge.
+- **Bất đồng còn lại:** chưa có lượt phản biện kết quả nào.
+- **Thiếu bằng chứng:** biên p = α không có fixture; khoảng tin cậy bootstrap chưa nằm trong `luat_c`; adapter chưa chạy trên dữ liệu dev; C-g, C-c chưa nối bản ghi P3 thật; cạnh tĩnh chưa đọc T-038, T-039; thời gian, RAM trên ca thật. Đáp án tự lập (73 mục) chưa qua phản biện; nếu đáp án nào sai thì code đang khớp cùng cách hiểu sai.
+- **Quyết định bị ảnh hưởng:** T-045 bắt đầu khi T-044 được nghiệm thu (STATE dòng T-045). Cách khớp E3 chốt ở D17 của T-045.
+
+**Đề xuất dòng DECISIONS (chưa ghi; chờ Minh duyệt):**
+> | Q-213 | 29/10/2026 | “duyệt toàn bộ các đề xuất bên trên của bạn, nếu không còn vướng mắc gì thì hãy tiếp tục t-044 giúp tôi” | Duyệt 11 mục đề xuất của T-044 phiên 1 (R1–R14, D1–D5): script kiểm hash T-043 trên bản clone và sửa SPEC T-044 dòng 44, 86, 118; E1-CP là chế độ của E1, chỉ kiểm bằng fixture, không vào ma trận dev; UV-6 đếm gộp theo Hit@1 = 1; nhóm vòng E5 theo cách đọc C′, cách đọc A chỉ chẩn đoán (D5 của T-045); đường xử lý log của E3 (chuỗi vào Drain theo quy tắc chung, một Drain chung, ba cách khớp mặc định (a), bỏ che chuỗi trong ngoặc — đổi thiết kế, che UUID → IP → HEX → NUM, giữ ngưỡng 0,4); `params.ho_so_nguon`, `params.tham_so_E3`, `params.tham_so_E5`; mở rộng đáp án tự lập N1; ghi đính chính Phần I vào `results/T-044/dinh-chinh-cai-dat.md`; sửa SPEC T-045 theo D1–D5; xóa ba thư mục ngoài repo. Nguồn: chat 29/10/2026. |
+
+**Bước tiếp theo chính xác.**
+- Minh: quyết bốn mục trên; chuyển prompt dưới đây cho Codex.
+- Khi có `tasks/T-044-cai-dat-m1/REVIEW.md`: mở phiên mới của người làm, đọc AGENTS, STATE, SPEC, mục này của LOG; tự soát đầu ra gốc trước khi mở kết luận phản biện (AGENTS mục 5 bước 7); chạy lại `cd results/T-044/tests && python -B -m pytest -q -p no:cacheprovider` và `python -B results/T-044/scripts/tao_manifest.py --kiem` để chắc đầu ra không đổi.
+- Sửa code sau phản biện thì chạy lại `scripts/tat_dinh.py`, lưới pytest của bước 6, `scripts/dot_bien.py` (lượt mới), rồi `tao_manifest.py --tao`.
+
+**Lệnh cuối đã chạy:** `$HOME/m1env/bin/python -B results/T-044/scripts/tao_manifest.py --kiem` (PASS 218/218), rồi push branch.
+
+**Prompt phản biện cho Codex** (Prompt chung + khối "Soát kết quả" + khối G3 của `docs/review-prompt.md`, chép nguyên văn, chỉ điền thông tin trung tính):
+
+```text
+Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
+Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
+
+Thông tin lượt này:
+- Task hoặc đề xuất: T-044 — cài chuỗi M1 và kiểm đặc tả; tasks/T-044-cai-dat-m1/SPEC.md.
+- Công đoạn: soát kết quả.
+- Gói/cổng: P6 (M1); chuẩn bị G3.
+- Người làm và người phản biện chính thức: người làm Claude; người phản biện Codex (theo SPEC).
+- Tài liệu gốc: tasks/T-044-cai-dat-m1/SPEC.md; tasks/T-044-cai-dat-m1/LOG.md; tasks/T-045-chay-khoi-k-dev/SPEC.md; tasks/T-043-thiet-ke-rca-m1/SPEC.md (Phụ lục B–D); results/T-043/dac-ta-phuong-phap-v1.md, hop-dong.json, ma-tran-thu.json, dinh-nghia-pha2.json, bang-chuyen-giao.json, fixture-dac-ta.json, fixture/fixture-bo-sung.json, dinh-chinh-phien8.md, dinh-chinh-phien9.md, dinh-chinh-phien10.md; results/T-044/dinh-chinh-cai-dat.md; git diff 6b2f6ac6..1487416c trên branch claude/sweet-hawking-dy078d (LOG và STATE ở commit kế tiếp trên cùng branch).
+- Phản biện và phản hồi trước: không có bản phản biện dạng file cho T-044. Lượt rà SPEC của Codex diễn ra trong chat ngày 29/10/2026 (SPEC T-044 dòng 3).
+- Code và kết quả liên quan: branch claude/sweet-hawking-dy078d, commit 1487416c; src/m1/, src/m1_danh_gia/; results/T-044/ (bao-cao.md, bang-phep-kiem.json, dinh-chinh-cai-dat.md, de-xuat-why.md, fixture/, tests/, scripts/, runs/); manifest results/T-044/manifest.json, kiểm bằng `py -3 -B results/T-044/scripts/tao_manifest.py --kiem`; môi trường results/T-044/requirements-m1.txt và results/T-044/freeze-m1.txt (Python 3.12); chạy test: `cd results/T-044/tests` rồi `py -3 -B -m pytest -q -p no:cacheprovider`; các lệnh khác ở results/T-044/bao-cao.md mục 11.
+- Phạm vi ghi được Minh cho phép trong lượt này: <Minh điền khi chuyển prompt: chỉ trả lời trong chat, hoặc ghi tasks/T-044-cai-dat-m1/REVIEW.md (chưa có) theo tasks/_MAU/REVIEW.md>.
+
+Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
+
+Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
+Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
+Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
+
+Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
+hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
+Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
+số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
+có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
+
+Bổ sung yêu cầu phản biện:
+1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
+2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
+3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
+4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
+5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
+6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
+7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
+8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
+9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
+10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
+
+Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
+Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
+
+Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
+bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
+Tiếng Việt, câu ngắn.
+
+Cuối lượt báo:
+1. Đã làm gì.
+2. File đã thay đổi, hoặc không sửa file nào.
+3. Kiểm đã chạy và kết quả.
+4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
+
+Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
+
+Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
+
+Công đoạn: soát kết quả.
+Kiểm trên đầu ra thật, code và dữ liệu được phép; không tin tóm tắt LOG. Đối chiếu tiêu chí xong với phần mục tiêu nguồn và mức căn cứ cho bước tiếp theo; chạy lại phần rẻ khi trong quyền được duyệt.
+Phân biệt hoàn thành task mô tả, xác nhận cơ chế và đủ căn cứ chọn/đánh giá thiết kế. Giới hạn đã khai không tự miễn phép kiểm cần thiết còn làm được.
+Chỉ ghi bản phản biện lượt được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ bản cũ; không sửa kết quả thay người làm.
+
+Với từng thành phần, kiểm mục đích và căn cứ: sửa hạn chế P4, đáp ứng DT18 hay nhu cầu kỹ thuật. Có lý do kỹ thuật, phương án khác, bằng chứng dev và điều kiện thất bại không; có dùng mã hạn chế mô tả như bằng chứng cơ chế hoặc chọn theo mức chênh đồ thị trừ không đồ thị không?
+Nêu rõ nút/cạnh, ánh xạ log/trace/metric và phép tính thực sự sử dụng cạnh. Lần theo thông tin quan hệ và nhãn trong phương pháp lẫn đối chứng; gọi “không đồ thị” có đúng với thông tin còn giữ không?
+Kiểm baseline và đối chứng đủ mạnh, tương đương về tín hiệu/cửa sổ/tập ứng viên/coverage/tiền xử lý/quy tắc chấm/ngân sách chọn cấu hình ở phần không chủ ý thay; yếu tố thay cùng phải giới hạn kết luận.
+Phương pháp và đối chứng đã được cài và kiểm đầu vào, trung gian, hành vi trên dev chưa, hay chỉ chạy không lỗi? Không đòi đồ thị phải thắng để khóa.
+Code/revision, cấu hình, giả thuyết, độ đo, tập ca/tập ứng viên, cách xử lý ca lỗi/UNSUPPORTED/nhánh dự phòng và bảng diễn giải đã khóa trước test chưa? Có bỏ nhóm khó sau khi nhìn điểm hoặc dùng test để chọn thiết kế không?
+Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.
+```
