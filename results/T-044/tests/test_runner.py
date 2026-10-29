@@ -83,3 +83,59 @@ def test_runner_chan_ro_gia_tri(ma, tmp_path):
     p['config_id'] = 'R0-gia-001'
     with pytest.raises(Exception):
         runner.pha1(ca, {'gia-001': 1000}, [{'config_id': 'R0-gia-001', 'params': p}], tmp_path / 'l3')
+
+
+def test_tham_so_E4_khop_hop_dong(ma):
+    """Tham số E4 runner dùng = hop-dong.json#/vao/params/tham_so_E4; ma trận không ghi đè giá trị khác."""
+    from m1 import runner
+    ma('runner-tham-so-E4')
+    hd = _doc(T043 / 'hop-dong.json')
+    assert runner.TS_HOP_DONG == hd['vao']['params']['tham_so_E4']
+    mt = runner.ap_dinh_chinh(MA_TRAN)
+    for k, v in MA_TRAN['co_dinh_moi_buoc']['tham_so_E4'].items():
+        assert runner.TS_HOP_DONG[k] == v, k
+    ds = runner.sinh_cau_hinh(mt, thang={'E1': 'U', 'E2': 'C', 'E3': True, 'E5': False},
+                              chuoi_cuoi=dict(runner.R0, E1='U', E2='C', E3=True))
+    assert ds['T1'][0]['tham_so_E4'] == hd['vao']['params']['tham_so_E4']
+
+
+def test_T13_doi_chung(ma):
+    """T13: bỏ từng thành phần đang bật + 7 đối chứng (Đ16); C-e là vế mốc giả, không là cấu hình."""
+    from m1 import runner
+    m = tu_lap(DAP_AN_THANH_PHAN, 'RUN1')
+    ma('runner-T13')
+    ds = runner.sinh_cau_hinh(runner.ap_dinh_chinh(MA_TRAN), thang=m['dau_vao']['thang'],
+                              chuoi_cuoi=m['dau_vao']['chuoi_cuoi'])
+    dc = [c['doi_chung'] for c in ds['T13'] if 'doi_chung' in c]
+    assert dc == ['C-a0', 'C-a1', 'C-d1', 'C-d2', 'C-d3', 'C-c', 'C-g']
+    assert {c['doi_chung']: c['chay_M1'] for c in ds['T13'] if 'doi_chung' in c} == \
+        {'C-a0': True, 'C-a1': True, 'C-d1': False, 'C-d2': False, 'C-d3': False, 'C-c': False, 'C-g': False}
+    assert not any('C-e' in c['config_id'] or 'C-h' in c['config_id'] for c in ds['T13'])
+
+
+def test_pha2_M5_va_luat_C(ma, tmp_path):
+    """Pha 2 trên S1: cờ M5 đọc G_N từ bản ghi (R0: A, F đứng trước R và có đường tới R); luật C ba thế giới."""
+    from fractions import Fraction
+    from m1 import runner
+    from m1_danh_gia import pha2
+    import sinh_trace_S
+    from conftest import FIXTURE
+    ma('pha2-M5-luat-C')
+    spans, logs = sinh_trace_S.sinh('S1', t=1000, mau=FIXTURE['trace_mau_S'])
+    ca = [{'opaque_id': 'gia-001', 'spans': spans, 'metrics': [], 'logs': logs,
+           'inventory': ['A', 'B', 'F', 'I', 'R', 'X'], 'aliases': {}}]
+    cau_hinh = [{'config_id': 'R0', 'params': sinh_trace_S.params({})},
+                {'config_id': 'C1', 'params': sinh_trace_S.params({'E1': 'U'})}]
+    h = runner.pha1(ca, {'gia-001': 1000}, cau_hinh, tmp_path / 'l')
+    nhan = {'gia-001': {'root': 'R', 'dataset': 'RE2-TT', 'o': 'o1'}}
+    kq = pha2.cham(tmp_path / 'l', h['sha256'], nhan)
+    r0, c1 = kq['cau_hinh']['R0']['ca']['gia-001'], kq['cau_hinh']['C1']['ca']['gia-001']
+    assert r0['theo_the_gioi']['P']['RR'] == Fraction(1, 3) and r0['theo_the_gioi']['P']['M5'] is True
+    assert c1['theo_the_gioi']['P']['RR'] == 1 and c1['theo_the_gioi']['P']['M5'] is False
+    cap = pha2.ket_cuc_cap(kq, 'R0', 'C1', E_X={'o1'}, thanh_phan='E1', buoc='khoi_K')
+    for w in ('P', 'S_lo', 'S_hi'):
+        assert cap['theo_the_gioi'][w]['ket_cuc'] == 'KHONG_DU_CA'
+        assert cap['theo_the_gioi'][w]['dMRR']['gop'] == Fraction(2, 3)
+    assert cap['ket_hop']['phu_thuoc_quan_sat'] is False
+    cap5 = pha2.ket_cuc_cap(kq, 'R0', 'C1', E_X={'o1'}, thanh_phan='E5', buoc='khoi_K')
+    assert cap5['theo_the_gioi']['P']['dieu_kien_E5'] == 'KHONG_HAI'

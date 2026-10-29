@@ -238,7 +238,7 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
                            'ben_duoc_goi': b, 'nhom': 'canh', 'loai': 'phan_vi', 'N': m['N'], 'A': m['A'],
                            'moc_A_ns': [int(x * he_span) for x in m['moc_A']], 'm': ts['m_span'], 'nguon': 'trace',
                            'huong_cham': ['len'], 'lop': {'len': 'khong_lan'}})
-    chan_doan = {'span': prep['chan_doan'], 'nguon_metric_unsupported': []}
+    chan_doan = {'span': prep['chan_doan'], 'nguon_metric_unsupported': [], 'cot_chua_khai_nguon': []}
     # metric
     if metrics:
         tg = quan_sat.thoi_gian_nguon_metric(
@@ -253,10 +253,11 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
             hc = kenh_mod.huong_cham('metric', E3, lop_m)
             if not hc:
                 continue
-            ng = nguon_cua.get(cot, 'metric')
-            thong_tin = tg.get(ng)
-            if thong_tin is None:
-                thong_tin = {'trang_thai': 'OK', 'moc': [int(r['time'] * he_m) for r in metrics], 'cham_NA': True}
+            ng = nguon_cua.get(cot)
+            if ng is None:  # Đ19 điểm 3: không dùng metrics.time khi adapter chưa khai và xác nhận nguồn
+                chan_doan['cot_chua_khai_nguon'].append(cot)
+                continue
+            thong_tin = tg[ng]
             if not thong_tin['cham_NA']:
                 chan_doan['nguon_metric_unsupported'].append(ng)
                 continue
@@ -264,7 +265,7 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
             N, A, mocA = [], [], []
             for r, mc in zip(metrics, moc):
                 v = r.get(cot)
-                if v is None or not (lo_ns <= mc < hi_ns):
+                if v is None or not math.isfinite(v) or not (lo_ns <= mc < hi_ns):  # đặc tả v1 dòng 110: giá trị hữu hạn
                     continue
                 if mc < t_ns:
                     N.append(v)
@@ -481,16 +482,27 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
         'diagnostics': {'so_canh_tinh': so_canh_tinh, 'so_canh_quan_sat': len(canh_qs), 'span': prep['chan_doan'],
                         'E2_du_phong': chan_doan.get('E2_du_phong', 0),
                         'nguon_metric_unsupported': sorted(set(chan_doan['nguon_metric_unsupported'])),
+                        'cot_metric_chua_khai_nguon': sorted(chan_doan['cot_chua_khai_nguon']),
                         'E6b': xP['trang_thai_E6b'], 'so_cham_hop_le': so_hop_le,
                         'NO_VALID_CHANNEL': sorted(set(O) - co_OK_P)},
         'extra': {'blocks_P': blocks, 'tang_P': xP['tang'],
                   'K_I_P': {e: list(v) for e, v in xP['K_I'].items()},
                   'K_raw_P': {e: list(v) for e, v in xP['K_raw'].items()},
                   'canh': [list(c) for c in canh], 'nhom_vong_P': e5_w['P']['nhom_vong'],
-                  'doi_chung': dc, 'T4c': T4c, 'kenh_co': kenh_co, 'G_N': [list(c) for c in G_N]},
+                  'doi_chung': dc, 'T4c': T4c, 'kenh_co': kenh_co, 'G_N': [list(c) for c in G_N],
+                  'don_vi_phan_vi': [_gon_pv(u['ma'], kq_pv[u['ma']]) for u in don_vi if u['loai'] == 'phan_vi']},
     }
     hop_dong.kiem_ban_ghi(rec)
     return rec
+
+
+CHI_TIET_PV = ('trang_thai', 'n_N', 'n_A', 'h', 'l', 'r_len_N', 'r_len_A', 'r_xuong_N', 'r_xuong_A', 'p_len', 'p_xuong',
+               'cach_cong_len', 'cach_cong_xuong', 'e_len', 'e_xuong', 'F_raw_len', 'F_raw_xuong', 'hop_le')
+
+
+def _gon_pv(ma, kq):
+    """Chi tiết đơn vị phân vị (dùng chung ba thế giới; CĐ13)."""
+    return dict({k: kq.get(k) for k in CHI_TIET_PV}, ma=ma)
 
 
 def _gon_qs(q):

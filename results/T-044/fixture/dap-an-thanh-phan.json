@@ -191,6 +191,10 @@
   {"id": "T4C-S1", "thanh_phan": "T4c qua chuỗi từ span (CĐ7), S1 cấu hình C0",
    "dau_vao": {"S": "S1", "cau_hinh": "C0", "the_gioi": "P"},
    "dap_an": {"T4c": [["R"], ["A"], ["F"], ["B", "I", "X"]], "m": {"R": 0.49783842823917956, "A": 0.4855078157817008, "F": 0.4228568508200336}},
-   "loi_giai": "C0 dùng thời lượng cả span. Ở A mọi mẫu tăng 20 ms: R.handle 31 → 51, A.callR 32 → 52, A.handle 37 → 57, F.callA 38 → 58, F.handle 54 → 74 (trace_mau_S). Mỗi đơn vị chỉ có hai giá trị nên r_u = 20 ms và m = log(1 + 20/N). Max m theo thực thể: R log(51/31), A log(52/32) (A.callR), F log(58/38) (F.callA). Cả ba ở tầng 1 với max s = 1: R (1; 0,498; 1; 1) > A (1; 0,486; 2; 2) > F (1; 0,423; 2; 2). B, I, X không cờ, hòa ở cuối. E6a của cùng ca cho A, F trước R (fixture 1)."}
+   "loi_giai": "C0 dùng thời lượng cả span. Ở A mọi mẫu tăng 20 ms: R.handle 31 → 51, A.callR 32 → 52, A.handle 37 → 57, F.callA 38 → 58, F.handle 54 → 74 (trace_mau_S). Mỗi đơn vị chỉ có hai giá trị nên r_u = 20 ms và m = log(1 + 20/N). Max m theo thực thể: R log(51/31), A log(52/32) (A.callR), F log(58/38) (F.callA). Cả ba ở tầng 1 với max s = 1: R (1; 0,498; 1; 1) > A (1; 0,486; 2; 2) > F (1; 0,423; 2; 2). B, I, X không cờ, hòa ở cuối. E6a của cùng ca cho A, F trước R (fixture 1)."},
+  {"id": "MET1", "thanh_phan": "metric qua chuỗi: khai nguồn (Đ19 điểm 3), giá trị hữu hạn (đặc tả v1 dòng 110)",
+   "dau_vao": {"S": "S5", "cau_hinh": "C1", "cot": "R_cpu", "moc_s": "t − 300 + 10i, i = 0…59 (30 dòng N, 30 dòng A)", "N": "10 + 0,1·(i mod 7)", "A": "50, riêng dòng A thứ 4 là NaN", "nguon": {"nguon_metric": {"R_cpu": "m"}, "thoi_gian_nguon": {"m": "metrics.time"}}},
+   "dap_an": {"co_khai_nguon": {"dau": ["I", "R"], "n_A": 29, "F_raw_len": 1}, "khong_khai_nguon": {"dau": ["I"], "cot_chua_khai_nguon": ["R_cpu"]}},
+   "loi_giai": "cpu thuộc lớp tài nguyên (hop-dong.json dòng 55), hướng lên không lan. N nằm trong [10; 10,6] nên h = q95 + 0,05·|q95| < 11,2 và r_N = 0; mọi giá trị A hữu hạn (29, bỏ NaN) đều vượt h nên e = 1, cổng chính xác qua. R có khóa (1; 1; 1) bằng I (I.handle đổi ở S5), hòa ở đầu. Không khai nguồn: kênh của cột không được chấm, ghi chẩn đoán; đầu chỉ còn I."}
  ]
 }
