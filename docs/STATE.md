@@ -20,7 +20,7 @@ Cập nhật: 29/10/2026. Mốc quyết định ở [DECISIONS.md](DECISIONS.md)
 - Các phần chưa phân xử/thiếu nguồn giữ tại báo cáo T-041 §8 O01–O12 và [OPEN P5](../results/T-040/con-mo.json); nghiệm thu không xác nhận cơ chế hay lợi ích đồ thị. Không tự lấy lại nguồn EC2.
 - P9a/T-004 chưa triển khai: nhận [R-01–R-10](../results/T-040/yeu-cau-quan-sat-p9.md), được bổ sung sau; OM-11 đã chuyển P9a, OM-07 hoãn ngoài P5 (Q-175); chưa gửi nhóm hệ thống.
 - Việc hồ sơ cũ: ghi sổ Q-75 của T-022; ghi chú scratchpad T-030 ngoài repo; T-007 dọn marker sudo khi EC2 được bật lại. Giữ theo LOG liên quan, không mở lại nghiên cứu của task đã đóng.
-- Git remote `github.com/levanminh04/RCA`; gói T-041/đồng bộ trạng thái chưa commit/push. Phần nặng T-032 giữ local theo Q-181, không còn việc kiểm kê treo.
+- Git remote `github.com/levanminh04/RCA`; đã push tới `bc686d80` (29/10/2026). Phần nặng của T-032, T-041, T-042 giữ local theo cách của Q-181.
 
 ## Mục lục task đã đóng
 

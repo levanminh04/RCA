@@ -86,7 +86,7 @@ Không ghi `src/p3`, `results/T-043/`, `requirements.txt` ở gốc, DECISIONS, 
 0. **Mở phiên.** Đọc AGENTS, STATE, SPEC này, SPEC T-043 Phụ lục B–D, đặc tả v1, ba file đính chính. Chạy lệnh kiểm hash T-043 (PASS). Đếm 82 fixture, 8 fixture B. Ghi dòng mở phiên vào LOG.
 1. **Môi trường.** Tạo `requirements-m1.txt`, cài, ghi phiên bản thực tế vào LOG. Kiểm: `python -c` in phiên bản từng gói khớp file.
 2. **Chép đáp án U và H.** Chép U1–U6 (Đ15) và H1–H6 (Đ19) sang `dap-an-u-h.json`, kèm số dòng nguồn. Không tự sửa đáp án. Kiểm: người phản biện đối chiếu từng dòng.
-3. **Khung test.** Viết test cho mọi fixture trong phạm vi trước khi viết thành phần; chạy để thấy đỏ. Sai số: theo fixture (cổng so với oracle phân số: ≤ 1e−12); thứ hạng và trạng thái: khớp tuyệt đối.
+3. **Khung test.** Viết test cho mọi fixture trong phạm vi trước khi viết thành phần; chạy để thấy đỏ. Sai số: theo fixture (cổng so với oracle phân số: ≤ 1e−12); thứ hạng và trạng thái: khớp tuyệt đối. Đối chứng chưa có fixture đáp án (C-a1, C-d2, C-c; C-d1 nếu fixture 1 không phủ) thì người làm tự lập ca giả có đáp án tính tay, ghi vào `results/T-044/fixture/dap-an-doi-chung.json`, đánh dấu "đáp án của người làm T-044, chưa qua phản biện"; Codex kiểm các đáp án này khi phản biện (Q-212).
 4. **Cài theo thứ tự phụ thuộc,** mỗi khối xong thì chạy test của khối đó và ghi một dòng LOG:
    1. hợp đồng, bộ kiểm trường cấm (fixture 74);
    2. cửa sổ, trạng thái quan sát, đếm, ba thế giới (21–24, 28–30, 82; H1–H6);
