@@ -1048,3 +1048,316 @@ Yêu cầu bổ sung của Minh cho lượt này (chat 29/10/2026; Minh duyệt 
 3. Đáp án tự lập: tính lại từng mục từ nguồn, độc lập với code.
 4. Được dùng tối đa 3 subagent, model SOL 6.1 ULTRA. Subagent chỉ đọc và chạy lệnh trong bộ nhớ hoặc thư mục tạm ngoài repo; không ghi file trong repo. Codex tự chia việc, tự kiểm lại mọi điểm do subagent báo trước khi đưa vào bản phản biện, và ghi subagent nào đã soát phần nào.
 ```
+
+### Phản hồi phản biện lượt 2 và gói sửa (29/10/2026; Claude; cloud, branch `claude/sweet-hawking-dy078d`; người làm)
+
+Cùng phiên cloud; vai trò không đổi. Lượt đáp đầu chỉ trả lời trong chat; mục này ghi lại sau khi Minh cho sửa.
+
+**Đầu vào (Minh chuyển nguyên văn).** Không có REVIEW.md; chép phần nhận xét, bỏ prompt Codex soạn cho người làm.
+
+Lượt kiểm lại của Codex (8 điểm):
+
+```text
+Core audit đã được gọi tiếp và bàn giao phần dở. Tôi đã tự tái hiện các lỗi agent báo, rồi đối chiếu thêm phần nguồn còn thiếu.
+
+**Chưa nên nghiệm thu T-044.** Có bảy lỗi chặn từng phần đầu ra và một nhánh biên không chặn khối K hiện tại. Bộ test vẫn qua **246/246 trên đúng phiên bản đã ghim, gồm NetworkX 2.5**.
+
+Các liên kết code dưới đây trỏ vào **bản tạm của branch origin đã kiểm**, vì checkout local vẫn ở bản trước gói sửa.
+
+1. **CHẶN lựa chọn cấu hình — MRR mất độ chính xác tại biên 0,01.**
+
+   [pha2.py:75](D:/RCA-ext/tmp/review-t044-20261029-9206eaa6/src/m1_danh_gia/pha2.py:75) đổi MRR từ phân số sang `float`. [chon_khoi.py:51](D:/RCA-ext/tmp/review-t044-20261029-9206eaa6/src/m1_danh_gia/chon_khoi.py:51) đổi ngược thành phân số, nhưng giữ luôn sai số nhị phân.
+
+   Phản ví dụ 52 ca: MRR chính xác của R0 và E1 là `1301/2600` và `1327/2600`; chênh đúng `1/100`. Theo luật gần tốt nhất, cả hai được giữ và **R0 thắng vì ít thành phần**. Đường `cham → chon` hiện cho chênh `0.010000000000000009`, loại R0 và **chọn E1**.
+
+   Trái CĐ16 và SPEC T-043 B4 bước 7. Sửa tối thiểu: giữ MRR chính xác đến hết lựa chọn; chỉ đổi sang số thập phân khi trình bày. Không thêm dung sai tùy ý.
+
+2. **CHẶN phép độ bền — ô không được lấy vào mẫu làm chia cho 0.**
+
+   [rr.py:41](D:/RCA-ext/tmp/review-t044-20261029-9206eaa6/src/m1_danh_gia/rr.py:41) vẫn tính trung bình cho ô có tổng trọng số bằng 0.
+
+   Hai ô với bội số `{a:2, b:0}` làm `luat_c.ap_dung` trả:
+   `ZeroDivisionError: Fraction(1, 0)`.
+
+   Đây là đầu vào bình thường của phép lấy mẫu ô có hoàn lại trong T-045 bước 7. Các test trọng số hiện chỉ phủ bội số dương.
+
+   Sửa tối thiểu: ô có bội số 0 không đóng góp vào phép tính; vẫn giữ tập E_X, phân loại ít ca và δ_d từ T0.
+
+3. **CHẶN kiểm cấu hình thắng — bước 8 đọc sai cặp phụ thuộc quan sát.**
+
+   [chon_khoi.py:122](D:/RCA-ext/tmp/review-t044-20261029-9206eaa6/src/m1_danh_gia/chon_khoi.py:122) dùng kết cục tại P từ dict của khối K. CĐ6.3 yêu cầu riêng bước 8 xử lý phụ thuộc quan sát như **KHÔNG ĐỦ CA**.
+
+   Đã tái hiện hai chiều:
+
+   - E1 đang bật; P=HẠI, S_lo=KHÔNG TÁC DỤNG: code báo **xung đột**, phải là **nhất quán** theo CĐ6.3.
+   - E1 đang tắt; P=KHÔNG TÁC DỤNG, S_lo=GIÚP: code báo **nhất quán**, phải là **xung đột**.
+
+   Sửa riêng cách đọc kết cục ở bước 8. Không đổi ngầm cách dùng kết cục tại các bước khác của khối K.
+
+4. **CHẶN nghiệm thu hợp đồng — thiếu khai báo bắt buộc vẫn được xử lý như dữ liệu hợp lệ.**
+
+   [chuoi.py:180](D:/RCA-ext/tmp/review-t044-20261029-9206eaa6/src/m1/chuoi.py:180) tự dùng đơn vị mặc định khi thiếu khóa con trong `don_vi_thoi_gian`.
+
+   Ca metric ns có 5 mẫu N bằng 0 và 5 mẫu A bằng 10:
+
+   - Khai đầy đủ: `OK`, `CAUSE_FOUND`, p=`1/252`, e=1.
+   - Bỏ riêng `metrics.time`, hoặc truyền object rỗng: `NO_EVIDENCE`, `INSUFFICIENT_EVIDENCE`, nN=nA=0.
+   - Theo Đ19.1, phải trả **ERROR**.
+
+   Bỏ `ho_so_nguon.nguon_khoi_phat` cũng vẫn trả `OK`, nhưng mất khởi phát metric. CĐ5 yêu cầu thiếu khóa phải báo lỗi.
+
+   Sửa tối thiểu: kiểm đủ khóa bắt buộc và giá trị hợp lệ trước tính toán.
+
+5. **CHẶN kết luận đã cài đủ đầu ra E3 — bản ghi làm mất thống kê severity và mẫu Drain.**
+
+   Các bộ đếm được tính trong helper nhưng bị bỏ khi tạo đơn vị và ghi bản ghi tại [chuoi.py:294](D:/RCA-ext/tmp/review-t044-20261029-9206eaa6/src/m1/chuoi.py:294).
+
+   Phản ví dụ: mỗi phía có 30 dòng cùng thông điệp, gồm 10 ERROR, 10 INFO, 10 UNKNOWN. Đổi 10 INFO thành UNKNOWN làm độ phủ severity xác định đổi từ **20/30 xuống 10/30**. **Toàn bộ bản ghi vẫn giống hệt**, cả khi E3 bật và tắt.
+
+   Trái SPEC T-043 dòng 641 và Đ15.6. Từ bản ghi đã băm không thể phân biệt thay đổi tín hiệu với thay đổi độ phủ severity.
+
+   Sửa tối thiểu: lưu thống kê theo thực thể/N/A; lưu phiếu và UNKNOWN theo cặp mẫu, kể cả cặp không có hướng chấm. Kiểm qua đầu ra `chay`, không chỉ helper.
+
+6. **CHẶN phần giải thích WORLD_DEPENDENT — còn bỏ sót thay đổi giữa hòa và đứng trước.**
+
+   [the_gioi.py:72](D:/RCA-ext/tmp/review-t044-20261029-9206eaa6/src/m1_danh_gia/the_gioi.py:72) chỉ xét việc thực thể khác đứng trước hẳn root.
+
+   Phản ví dụ:
+
+   - P: B và R hòa.
+   - S_lo: R đứng trước B.
+   - S_hi giống P.
+
+   Code xác nhận `WORLD_DEPENDENT=True`, hạng kỳ vọng R đổi `3/2 → 1`, nhưng giải thích trả `cap=None`, `theo_the_gioi={}`.
+
+   Sửa tối thiểu: xét quan hệ thứ tự hai chiều, gồm chuyển vào/ra hòa. Quy tắc “đứng trước hẳn” của M5 vẫn giữ riêng.
+
+7. **CHẶN diễn giải D4 của T-045 — E1-CP bỏ mất sibling đã chọn khi kiểm chồng lấn.**
+
+   [span.py:94](D:/RCA-ext/tmp/review-t044-20261029-9206eaa6/src/m1/span.py:94) chỉ xét các con còn trong `con_lai`. CĐ1 và CRISP §5.2 yêu cầu xét các con khác cùng cha. [Nguồn CRISP chính thức](https://www.usenix.org/system/files/atc22-zhang-zhizhou.pdf).
+
+   Cha `[0,5000)`, τ=1000 µs, bốn con:
+   `[(0,1500), (600,1500), (0,2100), (1000,3000)]`.
+
+   Code cho **uCP=2000**. Theo điều kiện CĐ1 đã duyệt, phải là **2600**: con `(0,1500)` không được nối tiếp vì sibling `(1000,3000)` bắt đầu trong vùng chồng lấn.
+
+   Sửa tối thiểu: giữ đầy đủ sibling để kiểm điều kiện, loại đúng hai con đang so bằng định danh. Lỗi này ảnh hưởng D4 mô tả E1-CP; chưa chứng minh khối K/K-b hoặc số dev nào sai.
+
+8. **KHÔNG CHẶN khối K hiện tại — nguồn metric rỗng lại mất trạng thái quan sát.**
+
+   [chuoi.py:243](D:/RCA-ext/tmp/review-t044-20261029-9206eaa6/src/m1/chuoi.py:243) chỉ dựng trạng thái nguồn metric trong nhánh `if metrics:`.
+
+   Với nguồn S đã khai, mốc riêng `[]`, coverage rỗng hợp lệ và `metrics=[]`, bản ghi chỉ có coverage của trace/log; S biến mất.
+
+   Đây là phần còn thiếu của sửa S2, chưa chứng minh điểm xếp hạng sai. Sửa tối thiểu: xuất trạng thái các nguồn đã khai ngay cả khi không có hàng metric.
+
+**Kiểm lại phản hồi lượt trước**
+
+| Điểm cũ | Kết luận hiện tại |
+|---|---|
+| S1 — bội số ô | **Đúng một phần:** bội số dương, M5, UV-6 và mốc giả đã sửa đúng; còn nhánh bội số 0 ở điểm 2. |
+| S2 — coverage metric | **Đúng một phần:** nguồn có dữ liệu và các nhánh H1–H3 đã được nối qua chuỗi; còn nguồn rỗng ở điểm 8. |
+| S3 — cặp WORLD_DEPENDENT | **Đúng một phần:** ví dụ đảo hạng chặt đã sửa; còn thay đổi hòa ở điểm 6. |
+| S4 — lập luận E3 | **Đã xử lý:** câu WHY đã thu hẹp đúng. Tôi chạy lại: khớp hoàn toàn và khớp ngưỡng đều gộp 20 dòng ERROR vào mẫu thường; cách cùng lớp đưa chúng vào mẫu mới. Ví dụ này không xác nhận cách nào tốt hơn trên dev. |
+| N1 — manifest Windows | **Đã xử lý trong phạm vi kiểm:** 314/314 file khớp; 29 file nguồn khớp Git blob khi khác chuyển dòng. |
+
+**Phạm vi đã kiểm và phần còn mở**
+
+- **Đã làm:** Core audit đọc toàn bộ 17 file lõi; Evaluation audit đọc toàn bộ 12 file bộ đánh giá; Fixtures audit đọc toàn bộ 16 file test/hỗ trợ, 6 script và tính lại từng mục đáp án. Tôi kiểm nguồn chi phối, diff, các điểm nối và tự tái hiện mọi finding đưa vào trên.
+- **File thay đổi:** không sửa nội dung repo; không commit, push hoặc merge. Đã fetch và tạo bản tạm cùng hai script tái hiện ngoài repo.
+- **Kiểm:** manifest T-043 PASS 69/69 và 10/10 phần đóng băng; T-044 PASS 314/314; pytest đúng môi trường ghim **246/246 PASS**. Đáp án U/H 12 mục và 78 mục tự lập khớp nguồn. Đối chiếu đầu ra lưu của phép tất định và 27 đột biến khớp báo cáo; không chạy lại toàn bộ hai gói đó.
+- **Còn mở:** chưa đánh giá hiệu quả, cơ chế hoặc hành vi trên dev; chưa mở dữ liệu khóa. Một đầu ra lỗi thử tất định từng bị ghi đè như LOG thừa nhận, nên không thể kiểm lại lượt đó từ đầu ra gốc. Nội dung WHY/DECISIONS đang chờ duyệt vẫn cần được lưu chính thức theo quyền.
+
+Hai script tái hiện: [bộ đánh giá](D:/RCA-ext/tmp/review-t044-20261029-probes/tai_hien_pha2.py), [hợp đồng, severity và E1-CP](D:/RCA-ext/tmp/review-t044-20261029-probes/tai_hien_loi.py). Chạy bằng Python 3.12 với `-B`; chỉ dùng ca giả.
+
+**Đề xuất tiếp tục bằng lượt Claude đáp phản biện**, vì còn phản ví dụ ảnh hưởng nghiệm thu và T-045. Các sửa trên là đề xuất; Minh quyết phạm vi sửa.
+```
+
+Lượt Codex kiểm phản hồi của người làm:
+
+```text
+**Phản hồi của Claude phần lớn đúng, nhưng chưa nên duyệt gói sửa 1–9 nguyên văn.** Cần chỉnh cách xử lý T12, làm rõ đặc tả E1-CP và quyết riêng N2.
+
+Tôi vừa **fetch lại**: origin vẫn ở bản đã rà, chưa có gói sửa mới. Không pull vào checkout local.
+
+**1. Tôi đính chính kết luận trước của mình về E1-CP.**
+
+Code M1 hiện cho **2000** là quan sát đã xác nhận. Nhưng tôi đã nói quá chắc khi yêu cầu đáp án phải là **2600**.
+
+Đã đọc và chạy ba hàm từ [code CRISP chính thức, revision trước ATC](https://github.com/uber-research/CRISP/blob/7a6b667965fa5ec395a74cfb2dca6931a7530e14/graph.py#L388). Với bốn con đã nêu, code chỉ chọn `[1000,3000)`. Áp phép trừ hợp khoảng của M1 thì được **3000**, giống nhau qua cả 24 thứ tự đầu vào.
+
+Code nguồn khác M1 ở các điểm có ảnh hưởng: ngưỡng chồng lấn bằng 1% thời lượng cha, kiểm cả hai biên đóng, điều kiện thứ tự start/end chặt và xét toàn bộ sibling. Bài báo lại mô tả ngưỡng 1 ms. Chưa xác minh được đúng revision artifact mà bài dùng.
+
+Vì vậy:
+
+- **Giữ CHẶN diễn giải D4**, vì đặc tả và căn cứ nguồn chưa thống nhất.
+- **Rút yêu cầu sửa ngay đáp án thành 2600.**
+- Cần trình rõ quy tắc E1-CP của M1: ngưỡng, biên, sibling và phá hòa; Minh duyệt rồi mới sửa code/đáp án. Không tự thay bằng code CRISP hiện có.
+
+**2. N1 đúng về thiếu khóa, nhưng đề xuất “mỗi khóa thiếu ra ERROR” sai với T12.**
+
+Tôi tái hiện được:
+
+| Đầu vào | Code hiện tại |
+|---|---|
+| E3 thiếu từng khóa `khop`, `sim_th`, `do_sau` | Vẫn `OK` |
+| T12 bật, thiếu toàn bộ `canh_tinh` | `UNSUPPORTED` |
+| `canh_tinh={}`, thiếu `canh` hoặc thiếu `revision` | Vẫn `OK` |
+
+[Đ19 điểm 5](D:/RCA-ext/tmp/review-t044-20261029-9206eaa6/results/T-043/dinh-chinh-phien10.md:138) quy định thiếu khai báo cạnh tĩnh là **UNSUPPORTED**. H4 cũng kiểm trạng thái này.
+
+**CHẶN đề xuất sửa mục 4 theo câu chữ hiện tại**, vì đổi mọi trường hợp thành ERROR sẽ làm sai hợp đồng đã duyệt. Sửa tối thiểu: kiểm đủ khai báo, nhưng giữ đúng trạng thái theo từng loại thiếu.
+
+**3. N2 là OPEN có ảnh hưởng lựa chọn, chưa phải lỗi code đã được phân xử.**
+
+[Phụ lục C](D:/RCA-ext/tmp/review-t044-20261029-9206eaa6/tasks/T-043-thiet-ke-rca-m1/SPEC.md:896) tách hành động trong khối K khỏi T6/T9/T11/T12. CĐ6.3 chốt riêng bước 8; chưa chốt rõ ánh xạ tại bước 5.
+
+Phản ví dụ tôi chạy với E3 thuộc nhóm ít ca:
+
+- Giữ kết cục P tại bước 5: chọn **E1**.
+- Đổi cặp phụ thuộc quan sát thành KHÔNG ĐỦ CA: loại thêm E1, chọn **E1+E3**.
+
+Đây là quyết định về chính sách chọn. **Minh cần quyết trước khi áp dụng bước 5**, không gộp ngầm vào sửa bước 8.
+
+**4. N3 là đề xuất hợp lý, nhưng phải giữ số chính xác cả khi lưu và đọc lại.**
+
+Chỉ thêm “từ chối float” chưa sửa trọn đường sử dụng kết quả:
+
+- Ghi `Fraction` bằng JSON mặc định: `TypeError`.
+- Đổi sang float rồi lưu/đọc: vẫn mất chính xác, phản ví dụ chọn E1.
+- Lưu dạng phân số chính xác rồi giải mã: giữ đúng kết quả chọn R0.
+
+Định dạng cụ thể là lựa chọn kỹ thuật cần ghi rõ trong gói sửa. Không cần coi N3 là một lỗi CHẶN riêng ngoài lỗi mất độ chính xác đã xác nhận.
+
+**5. Nguy cơ Claude nêu thêm ở WORLD_DEPENDENT đã được xác nhận.**
+
+P xếp B trước R; S_lo chỉ còn R. Hạng R đổi **2→1**, nhưng hàm vẫn trả `cap=None`, không có giải thích theo thế giới, vì [code chỉ xét giao hai tập thực thể](D:/RCA-ext/tmp/review-t044-20261029-9206eaa6/src/m1_danh_gia/the_gioi.py:71).
+
+Nên giữ phần sửa xử lý thực thể xuất hiện/vắng trong đề xuất mục 6. Đây là mở rộng của lỗi giải thích, chưa chứng minh điểm xếp hạng sai.
+
+Các điểm cũ 1–5 và 8 vẫn đứng; điểm 6 có phạm vi rộng hơn. Điểm 7 cần đổi cách kết luận như trên. Claude đã nói rõ lượt đáp không phải tự soát độc lập; bằng chứng tái hiện vẫn dùng được, nhưng không tính N1–N3 là kết quả tự soát trước khi đọc reviewer.
+
+- **Đã làm:** kiểm phản hồi, N1–N3 và nguồn CRISP; dùng hai subagent hỗ trợ, tự kiểm lại các kết quả đưa vào đây.
+- **File thay đổi:** không sửa file nội dung nào; không commit, push hoặc merge.
+- **Kiểm:** hai manifest PASS; các ca giả về khóa thiếu, bước 5, lưu/đọc MRR và WORLD_DEPENDENT đã chạy. CRISP kiểm 24 thứ tự ở mỗi cấu hình thời lượng cha. Không chạy lại toàn bộ pytest vì code chưa đổi.
+- **Cần Minh quyết:** phạm vi gói sửa sau điều chỉnh; quy tắc E1-CP; cách xử lý bước 5. Hiệu quả và cơ chế trên dev vẫn chưa được xác nhận.
+
+**Đề xuất tiếp tục bằng lượt Claude đáp các điểm này**, rồi trình một gói sửa đã làm rõ phạm vi. Chưa đề xuất nghiệm thu T-044.
+```
+
+**Tự soát.** Lượt đáp đầu đọc kết luận của Codex trước rồi mới soát, nên N1–N3 dưới đây không tính là tự soát độc lập (Codex đã ghi nhận).
+
+**Phản hồi của người làm (lượt đáp đầu, chat; kiểm bằng ca giả trong bộ nhớ, `-B`):**
+
+| Điểm | Kết luận | Bằng chứng | Sau lượt Codex kiểm phản hồi |
+|---|---|---|---|
+| 1. MRR số thực | đúng | 1327/2600 − 1301/2600 = 1/100; qua số thực 0,010000000000000009; Fraction chọn R0, số thực chọn E1 | đứng; N3 nhập vào điểm này, phải giữ chính xác cả khi lưu/đọc |
+| 2. Bội số 0 | đúng | `{a:2, b:0}` → ZeroDivisionError | đứng |
+| 3. Bước 8 phụ thuộc quan sát | đúng | hai chiều như Codex báo; CĐ6.3 | đứng |
+| 4. Thiếu khóa | đúng | bỏ `metrics.time` hoặc `{}`: NO_EVIDENCE thay ERROR; bỏ `nguon_khoi_phat`: OK | đứng; đề xuất "mọi khóa thiếu ra ERROR" sai với T12 (Đ19 điểm 5: UNSUPPORTED), đã chỉnh |
+| 5. Thống kê severity | đúng | đổi INFO → UNKNOWN, bản ghi giống hệt cả E3 bật/tắt | đứng |
+| 6. WORLD_DEPENDENT hòa | đúng | WD True, cặp None; thêm nguy cơ thực thể vắng | đứng; nguy cơ vắng Codex xác nhận |
+| 7. E1-CP | đúng phần quan sát (2000) | đáp án 2600 phụ thuộc cách đọc "bỏ qua" và PII-04; không vào được nguồn CRISP | Codex rút yêu cầu 2600: code CRISP chính thức cho 3000; giữ CHẶN diễn giải D4, chờ Minh quyết quy tắc |
+| 8. Nguồn metric rỗng | đúng | coverage thiếu S | đứng |
+| N1. Tham số con E3, khóa con T12 | thêm | mặc định ngầm | đúng về thiếu khóa; T12 phải UNSUPPORTED |
+| N2. Bước 5 | câu hỏi | D2f và SPEC T-043 dòng 898 | OPEN; Codex: giữ P chọn E1, đọc KHÔNG ĐỦ CA chọn E1+E3; Minh quyết |
+| N3. chon nhận số thực | thêm | đổi ngầm | nhập vào điểm 1 |
+
+**Quyết định của Minh trong phiên** (chat 29/10/2026, nguyên văn): "NẾU KHÔNG CÓ ĐIỂM NÀO XUNG ĐỘT THÌ SỬA NGAY, NẾU CÓ THÌ DỪNG VÀ PHẢN BIỆN CODEX". Người làm kiểm: không có điểm nào người làm phản đối Codex. Đ19 điểm 5 ghi "Thiếu khóa khi T12 bật: bản ghi UNSUPPORTED", khớp điều chỉnh của Codex. E1-CP và N2 không phải xung đột mà là việc Minh quyết, nên không sửa. Phạm vi đã sửa: điểm 1 (gồm N3), 2, 3 (chỉ bước 8), 4 (gồm N1, giữ UNSUPPORTED cho T12), 5, 6 (gồm thực thể vắng), 8, cùng ghi chép và chạy lại. Câu quyết định cần ghi vào DECISIONS khi Minh duyệt dòng ghi.
+
+**1. Đã làm gì.** Sửa theo phạm vi trên; chi tiết từng sửa ở `results/T-044/dinh-chinh-cai-dat.md` Phần II mục C3 (S5–S11). Thêm vào mục D hai OPEN: E1-CP và bước 5. Đáp án mới TS6, TS7, CK8, HD1, LOG1, WD2, WD3, MET2 (`fixture/dap-an-thanh-phan.json`, 66 mục). Đột biến mới D28–D35; D26, D27 đổi chỗ đột biến theo code mới (cùng ý). `so_ban_ghi_truoc_sau.py` bỏ thêm `extra.thong_ke_log`.
+
+**2. File đã thay đổi** (commit ebcea43c và commit chứa mục này):
+- `src/m1/chuoi.py`, `src/m1/e3.py`, `src/m1_danh_gia/pha2.py`, `chon_khoi.py`, `rr.py`, `the_gioi.py`;
+- `results/T-044/`: `fixture/dap-an-thanh-phan.json`; `tests/test_k02_quan_sat.py`, `test_k11_danh_gia.py`, `test_runner.py`; `scripts/dot_bien.py`, `so_ban_ghi_truoc_sau.py`, `tao_manifest.py`; `bang-phep-kiem.json`, `bao-cao.md`, `dinh-chinh-cai-dat.md`, `manifest.json`; lượt mới `runs/test-xanh-003`, `tat-dinh-004`, `dot-bien-004`, `kiem-hash-t043-004`;
+- LOG này; dòng T-044 trong `docs/STATE.md`. Không ghi ngoài phạm vi SPEC.
+
+**3. Kiểm đã chạy và kết quả.**
+- Test mới chạy trên code cũ (9206eaa6, bản tạm ngoài repo): 10 phép trượt, đúng các phép của gói sửa; trên code mới: qua.
+- Test: 254/254 qua (`runs/test-xanh-003/stdout.txt`; `bang-phep-kiem.json#/tong`); 97/97 phép T-043 trong phạm vi.
+- Tất định: PASS, 104 bản ghi, 254 phép, 12 biến thể (`runs/tat-dinh-004/tong-hop.json#/ket_luan`). Bỏ các trường mới thì 104 bản ghi giống hệt bản ở 9206eaa6 (`#/so_voi_truoc_sua/so_lech_sau_khi_bo_truong_moi` = 0).
+- Đột biến: 35/35 bị bắt, đối chứng xanh (`runs/dot-bien-004/tong-hop.json#/so_bi_bat`).
+- Hash T-043: PASS 69/69, 10/10 (`runs/kiem-hash-t043-004/stdout.txt`). Manifest T-044: `--kiem` PASS 421/421.
+
+**4. Điều chưa chắc hoặc cần Minh quyết.**
+- Task đạt gì: các lỗi đã thống nhất đã sửa trên ca giả, mỗi lỗi có đáp án và đột biến riêng. Chưa được Codex kiểm lại.
+- Câu hỏi nguồn: A1–A5 như `bao-cao.md` mục 1, trong phạm vi fixture. Hai lượt phản biện đều tìm thêm lỗi mà bộ test lúc đó không bắt; "254/254 qua" không chứng minh hết lỗi cùng loại.
+- Giới hạn của phép đột biến: khai báo bắt buộc được kiểm hai lớp (kiểm trước, rồi đọc không mặc định), nên đột biến bỏ một lớp vẫn cho ERROR; chỉ đột biến của T12 đổi được trạng thái (D31).
+- OPEN, cần Minh quyết:
+  - quy tắc E1-CP: ngưỡng (1 ms hay 1% thời lượng cha), biên mở hay đóng, xét con đã chọn hay không, phá hòa; Codex dẫn code CRISP chính thức cho 3000, CĐ1 + PII-04 cho 2600, code hiện cho 2000;
+  - bước 5 luật chọn khối: đọc cặp phụ thuộc quan sát theo kết cục tại P (hiện tại) hay như KHÔNG ĐỦ CA;
+  - còn chờ từ trước: dòng DECISIONS, ba đề xuất WHY, dòng 23 của STATE.
+
+**Bước tiếp theo.** Minh chuyển prompt dưới đây cho Codex, điền quyền ghi và subagent. Minh quyết hai OPEN; có quyết thì người làm sửa E1-CP hoặc bước 5 trong cùng task.
+
+**Lệnh cuối đã chạy.** `git push -u origin claude/sweet-hawking-dy078d` (sau commit chứa mục này).
+
+**Prompt cho Codex kiểm lại phản hồi và sửa.** Prompt chung, khối "Kiểm lại phản hồi và sửa" và khối G3 chép nguyên văn từ `docs/review-prompt.md`.
+
+```text
+Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
+Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
+
+Thông tin lượt này:
+- Task hoặc đề xuất: T-044 — cài chuỗi M1 và kiểm đặc tả; tasks/T-044-cai-dat-m1/SPEC.md.
+- Công đoạn: kiểm lại phản hồi và sửa.
+- Gói/cổng: P6 (M1); chuẩn bị G3.
+- Người làm và người phản biện chính thức: người làm Claude; người phản biện Codex (theo SPEC).
+- Tài liệu gốc: tasks/T-044-cai-dat-m1/SPEC.md; tasks/T-044-cai-dat-m1/LOG.md; tasks/T-045-chay-khoi-k-dev/SPEC.md; tasks/T-043-thiet-ke-rca-m1/SPEC.md (Phụ lục B–D); results/T-043/dac-ta-phuong-phap-v1.md, hop-dong.json, ma-tran-thu.json, dinh-nghia-pha2.json, bang-chuyen-giao.json, fixture-dac-ta.json, fixture/fixture-bo-sung.json, the-doc/crisp.md, dinh-chinh-phien8.md, dinh-chinh-phien9.md, dinh-chinh-phien10.md; results/T-044/dinh-chinh-cai-dat.md, de-xuat-why.md; nguồn CRISP: https://www.usenix.org/system/files/atc22-zhang-zhizhou.pdf, https://github.com/uber-research/CRISP/blob/7a6b667965fa5ec395a74cfb2dca6931a7530e14/graph.py, https://github.com/uber-research/CRISP/blob/18dbd7146e39694c8b7369a9d1d4cdb1a485a276/crisp/graph.py; toàn bộ cài đặt: git diff 6b2f6ac6..origin/claude/sweet-hawking-dy078d; gói sửa lượt 2: git diff 9206eaa6..origin/claude/sweet-hawking-dy078d (commit ebcea43c và commit kế tiếp trên cùng branch).
+- Phản biện và phản hồi trước: (1) lượt rà SPEC của Codex trong chat ngày 29/10/2026 (SPEC T-044 dòng 3); (2) lượt soát kết quả của Codex và phản hồi của người làm: tasks/T-044-cai-dat-m1/LOG.md mục "Phản hồi phản biện lượt 1 và gói sửa"; (3) lượt kiểm lại 8 điểm của Codex, (4) phản hồi của người làm, (5) lượt Codex kiểm phản hồi, (6) quyết định của Minh: cùng chép ở tasks/T-044-cai-dat-m1/LOG.md mục "Phản hồi phản biện lượt 2 và gói sửa" ((3), (5) nguyên văn; (4) tóm tắt, nguyên văn trong chat). Chưa có REVIEW.md dạng file cho T-044.
+- Code và kết quả liên quan: branch claude/sweet-hawking-dy078d trên origin (github.com/levanminh04/RCA); gói sửa lượt 2 ở commit ebcea43c; commit kế tiếp thêm LOG và STATE; lấy về: `git fetch origin claude/sweet-hawking-dy078d`, `git switch claude/sweet-hawking-dy078d`, `git pull --ff-only origin claude/sweet-hawking-dy078d` (thư mục làm việc phải sạch); src/m1/, src/m1_danh_gia/; results/T-044/ (bao-cao.md, bang-phep-kiem.json, dinh-chinh-cai-dat.md, de-xuat-why.md, fixture/, tests/, scripts/, runs/); manifest results/T-043/manifest.json và results/T-044/manifest.json, kiểm bằng `py -3 -B results/T-044/scripts/kiem_hash_t043.py` và `py -3 -B results/T-044/scripts/tao_manifest.py --kiem`; môi trường results/T-044/requirements-m1.txt và freeze-m1.txt (Python 3.12); môi trường local đã dùng: D:/RCA-ext/envs/py312-pin/Scripts/python.exe cùng các gói ở D:/RCA-ext/envs/T-016-cong-cu/Lib/site-packages và D:/RCA-ext/envs/T-014-main/Lib/site-packages; chạy test: `cd results/T-044/tests` rồi `py -3 -B -m pytest -q -p no:cacheprovider`; script tái hiện của lượt (3) ở D:/RCA-ext/tmp/review-t044-20261029-probes/ (ngoài repo); các lệnh khác ở results/T-044/bao-cao.md mục 11.
+- Phạm vi ghi được Minh cho phép trong lượt này: được chạy `git fetch`, `git switch`, `git pull --ff-only` để lấy branch trên; chạy kiểm dùng ca giả trong bộ nhớ hoặc thư mục tạm ngoài repo; không commit, không push, không merge. Bản phản biện: <Minh điền: chỉ trả lời trong chat, hoặc ghi tasks/T-044-cai-dat-m1/REVIEW.md (chưa có) theo tasks/_MAU/REVIEW.md>. Subagent: <Minh điền: không dùng, hoặc số lượng và model được duyệt>.
+
+Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
+
+Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
+Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
+Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
+
+Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
+hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
+Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
+số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
+có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
+
+Bổ sung yêu cầu phản biện:
+1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
+2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
+3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
+4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
+5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
+6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
+7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
+8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
+9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
+10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
+
+Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
+Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
+
+Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
+bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
+Tiếng Việt, câu ngắn.
+
+Cuối lượt báo:
+1. Đã làm gì.
+2. File đã thay đổi, hoặc không sửa file nào.
+3. Kiểm đã chạy và kết quả.
+4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
+
+Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
+
+Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
+
+Công đoạn: người phản biện kiểm lại phản hồi và sửa.
+Tự soát yêu cầu và đầu ra gốc trước; sau đó đọc phản biện, phản hồi và các thay đổi được duyệt. Kiểm cả ý kiến phản bác reviewer; không mặc định phản hồi hoặc bản sửa đúng.
+Đối chiếu từng điểm với bằng chứng hiện tại, quyền sửa và hậu quả. Có điểm đúng nhưng chưa được Minh duyệt sửa thì ghi đúng trạng thái; không tự coi đã xử lý hoặc ép người làm sửa.
+Chỉ ghi bản phản biện lượt mới được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ lịch sử, không ghi LOG/STATE hay sửa thay người làm. Nêu bất đồng còn lại và soạn prompt để người làm đáp.
+
+Với từng thành phần, kiểm mục đích và căn cứ: sửa hạn chế P4, đáp ứng DT18 hay nhu cầu kỹ thuật. Có lý do kỹ thuật, phương án khác, bằng chứng dev và điều kiện thất bại không; có dùng mã hạn chế mô tả như bằng chứng cơ chế hoặc chọn theo mức chênh đồ thị trừ không đồ thị không?
+Nêu rõ nút/cạnh, ánh xạ log/trace/metric và phép tính thực sự sử dụng cạnh. Lần theo thông tin quan hệ và nhãn trong phương pháp lẫn đối chứng; gọi “không đồ thị” có đúng với thông tin còn giữ không?
+Kiểm baseline và đối chứng đủ mạnh, tương đương về tín hiệu/cửa sổ/tập ứng viên/coverage/tiền xử lý/quy tắc chấm/ngân sách chọn cấu hình ở phần không chủ ý thay; yếu tố thay cùng phải giới hạn kết luận.
+Phương pháp và đối chứng đã được cài và kiểm đầu vào, trung gian, hành vi trên dev chưa, hay chỉ chạy không lỗi? Không đòi đồ thị phải thắng để khóa.
+Code/revision, cấu hình, giả thuyết, độ đo, tập ca/tập ứng viên, cách xử lý ca lỗi/UNSUPPORTED/nhánh dự phòng và bảng diễn giải đã khóa trước test chưa? Có bỏ nhóm khó sau khi nhìn điểm hoặc dùng test để chọn thiết kế không?
+Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.
+```
