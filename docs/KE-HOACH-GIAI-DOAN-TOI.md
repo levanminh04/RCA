@@ -152,7 +152,7 @@ Mỗi mục cần Minh duyệt riêng (Luật 0). Ghi "duyệt C-xx" là đủ �
 | C-05 | Duyệt hướng (M-30) | Soạn đoạn sửa MRP P8 và §5 (LLM ở khâu trung gian, năm điều kiện) → trình |
 | C-06 | Duyệt hướng (M-30) | Soạn đoạn sửa MRP P10 → trình |
 | C-07 | Duyệt hướng (M-30) | Soạn đoạn thêm vào MRP §4 → trình |
-| C-08 | Duyệt hướng (M-30). E-04 đã duyệt theo bản sửa KS-07 (M-44) | Soạn đoạn sửa WHY-06, gộp biên Δ và cách đọc của E-04 ở D.1 → trình |
+| C-08 | Duyệt hướng (M-30). E-04 đã duyệt theo bản sửa KS-07 (M-44) | Đã ghi WHY-06 (Q-203) |
 | C-09 | Duyệt hướng (M-30) | Soạn ghi chú đầu PLAN-P6 trỏ tới file này; giữ nội dung cũ làm lịch sử → trình |
 | C-10 | **Không duyệt** (M-30). Khối yêu cầu của Minh chỉ dùng cho lượt phản biện ở Phụ lục P2; prompt vẫn theo mẫu (M-29) | — |
 | C-11 | **Rút lại** (M-31). Minh đúng: SPEC đã duyệt luôn có ngân sách, và việc duyệt SPEC đó đã là sự đồng ý theo luật cứng 8 | — |
@@ -254,12 +254,13 @@ Dữ liệu (trace, log, metric; FlashTicket có thêm kind, DB, hàng đợi, m
 | 1 | E1 | Ở Nezha-OB không hơn phép trừ hợp khoảng con (đang 10/22), hoặc ở RE2-TT kém 26/26 |
 | 2 | E4 | Còn ca do một điểm cực lớn quyết định |
 | 3 | E3 | Số ca đang đúng bị hỏng vượt số ca lỗi trả về được sửa |
-| 4 | E2 | Theo dự đoán UV-1 ở G2 §5 |
-| 5 | E5 | Không giảm số ca dịch vụ phía gọi đứng trên root, hoặc tăng ở mốc giả |
+| 4 | E2 | Theo luật C ở SPEC T-043 Phụ lục C; UV-1 bỏ vế (iii) và câu bác bỏ phụ thuộc vế đó (D11, Q-199) |
+| 5 | E5 | Điều kiện riêng của E5 ở SPEC T-043 Phụ lục C (D2c, Q-199) |
 | 6 | E6, E7 | E6 chọn theo MRR; E7 báo vùng chứa root và kích thước |
 
 - Lượt 1–3 chạy trên span và log đã lưu, không cần thực nghiệm mới nặng.
 - Số cấu hình được thử khai trước trong SPEC M1.
+- Thứ tự thử tuần tự ở bảng trên đã được thay bằng khối K, luật chọn khối và luật C ở SPEC T-043 (B4, Phụ lục C; Q-197, Q-199). Giữ bảng làm lịch sử.
 
 ### D.3 LLM ở các khâu (M-13) [ĐX]
 
@@ -285,7 +286,7 @@ Dữ liệu (trace, log, metric; FlashTicket có thêm kind, DB, hàng đợi, m
 - tín dụng Google Cloud không trả được Gemini API trên AI Studio;
 - chỉ gửi dữ liệu đã lọc theo B16 §6.
 
-**Ưu tiên:** L1 và L2 trước, vì chúng sửa đúng hạn chế đã thấy và đánh giá được. L5 là thí nghiệm phụ có giá trị trình bày trước hội đồng.
+**Ưu tiên:** L1 không vào lõi chạy trên dữ liệu công khai. Thử L1 và L2 ở chặng phát triển chuyển giao (S6a), trước khi khóa bản FlashTicket; so chất lượng RCA khi dùng Drain và khi dùng LLM, không chỉ so chất lượng tách mẫu log (D7, Q-199). L5 là thí nghiệm phụ có giá trị trình bày trước hội đồng.
 
 ### D.4 Khâu phát hiện (M-12, M-20) [ĐX]
 
@@ -463,13 +464,13 @@ Dịch vụ RCA đọc kho tự cài → JSON, annotation lên Grafana tự cài
 
 | Bước | Làm gì | Trả lời câu hỏi nào | Ở đâu | Qua khi | Nếu không qua |
 |---|---|---|---|---|---|
-| H0 | Ghim phiên bản (Tempo 3.x). Kiểm kích thước image. Giới hạn RAM WSL (sửa `.wslconfig`, file ngoài repo, cần duyệt). Tắt chế độ ngủ | Chuẩn bị | Laptop | Có danh sách phiên bản và dung lượng | — |
+| H0 | Ghim phiên bản (Tempo 3.x; cả Grafana, Prometheus, Loki, theo D.8.7 mục 10). Kiểm kích thước image. Giới hạn RAM WSL (sửa `.wslconfig`, file ngoài repo, cần duyệt). Tắt chế độ ngủ | Chuẩn bị | Laptop | Có danh sách phiên bản và dung lượng | — |
 | H1 | `otel-lgtm` cùng gateway và một service khung FlashTicket có Java agent | Agent có chạy với Spring Boot 4.1.1 không; span có kind và route không; log có trace_id không; Micrometer có lên Prometheus không | Laptop | Đủ bốn điều | Thử `spring-boot-starter-opentelemetry` (đổi B16, cần nhóm hệ thống đồng ý) |
 | H2 | OTel Demo với Collector theo DE-XUAT §4 | RAM, CPU; số byte mỗi giờ ở 2–3 mức tải; chỉ số mất dữ liệu ở cổng 8888 | Laptop nếu trơn tru (M-08) | Chạy 1 giờ: không container nào bị dừng vì hết bộ nhớ hay tự khởi động lại; RAM trống ≥ 20%; Collector không báo bỏ span; CPU trung bình < 80%; đạt tải đặt | Lên cloud |
-| H3 | Luật cảnh báo, dịch vụ nhận webhook, gom đợt sự cố; bật cờ `paymentFailure`, `intlShippingSlowdown`, `kafkaQueueProblems` | Độ trễ cảnh báo; số thông báo mỗi sự cố | Laptop hoặc cloud | Đo được | Chỉnh luật |
+| H3 | Luật cảnh báo, dịch vụ nhận webhook, gom đợt sự cố; bật lưu lịch sử trạng thái luật vào Loki và xuất định nghĩa luật theo D.8.7 mục 10; bật cờ `paymentFailure`, `intlShippingSlowdown`, `kafkaQueueProblems` | Độ trễ cảnh báo; số thông báo mỗi sự cố | Laptop hoặc cloud | Đo được | Chỉnh luật |
 | H4 | Adapter OTLP→P5; Node graph qua Infinity | Giao diện có làm được không | Như trên | Hiện được đồ thị | Sửa adapter, đổi panel |
 | H5 | Lên EC2 theo D.8.4; chrony với Amazon Time Sync [TL]; security group chỉ mở cho IP của Minh; dung lượng ổ theo D.8.5 | Máy 8 GiB có đủ không | AWS | Chạy ổn 1 giờ | Thêm máy riêng cho bộ quan sát |
-| H6 | Bộ chạy chiến dịch: lịch tiêm lỗi, sổ thực nghiệm, xuất gói chấm lại, checksum; chạy qua đêm | Tự động hóa | Cloud | Chạy thử một đêm đạt | Sửa script |
+| H6 | Bộ chạy chiến dịch: lịch tiêm lỗi, sổ thực nghiệm, xuất gói chấm lại, checksum; manifest lượt có các trường ở D.8.7 mục 10; chạy qua đêm | Tự động hóa | Cloud | Chạy thử một đêm đạt | Sửa script |
 | H7 | Gửi song song lên Grafana Cloud; bật Knowledge Graph và Synthetics | Tận dụng Cloud | Cloud | Thấy entity graph | Chỉ dùng kho tự cài |
 
 - **Các bước dài chạy trên cloud.** Lý do: laptop có thể ngủ, tự cập nhật và khởi động lại, đồng hồ có thể lệch.
@@ -533,6 +534,13 @@ Giả định: mỗi request 10 span; mỗi span 450 B (suy từ tài liệu Tem
 7. **Tempo 3.x khác 2.9:** đối chiếu lại các khẳng định của DE-XUAT theo bản đã ghim.
 8. **Dữ liệu Docker trên laptop nằm ở ổ C.**
 9. **Sao lưu trước khi tài khoản hết hạn.**
+10. **Siêu dữ liệu cho biến thể nền lùi D13** (SPEC T-043 B1.1; Q-202). Thiếu thì D13 luôn UNSUPPORTED; lượt chính không bị ảnh hưởng.
+   - Phiên bản Grafana, Prometheus, Loki đã ghim (H0) và ghi vào manifest lượt chạy (H6).
+   - Khoảng nhìn lùi Δ hiệu lực của Prometheus (cờ `--query.lookback-delta`, mặc định 5 phút). Không dùng tham số truy vấn để thay Δ.
+   - Với mỗi luật cảnh báo, xuất định nghĩa đã giải biến: nguồn dữ liệu; biểu thức; kiểu truy vấn (điểm hoặc khoảng); `from` và `to` của khoảng thời gian tương đối; bước truy vấn; độ lệch múi giờ; chu kỳ đánh giá. Xuất cùng manifest (H6).
+   - Lịch sử trạng thái của luật lưu vào Loki (H3).
+   - Đối chiếu ngữ nghĩa thời gian với code ở bản đã ghim: truy vấn điểm đánh giá tại mốc nào; truy vấn khoảng làm tròn mốc đầu ra sao; subquery căn bước thế nào; lịch sử trạng thái ghi thời điểm đánh giá hay thời điểm ghi. Grafana v12.2.0 đã đọc ngày 26/10/2026 (LOG T-043 phiên 4); bản khác phải đọc lại.
+   - Chưa kiểm: lấy được tự động các trường này trên bản đã ghim.
 
 ### D.9 FlashTicket (P10)
 
@@ -550,7 +558,9 @@ Giả định: mỗi request 10 span; mỗi span 450 B (suy từ tài liệu Tem
 2. **Phát triển chuyển giao** trên OTel Demo và FlashTicket dev: phần dùng thông tin phong phú (kiểu span, DB/cache/pool, thông điệp, máy, nối log–span, siêu dữ liệu thu), hiệu chỉnh tham số theo tải, ứng viên LLM ở khâu giữa.
 3. **Đánh giá** trên phần FlashTicket dành riêng, bằng các lượt mới sau khi khóa.
 - Có hai bản được ghi rõ: bản P7 và bản FlashTicket. Kết quả P7 chỉ nói về bản P7.
+- **Phép so trên FlashTicket** (D14, Q-201; chi tiết ở B1.9 của SPEC T-043): bắt buộc ba bản: bản P7 đã khóa chạy thẳng; bản FlashTicket đã khóa; bản FlashTicket đã khóa che từng nhóm thông tin phong phú. Gói thông tin chung tối ưu riêng trên FlashTicket dev là tùy chọn. Cùng ca, cùng cách chấm; báo chế độ (a) và (b). RQ5 báo riêng câu "chuyển thẳng được tới đâu" và câu "sau thích nghi đạt gì".
 - **Chia đợt theo ô** (thành phần gốc × loại lỗi), như MRP §4 và WHY-04. Với mỗi họ lỗi, liệt kê các vị trí hợp lệ; đợt phát triển dùng một vị trí, đợt đánh giá dùng vị trí khác.
+- Trước khi nhóm hệ thống cài cờ lỗi: kiểm kê vị trí có ý nghĩa của từng họ lỗi, nhu cầu cài lỗi và thiếu hụt quan sát. Không tạo vị trí giả để đủ hai phía.
 - Họ lỗi chỉ có một vị trí hợp lệ (ví dụ một số lỗi Saga) thì khai trước: chỉ đánh giá, tức chưa thấy khi thiết kế; hoặc ghi riêng giới hạn. **Phương án đặt các lần lặp của cùng một ô ở cả hai phía trái MRP §4 và WHY-04. Phương án này để OPEN; chỉ dùng khi Minh duyệt ngoại lệ, hoặc duyệt đoạn sửa hai nguồn đó.**
 - Báo riêng ba câu hỏi: chuyển sang vị trí lỗi mới; chịu được điều kiện khác đã khai trước (tải, cường độ, cách triển khai); lặp lại được trên tình huống đã phát triển.
 - **Đợt phát triển phải có:** tải tăng mà hệ khỏe; lỗi khi tải giữ nguyên; cùng lỗi đó dưới tải khác; các lượt chạy nền để kiểm ngưỡng và trạng thái quan sát.
@@ -584,7 +594,7 @@ Giả định: mỗi request 10 span; mỗi span 450 B (suy từ tài liệu Tem
 5. Có ablation "phương pháp bỏ cạnh có kiểu" để thấy phần lợi ích đến từ lợi thế thông tin.
 
 **Nhãn:**
-- Root theo quy tắc khai trước. Mốc tiêm lấy từ log của công cụ tiêm lỗi, ghi vào sổ thực nghiệm. RCA không đọc sổ này (luật cứng 6).
+- Root theo quy tắc khai trước. Mốc tiêm lấy từ log của công cụ tiêm lỗi, ghi vào sổ thực nghiệm. Phương pháp ở chế độ (b) không đọc sổ này (luật cứng 6). Runner chế độ (a) được đọc mốc tiêm như thông tin vận hành biết trước (D14, Q-201).
 - Đoạn bình thường theo DE-XUAT §5.6.
 - Vùng ảnh hưởng lấy từ số đo phía người dùng của k6 hoặc Synthetics, tức tín hiệu RCA không dùng. Số đo này chỉ ở mức endpoint. Vì vậy: hoặc đo độc lập ở từng thành phần, hoặc đưa cả dự đoán lẫn nhãn về mức endpoint và gọi đúng là "ảnh hưởng endpoint".
 - Nhãn là cạnh: khai trước tập đáp án chấp nhận cho mọi phương pháp, cộng một bảng định vị cạnh riêng. Báo riêng điểm xác định đúng nguyên nhân theo nhãn thật và điểm định vị theo tập đáp án chấp nhận; không gọi điểm thứ hai là xác định đúng nguyên nhân.
@@ -983,3 +993,5 @@ Giới hạn:
 | 23/10/2026 | Claude | Thiết kế RCA không chờ thư cô: sửa D.12 (dòng S1, cột "Vào khi"); ghi Q-187 ở DECISIONS, sửa STATE. Áp đoạn sửa RQ3d vào MRP, WHY-07, LESSONS QT8, AGENTS luật cứng 18; cập nhật bảng C.1 (C-02) | Q-187; lời Minh "duyệt đề xuất 1 3" ngày 23/10/2026 |
 | 23/10/2026 | Claude | Ghi M-48 ở Phần A: bốn nhóm gợi ý của bản khảo sát vào SPEC M1 làm ứng viên để thử, kèm ba kết cục. Không sửa D.2, D.5, D.7 | M-48 |
 | 25/10/2026 | Claude | D.9: thêm "Ba chặng và hai đợt FlashTicket" (chia theo ô; ngoại lệ chia theo lần lặp để OPEN; ba câu hỏi báo riêng; điều kiện tải trong đợt phát triển; kiểm chất lượng telemetry; LLM ở khâu giữa; chi phí đợt phát triển OPEN); ghi chú tách vị trí tiêm, cơ chế, đáp án dưới bảng kịch bản; luật chống thiên lệch 3 chỉ áp cho đợt đánh giá; nhãn vùng ở mức endpoint và chấm nhãn cạnh; dự toán chiến dịch chỉ cho đợt đánh giá. D.12: tách S6 thành S6a (phát triển chuyển giao) và S6b (đánh giá) | Q-197; phản biện Codex R17–R24 ngày 25/10/2026 |
+| 26/10/2026 | Claude | D.2: lượt 4 và 5 trỏ về luật C và điều kiện riêng của E5 ở SPEC T-043; ghi bảng thứ tự thử là lịch sử. D.3: L1 thử ở S6a, không vào lõi công khai (D7). D.9: phép so trên FlashTicket (D14); kiểm kê vị trí tiêm trước khi cài cờ lỗi; chế độ (a) trên FlashTicket | Q-199, Q-201 |
+| 26/10/2026 | Claude | D.8.3: H0, H3, H6 trỏ tới D.8.7 mục 10. D.8.7: thêm mục 10 (siêu dữ liệu cho biến thể nền lùi D13). C.1: C-08 đã ghi WHY-06 | Q-203 |

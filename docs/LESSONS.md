@@ -48,7 +48,7 @@ Bản rút gọn để đọc nhanh. Câu chuyện đầy đủ, số liệu và
 - **QT5 — Soi giá trị trung gian.** Điểm lớn hơn 1e6, toàn hòa, ngưỡng cực lớn, một nhóm kênh chiếm gần hết → dừng tìm nguyên nhân.
 - **QT6 — Dev để sửa, test để kiểm.** Khuyết tật thấy trên dev thì sửa, có nguyên lý. Test mở một lần sau G3.
 - **QT7 — Nhánh không đồ thị phải mạnh.** Ngang hoặc hơn baseline đơn giản đã công bố trên cùng dữ liệu.
-- **QT8 — Khẳng định lợi ích do cấu trúc đồ thị thật cần ba thứ:** hơn nhánh cùng bằng chứng không dùng đồ thị; hơn đồ thị ngẫu nhiên giữ bậc; báo theo điều kiện và từng ca. Dùng khi đánh giá lợi ích, không đòi đồ thị thắng trước khi chỉ ra hạn chế baseline hoặc bắt đầu thiết kế.
+- **QT8 — Khẳng định lợi ích do dùng quan hệ cần ba thứ:** hơn nhánh cùng bằng chứng không dùng quan hệ; hơn quy tắc đơn giản trên cùng đồ thị; báo theo điều kiện và từng ca. Không có đối chứng đồ thị ngẫu nhiên thì không khẳng định lợi ích do cấu trúc phụ thuộc thật. Dùng khi đánh giá lợi ích, không đòi đồ thị thắng trước khi chỉ ra hạn chế baseline hoặc bắt đầu thiết kế.
 - **QT12 — Review độc lập, đúng mục tiêu.** Người phản biện khác người làm; nhận nguồn yêu cầu, SPEC, diff và kết quả, không nhận kết luận dẫn hướng trong prompt. Tự soát phần gốc trước rồi kiểm ý kiến các lượt trước. Mỗi bên bàn giao bằng prompt chuẩn để Minh chuyển thủ công; bất đồng phải có bằng chứng và quyết định bị ảnh hưởng. Minh quyết sửa, gửi tiếp hay dừng; đồng thuận không thay bằng chứng và dừng review không tự đóng task (Q-88).
 - **QT13 — Viết cho người đọc.** Tiếng Việt, câu ngắn, có "tại sao".
 - **QT15 — Tách theo ô và theo ca trước khi nêu mẫu hình.** Một ô không phải mẫu hình. Service không có cạnh không tính là bằng chứng cho hay chống đồ thị.

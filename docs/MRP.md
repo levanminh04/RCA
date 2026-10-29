@@ -56,6 +56,11 @@ K1 §D.3 ghi một phản ví dụ quan trọng: MicroRCA và MicroRank chỉ d�
 
 **Chọn:** thiết kế thỏa cả hai nghĩa. Đồ thị tham gia vào điểm bất thường (tầng 2 ở P6). Cả chuỗi khoanh vùng và xếp hạng cũng chạy trên đồ thị (tầng 3, 4). Khung bốn tầng là ứng viên để tổ chức thiết kế, không phải yêu cầu của DT18; thành phần cụ thể chọn sau P4 (WHY-02). Ba ví dụ của cô được đặt vào đúng tầng mà tài liệu dùng chúng:
 
+**Hai mức phát hiện** (Minh duyệt hướng ngày 22/10/2026, M-38 trong `docs/KE-HOACH-GIAI-DOAN-TOI.md`):
+- **Mức hệ thống, tức có sự cố hay không:** luật cảnh báo của Grafana mở sự cố. Ngưỡng chọn trên đoạn bình thường, không dùng nhãn.
+- **Mức thành phần, tức thành phần nào bất thường:** lúc chẩn đoán, đồ thị tham gia tính điểm bất thường của từng thành phần và tách bất thường tự sinh khỏi bất thường kế thừa (tầng 2 ở P6). Nghĩa hẹp ở trên được đáp ứng ở mức này.
+- **Đồ thị tham gia quyết định báo động** (điểm toàn hệ tính trên đồ thị, hoặc đồ thị gom các cảnh báo cùng một nguyên nhân): hoãn. Chỉ làm nếu cô yêu cầu, hoặc Minh quyết sau khi phương pháp RCA đã chạy trên dev (M-20).
+
 | Ví dụ của cô | Tầng | Lý do |
 |---|---|---|
 | Subgraph anomaly detection | Tầng 3: đồ thị con bất thường → vùng nghi ngờ | DT18 yêu cầu "xác định vùng ảnh hưởng". Các phần tử bất thường liên thông chỉ là vùng triệu chứng quan sát được, chưa chắc là vùng ảnh hưởng thật: thành phần gốc không có cạnh hoặc không có tín hiệu có thể nằm ngoài; hai bất thường độc lập có thể nằm liền nhau. Vì vậy gọi là "vùng nghi ngờ" cho tới khi có nhãn vùng để kiểm. Chỉ gọi bước này là subgraph anomaly detection khi có định nghĩa điểm bất thường và quy tắc quyết định cho đồ thị con |
@@ -74,7 +79,7 @@ Không câu nào giả định đồ thị sẽ thắng (Minh quyết 02/10: bá
   - RQ3a: phát hiện sự cố (Precision, Recall, F1).
   - RQ3b: xếp hạng nguyên nhân gốc (MRR, NDCG, Hit@k).
   - RQ3c: vùng ảnh hưởng (Precision, Recall, F1), ở nơi có nhãn.
-  - RQ3d: phần thay đổi có đến từ cấu trúc đồ thị thật không, hay đồ thị bất kỳ cũng cho kết quả tương tự? (đối chứng ở §6)
+  - RQ3d: phần thay đổi có đến từ việc dùng quan hệ không, so với nhánh cùng tín hiệu bỏ quan hệ; và có hơn quy tắc đơn giản trên cùng đồ thị không (ví dụ chọn thành phần bất thường sâu nhất hoặc sớm nhất)? Không có đối chứng đồ thị ngẫu nhiên, nên RQ3d không trả lời việc lợi ích có đến từ cấu trúc phụ thuộc thật hay không (đối chứng ở §6).
 - **RQ4 — Giải thích.** LLM nhận bằng chứng có cấu trúc đồ thị có cho giải thích đúng, trung thành với bằng chứng và gợi ý xử lý dùng được hơn khi chỉ nhận bằng chứng dạng danh sách không? → P8.
 - **RQ5 — Áp dụng trên FlashTicket.** Kết quả có giữ được trên một hệ khác các hệ trong dataset, với lỗi tự tiêm và tải thay đổi không? → P10.
   - Câu phụ (đề xuất **chưa kiểm**, chờ dữ liệu FlashTicket): flash sale làm tải tăng đột biến từ cổng vào; sự cố thường bắt đầu ở một thành phần rồi lan ngược lên phía gọi. Nếu giả định này đúng, hướng lan trên đồ thị có thể giúp phân biệt "tải tăng" với "sự cố". Giả định sai khi tải làm cạn tài nguyên ở một service (lúc đó tải gây ra sự cố thật). Dataset công khai thường giữ tải đều nên không kiểm được câu này; chỉ FlashTicket kiểm được.
@@ -197,7 +202,7 @@ Repo mới, MRP, quy trình agent, nhật ký quyết định. Xong khi Minh duy
   4. Quan hệ giữa dịch vụ có thể bổ sung thông tin gì; đây là căn cứ đề xuất ứng viên, chưa là bằng chứng đồ thị đã giúp.
   5. Câu nào chưa trả lời, thiếu đúng bằng chứng gì, ảnh hưởng tới lựa chọn nào và bước xử lý cần Minh quyết.
   Thành phần P5–P6 đề xuất để xử lý hạn chế phải nối với mục đã có đủ căn cứ tương ứng; không dùng mã hạn chế mô tả như bằng chứng cơ chế. Thành phần đáp ứng DT18 hoặc nhu cầu kỹ thuật ghi rõ loại lý do và phương án đã xét.
-- Đối chứng bỏ quan hệ và đồ thị ngẫu nhiên giữ bậc dùng khi đánh giá tác dụng của cơ chế đồ thị ở P6–P7. Chúng không là điều kiện trì hoãn vô hạn việc chỉ ra hạn chế của baseline ở P4; nếu một kết luận P4 thật sự cần phép kiểm bổ sung thì trình đúng phép kiểm ấy.
+- Đối chứng bỏ quan hệ và quy tắc đơn giản trên cùng đồ thị dùng khi đánh giá tác dụng của cơ chế đồ thị ở P6–P7. Chúng không là điều kiện trì hoãn vô hạn việc chỉ ra hạn chế của baseline ở P4; nếu một kết luận P4 thật sự cần phép kiểm bổ sung thì trình đúng phép kiểm ấy.
 - **Vì sao:** đây là việc "chỉ ra vấn đề tồn đọng" của cô, và là cầu nối logic sang phương pháp đồ thị.
 
 ### P5 — Bước 1: Mô hình đồ thị phụ thuộc
@@ -220,18 +225,20 @@ Repo mới, MRP, quy trình agent, nhật ký quyết định. Xong khi Minh duy
 
 Khung bốn tầng, lấy từ câu chữ của DT18 ("ánh xạ lên đồ thị để xác định vùng ảnh hưởng, phát hiện dấu hiệu bất thường và xếp hạng"). Khung này là ứng viên; DT18 yêu cầu các đầu ra, không bắt buộc kiến trúc này. Lựa chọn cụ thể trong mỗi tầng chốt trong spec P6, **sau P4**, trên phần dev.
 
+**Cấu trúc tổng** (Minh duyệt hướng, lời sửa theo M-32): phương pháp là một chuỗi chẩn đoán gồm các thành phần thay được. Mỗi thành phần ghi nguồn (hạn chế P4, công trình khác, DT18 hoặc nhu cầu kỹ thuật), dữ liệu cần dùng, cách xử lý khi thiếu dữ liệu, và có nhánh bỏ để đo tác dụng. Khi thử trên dev, mỗi thành phần có ba kết cục khai trước: giúp thì giữ; hại thì bỏ; không đủ ca để phân xử thì giữ lại và kiểm trên FlashTicket (M-48). Không tuyên bố đây là phương pháp mới hay "hợp nhất từ các bài học".
+
 1. **Ánh xạ.** Theo từng cửa sổ thời gian, gắn tín hiệu lên phần tử của đồ thị. Các tín hiệu dưới đây là ứng viên, chưa là bộ đặc trưng đã chọn; chỉ giữ sau khi xét bằng chứng, chất lượng đầu vào và phương án khác trên dev.
    - Cạnh: số lời gọi, độ trễ đo từ phía gọi, số lỗi.
    - Nút:
      - ứng viên thời gian tự xử lý: phần thời gian span không chờ span con; phép tính phải xử lý chồng lấn, song song, bất đồng bộ và span thiếu, không mặc định trừ tổng duration con là đúng;
      - log lỗi và mẫu log: gắn vào span qua trace_id nếu có, nếu không thì theo service và thời gian;
      - metric tài nguyên.
-2. **Chấm điểm bất thường có dùng đồ thị.** So từng phần tử với mức bình thường của chính nó. Cơ chế ứng viên (**chưa kiểm**): dùng đồ thị để tách bất thường **tự sinh** (từ chính thành phần) khỏi bất thường **kế thừa** (do thành phần phía dưới truyền lên). Ứng viên này nhắm vào giả thuyết "nhầm triệu chứng với nguyên nhân" của P4; chỉ giữ nếu P4 xác nhận hạn chế đó trên dev. Phát hiện bất thường có dùng đồ thị là bắt buộc (bước 2 của cô, DT18); P4 chỉ quyết định dùng cơ chế nào.
+2. **Chấm điểm bất thường có dùng đồ thị.** So từng phần tử với mức bình thường của chính nó. Cơ chế ứng viên (**chưa kiểm**): dùng đồ thị để tách bất thường **tự sinh** (từ chính thành phần) khỏi bất thường **kế thừa** (do thành phần phía dưới truyền lên). Ứng viên này nhắm vào giả thuyết "nhầm triệu chứng với nguyên nhân" của P4; chỉ giữ nếu P4 xác nhận hạn chế đó trên dev. Phát hiện bất thường có dùng đồ thị ở **mức thành phần** là bắt buộc (bước 2 của cô, DT18); P4 chỉ quyết định dùng cơ chế nào. Việc quyết định có sự cố hay không do luật cảnh báo Grafana đảm nhận (§2.3).
    - Các cách ứng viên:
      - quy tắc phân rã theo cây lời gọi;
      - hồi quy có điều kiện trên nút cha/con, giống CIRCA;
      - GNN dự báo hành vi bình thường, giống GDN.
-   - Phát hiện ở mức hệ thống: báo sự cố khi điểm vượt ngưỡng học từ dữ liệu bình thường.
+   - Phát hiện ở mức hệ thống: luật cảnh báo Grafana mở sự cố (§2.3). Phương án báo sự cố khi điểm tổng trên đồ thị vượt ngưỡng học từ dữ liệu bình thường được hoãn (M-20).
    - Quy tắc phân rã theo cây lời gọi sai khi:
      - lời gọi bất đồng bộ hoặc song song (trừ con làm sai thời gian tự xử lý);
      - thiếu span con;
@@ -255,7 +262,7 @@ Trước G3, phương pháp và các đối chứng đã khai báo phải đư�
 - **So với:**
   - các baseline của P3;
   - nhánh **cùng bằng chứng nhưng không dùng đồ thị**. Spec P7 ghi rõ cấu trúc nào được coi là đồ thị (quan hệ cha–con trong trace, đồ thị service), thông tin nào giữ chung, bước nào bị loại. Ví dụ self-time và hồi quy theo nút cha đã dùng quan hệ; nếu nhánh này giữ chúng mà chỉ bỏ bước xếp hạng trên đồ thị thì kết quả chỉ nói về bước xếp hạng (WHY-07);
-  - nhánh **đồ thị ngẫu nhiên giữ bậc**;
+  - **quy tắc đơn giản trên cùng đồ thị** (ví dụ thành phần bất thường sâu nhất, sớm nhất);
   - nhánh đồ thị tĩnh so với đồ thị quan sát.
 - Khi so tác dụng cấu trúc, giữ cùng tín hiệu, cửa sổ, tập ứng viên, coverage, tiền xử lý, quy tắc chấm và ngân sách chọn cấu hình ở những phần không phải yếu tố đang thay. Nếu không thể giữ tương đương, khai rõ yếu tố thay cùng và giới hạn kết luận. Không gọi nhánh là "không đồ thị" chỉ vì bỏ hình hoặc bước xếp hạng trong khi vẫn dùng quan hệ ở đặc trưng/điểm.
 - **Độ đo** (WHY-06):
@@ -313,11 +320,11 @@ Trước G3, phương pháp và các đối chứng đã khai báo phải đư�
 
 1. **Dev để thiết kế, test để kiểm.** Test và dataset giữ ngoài chỉ mở một lần, sau G3, khi Minh cho phép.
 2. **Baseline phải mạnh** trước khi nói đồ thị giúp, gồm cả baseline đơn giản đã công bố (QT7).
-3. **Khẳng định lợi ích đến từ cấu trúc đồ thị thật cần đủ ba thứ** (QT8):
-   - hơn nhánh cùng bằng chứng mà không dùng đồ thị;
-   - hơn đồ thị ngẫu nhiên giữ bậc;
+3. **Khẳng định lợi ích đến từ việc dùng quan hệ cần đủ ba thứ** (QT8):
+   - hơn nhánh cùng bằng chứng mà không dùng quan hệ;
+   - hơn quy tắc đơn giản trên cùng đồ thị;
    - báo theo điều kiện và theo từng ca, không chỉ trung bình.
-   - Vì sao cần đồ thị ngẫu nhiên (WHY-07): nếu đồ thị bất kỳ cũng cho kết quả như vậy thì lợi ích không đến từ quan hệ phụ thuộc thật.
+   - Không dùng đối chứng đồ thị ngẫu nhiên (M-25). Vì vậy kết luận dừng ở mức lợi ích của bước lan và của phép dùng quan hệ; không khẳng định lợi ích do cấu trúc phụ thuộc thật (WHY-07).
    Điều này áp dụng cho khẳng định lợi ích sau đánh giá, không đòi đồ thị thắng trước khi nghiên cứu hoặc chỉ ra hạn chế baseline. Nếu đối chứng không hỗ trợ, báo kết quả và giới hạn trung thực.
 4. **Prior work là mặc định.** Lấy đúng quy ước của bài hoặc code gốc, ghi file và dòng. Muốn lệch thì ghi lý do vào WHY (QT2).
 5. **Kiểm chịu lực.** Mỗi lựa chọn riêng của nhóm được thay trong khoảng hợp lý trên dev. Nếu kết luận đổi dấu thì báo kèm độ nhạy (QT3).
