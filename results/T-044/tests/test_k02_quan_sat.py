@@ -97,7 +97,7 @@ def test_29_the_gioi_doi_thu_tu(ma):
     f = fx(29)
     ma('29')
     d, da = f['dau_vao'], f['dap_an']
-    thu_tu, khoi = {}, {}
+    thu_tu, khoi, kenh_w = {}, {}, {}
     for w in ('P', 'S_lo', 'S_hi'):
         T_N, T_A = d['U1']['T'][w]
         kq = e4.cham_dem(d['U1']['n_N'], d['U1']['n_A'], T_N, T_A, TS)
@@ -107,10 +107,14 @@ def test_29_the_gioi_doi_thu_tu(ma):
         xh = xep_hang.xep(kenh, thuc_the_co_kenh_OK={'A', 'B'})
         thu_tu[w] = xh['thu_tu']
         khoi[w] = xh['blocks']
+        kenh_w[w] = kenh
     assert thu_tu == da['thu_tu']
     assert xep_hang.rank_changed(thu_tu) == da['RANK_CHANGED']
     wd = the_gioi.world_dependent(khoi, d['root'])
     assert wd['WORLD_DEPENDENT'] == da['WORLD_DEPENDENT']
+    # da['nguyen_nhan'] = "chỉ điểm đổi (cổng qua ở cả ba thế giới); cặp (U1 của A, U2 của B)", viết thành cấu trúc.
+    nn = the_gioi.nguyen_nhan(kenh_w, d['root'], khoi)
+    assert nn == {'loai': 'chi_diem_doi', 'cap': (('A', 'U1'), ('B', 'U2'))}
 
 
 def test_30_thu_tu_khong_doi(ma):
