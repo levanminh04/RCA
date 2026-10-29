@@ -153,11 +153,13 @@ pyarrow 18.1.0 (bản T-043 đã dùng, `results/T-043/manifest.json#/runtime/pa
 - Khi E3 bật, kênh mẫu Drain thay kênh log lỗi cơ bản (`hop-dong.json` dòng 51).
 - `params.coverage`: `khoang` = [mốc bản ghi đầu, mốc bản ghi cuối] của từng file; M1 cộng r_ns; danh sách rỗng là XÁC NHẬN THIẾU THU; thiếu khóa là UNSUPPORTED (Đ19 điểm 4).
 
-## Phần II — chỗ lệch lộ ra khi cài (ghi 29/10/2026, chờ Minh quyết)
+## Phần II — chỗ lệch lộ ra khi cài (ghi 29/10/2026; mục A đã duyệt 29/10/2026)
 
-**Tóm tắt.** Không có fixture hay đáp án nào của T-043 lệch với code: 97/97 phép kiểm trong phạm vi qua mà không sửa đáp án. Không có đáp án đặc tả nào cần đính chính. Phần này gồm các chỗ đặc tả không nói hoặc nói chưa đủ, nơi người làm phải chọn một cách hiểu để viết code (mục A, cần Minh quyết), các quy ước biểu diễn không đổi kết quả (mục B, để người phản biện kiểm), các sửa đã làm trong phiên theo đúng nguồn (mục C) và giới hạn (mục D). Theo tiêu chí 8 của SPEC, task ở trạng thái "chờ Minh" cho tới khi Minh quyết mục A.
+- **Trạng thái mục A:** Minh duyệt giữ cả 20 cách hiểu, lời trong chat ngày 29/10/2026: "DUYỆT 20 ĐIỂM". Không đổi code.
 
-### A. Cách hiểu đã cài ở chỗ đặc tả không nói (cần Minh quyết)
+**Tóm tắt.** Không có fixture hay đáp án nào của T-043 lệch với code: 97/97 phép kiểm trong phạm vi qua mà không sửa đáp án. Không có đáp án đặc tả nào cần đính chính. Phần này gồm các chỗ đặc tả không nói hoặc nói chưa đủ, nơi người làm phải chọn một cách hiểu để viết code (mục A, cần Minh quyết), các quy ước biểu diễn không đổi kết quả (mục B, để người phản biện kiểm), các sửa đã làm trong phiên theo đúng nguồn (mục C) và giới hạn (mục D). Theo tiêu chí 8 của SPEC, task ở trạng thái "chờ Minh" cho tới khi Minh quyết mục A; Minh đã quyết (dòng trạng thái ở đầu phần này).
+
+### A. Cách hiểu đã cài ở chỗ đặc tả không nói (đã duyệt 29/10/2026)
 
 Mỗi mục: chỗ; đã cài; phương án khác; ảnh hưởng. Đề xuất chung: giữ cách đã cài, trừ khi Minh chọn khác.
 

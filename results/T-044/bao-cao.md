@@ -19,11 +19,11 @@
 - A2 (test có sức bắt lỗi?): 21/21 đột biến bị bắt. Chỗ không có fixture thì đột biến tương ứng không thể bị bắt (biên p = α, mục 9).
 - A3 (nhãn có lọt?): kiểm tĩnh qua; fixture 74 qua; chặn rò ở mức giá trị (CĐ12) có test và đột biến D06–D08.
 - A4 (tất định?): PASS trên ca giả. Trên dữ liệu thật: T-045 T1.
-- A5 (đặc tả có chỗ sai hay mơ hồ?): không chỗ sai; 20 chỗ đặc tả không nói, người làm đã chọn cách hiểu (`dinh-chinh-cai-dat.md` Phần II, mục A), **chờ Minh quyết**.
+- A5 (đặc tả có chỗ sai hay mơ hồ?): không chỗ sai; 20 chỗ đặc tả không nói, người làm đã chọn cách hiểu (`dinh-chinh-cai-dat.md` Phần II, mục A); Minh duyệt giữ cả 20 ngày 29/10/2026.
 
 **Không trả lời:** hiệu quả của M1 (RQ3b, RQ3c, RQ3d); hành vi, thời gian, RAM trên dữ liệu thật (T-045).
 
-**Trạng thái đề nghị:** chờ Minh (Phần II mục A, theo tiêu chí 8) và chờ phản biện.
+**Trạng thái:** Phần II mục A đã được Minh duyệt (29/10/2026); chờ phản biện.
 
 ## 2. Đầu vào, môi trường, kiểm hash
 
@@ -135,7 +135,7 @@ Nguồn: `runs/dot-bien-002/tong-hop.json`. Mỗi đột biến thay đúng mộ
 ## 9. Tự diễn giải, giới hạn, phần chưa kiểm
 
 - Tự diễn giải đã duyệt: Phần I của `dinh-chinh-cai-dat.md` (CĐ1–CĐ16).
-- Tự diễn giải lộ ra khi cài, **chờ Minh quyết**: Phần II mục A (PII-01…PII-20). Quy ước biểu diễn: mục B. Sửa trong phiên: mục C.
+- Tự diễn giải lộ ra khi cài: Phần II mục A (PII-01…PII-20), Minh duyệt giữ cả 20 ngày 29/10/2026. Quy ước biểu diễn: mục B. Sửa trong phiên: mục C.
 - Chưa kiểm (Phần II mục D):
   - biên p = α không có fixture; đột biến ≤ thay < sẽ không bị bắt (PII-01);
   - khoảng tin cậy bootstrap theo ô chưa nằm trong `luat_c` (báo kèm; T-045 dùng `p3.danh_gia.bootstrap`);

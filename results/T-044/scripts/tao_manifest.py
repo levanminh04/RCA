@@ -67,8 +67,8 @@ def tao():
         'authorization': [['SPEC', 'tasks/T-044-cai-dat-m1/SPEC.md (đã duyệt; Q-212)'],
                           ['giai_doan_2', 'lời Minh trong chat ngày 29/10/2026: "duyệt toàn bộ các đề xuất bên trên của bạn"; '
                                           'ghi ở LOG T-044, giai đoạn 2; dòng DECISIONS chờ Minh duyệt']],
-        'trang_thai': 'xong các bước 0–9 trong phạm vi SPEC; chờ Minh quyết Phần II mục A của dinh-chinh-cai-dat.md; '
-                      'chờ phản biện',
+        'trang_thai': 'xong các bước 0–9 trong phạm vi SPEC; Phần II mục A của dinh-chinh-cai-dat.md đã được Minh duyệt '
+                      '(29/10/2026); chờ phản biện',
         'outputs': [{'path': str(p.relative_to(ROOT)).replace('\\', '/'), 'sha256': sha(p), 'bytes': p.stat().st_size}
                     for p in tep()],
         'luot_chay': LUOT,
