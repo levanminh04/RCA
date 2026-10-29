@@ -1,0 +1,32 @@
+........................................................................ [ 29%]
+..............................................................F......... [ 58%]
+........................................................................ [ 87%]
+..............................                                           [100%]
+=================================== FAILURES ===================================
+___________________________ test_E7_dung_vung[E7-2] ____________________________
+
+muc = 'E7-2', ma = <function ma.<locals>._gan at 0x7fdcfd6e0f40>
+
+    @pytest.mark.parametrize('muc', ['E7-1', 'E7-2', 'E7-3'])
+    def test_E7_dung_vung(muc, ma):
+        from m1 import e5, e7
+        m = tu_lap(DAP_AN_THANH_PHAN, muc)
+        ma(muc)
+        d = m['dau_vao']
+        kenh = kenh_tu_fixture(d['kenh'])
+        canh = [tuple(c) for c in d['canh']]
+        p = e5.phan_loai(kenh, canh, bat=d['E5'])
+        for cach in ('1', '2'):
+            R = e7.vung(d['T'], kenh, canh, p['inherited_by'], cach=int(cach))
+>           assert {r: sorted(v) for r, v in R.items()} == m['dap_an'][cach], cach
+E           AssertionError: 1
+E           assert {'R': ['A', 'F', 'R', 'X']} == {'R': ['A', 'R', 'X']}
+E             
+E             Differing items:
+E             {'R': ['A', 'F', 'R', 'X']} != {'R': ['A', 'R', 'X']}
+E             Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:185: AssertionError
+=========================== short test summary info ============================
+FAILED test_k08_e5_e6_e7_e9.py::test_E7_dung_vung[E7-2] - AssertionError: 1
+1 failed, 245 passed in 4.19s

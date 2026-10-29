@@ -1,0 +1,67 @@
+...............................F........................................ [ 29%]
+........................................................................ [ 58%]
+........................................................................ [ 87%]
+.................F............                                           [100%]
+=================================== FAILURES ===================================
+___________________________ test_WD1_cap_dao_thu_tu ____________________________
+
+ma = <function ma.<locals>._gan at 0x7fbf87a7f740>
+
+    def test_WD1_cap_dao_thu_tu(ma):
+        from m1.kieu import Kenh
+        from m1_danh_gia import the_gioi
+        m = tu_lap(DAP_AN_THANH_PHAN, 'WD1')
+        ma('WD1')
+        d, da = m['dau_vao'], m['dap_an']
+        b = lambda xs: [{'key': [len(xs) - i], 'groups': [[e]]} for i, e in enumerate(xs)]
+        k = {w: [Kenh(e, 'k' + e, 'len', 'lan_nguoc', 1.0) for e in d['P']] for w in ('P', 'S_lo', 'S_hi')}
+        nn = the_gioi.nguyen_nhan(k, d['root'], {w: b(d[w]) for w in ('P', 'S_lo', 'S_hi')})
+>       assert nn['loai'] == da['loai'] and [list(x) for x in nn['cap']] == da['cap']
+E       AssertionError: assert ('chi_diem_doi' == 'chi_diem_doi'
+E         
+E           chi_diem_doi and [['R', 'kR'], ['A', 'kA']] == [['R', 'kR'], ['B', 'kB']]
+E         
+E         At index 1 diff: ['A', 'kA'] != ['B', 'kB']
+E         Use -v to get more diff)
+
+test_k02_quan_sat.py:283: AssertionError
+___________________________ test_pha2_giai_thich_WD ____________________________
+
+ma = <function ma.<locals>._gan at 0x7fbf84480180>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-131/test_pha2_giai_thich_WD0')
+
+    def test_pha2_giai_thich_WD(ma, tmp_path):
+        """pha2.cham ghi `nguyen_nhan_WD` từ `extra.kenh_co_the_gioi` của bản ghi khi ca WORLD_DEPENDENT (WD1)."""
+        import hashlib
+        import json
+        from m1_danh_gia import pha2
+        m = tu_lap(DAP_AN_THANH_PHAN, 'WD1')
+        ma('WD1-pha2')
+        d, da = m['dau_vao'], m['dap_an']
+        b = lambda xs: [{'key': [len(xs) - i], 'groups': [[e]]} for i, e in enumerate(xs)]
+        kenh = [{'thuc_the': e, 'ten': 'k' + e, 'huong': 'len', 'lop': 'lan_nguoc', 's': 1.0, 'F_I': 1} for e in d['P']]
+        rec = {'config_id': 'C', 'opaque_id': 'x', 'status': 'OK', 'verdict': 'CAUSE_FOUND', 'blocks': b(d['P']),
+               'worlds': {w: {'blocks': b(d[w])} for w in ('S_lo', 'S_hi')},
+               'extra': {'G_N': [], 'kenh_co_the_gioi': {w: kenh for w in ('P', 'S_lo', 'S_hi')}}}
+        du_lieu = (json.dumps(rec, sort_keys=True) + '\n').encode('utf-8')
+        (tmp_path / 'ban-ghi.jsonl').write_bytes(du_lieu)
+        h = hashlib.sha256(du_lieu).hexdigest()
+        (tmp_path / 'pha1.json').write_text(json.dumps({'tep': 'ban-ghi.jsonl', 'sha256': h, 'so_ban_ghi': 1}),
+                                            encoding='utf-8')
+        kq = pha2.cham(tmp_path, h, {'x': {'root': d['root'], 'dataset': 'RE2-TT', 'o': 'o1'}})
+        c = kq['cau_hinh']['C']['ca']['x']
+        assert c['WORLD_DEPENDENT'] is True
+        nn = c['nguyen_nhan_WD']
+>       assert nn['loai'] == da['loai'] and [list(x) for x in nn['cap']] == da['cap']
+E       AssertionError: assert ('chi_diem_doi' == 'chi_diem_doi'
+E         
+E           chi_diem_doi and [['R', 'kR'], ['A', 'kA']] == [['R', 'kR'], ['B', 'kB']]
+E         
+E         At index 1 diff: ['A', 'kA'] != ['B', 'kB']
+E         Use -v to get more diff)
+
+test_k11_danh_gia.py:397: AssertionError
+=========================== short test summary info ============================
+FAILED test_k02_quan_sat.py::test_WD1_cap_dao_thu_tu - AssertionError: assert...
+FAILED test_k11_danh_gia.py::test_pha2_giai_thich_WD - AssertionError: assert...
+2 failed, 244 passed in 3.70s

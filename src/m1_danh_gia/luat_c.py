@@ -10,6 +10,9 @@ dinh-chinh-cai-dat.md CĐ2, CĐ6.2, CĐ6.4, CĐ13). Chạy sau ghép nhãn. Mọ
 6. KHÔNG TÁC DỤNG: |ΔMRR gộp| <= δ.
 7. TRÁI CHIỀU theo ô.
 Cặp (R0, c) nhiều thành phần (thanh_phan = 'R0,c'): không áp UV-6 và M5 (CĐ6.4).
+Trọng số (CĐ13; SPEC T-045 bước 7): `trong_so` là bội số của ô, gán cho mọi ca của ô (ô được lấy k lần thì mọi ca
+của ô có trọng số k). MRR, RR_o tính có trọng số; P, M, P′, M′ đếm ô theo bội số. Tập E_X, số ô của E_X (cho KHÔNG
+ĐỦ CA) và δ_d giữ cố định từ T0; δ_d truyền qua `delta_d_co_dinh`.
 RR_o tăng khi ΔRR_o > 1e-12, giảm khi ΔRR_o < −1e-12 (rr_theo_o#/tang_giam).
 """
 from fractions import Fraction
@@ -47,16 +50,25 @@ def tong_hop(ds, tat, bat, E_X, trong_so=None):
     MRR_t['gop'], MRR_b['gop'] = rr.mrr(rt, None, trong_so), rr.mrr(rb, None, trong_so)
     dM['gop'] = MRR_b['gop'] - MRR_t['gop']
     o_t, o_b = rr.rr_o(rt, o_cua, trong_so), rr.rr_o(rb, o_cua, trong_so)
+    boi = {}
+    for c in ds:
+        w = _fr(trong_so.get(c['ma'], 1)) if trong_so else Fraction(1)
+        if w < 0 or w.denominator != 1:
+            raise ValueError(f"bội số của ca {c['ma']} phải là số nguyên không âm")
+        if boi.setdefault(c['o'], w) != w:
+            raise ValueError(f"các ca của ô {c['o']} có bội số khác nhau")
     P = M = Pp = Mp = 0
     huong_o = {}
     for o in sorted(o_t):
         x = o_b[o] - o_t[o]
         h = 1 if x > NGUONG_O else (-1 if x < -NGUONG_O else 0)
         huong_o[o] = h
+        k = boi[o]
         if o in E_X:
-            P, M = P + (h > 0), M + (h < 0)
+            P, M = P + k * (h > 0), M + k * (h < 0)
         else:
-            Pp, Mp = Pp + (h > 0), Mp + (h < 0)
+            Pp, Mp = Pp + k * (h > 0), Mp + k * (h < 0)
+    P, M, Pp, Mp = (int(x) for x in (P, M, Pp, Mp))
     return {'dMRR': dM, 'MRR_tat': MRR_t, 'MRR_bat': MRR_b, 'P': P, 'M': M, 'P_phay': Pp, 'M_phay': Mp,
             'so_o_E_X': len(set(E_X)), 'huong_o': huong_o, 'datasets': datasets}
 

@@ -4,7 +4,7 @@ Fixture 21–24, 28–30, 82; B1, B8 (Đ9, Đ20); H1–H6 (Đ19, chép ở dap-a
 """
 import pytest
 
-from conftest import fx, bx, uh, gan_bang, gan_lam_tron
+from conftest import fx, bx, uh, gan_bang, gan_lam_tron, tu_lap, DAP_AN_THANH_PHAN
 
 TS = {'m_span': 20, 'm_metric': 5, 'alpha': 0.01, 'epsilon': 0.05, 'q_hi': 0.95, 'q_lo': 0.05,
       'n_exact_max': 100, 'count_min': 10}
@@ -114,7 +114,8 @@ def test_29_the_gioi_doi_thu_tu(ma):
     assert wd['WORLD_DEPENDENT'] == da['WORLD_DEPENDENT']
     # da['nguyen_nhan'] = "chỉ điểm đổi (cổng qua ở cả ba thế giới); cặp (U1 của A, U2 của B)", viết thành cấu trúc.
     nn = the_gioi.nguyen_nhan(kenh_w, d['root'], khoi)
-    assert nn == {'loai': 'chi_diem_doi', 'cap': (('A', 'U1'), ('B', 'U2'))}
+    assert nn['loai'] == 'chi_diem_doi' and nn['cap'] == (('A', 'U1'), ('B', 'U2'))
+    assert nn['theo_the_gioi'] == {'S_hi': {'vuot': ['B'], 'bi_vuot': [], 'cap': [(('A', 'U1'), ('B', 'U2'))]}}
 
 
 def test_30_thu_tu_khong_doi(ma):
@@ -235,3 +236,51 @@ def test_H6_thieu_don_vi_thoi_gian(ma):
     ma('H6')
     rec = chuoi.chay(_ca_nho(), [], [], ['P', 'Q'], {}, 1000, _params(don_vi_thoi_gian=None))
     assert rec['status'] == 'ERROR'
+
+
+def _ca_metric_H(nguon):
+    """H1–H3 qua chuỗi: một cột S_cpu, ba dòng metric với metrics.time = [1e9, 61e9, 121e9] ns, t = 60 s."""
+    p = _params(**nguon)
+    p['don_vi_thoi_gian'] = {'spans.start_us': 'us', 'metrics.time': 'ns', 'logs.timestamp': 's'}
+    p['coverage'] = dict(p['coverage'], S={'khoang': [[0, 120 * 10 ** 9]], 'r_ns': 10 ** 9})
+    metrics = [{'time': x * 10 ** 9, 'S_cpu': 1.0 + i} for i, x in enumerate((1, 61, 121))]
+    from m1 import chuoi
+    return chuoi.chay([], metrics, [], ['S'], {}, 60, p)
+
+
+def test_H1_qua_chuoi(ma):
+    ma('H1-chuoi')
+    rec = _ca_metric_H({'nguon_metric': {'S_cpu': 'S'}, 'thoi_gian_nguon': {'S': [0, 60 * 10 ** 9, 120 * 10 ** 9]}})
+    assert rec['error'] is None
+    assert rec['coverage']['S']['trang_thai'] == 'OK'
+    assert rec['coverage']['S']['H'] == [0, 121 * 10 ** 9]  # theo mốc riêng, không theo metrics.time
+
+
+def test_H2_qua_chuoi(ma):
+    ma('H2-chuoi')
+    rec = _ca_metric_H({'nguon_metric': {'S_cpu': 'S'}, 'thoi_gian_nguon': {}, 'phan_hoach_NA_da_kiem': {'S': True}})
+    assert rec['coverage']['S'] == {'trang_thai': 'UNSUPPORTED', 'ly_do': 'khong_co_moc_rieng', 'cham_NA': True}
+    assert any(d['ma'] == 'metric|S_cpu' for d in rec['extra']['don_vi_phan_vi'])
+
+
+def test_H3_qua_chuoi(ma):
+    ma('H3-chuoi')
+    rec = _ca_metric_H({'nguon_metric': {'S_cpu': 'S'}, 'thoi_gian_nguon': {}, 'phan_hoach_NA_da_kiem': {}})
+    assert rec['coverage']['S'] == {'trang_thai': 'UNSUPPORTED', 'ly_do': 'khong_co_moc_rieng', 'cham_NA': False}
+    assert not any(d['ma'] == 'metric|S_cpu' for d in rec['extra']['don_vi_phan_vi'])
+    assert rec['diagnostics']['nguon_metric_unsupported'] == ['S']
+
+
+def test_WD1_cap_dao_thu_tu(ma):
+    from m1.kieu import Kenh
+    from m1_danh_gia import the_gioi
+    m = tu_lap(DAP_AN_THANH_PHAN, 'WD1')
+    ma('WD1')
+    d, da = m['dau_vao'], m['dap_an']
+    b = lambda xs: [{'key': [len(xs) - i], 'groups': [[e]]} for i, e in enumerate(xs)]
+    k = {w: [Kenh(e, 'k' + e, 'len', 'lan_nguoc', 1.0) for e in d['P']] for w in ('P', 'S_lo', 'S_hi')}
+    nn = the_gioi.nguyen_nhan(k, d['root'], {w: b(d[w]) for w in ('P', 'S_lo', 'S_hi')})
+    assert nn['loai'] == da['loai'] and [list(x) for x in nn['cap']] == da['cap']
+    assert {w: {'vuot': v['vuot'], 'bi_vuot': v['bi_vuot']} for w, v in nn['theo_the_gioi'].items()} == da['theo_the_gioi']
+    nn2 = the_gioi.nguyen_nhan(k, d['root'], {w: b(d['P']) for w in ('P', 'S_lo', 'S_hi')})
+    assert nn2['cap'] == da['khong_doi']['cap'] and nn2['theo_the_gioi'] == da['khong_doi']['theo_the_gioi']

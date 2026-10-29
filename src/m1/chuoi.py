@@ -200,7 +200,7 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
     def _nguon(ten, moc):
         c = cov.get(ten)
         if c is None or c.get('r_ns') is None:
-            return {'trang_thai': 'UNSUPPORTED'}
+            return {'trang_thai': 'UNSUPPORTED', 'ly_do': 'thieu_coverage'}
         khoang = [(a, b + c['r_ns']) for a, b in c['khoang']]
         kq = quan_sat.tinh_nguon(khoang, moc, c['r_ns'], (lo_ns, hi_ns), phia, o_s=o_s_ns)
         kq['trang_thai'] = 'OK'
@@ -246,6 +246,15 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
             [int(r['time'] * he_m) for r in metrics])
         cols = sorted({k for r in metrics for k in r if k != 'time'})
         nguon_cua = params.get('nguon_metric') or {}
+        # trạng thái quan sát của từng nguồn metric: chỉ báo, không tham gia T (đặc tả v1 §2.2 điểm 8; Đ19 điểm 3, 4)
+        for ng_s in sorted(tg):
+            if ng_s in ('trace', 'log'):
+                raise LoiHopDong('ERROR', f'tên nguồn metric trùng nguồn trace/log: {ng_s}')
+            if tg[ng_s]['trang_thai'] != 'OK':
+                qs[ng_s] = {'trang_thai': 'UNSUPPORTED', 'ly_do': 'khong_co_moc_rieng',
+                            'cham_NA': tg[ng_s]['cham_NA']}
+            else:
+                qs[ng_s] = _nguon(ng_s, [m for m in tg[ng_s]['moc'] if lo_ns <= m < hi_ns])
         for cot in cols:
             lop_m = kenh_mod.lop_metric(cot, ho_so)
             if lop_m is None:
@@ -434,6 +443,11 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
     kenh_co = [{'thuc_the': k.thuc_the, 'ten': k.ten, 'huong': k.huong, 'lop': k.lop, 's': k.s,
                 'F_I': F_I_P.get(k.ma, 1), 'don_vi': k.don_vi, 'khoi_phat': k.khoi_phat}
                for k in sorted(kenh_P_U, key=lambda x: x.ma) if k.co]
+    # kênh có cờ ở từng thế giới: để bộ đánh giá giải thích WORLD_DEPENDENT (B1.3b), không dùng để xếp hạng
+    kenh_co_w = {w: [{'thuc_the': k.thuc_the, 'ten': k.ten, 'huong': k.huong, 'lop': k.lop, 's': k.s,
+                      'F_I': e5_w[w]['F_I'].get(k.ma, 1)}
+                     for k in sorted(worlds[w]['kenh'], key=lambda x: x.ma) if k.co and k.thuc_the in set(U)]
+                 for w in WORLDS}
     # G_N (codebook T-028 §4; CĐ6.1): cạnh cha–con khác chủ khi cả hai span thuộc N; chỉ để bộ đánh giá đếm M5
     sp = prep['spans']
     G_N = sorted({(sp[s['cha']]['chu'], s['chu']) for s in sp.values()
@@ -489,7 +503,8 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
                   'K_I_P': {e: list(v) for e, v in xP['K_I'].items()},
                   'K_raw_P': {e: list(v) for e, v in xP['K_raw'].items()},
                   'canh': [list(c) for c in canh], 'nhom_vong_P': e5_w['P']['nhom_vong'],
-                  'doi_chung': dc, 'T4c': T4c, 'kenh_co': kenh_co, 'G_N': [list(c) for c in G_N],
+                  'doi_chung': dc, 'T4c': T4c, 'kenh_co': kenh_co, 'kenh_co_the_gioi': kenh_co_w,
+                  'G_N': [list(c) for c in G_N],
                   'don_vi_phan_vi': [_gon_pv(u['ma'], kq_pv[u['ma']]) for u in don_vi if u['loai'] == 'phan_vi']},
     }
     hop_dong.kiem_ban_ghi(rec)
@@ -507,7 +522,7 @@ def _gon_pv(ma, kq):
 
 def _gon_qs(q):
     if q.get('trang_thai') != 'OK':
-        return {'trang_thai': q.get('trang_thai')}
+        return {k: q[k] for k in ('trang_thai', 'ly_do', 'cham_NA') if k in q}
     return {'trang_thai': 'OK', 'F': list(q['F']) if q['F'] else None, 'H': list(q['H']) if q['H'] else None,
             'khe': [list(k) for k in q['khe']], 'T_chac': q['T_chac'], 'T_max': q['T_max'], 'o': q['o'],
             'the_gioi': {w: list(v) for w, v in q['the_gioi'].items()}}

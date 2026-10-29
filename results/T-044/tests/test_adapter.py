@@ -83,6 +83,8 @@ def test_adapter_re2tt(ma, tmp_path):
     assert rec['status'] == 'OK' and rec['error'] is None and h['so_ban_ghi'] == 1
     assert any(k['don_vi'] == 'metric|R_cpu' for k in rec['extra']['kenh_co'])
     assert rec['extra']['blocks_P'][0]['groups'][0] == ['R']
+    # trạng thái quan sát của nguồn metric (đặc tả v1 dòng 73; Đ19 điểm 3–4)
+    assert rec['coverage']['metric']['trang_thai'] == 'OK'
     # mã mờ, case_dir hay đường dẫn tệp lọt vào params thì pha 1 từ chối (CĐ12)
     ch2 = [dict(ch[0], tham_so_E3={'khop': 'hoan_toan', 'sim_th': 0.4, 'do_sau': 4, 'ghi_chu': 're2tt_gia_1/x'})]
     assert 're2tt_gia_1' in ca['chuoi_cam']
@@ -203,6 +205,12 @@ def test_adapter_nezha(ma, tmp_path):
     assert len(pc['coverage']['trace']['khoang']) == 3 and pc['coverage']['trace']['r_ns'] == 1
     k0 = pc['coverage']['trace']['khoang']
     assert all(a[1] < b[0] for a, b in zip(k0, k0[1:]))
+    # coverage khai theo từng nguồn metric, khóa là mã nguồn trung tính, khoảng từ cột Time của file nguồn
+    assert {k for k in pc['coverage'] if k.startswith('metric')} == set(pc['thoi_gian_nguon'])
+    for k in pc['thoi_gian_nguon']:
+        assert pc['coverage'][k]['r_ns'] == 1 and len(pc['coverage'][k]['khoang']) == 1
+        a, b = pc['coverage'][k]['khoang'][0]
+        assert a <= min(pc['thoi_gian_nguon'][k]) and max(pc['thoi_gian_nguon'][k]) <= b
     lg = ca['logs'][0]
     assert lg['message'].startswith('request 0 done') and lg['severity_raw'] in ('error', ' info ')
     assert pc['ho_so_nguon']['quy_tac_log']['kieu'] == 'severity'
@@ -215,6 +223,7 @@ def test_adapter_nezha(ma, tmp_path):
     assert rec['diagnostics']['cot_metric_chua_khai_nguon'] == []
     assert rec['diagnostics']['nguon_metric_unsupported'] == []
     assert rec['coverage']['trace']['trang_thai'] == 'OK'
+    assert all(rec['coverage'][k]['trang_thai'] == 'OK' for k in pc['thoi_gian_nguon'])
     assert any(k['don_vi'] == 'metric|cartservice_CpuUsage-m' for k in rec['extra']['kenh_co'])
     # tên file phút (mang phút tiêm) lọt vào params thì pha 1 từ chối (CĐ12)
     ch2 = [dict(ch[0], tham_so_E3={'khop': 'hoan_toan', 'sim_th': 0.4, 'do_sau': 4, 'x': '10_00_trace.csv'})]

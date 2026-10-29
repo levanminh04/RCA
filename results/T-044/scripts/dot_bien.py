@@ -63,6 +63,23 @@ DOT_BIEN = [
      'Chuỗi: cột metric không khai nguồn vẫn được chấm'),
     ('D21-chuoi-mac-dinh-ke-canh', 'src/m1/chuoi.py', "doc_nhom_vong=tham_so_E5.get('doc_nhom_vong', 'co_vong')",
      "doc_nhom_vong=tham_so_E5.get('doc_nhom_vong', 'ke_canh')", 'Chuỗi: thiếu tham_so_E5 thì dùng cách đọc A'),
+    # sau phản biện lượt 1 (LOG T-044, mục "Phản hồi phản biện lượt 1 và gói sửa")
+    ('D22-luat-C-bo-boi-so-o', 'src/m1_danh_gia/luat_c.py', "        k = boi[o]\n", "        k = 1\n",
+     'Luật C: P, M đếm mỗi ô một lần dù ô được lấy k lần'),
+    ('D23-M5-bo-boi-so', 'src/m1_danh_gia/pha2.py',
+     "            them['M5'] = (sum(_w(trong_so, o) * tat[o]['theo_the_gioi'][w]['M5'] for o in tat),",
+     "            them['M5'] = (sum(tat[o]['theo_the_gioi'][w]['M5'] for o in tat),", 'Cờ M5 nhánh tắt: bỏ bội số'),
+    ('D24-UV6-bo-boi-so', 'src/m1_danh_gia/uv6.py', "        w = c.get('trong_so', 1)\n", "        w = 1\n",
+     'UV-6: bỏ bội số'),
+    ('D25-moc-gia-bo-boi-so', 'src/m1_danh_gia/pha2.py', "    n = sum(_w(trong_so, o) for o, _, _ in giu)\n",
+     "    n = len(giu)\n", 'Mốc giả: mẫu số không theo bội số'),
+    ('D26-bo-coverage-metric', 'src/m1/chuoi.py',
+     "                qs[ng_s] = _nguon(ng_s, [m for m in tg[ng_s]['moc'] if lo_ns <= m < hi_ns])\n",
+     "                pass\n", 'Chuỗi: không xuất trạng thái quan sát của nguồn metric'),
+    ('D27-WD-cap-dau-bang', 'src/m1_danh_gia/the_gioi.py',
+     "        vuot = [e for e in chung if _truoc_han(vw[e], vw[root]) and not _truoc_han(vP[e], vP[root])]",
+     "        vuot = [e for e in chung if _truoc_han(vw[e], vw[root])]",
+     'WORLD_DEPENDENT: lấy mọi thực thể đứng trước root, kể cả thực thể đã đứng trước ở P'),
 ]
 XAO = {'D19-bo-sap-kenh-E5': '1'}
 

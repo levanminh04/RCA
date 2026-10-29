@@ -3,6 +3,9 @@
 --tao : ghi sha256, bytes của mọi file trong results/T-044 (trừ manifest.json), src/m1, src/m1_danh_gia (bỏ __pycache__),
         các lượt chạy kể cả lượt hỏng, môi trường.
 --kiem: tính lại hash, so với manifest; báo file thiếu, file thừa, hash lệch.
+File ngoài results/ (src/…) còn ghi `git_blob` (git hash-object, theo .gitattributes). Trên Windows, git chuyển
+src/*.py sang CRLF khi checkout (.gitattributes chỉ đặt -text cho results/**), nên sha256 của byte lệch dù nội dung
+cam kết không đổi. Khi đó --kiem so `git_blob` và liệt kê riêng ở `khop_git_blob`; file trong results/ vẫn so sha256.
 Chạy: python -B results/T-044/scripts/tao_manifest.py --tao ; python -B results/T-044/scripts/tao_manifest.py --kiem
 """
 import argparse
@@ -36,7 +39,15 @@ LUOT = [
     {'duong_dan': 'runs/tat-dinh-002', 'script': 'scripts/tat_dinh.py; pytest 3 hash seed × 4 thứ tự',
      'ket_qua': 'PASS (104 bản ghi, 235 phép)', 'ghi_chu': 'lượt dùng cho tiêu chí 5'},
     {'duong_dan': 'runs/kiem-hash-t043-002', 'script': 'scripts/kiem_hash_t043.py', 'ket_qua': 'PASS 69/69, 10/10',
-     'ghi_chu': 'cuối phiên'},
+     'ghi_chu': 'cuối phiên 2'},
+    {'duong_dan': 'runs/test-xanh-002', 'script': 'pytest -v, PYTHONHASHSEED=0', 'ket_qua': '246/246 qua',
+     'ghi_chu': 'sau gói sửa phản biện lượt 1; tổng hợp ở bang-phep-kiem.json (scripts/tao_bang_phep_kiem.py)'},
+    {'duong_dan': 'runs/tat-dinh-003', 'script': 'scripts/tat_dinh.py; pytest 3 hash seed × 4 thứ tự',
+     'ket_qua': 'PASS (104 bản ghi, 246 phép)', 'ghi_chu': 'sau gói sửa phản biện lượt 1'},
+    {'duong_dan': 'runs/dot-bien-003', 'script': 'scripts/dot_bien.py (27 đột biến)', 'ket_qua': '27/27 bị bắt',
+     'ghi_chu': 'sau gói sửa phản biện lượt 1; D22–D27 mới'},
+    {'duong_dan': 'runs/kiem-hash-t043-003', 'script': 'scripts/kiem_hash_t043.py', 'ket_qua': 'PASS 69/69, 10/10',
+     'ghi_chu': 'sau gói sửa phản biện lượt 1'},
 ]
 
 
@@ -46,6 +57,19 @@ def sha(p):
         for b in iter(lambda: f.read(1 << 20), b''):
             h.update(b)
     return h.hexdigest()
+
+
+def git_blob(paths):
+    """git hash-object theo đường dẫn (áp chuyển dòng của .gitattributes): cùng blob với bản đã cam kết."""
+    if not paths:
+        return {}
+    r = subprocess.run(['git', 'hash-object', '--'] + [str(p) for p in paths], cwd=ROOT, capture_output=True,
+                       text=True, check=True)
+    return dict(zip(paths, r.stdout.split()))
+
+
+def _ngoai_results(p):
+    return not str(p.relative_to(ROOT)).replace('\\', '/').startswith('results/')
 
 
 def tep():
@@ -59,18 +83,23 @@ def tep():
 
 def tao():
     head = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+    ds = tep()
+    gb = git_blob([p for p in ds if _ngoai_results(p)])
     freeze = (ROOT / 'results' / 'T-044' / 'freeze-m1.txt').read_text(encoding='utf-8').split()
     m = {
-        'schema': 'T044-manifest-v1', 'task': 'T-044',
+        'schema': 'T044-manifest-v2', 'task': 'T-044',
         'generated_at': datetime.now(timezone.utc).isoformat(timespec='seconds'),
         'git_head_khi_tao': head,
         'authorization': [['SPEC', 'tasks/T-044-cai-dat-m1/SPEC.md (đã duyệt; Q-212)'],
                           ['giai_doan_2', 'lời Minh trong chat ngày 29/10/2026: "duyệt toàn bộ các đề xuất bên trên của bạn"; '
-                                          'ghi ở LOG T-044, giai đoạn 2; dòng DECISIONS chờ Minh duyệt']],
+                                          'ghi ở LOG T-044, giai đoạn 2; dòng DECISIONS chờ Minh duyệt'],
+                          ['sua_sau_phan_bien_1', 'lời Minh trong chat ngày 29/10/2026: "DUYỆT SỬA LUÔN"; ghi ở LOG T-044, '
+                                                  'mục "Phản hồi phản biện lượt 1 và gói sửa"']],
         'trang_thai': 'xong các bước 0–9 trong phạm vi SPEC; Phần II mục A của dinh-chinh-cai-dat.md đã được Minh duyệt '
-                      '(29/10/2026); chờ phản biện',
-        'outputs': [{'path': str(p.relative_to(ROOT)).replace('\\', '/'), 'sha256': sha(p), 'bytes': p.stat().st_size}
-                    for p in tep()],
+                      '(29/10/2026); đã sửa sau phản biện lượt 1 (Phần II mục C2); chờ phản biện lượt 2',
+        'outputs': [dict({'path': str(p.relative_to(ROOT)).replace('\\', '/'), 'sha256': sha(p),
+                          'bytes': p.stat().st_size}, **({'git_blob': gb[p]} if p in gb else {}))
+                    for p in ds],
         'luot_chay': LUOT,
         'mutable_governance_links_not_hashed': ['tasks/T-044-cai-dat-m1/LOG.md', 'tasks/T-044-cai-dat-m1/SPEC.md',
                                                 'docs/STATE.md'],
@@ -87,12 +116,15 @@ def kiem():
     that = {str(p.relative_to(ROOT)).replace('\\', '/'): p for p in tep()}
     thieu = sorted(set(ghi) - set(that))
     thua = sorted(set(that) - set(ghi))
-    lech = sorted(k for k in set(ghi) & set(that) if sha(that[k]) != ghi[k]['sha256'])
+    lech_sha = sorted(k for k in set(ghi) & set(that) if sha(that[k]) != ghi[k]['sha256'])
+    gb = git_blob([that[k] for k in lech_sha if 'git_blob' in ghi[k]])
+    khop_git_blob = sorted(k for k in lech_sha if that[k] in gb and gb[that[k]] == ghi[k]['git_blob'])
+    lech = [k for k in lech_sha if k not in khop_git_blob]
     luot_thieu = [x['duong_dan'] for x in m['luot_chay']
                   if not (ROOT / 'results' / 'T-044' / x['duong_dan']).exists()]
     ok = not (thieu or thua or lech or luot_thieu)
     print(json.dumps({'so_file_manifest': len(ghi), 'so_file_that': len(that), 'thieu': thieu, 'thua': thua,
-                      'lech': lech, 'luot_thieu': luot_thieu, 'PASS': ok}, ensure_ascii=False))
+                      'lech': lech, 'khop_git_blob': khop_git_blob, 'luot_thieu': luot_thieu, 'PASS': ok}, ensure_ascii=False))
     sys.exit(0 if ok else 1)
 
 

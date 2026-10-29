@@ -192,7 +192,7 @@ Mỗi mục: chỗ; đã cài; phương án khác; ảnh hưởng. Đề xuất 
 - Nguyên nhân của WORLD_DEPENDENT (fixture 29) ghi dạng cấu trúc: loại (cổng đổi hay chỉ điểm đổi) và cặp (thực thể, kênh mạnh nhất).
 - Trong test luật C, khi đáp án không phụ thuộc ô nào thuộc E_X, hàm dựng E_X đưa các ô có ca đổi vào trước rồi thêm ô khác cho đủ số.
 - Bản ghi NO_EVIDENCE khi không có thực thể nào được xếp, như quy ước của `ban_ghi.tao` (OK cần danh sách khác rỗng).
-- Bản ghi thêm `extra.doi_chung`, `extra.T4c`, `extra.kenh_co`, `extra.G_N`, `extra.don_vi_phan_vi`, `worlds.*.don_vi_dem.*.loai_thay_doi` (tên `nhan` là trường cấm). Không trường nào chứa nhãn.
+- Bản ghi thêm `extra.doi_chung`, `extra.T4c`, `extra.kenh_co`, `extra.kenh_co_the_gioi` (kênh có cờ trong U theo từng thế giới, cho giải thích WORLD_DEPENDENT ở pha 2), `extra.G_N`, `extra.don_vi_phan_vi`, `worlds.*.don_vi_dem.*.loai_thay_doi` (tên `nhan` là trường cấm). Không trường nào chứa nhãn.
 - Mã ô của luật C phải duy nhất giữa hai dataset (hàm báo lỗi nếu trùng).
 
 ### C. Sửa đã làm trong phiên (theo đúng nguồn; ghi để kiểm)
@@ -202,6 +202,16 @@ Mỗi mục: chỗ; đã cài; phương án khác; ảnh hưởng. Đề xuất 
 - Phép tất định lộ hai phụ thuộc thứ tự: `e2.gan_canh` trả danh sách theo thứ tự đầu vào; `e5.phan_loai` ghi `inherited_by` theo thứ tự kênh đầu vào. Đã sắp theo (bên gọi, bên được gọi) và theo mã kênh (`runs/tat-dinh-000-truoc-sua/ghi-chu.md`).
 - Thiếu đáp án tự lập cho T4c (SPEC bước 3) và thứ tự T4c trong bản ghi (CĐ7): đã thêm 7 mục T4C và gắn T4c vào chuỗi.
 - Phép đột biến lộ hai lỗ hổng test (cắt con qua `chuan_bi`; cách đọc nhóm vòng mặc định): đã thêm test (`runs/dot-bien-001`, `runs/dot-bien-002`).
+
+### C2. Sửa sau phản biện lượt 1 (Codex, chat 29/10/2026; Minh duyệt "DUYỆT SỬA LUÔN" ngày 29/10/2026)
+
+Mỗi mục: lỗi; nguồn; đã sửa; phép kiểm mới. Chi tiết và phản hồi từng điểm ở LOG T-044, mục "Phản hồi phản biện lượt 1 và gói sửa".
+
+- **S1. Bội số ô chưa vào P, M, cờ M5, UV-6, mốc giả (CHẶN).** SPEC T-045 dòng 88–89: ô được lấy k lần thì tính k lần cho P/M/P′/M′, M5, UV-6 và mẫu số C-e; E_X, |E_X| và δ_d giữ từ T0. Code cũ chỉ dùng bội số cho MRR. Phản ví dụ: một ô lấy 3 lần, giảm, đếm M = 1 thay vì 3. Đã sửa: `luat_c.tong_hop` đếm ô theo bội số và bắt các ca của một ô phải cùng bội số nguyên không âm; `pha2.ket_cuc_cap` đếm M5 và truyền bội số cho UV-6; `uv6.dem` đếm theo `trong_so`; `pha2.dem_moc_gia` nhận `trong_so`. Test cũ của CĐ13 nhân đôi ca *trong cùng ô*, nên không phân biệt được "ô lấy 2 lần" với "ô có thêm ca"; đã viết lại: so ô lấy 2 lần với một ô bản sao mang mã ô mới. Đáp án mới TS2–TS5. Đột biến D22–D25.
+- **S2. Chuỗi chưa xuất trạng thái quan sát của nguồn metric (CHẶN).** Đặc tả v1 dòng 73; Đ19 điểm 3–4: báo F/H/số ô theo từng nguồn metric, hoặc UNSUPPORTED. Code cũ chỉ có `coverage.trace`, `coverage.log`. Đã sửa: `chuoi.chay` ghi `coverage[<mã nguồn metric>]` từ mốc riêng của nguồn trong cửa sổ; nguồn không có mốc riêng ghi `UNSUPPORTED` kèm `ly_do = khong_co_moc_rieng` và `cham_NA`; thiếu khai coverage ghi `UNSUPPORTED`, `ly_do = thieu_coverage`; mã nguồn metric trùng `trace`/`log` là ERROR. Adapter Nezha-OB khai coverage theo từng nguồn `metric:<dịch vụ>` từ cột Time của file nguồn (bỏ mục gộp cũ). Metric vẫn không tham gia T (PII-20). Test mới H1–H3 qua chuỗi, kiểm coverage trong test adapter. Đột biến D26.
+- **S3. Giải thích WORLD_DEPENDENT chọn nhầm cặp (CHẶN).** SPEC T-043 B1.3b dòng 464: cặp là thực thể đổi thứ tự với root. Code cũ lấy thực thể đầu bảng ở thế giới khác, kể cả khi thực thể đó đã đứng trước root ở P, và trả cặp cả khi không có thay đổi. Đã sửa: `the_gioi.nguyen_nhan` so vị trí "đứng trước hẳn" (khối khóa lớn hơn, hoặc cùng khối và nhóm trước, như PII-08) giữa P và từng thế giới; ghi `vuot`, `bi_vuot`, cặp (root, kênh mạnh nhất) – (thực thể, kênh mạnh nhất) theo từng thế giới; không có thay đổi thì `cap = None`. Pha 2 ghi `nguyen_nhan_WD` cho ca WORLD_DEPENDENT từ `extra.kenh_co_the_gioi`. Đáp án mới WD1; fixture 29 viết lại phần cấu trúc. Đột biến D27.
+- **S4. Lập luận E3 trong đề xuất WHY quá mạnh (KHÔNG CHẶN).** Khớp hoàn toàn cũng có thể gộp dòng ERROR mới qua token `<*>`. Đã sửa câu trong `de-xuat-why.md` đề xuất 1: lý do chọn (a) chỉ là bám hàm suy luận gốc; cách khớp nào giữ bằng chứng log lỗi tốt hơn là chưa kiểm, T-045 đo bằng D3. Không đổi code.
+- **N1. Manifest lệch trên Windows (người làm tự thêm, Minh duyệt cùng gói).** `.gitattributes` chỉ đặt `-text` cho `results/**`, nên git đổi `src/*.py` sang CRLF khi checkout trên Windows và sha256 lệch dù nội dung cam kết không đổi. Không sửa `.gitattributes` (ngoài phạm vi). Đã sửa `scripts/tao_manifest.py`: ghi thêm `git_blob` cho file ngoài `results/`; `--kiem` chấp nhận file lệch sha256 nhưng khớp `git_blob`, liệt kê riêng ở `khop_git_blob`. File trong `results/` vẫn so sha256.
 
 ### D. Giới hạn và phần chưa kiểm
 

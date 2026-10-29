@@ -195,6 +195,26 @@
   {"id": "MET1", "thanh_phan": "metric qua chuỗi: khai nguồn (Đ19 điểm 3), giá trị hữu hạn (đặc tả v1 dòng 110)",
    "dau_vao": {"S": "S5", "cau_hinh": "C1", "cot": "R_cpu", "moc_s": "t − 300 + 10i, i = 0…59 (30 dòng N, 30 dòng A)", "N": "10 + 0,1·(i mod 7)", "A": "50, riêng dòng A thứ 4 là NaN", "nguon": {"nguon_metric": {"R_cpu": "m"}, "thoi_gian_nguon": {"m": "metrics.time"}}},
    "dap_an": {"co_khai_nguon": {"dau": ["I", "R"], "n_A": 29, "F_raw_len": 1}, "khong_khai_nguon": {"dau": ["I"], "cot_chua_khai_nguon": ["R_cpu"]}},
-   "loi_giai": "cpu thuộc lớp tài nguyên (hop-dong.json dòng 55), hướng lên không lan. N nằm trong [10; 10,6] nên h = q95 + 0,05·|q95| < 11,2 và r_N = 0; mọi giá trị A hữu hạn (29, bỏ NaN) đều vượt h nên e = 1, cổng chính xác qua. R có khóa (1; 1; 1) bằng I (I.handle đổi ở S5), hòa ở đầu. Không khai nguồn: kênh của cột không được chấm, ghi chẩn đoán; đầu chỉ còn I."}
+   "loi_giai": "cpu thuộc lớp tài nguyên (hop-dong.json dòng 55), hướng lên không lan. N nằm trong [10; 10,6] nên h = q95 + 0,05·|q95| < 11,2 và r_N = 0; mọi giá trị A hữu hạn (29, bỏ NaN) đều vượt h nên e = 1, cổng chính xác qua. R có khóa (1; 1; 1) bằng I (I.handle đổi ở S5), hòa ở đầu. Không khai nguồn: kênh của cột không được chấm, ghi chẩn đoán; đầu chỉ còn I."},
+  {"id": "TS2", "thanh_phan": "luật C, ô theo bội số (CĐ13; SPEC T-045 dòng 88–89)",
+   "dau_vao": {"ca": [["c0", "RE2-TT", "o0"], ["c1", "RE2-TT", "o1"], ["c2", "RE2-TT", "o2"], ["c3", "RE2-TT", "o3"]], "RR_tat": 0.5, "RR_bat": {"c0": 0.49}, "boi_so": {"c0": 3}, "E_X": ["o0", "o1", "o2", "o3"], "delta_d": {"RE2-TT": "1/30"}},
+   "dap_an": {"M": 3, "P": 0, "dMRR_gop": -0.005, "ket_cuc": "HAI", "buoc": 1},
+   "loi_giai": "Phản ví dụ của Codex (lượt soát kết quả, chat 29/10/2026). o0 được lấy 3 lần nên đếm 3 ô giảm; P + P′ = 0, M + M′ = 3: HẠI riêng ở bước 1. ΔMRR = 3·(−0,01)/6 = −0,005."},
+  {"id": "TS3", "thanh_phan": "cờ M5 theo bội số (SPEC T-045 dòng 88)",
+   "dau_vao": {"ca": [["a", "RE2-TT", "o1", 3, true, false], ["b", "RE2-TT", "o2", 1, false, true], ["c", "RE2-TT", "o3", 1, false, true]], "cot": "mã, dataset, ô, bội số, M5 nhánh tắt, M5 nhánh bật", "RR": 0.5},
+   "dap_an": {"M5": [3, 2], "dieu_kien_E5": "KHONG_HAI", "M5_khong_boi_so": [1, 2], "dieu_kien_E5_khong_boi_so": "HAI"},
+   "loi_giai": "Phản ví dụ của Codex. Đếm theo bội số: nhánh tắt 3, nhánh bật 2, không lớn hơn nên không HẠI. Bỏ bội số cho 1 → 2, HẠI sai."},
+  {"id": "TS4", "thanh_phan": "UV-6 theo bội số",
+   "dau_vao": {"ca": [{"dataset": "Nezha-OB", "loai_loi": "return", "hit1_tat": 0, "hit1_bat": 1, "hang_tat": 2, "hang_bat": 1, "trong_so": 1}, {"dataset": "RE2-TT", "loai_loi": "cpu", "hit1_tat": 1, "hit1_bat": 0, "hang_tat": 1, "hang_bat": 2, "trong_so": 2}]},
+   "dap_an": {"hong": 2, "sua": 1, "vi_pham": true},
+   "loi_giai": "Ca hỏng ở RE2-TT được lấy 2 lần: 2 hỏng > 1 sửa, vi phạm. Bỏ bội số cho 1 = 1, không vi phạm."},
+  {"id": "TS5", "thanh_phan": "mẫu số mốc giả theo bội số (SPEC T-045 dòng 88)",
+   "dau_vao": {"ca": [["a", 2, "NO_INTRINSIC_ANOMALY", "CAUSE_FOUND"], ["b", 1, "INSUFFICIENT_EVIDENCE", "CAUSE_FOUND"], ["c", 1, "NO_INTRINSIC_ANOMALY", "NO_INTRINSIC_ANOMALY"]], "cot": "mã, bội số, verdict nhánh tắt, verdict nhánh bật"},
+   "dap_an": {"tat": [0, 3], "bat": [2, 3], "bi_loai": 1},
+   "loi_giai": "Cặp b bị loại (có INSUFFICIENT_EVIDENCE). Mẫu số 2 + 1 = 3; nhánh bật báo 2 (ca a lấy 2 lần)."},
+  {"id": "WD1", "thanh_phan": "giải thích WORLD_DEPENDENT (SPEC T-043 B1.3b, dòng 464)",
+   "dau_vao": {"P": ["A", "R", "B"], "S_lo": ["A", "B", "R"], "S_hi": ["A", "R", "B"], "root": "R", "kenh": "mỗi thực thể một kênh 'k'+tên, điểm 1, cờ như nhau ở ba thế giới"},
+   "dap_an": {"loai": "chi_diem_doi", "cap": [["R", "kR"], ["B", "kB"]], "theo_the_gioi": {"S_lo": {"vuot": ["B"], "bi_vuot": []}}, "khong_doi": {"cap": null, "theo_the_gioi": {}}},
+   "loi_giai": "Phản ví dụ của Codex: A luôn đứng trước R nên không là nguyên nhân; B vượt R ở S_lo. Khi cả ba thế giới cùng thứ tự A, R, B thì không có cặp nào (khong_doi)."}
  ]
 }

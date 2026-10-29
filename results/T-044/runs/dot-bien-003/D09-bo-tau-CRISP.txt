@@ -1,0 +1,52 @@
+........................................................................ [ 29%]
+.F............F......................................................... [ 58%]
+........................................................................ [ 87%]
+..............................                                           [100%]
+=================================== FAILURES ===================================
+_________________________________ test_U_CP[3] _________________________________
+
+i = 3, ma = <function ma.<locals>._gan at 0x7f93cd5fe700>
+
+    @pytest.mark.parametrize('i', [2, 3])
+    def test_U_CP(i, ma):
+        from m1 import span
+        f = fx(i)
+        ma(str(i))
+        cha, con = tuple(f['dau_vao']['cha']), [tuple(c) for c in f['dau_vao']['con']]
+        assert gan_bang(span.doc_quyen_U(cha, con), f['dap_an']['U'])
+>       assert gan_bang(span.doc_quyen_CP(cha, con, tau=1), f['dap_an']['CP'])
+E       AssertionError: assert False
+E        +  where False = gan_bang(50, 0)
+E        +    where 50 = <function doc_quyen_CP at 0x7f93cd5c87c0>((0, 100), [(0, 50.2), (50, 100)], tau=1)
+E        +      where <function doc_quyen_CP at 0x7f93cd5c87c0> = <module 'm1.span' from '/tmp/tmpeolop0i3/src/m1/span.py'>.doc_quyen_CP
+
+test_k06_e1_e2.py:14: AssertionError
+___________________________ test_E1_qua_chuan_bi[3] ____________________________
+
+i = 3, ma = <function ma.<locals>._gan at 0x7f93cc0b8fe0>
+
+    @pytest.mark.parametrize('i', [2, 3, 4, 5])
+    def test_E1_qua_chuan_bi(i, ma):
+        """Fixture 2–5 đi qua span.chuan_bi (đường chuỗi dùng thật): cắt con về cha, U, CP, đếm con vượt biên > τ."""
+        from m1 import span
+        f = fx(i)
+        ma(f'{i}-chuan-bi')
+        (c0, c1), con = f['dau_vao']['cha'], f['dau_vao']['con']
+        rows = [{'traceID': 'T', 'spanID': 'p', 'parentSpanID': '', 'owner': 'P', 'operation': 'P.op',
+                 'start_us': c0, 'duration_us': c1 - c0}]
+        for j, (a, b) in enumerate(con):
+            rows.append({'traceID': 'T', 'spanID': f'c{j}', 'parentSpanID': 'p', 'owner': 'Q', 'operation': 'Q.op',
+                         'start_us': a, 'duration_us': b - a})
+        prep = span.chuan_bi(rows, t=1000, tau=1)
+        p = prep['spans'][('T', 'p')]
+        assert gan_bang(p['u'], f['dap_an']['U'])
+        if 'CP' in f['dap_an']:
+>           assert gan_bang(p['u_CP'], f['dap_an']['CP'])
+E           assert False
+E            +  where False = gan_bang(50, 0)
+
+test_k06_e1_e2.py:95: AssertionError
+=========================== short test summary info ============================
+FAILED test_k06_e1_e2.py::test_U_CP[3] - AssertionError: assert False
+FAILED test_k06_e1_e2.py::test_E1_qua_chuan_bi[3] - assert False
+2 failed, 244 passed in 4.04s

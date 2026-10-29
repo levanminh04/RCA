@@ -1,0 +1,51 @@
+........................................................................ [ 29%]
+........................................................................ [ 58%]
+........................................................................ [ 87%]
+..............FF..............                                           [100%]
+=================================== FAILURES ===================================
+_____________________________ test_TS4_uv6_boi_so ______________________________
+
+ma = <function ma.<locals>._gan at 0x7f7fec3b9d00>
+
+    def test_TS4_uv6_boi_so(ma):
+        from m1_danh_gia import uv6
+        m = tu_lap(DAP_AN_THANH_PHAN, 'TS4')
+        ma('TS4')
+        kq = uv6.dem(m['dau_vao']['ca'])
+>       assert {k: kq[k] for k in ('hong', 'sua', 'vi_pham')} == m['dap_an']
+E       AssertionError: assert {'hong': 1, '..._pham': False} == {'hong': 2, '...i_pham': True}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'hong': 1} != {'hong': 2}
+E         {'vi_pham': False} != {'vi_pham': True}
+E         Use -v to get more diff
+
+test_k11_danh_gia.py:342: AssertionError
+____________________________ test_TS4_uv6_qua_pha2 _____________________________
+
+ma = <function ma.<locals>._gan at 0x7f7fec404360>
+
+    def test_TS4_uv6_qua_pha2(ma):
+        """Cặp E3 qua pha2.ket_cuc_cap: bội số của ca đến được UV-6."""
+        from m1_danh_gia import pha2
+        m = tu_lap(DAP_AN_THANH_PHAN, 'TS4')
+        ma('TS4-pha2')
+        ca = m['dau_vao']['ca']
+        tat = {f'c{i}': {'dataset': c['dataset'], 'o': f'o{i}', 'loai_loi': c['loai_loi'], 'hit1': c['hit1_tat'],
+                         'hang': c['hang_tat']} for i, c in enumerate(ca)}
+        bat = {f'c{i}': {'dataset': c['dataset'], 'o': f'o{i}', 'loai_loi': c['loai_loi'], 'hit1': c['hit1_bat'],
+                         'hang': c['hang_bat']} for i, c in enumerate(ca)}
+        w = {f'c{i}': c['trong_so'] for i, c in enumerate(ca)}
+        cap = pha2.ket_cuc_cap(_kq_tu_ca(tat, bat), 'T', 'B', {'o0', 'o1'}, 'E3', 'khoi_K', trong_so=w)
+>       assert cap['theo_the_gioi']['P']['UV6'] == ('HAI' if m['dap_an']['vi_pham'] else 'KHONG_HAI')
+E       AssertionError: assert 'KHONG_HAI' == 'HAI'
+E         
+E         - HAI
+E         + KHONG_HAI
+
+test_k11_danh_gia.py:359: AssertionError
+=========================== short test summary info ============================
+FAILED test_k11_danh_gia.py::test_TS4_uv6_boi_so - AssertionError: assert {'h...
+FAILED test_k11_danh_gia.py::test_TS4_uv6_qua_pha2 - AssertionError: assert '...
+2 failed, 244 passed in 4.24s

@@ -243,27 +243,160 @@ def test_phu_thuoc_quan_sat(ma):
 
 
 def test_trong_so_o(ma):
-    """CĐ13: trọng số 2 cho một ô cho cùng kết quả như nhân đôi các ca của ô đó."""
+    """CĐ13; SPEC T-045 dòng 88–89: ô o1 lấy 2 lần cho cùng ΔMRR, P, M, kết cục như thêm một ô bản sao o1′ (mã ô
+    mới, vào E_X). |E_X| khác nhau một ô nhưng cả hai đều >= 6, nên không đổi bước 4."""
     from m1_danh_gia import luat_c
     ma('TS1')
-    d = {'ca_doi': [['RE2-TT', 'o1', 0.5, 1.0], ['RE2-TT', 'o2', 0.5, 1.0], ['Nezha-OB', 'n1', 1.0, 0.5]],
-         'E_X_so_o': 8}
-    ds, tat, bat = _ca_tu_fixture(d)
-    E_X = _E_X(d, ds)
-    w = {c['ma']: (2 if c['o'] == 'o1' else 1) for c in ds}
-    kq_w = luat_c.ap_dung(ds, tat, bat, E_X, thanh_phan='X', trong_so=w, delta_d_co_dinh={'RE2-TT': Fraction(1, 30),
-                                                                                       'Nezha-OB': Fraction(1, 22)})
-    ds2, tat2, bat2 = list(ds), dict(tat), dict(bat)
-    for c in ds:
-        if c['o'] == 'o1':
-            c2 = dict(c, ma=c['ma'] + '-x2')
-            ds2.append(c2)
-            tat2[c2['ma']], bat2[c2['ma']] = tat[c['ma']], bat[c['ma']]
-    kq_x2 = luat_c.ap_dung(ds2, tat2, bat2, E_X, thanh_phan='X', delta_d_co_dinh={'RE2-TT': Fraction(1, 30),
-                                                                                  'Nezha-OB': Fraction(1, 22)})
-    assert kq_w['ket_cuc'] == kq_x2['ket_cuc']
-    assert kq_w['dMRR'] == kq_x2['dMRR']
-    assert (kq_w['P'], kq_w['M']) == (kq_x2['P'], kq_x2['M'])
+    dd = {'RE2-TT': Fraction(1, 30), 'Nezha-OB': Fraction(1, 22)}
+    for ca_doi in ([['RE2-TT', 'o1', 0.5, 1.0], ['RE2-TT', 'o2', 0.5, 1.0], ['Nezha-OB', 'n1', 1.0, 0.5]],
+                   [['RE2-TT', 'o1', 0.5, 0.25], ['RE2-TT', 'o2', 0.5, 0.25], ['RE2-TT', 'o3', 0.5, 0.25],
+                    ['Nezha-OB', 'n1', 0.5, 1.0]]):
+        d = {'ca_doi': ca_doi, 'E_X_so_o': 8}
+        ds, tat, bat = _ca_tu_fixture(d)
+        E_X = _E_X(d, ds)
+        w = {c['ma']: (2 if c['o'] == 'o1' else 1) for c in ds}
+        kq_w = luat_c.ap_dung(ds, tat, bat, E_X, thanh_phan='X', trong_so=w, delta_d_co_dinh=dd)
+        ds2, tat2, bat2 = list(ds), dict(tat), dict(bat)
+        for c in ds:
+            if c['o'] == 'o1':
+                c2 = dict(c, ma=c['ma'] + '-x2', o='o1x')
+                ds2.append(c2)
+                tat2[c2['ma']], bat2[c2['ma']] = tat[c['ma']], bat[c['ma']]
+        kq_x2 = luat_c.ap_dung(ds2, tat2, bat2, E_X | {'o1x'}, thanh_phan='X', delta_d_co_dinh=dd)
+        assert kq_w['ket_cuc'] == kq_x2['ket_cuc'] and kq_w['buoc'] == kq_x2['buoc']
+        assert kq_w['dMRR'] == kq_x2['dMRR']
+        assert (kq_w['P'], kq_w['M'], kq_w['P_phay'], kq_w['M_phay']) == \
+            (kq_x2['P'], kq_x2['M'], kq_x2['P_phay'], kq_x2['M_phay'])
+        assert kq_w['so_o_E_X'] == 8  # |E_X| cố định từ T0, không nhân bội số
+
+
+def test_trong_so_o_khac_boi_so(ma):
+    """Các ca của cùng một ô phải cùng bội số (bội số là của ô)."""
+    from m1_danh_gia import luat_c
+    ma('TS1-boi-so-o')
+    ds = [{'ma': 'a', 'dataset': 'RE2-TT', 'o': 'o1'}, {'ma': 'b', 'dataset': 'RE2-TT', 'o': 'o1'}]
+    with pytest.raises(ValueError):
+        luat_c.ap_dung(ds, {'a': 1, 'b': 1}, {'a': 1, 'b': 1}, {'o1'}, trong_so={'a': 2, 'b': 1})
+    with pytest.raises(ValueError):
+        luat_c.ap_dung(ds, {'a': 1, 'b': 1}, {'a': 1, 'b': 1}, {'o1'}, trong_so={'a': Fraction(3, 2), 'b': Fraction(3, 2)})
+
+
+def test_TS2_luat_c_boi_so(ma):
+    from m1_danh_gia import luat_c
+    m = tu_lap(DAP_AN_THANH_PHAN, 'TS2')
+    ma('TS2')
+    d, da = m['dau_vao'], m['dap_an']
+    ds = [{'ma': a, 'dataset': b, 'o': c} for a, b, c in d['ca']]
+    tat = {c['ma']: phan_so(d['RR_tat']) for c in ds}
+    bat = dict(tat, **{k: phan_so(v) for k, v in d['RR_bat'].items()})
+    kq = luat_c.ap_dung(ds, tat, bat, set(d['E_X']), thanh_phan='X', trong_so=d['boi_so'],
+                        delta_d_co_dinh={k: phan_so(v) for k, v in d['delta_d'].items()})
+    assert (kq['M'], kq['P']) == (da['M'], da['P'])
+    assert gan_bang(kq['dMRR']['gop'], da['dMRR_gop'])
+    assert (kq['ket_cuc'], kq['buoc']) == (da['ket_cuc'], da['buoc'])
+
+
+def _kq_tu_ca(ca_tat, ca_bat):
+    """Cấu trúc kết quả `pha2.cham` tối thiểu cho hai cấu hình T và B (một thế giới lặp ba lần)."""
+    def cfg(ca):
+        return {'ca': {o: {'dataset': v['dataset'], 'o': v['o'], 'loai_loi': v.get('loai_loi'),
+                           'verdict': v.get('verdict'),
+                           'theo_the_gioi': {w: {'RR': v.get('RR', Fraction(1, 2)), 'hit1': v.get('hit1', 0),
+                                                 'hang': v.get('hang'), 'M5': v.get('M5', False)}
+                                             for w in ('P', 'S_lo', 'S_hi')}} for o, v in ca.items()}}
+    return {'cau_hinh': {'T': cfg(ca_tat), 'B': cfg(ca_bat)}}
+
+
+def test_TS3_M5_boi_so(ma):
+    from m1_danh_gia import pha2
+    m = tu_lap(DAP_AN_THANH_PHAN, 'TS3')
+    ma('TS3')
+    d, da = m['dau_vao'], m['dap_an']
+    tat = {a: {'dataset': b, 'o': o, 'M5': m_t, 'RR': phan_so(d['RR'])} for a, b, o, _, m_t, _ in d['ca']}
+    bat = {a: {'dataset': b, 'o': o, 'M5': m_b, 'RR': phan_so(d['RR'])} for a, b, o, _, _, m_b in d['ca']}
+    w = {a: k for a, _, _, k, _, _ in d['ca']}
+    kq = _kq_tu_ca(tat, bat)
+    E_X = {o for _, _, o, _, _, _ in d['ca']}
+    cap = pha2.ket_cuc_cap(kq, 'T', 'B', E_X, 'E5', 'khoi_K', trong_so=w)
+    cap0 = pha2.ket_cuc_cap(kq, 'T', 'B', E_X, 'E5', 'khoi_K')
+    for x in ('P', 'S_lo', 'S_hi'):
+        assert cap['theo_the_gioi'][x]['dieu_kien_E5'] == da['dieu_kien_E5']
+        assert cap0['theo_the_gioi'][x]['dieu_kien_E5'] == da['dieu_kien_E5_khong_boi_so']
+    import m1_danh_gia.luat_c as lc
+    goc = lc.ap_dung
+    seen = []
+    try:
+        lc.ap_dung = lambda *a, **k: (seen.append((k.get('M5'), k.get('trong_so'))), goc(*a, **k))[1]
+        pha2.ket_cuc_cap(kq, 'T', 'B', E_X, 'E5', 'khoi_K', trong_so=w)
+        pha2.ket_cuc_cap(kq, 'T', 'B', E_X, 'E5', 'khoi_K')
+    finally:
+        lc.ap_dung = goc
+    assert [list(x[0]) for x in seen] == [da['M5']] * 3 + [da['M5_khong_boi_so']] * 3
+
+
+def test_TS4_uv6_boi_so(ma):
+    from m1_danh_gia import uv6
+    m = tu_lap(DAP_AN_THANH_PHAN, 'TS4')
+    ma('TS4')
+    kq = uv6.dem(m['dau_vao']['ca'])
+    assert {k: kq[k] for k in ('hong', 'sua', 'vi_pham')} == m['dap_an']
+    kq1 = uv6.dem([dict(c, trong_so=1) for c in m['dau_vao']['ca']])
+    assert kq1['vi_pham'] is False
+
+
+def test_TS4_uv6_qua_pha2(ma):
+    """Cặp E3 qua pha2.ket_cuc_cap: bội số của ca đến được UV-6."""
+    from m1_danh_gia import pha2
+    m = tu_lap(DAP_AN_THANH_PHAN, 'TS4')
+    ma('TS4-pha2')
+    ca = m['dau_vao']['ca']
+    tat = {f'c{i}': {'dataset': c['dataset'], 'o': f'o{i}', 'loai_loi': c['loai_loi'], 'hit1': c['hit1_tat'],
+                     'hang': c['hang_tat']} for i, c in enumerate(ca)}
+    bat = {f'c{i}': {'dataset': c['dataset'], 'o': f'o{i}', 'loai_loi': c['loai_loi'], 'hit1': c['hit1_bat'],
+                     'hang': c['hang_bat']} for i, c in enumerate(ca)}
+    w = {f'c{i}': c['trong_so'] for i, c in enumerate(ca)}
+    cap = pha2.ket_cuc_cap(_kq_tu_ca(tat, bat), 'T', 'B', {'o0', 'o1'}, 'E3', 'khoi_K', trong_so=w)
+    assert cap['theo_the_gioi']['P']['UV6'] == ('HAI' if m['dap_an']['vi_pham'] else 'KHONG_HAI')
+    cap0 = pha2.ket_cuc_cap(_kq_tu_ca(tat, bat), 'T', 'B', {'o0', 'o1'}, 'E3', 'khoi_K')
+    assert cap0['theo_the_gioi']['P']['UV6'] == 'KHONG_HAI'
+
+
+def test_TS5_moc_gia_boi_so(ma):
+    from m1_danh_gia import pha2
+    m = tu_lap(DAP_AN_THANH_PHAN, 'TS5')
+    ma('TS5')
+    d, da = m['dau_vao'], m['dap_an']
+    tat = {a: {'dataset': 'RE2-TT', 'o': 'o' + a, 'verdict': vt} for a, _, vt, _ in d['ca']}
+    bat = {a: {'dataset': 'RE2-TT', 'o': 'o' + a, 'verdict': vb} for a, _, _, vb in d['ca']}
+    t, b, phu = pha2.dem_moc_gia(_kq_tu_ca(tat, bat), 'T', 'B', trong_so={a: k for a, k, _, _ in d['ca']})
+    assert list(t) == da['tat'] and list(b) == da['bat'] and phu['bi_loai'] == da['bi_loai']
+
+
+def test_pha2_giai_thich_WD(ma, tmp_path):
+    """pha2.cham ghi `nguyen_nhan_WD` từ `extra.kenh_co_the_gioi` của bản ghi khi ca WORLD_DEPENDENT (WD1)."""
+    import hashlib
+    import json
+    from m1_danh_gia import pha2
+    m = tu_lap(DAP_AN_THANH_PHAN, 'WD1')
+    ma('WD1-pha2')
+    d, da = m['dau_vao'], m['dap_an']
+    b = lambda xs: [{'key': [len(xs) - i], 'groups': [[e]]} for i, e in enumerate(xs)]
+    kenh = [{'thuc_the': e, 'ten': 'k' + e, 'huong': 'len', 'lop': 'lan_nguoc', 's': 1.0, 'F_I': 1} for e in d['P']]
+    rec = {'config_id': 'C', 'opaque_id': 'x', 'status': 'OK', 'verdict': 'CAUSE_FOUND', 'blocks': b(d['P']),
+           'worlds': {w: {'blocks': b(d[w])} for w in ('S_lo', 'S_hi')},
+           'extra': {'G_N': [], 'kenh_co_the_gioi': {w: kenh for w in ('P', 'S_lo', 'S_hi')}}}
+    du_lieu = (json.dumps(rec, sort_keys=True) + '\n').encode('utf-8')
+    (tmp_path / 'ban-ghi.jsonl').write_bytes(du_lieu)
+    h = hashlib.sha256(du_lieu).hexdigest()
+    (tmp_path / 'pha1.json').write_text(json.dumps({'tep': 'ban-ghi.jsonl', 'sha256': h, 'so_ban_ghi': 1}),
+                                        encoding='utf-8')
+    kq = pha2.cham(tmp_path, h, {'x': {'root': d['root'], 'dataset': 'RE2-TT', 'o': 'o1'}})
+    c = kq['cau_hinh']['C']['ca']['x']
+    assert c['WORLD_DEPENDENT'] is True
+    nn = c['nguyen_nhan_WD']
+    assert nn['loai'] == da['loai'] and [list(x) for x in nn['cap']] == da['cap']
+    assert {w: {'vuot': v['vuot'], 'bi_vuot': v['bi_vuot']} for w, v in nn['theo_the_gioi'].items()} == \
+        da['theo_the_gioi']
 
 
 def test_D17_van_ban(ma):

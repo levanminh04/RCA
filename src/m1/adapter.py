@@ -8,7 +8,7 @@ hash), mã mờ và mốc t của lượt (chế độ (a): mốc tiêm runner t
   theo cột thời gian), không gộp khe; r theo `hop-dong.json#/quan_sat/do_phan_giai_r` (Đ9 v1.1; Đ19 điểm 4).
 - Metric: giá trị không hữu hạn thành None (đặc tả v1 dòng 110). RE2-TT một file metric mỗi ca nên
   `thoi_gian_nguon = "metrics.time"` (Đ19 điểm 3); Nezha-OB truyền mốc ns thật của từng nguồn từ `provenance` và
-  `phan_hoach_NA_da_kiem` (đã kiểm ở `nezha.doc_cua_so`). Mã nguồn là chuỗi trung tính ('metric'; 'metric:<dịch vụ>',
+  `phan_hoach_NA_da_kiem` (đã kiểm ở `nezha.doc_cua_so`); coverage khai theo từng nguồn metric. Mã nguồn là chuỗi trung tính ('metric'; 'metric:<dịch vụ>',
   'metric:front_service'), không là đường dẫn (luật cứng 6).
 - `chuoi_cam`: mã mờ, case_dir, tên thư mục ca (mang root và loại lỗi) và mọi đường dẫn tệp của ca; runner từ chối nếu chuỗi nào lọt vào đầu vào (CĐ12).
 - Log Nezha-OB: chuỗi vào Drain theo CĐ4.1; `severity_raw` theo đường đọc `hop-dong.json#/severity/Nezha-OB`.
@@ -143,17 +143,23 @@ def severity_raw_nezha(cot_log):
 
 
 def _khoang_file_nezha(sel):
-    """F trace (theo end) và log (theo mốc) của từng file phút, đọc toàn file qua `nezha._open_source` (kiểm hash)."""
-    out = {'trace': [], 'log': []}
+    """F của từng file, đọc toàn file qua `nezha._open_source` (kiểm hash): trace theo end, log theo mốc (từng file
+    phút); metric theo cột Time (từng nguồn, khóa là đường dẫn tương đối)."""
+    out = {'trace': [], 'log': [], 'metric': {}}
     csv.field_size_limit(10_000_000)
     for rel, meta in sorted(sel['files'].items()):
         kind = nezha._relative_path(rel).parts[-2]
-        if kind not in out:
-            continue
-        cot = 'EndTimeUnixNano' if kind == 'trace' else 'TimeUnixNano'
         with nezha._open_source(meta) as f:
-            x = [int(r[cot]) for r in csv.DictReader(f)]
-        if x:
+            if kind == 'metric':
+                x = [nezha.parse_time_ns(r['Time']) for r in csv.DictReader(f)]
+            else:
+                cot = 'EndTimeUnixNano' if kind == 'trace' else 'TimeUnixNano'
+                x = [int(r[cot]) for r in csv.DictReader(f)]
+        if not x:
+            continue
+        if kind == 'metric':
+            out['metric'][rel] = [min(x), max(x)]
+        else:
             out[kind].append([min(x), max(x)])
     return out
 
@@ -186,12 +192,12 @@ def ca_nezha(allowlist, opaque_id, repo_root, hop_dong, inventory=None, canh_tin
             for x, e, m in lg[['timestamp', 'container_name', 'message']].itertuples(index=False, name=None)]
     kf = _khoang_file_nezha(sel)
     r = _r_ns(hop_dong, 'Nezha-OB')
-    mk = [[min(v), max(v)] for v in nguon_ts.values() if v]
     params_ca = {
         'ho_so_nguon': ho_so_nguon(hop_dong, 'Nezha-OB'),
         'don_vi_thoi_gian': {'spans.start_us': 'us', 'metrics.time': 'ns', 'logs.timestamp': 'ns'},
-        'coverage': {'trace': {'khoang': kf['trace'], 'r_ns': r}, 'log': {'khoang': kf['log'], 'r_ns': r},
-                     'metric': {'khoang': sorted(mk), 'r_ns': r}},
+        'coverage': dict({'trace': {'khoang': kf['trace'], 'r_ns': r}, 'log': {'khoang': kf['log'], 'r_ns': r}},
+                         **{ma_nguon[rel]: {'khoang': [k], 'r_ns': r} for rel, k in kf['metric'].items()
+                            if rel in ma_nguon}),
         'nguon_metric': nguon_metric, 'thoi_gian_nguon': nguon_ts,
         'phan_hoach_NA_da_kiem': {ma: True for ma in nguon_ts}}
     if canh_tinh is not None:
