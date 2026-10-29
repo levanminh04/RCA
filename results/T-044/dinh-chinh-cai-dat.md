@@ -46,10 +46,10 @@ Câu gốc (đặc tả v1 dòng 308; SPEC T-043 dòng 671): "trong SCC của đ
 1. **Chuỗi đưa vào Drain:**
    - Nezha-OB: lấy chuỗi `log` của JSON ngoài; nếu `log` giải mã được thành JSON object có khóa `message` kiểu chuỗi thì dùng `message`, không thì dùng `log`; JSON ngoài không giải mã được thì dùng nguyên chuỗi. Quy tắc không gọi tên dịch vụ (WHY-08) và cho cùng kết quả với `log_parsing.py` dòng 94–127 của Nezha (commit `d8140101fdb4`). Việc này thuộc adapter; `severity_raw` giữ đường đọc của `hop-dong.json` dòng 69;
    - RE2-TT: cột `message` nguyên văn.
-2. **Khớp dòng A với mẫu học từ N** (`params.tham_so_E3.khop`):
-   - (a) `"hoan_toan"` — mặc định: `TemplateMiner.match(msg, full_search_strategy="fallback")` của drain3 0.9.11 ("Match shall be perfect (sim_th=1.0)", `drain3/template_miner.py` dòng 149–166);
-   - (b) `"nguong"`: khớp theo ngưỡng giống của Drain (`Drain.tree_search` với sim_th của E3, không cập nhật mẫu);
-   - (c) `"nguong_cung_lop"`: như (b) nhưng chỉ xét các mẫu cùng lớp với dòng: dòng lỗi chỉ khớp mẫu lớp lỗi; dòng không lỗi chỉ khớp mẫu lớp thường; dòng UNKNOWN khớp mọi mẫu. Đây là cơ chế mới, chưa có prior work; nếu được chọn ở T-045 thì cần WHY;
+2. **Khớp dòng A với mẫu học từ N** (`params.tham_so_E3.khop`). Theo Đ15 điểm 5, cả ba cách chỉ xét **mẫu đã biết của chính thực thể** (mẫu có ít nhất một dòng N của thực thể đó):
+   - (a) `"hoan_toan"` — mặc định: khớp hoàn toàn như `Drain.match(…, full_search_strategy="fallback")` của drain3 0.9.11 ("Match shall be perfect (sim_th=1.0)", `drain3/template_miner.py` dòng 149–166): đi cây tiền tố rồi `fast_match` với sim_th = 1,0 và tham số `<*>` khớp mọi token; không thấy thì tìm hết các mẫu cùng số token;
+   - (b) `"nguong"`: như `Drain.tree_search` (đi cây tiền tố, rồi `fast_match` với sim_th của E3, không tính tham số); không cập nhật mẫu;
+   - (c) `"nguong_cung_lop"`: như (b) nhưng chỉ xét các mẫu cùng lớp với dòng, lớp lấy theo cặp (thực thể, mẫu): dòng lỗi chỉ khớp mẫu lớp lỗi; dòng không lỗi chỉ khớp mẫu lớp thường; dòng UNKNOWN khớp mọi mẫu đã biết. Đây là cơ chế mới, chưa có prior work; nếu được chọn ở T-045 thì cần WHY;
    - không khớp thì dòng vào ô "mẫu mới" của thực thể. Mọi cách khớp không học thêm từ A.
 3. **Che token (đổi thiết kế: bỏ "chuỗi trong ngoặc" của đặc tả v1 dòng 227 và SPEC T-043 dòng 636):** che theo thứ tự, với ranh giới không dính chữ hoặc số (`(?<![A-Za-z0-9])…(?![A-Za-z0-9])`):
    - UUID 8-4-4-4-12 chữ số hex → `<UUID>`;
@@ -58,7 +58,7 @@ Câu gốc (đặc tả v1 dòng 308; SPEC T-043 dòng 671): "trong SCC của đ
    - số nguyên hoặc thập phân, có dấu tùy chọn → `<NUM>`;
    - tắt phần che sẵn của drain3 (không có masking instruction).
    - Lý do bỏ che ngoặc: TrainTicket v1.0.0 trong repo (`results/T-038/sources/train-ticket-v1.0.0/`) ghi log dạng `[method][…][…][…]`; che nội dung trong ngoặc gộp mọi thông điệp cùng số nhóm ngoặc thành một token, gộp cả dòng lỗi với dòng thường. Chưa xác nhận RE2-TT chạy đúng bản này.
-4. **Thứ tự học:** dòng N của mỗi thực thể đưa vào Drain theo thứ tự (mốc ns, thực thể, nội dung). Mỗi thực thể có một Drain riêng (đặc tả: mẫu theo (thực thể, mẫu)).
+4. **Thứ tự học:** mọi dòng N quan sát được của thế giới đang tính, của mọi thực thể, đưa vào **một Drain chung** (Đ15 điểm 5: "Drain học chung cho mọi thực thể"), theo thứ tự (mốc ns, thực thể, nội dung). Đơn vị phân loại và kênh là cặp (thực thể, mẫu) (Đ15 điểm 2).
 5. **Ngưỡng:** giữ sim_th = 0,4, độ sâu 4 (đặc tả v1 dòng 228). Chưa có WHY; người làm soạn và trình riêng.
 6. **Tham số drain3 còn lại:** mặc định 0.9.11 (`drain3/drain.py` dòng 54–61): max_children 100, max_clusters không giới hạn, extra_delimiters rỗng, parametrize_numeric_tokens True.
 
