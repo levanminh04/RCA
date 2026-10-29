@@ -223,3 +223,41 @@ def test_E9_tat_tren_canh_E2(ma):
         p = e5.phan_loai(kenh, [tuple(c) for c in d['canh']], bat=True,
                          e9={'bat': True, 'o_s': 10, 'tau': 0.001, 'canh_E2_bat_thuong': canh_E2})
         assert sorted([list(x) for x in p['ke_thua']]) == sorted(m['dap_an'][nhanh]['ke_thua']), nhanh
+
+
+@pytest.mark.parametrize('muc', ['SCC1', 'SCC2', 'SCC3', 'SCC4'])
+def test_nhom_vong_mac_dinh_la_C_phay(muc, ma):
+    """CĐ5: không truyền cách đọc thì dùng C′ ('co_vong'), cả ở e5.phan_loai lẫn ở chuỗi khi thiếu tham_so_E5."""
+    from m1 import chuoi
+    m = tu_lap(DAP_AN_THANH_PHAN, muc)
+    ma(f'{muc}-mac-dinh')
+    ca = dict(m['dau_vao'], E5=True)
+    p, xh = _chay_E5(ca)
+    da = m['dap_an']['co_vong']
+    assert sorted([list(x) for x in p['ke_thua']]) == sorted(da['ke_thua'])
+    assert xh['thu_tu'] == da['thu_tu']
+    kenh = kenh_tu_fixture(ca['kenh'])
+    kq = chuoi.xep_tu_kenh_fixture(ca['kenh'], [tuple(c) for c in ca['canh']], bat_E5=True)
+    assert kq['thu_tu'] == da['thu_tu'] and kenh
+
+
+def test_chuoi_thieu_tham_so_E5_dung_C_phay(ma, monkeypatch):
+    """Chuỗi: thiếu tham_so_E5 thì gọi E5 với cách đọc C′ ('co_vong'); có thì truyền đúng giá trị (CĐ5)."""
+    from m1 import chuoi, e5
+    import sinh_trace_S
+    from conftest import FIXTURE
+    ma('E5-mac-dinh-chuoi')
+    spans, logs = sinh_trace_S.sinh('S3', t=1000, mau=FIXTURE['trace_mau_S'])
+    p1 = sinh_trace_S.params({'E1': 'U', 'E2': 'VC', 'E3b': True, 'E5': True})
+    p0 = {k: v for k, v in p1.items() if k != 'tham_so_E5'}
+    pA = dict(p1, tham_so_E5={'doc_nhom_vong': 'ke_canh'})
+    goc, nhan = e5.phan_loai, []
+
+    def ghi(*a, **kw):
+        nhan.append(kw.get('doc_nhom_vong'))
+        return goc(*a, **kw)
+    monkeypatch.setattr(e5, 'phan_loai', ghi)
+    for p, mong in ((p0, 'co_vong'), (p1, 'co_vong'), (pA, 'ke_canh')):
+        nhan.clear()
+        rec = chuoi.chay(spans, [], logs, ['A', 'B', 'F', 'I', 'R', 'X'], {}, 1000, p)
+        assert rec['error'] is None and nhan and set(nhan) == {mong}

@@ -74,3 +74,24 @@ def test_E2VC_qua_25_dinh(ma):
     kq = e2.gan_canh(canh, che_do='VC')
     assert kq['du_phong'] is True
     assert all(g[2] == g[1] and g[3] == 'khong_dinh_danh' for g in kq['gan'])
+
+
+@pytest.mark.parametrize('i', [2, 3, 4, 5])
+def test_E1_qua_chuan_bi(i, ma):
+    """Fixture 2–5 đi qua span.chuan_bi (đường chuỗi dùng thật): cắt con về cha, U, CP, đếm con vượt biên > τ."""
+    from m1 import span
+    f = fx(i)
+    ma(f'{i}-chuan-bi')
+    (c0, c1), con = f['dau_vao']['cha'], f['dau_vao']['con']
+    rows = [{'traceID': 'T', 'spanID': 'p', 'parentSpanID': '', 'owner': 'P', 'operation': 'P.op',
+             'start_us': c0, 'duration_us': c1 - c0}]
+    for j, (a, b) in enumerate(con):
+        rows.append({'traceID': 'T', 'spanID': f'c{j}', 'parentSpanID': 'p', 'owner': 'Q', 'operation': 'Q.op',
+                     'start_us': a, 'duration_us': b - a})
+    prep = span.chuan_bi(rows, t=1000, tau=1)
+    p = prep['spans'][('T', 'p')]
+    assert gan_bang(p['u'], f['dap_an']['U'])
+    if 'CP' in f['dap_an']:
+        assert gan_bang(p['u_CP'], f['dap_an']['CP'])
+    if 'vuot_bien_qua_1ms' in f['dap_an']:
+        assert prep['chan_doan']['con_vuot_bien_cha'] == f['dap_an']['vuot_bien_qua_1ms']

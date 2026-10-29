@@ -1,0 +1,26 @@
+.....................................................................F.. [ 31%]
+........................................................................ [ 63%]
+........................................................................ [ 95%]
+..........                                                               [100%]
+=================================== FAILURES ===================================
+_________________________________ test_U_CP[3] _________________________________
+
+i = 3, ma = <function ma.<locals>._gan at 0x7fe3838d4f40>
+
+    @pytest.mark.parametrize('i', [2, 3])
+    def test_U_CP(i, ma):
+        from m1 import span
+        f = fx(i)
+        ma(str(i))
+        cha, con = tuple(f['dau_vao']['cha']), [tuple(c) for c in f['dau_vao']['con']]
+        assert gan_bang(span.doc_quyen_U(cha, con), f['dap_an']['U'])
+>       assert gan_bang(span.doc_quyen_CP(cha, con, tau=1), f['dap_an']['CP'])
+E       AssertionError: assert False
+E        +  where False = gan_bang(50, 0)
+E        +    where 50 = <function doc_quyen_CP at 0x7fe383883880>((0, 100), [(0, 50.2), (50, 100)], tau=1)
+E        +      where <function doc_quyen_CP at 0x7fe383883880> = <module 'm1.span' from '/tmp/tmpvjvfrb5a/src/m1/span.py'>.doc_quyen_CP
+
+test_k06_e1_e2.py:14: AssertionError
+=========================== short test summary info ============================
+FAILED test_k06_e1_e2.py::test_U_CP[3] - AssertionError: assert False
+1 failed, 225 passed in 3.42s

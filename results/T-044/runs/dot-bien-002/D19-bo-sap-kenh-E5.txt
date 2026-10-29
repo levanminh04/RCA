@@ -1,0 +1,35 @@
+........................................................................ [ 30%]
+........................................................................ [ 61%]
+........................................................................ [ 91%]
+...........F.......                                                      [100%]
+=================================== FAILURES ===================================
+__________________________ test_hai_pha_hash_on_dinh ___________________________
+
+ma = <function ma.<locals>._gan at 0x7f4e47f6d260>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-71/test_hai_pha_hash_on_dinh0')
+
+    def test_hai_pha_hash_on_dinh(ma, tmp_path):
+        """Pha 1 không đọc nhãn, ghi bản ghi và hash; chạy lại cho cùng hash. Pha 2 đọc bản ghi đã băm và nhãn."""
+        from m1 import runner
+        from m1_danh_gia import pha2
+        import sinh_trace_S
+        from conftest import FIXTURE
+        ma('runner-hai-pha')
+        spans, logs = sinh_trace_S.sinh('S1', t=1000, mau=FIXTURE['trace_mau_S'])
+        ca = [{'opaque_id': 'gia-001', 'dataset': 'RE2-TT', 'spans': spans, 'metrics': [], 'logs': logs,
+               'inventory': ['A', 'B', 'F', 'I', 'R', 'X'], 'aliases': {}}]
+        moc = {'gia-001': 1000}
+        cau_hinh = [{'config_id': 'R0', 'params': sinh_trace_S.params({})},
+                    {'config_id': 'C1', 'params': sinh_trace_S.params({'E1': 'U'})}]
+        h1 = runner.pha1(ca, moc, cau_hinh, tmp_path / 'l1')
+        h2 = runner.pha1(ca, moc, cau_hinh, tmp_path / 'l2')
+>       assert h1['sha256'] == h2['sha256']
+E       AssertionError: assert '167effd84a56...2243e22686672' == '63555448a8e8...ce2be416561a3'
+E         
+E         - 63555448a8e830e99087dc6abac033b34536e927c9e04dd2928ce2be416561a3
+E         + 167effd84a569266e3ae8d4dd01320e80b2ada22dd9c764d94f2243e22686672
+
+test_runner.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED test_runner.py::test_hai_pha_hash_on_dinh - AssertionError: assert '16...
+1 failed, 234 passed in 3.44s

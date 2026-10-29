@@ -1,0 +1,38 @@
+.............F.......................................................... [ 30%]
+........................................................................ [ 61%]
+........................................................................ [ 91%]
+...................                                                      [100%]
+=================================== FAILURES ===================================
+______________________________ test_khe_file[B1] _______________________________
+
+ma_b = 'B1', ma = <function ma.<locals>._gan at 0x7f6a0ceb99e0>
+
+    @pytest.mark.parametrize('ma_b', ['B1', 'B8'])
+    def test_khe_file(ma_b, ma):
+        from m1 import quan_sat
+        f = bx(ma_b)
+        ma(ma_b)
+        d = f['dau_vao']
+        r = d['r_s']
+        khoang = [quan_sat.khoang_file(moc, r) for moc in d['file']]
+        moc_tat_ca = sorted(x for moc in d['file'] for x in moc)
+        kq = quan_sat.tinh_nguon(file_khoang=khoang, moc_ban_ghi=moc_tat_ca, r=r, cua_so=tuple(d['cua_so']),
+                                 phia={k: tuple(v) for k, v in d['phia'].items()}, o_s=10)
+        da = f['dap_an']
+        assert [list(k) for k in kq['khe']] == da['khe']
+        assert kq['T_chac'] == da['T_chac']
+        assert kq['T_max'] == da['T_max']
+        assert kq['thieu_thu'] == da['thieu_thu_s']
+>       assert {k: list(v) for k, v in kq['the_gioi'].items()} == da['the_gioi']
+E       AssertionError: assert {'P': [14, 6]..._lo': [14, 6]} == {'P': [14, 6]..._lo': [15, 6]}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'S_lo': [14, 6]} != {'S_lo': [15, 6]}
+E         {'S_hi': [15, 6]} != {'S_hi': [14, 6]}
+E         Use -v to get more diff
+
+test_k02_quan_sat.py:49: AssertionError
+=========================== short test summary info ============================
+FAILED test_k02_quan_sat.py::test_khe_file[B1] - AssertionError: assert {'P':...
+1 failed, 234 passed in 3.39s

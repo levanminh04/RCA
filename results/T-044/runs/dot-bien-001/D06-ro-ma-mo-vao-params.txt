@@ -1,0 +1,223 @@
+F.F..................................................................... [ 31%]
+........................................................................ [ 63%]
+........................................................................ [ 95%]
+..F...F...                                                               [100%]
+=================================== FAILURES ===================================
+______________________________ test_adapter_re2tt ______________________________
+
+ma = <function ma.<locals>._gan at 0x7f6ee783b4c0>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-37/test_adapter_re2tt0')
+
+    def test_adapter_re2tt(ma, tmp_path):
+        from p3 import selector
+        from m1 import adapter, runner
+        import sinh_trace_S
+        ma('adapter-re2tt')
+        t = 1000
+        p, spans, rows = _re2(tmp_path, t)
+        allow = selector.nap_allowlist(p)
+        ca = adapter.ca_re2tt(allow, 'dev-0123456789', t, tmp_path, HOP_DONG, U_S)
+        assert len(ca['spans']) == len(spans)  # hai span ngoài miền bị cắt như cua_so.cat_span
+        en = [r['startTime'] + r['duration'] for r in rows]
+        pc = ca['params_ca']
+        assert pc['coverage']['trace'] == {'khoang': [[min(en) * 1000, max(en) * 1000]], 'r_ns': 1000}
+        assert pc['coverage']['metric'] == {'khoang': [[(t - 720) * 10 ** 9, (t + 720) * 10 ** 9]], 'r_ns': 10 ** 9}
+        assert pc['coverage']['log'] == {'khoang': [[(t - 500) * 10 ** 9, (t + 100) * 10 ** 9]], 'r_ns': 10 ** 9}
+        assert len(ca['metrics']) == 600 and ca['metrics'][0]['time'] == t - 300
+        assert next(r for r in ca['metrics'] if r['time'] == t + 3)['R_cpu'] is None
+        assert [l['message'] for l in ca['logs']] == ['INFO request accepted', 'ERROR request failed']
+        assert pc['nguon_metric'] == {'A_latency-90': 'metric', 'R_cpu': 'metric'}
+        assert pc['thoi_gian_nguon'] == {'metric': 'metrics.time'}
+        assert pc['ho_so_nguon']['kenh_metric']['bang'] == HOP_DONG['kenh']['RE2-TT']['metric_theo_hau_to']
+        assert pc['don_vi_thoi_gian'] == {'spans.start_us': 'us', 'metrics.time': 's', 'logs.timestamp': 's'}
+        assert 'data/rcaeval/re2tt_gia_1' in ca['chuoi_cam']
+        # chạy pha 1 trên ca của adapter: cpu của R có cờ (S1, E1-U)
+        ch = [{'config_id': 'C1', 'bat_tat': dict(runner.R0, E1='U'), 'tham_so_E4': dict(runner.TS_HOP_DONG)}]
+>       h = runner.pha1([ca], {'dev-0123456789': t}, ch, tmp_path / 'l')
+
+test_adapter.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ca = [{'aliases': {}, 'case_dir': 'data/rcaeval/re2tt_gia_1', 'chan_doan_adapter': {'co_file_log': True, 'cot_log': ['times...e2tt_gia_1/logs.parquet', 'data/rcaeval/re2tt_gia_1/metrics.parquet', 'data/rcaeval/re2tt_gia_1/traces.parquet'], ...}]
+moc = {'dev-0123456789': 1000}
+cau_hinh = [{'bat_tat': {'E1': 'U', 'E2': 'tat', 'E3': False, 'E3b': False, ...}, 'config_id': 'C1', 'tham_so_E4': {'alpha': 0.01, 'count_min': 10, 'epsilon': 0.05, 'm_metric': 5, ...}}]
+thu_muc = PosixPath('/tmp/pytest-of-root/pytest-37/test_adapter_re2tt0/l')
+
+    def pha1(ca, moc, cau_hinh, thu_muc):
+        """ca: [{'opaque_id', 'spans', 'metrics', 'logs', 'inventory', 'aliases', 'params_ca'?, 'case_dir'?, 'chuoi_cam'?}];
+        moc: {mã mờ: t} (giây); cau_hinh: [{'config_id', 'params'} hoặc {'config_id', 'bat_tat', 'tham_so_E4', ...}].
+        Ghi `ban-ghi.jsonl` (JSON chuẩn hóa, sắp theo cấu hình rồi ca), `pha1.json` (hash) và `thoi-gian.json` (không băm).
+        Không đọc nhãn: chỉ nhận mã mờ và mốc t."""
+        thu_muc = Path(thu_muc)
+        thu_muc.mkdir(parents=True, exist_ok=True)
+        cam = sorted({c['opaque_id'] for c in ca} | {c['case_dir'] for c in ca if c.get('case_dir')}
+                     | {x for c in ca for x in (c.get('chuoi_cam') or []) if x})
+        dong, tg = [], {}
+        for ch in sorted(cau_hinh, key=lambda c: c['config_id']):
+            for c in sorted(ca, key=lambda x: x['opaque_id']):
+                p = _params(ch, c)
+                vp = hop_dong.vi_pham_gia_tri(p, c.get('aliases') or {}, c.get('inventory') or [], cam)
+                if vp:
+>                   raise LoiRoNhan(f'chuỗi cấm trong đầu vào của phương pháp: {sorted(set(x[0] for x in vp))}')
+E                   m1.runner.LoiRoNhan: chuỗi cấm trong đầu vào của phương pháp: ['params']
+
+../../../src/m1/runner.py:203: LoiRoNhan
+______________________________ test_adapter_nezha ______________________________
+
+ma = <function ma.<locals>._gan at 0x7f6ed75f8ea0>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-37/test_adapter_nezha0')
+
+    def test_adapter_nezha(ma, tmp_path):
+        from p3 import nezha
+        from m1 import adapter, runner
+        ma('adapter-nezha')
+        p, t = _nezha(tmp_path)
+        allow = nezha.nap_allowlist(p)
+        ca = adapter.ca_nezha(allow, 'dev-abcdef0123', tmp_path, HOP_DONG)
+        pc = ca['params_ca']
+        assert ca['t'] * 10 ** 9 == t and ca['inventory'] == nezha.UNIVERSE
+        assert len(ca['metrics']) == 10 and len(pc['nguon_metric']) == 165
+        assert len(pc['thoi_gian_nguon']) == 11 and all(len(v) == 10 for v in pc['thoi_gian_nguon'].values())
+        assert pc['nguon_metric']['frontend_FrontSuccessRate-pct'] == 'metric:front_service'
+        assert pc['nguon_metric']['frontend_CpuUsage-m'] == 'metric:frontend'
+        assert pc['phan_hoach_NA_da_kiem'] == {k: True for k in pc['thoi_gian_nguon']}
+        assert not any('/' in v for v in pc['nguon_metric'].values())
+        # F trace, log: một khoảng mỗi file phút (ba file, có khe), r = 1 ns
+        assert len(pc['coverage']['trace']['khoang']) == 3 and pc['coverage']['trace']['r_ns'] == 1
+        k0 = pc['coverage']['trace']['khoang']
+        assert all(a[1] < b[0] for a, b in zip(k0, k0[1:]))
+        lg = ca['logs'][0]
+        assert lg['message'].startswith('request 0 done') and lg['severity_raw'] in ('error', ' info ')
+        assert pc['ho_so_nguon']['quy_tac_log']['kieu'] == 'severity'
+        assert pc['don_vi_thoi_gian'] == {'spans.start_us': 'us', 'metrics.time': 'ns', 'logs.timestamp': 'ns'}
+        assert any(x.endswith('10_00_trace.csv') for x in ca['chuoi_cam'])
+        ch = [{'config_id': 'C1', 'bat_tat': dict(runner.R0, E1='U', E3=True), 'tham_so_E4': dict(runner.TS_HOP_DONG)}]
+>       runner.pha1([ca], {'dev-abcdef0123': ca['t']}, ch, tmp_path / 'l')
+
+test_adapter.py:212: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ca = [{'aliases': {}, 'chan_doan_adapter': {'cot_metric': 165, 'cua_so': {'A_ns': [1661162400000000000, 1661162700000000000...'inventory': ['adservice', 'cartservice', 'checkoutservice', 'currencyservice', 'emailservice', 'frontend', ...], ...}]
+moc = {'dev-abcdef0123': 1661162400}
+cau_hinh = [{'bat_tat': {'E1': 'U', 'E2': 'tat', 'E3': True, 'E3b': False, ...}, 'config_id': 'C1', 'tham_so_E4': {'alpha': 0.01, 'count_min': 10, 'epsilon': 0.05, 'm_metric': 5, ...}}]
+thu_muc = PosixPath('/tmp/pytest-of-root/pytest-37/test_adapter_nezha0/l')
+
+    def pha1(ca, moc, cau_hinh, thu_muc):
+        """ca: [{'opaque_id', 'spans', 'metrics', 'logs', 'inventory', 'aliases', 'params_ca'?, 'case_dir'?, 'chuoi_cam'?}];
+        moc: {mã mờ: t} (giây); cau_hinh: [{'config_id', 'params'} hoặc {'config_id', 'bat_tat', 'tham_so_E4', ...}].
+        Ghi `ban-ghi.jsonl` (JSON chuẩn hóa, sắp theo cấu hình rồi ca), `pha1.json` (hash) và `thoi-gian.json` (không băm).
+        Không đọc nhãn: chỉ nhận mã mờ và mốc t."""
+        thu_muc = Path(thu_muc)
+        thu_muc.mkdir(parents=True, exist_ok=True)
+        cam = sorted({c['opaque_id'] for c in ca} | {c['case_dir'] for c in ca if c.get('case_dir')}
+                     | {x for c in ca for x in (c.get('chuoi_cam') or []) if x})
+        dong, tg = [], {}
+        for ch in sorted(cau_hinh, key=lambda c: c['config_id']):
+            for c in sorted(ca, key=lambda x: x['opaque_id']):
+                p = _params(ch, c)
+                vp = hop_dong.vi_pham_gia_tri(p, c.get('aliases') or {}, c.get('inventory') or [], cam)
+                if vp:
+>                   raise LoiRoNhan(f'chuỗi cấm trong đầu vào của phương pháp: {sorted(set(x[0] for x in vp))}')
+E                   m1.runner.LoiRoNhan: chuỗi cấm trong đầu vào của phương pháp: ['params']
+
+../../../src/m1/runner.py:203: LoiRoNhan
+__________________________ test_hai_pha_hash_on_dinh ___________________________
+
+ma = <function ma.<locals>._gan at 0x7f6ed4297240>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-37/test_hai_pha_hash_on_dinh0')
+
+    def test_hai_pha_hash_on_dinh(ma, tmp_path):
+        """Pha 1 không đọc nhãn, ghi bản ghi và hash; chạy lại cho cùng hash. Pha 2 đọc bản ghi đã băm và nhãn."""
+        from m1 import runner
+        from m1_danh_gia import pha2
+        import sinh_trace_S
+        from conftest import FIXTURE
+        ma('runner-hai-pha')
+        spans, logs = sinh_trace_S.sinh('S1', t=1000, mau=FIXTURE['trace_mau_S'])
+        ca = [{'opaque_id': 'gia-001', 'dataset': 'RE2-TT', 'spans': spans, 'metrics': [], 'logs': logs,
+               'inventory': ['A', 'B', 'F', 'I', 'R', 'X'], 'aliases': {}}]
+        moc = {'gia-001': 1000}
+        cau_hinh = [{'config_id': 'R0', 'params': sinh_trace_S.params({})},
+                    {'config_id': 'C1', 'params': sinh_trace_S.params({'E1': 'U'})}]
+>       h1 = runner.pha1(ca, moc, cau_hinh, tmp_path / 'l1')
+
+test_runner.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ca = [{'aliases': {}, 'dataset': 'RE2-TT', 'inventory': ['A', 'B', 'F', 'I', 'R', 'X'], 'logs': [], ...}]
+moc = {'gia-001': 1000}
+cau_hinh = [{'config_id': 'R0', 'params': {'bat_tat': {'E1': 'tat', 'E2': 'tat', 'E3': False, 'E3b': False, ...}, 'config_id': 'S.....]], 'r_ns': 1000}}, 'don_vi_thoi_gian': {'logs.timestamp': 'ns', 'metrics.time': 's', 'spans.start_us': 'us'}, ...}}]
+thu_muc = PosixPath('/tmp/pytest-of-root/pytest-37/test_hai_pha_hash_on_dinh0/l1')
+
+    def pha1(ca, moc, cau_hinh, thu_muc):
+        """ca: [{'opaque_id', 'spans', 'metrics', 'logs', 'inventory', 'aliases', 'params_ca'?, 'case_dir'?, 'chuoi_cam'?}];
+        moc: {mã mờ: t} (giây); cau_hinh: [{'config_id', 'params'} hoặc {'config_id', 'bat_tat', 'tham_so_E4', ...}].
+        Ghi `ban-ghi.jsonl` (JSON chuẩn hóa, sắp theo cấu hình rồi ca), `pha1.json` (hash) và `thoi-gian.json` (không băm).
+        Không đọc nhãn: chỉ nhận mã mờ và mốc t."""
+        thu_muc = Path(thu_muc)
+        thu_muc.mkdir(parents=True, exist_ok=True)
+        cam = sorted({c['opaque_id'] for c in ca} | {c['case_dir'] for c in ca if c.get('case_dir')}
+                     | {x for c in ca for x in (c.get('chuoi_cam') or []) if x})
+        dong, tg = [], {}
+        for ch in sorted(cau_hinh, key=lambda c: c['config_id']):
+            for c in sorted(ca, key=lambda x: x['opaque_id']):
+                p = _params(ch, c)
+                vp = hop_dong.vi_pham_gia_tri(p, c.get('aliases') or {}, c.get('inventory') or [], cam)
+                if vp:
+>                   raise LoiRoNhan(f'chuỗi cấm trong đầu vào của phương pháp: {sorted(set(x[0] for x in vp))}')
+E                   m1.runner.LoiRoNhan: chuỗi cấm trong đầu vào của phương pháp: ['params']
+
+../../../src/m1/runner.py:203: LoiRoNhan
+____________________________ test_pha2_M5_va_luat_C ____________________________
+
+ma = <function ma.<locals>._gan at 0x7f6ed41ec180>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-37/test_pha2_M5_va_luat_C0')
+
+    def test_pha2_M5_va_luat_C(ma, tmp_path):
+        """Pha 2 trên S1: cờ M5 đọc G_N từ bản ghi (R0: A, F đứng trước R và có đường tới R); luật C ba thế giới."""
+        from fractions import Fraction
+        from m1 import runner
+        from m1_danh_gia import pha2
+        import sinh_trace_S
+        from conftest import FIXTURE
+        ma('pha2-M5-luat-C')
+        spans, logs = sinh_trace_S.sinh('S1', t=1000, mau=FIXTURE['trace_mau_S'])
+        ca = [{'opaque_id': 'gia-001', 'spans': spans, 'metrics': [], 'logs': logs,
+               'inventory': ['A', 'B', 'F', 'I', 'R', 'X'], 'aliases': {}}]
+        cau_hinh = [{'config_id': 'R0', 'params': sinh_trace_S.params({})},
+                    {'config_id': 'C1', 'params': sinh_trace_S.params({'E1': 'U'})}]
+>       h = runner.pha1(ca, {'gia-001': 1000}, cau_hinh, tmp_path / 'l')
+
+test_runner.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ca = [{'aliases': {}, 'inventory': ['A', 'B', 'F', 'I', 'R', 'X'], 'logs': [], 'metrics': [], ...}]
+moc = {'gia-001': 1000}
+cau_hinh = [{'config_id': 'R0', 'params': {'bat_tat': {'E1': 'tat', 'E2': 'tat', 'E3': False, 'E3b': False, ...}, 'config_id': 'S.....]], 'r_ns': 1000}}, 'don_vi_thoi_gian': {'logs.timestamp': 'ns', 'metrics.time': 's', 'spans.start_us': 'us'}, ...}}]
+thu_muc = PosixPath('/tmp/pytest-of-root/pytest-37/test_pha2_M5_va_luat_C0/l')
+
+    def pha1(ca, moc, cau_hinh, thu_muc):
+        """ca: [{'opaque_id', 'spans', 'metrics', 'logs', 'inventory', 'aliases', 'params_ca'?, 'case_dir'?, 'chuoi_cam'?}];
+        moc: {mã mờ: t} (giây); cau_hinh: [{'config_id', 'params'} hoặc {'config_id', 'bat_tat', 'tham_so_E4', ...}].
+        Ghi `ban-ghi.jsonl` (JSON chuẩn hóa, sắp theo cấu hình rồi ca), `pha1.json` (hash) và `thoi-gian.json` (không băm).
+        Không đọc nhãn: chỉ nhận mã mờ và mốc t."""
+        thu_muc = Path(thu_muc)
+        thu_muc.mkdir(parents=True, exist_ok=True)
+        cam = sorted({c['opaque_id'] for c in ca} | {c['case_dir'] for c in ca if c.get('case_dir')}
+                     | {x for c in ca for x in (c.get('chuoi_cam') or []) if x})
+        dong, tg = [], {}
+        for ch in sorted(cau_hinh, key=lambda c: c['config_id']):
+            for c in sorted(ca, key=lambda x: x['opaque_id']):
+                p = _params(ch, c)
+                vp = hop_dong.vi_pham_gia_tri(p, c.get('aliases') or {}, c.get('inventory') or [], cam)
+                if vp:
+>                   raise LoiRoNhan(f'chuỗi cấm trong đầu vào của phương pháp: {sorted(set(x[0] for x in vp))}')
+E                   m1.runner.LoiRoNhan: chuỗi cấm trong đầu vào của phương pháp: ['params']
+
+../../../src/m1/runner.py:203: LoiRoNhan
+=========================== short test summary info ============================
+FAILED test_adapter.py::test_adapter_re2tt - m1.runner.LoiRoNhan: chuỗi cấm t...
+FAILED test_adapter.py::test_adapter_nezha - m1.runner.LoiRoNhan: chuỗi cấm t...
+FAILED test_runner.py::test_hai_pha_hash_on_dinh - m1.runner.LoiRoNhan: chuỗi...
+FAILED test_runner.py::test_pha2_M5_va_luat_C - m1.runner.LoiRoNhan: chuỗi cấ...
+4 failed, 222 passed in 3.19s

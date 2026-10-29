@@ -1,0 +1,32 @@
+........................................................................ [ 30%]
+........................................................................ [ 61%]
+........................................................................ [ 91%]
+................F..                                                      [100%]
+=================================== FAILURES ===================================
+________________________ test_khong_import_bo_danh_gia _________________________
+
+ma = <function ma.<locals>._gan at 0x7ff4d44114e0>
+
+    def test_khong_import_bo_danh_gia(ma):
+        ma('tinh-import')
+        xau = []
+        for p in _tep():
+            cay = ast.parse(p.read_text(encoding='utf-8'))
+            for n in ast.walk(cay):
+                if isinstance(n, ast.Import):
+                    ten = [a.name for a in n.names]
+                elif isinstance(n, ast.ImportFrom):
+                    ten = [n.module or ''] + [f'{n.module}.{a.name}' for a in n.names]
+                else:
+                    continue
+                for t in ten:
+                    if t.startswith('m1_danh_gia') or t in ('p3.nhan',) or t.endswith('.nhan') and t.startswith('p3'):
+                        xau.append((p.name, t))
+>       assert not xau, xau
+E       AssertionError: [('chuoi.py', 'm1_danh_gia'), ('chuoi.py', 'm1_danh_gia.rr')]
+E       assert not [('chuoi.py', 'm1_danh_gia'), ('chuoi.py', 'm1_danh_gia.rr')]
+
+test_tinh.py:31: AssertionError
+=========================== short test summary info ============================
+FAILED test_tinh.py::test_khong_import_bo_danh_gia - AssertionError: [('chuoi...
+1 failed, 234 passed in 3.52s
