@@ -106,7 +106,9 @@ def ca_re2tt(allowlist, opaque_id, t, repo_root, hop_dong, inventory, kiem_hash=
         if len(ts):
             F_log = [[int(round(ts.min() * NS)), int(round(ts.max() * NS))]]
         w = (ts >= lo) & (ts < hi)
-        for x, e, m in zip(ts[w], lg['container_name'].to_numpy()[w], lg['message'].astype(str).to_numpy()[w]):
+        # message rỗng (pd.NA) thành '' như src/simplerca/adapter.py:84, không thành chuỗi '<NA>' (T-045 ĐC2)
+        msg = lg['message'].fillna('').astype(str).to_numpy()
+        for x, e, m in zip(ts[w], lg['container_name'].to_numpy()[w], msg[w]):
             logs.append({'timestamp': int(x) if float(x).is_integer() else float(x), 'entity': str(e), 'message': m})
     params_ca = {
         'ho_so_nguon': ho_so_nguon(hop_dong, 'RE2-TT'),

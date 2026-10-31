@@ -65,3 +65,11 @@ def test_DC1_rong_nhan_NA():
     from m1 import adapter
     assert adapter._rong(pd.NA) and adapter._rong(None) and adapter._rong(float('nan')) and adapter._rong('')
     assert not adapter._rong('a') and not adapter._rong('<NA>')
+
+
+def test_DC2_message_NA_thanh_rong(tmp_path):
+    from m1 import adapter
+    from p3 import selector
+    p, _ = _ca(tmp_path)
+    ca = adapter.ca_re2tt(selector.nap_allowlist(p), 'dev-0a1b2c3d4e', T, tmp_path, HOP_DONG, U)
+    assert [(l['entity'], l['message']) for l in ca['logs']] == [('F', 'INFO ok'), ('R', ''), ('R', 'ERROR failed')]
