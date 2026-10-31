@@ -71,7 +71,8 @@ def _dong_metric(df, cot_thoi_gian='time'):
 
 
 def _rong(x):
-    return x is None or (isinstance(x, float) and math.isnan(x)) or x == ''
+    # parquet RE2-TT có metadata pandas kiểu `string`: giá trị rỗng là pd.NA, so `== ''` sẽ ném lỗi (T-045 ĐC1)
+    return x is None or x is pd.NA or (isinstance(x, float) and math.isnan(x)) or x == ''
 
 
 # ---------------------------------------------------------------- RE2-TT
