@@ -2063,3 +2063,50 @@ Không báo chính tả, văn phong; không thêm phép kiểm "cho chắc"; kh�
 
 - 31/10/2026, lượt 5c: bắt đầu sửa S43–S45.
 - 31/10/2026, lượt 5c: sửa S43 (`xep_hang.sap_khoa`, dùng ở `xep` và `doi_chung._khoi`), S44 (số gộp của T4c trong `diagnostics` và `extra.T4c`); test mới `tests/test_k15_luot5c.py`; mở rộng CW1, BT3, DO1 (test_k14); đáp án FX1 mới, mở rộng CE1, MB1, LM1, RN1, BT3, XH1, DO1 (126 mục); đột biến D129–D147. pytest 374/374 (chưa ghi lượt chạy).
+
+### Nghiệm thu T-044 (31/10/2026; Claude; local Windows; người làm)
+
+**Căn cứ.** Q-215: "triển khai 1 2 3 4 giúp tôi, 045 sẽ là claude làm" (việc 3: nghiệm thu nếu không còn điểm CHẶN). Sau đó Minh chọn "Sửa rồi nghiệm thu" (chat 31/10/2026). Gói S43–S45 đã sửa (`results/T-044/dinh-chinh-cai-dat.md` mục C9) và gói kiểm sau sửa xanh. Lượt kiểm lại gói C8 không có điểm CHẶN. T-044 chuyển sang **xong**.
+
+**Code được nghiệm thu:** commit `69ef90b6` trên branch `claude/sweet-hawking-dy078d`. Đây là mốc mà SPEC T-045 gọi là "commit được ghi khi nghiệm thu T-044". Commit ghi sổ này chỉ đổi LOG và STATE, không đổi `src`.
+
+**1. Đã làm gì.** Sửa S43 (khóa ghi ra luôn giảm dần), S44 (số lần gộp của T4c), S45 (test cho 15 đột biến sống sót của lượt kiểm lại gói C8).
+- Test mới: `tests/test_k15_luot5c.py`; mở rộng CW1, BT3, DO1.
+- Đáp án: FX1 mới; mở rộng CE1, MB1, LM1, RN1, BT3, XH1, DO1 (126 mục).
+- Đột biến D129–D147.
+- Viết mục C9 trong đính chính; cập nhật báo cáo, bảng phép kiểm, manifest.
+
+**2. File đã thay đổi:**
+- `src/m1/xep_hang.py`, `doi_chung.py`, `chuoi.py`;
+- `results/T-044/`:
+  - `tests/test_k14_luot5b.py`, `test_k15_luot5c.py` (mới);
+  - `fixture/dap-an-thanh-phan.json`;
+  - `scripts/dot_bien.py`, `tao_bang_phep_kiem.py`;
+  - `dinh-chinh-cai-dat.md`, `bao-cao.md`, `bang-phep-kiem.json`, `manifest.json`;
+  - lượt chạy `runs/test-xanh-011`, `tat-dinh-012`, `dot-bien-013`, `kiem-hash-t043-012`;
+- LOG này; dòng T-044, T-045 trong STATE.
+
+**3. Kiểm đã chạy và kết quả** (bản `69ef90b6`):
+- **Test:** 374/374 qua (`runs/test-xanh-011/stdout.txt`; `bang-phep-kiem.json#/tong`).
+- **Tất định:** PASS, hash seed khớp (`runs/tat-dinh-012/tong-hop.json`). So đủ mọi trường với cây trước lượt 5: 104 bản ghi chỉ khác ở ba trường số gộp mới.
+- **Đột biến:** 147/147, trong đó 145/145 đột biến hành vi; 103 đột biến chỉ bị đúng một phép bắt (`runs/dot-bien-013/tong-hop.json`).
+- **Hash:** T-043 PASS 69/69, 10/10. Manifest T-044 PASS 2133/2133.
+
+**4. Phạm vi nghiệm thu và phần còn mở.**
+- **Task đạt gì:** code `src/m1`, `src/m1_danh_gia` đúng đặc tả T-043 (với đính chính Phần I, II) trên mọi ca giả có đáp án; tất định; nhãn không lọt (kiểm tĩnh và mức giá trị).
+- **Không xác nhận:** hiệu quả của M1, cơ chế, hay hành vi trên dữ liệu thật (thuộc T-045).
+- **Còn mở, ghi ở mục D của đính chính:**
+  - đáp án tự lập do người làm viết; một số dựa trên diễn giải của đính chính (rủi ro đọc sai chung với code);
+  - 103/147 đột biến chỉ bị đúng một phép bắt;
+  - tần suất gộp khóa ghi ra trên dev chưa biết;
+  - G_N cho baseline từ `call_rows` chưa có hàm;
+  - vòng 1.000 mẫu của phép độ bền do T-045 viết;
+  - lệch code CRISP chính thức ở E1-CP chưa phân xử;
+  - C-e theo verdict tại P;
+  - ứng viên E5 giữ phần dư chưa kiểm.
+- **Phản biện chính thức:** SPEC ghi Codex là người phản biện. Các lượt 1–4 do Codex làm. Lượt 5 và hai lượt kiểm lại do phiên Claude (một phiên mới và subagent trong phiên người làm) làm theo lựa chọn của Minh. Gói C9 chưa được bên nào ngoài người làm kiểm lại.
+- **DECISIONS:** Q-213–Q-215 đã ghi. Các duyệt phiên 1 và lượt 1–4 của T-044 chưa có dòng riêng.
+
+**Bước tiếp theo.** Mở T-045. Người làm là Claude, người phản biện là Codex (Q-215). Dùng code ở `69ef90b6`. Đọc SPEC T-045 (đã thêm dòng mặc định bước 8) và mục D của đính chính T-044. SPEC T-045 bước 0 và 1 đo RAM và thời gian trước lượt dài.
+
+**Lệnh cuối đã chạy.** `py -3 -B results/T-044/scripts/tao_manifest.py --kiem` (PASS 2133/2133).
