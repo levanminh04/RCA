@@ -1,0 +1,75 @@
+........................................................................ [ 21%]
+.......F............F..F................................................ [ 42%]
+........................................................................ [ 63%]
+........................................................................ [ 84%]
+......................................................                   [100%]
+================================== FAILURES ===================================
+________________________________ test_U_CP[3] _________________________________
+
+i = 3, ma = <function ma.<locals>._gan at 0x000002867F9640E0>
+
+    @pytest.mark.parametrize('i', [2, 3])
+    def test_U_CP(i, ma):
+        from m1 import span
+        f = fx(i)
+        ma(str(i))
+        cha, con = tuple(f['dau_vao']['cha']), [tuple(c) for c in f['dau_vao']['con']]
+        assert gan_bang(span.doc_quyen_U(cha, con), f['dap_an']['U'])
+>       assert gan_bang(span.doc_quyen_CP(cha, con, tau=1), f['dap_an']['CP'])
+E       AssertionError: assert False
+E        +  where False = gan_bang(50, 0)
+E        +    where 50 = <function doc_quyen_CP at 0x000002861115DDA0>((0, 100), [(0, 50.2), (50, 100)], tau=1)
+E        +      where <function doc_quyen_CP at 0x000002861115DDA0> = <module 'm1.span' from 'C:\\Users\\84583\\AppData\\Local\\Temp\\tmp5a8b093q\\src\\m1\\span.py'>.doc_quyen_CP
+
+test_k06_e1_e2.py:14: AssertionError
+___________________________ test_E1_qua_chuan_bi[3] ___________________________
+
+i = 3, ma = <function ma.<locals>._gan at 0x000002867F966D40>
+
+    @pytest.mark.parametrize('i', [2, 3, 4, 5])
+    def test_E1_qua_chuan_bi(i, ma):
+        """Fixture 2–5 đi qua span.chuan_bi (đường chuỗi dùng thật): cắt con về cha, U, CP, đếm con vượt biên > τ."""
+        from m1 import span
+        f = fx(i)
+        ma(f'{i}-chuan-bi')
+        (c0, c1), con = f['dau_vao']['cha'], f['dau_vao']['con']
+        rows = [{'traceID': 'T', 'spanID': 'p', 'parentSpanID': '', 'owner': 'P', 'operation': 'P.op',
+                 'start_us': c0, 'duration_us': c1 - c0}]
+        for j, (a, b) in enumerate(con):
+            rows.append({'traceID': 'T', 'spanID': f'c{j}', 'parentSpanID': 'p', 'owner': 'Q', 'operation': 'Q.op',
+                         'start_us': a, 'duration_us': b - a})
+        prep = span.chuan_bi(rows, t=1000, tau=1)
+        p = prep['spans'][('T', 'p')]
+        assert gan_bang(p['u'], f['dap_an']['U'])
+        if 'CP' in f['dap_an']:
+>           assert gan_bang(p['u_CP'], f['dap_an']['CP'])
+E           assert False
+E            +  where False = gan_bang(50, 0)
+
+test_k06_e1_e2.py:95: AssertionError
+_____________________________ test_CP2_quy_tac_M1 _____________________________
+
+ma = <function ma.<locals>._gan at 0x000002867F9665C0>
+
+    def test_CP2_quy_tac_M1(ma):
+        """E1-CP theo quy tắc M1 Minh duyệt 30/10/2026: xét cả con đã chọn khi kiểm vùng chồng lấn; biên mở; mọi thứ tự."""
+        import itertools
+        from m1 import span
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CP2')
+        ma('CP2')
+        d, da = m['dau_vao'], m['dap_an']
+        cha, con = tuple(d['cha']), [tuple(c) for c in d['con']]
+        for p in itertools.permutations(con):
+>           assert span.doc_quyen_CP(cha, list(p), tau=d['tau']) == da['CP'], p
+E           AssertionError: ((0, 1500), (600, 1500), (0, 2100), (1000, 3000))
+E           assert 3000 == 2600
+E            +  where 3000 = <function doc_quyen_CP at 0x000002861115DDA0>((0, 5000), [(0, 1500), (600, 1500), (0, 2100), (1000, 3000)], tau=1000)
+E            +    where <function doc_quyen_CP at 0x000002861115DDA0> = <module 'm1.span' from 'C:\\Users\\84583\\AppData\\Local\\Temp\\tmp5a8b093q\\src\\m1\\span.py'>.doc_quyen_CP
+E            +    and   [(0, 1500), (600, 1500), (0, 2100), (1000, 3000)] = list(((0, 1500), (600, 1500), (0, 2100), (1000, 3000)))
+
+test_k06_e1_e2.py:109: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k06_e1_e2.py::test_U_CP[3] - AssertionError: assert False
+FAILED test_k06_e1_e2.py::test_E1_qua_chuan_bi[3] - assert False
+FAILED test_k06_e1_e2.py::test_CP2_quy_tac_M1 - AssertionError: ((0, 1500), (...
+3 failed, 339 passed in 16.51s

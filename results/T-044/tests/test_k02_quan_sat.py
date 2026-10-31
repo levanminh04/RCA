@@ -113,10 +113,16 @@ def test_29_the_gioi_doi_thu_tu(ma):
     wd = the_gioi.world_dependent(khoi, d['root'])
     assert wd['WORLD_DEPENDENT'] == da['WORLD_DEPENDENT']
     # da['nguyen_nhan'] = "chỉ điểm đổi (cổng qua ở cả ba thế giới); cặp (U1 của A, U2 của B)", viết thành cấu trúc.
+    # Sửa S13 (lượt 3): cặp ghi mã kênh (gồm đơn vị); U1 của A là kênh đổi điểm, U2 của B không đổi.
     nn = the_gioi.nguyen_nhan(kenh_w, d['root'], khoi)
-    assert nn['loai'] == 'chi_diem_doi' and nn['cap'] == (('A', 'U1'), ('B', 'U2'))
-    assert nn['theo_the_gioi'] == {'S_hi': {'doi': [{'thuc_the': 'B', 'P': 'sau', 'S_hi': 'truoc'}], 'vuot': ['B'],
-                                            'bi_vuot': [], 'cap': [(('A', 'U1'), ('B', 'U2'))]}}
+    assert nn['loai'] == 'chi_diem_doi' and nn['cap'] == (('A', ['A||U1|len']), ('B', ['B||U2|len']))
+    v = nn['theo_the_gioi']['S_hi']
+    assert set(nn['theo_the_gioi']) == {'S_hi'}
+    assert {k: v[k] for k in ('doi', 'vuot', 'bi_vuot', 'cap')} == {
+        'doi': [{'thuc_the': 'B', 'P': 'sau', 'S_hi': 'truoc'}], 'vuot': ['B'], 'bi_vuot': [],
+        'cap': [(('A', ['A||U1|len']), ('B', ['B||U2|len']))]}
+    assert [x['ma'] for x in v['kenh_doi']['A']] == ['A||U1|len'] and v['kenh_doi']['B'] == []
+    assert v['khong_co_kenh_doi'] is False
 
 
 def test_30_thu_tu_khong_doi(ma):
@@ -283,6 +289,7 @@ def test_WD1_cap_dao_thu_tu(ma):
     nn = the_gioi.nguyen_nhan(k, d['root'], {w: b(d[w]) for w in ('P', 'S_lo', 'S_hi')})
     assert nn['loai'] == da['loai'] and [list(x) for x in nn['cap']] == da['cap']
     assert {w: {'vuot': v['vuot'], 'bi_vuot': v['bi_vuot']} for w, v in nn['theo_the_gioi'].items()} == da['theo_the_gioi']
+    assert nn['theo_the_gioi']['S_lo']['khong_co_kenh_doi'] is da['khong_co_kenh_doi']
     nn2 = the_gioi.nguyen_nhan(k, d['root'], {w: b(d['P']) for w in ('P', 'S_lo', 'S_hi')})
     assert nn2['cap'] == da['khong_doi']['cap'] and nn2['theo_the_gioi'] == da['khong_doi']['theo_the_gioi']
 
@@ -371,7 +378,8 @@ def _wd(dau_vao, kenh_S_lo=None):
     b = {w: [{'key': [len(dau_vao[w]) - i], 'groups': [list(g)]} for i, g in enumerate(dau_vao[w])]
          for w in ('P', 'S_lo', 'S_hi')}
     tt = sorted({e for w in b for x in dau_vao[w] for e in x})
-    k = {w: [{'thuc_the': e, 'ten': 'k' + e, 'huong': 'len', 'lop': 'lan_nguoc', 's': 1.0, 'F_I': 1}
+    k = {w: [{'ma': f'{e}||k{e}|len', 'thuc_the': e, 'ten': 'k' + e, 'huong': 'len', 'don_vi': '', 'lop': 'lan_nguoc',
+              's': 1.0, 'F_I': 1}
              for e in (kenh_S_lo if (w == 'S_lo' and kenh_S_lo) else tt)] for w in b}
     return the_gioi.world_dependent(b, dau_vao['root']), the_gioi.nguyen_nhan(k, dau_vao['root'], b)
 
@@ -388,6 +396,36 @@ def test_WD2_WD3_hoa_va_vang(ma_wd, ma):
     assert {k: nn['theo_the_gioi']['S_lo'][k] for k in ('doi', 'vuot', 'bi_vuot')} == da['S_lo']
     assert set(nn['theo_the_gioi']) == {'S_lo'}
     assert [list(x) for x in nn['cap']] == da['cap']
+    assert nn['theo_the_gioi']['S_lo']['khong_co_kenh_doi'] is da['khong_co_kenh_doi']
+    if 'kenh_doi_B' in da:
+        assert nn['theo_the_gioi']['S_lo']['kenh_doi']['B'] == da['kenh_doi_B']
+
+
+def test_WD4_kenh_doi_va_phan_khoa(ma):
+    """S13: cặp giải thích chỉ ra kênh đổi và phần khóa phân định, không chỉ kênh mạnh nhất (WD4)."""
+    from fractions import Fraction
+    from m1 import xep_hang
+    from m1.kieu import Kenh
+    from m1_danh_gia import the_gioi
+    m = tu_lap(DAP_AN_THANH_PHAN, 'WD4')
+    ma('WD4')
+    d, da = m['dau_vao'], m['dap_an']
+    k, b = {}, {}
+    for w in ('P', 'S_lo', 'S_hi'):
+        ks = [Kenh(e, x['ten'], 'len', x['lop'], x['s'], don_vi=x['don_vi']) for e in sorted(d['kenh'])
+              for x in d['kenh'][e] if w in x.get('chi_o', ('P', 'S_lo', 'S_hi'))]
+        xh = xep_hang.xep(ks, thuc_the_co_kenh_OK=set(d['kenh']))
+        b[w] = xh['blocks']
+        k[w] = [{'ma': x.ma, 'thuc_the': x.thuc_the, 'ten': x.ten, 'huong': x.huong, 'don_vi': x.don_vi, 'lop': x.lop,
+                 's': x.s, 'F_I': 1} for x in ks]
+    wd = the_gioi.world_dependent(b, d['root'])
+    assert wd['WORLD_DEPENDENT'] is True
+    assert wd['hang_ky_vong'] == {w: Fraction(v) for w, v in da['hang_ky_vong'].items()}
+    nn = the_gioi.nguyen_nhan(k, d['root'], b)
+    assert nn['loai'] == da['loai'] and [list(x) for x in nn['cap']] == da['cap']
+    assert set(nn['theo_the_gioi']) == {'S_hi'}
+    v = nn['theo_the_gioi']['S_hi']
+    assert {x: v[x] for x in da['S_hi']} == da['S_hi']
 
 
 def test_MET2_nguon_metric_khong_co_hang(ma):

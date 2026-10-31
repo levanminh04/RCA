@@ -1,0 +1,37 @@
+........................................................................ [ 19%]
+........................................................................ [ 39%]
+........................................................................ [ 59%]
+........................................................................ [ 78%]
+........................................................F............... [ 98%]
+......                                                                   [100%]
+================================== FAILURES ===================================
+_________________________ test_GN3_G_N_ca_hai_phia_N __________________________
+
+ma = <function ma.<locals>._gan at 0x0000024A20125EE0>
+
+    def test_GN3_G_N_ca_hai_phia_N(ma):
+        from m1 import chuoi
+        import sinh_trace_S
+        m = tu_lap(DAP_AN_THANH_PHAN, 'GN3')
+        ma('GN3')
+        t = 1000 * 10 ** 6
+        rows = [{'traceID': 't1', 'spanID': 'p', 'parentSpanID': '', 'owner': 'P', 'operation': 'a',
+                 'start_us': t - 10 * 10 ** 6, 'duration_us': 20 * 10 ** 6},
+                {'traceID': 't1', 'spanID': 'c', 'parentSpanID': 'p', 'owner': 'C', 'operation': 'b',
+                 'start_us': t - 9 * 10 ** 6, 'duration_us': 10 ** 6},
+                {'traceID': 't2', 'spanID': 'q', 'parentSpanID': '', 'owner': 'Q', 'operation': 'a',
+                 'start_us': t - 20 * 10 ** 6, 'duration_us': 15 * 10 ** 6},
+                {'traceID': 't2', 'spanID': 'd', 'parentSpanID': 'q', 'owner': 'D', 'operation': 'b',
+                 'start_us': t - 19 * 10 ** 6, 'duration_us': 10 ** 6}]
+        r = chuoi.chay(rows, [], [], ['P', 'C', 'Q', 'D'], {}, 1000, sinh_trace_S.params({}))
+>       assert r['extra']['G_N'] == m['dap_an']['G_N']
+E       AssertionError: assert [['P', 'C'], ['Q', 'D']] == [['Q', 'D']]
+E         
+E         At index 0 diff: ['P', 'C'] != ['Q', 'D']
+E         Left contains one more item: ['Q', 'D']
+E         Use -v to get more diff
+
+test_k14_luot5b.py:260: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k14_luot5b.py::test_GN3_G_N_ca_hai_phia_N - AssertionError: asser...
+1 failed, 365 passed in 15.78s

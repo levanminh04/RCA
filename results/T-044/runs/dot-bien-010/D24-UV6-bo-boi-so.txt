@@ -1,0 +1,103 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+...................F.........FF.....................................F... [ 84%]
+......................................................                   [100%]
+================================== FAILURES ===================================
+_____________________________ test_UV6_3_ky_vong ______________________________
+
+ma = <function ma.<locals>._gan at 0x00000202E1C2B600>
+
+    def test_UV6_3_ky_vong(ma):
+        """S16: báo kèm UV-6 theo Hit@1 kỳ vọng, gộp và theo dataset, phân số chính xác (CĐ2 dòng 28)."""
+        from m1_danh_gia import uv6
+        m = tu_lap(DAP_AN_THANH_PHAN, 'UV6-3')
+        ma('UV6-3')
+        kq = uv6.dem(_ca_uv6(m['dau_vao']['ca']))
+        da = m['dap_an']
+>       assert {k: kq[k] for k in ('hong', 'sua', 'vi_pham')} == {k: da[k] for k in ('hong', 'sua', 'vi_pham')}
+E       AssertionError: assert {'hong': 2, '...i_pham': True} == {'hong': 2, '..._pham': False}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'sua': 1} != {'sua': 2}
+E         {'vi_pham': True} != {'vi_pham': False}
+E         Use -v to get more diff
+
+test_k11_danh_gia.py:224: AssertionError
+_____________________________ test_TS4_uv6_boi_so _____________________________
+
+ma = <function ma.<locals>._gan at 0x00000202E1D3A700>
+
+    def test_TS4_uv6_boi_so(ma):
+        from m1_danh_gia import uv6
+        m = tu_lap(DAP_AN_THANH_PHAN, 'TS4')
+        ma('TS4')
+        kq = uv6.dem(m['dau_vao']['ca'])
+>       assert {k: kq[k] for k in ('hong', 'sua', 'vi_pham')} == m['dap_an']
+E       AssertionError: assert {'hong': 1, '..._pham': False} == {'hong': 2, '...i_pham': True}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'hong': 1} != {'hong': 2}
+E         {'vi_pham': False} != {'vi_pham': True}
+E         Use -v to get more diff
+
+test_k11_danh_gia.py:362: AssertionError
+____________________________ test_TS4_uv6_qua_pha2 ____________________________
+
+ma = <function ma.<locals>._gan at 0x00000202E1D3B380>
+
+    def test_TS4_uv6_qua_pha2(ma):
+        """Cặp E3 qua pha2.ket_cuc_cap: bội số của ca đến được UV-6."""
+        from m1_danh_gia import pha2
+        m = tu_lap(DAP_AN_THANH_PHAN, 'TS4')
+        ma('TS4-pha2')
+        ca = m['dau_vao']['ca']
+        tat = {f'c{i}': {'dataset': c['dataset'], 'o': f'o{i}', 'loai_loi': c['loai_loi'], 'hit1': c['hit1_tat'],
+                         'hang': c['hang_tat']} for i, c in enumerate(ca)}
+        bat = {f'c{i}': {'dataset': c['dataset'], 'o': f'o{i}', 'loai_loi': c['loai_loi'], 'hit1': c['hit1_bat'],
+                         'hang': c['hang_bat']} for i, c in enumerate(ca)}
+        w = {f'c{i}': c['trong_so'] for i, c in enumerate(ca)}
+        cap = pha2.ket_cuc_cap(_kq_tu_ca(tat, bat), 'T', 'B', {'o0', 'o1'}, 'E3', 'khoi_K', trong_so=w)
+>       assert cap['theo_the_gioi']['P']['UV6'] == ('HAI' if m['dap_an']['vi_pham'] else 'KHONG_HAI')
+E       AssertionError: assert 'KHONG_HAI' == 'HAI'
+E         
+E         - HAI
+E         + KHONG_HAI
+
+test_k11_danh_gia.py:379: AssertionError
+____________________________ test_LC1_so_chinh_xac ____________________________
+
+ma = <function ma.<locals>._gan at 0x00000202E1D905E0>
+
+    def test_LC1_so_chinh_xac(ma):
+        from m1_danh_gia import luat_c, rr, uv6
+        m = tu_lap(DAP_AN_THANH_PHAN, 'LC1')
+        da = m['dap_an']
+        ma('LC1')
+        ds, tat, bat = _ds_LC1()
+        E_X = {c['o'] for c in ds}
+        dd = {k: _q(v) for k, v in m['dau_vao']['delta_d'].items()}
+        kq = luat_c.ap_dung(ds, tat, bat, E_X, thanh_phan='X', delta_d_co_dinh=dd)
+        assert kq['dMRR'] == {k: _q(v) for k, v in da['dMRR'].items()}
+        assert (kq['P'], kq['M'], kq['ket_cuc'], kq['buoc']) == (da['P'], da['M'], da['ket_cuc'], da['buoc'])
+        with pytest.raises(TypeError):
+            luat_c.ap_dung(ds, tat, bat, E_X, thanh_phan='X', delta_d_co_dinh={'RE2-TT': 1 / 30, 'Nezha-OB': 1 / 22})
+        with pytest.raises(TypeError):
+            luat_c.ap_dung(ds, tat, dict(bat, r1=1.0), E_X, thanh_phan='X', delta_d_co_dinh=dd)
+        for w in ('2', 2.5, True, -1):
+            with pytest.raises(ValueError):
+                rr.boi_so({'a': w}, 'a')
+        ca = [{'dataset': 'RE2-TT', 'loai_loi': None, 'hit1_tat': Fraction(1), 'hit1_bat': Fraction(0),
+               'hang_tat': None, 'hang_bat': None}]
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+test_k13_luot5.py:108: Failed
+=========================== short test summary info ===========================
+FAILED test_k11_danh_gia.py::test_UV6_3_ky_vong - AssertionError: assert {'ho...
+FAILED test_k11_danh_gia.py::test_TS4_uv6_boi_so - AssertionError: assert {'h...
+FAILED test_k11_danh_gia.py::test_TS4_uv6_qua_pha2 - AssertionError: assert '...
+FAILED test_k13_luot5.py::test_LC1_so_chinh_xac - Failed: DID NOT RAISE <clas...
+4 failed, 338 passed in 13.53s

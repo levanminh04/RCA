@@ -1,0 +1,53 @@
+........................................................................ [ 19%]
+........................................................................ [ 39%]
+........................................................................ [ 59%]
+....................................................................F... [ 78%]
+........................F............................................... [ 98%]
+......                                                                   [100%]
+================================== FAILURES ===================================
+____________________________ test_LC1_so_chinh_xac ____________________________
+
+ma = <function ma.<locals>._gan at 0x00000229854B6FC0>
+
+    def test_LC1_so_chinh_xac(ma):
+        from m1_danh_gia import luat_c, rr, uv6
+        m = tu_lap(DAP_AN_THANH_PHAN, 'LC1')
+        da = m['dap_an']
+        ma('LC1')
+        ds, tat, bat = _ds_LC1()
+        E_X = {c['o'] for c in ds}
+        dd = {k: _q(v) for k, v in m['dau_vao']['delta_d'].items()}
+        kq = luat_c.ap_dung(ds, tat, bat, E_X, thanh_phan='X', delta_d_co_dinh=dd)
+        assert kq['dMRR'] == {k: _q(v) for k, v in da['dMRR'].items()}
+>       assert (kq['P'], kq['M'], kq['ket_cuc'], kq['buoc']) == (da['P'], da['M'], da['ket_cuc'], da['buoc'])
+E       AssertionError: assert (1, 2, 'TRAI_...U_DATASET', 2) == (1, 2, 'HAI', 3)
+E         
+E         At index 2 diff: 'TRAI_CHIEU_DATASET' != 'HAI'
+E         Use -v to get more diff
+
+test_k13_luot5.py:98: AssertionError
+____________________________ test_BC1_bien_luat_C _____________________________
+
+ma = <function ma.<locals>._gan at 0x00000229859BAF20>
+
+    def test_BC1_bien_luat_C(ma):
+        from m1_danh_gia import luat_c
+        m = tu_lap(DAP_AN_THANH_PHAN, 'BC1')
+        ma('BC1')
+        dd = {k: _q(v) for k, v in m['dau_vao']['delta_d'].items()}
+        ra = []
+        for c in m['dau_vao']['ca']:
+            t = dict(c, dMRR={k: _q(v) for k, v in c['dMRR'].items()})
+            kc = luat_c.ket_cuc_tu_tong_hop(t, delta_d={k: dd[k] for k in t['dMRR'] if k != 'gop'})
+            ra.append([kc['ket_cuc'], kc['buoc']])
+>       assert ra == m['dap_an']['ket_cuc']
+E       AssertionError: assert [['KHONG_TAC_...HAI', 1], ...] == [['KHONG_TAC_...HAI', 1], ...]
+E         
+E         At index 3 diff: ['TRAI_CHIEU_DATASET', 2] != ['KHONG_TAC_DUNG', 6]
+E         Use -v to get more diff
+
+test_k13_luot5.py:347: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_LC1_so_chinh_xac - AssertionError: assert (1, ...
+FAILED test_k13_luot5.py::test_BC1_bien_luat_C - AssertionError: assert [['KH...
+2 failed, 364 passed in 14.77s

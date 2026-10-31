@@ -1,0 +1,49 @@
+........................................................................ [ 27%]
+........................................................................ [ 54%]
+.......FF............................................................... [ 81%]
+..................................................                       [100%]
+================================== FAILURES ===================================
+___________________ test_nhom_vong_mac_dinh_la_C_phay[SCC1] ___________________
+
+muc = 'SCC1', ma = <function ma.<locals>._gan at 0x00000270C0EFAAC0>
+
+    @pytest.mark.parametrize('muc', ['SCC1', 'SCC2', 'SCC3', 'SCC4'])
+    def test_nhom_vong_mac_dinh_la_C_phay(muc, ma):
+        """CĐ5: không truyền cách đọc thì dùng C′ ('co_vong'), cả ở e5.phan_loai lẫn ở chuỗi khi thiếu tham_so_E5."""
+        from m1 import chuoi
+        m = tu_lap(DAP_AN_THANH_PHAN, muc)
+        ma(f'{muc}-mac-dinh')
+        ca = dict(m['dau_vao'], E5=True)
+        p, xh = _chay_E5(ca)
+        da = m['dap_an']['co_vong']
+>       assert sorted([list(x) for x in p['ke_thua']]) == sorted(da['ke_thua'])
+E       AssertionError: assert [['seat', 'lat']] == [['seat', 'la...'tr1', 'lat']]
+E         
+E         Right contains one more item: ['tr1', 'lat']
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:237: AssertionError
+___________________ test_nhom_vong_mac_dinh_la_C_phay[SCC2] ___________________
+
+muc = 'SCC2', ma = <function ma.<locals>._gan at 0x00000270C1294AE0>
+
+    @pytest.mark.parametrize('muc', ['SCC1', 'SCC2', 'SCC3', 'SCC4'])
+    def test_nhom_vong_mac_dinh_la_C_phay(muc, ma):
+        """CĐ5: không truyền cách đọc thì dùng C′ ('co_vong'), cả ở e5.phan_loai lẫn ở chuỗi khi thiếu tham_so_E5."""
+        from m1 import chuoi
+        m = tu_lap(DAP_AN_THANH_PHAN, muc)
+        ma(f'{muc}-mac-dinh')
+        ca = dict(m['dau_vao'], E5=True)
+        p, xh = _chay_E5(ca)
+        da = m['dap_an']['co_vong']
+>       assert sorted([list(x) for x in p['ke_thua']]) == sorted(da['ke_thua'])
+E       AssertionError: assert [['seat', 'lat']] == [['seat', 'la...'tr1', 'lat']]
+E         
+E         Right contains one more item: ['tr1', 'lat']
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:237: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k08_e5_e6_e7_e9.py::test_nhom_vong_mac_dinh_la_C_phay[SCC1] - Ass...
+FAILED test_k08_e5_e6_e7_e9.py::test_nhom_vong_mac_dinh_la_C_phay[SCC2] - Ass...
+2 failed, 264 passed in 5.75s

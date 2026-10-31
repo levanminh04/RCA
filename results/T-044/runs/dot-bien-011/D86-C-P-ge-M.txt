@@ -1,0 +1,30 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+........................................................................ [ 84%]
+......................F...............................                   [100%]
+================================== FAILURES ===================================
+____________________________ test_BC1_bien_luat_C _____________________________
+
+ma = <function ma.<locals>._gan at 0x000001B2EE6EEB60>
+
+    def test_BC1_bien_luat_C(ma):
+        from m1_danh_gia import luat_c
+        m = tu_lap(DAP_AN_THANH_PHAN, 'BC1')
+        ma('BC1')
+        dd = {k: _q(v) for k, v in m['dau_vao']['delta_d'].items()}
+        ra = []
+        for c in m['dau_vao']['ca']:
+            t = dict(c, dMRR={k: _q(v) for k, v in c['dMRR'].items()})
+            kc = luat_c.ket_cuc_tu_tong_hop(t, delta_d={k: dd[k] for k in t['dMRR'] if k != 'gop'})
+            ra.append([kc['ket_cuc'], kc['buoc']])
+>       assert ra == m['dap_an']['ket_cuc']
+E       AssertionError: assert [['KHONG_TAC_...HAI', 1], ...] == [['KHONG_TAC_...HAI', 1], ...]
+E         
+E         At index 2 diff: ['GIUP', 5] != ['TRAI_CHIEU_O', 7]
+E         Use -v to get more diff
+
+test_k13_luot5.py:321: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_BC1_bien_luat_C - AssertionError: assert [['KH...
+1 failed, 341 passed in 14.24s

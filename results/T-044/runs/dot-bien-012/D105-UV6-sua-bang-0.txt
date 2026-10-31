@@ -1,0 +1,30 @@
+........................................................................ [ 19%]
+........................................................................ [ 39%]
+........................................................................ [ 59%]
+........................................................................ [ 78%]
+......................................F................................. [ 98%]
+......                                                                   [100%]
+================================== FAILURES ===================================
+___________________________ test_UV6_4_sua_phan_so ____________________________
+
+ma = <function ma.<locals>._gan at 0x00000248293A0AE0>
+
+    def test_UV6_4_sua_phan_so(ma):
+        from m1_danh_gia import uv6
+        m = tu_lap(DAP_AN_THANH_PHAN, 'UV6-4')
+        ma('UV6-4')
+        ca = [dict(c, **{k: _q(c[k]) for k in ('hit1_tat', 'hit1_bat', 'hang_tat', 'hang_bat')})
+              for c in m['dau_vao']['ca']]
+        kq = uv6.dem(ca)
+>       assert {k: kq[k] for k in ('hong', 'sua', 'vi_pham')} == m['dap_an']
+E       AssertionError: assert {'hong': 0, '..._pham': False} == {'hong': 0, '..._pham': False}
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Differing items:
+E         {'sua': 0} != {'sua': 1}
+E         Use -v to get more diff
+
+test_k13_luot5.py:497: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_UV6_4_sua_phan_so - AssertionError: assert {'h...
+1 failed, 365 passed in 14.59s

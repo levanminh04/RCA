@@ -15,7 +15,7 @@ import json
 import time
 from pathlib import Path
 
-from m1 import chuoi, hop_dong
+from m1 import chuoi, e4, hop_dong
 
 R0 = {'E1': 'tat', 'E2': 'tat', 'E3': False, 'E3b': False, 'E5': False, 'E6': 'a', 'E9': False, 'T12': False}
 # hop-dong.json#/vao/params/tham_so_E4 (q_hi, q_lo không có ở ma-tran-thu.json#/co_dinh_moi_buoc/tham_so_E4)
@@ -68,9 +68,11 @@ def _ts(mt, **doi):
     return ts
 
 
-def _ma_noi_dung(bat_tat, ts, nhanh_z, ts3, ts5):
-    s = json.dumps({'bat_tat': bat_tat, 'tham_so_E4': ts, 'nhanh_z': nhanh_z, 'tham_so_E3': ts3, 'tham_so_E5': ts5},
-                   sort_keys=True)
+def _ma_noi_dung(bat_tat, ts, nhanh_z, ts3, ts5, doi_chung=None):
+    d = {'bat_tat': bat_tat, 'tham_so_E4': ts, 'nhanh_z': nhanh_z, 'tham_so_E3': ts3, 'tham_so_E5': ts5}
+    if doi_chung is not None:  # C-a0, C-a1 không dựng vùng E7 (S14): khác cấu hình cùng bat_tat
+        d['doi_chung'] = doi_chung
+    s = json.dumps(d, sort_keys=True)
     return hashlib.sha256(s.encode()).hexdigest()[:16]
 
 
@@ -79,7 +81,7 @@ def _cau_hinh(buoc, ten, bat_tat, ts, nhanh_z=False, ts3=None, ts5=None, **them)
     bt.update(bat_tat)
     ts3, ts5 = dict(ts3 or TS_E3), dict(ts5 or TS_E5)
     out = {'config_id': f'{buoc}-{ten}', 'buoc': buoc, 'bat_tat': bt, 'tham_so_E4': ts, 'nhanh_z': nhanh_z,
-           'tham_so_E3': ts3, 'tham_so_E5': ts5, 'ma_noi_dung': _ma_noi_dung(bt, ts, nhanh_z, ts3, ts5)}
+           'tham_so_E3': ts3, 'tham_so_E5': ts5, 'ma_noi_dung': _ma_noi_dung(bt, ts, nhanh_z, ts3, ts5, them.get('doi_chung'))}
     out.update(them)
     return out
 
@@ -177,7 +179,11 @@ def _params(cau_hinh, ca):
         'tham_so_E3': dict(cau_hinh.get('tham_so_E3') or TS_E3), 'tham_so_E5': dict(cau_hinh.get('tham_so_E5') or TS_E5),
         'the_gioi': ['P', 'S_lo', 'S_hi']}
     p['config_id'] = cau_hinh['config_id']
+    if cau_hinh.get('chay_M1') and cau_hinh.get('doi_chung'):  # C-a0, C-a1: chuỗi không dựng vùng E7 (S14)
+        p['doi_chung'] = cau_hinh['doi_chung']
     rieng = ca.get('params_ca') or {}
+    if 'doi_chung' in rieng:  # chỉ cấu hình đối chứng C-a0, C-a1 được tắt vùng E7 (S14)
+        raise ValueError('params_ca không được mang doi_chung')
     trung = sorted(set(rieng) & set(p))
     if trung:
         raise ValueError(f'params của ca trùng khóa với params của cấu hình: {trung}')
@@ -194,9 +200,17 @@ def pha1(ca, moc, cau_hinh, thu_muc):
     thu_muc.mkdir(parents=True, exist_ok=True)
     cam = sorted({c['opaque_id'] for c in ca} | {c['case_dir'] for c in ca if c.get('case_dir')}
                  | {x for c in ca for x in (c.get('chuoi_cam') or []) if x})
-    dong, tg = [], {}
-    for ch in sorted(cau_hinh, key=lambda c: c['config_id']):
-        for c in sorted(ca, key=lambda x: x['opaque_id']):
+    ds_ch = sorted(cau_hinh, key=lambda c: c['config_id'])
+    ds_ca = sorted(ca, key=lambda x: x['opaque_id'])
+    for ten, ds_x, k in (('config_id', ds_ch, 'config_id'), ('opaque_id', ds_ca, 'opaque_id')):
+        if len({x[k] for x in ds_x}) != len(ds_x):
+            raise ValueError(f'{ten} trùng')
+    dong_theo, tg = {}, {}
+    # ca ở vòng ngoài, cache cổng mới cho mỗi ca: dùng lại giữa các cấu hình của cùng ca, không giữ mẫu của ca đã
+    # xong (C8, S38); dòng ghi ra vẫn sắp theo cấu hình rồi ca, nên hash không đổi
+    for c in ds_ca:
+        chuoi.CACHE = e4.CacheCong()
+        for ch in ds_ch:
             p = _params(ch, c)
             vp = hop_dong.vi_pham_gia_tri(p, c.get('aliases') or {}, c.get('inventory') or [], cam)
             if vp:
@@ -206,7 +220,8 @@ def pha1(ca, moc, cau_hinh, thu_muc):
                              c.get('aliases') or {}, moc[c['opaque_id']], p)
             tg[f"{ch['config_id']}|{c['opaque_id']}"] = time.perf_counter() - t0
             hop_dong.kiem_ban_ghi(rec)
-            dong.append(_json(dict(rec, opaque_id=c['opaque_id'])))
+            dong_theo[(ch['config_id'], c['opaque_id'])] = _json(dict(rec, opaque_id=c['opaque_id']))
+    dong = [dong_theo[k] for k in sorted(dong_theo)]
     du_lieu = ('\n'.join(dong) + '\n').encode('utf-8')
     (thu_muc / 'ban-ghi.jsonl').write_bytes(du_lieu)
     h = hashlib.sha256(du_lieu).hexdigest()

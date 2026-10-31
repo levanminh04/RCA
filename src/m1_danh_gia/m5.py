@@ -51,7 +51,11 @@ def co_M5(blocks, root, G_N):
 
 
 def G_N_tu_span(spans, t):
-    """spans: hàng theo hop-dong.json#/vao/spans (start_us, duration_us cùng đơn vị với t)."""
+    """spans: hàng theo hop-dong.json#/vao/spans (start_us, duration_us cùng đơn vị với t).
+
+    Chỉ dùng cho kiểm (đáp án GN1); pha 2 dùng `extra.G_N` của bản ghi M1 (C8, S41). Khác cách chuỗi dựng G_N: không
+    áp alias; không lọc miền [t − 300, t + 300); khóa trùng khác nội dung bị bỏ khỏi đồ thị (chuỗi trả ERROR cả ca).
+    Trên span trong miền, không alias, không khóa trùng, hai cách cho cùng tập cạnh (test GN2)."""
     seen, xung = {}, set()
     for s in spans:
         k = (s['traceID'], s['spanID'])

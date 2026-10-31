@@ -1,0 +1,134 @@
+F.F.........................F........F.................................. [ 19%]
+........................................................................ [ 39%]
+........................................................................ [ 59%]
+........................................................................ [ 78%]
+........................................................................ [ 98%]
+......                                                                   [100%]
+================================== FAILURES ===================================
+_____________________________ test_adapter_re2tt ______________________________
+
+ma = <function ma.<locals>._gan at 0x000001F88BFED1C0>
+tmp_path = WindowsPath('C:/Users/84583/AppData/Local/Temp/pytest-of-84583/pytest-741/test_adapter_re2tt0')
+
+    def test_adapter_re2tt(ma, tmp_path):
+        from p3 import selector
+        from m1 import adapter, runner
+        import sinh_trace_S
+        ma('adapter-re2tt')
+        t = 1000
+        p, spans, rows = _re2(tmp_path, t)
+        allow = selector.nap_allowlist(p)
+        ca = adapter.ca_re2tt(allow, 'dev-0123456789', t, tmp_path, HOP_DONG, U_S)
+        assert len(ca['spans']) == len(spans)  # hai span ngoài miền bị cắt như cua_so.cat_span
+        en = [r['startTime'] + r['duration'] for r in rows]
+        pc = ca['params_ca']
+        assert pc['coverage']['trace'] == {'khoang': [[min(en) * 1000, max(en) * 1000]], 'r_ns': 1000}
+        assert pc['coverage']['metric'] == {'khoang': [[(t - 720) * 10 ** 9, (t + 720) * 10 ** 9]], 'r_ns': 10 ** 9}
+        assert pc['coverage']['log'] == {'khoang': [[(t - 500) * 10 ** 9, (t + 100) * 10 ** 9]], 'r_ns': 10 ** 9}
+        assert len(ca['metrics']) == 600 and ca['metrics'][0]['time'] == t - 300
+        assert next(r for r in ca['metrics'] if r['time'] == t + 3)['R_cpu'] is None
+        assert [l['message'] for l in ca['logs']] == ['INFO request accepted', 'ERROR request failed']
+        assert pc['nguon_metric'] == {'A_latency-90': 'metric', 'R_cpu': 'metric'}
+        assert pc['thoi_gian_nguon'] == {'metric': 'metrics.time'}
+        assert pc['ho_so_nguon']['kenh_metric']['bang'] == HOP_DONG['kenh']['RE2-TT']['metric_theo_hau_to']
+        assert pc['don_vi_thoi_gian'] == {'spans.start_us': 'us', 'metrics.time': 's', 'logs.timestamp': 's'}
+        assert 'data/rcaeval/re2tt_gia_1' in ca['chuoi_cam']
+        # chạy pha 1 trên ca của adapter: cpu của R có cờ (S1, E1-U)
+        ch = [{'config_id': 'C1', 'bat_tat': dict(runner.R0, E1='U'), 'tham_so_E4': dict(runner.TS_HOP_DONG)}]
+        h = runner.pha1([ca], {'dev-0123456789': t}, ch, tmp_path / 'l')
+        rec = json.loads((tmp_path / 'l' / 'ban-ghi.jsonl').read_text(encoding='utf-8').splitlines()[0])
+        assert rec['status'] == 'OK' and rec['error'] is None and h['so_ban_ghi'] == 1
+        assert any(k['don_vi'] == 'metric|R_cpu' for k in rec['extra']['kenh_co'])
+        assert rec['extra']['blocks_P'][0]['groups'][0] == ['R']
+        # trạng thái quan sát của nguồn metric (đặc tả v1 dòng 73; Đ19 điểm 3–4)
+>       assert rec['coverage']['metric']['trang_thai'] == 'OK'
+E       KeyError: 'metric'
+
+test_adapter.py:87: KeyError
+_____________________________ test_adapter_nezha ______________________________
+
+ma = <function ma.<locals>._gan at 0x000001F8AE1DF9C0>
+tmp_path = WindowsPath('C:/Users/84583/AppData/Local/Temp/pytest-of-84583/pytest-741/test_adapter_nezha0')
+
+    def test_adapter_nezha(ma, tmp_path):
+        from p3 import nezha
+        from m1 import adapter, runner
+        ma('adapter-nezha')
+        p, t = _nezha(tmp_path)
+        allow = nezha.nap_allowlist(p)
+        ca = adapter.ca_nezha(allow, 'dev-abcdef0123', tmp_path, HOP_DONG)
+        pc = ca['params_ca']
+        assert ca['t'] * 10 ** 9 == t and ca['inventory'] == nezha.UNIVERSE
+        assert len(ca['metrics']) == 10 and len(pc['nguon_metric']) == 165
+        assert len(pc['thoi_gian_nguon']) == 11 and all(len(v) == 10 for v in pc['thoi_gian_nguon'].values())
+        assert pc['nguon_metric']['frontend_FrontSuccessRate-pct'] == 'metric:front_service'
+        assert pc['nguon_metric']['frontend_CpuUsage-m'] == 'metric:frontend'
+        assert pc['phan_hoach_NA_da_kiem'] == {k: True for k in pc['thoi_gian_nguon']}
+        assert not any('/' in v for v in pc['nguon_metric'].values())
+        # F trace, log: một khoảng mỗi file phút (ba file, có khe), r = 1 ns
+        assert len(pc['coverage']['trace']['khoang']) == 3 and pc['coverage']['trace']['r_ns'] == 1
+        k0 = pc['coverage']['trace']['khoang']
+        assert all(a[1] < b[0] for a, b in zip(k0, k0[1:]))
+        # coverage khai theo từng nguồn metric, khóa là mã nguồn trung tính, khoảng từ cột Time của file nguồn
+        assert {k for k in pc['coverage'] if k.startswith('metric')} == set(pc['thoi_gian_nguon'])
+        for k in pc['thoi_gian_nguon']:
+            assert pc['coverage'][k]['r_ns'] == 1 and len(pc['coverage'][k]['khoang']) == 1
+            a, b = pc['coverage'][k]['khoang'][0]
+            assert a <= min(pc['thoi_gian_nguon'][k]) and max(pc['thoi_gian_nguon'][k]) <= b
+        lg = ca['logs'][0]
+        assert lg['message'].startswith('request 0 done') and lg['severity_raw'] in ('error', ' info ')
+        assert pc['ho_so_nguon']['quy_tac_log']['kieu'] == 'severity'
+        assert pc['don_vi_thoi_gian'] == {'spans.start_us': 'us', 'metrics.time': 'ns', 'logs.timestamp': 'ns'}
+        assert any(x.endswith('10_00_trace.csv') for x in ca['chuoi_cam'])
+        ch = [{'config_id': 'C1', 'bat_tat': dict(runner.R0, E1='U', E3=True), 'tham_so_E4': dict(runner.TS_HOP_DONG)}]
+        runner.pha1([ca], {'dev-abcdef0123': ca['t']}, ch, tmp_path / 'l')
+        rec = json.loads((tmp_path / 'l' / 'ban-ghi.jsonl').read_text(encoding='utf-8').splitlines()[0])
+        assert rec['error'] is None and rec['status'] in ('OK', 'NO_EVIDENCE')
+        assert rec['diagnostics']['cot_metric_chua_khai_nguon'] == []
+        assert rec['diagnostics']['nguon_metric_unsupported'] == []
+        assert rec['coverage']['trace']['trang_thai'] == 'OK'
+>       assert all(rec['coverage'][k]['trang_thai'] == 'OK' for k in pc['thoi_gian_nguon'])
+
+test_adapter.py:226: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+.0 = <dict_keyiterator object at 0x000001F8ADF062A0>
+
+>   assert all(rec['coverage'][k]['trang_thai'] == 'OK' for k in pc['thoi_gian_nguon'])
+E   KeyError: 'metric:adservice'
+
+test_adapter.py:226: KeyError
+______________________________ test_H1_qua_chuoi ______________________________
+
+ma = <function ma.<locals>._gan at 0x000001F8ADEE6DE0>
+
+    def test_H1_qua_chuoi(ma):
+        ma('H1-chuoi')
+        rec = _ca_metric_H({'nguon_metric': {'S_cpu': 'S'}, 'thoi_gian_nguon': {'S': [0, 60 * 10 ** 9, 120 * 10 ** 9]}})
+        assert rec['error'] is None
+>       assert rec['coverage']['S']['trang_thai'] == 'OK'
+E       KeyError: 'S'
+
+test_k02_quan_sat.py:262: KeyError
+____________________ test_MET2_nguon_metric_khong_co_hang _____________________
+
+ma = <function ma.<locals>._gan at 0x000001F8ADEE4220>
+
+    def test_MET2_nguon_metric_khong_co_hang(ma):
+        from m1 import chuoi
+        m = tu_lap(DAP_AN_THANH_PHAN, 'MET2')
+        ma('MET2')
+        bt = m['dau_vao']['bien_the']
+        p = _params(nguon_metric=m['dau_vao']['nguon_metric'], thoi_gian_nguon=bt['co_moc_rong']['thoi_gian_nguon'])
+        p['coverage'] = dict(p['coverage'], S=bt['co_moc_rong']['coverage_S'])
+        r = chuoi.chay(_ca_nho(), [], [], ['P', 'Q'], {}, 1000, p)
+>       assert {k: r['coverage']['S'].get(k) for k in ('trang_thai', 'F', 'H')} == m['dap_an']['co_moc_rong']
+E       KeyError: 'S'
+
+test_k02_quan_sat.py:439: KeyError
+=========================== short test summary info ===========================
+FAILED test_adapter.py::test_adapter_re2tt - KeyError: 'metric'
+FAILED test_adapter.py::test_adapter_nezha - KeyError: 'metric:adservice'
+FAILED test_k02_quan_sat.py::test_H1_qua_chuoi - KeyError: 'S'
+FAILED test_k02_quan_sat.py::test_MET2_nguon_metric_khong_co_hang - KeyError:...
+4 failed, 362 passed in 16.70s

@@ -1,0 +1,36 @@
+........................................................................ [ 24%]
+........................................................................ [ 49%]
+........................................................................ [ 74%]
+.................................................................F...... [ 99%]
+.                                                                        [100%]
+================================== FAILURES ===================================
+__________________________ test_hai_pha_hash_on_dinh __________________________
+
+ma = <function ma.<locals>._gan at 0x0000021D659DFCE0>
+tmp_path = WindowsPath('C:/Users/84583/AppData/Local/Temp/pytest-of-84583/pytest-173/test_hai_pha_hash_on_dinh0')
+
+    def test_hai_pha_hash_on_dinh(ma, tmp_path):
+        """Pha 1 không đọc nhãn, ghi bản ghi và hash; chạy lại cho cùng hash. Pha 2 đọc bản ghi đã băm và nhãn."""
+        from m1 import runner
+        from m1_danh_gia import pha2
+        import sinh_trace_S
+        from conftest import FIXTURE
+        ma('runner-hai-pha')
+        spans, logs = sinh_trace_S.sinh('S1', t=1000, mau=FIXTURE['trace_mau_S'])
+        ca = [{'opaque_id': 'gia-001', 'dataset': 'RE2-TT', 'spans': spans, 'metrics': [], 'logs': logs,
+               'inventory': ['A', 'B', 'F', 'I', 'R', 'X'], 'aliases': {}}]
+        moc = {'gia-001': 1000}
+        cau_hinh = [{'config_id': 'R0', 'params': sinh_trace_S.params({})},
+                    {'config_id': 'C1', 'params': sinh_trace_S.params({'E1': 'U'})}]
+        h1 = runner.pha1(ca, moc, cau_hinh, tmp_path / 'l1')
+        h2 = runner.pha1(ca, moc, cau_hinh, tmp_path / 'l2')
+>       assert h1['sha256'] == h2['sha256']
+E       AssertionError: assert '9fd2bfa961ed...9b6724a30ba69' == 'a83f0b5183d3...188e64f6e29a4'
+E         
+E         - a83f0b5183d3deef6b52b2965c4e6cf40460d1fb8e293f6f380188e64f6e29a4
+E         + 9fd2bfa961ed9f01bcd8ca7cb0a7c26576b4d7d7ee4d1e8aa389b6724a30ba69
+
+test_runner.py:66: AssertionError
+=========================== short test summary info ===========================
+FAILED test_runner.py::test_hai_pha_hash_on_dinh - AssertionError: assert '9f...
+1 failed, 288 passed in 6.08s

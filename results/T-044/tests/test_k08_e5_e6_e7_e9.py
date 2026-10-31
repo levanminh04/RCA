@@ -261,3 +261,93 @@ def test_chuoi_thieu_tham_so_E5_dung_C_phay(ma, monkeypatch):
         nhan.clear()
         rec = chuoi.chay(spans, [], logs, ['A', 'B', 'F', 'I', 'R', 'X'], {}, 1000, p)
         assert rec['error'] is None and nhan and set(nhan) == {mong}
+
+
+# ---- định danh kênh theo đơn vị (S12, lượt 3) ----
+
+def _kenh_km(ds):
+    from m1.kieu import Kenh
+    return [Kenh(x['thuc_the'], x['ten'], x['huong'], x['lop'], x['s'], nhom=x['nhom'], don_vi=x['don_vi']) for x in ds]
+
+
+@pytest.mark.parametrize('bien_the', ['goc', 'dao', 'request'])
+def test_KM1_ma_kenh_theo_don_vi(bien_the, ma):
+    """Thao tác `cpu` của S và metric `S_cpu` không dùng chung F_I; kết quả không phụ thuộc thứ tự hay tên thao tác."""
+    from m1 import e5, e7, xep_hang
+    m = tu_lap(DAP_AN_THANH_PHAN, 'KM1')
+    ma(f'KM1-{bien_the}')
+    d, da = m['dau_vao'], m['dap_an']
+    ds = [dict(x) for x in d['kenh']]
+    F_I_dap_an = dict(da['F_I'])
+    if bien_the == 'dao':
+        ds[0], ds[1] = ds[1], ds[0]
+    if bien_the == 'request':
+        ds[0] = dict(ds[0], ten='request', don_vi='op|S|request')
+        F_I_dap_an = {k.replace('op|S|cpu|cpu', 'op|S|request|request'): v for k, v in F_I_dap_an.items()}
+    kenh = _kenh_km(ds)
+    canh = [tuple(c) for c in d['canh']]
+    p = e5.phan_loai(kenh, canh, bat=d['E5'])
+    assert p['F_I'] == F_I_dap_an
+    xh = xep_hang.xep(kenh, F_I=p['F_I'], thuc_the_co_kenh_OK={k.thuc_the for k in kenh})
+    assert [[b['key'], b['groups'][0]] for b in xh['blocks']] == da['blocks']
+    R = e7.vung(xh['T'], kenh, canh, p['inherited_by'], cach=1)
+    assert {r: sorted(v) for r, v in R.items()} == da['vung_1']
+    assert {x['ma'] for x in p['inherited_by']} <= set(p['F_I'])
+
+
+def test_KM2_alias_va_trung_ma(ma):
+    from m1 import e5, xep_hang
+    m = tu_lap(DAP_AN_THANH_PHAN, 'KM2')
+    ma('KM2')
+    d, da = m['dau_vao'], m['dap_an']
+    kenh = _kenh_km(d['kenh_alias'])
+    p = e5.phan_loai(kenh, [], bat=True)
+    assert p['F_I'] == da['alias_F_I']
+    xh = xep_hang.xep(kenh, F_I=p['F_I'], thuc_the_co_kenh_OK={'S'})
+    assert list(xh['K_I']['S']) == da['alias_K_I_S']
+    with pytest.raises(ValueError):
+        e5.phan_loai([kenh[0], kenh[0]], [], bat=True)
+
+
+def test_KM2_trung_ma_qua_chuoi(ma, monkeypatch):
+    """Chuỗi trả ERROR (không xếp hạng) khi hai kênh trùng mã; không để F_I ghi đè."""
+    from m1 import chuoi, e5
+    from test_k02_quan_sat import _ca_nho, _params
+    ma('KM2-chuoi')
+    goc = e5.phan_loai
+    monkeypatch.setattr(e5, 'phan_loai', lambda kenh, *a, **k: goc(list(kenh) + list(kenh)[:1], *a, **k))
+    r = chuoi.chay(_ca_nho(), [], [], ['P', 'Q'], {}, 1000, _params())
+    assert r['status'] == 'ERROR' and 'mã kênh trùng' in r['error']
+
+
+def _ca_km3(ten_op):
+    rows = []
+    for phia in ('N', 'A'):
+        for i in range(20):
+            st = (800 + i * 10 if phia == 'N' else 1010 + i * 10) * 10 ** 6
+            du = 10000 if phia == 'N' else 20000
+            rows += [{'traceID': f'{phia}{i}', 'spanID': 's', 'parentSpanID': '', 'owner': 'S', 'operation': ten_op,
+                      'start_us': st, 'duration_us': du},
+                     {'traceID': f'{phia}{i}', 'spanID': 'b', 'parentSpanID': 's', 'owner': 'B', 'operation': 'work',
+                      'start_us': st + 1000, 'duration_us': du // 2}]
+    return rows
+
+
+@pytest.mark.parametrize('ten_op', ['cpu', 'request'])
+def test_KM3_ma_kenh_qua_chuoi(ten_op, ma):
+    from m1 import chuoi
+    import sinh_trace_S
+    m = tu_lap(DAP_AN_THANH_PHAN, 'KM3')
+    ma(f'KM3-{ten_op}')
+    da = m['dap_an']
+    metrics = [{'time': 950 + i, 'S_cpu': 0.0} for i in range(5)] + [{'time': 1050 + i, 'S_cpu': 10.0} for i in range(5)]
+    p = sinh_trace_S.params({'E5': True})
+    p['nguon_metric'] = {'S_cpu': 'metric:S'}
+    p['thoi_gian_nguon'] = {'metric:S': 'metrics.time'}
+    p['coverage']['metric:S'] = {'khoang': [[700 * 10 ** 9, 1300 * 10 ** 9]], 'r_ns': 10 ** 9}
+    r = chuoi.chay(_ca_km3(ten_op), metrics, [], ['S', 'B'], {}, 1000, p)
+    assert r['status'] == 'OK'
+    assert [[b['key'], b['groups'][0]] for b in r['blocks']] == da['blocks']
+    F = {k['don_vi']: k['F_I'] for k in r['extra']['kenh_co']}
+    assert F == {x.replace('<thao tác>', ten_op): v for x, v in da['F_I_theo_don_vi'].items()}
+    assert len({k['ma'] for k in r['extra']['kenh_co']}) == len(r['extra']['kenh_co'])

@@ -1,0 +1,61 @@
+........................................................................ [ 27%]
+........................................................................ [ 54%]
+........................................................................ [ 81%]
+.....................................FF...........                       [100%]
+================================== FAILURES ===================================
+____________________ test_CK5_buoc5_phu_thuoc_quan_sat[a] _____________________
+
+bien_the = 'a', ma = <function ma.<locals>._gan at 0x0000017478C604A0>
+
+    @pytest.mark.parametrize('bien_the', ['a', 'b'])
+    def test_CK5_buoc5_phu_thuoc_quan_sat(bien_the, ma):
+        """Bước 5 đọc cặp phụ thuộc quan sát là KHÔNG ĐỦ CA (Minh duyệt 30/10/2026); bước 8 nhất quán với bước 5."""
+        from m1_danh_gia import chon_khoi, luat_c
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CK5')
+        ma(f'CK5-{bien_the}')
+        d, da = m['dau_vao'], m['dap_an'][bien_the]
+        cap = dict(d['cap'])
+        cap['E1|E1+E3'] = luat_c.ket_hop_the_gioi(d['cap_E1|E1+E3_theo_the_gioi'][bien_the], 'khoi_K')
+        kq = chon_khoi.chon(d['thanh_phan'], it_ca=d['it_ca'], do_thi=d['do_thi'],
+                            MRR={k: Fraction(v) for k, v in d['MRR'].items()}, cap=cap)
+        assert kq['thieu_cap'] == []
+>       assert {k: kq[k] for k in ('co_dinh', 'loai_luot_hai', 'chon')} == {k: da[k] for k in ('co_dinh', 'loai_luot_hai', 'chon')}
+E       AssertionError: assert {'chon': 'E1'...luot_hai': []} == {'chon': 'E1+..._hai': ['E1']}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'loai_luot_hai': []} != {'loai_luot_hai': ['E1']}
+E         {'chon': 'E1'} != {'chon': 'E1+E3'}
+E         Use -v to get more diff
+
+test_k11_danh_gia.py:494: AssertionError
+____________________ test_CK5_buoc5_phu_thuoc_quan_sat[b] _____________________
+
+bien_the = 'b', ma = <function ma.<locals>._gan at 0x0000017478C62F20>
+
+    @pytest.mark.parametrize('bien_the', ['a', 'b'])
+    def test_CK5_buoc5_phu_thuoc_quan_sat(bien_the, ma):
+        """Bước 5 đọc cặp phụ thuộc quan sát là KHÔNG ĐỦ CA (Minh duyệt 30/10/2026); bước 8 nhất quán với bước 5."""
+        from m1_danh_gia import chon_khoi, luat_c
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CK5')
+        ma(f'CK5-{bien_the}')
+        d, da = m['dau_vao'], m['dap_an'][bien_the]
+        cap = dict(d['cap'])
+        cap['E1|E1+E3'] = luat_c.ket_hop_the_gioi(d['cap_E1|E1+E3_theo_the_gioi'][bien_the], 'khoi_K')
+        kq = chon_khoi.chon(d['thanh_phan'], it_ca=d['it_ca'], do_thi=d['do_thi'],
+                            MRR={k: Fraction(v) for k, v in d['MRR'].items()}, cap=cap)
+        assert kq['thieu_cap'] == []
+>       assert {k: kq[k] for k in ('co_dinh', 'loai_luot_hai', 'chon')} == {k: da[k] for k in ('co_dinh', 'loai_luot_hai', 'chon')}
+E       AssertionError: assert {'chon': 'E1'...luot_hai': []} == {'chon': 'E1+..._hai': ['E1']}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'loai_luot_hai': []} != {'loai_luot_hai': ['E1']}
+E         {'chon': 'E1'} != {'chon': 'E1+E3'}
+E         Use -v to get more diff
+
+test_k11_danh_gia.py:494: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k11_danh_gia.py::test_CK5_buoc5_phu_thuoc_quan_sat[a] - Assertion...
+FAILED test_k11_danh_gia.py::test_CK5_buoc5_phu_thuoc_quan_sat[b] - Assertion...
+2 failed, 264 passed in 5.43s

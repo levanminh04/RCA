@@ -27,7 +27,7 @@ def root_E5_tu_ban_ghi(rec_bo, rec_bat, root):
     co = [k for k in rec_bat['extra']['kenh_co'] if k['thuc_the'] == root]
     mat = sum(1 for k in co if k['F_I'] == 0)
     return {'mat_kenh_F_raw': [mat, len(co)], 'con_tu_sinh': any(k['F_I'] == 1 for k in co),
-            'kenh_mat': sorted(f"{k['ten']}|{k['huong']}" for k in co if k['F_I'] == 0),
+            'kenh_mat': sorted(k['ma'] for k in co if k['F_I'] == 0),  # mã kênh gồm đơn vị (S12)
             'hang_bo_E5': _so(rr.hang_ky_vong(rec_bo['extra']['blocks_P'] or [], root)),
             'hang_bat_E5': _so(rr.hang_ky_vong(rec_bat['extra']['blocks_P'] or [], root))}
 

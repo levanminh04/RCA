@@ -1,0 +1,86 @@
+........................................................................ [ 24%]
+........................................................................ [ 49%]
+........................................................................ [ 74%]
+....................................FFF................................. [ 99%]
+.                                                                        [100%]
+================================== FAILURES ===================================
+______________________ test_CK8_buoc8_phu_thuoc_quan_sat ______________________
+
+ma = <function ma.<locals>._gan at 0x00000224DCFD20C0>
+
+    def test_CK8_buoc8_phu_thuoc_quan_sat(ma):
+        from m1_danh_gia import chon_khoi, luat_c
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CK8')
+        ma('CK8')
+        d = m['dau_vao']
+        ra = []
+        for c in d['ca']:
+            cap = {'R0|E1': luat_c.ket_hop_the_gioi(c['ket_cuc'], 'khoi_K')}
+            kq = chon_khoi.kiem_cau_hinh_thang(c['thang'], d['thanh_phan'], cap)
+            ra.append(next(k for k in ('nhat_quan', 'xung_dot', 'trinh_Minh') if kq[k] == ['E1']))
+>       assert ra == m['dap_an']['ket_qua']
+E       AssertionError: assert ['xung_dot', ...', 'xung_dot'] == ['nhat_quan',...', 'xung_dot']
+E         
+E         At index 0 diff: 'xung_dot' != 'nhat_quan'
+E         Use -v to get more diff
+
+test_k11_danh_gia.py:479: AssertionError
+____________________ test_CK5_buoc5_phu_thuoc_quan_sat[a] _____________________
+
+bien_the = 'a', ma = <function ma.<locals>._gan at 0x00000224DD0B0AE0>
+
+    @pytest.mark.parametrize('bien_the', ['a', 'b'])
+    def test_CK5_buoc5_phu_thuoc_quan_sat(bien_the, ma):
+        """Bước 5 đọc cặp phụ thuộc quan sát là KHÔNG ĐỦ CA (Minh duyệt 30/10/2026); bước 8 nhất quán với bước 5."""
+        from m1_danh_gia import chon_khoi, luat_c
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CK5')
+        ma(f'CK5-{bien_the}')
+        d, da = m['dau_vao'], m['dap_an'][bien_the]
+        cap = dict(d['cap'])
+        cap['E1|E1+E3'] = luat_c.ket_hop_the_gioi(d['cap_E1|E1+E3_theo_the_gioi'][bien_the], 'khoi_K')
+        kq = chon_khoi.chon(d['thanh_phan'], it_ca=d['it_ca'], do_thi=d['do_thi'],
+                            MRR={k: Fraction(v) for k, v in d['MRR'].items()}, cap=cap)
+        assert kq['thieu_cap'] == []
+        assert {k: kq[k] for k in ('co_dinh', 'loai_luot_hai', 'chon')} == {k: da[k] for k in ('co_dinh', 'loai_luot_hai', 'chon')}
+        b8 = chon_khoi.kiem_cau_hinh_thang(kq['chon'], d['thanh_phan'], cap)
+>       assert {k: b8[k] for k in ('nhat_quan', 'xung_dot')} == da['buoc8']
+E       AssertionError: assert {'nhat_quan':..._dot': ['E3']} == {'nhat_quan':...xung_dot': []}
+E         
+E         Differing items:
+E         {'xung_dot': ['E3']} != {'xung_dot': []}
+E         {'nhat_quan': ['E1']} != {'nhat_quan': ['E1', 'E3']}
+E         Use -v to get more diff
+
+test_k11_danh_gia.py:496: AssertionError
+____________________ test_CK5_buoc5_phu_thuoc_quan_sat[b] _____________________
+
+bien_the = 'b', ma = <function ma.<locals>._gan at 0x00000224DD0B0D60>
+
+    @pytest.mark.parametrize('bien_the', ['a', 'b'])
+    def test_CK5_buoc5_phu_thuoc_quan_sat(bien_the, ma):
+        """Bước 5 đọc cặp phụ thuộc quan sát là KHÔNG ĐỦ CA (Minh duyệt 30/10/2026); bước 8 nhất quán với bước 5."""
+        from m1_danh_gia import chon_khoi, luat_c
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CK5')
+        ma(f'CK5-{bien_the}')
+        d, da = m['dau_vao'], m['dap_an'][bien_the]
+        cap = dict(d['cap'])
+        cap['E1|E1+E3'] = luat_c.ket_hop_the_gioi(d['cap_E1|E1+E3_theo_the_gioi'][bien_the], 'khoi_K')
+        kq = chon_khoi.chon(d['thanh_phan'], it_ca=d['it_ca'], do_thi=d['do_thi'],
+                            MRR={k: Fraction(v) for k, v in d['MRR'].items()}, cap=cap)
+        assert kq['thieu_cap'] == []
+        assert {k: kq[k] for k in ('co_dinh', 'loai_luot_hai', 'chon')} == {k: da[k] for k in ('co_dinh', 'loai_luot_hai', 'chon')}
+        b8 = chon_khoi.kiem_cau_hinh_thang(kq['chon'], d['thanh_phan'], cap)
+>       assert {k: b8[k] for k in ('nhat_quan', 'xung_dot')} == da['buoc8']
+E       AssertionError: assert {'nhat_quan':..._dot': ['E3']} == {'nhat_quan':...xung_dot': []}
+E         
+E         Differing items:
+E         {'xung_dot': ['E3']} != {'xung_dot': []}
+E         {'nhat_quan': ['E1']} != {'nhat_quan': ['E1', 'E3']}
+E         Use -v to get more diff
+
+test_k11_danh_gia.py:496: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k11_danh_gia.py::test_CK8_buoc8_phu_thuoc_quan_sat - AssertionErr...
+FAILED test_k11_danh_gia.py::test_CK5_buoc5_phu_thuoc_quan_sat[a] - Assertion...
+FAILED test_k11_danh_gia.py::test_CK5_buoc5_phu_thuoc_quan_sat[b] - Assertion...
+3 failed, 286 passed in 6.00s

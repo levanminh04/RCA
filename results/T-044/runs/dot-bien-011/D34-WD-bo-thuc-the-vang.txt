@@ -1,0 +1,26 @@
+...................................F.................................... [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+........................................................................ [ 84%]
+......................................................                   [100%]
+================================== FAILURES ===================================
+________________________ test_WD2_WD3_hoa_va_vang[WD3] ________________________
+
+ma_wd = 'WD3', ma = <function ma.<locals>._gan at 0x000001FC437DE7A0>
+
+    @pytest.mark.parametrize('ma_wd', ['WD2', 'WD3'])
+    def test_WD2_WD3_hoa_va_vang(ma_wd, ma):
+        from fractions import Fraction
+        m = tu_lap(DAP_AN_THANH_PHAN, ma_wd)
+        ma(ma_wd)
+        d, da = m['dau_vao'], m['dap_an']
+        wd, nn = _wd(d, ['R'] if ma_wd == 'WD3' else None)
+        assert wd['WORLD_DEPENDENT'] is True
+        assert wd['hang_ky_vong'] == {w: Fraction(v) for w, v in da['hang_ky_vong'].items()}
+>       assert {k: nn['theo_the_gioi']['S_lo'][k] for k in ('doi', 'vuot', 'bi_vuot')} == da['S_lo']
+E       KeyError: 'S_lo'
+
+test_k02_quan_sat.py:396: KeyError
+=========================== short test summary info ===========================
+FAILED test_k02_quan_sat.py::test_WD2_WD3_hoa_va_vang[WD3] - KeyError: 'S_lo'
+1 failed, 341 passed in 13.36s

@@ -1,0 +1,91 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+...................................F..................................FF [ 84%]
+......................................................                   [100%]
+================================== FAILURES ===================================
+______________________________ test_TS7_boi_so_0 ______________________________
+
+ma = <function ma.<locals>._gan at 0x000001D9D0030720>
+
+    def test_TS7_boi_so_0(ma):
+        from m1_danh_gia import luat_c
+        m = tu_lap(DAP_AN_THANH_PHAN, 'TS7')
+        ma('TS7')
+        d, da = m['dau_vao'], m['dap_an']
+        ds = [{'ma': a, 'dataset': b, 'o': c} for a, b, c in d['ca']]
+        dd = {k: Fraction(v) for k, v in d['delta_d'].items()}
+        kq = luat_c.ap_dung(ds, {k: Fraction(v) for k, v in d['RR_tat'].items()},
+                            {k: Fraction(v) for k, v in d['RR_bat'].items()}, set(d['E_X']), thanh_phan='X',
+                            trong_so=d['boi_so'], delta_d_co_dinh=dd)
+        assert gan_bang(kq['dMRR']['gop'], da['dMRR_gop']) and (kq['P'], kq['M']) == (da['P'], da['M'])
+        assert kq['so_o_E_X'] == da['so_o_E_X'] and sorted(kq['huong_o']) == da['o_co_huong']
+        assert (kq['ket_cuc'], kq['buoc']) == (da['ket_cuc'], da['buoc'])
+        # bỏ hẳn ca b mà E_X vẫn giữ ô của b: lỗi; ca không được lấy vào mẫu phải có bội số 0 (C7, G3, Q4)
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+test_k11_danh_gia.py:470: Failed
+__________________________ test_LC2_E_X_va_ma_ca[0] ___________________________
+
+bien_the = 0, ma = <function ma.<locals>._gan at 0x000001D9D00945E0>
+
+    @pytest.mark.parametrize('bien_the', [None, 0, 1, 2])
+    def test_LC2_E_X_va_ma_ca(bien_the, ma):
+        from m1_danh_gia import luat_c
+        m = tu_lap(DAP_AN_THANH_PHAN, 'LC2')
+        da = m['dap_an']
+        ma(f'LC2-{bien_the}')
+        ds = [{'ma': f'c{i}', 'dataset': 'RE2-TT', 'o': i} for i in range(8)]
+        tat = {c['ma']: Fraction(1, 2) for c in ds}
+        bat = {c['ma']: Fraction(1) for c in ds}
+        E_X = set(m['dau_vao']['E_X'])
+        if bien_the is None:
+            kq = luat_c.ap_dung(ds, tat, bat, E_X, thanh_phan='X')
+            assert (kq['ket_cuc'], kq['buoc'], kq['P'], kq['M']) == (da['ket_cuc'], da['buoc'], da['P'], da['M'])
+            return
+        if bien_the == 0:
+            E_X = {str(o) for o in E_X}
+        elif bien_the == 1:
+            E_X = 'o1'
+        else:
+            ds = ds + [dict(ds[0])]
+        assert da['bien_the'] == 'ValueError'
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+test_k13_luot5.py:135: Failed
+__________________________ test_LC2_E_X_va_ma_ca[1] ___________________________
+
+bien_the = 1, ma = <function ma.<locals>._gan at 0x000001D9D00958A0>
+
+    @pytest.mark.parametrize('bien_the', [None, 0, 1, 2])
+    def test_LC2_E_X_va_ma_ca(bien_the, ma):
+        from m1_danh_gia import luat_c
+        m = tu_lap(DAP_AN_THANH_PHAN, 'LC2')
+        da = m['dap_an']
+        ma(f'LC2-{bien_the}')
+        ds = [{'ma': f'c{i}', 'dataset': 'RE2-TT', 'o': i} for i in range(8)]
+        tat = {c['ma']: Fraction(1, 2) for c in ds}
+        bat = {c['ma']: Fraction(1) for c in ds}
+        E_X = set(m['dau_vao']['E_X'])
+        if bien_the is None:
+            kq = luat_c.ap_dung(ds, tat, bat, E_X, thanh_phan='X')
+            assert (kq['ket_cuc'], kq['buoc'], kq['P'], kq['M']) == (da['ket_cuc'], da['buoc'], da['P'], da['M'])
+            return
+        if bien_the == 0:
+            E_X = {str(o) for o in E_X}
+        elif bien_the == 1:
+            E_X = 'o1'
+        else:
+            ds = ds + [dict(ds[0])]
+        assert da['bien_the'] == 'ValueError'
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+test_k13_luot5.py:135: Failed
+=========================== short test summary info ===========================
+FAILED test_k11_danh_gia.py::test_TS7_boi_so_0 - Failed: DID NOT RAISE <class...
+FAILED test_k13_luot5.py::test_LC2_E_X_va_ma_ca[0] - Failed: DID NOT RAISE <c...
+FAILED test_k13_luot5.py::test_LC2_E_X_va_ma_ca[1] - Failed: DID NOT RAISE <c...
+3 failed, 339 passed in 14.63s

@@ -1,0 +1,39 @@
+........................................................................ [ 19%]
+........................................................................ [ 39%]
+........................................................................ [ 59%]
+........................................................................ [ 78%]
+...............................................F........................ [ 98%]
+......                                                                   [100%]
+================================== FAILURES ===================================
+_____________________________ test_LM1_lay_mau_o ______________________________
+
+ma = <function ma.<locals>._gan at 0x000001BFB06A0CC0>
+
+    def test_LM1_lay_mau_o(ma):
+        from m1_danh_gia import rr
+        m = tu_lap(DAP_AN_THANH_PHAN, 'LM1')
+        d, da = m['dau_vao'], m['dap_an']
+        ma('LM1')
+        ds = [{'ma': a, 'dataset': b, 'o': c} for a, b, c in d['ca']]
+        for seed in d['seed']:
+            w = rr.lay_mau_o(ds, np.random.default_rng(seed))
+            assert (set(w) == {c['ma'] for c in ds}) is da['du_moi_ca']
+            theo_o = {}
+            for c in ds:
+                theo_o.setdefault((c['dataset'], c['o']), set()).add(w[c['ma']])
+            assert all(len(v) == 1 for v in theo_o.values()) is da['ca_cung_o_cung_boi_so']
+            tong = {}
+            for (dsn, _), v in theo_o.items():
+                tong[dsn] = tong.get(dsn, 0) + next(iter(v))
+>           assert tong == da['tong_boi_so_o']
+E           AssertionError: assert {'Nezha-OB': 3, 'RE2-TT': 7} == {'Nezha-OB': 2, 'RE2-TT': 3}
+E             
+E             Differing items:
+E             {'Nezha-OB': 3} != {'Nezha-OB': 2}
+E             {'RE2-TT': 7} != {'RE2-TT': 3}
+E             Use -v to get more diff
+
+test_k14_luot5b.py:77: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k14_luot5b.py::test_LM1_lay_mau_o - AssertionError: assert {'Nezh...
+1 failed, 365 passed in 14.46s

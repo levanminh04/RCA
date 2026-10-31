@@ -1,0 +1,31 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+........................................................................ [ 84%]
+......................................F...............                   [100%]
+================================== FAILURES ===================================
+_____________________________ test_E9X_phu_quyet ______________________________
+
+ma = <function ma.<locals>._gan at 0x000001B7F47B36A0>
+
+    def test_E9X_phu_quyet(ma):
+        from m1 import e9
+        m = tu_lap(DAP_AN_THANH_PHAN, 'E9X')
+        d = m['dau_vao']
+        ma('E9X')
+        assert [e9.phu_quyet(e, B, o_s=d['o_s'], tau=d['tau'])[0] for e, B in d['ca']] == m['dap_an']['phu_quyet']
+        # qua E5: mọi bên giải thích đều được xét, không chỉ bên đầu
+        from m1 import e5
+        from m1.kieu import Kenh
+        kenh = [Kenh('e', 'k', 'len', 'lan_nguoc', 0.5, khoi_phat=0), Kenh('b1', 'k', 'len', 'khong_lan', 0.5, khoi_phat=30),
+                Kenh('b2', 'k', 'len', 'khong_lan', 0.5, khoi_phat=5)]
+        p = e5.phan_loai(kenh, [('e', 'b1'), ('e', 'b2')], bat=True,
+                         e9={'bat': True, 'o_s': d['o_s'], 'tau': d['tau'], 'canh_E2_bat_thuong': set()})
+        da = m['dap_an']['qua_E5']
+>       assert p['F_I']['e||k|len'] == da['F_I_e']
+E       assert 1 == 0
+
+test_k13_luot5.py:498: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_E9X_phu_quyet - assert 1 == 0
+1 failed, 341 passed in 14.44s

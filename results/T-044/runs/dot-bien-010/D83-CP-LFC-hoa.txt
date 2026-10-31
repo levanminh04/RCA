@@ -1,0 +1,26 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+........................................................................ [ 84%]
+....................F.................................                   [100%]
+================================== FAILURES ===================================
+_____________________________ test_CP4_bien_E1CP ______________________________
+
+ma = <function ma.<locals>._gan at 0x000001A59576EC00>
+
+    def test_CP4_bien_E1CP(ma):
+        from m1 import span
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CP4')
+        ma('CP4')
+        for c, u, dg in zip(m['dau_vao']['ca'], m['dap_an']['u_CP'], m['dap_an']['duong_gang']):
+            con = [tuple(x) for x in c['con']]
+>           assert span.doc_quyen_CP(tuple(c['cha']), con, c['tau']) == u
+E           AssertionError: assert 0 == 5
+E            +  where 0 = <function doc_quyen_CP at 0x000001A595A95DA0>((0, 10), [(0, 10), (5, 10)], 1)
+E            +    where <function doc_quyen_CP at 0x000001A595A95DA0> = <module 'm1.span' from 'C:\\Users\\84583\\AppData\\Local\\Temp\\tmp9_7uv8ll\\src\\m1\\span.py'>.doc_quyen_CP
+E            +    and   (0, 10) = tuple([0, 10])
+
+test_k13_luot5.py:286: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_CP4_bien_E1CP - AssertionError: assert 0 == 5
+1 failed, 341 passed in 15.80s

@@ -1,0 +1,30 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+........................................................................ [ 84%]
+................................F.....................                   [100%]
+================================== FAILURES ===================================
+___________________________ test_XH1_khoa_xep_hang ____________________________
+
+ma = <function ma.<locals>._gan at 0x00000242CE0832E0>
+
+    def test_XH1_khoa_xep_hang(ma):
+        from m1 import xep_hang
+        from m1.kieu import Kenh
+        m = tu_lap(DAP_AN_THANH_PHAN, 'XH1')
+        da = m['dap_an']
+        ma('XH1')
+        k = lambda e, ten, s, s_q=None: Kenh(e, ten, 'len', 'khong_lan', s, s_q=s_q)
+        x = xep_hang.xep([k('A', 'u1', 0.5), k('A', 'u2', 0.5), k('B', 'u1', 0.5)], thuc_the_co_kenh_OK={'A', 'B'},
+                         che_do='E6b', canh=())
+>       assert [b['groups'][0] for b in x['blocks']] == da['E6b']
+E       AssertionError: assert [['A', 'B']] == [['A'], ['B']]
+E         
+E         At index 0 diff: ['A', 'B'] != ['A']
+E         Right contains one more item: ['B']
+E         Use -v to get more diff
+
+test_k13_luot5.py:393: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_XH1_khoa_xep_hang - AssertionError: assert [['...
+1 failed, 341 passed in 14.06s

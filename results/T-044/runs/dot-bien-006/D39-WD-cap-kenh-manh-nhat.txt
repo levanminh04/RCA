@@ -1,0 +1,42 @@
+....................................F................................... [ 27%]
+........................................................................ [ 54%]
+........................................................................ [ 82%]
+...............................................                          [100%]
+================================== FAILURES ===================================
+_______________________ test_WD4_kenh_doi_va_phan_khoa ________________________
+
+ma = <function ma.<locals>._gan at 0x00000182DDE2E2A0>
+
+    def test_WD4_kenh_doi_va_phan_khoa(ma):
+        """S13: cặp giải thích chỉ ra kênh đổi và phần khóa phân định, không chỉ kênh mạnh nhất (WD4)."""
+        from fractions import Fraction
+        from m1 import xep_hang
+        from m1.kieu import Kenh
+        from m1_danh_gia import the_gioi
+        m = tu_lap(DAP_AN_THANH_PHAN, 'WD4')
+        ma('WD4')
+        d, da = m['dau_vao'], m['dap_an']
+        k, b = {}, {}
+        for w in ('P', 'S_lo', 'S_hi'):
+            ks = [Kenh(e, x['ten'], 'len', x['lop'], x['s'], don_vi=x['don_vi']) for e in sorted(d['kenh'])
+                  for x in d['kenh'][e] if w in x.get('chi_o', ('P', 'S_lo', 'S_hi'))]
+            xh = xep_hang.xep(ks, thuc_the_co_kenh_OK=set(d['kenh']))
+            b[w] = xh['blocks']
+            k[w] = [{'ma': x.ma, 'thuc_the': x.thuc_the, 'ten': x.ten, 'huong': x.huong, 'don_vi': x.don_vi, 'lop': x.lop,
+                     's': x.s, 'F_I': 1} for x in ks]
+        wd = the_gioi.world_dependent(b, d['root'])
+        assert wd['WORLD_DEPENDENT'] is True
+        assert wd['hang_ky_vong'] == {w: Fraction(v) for w, v in da['hang_ky_vong'].items()}
+        nn = the_gioi.nguyen_nhan(k, d['root'], b)
+>       assert nn['loai'] == da['loai'] and [list(x) for x in nn['cap']] == da['cap']
+E       AssertionError: assert ('cong_doi' == 'cong_doi'
+E         
+E           cong_doi and [['R', ['R|op...99|p99|len']]] == [['R', ['R|op...og_loi|len']]]
+E         
+E         At index 1 diff: ['B', ['B|op|B|p99|p99|len']] != ['B', ['B|log|B|log_loi|log_loi|len']]
+E         Use -v to get more diff)
+
+test_k02_quan_sat.py:425: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k02_quan_sat.py::test_WD4_kenh_doi_va_phan_khoa - AssertionError:...
+1 failed, 262 passed in 5.58s

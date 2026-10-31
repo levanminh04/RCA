@@ -6,7 +6,9 @@ giới cho đơn vị đếm) → kênh → E2 gán → E5 (+ E9) → xếp hạ
 đối chứng C-d1, C-d2, C-d3 trên kết quả chấm của cấu hình (P; CĐ10, chỉ báo cáo) → bản ghi.
 Khởi phát (Đ11) luôn tính cho đơn vị phân vị có cờ, vì C-d2 cần; E5 chỉ dùng khi E9 bật.
 """
+import json
 import math
+from fractions import Fraction
 
 from m1 import doi_chung, e2, e3 as e3_mod, e4, e5, e7, hop_dong, kenh as kenh_mod, quan_sat, span, xep_hang
 from m1.kieu import Kenh
@@ -83,6 +85,12 @@ def xep_tu_kenh_fixture(kenh_dict, canh, bat_E5):
 # ---------------------------------------------------------------- API 7 tham số
 
 DON_VI_HOP_LE = {'spans.start_us': ('us',), 'metrics.time': ('s', 'ns'), 'logs.timestamp': ('s', 'ns')}
+# hop-dong.json#/vao/params/bat_tat: đủ tám khóa, giá trị trong tập cho phép (S22)
+BAT_TAT_HOP_LE = {'E1': ('U', 'CP', 'tat'), 'E2': ('C', 'VC', 'tat'), 'E3': (True, False), 'E3b': (True, False),
+                  'E5': (True, False), 'E6': ('a', 'b'), 'E9': (True, False), 'T12': (True, False)}
+# đối chứng chạy M1 không dựng vùng E7 (đặc tả v1 dòng 361, 405; S14)
+DOI_CHUNG_KHONG_E7 = ('C-a0', 'C-a1')
+TS_E4_KHOA = ('m_span', 'm_metric', 'alpha', 'epsilon', 'q_hi', 'q_lo', 'n_exact_max', 'count_min')
 
 
 def _kiem_params(params):
@@ -112,6 +120,25 @@ def _kiem_params(params):
     if not isinstance(ho.get('nguon_khoi_phat'), list):
         raise LoiHopDong('ERROR', 'params.ho_so_nguon.nguon_khoi_phat thiếu hoặc sai (CĐ5)')
     bt = params['bat_tat']
+    if not isinstance(bt, dict) or set(bt) != set(BAT_TAT_HOP_LE):
+        raise LoiHopDong('ERROR', f'params.bat_tat phải có đúng tám khóa {sorted(BAT_TAT_HOP_LE)} (hop-dong.json)')
+    for k, cho_phep in BAT_TAT_HOP_LE.items():
+        v = bt[k]
+        if not any(v is x if isinstance(x, bool) else (isinstance(v, str) and v == x) for x in cho_phep):
+            raise LoiHopDong('ERROR', f'params.bat_tat.{k} sai: {v!r} (hop-dong.json)')
+    if not isinstance(params.get('nhanh_z', False), bool):
+        raise LoiHopDong('ERROR', f"params.nhanh_z phải là bool: {params.get('nhanh_z')!r}")
+    t4 = params['tham_so_E4']
+    if not isinstance(t4, dict) or set(t4) != set(TS_E4_KHOA):
+        raise LoiHopDong('ERROR', f'params.tham_so_E4 phải có đúng khóa {sorted(TS_E4_KHOA)} (hop-dong.json)')
+    # giá trị (C8, S39): số hữu hạn, không bool; cỡ mẫu là số nguyên >= 1; α, q trong (0, 1), ε trong [0, 1)
+    if any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) for v in t4.values()) or \
+            any(not isinstance(t4[k], int) or t4[k] < 1 for k in ('m_span', 'm_metric', 'n_exact_max', 'count_min')) or \
+            not (0 < t4['alpha'] < 1 and 0 <= t4['epsilon'] < 1 and 0 < t4['q_lo'] < t4['q_hi'] < 1):
+        raise LoiHopDong('ERROR', f'params.tham_so_E4 có giá trị sai: {t4!r}')
+    dc = params.get('doi_chung')
+    if dc is not None and dc not in DOI_CHUNG_KHONG_E7:
+        raise LoiHopDong('ERROR', f'params.doi_chung lạ: {dc!r}')
     if bt.get('T12'):
         # Đ19 điểm 5: thiếu khóa khi T12 bật là UNSUPPORTED; khóa có mặt nhưng sai kiểu là ERROR
         ct = params.get('canh_tinh')
@@ -157,7 +184,8 @@ def _kenh_tu_ket_qua(u, kq, huong_cham, lop_cua, khoi_phat=None):
         s = float(kq.get(f'e_{d}', 0.0)) if F else 0.0
         out.append(Kenh(u['thuc_the'], u['ten'], d, lop_cua[d], s, F_raw=F, trang_thai=kq['trang_thai'],
                         loai=kq.get('loai', 'phan_vi'), hop_le=bool(kq.get('hop_le')),
-                        khoi_phat=(khoi_phat or {}).get(d) if F else None, nhom=u['nhom'], don_vi=u['ma']))
+                        khoi_phat=(khoi_phat or {}).get(d) if F else None, nhom=u['nhom'], don_vi=u['ma'],
+                        s_q=kq.get(f'e_{d}_q') if F else None))
     return out
 
 
@@ -202,9 +230,9 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
     ts = params['tham_so_E4']
     ho_so = params['ho_so_nguon']
     dv = params['don_vi_thoi_gian']
-    E1, E2, E3, E3b, E5, E6, E9, T12 = (bt.get('E1', 'tat'), bt.get('E2', 'tat'), bool(bt.get('E3')),
-                                        bool(bt.get('E3b')), bool(bt.get('E5')), bt.get('E6', 'a'),
-                                        bool(bt.get('E9')), bool(bt.get('T12')))
+    E1, E2, E3, E3b, E5, E6, E9, T12 = (bt['E1'], bt['E2'], bt['E3'], bt['E3b'], bt['E5'], bt['E6'], bt['E9'],
+                                        bt['T12'])  # đã kiểm ở _kiem_params
+    E7 = params.get('doi_chung') not in DOI_CHUNG_KHONG_E7
     nhanh_z = bool(params.get('nhanh_z'))
     U = sorted(set(_alias(aliases, x) for x in inventory))
     t_ns = int(round(t * NS))
@@ -282,6 +310,9 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
     for ng_s in sorted(tg):
         if ng_s in ('trace', 'log'):
             raise LoiHopDong('ERROR', f'tên nguồn metric trùng nguồn trace/log: {ng_s}')
+        if tg[ng_s]['trang_thai'] == 'OK' and len(tg[ng_s]['moc']) != len(metrics):  # mốc ghép theo hàng (S24)
+            raise LoiHopDong('ERROR', f"mốc thời gian của nguồn {ng_s}: {len(tg[ng_s]['moc'])} mốc cho "
+                                      f'{len(metrics)} hàng metric')
         if tg[ng_s]['trang_thai'] != 'OK':
             qs[ng_s] = {'trang_thai': 'UNSUPPORTED', 'ly_do': 'khong_co_moc_rieng',
                         'cham_NA': tg[ng_s]['cham_NA']}
@@ -355,6 +386,9 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
                            'loai': 'dem', 'n_N': nN, 'n_A': nA, 'nguon': 'trace', 'huong_cham': ['len', 'xuong'],
                            'lop': {'len': 'lan_nguoc', 'xuong': 'lan_xuoi'}})
 
+    ma_dv = [u['ma'] for u in don_vi]
+    if len(set(ma_dv)) != len(ma_dv):  # mã ghép bằng '|' có thể trùng khi tên chứa '|'
+        raise LoiHopDong('ERROR', f'mã đơn vị trùng: {sorted({m for m in ma_dv if ma_dv.count(m) > 1})}')
     # ---- E4
     kq_pv = {}
     for u in don_vi:
@@ -366,7 +400,10 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
                 kq = dict(kq, hop_le=kq['hop_le'] and z['huu_han'])
                 for d in u['huong_cham']:
                     if kq[f'F_raw_{d}']:
-                        kq[f'e_{d}'] = z[f'z_{d}']
+                        if z['huu_han']:
+                            kq[f'e_{d}'], kq[f'e_{d}_q'] = z[f'z_{d}'], None
+                        else:  # đơn vị không hợp lệ không mang cờ và điểm không hữu hạn (S21)
+                            kq[f'F_raw_{d}'], kq[f'e_{d}'], kq[f'e_{d}_q'] = 0, 0.0, Fraction(0)
             kq_pv[u['ma']] = kq
     worlds = {}
     for w in WORLDS:
@@ -398,7 +435,8 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
         canh_E2_bat_thuong = set()
         if E2 != 'tat':
             co_canh = [(u, kq) for u, kq in don_vi_w if u['nhom'] == 'canh' and kq.get('F_raw_len')]
-            canh_co = [(u['ben_goi'], u['ben_duoc_goi'], kq['e_len']) for u, kq in co_canh]
+            canh_co = [(u['ben_goi'], u['ben_duoc_goi'],
+                        kq['e_len_q'] if kq.get('e_len_q') is not None else kq['e_len']) for u, kq in co_canh]
             canh_E2_bat_thuong = {(u['ben_goi'], u['ben_duoc_goi']) for u, _ in co_canh}
             kp_canh = {(u['ben_goi'], u['ben_duoc_goi']): _khoi_phat_phan_vi(u, kq, t_ns, o_s_ns).get('len')
                        for u, kq in co_canh}
@@ -407,15 +445,19 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
                 chan_doan.setdefault('E2_du_phong', 0)
                 chan_doan['E2_du_phong'] += int(g['du_phong'])
                 diem = {(a, b): s for a, b, s in canh_co}
+                canh_theo_ten = {}
+                for a, b, _ in canh_co:
+                    if canh_theo_ten.setdefault(f'E2:{a}->{b}', (a, b)) != (a, b):
+                        raise LoiHopDong('ERROR', f'tên cạnh E2 trùng: E2:{a}->{b}')
                 for e, ten, s in g['kenh']:
                     if ten.startswith('E2VC:'):
                         phu = [(a, b) for a, b, _ in canh_co if e in (a, b)]
                         best = max(phu, key=lambda x: (diem[x], x))
                     else:
-                        a, b = ten[3:].split('->')
-                        best = (a, b)
-                    ds_kenh.append(Kenh(e, ten, 'len', 'khong_lan', s, loai='phan_vi', nhom='canh',
-                                        khoi_phat=kp_canh.get(best), don_vi=f'canh|{best[0]}|{best[1]}'))
+                        best = canh_theo_ten[ten]
+                    ds_kenh.append(Kenh(e, ten, 'len', 'khong_lan', float(s), loai='phan_vi', nhom='canh',
+                                        khoi_phat=kp_canh.get(best), don_vi=f'canh|{best[0]}|{best[1]}',
+                                        s_q=s if isinstance(s, Fraction) else None))
             for u, kq in don_vi_w:
                 if u['nhom'] == 'canh' and not kq.get('F_raw_len'):
                     ds_kenh.append(Kenh(u['ben_duoc_goi'], f"E2:{u['ten']}", 'len', 'khong_lan', 0.0, F_raw=0,
@@ -448,15 +490,16 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
                                canh=canh)
         e5_w[w] = p
     xP = xh_w['P']
-    so_hop_le = sum(1 for u, kq in worlds['P']['don_vi'] if kq.get('hop_le'))
+    so_hop_le = sum(1 for u, kq in worlds['P']['don_vi'] if kq.get('hop_le') and u['thuc_the'] in set(U))
     verdict = xep_hang.verdict(xP['tang'], so_hop_le)
     O = sorted({k.thuc_the for k in worlds['P']['kenh']} & set(U))
     co_OK_P = {k.thuc_the for k in worlds['P']['kenh'] if k.trang_thai == 'OK'} & set(U)
     hop_le_tt = {k.thuc_the for k in worlds['P']['kenh'] if k.hop_le} & set(U)
-    R1 = e7.vung(xP['T'], [k for k in worlds['P']['kenh'] if k.thuc_the in set(U)], canh,
-                 e5_w['P']['inherited_by'], cach=1)
-    R2 = e7.vung(xP['T'], [k for k in worlds['P']['kenh'] if k.thuc_the in set(U)], canh,
-                 e5_w['P']['inherited_by'], cach=2)
+    if E7:
+        R1 = e7.vung(xP['T'], [k for k in worlds['P']['kenh'] if k.thuc_the in set(U)], canh,
+                     e5_w['P']['inherited_by'], cach=1)
+        R2 = e7.vung(xP['T'], [k for k in worlds['P']['kenh'] if k.thuc_the in set(U)], canh,
+                     e5_w['P']['inherited_by'], cach=2)
     nhan_dem = {}
     for w in WORLDS:
         for u, kq in worlds[w]['don_vi']:
@@ -465,7 +508,7 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
     obs_dep = sorted(m for m, v in nhan_dem.items() if e4.obs_dependent(v))
     # ---- đối chứng trên kết quả chấm của cấu hình (CĐ10; Đ11; Đ12), thế giới P, chỉ báo cáo
     kenh_P_U = [k for k in worlds['P']['kenh'] if k.thuc_the in set(U)]
-    diem_d3 = {e: xep_hang.khoa(ds)[0] for e, ds in doi_chung._theo_e(kenh_P_U).items()}
+    diem_d3 = {e: xep_hang.khoa_q(ds)[0] for e, ds in doi_chung._theo_e(kenh_P_U).items()}
     lan_nguoc = sorted({k.thuc_the for k in kenh_P_U if k.co and k.lop == 'lan_nguoc'})
     spans_A = [{'parent': None if (s['cha'] is None and not s['mo_coi']) else 'co', 'chu': s['chu']}
                for s in prep['spans'].values() if s['phia'] == 'A']
@@ -495,12 +538,12 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
         x4 = xep_hang.xep(kenh_P_U, F_I=F_I_P, thuc_the_co_kenh_OK=co_OK_P, che_do='E6a', canh=canh, khoa_T4c=kT)
         T4c = {'blocks': x4['blocks'], 'm_thuc_the': {e: list(v) for e, v in sorted(kT.items())},
                'm_don_vi': dict(sorted(m_dv.items()))}
-    kenh_co = [{'thuc_the': k.thuc_the, 'ten': k.ten, 'huong': k.huong, 'lop': k.lop, 's': k.s,
+    kenh_co = [{'ma': k.ma, 'thuc_the': k.thuc_the, 'ten': k.ten, 'huong': k.huong, 'lop': k.lop, 's': k.s,
                 'F_I': F_I_P.get(k.ma, 1), 'don_vi': k.don_vi, 'khoi_phat': k.khoi_phat}
                for k in sorted(kenh_P_U, key=lambda x: x.ma) if k.co]
     # kênh có cờ ở từng thế giới: để bộ đánh giá giải thích WORLD_DEPENDENT (B1.3b), không dùng để xếp hạng
-    kenh_co_w = {w: [{'thuc_the': k.thuc_the, 'ten': k.ten, 'huong': k.huong, 'lop': k.lop, 's': k.s,
-                      'F_I': e5_w[w]['F_I'].get(k.ma, 1)}
+    kenh_co_w = {w: [{'ma': k.ma, 'thuc_the': k.thuc_the, 'ten': k.ten, 'huong': k.huong, 'don_vi': k.don_vi,
+                      'lop': k.lop, 's': k.s, 'F_I': e5_w[w]['F_I'].get(k.ma, 1)}
                      for k in sorted(worlds[w]['kenh'], key=lambda x: x.ma) if k.co and k.thuc_the in set(U)]
                  for w in WORLDS}
     # G_N (codebook T-028 §4; CĐ6.1): cạnh cha–con khác chủ khi cả hai span thuộc N; chỉ để bộ đánh giá đếm M5
@@ -529,10 +572,10 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
         'classes': classes,
         'inherited_by': [dict(x, giai_thich=list(x['giai_thich']), duong=list(x['duong']))
                          for x in e5_w['P']['inherited_by']],
-        'region': {'T': xP['T'], 'cach_1': {r: sorted(v) for r, v in R1.items()},
-                   'cach_2': {r: sorted(v) for r, v in R2.items()},
-                   'hop_cach_1': sorted(set().union(*R1.values())) if R1 else [],
-                   'hop_cach_2': sorted(set().union(*R2.values())) if R2 else []},
+        'region': ({'T': xP['T'], 'cach_1': {r: sorted(v) for r, v in R1.items()},
+                    'cach_2': {r: sorted(v) for r, v in R2.items()},
+                    'hop_cach_1': sorted(set().union(*R1.values())) if R1 else [],
+                    'hop_cach_2': sorted(set().union(*R2.values())) if R2 else []} if E7 else None),
         'evidence_refs': sorted({k.don_vi for k in worlds['P']['kenh'] if k.co and k.don_vi}),
         'coverage': {n: _gon_qs(q) for n, q in qs.items()},
         'worlds': {w: {'thu_tu': xh_w[w]['thu_tu'], 'blocks': xh_w[w]['blocks'],
@@ -553,16 +596,24 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
                         'nguon_metric_unsupported': sorted(set(chan_doan['nguon_metric_unsupported'])),
                         'cot_metric_chua_khai_nguon': sorted(chan_doan['cot_chua_khai_nguon']),
                         'E6b': xP['trang_thai_E6b'], 'so_cham_hop_le': so_hop_le,
-                        'NO_VALID_CHANNEL': sorted(set(O) - co_OK_P)},
+                        'NO_VALID_CHANNEL': sorted(set(O) - co_OK_P),
+                        # khóa chính xác khác nhau nhưng ghi ra cùng số thực, gộp thành hòa (C8, S35)
+                        'gop_khoa_ghi_ra': {w: xh_w[w]['gop_khoa_ghi_ra'] for w in WORLDS}},
         'extra': {'blocks_P': blocks, 'tang_P': xP['tang'],
                   'K_I_P': {e: list(v) for e, v in xP['K_I'].items()},
                   'K_raw_P': {e: list(v) for e, v in xP['K_raw'].items()},
                   'canh': [list(c) for c in canh], 'nhom_vong_P': e5_w['P']['nhom_vong'],
                   'doi_chung': dc, 'T4c': T4c, 'kenh_co': kenh_co, 'kenh_co_the_gioi': kenh_co_w,
                   'thong_ke_log': thong_ke_log,
+                  # π gốc của E6b theo thế giới (đặc tả v1 dòng 346; S23); khóa khối giữ π làm tròn 12 chữ số
+                  'E6b_pi': ({w: dict(sorted(xh_w[w]['pi'].items())) for w in WORLDS} if E6 == 'b' else None),
                   'G_N': [list(c) for c in G_N],
                   'don_vi_phan_vi': [_gon_pv(u['ma'], kq_pv[u['ma']]) for u in don_vi if u['loai'] == 'phan_vi']},
     }
+    try:  # bản ghi phải ghi được JSON chuẩn (không NaN, vô hạn); không ghi được thì là ca lỗi, giữ ở mẫu số (S21)
+        json.dumps(rec, allow_nan=False)
+    except (ValueError, TypeError) as ex:
+        raise LoiHopDong('ERROR', f'bản ghi không ghi được JSON chuẩn: {ex}')
     hop_dong.kiem_ban_ghi(rec)
     return rec
 

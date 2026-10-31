@@ -1,0 +1,9 @@
+Lượt hỏng (giữ theo luật cứng 10). Máy local Windows, 30/10/2026, sau gói sửa phản biện lượt 3.
+
+Lần chạy 1: dừng ở D11 vì chuỗi cũ của đột biến D11 không còn trong src/m1/e7.py (S12 đổi dòng đó sang tra theo mã kênh).
+  Đầu ra D00–D10 của lần này bị người làm xóa nhầm (rm -rf) trước khi chạy lại; không dựng lại được. Ghi ở LOG T-044.
+  Sửa: D11 đổi chỗ đột biến sang dòng mới, cùng ý ("mọi kênh có giải thích" thành "một kênh").
+Lần chạy 2 (các file trong thư mục này): hỏng ở D01 vì subprocess trên Windows đọc đầu ra pytest bằng cp1252;
+  đầu ra có ký tự tiếng Việt nên stdout = None, dot_bien.py báo TypeError.
+  Sửa: dot_bien.py đọc đầu ra bằng UTF-8 (encoding='utf-8', errors='replace') và đặt PYTHONIOENCODING=utf-8.
+Lượt thay thế: runs/dot-bien-006.

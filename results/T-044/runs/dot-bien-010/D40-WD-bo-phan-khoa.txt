@@ -1,0 +1,46 @@
+....................................F................................... [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+........................................................................ [ 84%]
+......................................................                   [100%]
+================================== FAILURES ===================================
+_______________________ test_WD4_kenh_doi_va_phan_khoa ________________________
+
+ma = <function ma.<locals>._gan at 0x000001F0DF9F68E0>
+
+    def test_WD4_kenh_doi_va_phan_khoa(ma):
+        """S13: cặp giải thích chỉ ra kênh đổi và phần khóa phân định, không chỉ kênh mạnh nhất (WD4)."""
+        from fractions import Fraction
+        from m1 import xep_hang
+        from m1.kieu import Kenh
+        from m1_danh_gia import the_gioi
+        m = tu_lap(DAP_AN_THANH_PHAN, 'WD4')
+        ma('WD4')
+        d, da = m['dau_vao'], m['dap_an']
+        k, b = {}, {}
+        for w in ('P', 'S_lo', 'S_hi'):
+            ks = [Kenh(e, x['ten'], 'len', x['lop'], x['s'], don_vi=x['don_vi']) for e in sorted(d['kenh'])
+                  for x in d['kenh'][e] if w in x.get('chi_o', ('P', 'S_lo', 'S_hi'))]
+            xh = xep_hang.xep(ks, thuc_the_co_kenh_OK=set(d['kenh']))
+            b[w] = xh['blocks']
+            k[w] = [{'ma': x.ma, 'thuc_the': x.thuc_the, 'ten': x.ten, 'huong': x.huong, 'don_vi': x.don_vi, 'lop': x.lop,
+                     's': x.s, 'F_I': 1} for x in ks]
+        wd = the_gioi.world_dependent(b, d['root'])
+        assert wd['WORLD_DEPENDENT'] is True
+        assert wd['hang_ky_vong'] == {w: Fraction(v) for w, v in da['hang_ky_vong'].items()}
+        nn = the_gioi.nguyen_nhan(k, d['root'], b)
+        assert nn['loai'] == da['loai'] and [list(x) for x in nn['cap']] == da['cap']
+        assert set(nn['theo_the_gioi']) == {'S_hi'}
+        v = nn['theo_the_gioi']['S_hi']
+>       assert {x: v[x] for x in da['S_hi']} == da['S_hi']
+E       AssertionError: assert {'bi_vuot': [...': False, ...} == {'bi_vuot': [...': False, ...}
+E         
+E         Omitting 5 identical items, use -vv to show
+E         Differing items:
+E         {'phan_khoa': [{'P': None, 'S_hi': None, 'thuc_the': 'B'}]} != {'phan_khoa': [{'P': {'chi_so': 2, 'ten': 'so_kenh'}, 'S_hi': None, 'thuc_the': 'B'}]}
+E         Use -v to get more diff
+
+test_k02_quan_sat.py:428: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k02_quan_sat.py::test_WD4_kenh_doi_va_phan_khoa - AssertionError:...
+1 failed, 341 passed in 13.17s

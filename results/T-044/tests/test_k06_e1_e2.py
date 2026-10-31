@@ -95,3 +95,16 @@ def test_E1_qua_chuan_bi(i, ma):
         assert gan_bang(p['u_CP'], f['dap_an']['CP'])
     if 'vuot_bien_qua_1ms' in f['dap_an']:
         assert prep['chan_doan']['con_vuot_bien_cha'] == f['dap_an']['vuot_bien_qua_1ms']
+
+
+def test_CP2_quy_tac_M1(ma):
+    """E1-CP theo quy tắc M1 Minh duyệt 30/10/2026: xét cả con đã chọn khi kiểm vùng chồng lấn; biên mở; mọi thứ tự."""
+    import itertools
+    from m1 import span
+    m = tu_lap(DAP_AN_THANH_PHAN, 'CP2')
+    ma('CP2')
+    d, da = m['dau_vao'], m['dap_an']
+    cha, con = tuple(d['cha']), [tuple(c) for c in d['con']]
+    for p in itertools.permutations(con):
+        assert span.doc_quyen_CP(cha, list(p), tau=d['tau']) == da['CP'], p
+        assert [list(c) for c in span.duong_gang(cha, list(p), tau=d['tau'])] == da['duong_gang'], p

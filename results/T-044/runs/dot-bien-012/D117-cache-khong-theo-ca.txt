@@ -1,0 +1,44 @@
+........................................................................ [ 19%]
+........................................................................ [ 39%]
+........................................................................ [ 59%]
+........................................................................ [ 78%]
+................................................F....................... [ 98%]
+......                                                                   [100%]
+================================== FAILURES ===================================
+___________________________ test_RN1_cache_theo_ca ____________________________
+
+ma = <function ma.<locals>._gan at 0x0000024C19A9D300>
+tmp_path = WindowsPath('C:/Users/84583/AppData/Local/Temp/pytest-of-84583/pytest-832/test_RN1_cache_theo_ca0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000024C184A4F80>
+
+    def test_RN1_cache_theo_ca(ma, tmp_path, monkeypatch):
+        from m1 import chuoi, e4, runner
+        import sinh_trace_S
+        from conftest import FIXTURE
+        m = tu_lap(DAP_AN_THANH_PHAN, 'RN1')
+        da = m['dap_an']
+        ma('RN1')
+        ca = []
+        for i, s in enumerate(('S1', 'S2'), 1):
+            spans, logs = sinh_trace_S.sinh(s, t=1000, mau=FIXTURE['trace_mau_S'])
+            ca.append({'opaque_id': f'gia-00{i}', 'spans': spans, 'metrics': [], 'logs': logs,
+                       'inventory': ['A', 'B', 'F', 'I', 'R', 'X'], 'aliases': {}})
+        moc = {c['opaque_id']: 1000 for c in ca}
+        cau_hinh = [{'config_id': 'R0', 'params': sinh_trace_S.params({})},
+                    {'config_id': 'C1', 'params': sinh_trace_S.params({'E1': 'U'})}]
+        dem = []
+    
+        class Dem(e4.CacheCong):
+            def __init__(self):
+                super().__init__()
+                dem.append(1)
+        monkeypatch.setattr(e4, 'CacheCong', Dem)
+        runner.pha1(ca[::-1], moc, cau_hinh[::-1], tmp_path / 'l1')
+>       assert len(dem) == da['so_cache_moi']
+E       assert 0 == 2
+E        +  where 0 = len([])
+
+test_k14_luot5b.py:111: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k14_luot5b.py::test_RN1_cache_theo_ca - assert 0 == 2
+1 failed, 365 passed in 14.12s

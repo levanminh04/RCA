@@ -1,0 +1,28 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+...............................F........................................ [ 84%]
+......................................................                   [100%]
+================================== FAILURES ===================================
+___________________________ test_TS5_moc_gia_boi_so ___________________________
+
+ma = <function ma.<locals>._gan at 0x000001F792057F60>
+
+    def test_TS5_moc_gia_boi_so(ma):
+        from m1_danh_gia import pha2
+        m = tu_lap(DAP_AN_THANH_PHAN, 'TS5')
+        ma('TS5')
+        d, da = m['dau_vao'], m['dap_an']
+        tat = {a: {'dataset': 'RE2-TT', 'o': 'o' + a, 'verdict': vt} for a, _, vt, _ in d['ca']}
+        bat = {a: {'dataset': 'RE2-TT', 'o': 'o' + a, 'verdict': vb} for a, _, _, vb in d['ca']}
+        t, b, phu = pha2.dem_moc_gia(_kq_tu_ca(tat, bat), 'T', 'B', trong_so={a: k for a, k, _, _ in d['ca']})
+>       assert list(t) == da['tat'] and list(b) == da['bat'] and phu['bi_loai'] == da['bi_loai']
+E       assert ([0, 2] == [0, 3]
+E         
+E         At index 1 diff: 2 != 3
+E         Use -v to get more diff)
+
+test_k11_danh_gia.py:392: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k11_danh_gia.py::test_TS5_moc_gia_boi_so - assert ([0, 2] == [0, 3]
+1 failed, 341 passed in 14.38s

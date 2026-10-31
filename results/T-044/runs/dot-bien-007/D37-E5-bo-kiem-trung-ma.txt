@@ -1,0 +1,47 @@
+........................................................................ [ 27%]
+........................................................................ [ 54%]
+...............FF....................................................... [ 81%]
+..................................................                       [100%]
+================================== FAILURES ===================================
+_________________________ test_KM2_alias_va_trung_ma __________________________
+
+ma = <function ma.<locals>._gan at 0x000001E752B6AFC0>
+
+    def test_KM2_alias_va_trung_ma(ma):
+        from m1 import e5, xep_hang
+        m = tu_lap(DAP_AN_THANH_PHAN, 'KM2')
+        ma('KM2')
+        d, da = m['dau_vao'], m['dap_an']
+        kenh = _kenh_km(d['kenh_alias'])
+        p = e5.phan_loai(kenh, [], bat=True)
+        assert p['F_I'] == da['alias_F_I']
+        xh = xep_hang.xep(kenh, F_I=p['F_I'], thuc_the_co_kenh_OK={'S'})
+        assert list(xh['K_I']['S']) == da['alias_K_I_S']
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+test_k08_e5_e6_e7_e9.py:308: Failed
+_________________________ test_KM2_trung_ma_qua_chuoi _________________________
+
+ma = <function ma.<locals>._gan at 0x000001E752F04F40>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001E752BCBF20>
+
+    def test_KM2_trung_ma_qua_chuoi(ma, monkeypatch):
+        """Chuỗi trả ERROR (không xếp hạng) khi hai kênh trùng mã; không để F_I ghi đè."""
+        from m1 import chuoi, e5
+        from test_k02_quan_sat import _ca_nho, _params
+        ma('KM2-chuoi')
+        goc = e5.phan_loai
+        monkeypatch.setattr(e5, 'phan_loai', lambda kenh, *a, **k: goc(list(kenh) + list(kenh)[:1], *a, **k))
+        r = chuoi.chay(_ca_nho(), [], [], ['P', 'Q'], {}, 1000, _params())
+>       assert r['status'] == 'ERROR' and 'mã kênh trùng' in r['error']
+E       AssertionError: assert ('NO_EVIDENCE' == 'ERROR'
+E         
+E         - ERROR
+E         + NO_EVIDENCE)
+
+test_k08_e5_e6_e7_e9.py:320: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k08_e5_e6_e7_e9.py::test_KM2_alias_va_trung_ma - Failed: DID NOT ...
+FAILED test_k08_e5_e6_e7_e9.py::test_KM2_trung_ma_qua_chuoi - AssertionError:...
+2 failed, 264 passed in 4.96s

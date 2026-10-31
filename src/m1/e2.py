@@ -7,6 +7,7 @@
 - Đỉnh v thuộc mọi phủ nhỏ nhất khi và chỉ khi cấm v (buộc mọi láng giềng vào phủ) làm cỡ phủ nhỏ nhất tăng.
 - Cạnh nối hai đỉnh định danh: ghi gán cho bên được gọi; cả hai đỉnh vẫn tính cạnh này vào điểm của mình.
 """
+from fractions import Fraction
 from functools import lru_cache
 
 TOI_DA_DINH = 25
@@ -28,7 +29,8 @@ def _co_phu_nho_nhat(canh):
 def gan_canh(canh_co, che_do='VC', toi_da_dinh=TOI_DA_DINH):
     """canh_co: [(a, b, s)]. Trả dinh_danh, gan [(a, b, nhận, nhãn)], kenh [(thực thể, tên, s)], du_phong.
     Đầu ra sắp theo (bên gọi, bên được gọi), không phụ thuộc thứ tự đầu vào."""
-    canh_co = sorted((a, b, float(s)) for a, b, s in canh_co)
+    # điểm chính xác (Fraction) đi qua nguyên vẹn để xếp hạng so khóa chính xác (S20); số khác đổi sang số thực
+    canh_co = sorted((a, b, s if isinstance(s, Fraction) else float(s)) for a, b, s in canh_co)
     dinh = sorted({x for a, b, _ in canh_co for x in (a, b)})
     if che_do == 'C' or (che_do == 'VC' and len(dinh) > toi_da_dinh):
         gan = [(a, b, b, 'khong_dinh_danh') for a, b, _ in canh_co]

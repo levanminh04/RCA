@@ -1,0 +1,25 @@
+.................................F...................................... [ 19%]
+........................................................................ [ 39%]
+........................................................................ [ 59%]
+........................................................................ [ 78%]
+........................................................................ [ 98%]
+......                                                                   [100%]
+================================== FAILURES ===================================
+_________________________ test_LOG1_thong_ke_severity _________________________
+
+ma = <function ma.<locals>._gan at 0x000002095CF39120>
+
+    def test_LOG1_thong_ke_severity(ma):
+        m = tu_lap(DAP_AN_THANH_PHAN, 'LOG1')
+        ma('LOG1')
+        da = m['dap_an']
+        for E3 in (False, True):
+            r0, r1 = _ca_log1(False, E3), _ca_log1(True, E3)
+            assert r0['status'] == r1['status'] != 'ERROR', (r0['error'], r1['error'])
+>           assert (r0 != r1) is da['ban_ghi_khac_nhau']
+E           AssertionError: assert ({'OBS_DEPENDENT': [], 'RANK_CHANGED': False, 'blocks': [{'groups': [['P']], 'key': [0, 0.0, 0, 0.0]}], 'classes': {'P': 'binh_thuong', 'Q': 'thieu_du_lieu'}, ...} != {'OBS_DEPENDENT': [], 'RANK_CHANGED': False, 'blocks': [{'groups': [['P']], 'key': [0, 0.0, 0, 0.0]}], 'classes': {'P': 'binh_thuong', 'Q': 'thieu_du_lieu'}, ...}) is True
+
+test_k02_quan_sat.py:365: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k02_quan_sat.py::test_LOG1_thong_ke_severity - AssertionError: as...
+1 failed, 365 passed in 16.12s

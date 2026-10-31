@@ -1361,3 +1361,644 @@ Phương pháp và đối chứng đã được cài và kiểm đầu vào, tru
 Code/revision, cấu hình, giả thuyết, độ đo, tập ca/tập ứng viên, cách xử lý ca lỗi/UNSUPPORTED/nhánh dự phòng và bảng diễn giải đã khóa trước test chưa? Có bỏ nhóm khó sau khi nhìn điểm hoặc dùng test để chọn thiết kế không?
 Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.
 ```
+
+### Phản hồi phản biện lượt 3 và gói sửa (30/10/2026; Claude; local Windows 11, `D:\RCA-flashticket`, branch `claude/sweet-hawking-dy078d` tại 253dbe46; người làm)
+
+Phiên mới, đổi thiết bị: từ cloud sang máy local của Minh, cùng branch. Vai trò không đổi (người làm). Môi trường test local: `D:/RCA-ext/envs/py312-pin/Scripts/python.exe` (Python 3.12.10, numpy 1.26.4, pandas 2.2.3, scipy 1.14.1, networkx 2.5, pytest 8.3.4), `PYTHONPATH=D:/RCA-ext/envs/T-016-cong-cu/Lib/site-packages` (drain3 0.9.11). Không thêm `T-014-main` vào `PYTHONPATH`: thư mục đó có networkx 2.8.8 và che bản 2.5.
+
+**Đầu vào (Minh chuyển nguyên văn trong chat).** Lượt kiểm lại của Codex ngày 30/10/2026, phần nhận xét (bỏ prompt Codex soạn cho người làm):
+
+```text
+**Chưa nên nghiệm thu T-044. Tôi xác nhận một lỗi mới làm đổi thứ hạng và một lỗi còn lại ở phần giải thích WORLD_DEPENDENT. Bộ test hiện tại vẫn qua 254/254.**
+
+1. **CHẶN tính đúng E5/E7 — hai kênh khác nhau có thể trùng mã.**
+   kieu.py:39 chỉ ghép thực thể, tên và hướng. Vì vậy thao tác `cpu` của S và metric `S_cpu` cùng mang mã `S|cpu|len`. E5 (e5.py:112) ghi đè `F_I` của hai kênh, rồi bộ xếp hạng áp chung trạng thái đó.
+   Tôi đã tái hiện qua toàn chuỗi, với đầu vào hợp lệ:
+   - Giữ tên thao tác `cpu`: S đứng một mình trước B.
+   - Chỉ đổi tên thao tác thành `request`, giữ nguyên số đo và quan hệ: S hòa B.
+   - Đảo thứ tự hai kênh ở helper E5 còn làm kết quả đổi thành B trước S.
+   Cùng sự nhập nhằng xuất hiện tại e7.py:35: một kênh được giải thích khiến E7 coi cả kênh không lan cùng tên đã được giải thích.
+   **Sửa tối thiểu:** định danh kênh phải phân biệt loại và đơn vị; dùng thống nhất trong `F_I`, `inherited_by`, xếp hạng, E7 và phần đọc bản ghi. Chỉ sửa `Kenh.ma` chưa đủ. Chưa xác nhận dữ liệu dev có trường hợp trùng tên; phản ví dụ này đủ bác tính đúng tổng quát của đường cài đặt hiện tại.
+
+2. **CHẶN riêng phần giải thích WORLD_DEPENDENT — đúng thực thể nhưng có thể sai đơn vị gây đổi hạng.**
+   the_gioi.py:73 luôn lấy kênh mạnh nhất để lập cặp giải thích, trong khi SPEC:464 yêu cầu đơn vị làm đổi thứ tự.
+   Phản ví dụ đã chạy: R và B đều có kênh cố định điểm 0,8. B thêm kênh log điểm 0,2 tại P; kênh này mất cờ tại S_hi. B chuyển từ đứng trước R sang hòa R. Hàm lại chỉ hai kênh cố định 0,8 làm cặp giải thích, bỏ kênh log thực sự gây thay đổi.
+   **Sửa tối thiểu:** chỉ ra kênh thay đổi và phần của khóa xếp hạng gây đổi quan hệ. Trung gian còn được lưu, nên chưa mất bằng chứng. Lỗi này không làm sai cờ WORLD_DEPENDENT, MRR hay luật chọn.
+
+Các điểm **KHÔNG CHẶN thứ hạng chính**, nhưng cần xử lý hoặc ghi đúng giới hạn:
+| E7 chưa thực sự tắt ở C-a0/C-a1 | Cấu hình trả `E7=False`, nhưng chuỗi vẫn dựng vùng (chuoi.py:456). Tôi kiểm: bỏ cạnh giữ nguyên thứ hạng C-a0 nhưng làm vùng đổi. Không dùng vùng này để gọi toàn bộ đầu ra đối chứng là không dùng quan hệ. |
+| Lệnh dựng môi trường không dùng được trên máy khác | freeze-m1.txt:11 trỏ tới wheel Linux trong thư mục cloud. Lệnh dựng được chỉ dẫn tại requirements-m1.txt:12 đã thất bại ở bước kiểm thử không cài đặt. Cần constraint dùng được trên máy khác; giữ thông tin wheel cloud làm nguồn gốc riêng. |
+| Thiếu báo kèm UV-6 | uv6.py:33 chưa trả hai tổng Hit@1 kỳ vọng được yêu cầu trong CĐ2. Pha 2 vẫn giữ dữ liệu từng ca để tính lại; không mất bằng chứng hoặc đổi luật chọn. |
+
+Có thêm **nguy cơ có điều kiện**: `chon_khoi.chon` vẫn chọn cấu hình khi thiếu cặp so sánh, dù đã ghi `thieu_cap`. Chưa xác nhận đường chạy chuẩn tạo đầu vào thiếu như vậy, nên tôi không nâng thành lỗi lựa chọn đã xảy ra.
+
+Kiểm lại các phản hồi trước:
+| Bội số ô, bội số 0, MRR chính xác và lưu/đọc phân số | Đã xử lý trong phạm vi kiểm. |
+| Coverage metric, khai báo bắt buộc, thống kê severity/Drain | Đã xử lý các phản ví dụ cũ. |
+| WORLD_DEPENDENT | Đã sửa đúng thực thể đảo thứ tự, hòa và vắng; còn lỗi chọn đơn vị ở điểm 2. |
+| Lập luận WHY E3 và manifest Windows | Đã xử lý trong phạm vi kiểm. |
+| E1-CP và bước 5 | Vẫn OPEN, chưa coi là đã duyệt hoặc đã sửa. |
+
+Về năm đề xuất anh gửi:
+- Mục 1: tôi ủng hộ quy tắc E1-CP được đề xuất, với tên gọi rõ là quy tắc M1 theo CĐ1 và bài báo. Bài báo nêu ngưỡng 1 ms và xét các con khác cùng cha; mã CRISP đã dẫn có quy tắc khác. Tôi tính lại cả 24 thứ tự: code hiện cho 2000; phương án đề xuất cho 2600. Biên mở và phá hòa vẫn phải được ghi là lựa chọn của M1.
+- Mục 2: cách đọc “phụ thuộc quan sát như KHÔNG ĐỦ CA, chỉ ép bật thành phần ít ca” phù hợp câu chữ dòng 898 hơn. Đây vẫn là quyết định chính sách chọn cần anh chốt.
+- Mục 3: cần sửa cách gọi: SPEC T-044 đã được ghi tại Q-212. Dòng Q-213 đang đề xuất trong LOG là gói diễn giải và sửa bổ sung; không ghi hai OPEN thành quyết định khi anh chưa chốt.
+- Mục 4: chưa thấy lý do bác việc ghi ba WHY với nội dung đã thu hẹp; giữ nguyên trạng thái “chưa kiểm”.
+- Mục 5: câu phân biệt branch đã push và chưa merge là đúng. Khi ghi sau một lượt push mới, phải dùng mốc thực tế lúc đó.
+
+Đã làm và kiểm (Codex): ba subagent; đọc 29 file nguồn, 16 file test/hỗ trợ, sáu script và JSON đáp án; manifest T-043 PASS 69/69, 10/10; T-044 PASS 421/421; pytest 254/254 với NetworkX 2.5; 12 biến thể tất định khớp; 35 đột biến bị bắt. Script tái hiện: D:/RCA-ext/tmp/t044-review-20261030-probes-v2.py (ngoài repo).
+```
+
+**Tự soát.** Prompt Minh dán kèm sẵn kết luận của Codex, nên người làm đọc kết luận trước khi soát; N1–N3 tìm được khi lần theo code, không tính là tự soát mù.
+
+- **N1 (KHÔNG CHẶN riêng; thuộc sửa điểm 1).** Ngoài `Kenh.ma`, các chỗ chỉ dùng tên kênh: `giai_thich` và `ke_thua` của E5; bản ghi `extra.kenh_co_the_gioi` không lưu đơn vị; pha 2 dựng mã từ tên (`the_gioi._g`, `dau_vet.root_E5_tu_ban_ghi`). Ngoài trùng thao tác–metric còn trùng do alias: hai cột metric khác tiền tố được alias về cùng thực thể và cùng đuôi.
+- **N2 (KHÔNG CHẶN; mặt trái của sửa điểm 2).** Với E6b, quan hệ root–e có thể đổi do PageRank của thực thể khác, khi kênh của cả root và e không đổi. Bản sửa phải ghi đúng trường hợp này, không ép ra một cặp.
+- **N3 (KHÔNG CHẶN thứ hạng).** E7 ở C-a0/C-a1 trái câu chữ đặc tả v1 dòng 361 ("Nhánh tắt: top-k, không vùng") và dòng 405 (C-a1 bỏ E7). Ngoài vùng, bản ghi C-a0 còn trung gian dựng từ cạnh: `inherited_by` trạng thái `de_xuat`, nhóm vòng, C-d1/C-d3; các trung gian này chỉ báo, không vào thứ hạng.
+
+**Phản hồi của người làm (chat 30/10/2026; ca giả trong bộ nhớ, `-B`):**
+
+| Điểm | Kết luận | Bằng chứng riêng |
+|---|---|---|
+| 1. Trùng mã kênh E5/E7 | đúng | Thao tác `cpu` (lan ngược, 0,9, bên được gọi B có kênh không lan 0,7) và metric `S_cpu` (không lan, 0,5). Đúng: B (0,7) trước S (0,5). Thứ tự vào mặc định: `F_I[S|cpu|len] = 1`, S đứng đầu (0,9; 2 kênh). Đảo thứ tự: `F_I = 0`, S xuống tầng 2, vùng của B gồm cả S. Đổi tên thao tác: đúng ở cả hai thứ tự. Trong chuỗi, đơn vị thao tác đứng trước metric nên rơi vào nhánh S đứng đầu. |
+| 2. Đơn vị giải thích WORLD_DEPENDENT | đúng | Phản ví dụ của Codex: `cap = ((R,p99),(B,p99))`; kênh đổi là `log_loi` của B (số kênh 2 → 1). Cờ, `loai = cong_doi`, hạng kỳ vọng 2 → 3/2 đúng. |
+| E7 ở C-a0/C-a1 | đúng; phạm vi rộng hơn (N3) | `runner.py:161` bỏ khóa E7; `chuoi.py:456` luôn dựng vùng. |
+| Freeze | đúng | `freeze-m1.txt:11` là `file:///tmp/...manylinux...whl`. Chưa chạy lại lệnh dựng (cần mạng). |
+| UV-6 báo kèm | đúng | `uv6.dem` thiếu hai tổng theo Hit@1 kỳ vọng (CĐ2 dòng 28). |
+| Thiếu cặp | đúng là nguy cơ có điều kiện | 7 lần gọi `chon` trong test đều đủ cặp; `pha2` chưa có phần dựng đủ cặp (thuộc T-045). |
+| Năm mục | mục 1: đồng ý cách gọi, chưa tự tính lại 2600; mục 2: đồng ý khớp dòng 898, Minh quyết; mục 3: đúng (Q-212 ở `DECISIONS.md:306`; Q-213 đề xuất ở LOG dòng 723 là duyệt đề xuất phiên 1); mục 4, 5: không phản đối | — |
+
+Gói sửa người làm trình trong chat: S12 (định danh kênh theo đơn vị), S13 (giải thích WORLD_DEPENDENT theo kênh đổi và phần khóa), S14 (E7 tắt thật ở C-a0/C-a1), S15 (freeze dùng được trên máy khác), S16 (báo kèm UV-6), S17 (tùy Minh: `chon` báo lỗi khi thiếu cặp).
+
+**Quyết định của Minh trong phiên** (chat 30/10/2026, nguyên văn): "duyệt sửa, sau đó tạo 1 phiên cho codex mới, yêu cầu PHẢN BIỆN, ĐÀO SÂU VÀO TỪNG DÒNG CODE HƠN, CHỈ RA CÁC LỖI TIỀM TÀNG, CHO PHÉP DÙNG 3 SUB AGENT MODEL SOL 6.1 ULTRA, TÌM RA CÁC LỖI NGUY HIỂM NHƯ NHỮNG LỖI ĐÃ CHỈ RA VÀ SỬA TRƯỚC ĐÓ." Người làm đọc là duyệt S12–S16. S17 được trình kèm chữ "tùy Minh" nên chưa làm; hỏi lại Minh. Câu quyết định cần ghi vào DECISIONS khi Minh duyệt dòng ghi.
+
+**Kết thúc phiên (30/10/2026; Claude; local Windows; người làm).**
+
+**1. Đã làm gì.** Sửa S12, S13, S15, S16 theo duyệt của Minh; chi tiết ở `results/T-044/dinh-chinh-cai-dat.md` Phần II mục C4. S14 dừng giữa chừng: cách sửa đã trình ("runner giữ E7=False") lệch `results/T-043/hop-dong.json#/vao/params/bat_tat` (không có khóa E7; đó là lý do `runner.py` bỏ khóa này), nên trình lại theo Luật 0 mục 5. S17 trình kèm "tùy Minh" nên chưa làm. Đáp án tự lập mới KM1, KM2, KM3, WD4, UV6-3; đổi đáp án WD1–WD3 theo định nghĩa cặp mới của S13 (`fixture/dap-an-thanh-phan.json`, 71 mục). Đột biến mới D36–D41; D11 đổi chỗ đột biến theo dòng E7 mới (cùng ý). Script mới `scripts/chay_kiem_windows.sh` (chạy gói kiểm trên Git Bash) và `scripts/tong_hop_tat_dinh.py`. `so_ban_ghi_truoc_sau.py` bỏ thêm các trường mã của lượt 3 và so `kenh_co`, `inherited_by` theo nội dung. `dot_bien.py` đọc đầu ra con bằng UTF-8 (Windows).
+
+**2. File đã thay đổi** (chưa commit):
+- `src/m1/kieu.py`, `e5.py`, `e7.py`, `chuoi.py`; `src/m1_danh_gia/the_gioi.py`, `dau_vet.py`, `uv6.py`;
+- `results/T-044/`: `fixture/dap-an-thanh-phan.json`; `tests/test_k02_quan_sat.py`, `test_k08_e5_e6_e7_e9.py`, `test_k11_danh_gia.py`; `scripts/dot_bien.py`, `so_ban_ghi_truoc_sau.py`, `tao_manifest.py`, mới `chay_kiem_windows.sh`, `tong_hop_tat_dinh.py`; `freeze-m1.txt`, `bang-phep-kiem.json`, `bao-cao.md`, `dinh-chinh-cai-dat.md`, `manifest.json`; lượt mới `runs/test-xanh-004`, `tat-dinh-005`, `dot-bien-005` (hỏng), `dot-bien-006`, `kiem-hash-t043-005`;
+- LOG này; dòng T-044 trong `docs/STATE.md`. Không ghi ngoài phạm vi SPEC.
+
+**3. Kiểm đã chạy và kết quả** (Windows, Python 3.12.10, networkx 2.5).
+- Trước sửa: 254/254 qua ở 253dbe46 (khớp lượt Codex).
+- Test mới chạy trên code cũ (253dbe46, bản tạm ngoài repo): 14 phép trượt, đúng các phép của gói sửa (KM1 ba biến thể, KM2 hai phép, KM3 hai biến thể, WD1–WD4, fixture 29, UV6-3, WD qua pha 2). KM1-request và KM3-request trượt trên code cũ vì định dạng mã, không vì hành vi; KM1-goc, KM1-dao, KM3-cpu trượt vì hành vi. Trên code mới: qua.
+- Test: 263/263 qua (`runs/test-xanh-004/stdout.txt`; `bang-phep-kiem.json#/tong`); 97/97 phép T-043 trong phạm vi.
+- Tất định: PASS, 104 bản ghi, 263 phép, 12 biến thể (`runs/tat-dinh-005/tong-hop.json#/ket_luan`). Bỏ trường mới và so theo nội dung thì 104 bản ghi giống bản ở 253dbe46 (`#/so_voi_truoc_sua/so_lech_sau_khi_bo_truong_moi` = 0). Lần so đầu (so theo thứ tự) cho 2 bản ghi lệch, `S3|E3` và `S3|E6b`; người làm so lại sau khi sắp hai danh sách theo nội dung: giống hệt. Lệch chỉ do `kenh_co` và `inherited_by` sắp theo mã kênh, mà mã nay có đơn vị. Đầu ra của lần so đầu bị ghi đè khi chạy lại.
+- Đột biến: 41/41 bị bắt, đối chứng xanh 263/263 (`runs/dot-bien-006/tong-hop.json#/so_bi_bat`). D36 làm trượt 8 phép, gồm KM3-cpu (hành vi qua toàn chuỗi).
+- Hash T-043: PASS 69/69, 10/10 (`runs/kiem-hash-t043-005/stdout.txt`). Manifest T-044: `--tao` rồi `--kiem` PASS 547/547.
+
+**Vi phạm quy trình trong phiên (báo Minh).** Luật cứng 10 (giữ mọi lượt chạy): người làm xóa nhầm đầu ra một phần của lần chạy đột biến đầu (`runs/dot-bien-005`, D00–D10, dừng ở D11 vì chuỗi cũ không còn) trước khi chạy lại; không dựng lại được. Lần so bản ghi đầu của `tat-dinh-005` cũng bị ghi đè (kết quả đã ghi ở trên). Lần chạy hỏng thứ hai được giữ trong `runs/dot-bien-005` kèm `GHI-CHU.txt`. Không ảnh hưởng kết luận: lượt `dot-bien-006` chạy lại toàn bộ.
+
+**4. Điều chưa chắc hoặc cần Minh quyết.**
+- Task đạt gì: hai lỗi CHẶN của lượt 3 đã sửa trên ca giả, có đáp án, đột biến và phép bất biến theo tên qua toàn chuỗi. Chưa được Codex kiểm lại.
+- Câu hỏi nguồn: A1–A5 như `bao-cao.md` mục 1, trong phạm vi fixture. Ba lượt phản biện đều tìm thêm lỗi mà bộ test lúc đó không bắt; lượt 3 tìm một lỗi làm đổi thứ hạng. "263/263 qua" không chứng minh hết lỗi cùng loại.
+- Chưa biết dữ liệu dev có ca hai kênh trùng tên không (T-044 không đọc dữ liệu).
+- Cần Minh quyết:
+  - S14: chọn cách sửa. (a) Đề xuất: không đụng `bat_tat`; `chuoi.py` không dựng vùng (`region = None`) khi `params['doi_chung']` là C-a0 hoặc C-a1 (runner đã ghi khóa này trong cấu hình đối chứng; cần truyền thêm khóa này vào params của chuỗi), báo cáo ghi "không quan hệ" chỉ đúng cho thứ hạng. (b) Thêm E7 vào `bat_tat`: lệch hợp đồng T-043 đã khóa, phải ghi đính chính hợp đồng. (c) Giữ code, chỉ ghi giới hạn.
+  - S17: có cho `chon_khoi.chon` báo lỗi khi thiếu cặp không.
+  - Còn từ trước: quy tắc E1-CP; bước 5; dòng DECISIONS, ba WHY; commit gói sửa lượt 3.
+
+**Bước tiếp theo.** Minh chuyển prompt dưới đây sang phiên Codex mới. Minh quyết S14, S17, E1-CP, bước 5 và commit.
+
+**Lệnh cuối đã chạy.** `py -3 -B results/T-044/scripts/tao_manifest.py --kiem` (môi trường ghim ở `bao-cao.md` mục 2).
+
+**Minh hỏi trong phiên:** đánh giá độ khó T-045 và có nên giao Codex. Trả lời trong chat 30/10/2026; không đổi SPEC T-045. Các đề xuất giảm rủi ro trong câu trả lời chờ Minh duyệt.
+
+**Prompt cho Codex kiểm lại phản hồi và sửa (phiên mới).** Prompt chung, khối "Kiểm lại phản hồi và sửa" và khối G3 chép nguyên văn từ `docs/review-prompt.md`.
+
+```text
+Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
+Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
+
+Thông tin lượt này:
+- Task hoặc đề xuất: T-044 — cài chuỗi M1 và kiểm đặc tả; tasks/T-044-cai-dat-m1/SPEC.md.
+- Công đoạn: kiểm lại phản hồi và sửa.
+- Gói/cổng: P6 (M1); chuẩn bị G3.
+- Người làm và người phản biện chính thức: người làm Claude; người phản biện Codex, theo SPEC.
+- Tài liệu gốc: tasks/T-044-cai-dat-m1/SPEC.md; tasks/T-045-chay-khoi-k-dev/SPEC.md; tasks/T-043-thiet-ke-rca-m1/SPEC.md, Phụ lục B–D; results/T-043/dac-ta-phuong-phap-v1.md, hop-dong.json, ma-tran-thu.json, dinh-nghia-pha2.json, bang-chuyen-giao.json, fixture-dac-ta.json, fixture/fixture-bo-sung.json, the-doc/crisp.md, dinh-chinh-phien8.md, dinh-chinh-phien9.md, dinh-chinh-phien10.md; results/T-044/dinh-chinh-cai-dat.md, de-xuat-why.md. Toàn bộ cài đặt: git diff 6b2f6ac6 tới <revision Minh điền>. Gói sửa lượt 3: git diff 253dbe46 tới <revision Minh điền> (chưa commit lúc soạn prompt: so cây làm việc với 253dbe46 bằng git diff 253dbe46 và git status cho file mới).
+- Phản biện và phản hồi trước: tasks/T-044-cai-dat-m1/LOG.md, theo thứ tự các mục "Phản hồi phản biện lượt 1 và gói sửa", "Phản hồi phản biện lượt 2 và gói sửa", "Phản hồi phản biện lượt 3 và gói sửa" (lượt 3 chép nguyên văn phần nhận xét của Codex ngày 30/10/2026 và phản hồi của người làm). Chưa có REVIEW.md dạng file.
+- Code và kết quả liên quan: branch claude/sweet-hawking-dy078d trong checkout D:\RCA-flashticket, tại <revision Minh điền>; src/m1/, src/m1_danh_gia/; results/T-044/ (bao-cao.md, bang-phep-kiem.json, dinh-chinh-cai-dat.md, fixture/, tests/, scripts/, runs/). Kiểm manifest bằng py -3 -B results/T-044/scripts/kiem_hash_t043.py và py -3 -B results/T-044/scripts/tao_manifest.py --kiem. Môi trường: results/T-044/requirements-m1.txt, freeze-m1.txt; môi trường local: D:/RCA-ext/envs/py312-pin/Scripts/python.exe với PYTHONPATH=D:/RCA-ext/envs/T-016-cong-cu/Lib/site-packages (drain3); thư mục T-014-main có networkx 2.8.8. Chạy test: cd results/T-044/tests rồi chạy python ở trên với -B -m pytest -q -p no:cacheprovider. Lệnh khác: results/T-044/bao-cao.md mục 11; results/T-044/scripts/chay_kiem_windows.sh.
+- Phạm vi ghi được Minh cho phép trong lượt này: được chạy kiểm dùng ca giả trong bộ nhớ hoặc thư mục tạm ngoài repo; không sửa file trong repo, không commit, push hay merge. Bản phản biện: <Minh điền: chỉ trả lời trong chat, hoặc ghi tasks/T-044-cai-dat-m1/REVIEW.md theo tasks/_MAU/REVIEW.md>. Subagent: Minh cho phép 3 subagent model SOL 6.1 ULTRA. Yêu cầu của Minh cho lượt này (nguyên văn, chat 30/10/2026): "PHẢN BIỆN, ĐÀO SÂU VÀO TỪNG DÒNG CODE HƠN, CHỈ RA CÁC LỖI TIỀM TÀNG, CHO PHÉP DÙNG 3 SUB AGENT MODEL SOL 6.1 ULTRA, TÌM RA CÁC LỖI NGUY HIỂM NHƯ NHỮNG LỖI ĐÃ CHỈ RA VÀ SỬA TRƯỚC ĐÓ."
+
+Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
+
+Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
+Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
+Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
+
+Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
+hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
+Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
+số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
+có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
+
+Bổ sung yêu cầu phản biện:
+1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
+2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
+3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
+4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
+5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
+6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
+7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
+8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
+9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
+10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
+
+Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
+Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
+
+Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
+bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
+Tiếng Việt, câu ngắn.
+
+Cuối lượt báo:
+1. Đã làm gì.
+2. File đã thay đổi, hoặc không sửa file nào.
+3. Kiểm đã chạy và kết quả.
+4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
+
+Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
+
+Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
+
+Công đoạn: người phản biện kiểm lại phản hồi và sửa.
+Tự soát yêu cầu và đầu ra gốc trước; sau đó đọc phản biện, phản hồi và các thay đổi được duyệt. Kiểm cả ý kiến phản bác reviewer; không mặc định phản hồi hoặc bản sửa đúng.
+Đối chiếu từng điểm với bằng chứng hiện tại, quyền sửa và hậu quả. Có điểm đúng nhưng chưa được Minh duyệt sửa thì ghi đúng trạng thái; không tự coi đã xử lý hoặc ép người làm sửa.
+Chỉ ghi bản phản biện lượt mới được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ lịch sử, không ghi LOG/STATE hay sửa thay người làm. Nêu bất đồng còn lại và soạn prompt để người làm đáp.
+
+Với từng thành phần, kiểm mục đích và căn cứ: sửa hạn chế P4, đáp ứng DT18 hay nhu cầu kỹ thuật. Có lý do kỹ thuật, phương án khác, bằng chứng dev và điều kiện thất bại không; có dùng mã hạn chế mô tả như bằng chứng cơ chế hoặc chọn theo mức chênh đồ thị trừ không đồ thị không?
+Nêu rõ nút/cạnh, ánh xạ log/trace/metric và phép tính thực sự sử dụng cạnh. Lần theo thông tin quan hệ và nhãn trong phương pháp lẫn đối chứng; gọi “không đồ thị” có đúng với thông tin còn giữ không?
+Kiểm baseline và đối chứng đủ mạnh, tương đương về tín hiệu/cửa sổ/tập ứng viên/coverage/tiền xử lý/quy tắc chấm/ngân sách chọn cấu hình ở phần không chủ ý thay; yếu tố thay cùng phải giới hạn kết luận.
+Phương pháp và đối chứng đã được cài và kiểm đầu vào, trung gian, hành vi trên dev chưa, hay chỉ chạy không lỗi? Không đòi đồ thị phải thắng để khóa.
+Code/revision, cấu hình, giả thuyết, độ đo, tập ca/tập ứng viên, cách xử lý ca lỗi/UNSUPPORTED/nhánh dự phòng và bảng diễn giải đã khóa trước test chưa? Có bỏ nhóm khó sau khi nhìn điểm hoặc dùng test để chọn thiết kế không?
+Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.
+```
+
+### Minh quyết E1-CP và bước 5; sửa (30/10/2026; Claude; local Windows; người làm)
+
+Cùng phiên. Sau mục trên, trong chat:
+- Minh dán hai đề xuất (E1-CP theo CĐ1 và bài CRISP, ra 2600; bước 5 đọc cặp phụ thuộc quan sát là KHÔNG ĐỦ CA) và hỏi phản biện của người làm; yêu cầu prompt Codex mới không theo nguyên văn mẫu, ưu tiên mong muốn ở Phần A của `docs/KE-HOACH-GIAI-DOAN-TOI.md`, "hướng dẫn của cô giờ không phải là quan trọng nhất nữa".
+- Phản biện của người làm (chat): E1-CP đúng ở τ, xét cả con đã chọn, PII-04; nhưng biên mở/đóng mới quyết định kết quả: 24 thứ tự × 4 biến thể cho {chỉ con còn lại, biên mở} 2000; {chỉ con còn lại, biên đóng} 3000; {cả con đã chọn, biên mở} 2600; {cả con đã chọn, biên đóng} 3000. Vá tạm quy tắc đề xuất: 263/263 test vẫn qua. Bước 5: đồng ý; thêm lý do (bước 5 và bước 8 hết đọc lệch) và hệ quả (thành phần ít ca HẠI tại P vẫn được giữ bật).
+- Người làm nêu lệch luật: prompt không theo mẫu lệch AGENTS §9 và M-29/C-10; ưu tiên hướng dẫn của cô lệch AGENTS §9. Đề xuất ghi DECISIONS; chưa ghi.
+
+**Quyết định của Minh trong phiên** (chat 30/10/2026, nguyên văn): "duyệt E1-CP, bước 5 như trêm". Người làm hỏi lại biên vùng chồng lấn (chỗ quyết định 2600 hay 3000); Minh chọn "Biên mở (Recommended)". Câu quyết định cần ghi vào DECISIONS khi Minh duyệt dòng ghi.
+
+**1. Đã làm gì.** Sửa theo `results/T-044/dinh-chinh-cai-dat.md` mục C5: S18 (`span.duong_gang`: xét cả con đã chọn khi kiểm vùng chồng lấn, theo chỉ số để hai con trùng khoảng vẫn là hai con; biên mở giữ nguyên) và S19 (`chon_khoi`: hàm chung `_kc_ptqs` cho bước 5 và bước 8). Đáp án tự lập CP2, CK5 (73 mục). Đột biến D42–D44; D30 đổi chỗ theo hàm chung (cùng ý). `chay_kiem_windows.sh` nhận tên lượt và cây so qua biến môi trường; `tong_hop_tat_dinh.py` nhận cây so làm tham số thứ hai. Mục D của đính chính: E1-CP, bước 5 ghi đã quyết.
+
+**2. File đã thay đổi** (chưa commit, cùng gói lượt 3): `src/m1/span.py`, `src/m1_danh_gia/chon_khoi.py`; `results/T-044/`: `fixture/dap-an-thanh-phan.json`, `tests/test_k06_e1_e2.py`, `tests/test_k11_danh_gia.py`, `scripts/dot_bien.py`, `chay_kiem_windows.sh`, `tong_hop_tat_dinh.py`, `tao_manifest.py`, `bang-phep-kiem.json`, `bao-cao.md`, `dinh-chinh-cai-dat.md`, `manifest.json`; lượt mới `runs/test-xanh-005`, `tat-dinh-006`, `dot-bien-007`, `kiem-hash-t043-006`; LOG này; dòng T-044 trong STATE.
+
+**3. Kiểm đã chạy và kết quả.**
+- Test: 266/266 qua (`runs/test-xanh-005/stdout.txt`; `bang-phep-kiem.json#/tong`). Ca phản ví dụ E1-CP cho 2600 ở cả 24 thứ tự; CP1, fixture 2, 3 không đổi.
+- Tất định: PASS, 104 bản ghi, 266 phép, 12 biến thể (`runs/tat-dinh-006/tong-hop.json#/ket_luan`); 0 bản ghi lệch so với 253dbe46 sau khi bỏ trường mới (`#/so_voi_truoc_sua`). Bộ ca tất định không có cha nào mà quy tắc E1-CP mới đổi kết quả; hành vi mới chỉ kiểm bằng CP2.
+- Đột biến: 44/44 bị bắt, đối chứng xanh 266/266 (`runs/dot-bien-007/tong-hop.json#/so_bi_bat`). D42, D44 là hành vi cũ của hai chỗ sửa: bị bắt bởi CP2, CK5.
+- Hash T-043 PASS 69/69, 10/10 (`runs/kiem-hash-t043-006/stdout.txt`). Manifest T-044 `--tao`, `--kiem` PASS 673/673.
+
+**4. Điều chưa chắc hoặc cần Minh quyết.**
+- Task đạt gì: hai OPEN cũ đã quyết và cài, có đáp án và đột biến. Chưa được Codex kiểm.
+- Giới hạn: lệch code CRISP chính thức (ngưỡng 1%, biên đóng) chưa phân xử vì chưa xác minh bản code bài báo dùng; cách đọc câu "bỏ qua…" là của M1. Bước 5 có thể giữ bật thành phần ít ca HẠI tại P; T-045 phải báo khi xảy ra.
+- Cần Minh quyết: S14, S17; commit gói sửa; dòng DECISIONS cho các câu Minh duyệt từ lượt 3 và cho hai lệch luật (prompt không theo mẫu; ưu tiên hướng dẫn của cô); có giữ ngoại lệ prompt cho các lượt sau không.
+
+**Bước tiếp theo.** Minh chuyển prompt dưới đây sang phiên Codex mới. Minh quyết S14, S17 và commit.
+
+**Lệnh cuối đã chạy.** `py -3 -B results/T-044/scripts/tao_manifest.py --kiem` (môi trường ghim ở `bao-cao.md` mục 2).
+
+**Prompt cho phiên Codex mới (phản biện độc lập).** Theo yêu cầu của Minh ngày 30/10/2026, prompt này không chép nguyên văn `docs/review-prompt.md` (lệch AGENTS §9; ngoại lệ do Minh yêu cầu, chưa ghi DECISIONS).
+
+```text
+# Vai trò
+Bạn là người phản biện độc lập, cấp cao, cho task T-044 trong repo D:\RCA-flashticket (đồ án RCA cho microservice).
+Bạn không phải người làm. Bạn không sửa code hay tài liệu. Bạn tìm lỗi, chứng minh lỗi, và đề xuất.
+
+# Bối cảnh
+- T-044 cài chuỗi chẩn đoán M1 (src/m1/) và bộ đánh giá (src/m1_danh_gia/) theo đặc tả của T-043, kiểm bằng ca giả (results/T-044/tests, fixture/). Chưa chạy trên dữ liệu thật; việc đó là T-045 (tasks/T-045-chay-khoi-k-dev/SPEC.md), do Codex làm sau khi T-044 nghiệm thu.
+- Đã qua ba lượt phản biện. Lượt nào cũng tìm ra lỗi mà bộ test lúc đó vẫn qua; lượt 3 có một lỗi làm đổi thứ hạng. Lịch sử từng lỗi và cách sửa: tasks/T-044-cai-dat-m1/LOG.md (các mục "Phản hồi phản biện lượt 1/2/3 và gói sửa", "Minh quyết E1-CP và bước 5") và results/T-044/dinh-chinh-cai-dat.md Phần II mục C2–C5.
+- Code cần soát: cây làm việc hiện tại của branch claude/sweet-hawking-dy078d. Các sửa sau 253dbe46 có thể chưa commit: dùng `git diff 253dbe46` và `git status` để thấy phần mới. Toàn bộ cài đặt: `git diff 6b2f6ac6`.
+
+# Mong muốn của Minh (ưu tiên cao nhất khi đánh giá)
+Đọc Phần A của docs/KE-HOACH-GIAI-DOAN-TOI.md (M-01 đến M-48) trước khi đọc code. Tóm tắt các điểm chi phối lượt này (bản gốc trong file là nguồn):
+- Phản biện độc lập, đa chiều; chỉ ra cả những hướng Minh chưa nghĩ tới (M-13, M-22). Không bị gò bó bởi luật quá mức (M-12).
+- Thời gian không phải lý do cắt phạm vi hay kiểm nhẹ đi (M-15).
+- Đích kết quả: trên RE2-TT không bắt buộc vượt baseline nhưng không được thua quá xa (E-04: TORAI B, Δ MRR = 0,05); trên FlashTicket mục tiêu là vượt, có luật chống thiên lệch (M-18, M-24, D.1, D.9).
+- Kết luận về đồ thị chỉ ở mức "lợi ích của bước lan/phép dùng quan hệ", có đối chứng bỏ quan hệ và quy tắc đơn giản (M-19, M-25).
+- Nếu thấy mong muốn của Minh tự mâu thuẫn hoặc mâu thuẫn với tài liệu khác, nêu ra để Minh quyết (M-21).
+Hướng dẫn của giảng viên không còn là tiêu chí ưu tiên nhất trong lượt này. Yêu cầu chính thức của đề tài (docs/reference/sources/DT18-de-tai-va-nhiem-vu.md) vẫn là ràng buộc.
+
+# Yêu cầu của Minh cho lượt này (nguyên văn, chat 30/10/2026)
+"PHẢN BIỆN, ĐÀO SÂU VÀO TỪNG DÒNG CODE HƠN, CHỈ RA CÁC LỖI TIỀM TÀNG, CHO PHÉP DÙNG 3 SUB AGENT MODEL SOL 6.1 ULTRA, TÌM RA CÁC LỖI NGUY HIỂM NHƯ NHỮNG LỖI ĐÃ CHỈ RA VÀ SỬA TRƯỚC ĐÓ."
+
+# Nhiệm vụ
+1. Soát từng dòng src/m1/ và src/m1_danh_gia/. Tìm lỗi làm sai thứ hạng, sai lựa chọn cấu hình, sai bản ghi, lọt nhãn, hoặc làm kết quả phụ thuộc thứ tự/hash seed. Ưu tiên các họ lỗi đã từng xảy ra và tìm biến thể còn sót của chúng: định danh trùng nhau giữa các đối tượng khác loại; mất độ chính xác số (phân số → số thực); bội số/trọng số bằng 0 hoặc lớn hơn 1; khóa thiếu được thay bằng mặc định ngầm; trung gian tính xong nhưng không lưu vào bản ghi; hai bước đọc cùng một đầu vào theo hai cách; phép so chỉ xét một chiều (hòa, vắng mặt); nhánh tắt vẫn chạy.
+2. Kiểm sức bắt lỗi của bộ test: chỗ nào test so code với chính nó, đáp án tự lập có thể sai cùng cách hiểu với code, hoặc đột biến (scripts/dot_bien.py) chỉ đổi định dạng mà không đổi hành vi.
+3. Đánh giá độ sẵn sàng cho T-045: phần code điều phối T-045 sẽ phải tự viết (dựng đủ cặp cho 16 cấu hình × 3 thế giới, E_X, ít ca, M5, UV-6, mốc giả, gọi luật chọn khối, phép độ bền 1.000 mẫu theo bội số). Giao diện hiện có ở src/m1_danh_gia đủ và an toàn chưa; chỗ nào dễ sai im lặng.
+4. Đánh giá độc lập, không mặc định đồng ý với bên nào:
+   - hai quyết định Minh vừa duyệt và đã cài: quy tắc E1-CP của M1 (τ = 1 ms, xét cả con đã chọn, biên mở, phá hòa PII-04) và bước 5 đọc cặp phụ thuộc quan sát là KHÔNG ĐỦ CA — results/T-044/dinh-chinh-cai-dat.md mục C5; CĐ1; results/T-043/the-doc/crisp.md; bài CRISP §5.2; tasks/T-043-thiet-ke-rca-m1/SPEC.md dòng 797–812, 896–898, D2a, D2f. Cài đặt có đúng quyết định không, và quyết định có mặt trái nào chưa được ghi;
+   - hai điểm còn chờ Minh: S14 (E7 ở C-a0/C-a1; hợp đồng results/T-043/hop-dong.json#/vao/params/bat_tat không có khóa E7) và S17 (chon_khoi.chon khi thiếu cặp) — mục D của cùng file.
+5. Ngoài phạm vi trên, nêu đề xuất giúp M1 đạt đích ở mục "Mong muốn của Minh" mà hiện chưa ai nêu, kèm căn cứ và cách kiểm.
+
+# Cách làm
+- Chia việc cho 3 subagent (đã được Minh cho phép), ví dụ: (a) src/m1 (chuỗi, E1–E9, xếp hạng, runner, adapter); (b) src/m1_danh_gia và đường dẫn tới T-045; (c) tests, fixture, scripts, đáp án tự lập. Tự tái hiện mọi finding do subagent báo trước khi đưa vào kết luận.
+- Mỗi finding phải có phản ví dụ chạy được trên ca giả (script để ngoài repo), hoặc trích dòng code và đặc tả cụ thể. Không có bằng chứng thì ghi "nguy cơ chưa kiểm".
+- Chạy test bằng D:/RCA-ext/envs/py312-pin/Scripts/python.exe với PYTHONPATH=D:/RCA-ext/envs/T-016-cong-cu/Lib/site-packages (không thêm T-014-main: có networkx 2.8.8). Trong results/T-044/tests: `-B -m pytest -q -p no:cacheprovider`. Kiểm hash: `py -3 -B results/T-044/scripts/kiem_hash_t043.py` và `py -3 -B results/T-044/scripts/tao_manifest.py --kiem`. Gói kiểm đầy đủ: results/T-044/scripts/chay_kiem_windows.sh (Git Bash).
+
+# Ràng buộc cứng
+- Không tạo, sửa, xóa file trong repo; không commit, push, merge. Script và đầu ra kiểm để ngoài repo.
+- Không đọc data/locked/, dữ liệu dev hay bản ghi có nhãn. Chỉ dùng ca giả.
+- Không đọc repo cũ D:/Project/flash-ticket-rca-research.
+- Đọc code và file thật; không lấy tóm tắt trong LOG thay bằng chứng.
+
+# Đầu ra (trả lời trong chat, tiếng Việt, câu ngắn)
+1. Kết luận một đoạn: có nên nghiệm thu T-044 không, và T-045 đã an toàn để bắt đầu chưa.
+2. Bảng finding, sắp từ nghiêm trọng nhất. Mỗi dòng: mức (CHẶN / KHÔNG CHẶN / nguy cơ chưa kiểm); vị trí (file:dòng); sai gì; phản ví dụ hoặc bằng chứng; hậu quả (kết quả nào sai); sửa tối thiểu.
+3. Đánh giá từng mục ở nhiệm vụ 4: đồng ý / đồng ý có điều kiện / không đồng ý, kèm lý do và mặt trái.
+4. Đề xuất mới ở nhiệm vụ 5.
+5. Đã làm gì, đã chạy gì (lệnh và kết quả), phần chưa kiểm được và vì sao.
+Không báo lỗi chính tả, văn phong. Không thêm phép kiểm chỉ "cho chắc". Không có lỗi đáng kể thì nói thẳng.
+```
+
+### Phản hồi phản biện lượt 4 và gói sửa (30/10/2026; Claude; local Windows; người làm)
+
+Cùng phiên, cùng thiết bị. Vai trò không đổi.
+
+**Đầu vào (Minh chuyển nguyên văn).** Bản phản biện của Codex (phiên mới, prompt không theo mẫu ở mục trên), phần nhận xét chính:
+
+```text
+Chưa nên nghiệm thu T-044 hoặc bắt đầu chạy T-045. Trên bản mới có C5, 266/266 test qua, nhưng có hai lỗi CHẶN mới.
+| CHẶN — F1 | e4.py:122, e4.py:178, xep_hang.py:21 | Điểm bằng nhau theo công thức bị tách thành khóa khác nhau vì chia, trừ và cộng số thực. Đã tái hiện cả đơn vị phân vị và đơn vị đếm qua toàn chuỗi. | Sai hòa, RR và thứ tự giữa các thế giới. | Tính từ tử số nguyên trước khi chia; giữ tỷ lệ chính xác khi so khóa, kể cả Σs. Không thêm dung sai hòa tùy ý. |
+| CHẶN đường ghi — F2 | e4.py:228, chuoi.py:366, runner.py:209 | T4c có thể sinh inf từ đầu vào hữu hạn. Bản ghi vẫn OK; _json ném ValueError. Nhánh z còn giữ cờ và điểm vô hạn sau khi đặt hop_le=False. | Một ca làm dừng pha 1; nhánh z có thể báo CAUSE_FOUND khi số phép chấm hợp lệ bằng 0. | Tính log ổn định; ngăn điểm không hữu hạn vào kênh/xếp hạng; giữ ca lỗi. |
+| KHÔNG CHẶN — F3 | chuoi.py:88, 205, 261 | Chưa kiểm đủ khóa, kiểu, enum của bat_tat. E1="typo" vẫn OK; thiếu E5 tự thành tắt; "false" thành bật. | Sai cấu hình bị chấm như hợp lệ. | Kiểm đủ tám khóa theo hop-dong.json:13. |
+| KHÔNG CHẶN thứ hạng — F4 | chuoi.py:538 | E6b không lưu π gốc; đặc tả:346 yêu cầu cả hai. | Không kiểm lại được sai số hội tụ và ranh giới làm tròn. | Lưu π gốc theo từng thế giới. |
+| KHÔNG CHẶN; có điều kiện — F5 | quan_sat.py:131, chuoi.py:310 | Vector timestamp riêng 5 mốc cho 10 hàng vẫn nhận; zip bỏ 5 hàng cuối. | Mất dữ liệu thành thiếu quan sát. | Kiểm độ dài. |
+| KHÔNG CHẶN; có điều kiện — F6 | pha2.py:65, 80 | Pha 2 ghi đè bản ghi trùng (config_id, opaque_id), không kiểm đủ ca; metadata 99 dòng, thực tế 2 vẫn trả 99. | Ca lỗi/thiếu có thể biến mất khỏi mẫu số. | Kiểm duy nhất, số dòng thật, đủ tích cấu hình × ca. |
+| KHÔNG CHẶN; có điều kiện — F7 | rr.py:50, luat_c.py:55, pha2.py:141 | Map bội số thiếu khóa tự lấy 1: {'a':2,'b':0} cho HẠI; {'a':2} cho KHÔNG ĐỦ CA. | Giữ nhầm ca không được lấy vào mẫu bootstrap. | Yêu cầu map đầy đủ, gồm số 0. |
+| KHÔNG CHẶN; S17 còn OPEN | chon_khoi.py:68 | Không có cặp nào vẫn chọn E1, trinh_Minh=False. | Chọn khi chưa xét đủ điều kiện loại. | Kiểm đủ cặp trước lựa chọn. |
+Đánh giá: C5/S18 đồng ý có điều kiện về diễn giải (24 hoán vị đều 2600; biên mở, phá hòa là lựa chọn của M1); C5/S19 đồng ý; S14 đồng ý phương án (a); S17 đồng ý sửa. dem_moc_gia chỉ theo verdict tại P: chưa đủ căn cứ gọi là lỗi. D19 không chứng minh sức bắt lỗi xếp hạng. Đề xuất thêm: tối ưu C-d3; ứng viên chưa kiểm E5 giữ phần dư max(0, điểm kênh − điểm giải thích mạnh nhất).
+Kiểm của Codex: 3 subagent; pytest C5 266 passed; hash T-043 69/69, 10/10; T-044 673/673. Script ngoài repo: C:/Users/84583/AppData/Local/Temp/t044-root-20261030/.
+```
+
+**Tự soát.** Người làm đọc kết luận của Codex trước khi soát (bản phản biện dán kèm prompt); N1–N3 tìm được khi lần theo code, không tính là tự soát mù.
+- **N1 (thuộc F1, rộng hơn).** `e2.gan_canh` ép điểm cạnh thành `float(s)`, nên sửa riêng E4 không đủ cho kênh E2. Với max s và số kênh, tính chính xác rồi đổi số thực một lần là đủ (giá trị bằng nhau cho cùng số thực); riêng Σs phải cộng chính xác.
+- **N2 (KHÔNG CHẶN).** Khóa T4c (max m) tính bằng số thực và log, có thể tách hòa cùng cách; T4c chỉ báo cáo (CĐ7): ghi giới hạn.
+- **N3 (KHÔNG CHẶN, tài liệu).** `PYTHONPATH=T-016-cong-cu` nạp cả numpy, scipy, pandas (cùng phiên bản ghim 1.26.4, 1.14.1, 2.2.3), không chỉ drain3.
+
+**Phản hồi của người làm (chat 30/10/2026):** F1 đúng (phân vị: 0.09999999999999999 so với 0.1; đếm (10, 30) và (30, 90) lệch ở T = (590, 310), (610, 290), (7, 3)). F2 đúng (`m_T4c_phan_vi([0, 5e-324, 0, 0, 0], [1e10]*5)` = inf; nhánh z cho z_len = inf, `huu_han` = False nhưng cờ và điểm giữ; `json.dumps(..., allow_nan=False)` ném ValueError ngoài `chay`). F3–F7, S17 đúng theo đọc code. Đồng ý với Codex về C-e và D19. Ý kiến: tối ưu C-d3 nên đo ở T-045 bước 1 trước; E5 phần dư đáng thử nhưng điểm các loại kênh chưa chắc so được, là đổi ma trận, cần đặc tả và Minh duyệt.
+
+**Quyết định của Minh trong phiên** (chat 30/10/2026, nguyên văn): "Duyệt cả gói" — gói sửa F1–F7 (gồm N1), S14 phương án (a), S17, cùng ghi giới hạn N2 và sửa tài liệu N3, theo đề xuất gom theo file trong chat. Câu quyết định cần ghi vào DECISIONS khi Minh duyệt dòng ghi.
+
+**1. Đã làm gì.** Sửa toàn gói theo `results/T-044/dinh-chinh-cai-dat.md` mục C6: S20 (điểm và khóa chính xác qua E4, `Kenh.s_q`, E2, `xep_hang.khoa_q`, C-d1, C-d2, C-d3), S21 (T4c hữu hạn; nhánh z bỏ cờ khi điểm không hữu hạn; bản ghi không ghi được JSON chuẩn thành ERROR), S22 (`bat_tat`), S23 (π gốc E6b), S24 (số mốc metric), S25 (`rr.boi_so`: map bội số phải đủ), S26 (pha 2 kiểm trùng, thiếu, metadata), S14 phương án (a), S17. Test mới `tests/test_k12_luot4.py`; đáp án tự lập mới SS1, SS2, SS3, T4C1, Z1, BT1, PI1, MET3, BS1, P2D, CA0E7, CK9 (85 mục); TS2 ghi đủ map bội số (đáp án không đổi). Đột biến D45–D58; D03, D13 đổi chỗ theo dòng mới. Script mới `scripts/so_truong_ban_ghi.py` (so từng trường bản ghi giữa hai cây); `chay_kiem_windows.sh` gọi script này; `so_ban_ghi_truoc_sau.py` bỏ thêm `extra.E6b_pi`; `tao_bang_phep_kiem.py` thêm file test mới.
+
+Trong lúc làm:
+- Đáp án T4C1 ca 2 người làm tính tay sai (quên r_u = 2e308, ghi ln 3); test đỏ; sửa đáp án thành ln 2 (x = 1). Code đúng.
+- Lượt `tat-dinh-007` (trước bản cuối) so với 253dbe46 cho 104/104 bản ghi lệch. Người làm tra từng trường: khóa mới `extra.E6b_pi` (thêm vào danh sách bỏ khi so), cách ghi khóa C-d2 (bản mới để số nguyên, bản cũ số thực: đã giữ dạng số thực như cũ), và m của T4c ở chữ số cuối do tính log từ tử và mẫu (mất chính xác khi trừ hai log lớn: đã đổi sang log1p của x chính xác, chỉ dùng log của tử và mẫu khi x tràn). Lần so đầu của `tat-dinh-007` bị ghi đè khi chạy lại so sánh với danh sách bỏ mới. Vì code đổi sau lượt này nên chạy lại toàn gói ở lượt cuối.
+
+**2. File đã thay đổi** (chưa commit, cùng gói sau 253dbe46): `src/m1/e4.py`, `kieu.py`, `e2.py`, `xep_hang.py`, `doi_chung.py`, `chuoi.py`, `runner.py`; `src/m1_danh_gia/rr.py`, `luat_c.py`, `uv6.py`, `pha2.py`, `chon_khoi.py`; `results/T-044/`: `tests/test_k12_luot4.py` (mới), `fixture/dap-an-thanh-phan.json`, `scripts/dot_bien.py`, `so_ban_ghi_truoc_sau.py`, `so_truong_ban_ghi.py` (mới), `chay_kiem_windows.sh`, `tao_bang_phep_kiem.py`, `tao_manifest.py`, `bang-phep-kiem.json`, `bao-cao.md`, `dinh-chinh-cai-dat.md`, `manifest.json`; lượt mới `runs/test-xanh-006`, `tat-dinh-007`, `dot-bien-008`, `kiem-hash-t043-007` (trước bản cuối) và `runs/test-xanh-007`, `tat-dinh-008`, `dot-bien-009`, `kiem-hash-t043-008` (bản cuối); LOG này; dòng T-044 trong STATE.
+
+**3. Kiểm đã chạy và kết quả** (bản cuối).
+- Test: 289/289 qua (`runs/test-xanh-007/stdout.txt`; `bang-phep-kiem.json#/tong`); 97/97 phép T-043 trong phạm vi.
+- Tất định: PASS, 104 bản ghi, 289 phép, 12 biến thể (`runs/tat-dinh-008/tong-hop.json#/ket_luan`). So với 253dbe46 sau khi bỏ trường mới: 16 bản ghi lệch (`#/so_voi_truoc_sua`); `runs/tat-dinh-008/so-truong-253dbe46.json` cho thấy mọi chỗ lệch chỉ ở m của T4c, chữ số cuối (`/extra/T4c/m_thuc_the`, `m_don_vi`, `blocks/#/key`); khóa xếp hạng, thứ tự, kênh, verdict không đổi trên bộ ca này.
+- Đột biến: 58/58 bị bắt, đối chứng xanh 289/289 (`runs/dot-bien-009/tong-hop.json#/so_bi_bat`).
+- Hash T-043 PASS 69/69, 10/10 (`runs/kiem-hash-t043-008/stdout.txt`). Manifest T-044 `--tao`, `--kiem` PASS 984/984.
+
+**4. Điều chưa chắc hoặc cần Minh quyết.**
+- Task đạt gì: hai lỗi CHẶN và sáu điểm KHÔNG CHẶN của lượt 4 đã sửa trên ca giả, có đáp án và đột biến. Chưa được Codex kiểm.
+- Câu hỏi nguồn: A1–A5 trong phạm vi fixture. Bốn lượt phản biện đều tìm thêm lỗi mà bộ test lúc đó không bắt; "289/289 qua" không chứng minh hết lỗi.
+- Giới hạn còn lại: hai giá trị x khác nhau của T4c có thể làm tròn ra cùng m; π của E6b làm tròn 12 chữ số (đặc tả); C-g giữ số thực; C-e theo verdict tại P; tối ưu C-d3 và ứng viên E5 giữ phần dư chưa kiểm.
+- Tần suất F1, F2 trên dữ liệu dev: chưa biết.
+- Cần Minh quyết: commit; dòng DECISIONS cho các câu Minh duyệt từ lượt 3; có đưa ứng viên E5 giữ phần dư vào trước khối K không.
+
+**Bước tiếp theo.** Minh chuyển prompt dưới đây sang phiên Codex. Minh quyết commit.
+
+**Lệnh cuối đã chạy.** `py -3 -B results/T-044/scripts/tao_manifest.py --kiem` (môi trường ghim ở `bao-cao.md` mục 2).
+
+**Prompt cho Codex kiểm lại (phiên mới).** Không theo nguyên văn `docs/review-prompt.md`, theo yêu cầu của Minh ngày 30/10/2026.
+
+```text
+# Vai trò
+Bạn là người phản biện độc lập, cấp cao, cho task T-044 trong repo D:\RCA-flashticket. Bạn không sửa code hay tài liệu; bạn tìm lỗi, chứng minh lỗi, và đề xuất.
+
+# Bối cảnh
+- Đây là lượt kiểm lại sau gói sửa cho bản phản biện Codex ngày 30/10/2026 (F1–F7, S14, S17). Phản biện và phản hồi: tasks/T-044-cai-dat-m1/LOG.md (các mục mới nhất, gồm "Phản hồi phản biện lượt 4 và gói sửa"); results/T-044/dinh-chinh-cai-dat.md Phần II mục C2–C6.
+- Code: cây làm việc của branch claude/sweet-hawking-dy078d. Phần mới: `git diff 253dbe46` và `git status` (có thể chưa commit). Toàn bộ cài đặt: `git diff 6b2f6ac6`.
+- Mong muốn của Minh là tiêu chí ưu tiên: docs/KE-HOACH-GIAI-DOAN-TOI.md Phần A (M-01…M-48). DT18 vẫn là ràng buộc; hướng dẫn của giảng viên không còn là tiêu chí ưu tiên nhất.
+
+# Yêu cầu của Minh (nguyên văn, chat 30/10/2026)
+"PHẢN BIỆN, ĐÀO SÂU VÀO TỪNG DÒNG CODE HƠN, CHỈ RA CÁC LỖI TIỀM TÀNG, CHO PHÉP DÙNG 3 SUB AGENT MODEL SOL 6.1 ULTRA, TÌM RA CÁC LỖI NGUY HIỂM NHƯ NHỮNG LỖI ĐÃ CHỈ RA VÀ SỬA TRƯỚC ĐÓ."
+
+# Nhiệm vụ
+1. Kiểm từng sửa có đúng và đủ không, kể cả phạm vi rộng hơn finding gốc (ví dụ điểm chính xác phải đi qua mọi đường tạo kênh và mọi phép so khóa). Tìm chỗ sửa làm hỏng hành vi khác.
+2. Soát lại toàn bộ src/m1/ và src/m1_danh_gia/ tìm biến thể còn sót của các họ lỗi đã gặp: định danh trùng; mất độ chính xác số; giá trị không hữu hạn; bội số 0, thiếu hoặc thưa; khóa thiếu thành mặc định; trung gian không lưu; hai bước đọc cùng đầu vào theo hai cách; so một chiều; nhánh tắt vẫn chạy; đầu vào trùng hoặc thiếu khi ghép.
+3. Đánh giá độ sẵn sàng cho T-045 (tasks/T-045-chay-khoi-k-dev/SPEC.md).
+4. Đánh giá các điểm còn mở: đề xuất E5 giữ phần dư; tối ưu C-d3; C-e chỉ theo verdict tại P.
+5. Nêu đề xuất mới giúp đạt đích ở KE-HOACH Phần A, kèm căn cứ và cách kiểm.
+
+# Cách làm
+- 3 subagent (Minh cho phép). Tự tái hiện mọi finding trước khi kết luận. Mỗi finding cần phản ví dụ chạy được trên ca giả (script ngoài repo) hoặc trích dòng code và đặc tả; không có thì ghi "nguy cơ chưa kiểm".
+- Môi trường: D:/RCA-ext/envs/py312-pin/Scripts/python.exe, PYTHONPATH=D:/RCA-ext/envs/T-016-cong-cu/Lib/site-packages (thư mục này nạp drain3, numpy, scipy, pandas cùng phiên bản ghim; không thêm T-014-main). Test: trong results/T-044/tests, `-B -m pytest -q -p no:cacheprovider`. Hash: `py -3 -B results/T-044/scripts/kiem_hash_t043.py`, `py -3 -B results/T-044/scripts/tao_manifest.py --kiem`. Gói kiểm: results/T-044/scripts/chay_kiem_windows.sh; so trường bản ghi giữa hai cây: results/T-044/scripts/so_truong_ban_ghi.py.
+
+# Ràng buộc cứng
+Không tạo, sửa, xóa file trong repo; không commit, push, merge. Không đọc data/locked/, dữ liệu dev, bản ghi có nhãn, repo D:/Project/flash-ticket-rca-research. Đọc file thật, không lấy tóm tắt LOG thay bằng chứng.
+
+# Đầu ra (chat, tiếng Việt, câu ngắn)
+1. Kết luận: nghiệm thu T-044 được chưa; T-045 an toàn để bắt đầu chưa.
+2. Bảng finding sắp theo mức nghiêm trọng: mức (CHẶN / KHÔNG CHẶN / nguy cơ chưa kiểm); file:dòng; sai gì; bằng chứng; hậu quả; sửa tối thiểu.
+3. Kết luận từng sửa F1–F7, S14, S17: đạt / đạt một phần / chưa đạt.
+4. Ý kiến về nhiệm vụ 4 và đề xuất mới.
+5. Đã làm, đã chạy gì (lệnh và kết quả), phần chưa kiểm.
+Không báo chính tả, văn phong; không thêm phép kiểm "cho chắc"; không có lỗi đáng kể thì nói thẳng.
+```
+
+### Lượt 5: phản biện trong chat và gói sửa (31/10/2026; Claude; local Windows 11, `D:\RCA-flashticket`; người làm)
+
+Mở phiên. Cùng branch `claude/sweet-hawking-dy078d`, cây làm việc sau gói C6 (chưa commit). Vai trò trong task: người làm.
+
+**Đầu vào.** Minh dán vào phiên Claude này prompt phản biện viết cho Codex ở mục "Minh quyết E1-CP và bước 5" (bản trước lượt 4). Claude là người làm của T-044, nên lượt này không thay lượt phản biện chính thức của Codex theo SPEC. Claude soát cây hiện tại (gồm C6), có 3 subagent (Minh cho phép trong prompt), chỉ đọc repo, kiểm bằng ca giả ngoài repo. Kết quả và phản ví dụ nằm trong chat 31/10/2026; script ở thư mục tạm ngoài repo (scratchpad của phiên).
+
+Tóm tắt điểm tìm được (chi tiết ở `results/T-044/dinh-chinh-cai-dat.md` mục C7):
+- G1: `chon_khoi.chon` không kiểm đủ 16 cấu hình; thiếu một cấu hình làm đổi cấu hình thắng mà không báo.
+- G2: `luat_c`, `rr.boi_so`, `uv6.dem` nhận số thực; δ_d = 1/30 dạng số thực đổi kết cục.
+- G3: `luat_c.tong_hop` không kiểm E_X thuộc tập ô của ca; mã ô lệch kiểu đổi GIÚP thành TRÁI CHIỀU Ô.
+- G4: `pha2.ket_cuc_cap` tin nhãn thành phần; nhãn sai bỏ UV-6/M5 mà không báo.
+- G5: bước 8 đọc mọi cặp phụ thuộc quan sát là KHÔNG ĐỦ CA, kể cả thành phần không ít ca (CĐ6.3 lệch SPEC T-043 dòng 898).
+- G6: `runner._ma_noi_dung` không chứa `doi_chung`; C-a0/C-a1 trùng mã với `T1-R0`/`K-E1`.
+- Điểm 7–13: mã đơn vị trùng khi tên chứa `|`; verdict đếm phép chấm của thực thể ngoài U; E1-CP chọn con lồng trong LFC; ngưỡng E4 tràn thành inf; STOPPED/NEW_OP ở hướng không chấm; cặp giải thích WORLD_DEPENDENT; khóa params thiếu hay sai kiểu.
+- Bộ test: 28 đột biến đổi hành vi sống sót (biên luật C, luật chọn khối, khóa xếp hạng, E1-CP, pha 2, E4); ba test tự so với chính nó (Z1, PI1, CK9); bộ ca tất định không bắt được phụ thuộc hash seed của đường E5.
+
+**Quyết định của Minh trong phiên** (chat 31/10/2026, nguyên văn): "duyệt theo đề xuất, sau khi sửa xong, soạn prompt cho  1 phiên claude mới kiểm lại". Người làm đọc là duyệt gói sửa đã trình trong chat (A: G1–G4, G6, S27–S31, S33; B: năm nhóm test và công cụ kiểm) và sáu điểm chọn theo đề xuất: Q1 phương án (a) theo SPEC T-043 dòng 898; Q2 đếm phép chấm trong U; Q3 thêm điều kiện con bắt đầu không sau nút đang xét cho E1-CP; Q4 E_X phải thuộc tập ô của `ds`, đổi test TS7; Q5 STOPPED/NEW_OP ở hướng không chấm ghi `binh_thuong`; Q6 ghi giới hạn. Người kiểm lại là một phiên Claude mới (Minh chọn); SPEC vẫn ghi Codex là người phản biện, chưa đổi. Câu quyết định cần ghi vào DECISIONS khi Minh duyệt dòng ghi.
+- 31/10/2026, lượt 5: sửa code G1–G6, S27–S33 trong `src/m1`, `src/m1_danh_gia`; sửa test cũ (UV6 đọc phân số, B8/CK5/CK8 nhận it_ca, TS7, Z1, PI1, CK9) và đáp án B8-1..3, CK8, TS7; thêm `tests/test_k13_luot5.py` và 24 mục đáp án mới; thêm D59–D110 vào `dot_bien.py` (D09 đổi chỗ theo dòng mới); `tat_dinh.py` ghi hash seed, `tong_hop_tat_dinh.py` kiểm seed, `so_truong_ban_ghi.py` so cả inherited_by và có `--day-du`, `chay_kiem_windows.sh` nhận CAY_CU. pytest 342/342 (chưa ghi lượt chạy); test mới chạy trên code trước sửa: 35 phép trượt, đúng các mục sửa.
+- 31/10/2026, lượt 5: gói kiểm lần 1 (`runs/test-xanh-008`, `tat-dinh-009`, `dot-bien-010`, `kiem-hash-t043-009`): 342/342; hash PASS; đột biến 108/110 bị bắt, sống sót D103 (p = α ở đơn vị phân vị) và D107 (E9 qua E5 chỉ xét bên giải thích đầu) vì ca E4B chỉ giả lập p của đơn vị đếm và ca E9X chỉ gọi `e9.phu_quyet` trực tiếp. Thêm hai phép vào E4B, E9X (đáp án mở rộng, cùng ý); kiểm riêng: cả hai đột biến nay bị bắt. Chạy lại cả gói ở lượt cuối.
+
+**Kết thúc phiên lượt 5 (31/10/2026; Claude; local Windows; người làm).**
+
+**1. Đã làm gì.**
+- Sửa theo `results/T-044/dinh-chinh-cai-dat.md` mục C7: G1–G6, S27–S33. G5 theo Q1 phương án (a); S28 theo Q2; S32 theo Q3; G3 kèm đổi TS7 theo Q4; S30 theo Q5. Q6 ghi giới hạn ở mục D.
+- Test mới: `tests/test_k13_luot5.py`; 24 mục đáp án tự lập mới trong `fixture/dap-an-thanh-phan.json` (109 mục), gồm ca cho từng sửa và ca biên cho 28 đột biến đổi hành vi sống sót của lượt 5.
+- Sửa test cũ:
+  - UV6 đọc Hit@1 qua `phan_so`; B8, CK5, CK8 nhận `it_ca`;
+  - đáp án B8-1..3 thêm `it_ca`; CK8 tách hai biến thể; TS7 đổi vế "bỏ hẳn ca b" thành báo lỗi;
+  - sửa ba test tự so với chính nó: Z1, PI1, CK9.
+- Công cụ kiểm:
+  - `dot_bien.py`: thêm D59–D110; D09 đổi chỗ; tách D07, D08 khỏi số đột biến hành vi; đếm đột biến chỉ bị đúng một phép bắt;
+  - `tat_dinh.py` ghi hash seed, và `tong_hop_tat_dinh.py` kiểm seed khớp;
+  - `so_truong_ban_ghi.py` so cả `inherited_by` và có thêm `--day-du`;
+  - `chay_kiem_windows.sh` nhận `CAY_CU`; `tao_bang_phep_kiem.py` thêm file test mới.
+- Ghi chú khác lệnh: ca hash seed đường E5 viết thành phép kiểm TD2 (8 seed, chạy trong tiến trình con), không thêm vào bộ ca của `tat_dinh.py`. Đầu ra của bộ đánh giá qua seed kiểm bằng TD3.
+
+**2. File đã thay đổi** (chưa commit, cùng gói sau 253dbe46):
+- `src/m1/`: `chuoi.py`, `e4.py`, `runner.py`, `span.py`.
+- `src/m1_danh_gia/`: `chon_khoi.py`, `luat_c.py`, `pha2.py`, `rr.py`, `uv6.py`.
+- `results/T-044/`:
+  - `tests/test_k11_danh_gia.py`, `test_k12_luot4.py`, `test_k13_luot5.py` (mới);
+  - `fixture/dap-an-thanh-phan.json`;
+  - `scripts/dot_bien.py`, `tat_dinh.py`, `tong_hop_tat_dinh.py`, `so_truong_ban_ghi.py`, `chay_kiem_windows.sh`, `tao_bang_phep_kiem.py`;
+  - `dinh-chinh-cai-dat.md` (C7, D), `bao-cao.md`, `bang-phep-kiem.json`, `manifest.json`;
+  - lượt mới `runs/test-xanh-008`, `tat-dinh-009`, `dot-bien-010`, `kiem-hash-t043-009` (lần 1) và `runs/test-xanh-009`, `tat-dinh-010`, `dot-bien-011`, `kiem-hash-t043-010` (lượt cuối).
+- LOG này; dòng T-044 trong `docs/STATE.md`.
+- Không ghi ngoài phạm vi SPEC. Script vá thử, bản chụp cây trước sửa và phản ví dụ của phiên phản biện nằm ngoài repo (thư mục tạm của phiên).
+
+**3. Kiểm đã chạy và kết quả** (Windows, Python 3.12.10, môi trường ghim ở `bao-cao.md` mục 2).
+- Trước khi sửa repo: vá thử trên bản sao ngoài repo cho 285/289 qua; 4 test trượt đúng chỗ dự kiến (UV6 ×3, TS7).
+- Test mới chạy trên code trước sửa (bản chụp): 35 phép trượt, đúng các mục sửa. Gồm 4 phép trượt chỉ vì `kiem_cau_hinh_thang` đổi chữ ký (B8 ×3, CB1 bước 8); các ca biên còn lại qua trên code cũ, vì chúng nhắm vào đột biến, không vào lỗi.
+- **Test:** 342/342 qua (`runs/test-xanh-009/stdout.txt`; `bang-phep-kiem.json#/tong`); 97/97 phép T-043 trong phạm vi.
+- **Tất định:** PASS, gồm 104 bản ghi, 342 phép, 12 biến thể (`runs/tat-dinh-010/tong-hop.json#/ket_luan`). Hash seed ghi trong đầu ra khớp 0, 1, 2 (`#/ban_ghi/hash_seed_khop`). So đủ mọi trường với cây trước sửa: 0/104 bản ghi lệch (`runs/tat-dinh-010/so-truong-truoc-luot5.json`).
+- **Đột biến:**
+  - Lần 1 (`runs/dot-bien-010`): 108/110, D103 và D107 sống sót. Ca E4B chỉ giả lập p của đơn vị đếm; ca E9X chỉ gọi `e9.phu_quyet` trực tiếp. Đã thêm hai phép (cùng ý), rồi chạy lại cả gói.
+  - Lượt cuối (`runs/dot-bien-011/tong-hop.json`): 110/110 bị bắt, 108/108 đột biến hành vi; đối chứng xanh 342/342.
+  - 77/110 đột biến chỉ bị đúng một phép bắt (`#/so_bi_bat_dung_mot_phep`).
+- **Hash:** T-043 PASS 69/69, 10/10 (`runs/kiem-hash-t043-010/stdout.txt`). Manifest T-044 `--tao`, `--kiem` PASS 1503/1503.
+
+**4. Điều chưa chắc hoặc cần Minh quyết.**
+- **Task đạt gì:** các điểm của lượt 5 đã sửa trên ca giả, có đáp án, đột biến và phép so bản ghi đủ mọi trường. Chưa được ai kiểm lại.
+- **Câu hỏi nguồn:** A1–A5 trong phạm vi fixture. Năm lượt soát đều tìm thêm lỗi mà bộ test lúc đó không bắt. "342/342 qua" và "110/110 đột biến" không chứng minh hết lỗi; 77 đột biến chỉ bị đúng một phép bắt.
+- **Giới hạn mới:**
+  - Q6: cặp giải thích WORLD_DEPENDENT;
+  - trùng tên cạnh `->` chỉ kiểm bằng đọc code;
+  - Σs của nhánh z (T4b) còn có thể tràn;
+  - phép độ bền và bước 10 luật chọn khối do T-045 tự viết, với điều kiện ở mục D;
+  - bản chụp cây trước sửa nằm ngoài repo, không dựng lại được trên máy khác.
+- **Cần Minh quyết:**
+  - commit gói sửa sau 253dbe46;
+  - dòng DECISIONS cho các câu Minh duyệt ở lượt 3–5 (đề xuất cho lượt 5: "Q-213 | 31/10/2026 | 'duyệt theo đề xuất, sau khi sửa xong, soạn prompt cho 1 phiên claude mới kiểm lại' | Duyệt gói sửa lượt 5 của T-044 (G1–G6, S27–S33, test) và Q1–Q6 theo đề xuất; kiểm lại bằng một phiên Claude mới; SPEC vẫn ghi Codex là người phản biện", chưa ghi);
+  - có đổi người phản biện trong SPEC không;
+  - ứng viên E5 giữ phần dư (chưa kiểm).
+
+**Bước tiếp theo.** Minh mở phiên Claude mới, dán prompt dưới đây. Minh quyết commit và dòng DECISIONS.
+
+**Lệnh cuối đã chạy.** `py -3 -B results/T-044/scripts/tao_manifest.py --kiem` (môi trường ghim ở `bao-cao.md` mục 2).
+
+**Prompt cho phiên Claude mới kiểm lại.** Theo yêu cầu của Minh ngày 31/10/2026. Prompt không chép nguyên văn `docs/review-prompt.md`, cùng kiểu ngoại lệ Minh yêu cầu từ 30/10/2026; ngoại lệ này chưa ghi DECISIONS.
+
+```text
+# Vai trò
+Bạn là người kiểm lại độc lập cho task T-044 trong repo D:\RCA-flashticket (đồ án RCA cho microservice). Minh chọn một phiên Claude mới cho lượt này; SPEC T-044 vẫn ghi Codex là người phản biện chính thức. Bạn không phải người làm. Bạn không sửa code hay tài liệu; bạn tìm lỗi, chứng minh lỗi và đề xuất.
+
+# Bối cảnh
+- T-044 cài chuỗi chẩn đoán M1 (src/m1/) và bộ đánh giá (src/m1_danh_gia/) theo đặc tả T-043, kiểm bằng ca giả (results/T-044/tests, fixture/). Chưa chạy trên dữ liệu thật; việc đó là T-045 (tasks/T-045-chay-khoi-k-dev/SPEC.md).
+- Đây là lượt kiểm lại sau gói sửa lượt 5 (ngày 31/10/2026): results/T-044/dinh-chinh-cai-dat.md Phần II mục C7 (G1–G6, S27–S33, phần test và công cụ kiểm) và mục D; tasks/T-044-cai-dat-m1/LOG.md, mục "Lượt 5: phản biện trong chat và gói sửa" (gồm sáu điểm Minh chọn Q1–Q6). Lịch sử các lượt trước: mục C2–C6 và các mục "Phản hồi phản biện lượt 1–4" trong LOG.
+- Code: cây làm việc của branch claude/sweet-hawking-dy078d. Từ 253dbe46 trở đi chưa commit: dùng `git diff 253dbe46` và `git status`. Toàn bộ cài đặt: `git diff 6b2f6ac6`.
+- Mong muốn của Minh là tiêu chí ưu tiên: docs/KE-HOACH-GIAI-DOAN-TOI.md Phần A (M-01…M-48). DT18 (docs/reference/sources/DT18-de-tai-va-nhiem-vu.md) vẫn là ràng buộc; hướng dẫn của giảng viên không còn là tiêu chí ưu tiên nhất.
+
+# Nhiệm vụ
+1. Tự soát yêu cầu và code trước, rồi mới đọc kết luận trong LOG và đính chính. Kiểm từng sửa ở mục C7 có đúng và đủ không, kể cả phạm vi rộng hơn điểm gốc; tìm chỗ sửa làm hỏng hành vi khác hoặc làm đổi kết quả ngoài đúng các ca phản ví dụ.
+2. Soát lại src/m1/ và src/m1_danh_gia/ tìm biến thể còn sót của các họ lỗi đã gặp: định danh trùng; mất độ chính xác số; giá trị không hữu hạn; bội số 0, thiếu, thưa hoặc sai kiểu; khóa thiếu thành mặc định; trung gian không lưu; hai bước đọc cùng đầu vào theo hai cách; so một chiều (hòa, vắng); nhánh tắt vẫn chạy; đầu vào trùng hoặc thiếu khi ghép; kết quả phụ thuộc thứ tự hay hash seed; lọt nhãn.
+3. Kiểm sức bắt lỗi của bộ test: test so code với chính nó; đáp án tự lập có thể sai cùng cách hiểu với code; đột biến chỉ đổi định dạng; vùng hành vi chưa có ca.
+4. Đánh giá độ sẵn sàng cho T-045: phần điều phối T-045 phải tự viết (dựng đủ cặp cho 16 cấu hình × 3 thế giới, E_X, ít ca, M5, UV-6, mốc giả, gọi luật chọn khối theo từng thế giới, phép độ bền 1.000 mẫu theo bội số); chỗ nào còn dễ sai im lặng.
+5. Đánh giá độc lập sáu điểm Q1–Q6 Minh đã chọn: đúng nguồn không, mặt trái nào chưa ghi. Không mặc định đồng ý với bên nào.
+6. Nêu đề xuất mới giúp M1 đạt đích ở KE-HOACH Phần A, kèm căn cứ và cách kiểm.
+
+# Cách làm
+- Dùng tối đa 2 subagent; muốn dùng nhiều hơn phải hỏi Minh trước (AGENTS.md luật cứng 8). Tự tái hiện mọi finding trước khi kết luận.
+- Mỗi finding cần phản ví dụ chạy được trên ca giả (script và đầu ra để ngoài repo) hoặc trích dòng code và đặc tả; không có thì ghi "nguy cơ chưa kiểm".
+- Môi trường: D:/RCA-ext/envs/py312-pin/Scripts/python.exe, PYTHONPATH=D:/RCA-ext/envs/T-016-cong-cu/Lib/site-packages (nạp drain3, numpy, scipy, pandas cùng phiên bản ghim; không thêm T-014-main vì có networkx 2.8.8). Test: trong results/T-044/tests chạy `-B -m pytest -q -p no:cacheprovider`. Hash: `py -3 -B results/T-044/scripts/kiem_hash_t043.py`, `py -3 -B results/T-044/scripts/tao_manifest.py --kiem`. Gói kiểm: results/T-044/scripts/chay_kiem_windows.sh (Git Bash; ghi vào results/T-044/runs, nên chỉ chạy khi Minh cho phép ghi; nếu không, chạy từng lệnh với đầu ra ngoài repo). Đột biến: results/T-044/scripts/dot_bien.py <thư mục ngoài repo>. So bản ghi hai cây: results/T-044/scripts/so_truong_ban_ghi.py <cây cũ> <cây mới> [--day-du].
+
+# Ràng buộc cứng
+Không tạo, sửa, xóa file trong repo; không commit, push, merge. Không đọc data/locked/, dữ liệu dev, bản ghi có nhãn, repo D:/Project/flash-ticket-rca-research. Đọc file thật, không lấy tóm tắt trong LOG thay bằng chứng.
+
+# Đầu ra (chat, tiếng Việt, câu ngắn)
+1. Kết luận: nghiệm thu T-044 được chưa; T-045 an toàn để bắt đầu chưa.
+2. Bảng finding sắp theo mức nghiêm trọng: mức (CHẶN / KHÔNG CHẶN / nguy cơ chưa kiểm); file:dòng; sai gì; bằng chứng; hậu quả; sửa tối thiểu.
+3. Kết luận từng sửa G1–G6, S27–S33 và phần test: đạt / đạt một phần / chưa đạt.
+4. Ý kiến về Q1–Q6 và đề xuất mới.
+5. Đã làm, đã chạy gì (lệnh và kết quả), phần chưa kiểm và vì sao.
+6. Prompt để người làm đáp lượt này.
+Không báo chính tả, văn phong; không thêm phép kiểm "cho chắc"; không có lỗi đáng kể thì nói thẳng.
+```
+
+### Lượt 5, kiểm lại của phiên Claude mới: phản hồi của người làm (31/10/2026; Claude; local Windows; người làm)
+
+Cùng thiết bị, cùng branch, cây làm việc sau gói C7 (chưa commit). Vai trò không đổi.
+
+**Đầu vào.** Minh dán vào chat kết quả của phiên Claude kiểm lại (prompt ở mục trên), kèm prompt cho người làm. Tóm tắt phần nhận xét:
+- **Kết luận của người kiểm lại:**
+  - Chưa nên nghiệm thu T-044 ngay. Không có lỗi CHẶN, nhưng S33 chưa đạt.
+  - T-045 bắt đầu được bước 0–4. Trước bước 6–7 cần: sửa S33; thêm ca cho vùng có đột biến sống sót; chốt cách gọi luật chọn khối theo thế giới và MRR theo bội số.
+- **Finding:**
+  - (1) KHÔNG CHẶN, đã xảy ra: `pha2.py` `khong_moc_gia` gọi `ap_dung` với `thanh_phan='X'`, không M5/UV-6, nên bỏ cả điều kiện riêng E5/E3. PV1: thật là HẠI (`dieu_kien_E5`), `khong_moc_gia` ghi GIÚP.
+  - (2) KHÔNG CHẶN, mâu thuẫn thiết kế: `xep_hang._nhom` tách khối theo khóa chính xác nhưng ghi `key` số thực. Hai khối liền nhau cùng `key` thì `p3.danh_gia` đọc là hòa. PV2: code xếp A trước, T = ['A'], RR(B) bộ đánh giá = 3/4. Đáp án XH1 `chinh_xac` khẳng định đúng tình huống này.
+  - (3) Nguy cơ: `chon` không có tham số thế giới (bước 10).
+  - (4) Nguy cơ: không có hàm MRR theo bội số.
+  - (5) Nguy cơ RAM: `CACHE` toàn cục không xóa; `pha1` lặp cấu hình ở vòng ngoài. PV3: khoảng 20 B mỗi mẫu mỗi hướng.
+  - (6) KHÔNG CHẶN: S31 không kiểm giá trị `tham_so_E4`.
+- **Từng sửa:** G1–G4, G6, S27–S30, S32 đạt. G5 đạt một phần (bảng mặc định T-045 chưa có dòng cho loại trình Minh mới). S31 đạt một phần. S33 chưa đạt. Phần test đạt một phần (18 đột biến riêng, 9 sống sót: X02, X04, X05, X08, X10, X13, X14, X16, X26; XH1 sai cùng cách hiểu với code).
+- **Q1–Q6:** chấp nhận cả sáu, kèm mặt trái: Q1 sinh loại "trình Minh" mới; Q3 phản ví dụ chưa ai kiểm độc lập.
+- **Đề xuất mới:**
+  - (a) pha 2 tính đủ Hit@1–10, RR, nDCG@5, Avg@5 (M-02, M-07);
+  - (b) đưa hàm độ bền, MRR theo bội số, tham số thế giới của `chon` vào `m1_danh_gia`;
+  - (c) sửa cách ghi khóa;
+  - (d) xóa cache theo ca.
+- **Đã chạy:** pytest 342 qua; hash PASS. Không chạy lại đủ 110 đột biến (dừng sau D04, theo luật cứng 8). Phản ví dụ và đột biến riêng ở thư mục tạm của phiên kiểm lại.
+
+**Tự soát.** Kết luận của người kiểm lại được dán cùng prompt, nên tự soát không mù. Điểm tìm thêm khi lần theo code:
+- **N1 (thuộc finding 2):** sửa (2) làm đột biến D80 (gộp theo số thực, tên gốc K07) trở thành hành vi đúng. D80 phải đổi thành đột biến ngược (gộp theo khóa chính xác). Docstring đầu `xep_hang.py` và câu "gộp hòa theo khóa chính xác" của C6/S20 phải ghi lại: sắp vẫn theo khóa chính xác, gộp hòa theo khóa ghi ra.
+- **N2 (thuộc finding 1):** CE1 dùng nhãn `'X'` cho cả test và code. Đây đúng họ lỗi "đáp án cùng cách hiểu với code"; người làm không kiểm `khong_moc_gia` ở cặp E3/E5.
+- **N3 (phạm vi của finding 2):** RR, M5 và WORLD_DEPENDENT do bộ đánh giá tính đã coi hai khối cùng `key` là hòa. Vì vậy sửa (2) **không đổi RR hay luật C**. Sửa chỉ đổi phần bản ghi tự dùng thứ tự riêng: `T` (vùng E7), `thu_tu`, `RANK_CHANGED`, khối của T4c. Đường `entity_ranking` của `p3.danh_gia` còn báo lỗi "hai tie_group liền nhau cùng khóa" nếu đọc khối theo đường đó.
+
+**Phản hồi của người làm** (chat 31/10/2026; tái hiện ngoài repo, `-B`):
+
+| Điểm | Kết luận | Bằng chứng riêng |
+|---|---|---|
+| (1) S33 bỏ điều kiện riêng | đúng | Chạy lại PV1: `khong_moc_gia` = GIÚP ở ba thế giới, trong khi bỏ mốc giả thật là HẠI. Vá thử (tính trong cùng vòng thế giới, cùng `thanh_phan` và M5/UV-6, `moc_gia=None`): PV1 cho HẠI ở ba thế giới; 341/342 test qua, chỉ XH1 trượt (do vá (2) cùng lúc). |
+| (2) Khóa ghi ra so với khóa chính xác | đúng; hậu quả hẹp hơn (N3) | Chạy lại PV2: hai khối `[2, 1.0, 2, 1.0]`, T = ['A'], RR(B) = 3/4. `p3.danh_gia.phan_bo_hang` gộp khối liền nhau cùng `key` (dòng 59–60). Vá thử (gộp hòa khi khóa ghi ra bằng nhau): một khối ['A', 'B'], T = ['A', 'B']; RR vẫn 3/4. 104 bản ghi tất định không đổi trường nào (`so_truong_ban_ghi.py --day-du`). XH1 phải đổi đáp án. |
+| (3) `chon` không có tham số thế giới | đúng là nguy cơ | Đọc code: `_kc`, `_la_hai`, `_kc_ptqs` đọc `ket_cuc_dung`/`can_cu_loai` (tại P). Không có cách gọi ở S_lo/S_hi ngoài việc T-045 tự đổi `cap` sang chuỗi. |
+| (4) MRR theo bội số | đúng là nguy cơ | `pha2.cham` gọi `rr.mrr(r)` không trọng số; `rr.mrr` có `trong_so` nhưng không có hàm cấp cấu hình. |
+| (5) Cache RAM | đúng | Chạy lại PV3: 16,3 MB với 200 đơn vị × 2.000 mẫu. `runner.pha1` lặp cấu hình ngoài, ca trong; `chuoi.CACHE` không xóa. Khóa cache gồm khóa đơn vị (không có mã ca), nên lặp ca ở vòng ngoài và xóa theo ca vẫn giữ việc dùng lại giữa các cấu hình của cùng ca. |
+| (6) Giá trị `tham_so_E4` | đúng (đọc code) | `_kiem_params` chỉ so tập khóa. |
+| G5 thiếu dòng mặc định T-045 | đúng | SPEC T-045 dòng 96–106 không có dòng cho cặp phụ thuộc quan sát của thành phần không ít ca ở bước 8. Đây là sửa SPEC T-045 (Codex làm), cần Minh duyệt; T-044 không ghi. |
+| S31 đạt một phần | đúng | như (6) |
+| Phần test: 9 đột biến sống sót | đúng | Đọc `ket-qua.json` của người kiểm lại: X02, X04, X05, X08, X10, X13, X14, X16, X26 qua 342/342. Đọc code: hành vi hiện tại đúng ở cả 9; thiếu ca kiểm. |
+| Nguy cơ hai cách dựng G_N | đúng là nguy cơ; phạm vi hẹp | `m5.G_N_tu_span` chỉ dùng trong test GN1; pha 2 dùng `extra.G_N` của chuỗi. Khác nhau: alias, miền [t − 300, t + 300), xử lý khóa trùng (chuỗi ERROR cả ca; `G_N_tu_span` bỏ khóa xung đột). Chỉ thành lỗi nếu ai dùng `G_N_tu_span` cho M1. |
+| Q1–Q6 | không phản đối | Q3: CP3 do người làm lập. CP1, CP2, fixture 2, 3 (đáp án T-043) không đổi kết quả. |
+| Đề xuất (a) đủ độ đo | đồng ý, ngoài SPEC T-044 | Thêm trường báo cáo trong pha 2; không đổi quyết định. Cần Minh duyệt phạm vi. |
+| Đề xuất (b) | đồng ý một phần | Đưa vào T-044 phần nền dễ sai im lặng: `chon` theo thế giới, MRR theo bội số, lấy mẫu ô trong từng dataset. Phần điều phối 1.000 mẫu vẫn thuộc T-045 bước 7 theo SPEC. |
+| Đề xuất (c), (d) | đồng ý | là (2), (5) |
+
+**Gói sửa người làm trình** (chờ Minh duyệt; chưa sửa repo):
+- **S34 (sửa S33):** `pha2.ket_cuc_cap` tính `khong_moc_gia` trong cùng vòng thế giới, với cùng `thanh_phan`, M5/UV-6, `moc_gia=None`. CE1 thêm ca E5 (PV1) và ca E3. Đột biến: nhãn `'X'` như cũ.
+- **S35 (sửa (2)):** `xep_hang._nhom` gộp hòa khi khóa ghi ra (số thực) bằng nhau. Sắp vẫn theo khóa chính xác; làm tròn đơn điệu nên khóa ghi ra bằng nhau luôn liền nhau. Ghi số lần gộp như vậy vào `diagnostics`. Đáp án XH1 `chinh_xac` đổi thành một khối ['A', 'B']. D80 đổi thành đột biến ngược. Sửa docstring và ghi C8.
+- **S36 (sửa (3)):** `chon(..., the_gioi='P')`. Với S_lo/S_hi, giá trị dict của `cap` đọc `theo_the_gioi[w]` làm kết cục chuỗi (không đọc phụ thuộc quan sát, vì đó là phép so giữa các thế giới); `MRR` truyền là MRR của đúng thế giới. Ca kiểm: một cặp khác kết cục giữa P và S_lo cho hai cấu hình thắng khác nhau.
+- **S37 (sửa (4)):** hàm `pha2.mrr_cau_hinh(kq, trong_so=None, the_gioi='P')` trả MRR gộp và theo dataset của mọi cấu hình, phân số chính xác. Thêm hàm `lay_mau_o(o_theo_dataset, rng)` trả map bội số đủ mọi ca (lấy mẫu có hoàn lại trong từng dataset, trên danh sách ô đã sắp). Có ca kiểm tay. Vòng 1.000 mẫu vẫn do T-045 viết.
+- **S38 (sửa (5)):** `runner.pha1` lặp ca ở vòng ngoài, đặt `chuoi.CACHE = e4.CacheCong()` cho mỗi ca, giữ thứ tự dòng ghi ra (cấu hình rồi ca), nên hash pha 1 không đổi. Kiểm bằng `test_hai_pha_hash_on_dinh` và so hash với code cũ trên cùng ca giả.
+- **S39 (sửa (6)):** giá trị `tham_so_E4` phải là số hữu hạn, không bool; `m_span`, `m_metric`, `n_exact_max`, `count_min` là số nguyên ≥ 1; `alpha`, `epsilon`, `q_lo`, `q_hi` trong (0, 1) và `q_lo < q_hi`.
+- **S40 (9 đột biến sống sót):** ca kiểm và đột biến D111 trở đi cho X02 (mốc giả bỏ cặp ERROR, PII-13), X04 (m của T4c phần K_I theo F_I), X05 (M5 theo khối của từng thế giới), X08 (E2-VC chọn cạnh điểm cao nhất), X10 (WORLD_DEPENDENT theo phân bố), X13 (đích C-d3 lấy span phía A), X14 (G_N chỉ khi cả cha lẫn con thuộc N), X16 (ô E9 10 giây), X26 (cạnh E2 hai chiều ở E9).
+- **S41 (G_N hai cách):** docstring `m5.G_N_tu_span` ghi "chỉ dùng cho kiểm; pha 2 dùng `extra.G_N` của bản ghi", kèm ba chỗ khác. Thêm ca so hai cách trên span trong miền, không alias.
+- **S42 (đề xuất (a), tùy Minh):** pha 2 lưu thêm `do_ca` của `p3.danh_gia` cho mọi ca và thế giới (chỉ báo cáo). Ca kiểm tính tay ở một ca hòa.
+- **Ngoài T-044 (Minh quyết; người làm T-045 là Codex):** thêm một dòng vào bảng mặc định SPEC T-045: "Bước 8: cặp phụ thuộc quan sát của thành phần không ít ca (C7, G5) | Giữ cấu hình thắng; ghi 'phụ thuộc quan sát' | Không".
+- **Chặn bước nào của T-045:**
+  - S38 nên xong trước bước 1, vì bước 1 đo RAM để dự báo lượt đầy đủ.
+  - S35 nên xong trước bước 2, vì T1 ghi vùng E7 và RANK_CHANGED. RR không đổi.
+  - S34, S36, S37, S40 cần xong trước bước 6–7.
+  - S39, S41, S42 không chặn.
+
+Sau khi sửa: chạy lại gói kiểm (test, tất định, đột biến khoảng 25–30 phút trên máy này, hash), cập nhật C8, báo cáo, manifest, LOG, STATE.
+
+**Prompt cho phiên Claude kiểm lại, kiểm phản hồi này** (không theo nguyên văn `docs/review-prompt.md`, cùng ngoại lệ Minh yêu cầu từ 30/10/2026):
+
+```text
+# Vai trò
+Bạn là người kiểm lại độc lập của T-044 (repo D:\RCA-flashticket, branch claude/sweet-hawking-dy078d). Bạn không sửa code hay tài liệu.
+
+# Việc
+1. Đọc phản hồi của người làm: tasks/T-044-cai-dat-m1/LOG.md, mục "Lượt 5, kiểm lại của phiên Claude mới: phản hồi của người làm". Đối chiếu với kết quả kiểm lại bạn đã báo trong chat (Minh dán lại nếu phiên mới).
+2. Với từng dòng của bảng phản hồi: đồng ý / không đồng ý, kèm bằng chứng riêng (dòng code, phản ví dụ chạy lại ngoài repo). Đặc biệt kiểm phạm vi người làm nêu cho finding (2) (điểm N3).
+3. Với gói S34–S42 người làm trình: mỗi mục có sửa đúng chỗ, đủ phạm vi, có mặt trái nào chưa ghi; mục nào thiếu; thứ tự so với các bước T-045 có hợp lý không.
+4. Nêu bất đồng còn lại và điều Minh cần quyết. Đề xuất dừng hay tiếp tục kiểm lại.
+
+# Ràng buộc
+Không tạo, sửa, xóa file trong repo; không commit. Không đọc data/locked/, dữ liệu dev, bản ghi có nhãn, repo D:/Project/flash-ticket-rca-research. Lượt chạy dài hơn 1 giờ hoặc dùng hơn 2 subagent phải hỏi Minh trước. Môi trường: D:/RCA-ext/envs/py312-pin/Scripts/python.exe, PYTHONPATH=D:/RCA-ext/envs/T-016-cong-cu/Lib/site-packages.
+
+# Đầu ra (chat, tiếng Việt, câu ngắn)
+Bảng đồng ý / không đồng ý theo từng dòng; ý kiến về S34–S42; bất đồng còn lại; đã chạy gì; prompt cho người làm.
+```
+
+**Quyết định của Minh** (chat 31/10/2026, nguyên văn): "Duyệt cả gói". Người làm đọc là duyệt S34–S42. Dòng mặc định cho SPEC T-045 nằm ngoài phạm vi ghi của T-044 (SPEC T-045 do Codex làm, đã khóa): người làm không sửa SPEC T-045, ghi lại để Minh và người làm T-045 áp.
+
+- 31/10/2026, lượt 5b: bắt đầu sửa S34–S42.
+- 31/10/2026, lượt 5b: sửa S34–S39, S41, S42 trong `src`; test mới `tests/test_k14_luot5b.py`, CE1 thêm cặp E5/E3, XH1 thêm số lần gộp; đáp án XH1, CE1 sửa, 16 mục mới (125 mục); D80 đổi thành đột biến ngược, thêm D111–D128. pytest 366/366 (chưa ghi lượt chạy).
+
+**Kết thúc phiên lượt 5b (31/10/2026; Claude; local Windows; người làm).**
+
+**1. Đã làm gì.** Sửa S34–S42 theo `results/T-044/dinh-chinh-cai-dat.md` mục C8.
+
+- **Test:**
+  - file mới `tests/test_k14_luot5b.py`;
+  - CE1 thêm cặp E5, E3; XH1 thêm số lần gộp.
+- **Đáp án tự lập:**
+  - sửa XH1 (`chinh_xac` thành một khối) và CE1;
+  - thêm 16 mục, tổng 125 mục trong `dap-an-thanh-phan.json`.
+- **Đột biến:**
+  - D80 đổi thành đột biến ngược (gộp theo khóa chính xác);
+  - thêm D111–D128, gồm 9 đột biến sống sót của phiên kiểm lại.
+- **Không sửa SPEC T-045:** dòng mặc định cho bước 8 nằm ngoài phạm vi ghi, ghi trong C8.
+
+**2. File đã thay đổi** (chưa commit, cùng gói sau 253dbe46):
+
+- `src/m1/`: `xep_hang.py`, `chuoi.py`, `runner.py`;
+- `src/m1_danh_gia/`: `chon_khoi.py`, `pha2.py`, `rr.py`, `m5.py`;
+- `results/T-044/`:
+  - `tests/test_k13_luot5.py`, `test_k14_luot5b.py` (mới);
+  - `fixture/dap-an-thanh-phan.json`;
+  - `scripts/dot_bien.py`, `tao_bang_phep_kiem.py`;
+  - `dinh-chinh-cai-dat.md` (C8, D), `bao-cao.md`, `bang-phep-kiem.json`, `manifest.json`;
+  - lượt mới `runs/test-xanh-010`, `tat-dinh-011`, `dot-bien-012`, `kiem-hash-t043-011`;
+- LOG này; dòng T-044 trong `docs/STATE.md`.
+
+**3. Kiểm đã chạy và kết quả.**
+
+- **Vá thử S34, S35 trước khi sửa repo:** chỉ XH1 trượt; 104 bản ghi tất định giống nhau ở mọi trường.
+- **Test:** 366/366 qua (`runs/test-xanh-010/stdout.txt`; `bang-phep-kiem.json#/tong`).
+- **Tất định:** PASS (`runs/tat-dinh-011/tong-hop.json#/ket_luan`); hash seed khớp.
+- **So với cây trước lượt 5, đủ mọi trường:** 104 bản ghi khác đúng một đường dẫn, là trường mới `/diagnostics/gop_khoa_ghi_ra` (`so-truong-truoc-luot5.json`).
+- **Đột biến:** 128/128 bị bắt, 126/126 đột biến hành vi (`runs/dot-bien-012/tong-hop.json`); 93/128 chỉ bị đúng một phép bắt.
+- **Hash:** T-043 PASS 69/69, 10/10. Manifest T-044 `--tao`, `--kiem` PASS 1799/1799.
+- Test mới qua ngay lần đầu. Sức bắt lỗi kiểm bằng đột biến D111–D128, tất cả bị bắt.
+
+**4. Điều chưa chắc hoặc cần Minh quyết.**
+
+- **Task đạt gì:** các điểm của phiên kiểm lại đã sửa trên ca giả. Chưa ai kiểm lại gói C8.
+- **Câu hỏi nguồn:** A1–A5 trong phạm vi fixture. Sáu lượt soát đều tìm thêm điểm mà bộ test lúc đó không bắt.
+- **Còn mở:**
+  - tần suất gộp khóa ghi ra trên dev;
+  - dòng mặc định SPEC T-045 chưa áp;
+  - vòng 1.000 mẫu của phép độ bền vẫn do T-045 viết.
+- **Cần Minh quyết:**
+  - commit gói sau 253dbe46;
+  - dòng DECISIONS cho các lượt 3–5b (đề xuất Q-213 cho lượt 5 ở mục kết thúc lượt 5; đề xuất thêm Q-214: "31/10/2026 | 'Duyệt cả gói' | Duyệt gói S34–S42 sau kiểm lại lượt 5 của T-044", chưa ghi);
+  - áp dòng mặc định cho SPEC T-045;
+  - có thêm lượt kiểm lại không.
+
+**Bước tiếp theo.** Minh mở phiên kiểm lại (phiên Claude đã kiểm, hoặc phiên mới), dán prompt dưới đây. Sau đó Minh quyết commit và DECISIONS.
+
+**Lệnh cuối đã chạy.** `py -3 -B results/T-044/scripts/tao_manifest.py --kiem` (môi trường ghim ở `bao-cao.md` mục 2).
+
+**Prompt kiểm lại gói C8.** Không chép nguyên văn `docs/review-prompt.md`, cùng ngoại lệ Minh yêu cầu từ 30/10/2026.
+
+```text
+# Vai trò
+Bạn là người kiểm lại độc lập của T-044 (repo D:\RCA-flashticket, branch claude/sweet-hawking-dy078d). SPEC T-044 ghi Codex là người phản biện chính thức; Minh chọn phiên Claude cho các lượt kiểm lại gần đây. Bạn không sửa code hay tài liệu.
+
+# Bối cảnh
+- Lượt này kiểm gói sửa sau kiểm lại lượt 5: results/T-044/dinh-chinh-cai-dat.md Phần II mục C8 (S34–S42) và mục D. Kết quả kiểm lại và phản hồi của người làm nằm trong tasks/T-044-cai-dat-m1/LOG.md: mục "Lượt 5, kiểm lại của phiên Claude mới: phản hồi của người làm" và mục kết thúc lượt 5b. Lịch sử: mục C2–C7.
+- Code: cây làm việc của branch, chưa commit sau 253dbe46 (`git diff 253dbe46`, `git status`). T-045: tasks/T-045-chay-khoi-k-dev/SPEC.md.
+- Mong muốn của Minh là tiêu chí ưu tiên: docs/KE-HOACH-GIAI-DOAN-TOI.md Phần A. DT18 vẫn là ràng buộc.
+
+# Việc
+1. Tự soát code trước, rồi mới đọc kết luận trong LOG. Kiểm từng sửa S34–S42: đúng, đủ phạm vi, có làm hỏng hành vi khác không; có đổi kết quả ngoài các ca phản ví dụ không.
+2. Tìm biến thể còn sót của các họ lỗi đã gặp trong src/m1 và src/m1_danh_gia (định danh trùng, mất độ chính xác số, giá trị không hữu hạn, bội số 0/thiếu/sai kiểu, khóa thiếu thành mặc định, hai bước đọc cùng đầu vào theo hai cách, so một chiều, nhánh tắt vẫn chạy, đầu vào trùng/thiếu, phụ thuộc thứ tự hay hash seed, lọt nhãn).
+3. Sức bắt lỗi của bộ test và đáp án tự lập mới; đáp án nào có thể sai cùng cách hiểu với code.
+4. Độ sẵn sàng cho T-045, gồm các hàm mới `chon(..., the_gioi)`, `pha2.mrr_cau_hinh`, `rr.lay_mau_o` và phần T-045 vẫn phải tự viết.
+5. Đề xuất mới giúp M1 đạt đích ở KE-HOACH Phần A, kèm căn cứ và cách kiểm.
+
+# Cách làm và ràng buộc
+- Tối đa 2 subagent; lượt chạy dài hơn 1 giờ hoặc nhiều subagent hơn phải hỏi Minh trước (AGENTS.md luật cứng 8). Tự tái hiện mọi finding.
+- Mỗi finding cần phản ví dụ chạy được trên ca giả (script và đầu ra ngoài repo) hoặc trích dòng code và đặc tả; không có thì ghi "nguy cơ chưa kiểm".
+- Không tạo, sửa, xóa file trong repo; không commit. Không đọc data/locked/, dữ liệu dev, bản ghi có nhãn, repo D:/Project/flash-ticket-rca-research.
+- Môi trường: D:/RCA-ext/envs/py312-pin/Scripts/python.exe, PYTHONPATH=D:/RCA-ext/envs/T-016-cong-cu/Lib/site-packages. Test: trong results/T-044/tests chạy `-B -m pytest -q -p no:cacheprovider`. Hash: `py -3 -B results/T-044/scripts/kiem_hash_t043.py`, `py -3 -B results/T-044/scripts/tao_manifest.py --kiem`. Đột biến: results/T-044/scripts/dot_bien.py <thư mục ngoài repo> (khoảng 35 phút trên máy này).
+
+# Đầu ra (chat, tiếng Việt, câu ngắn)
+1. Kết luận: nghiệm thu T-044 được chưa; T-045 an toàn để bắt đầu chưa.
+2. Bảng finding sắp theo mức nghiêm trọng: mức (CHẶN / KHÔNG CHẶN / nguy cơ chưa kiểm); file:dòng; sai gì; bằng chứng; hậu quả; sửa tối thiểu.
+3. Kết luận từng sửa S34–S42: đạt / đạt một phần / chưa đạt.
+4. Đề xuất mới.
+5. Đã làm, đã chạy gì, phần chưa kiểm.
+6. Prompt cho người làm đáp lượt này.
+Không báo chính tả, văn phong; không thêm phép kiểm "cho chắc"; không có lỗi đáng kể thì nói thẳng.
+```

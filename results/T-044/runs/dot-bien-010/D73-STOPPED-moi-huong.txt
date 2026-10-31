@@ -1,0 +1,27 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+........................................................................ [ 84%]
+............F.........................................                   [100%]
+================================== FAILURES ===================================
+____________________________ test_STP1_huong_cham _____________________________
+
+ma = <function ma.<locals>._gan at 0x00000188B6706520>
+
+    def test_STP1_huong_cham(ma):
+        from m1 import e4, runner
+        m = tu_lap(DAP_AN_THANH_PHAN, 'STP1')
+        d, da = m['dau_vao'], m['dap_an']
+        ma('STP1')
+        ra = [e4.cham_dem(nN, nA, d['T_N'], d['T_A'], dict(runner.TS_HOP_DONG), huong_cham=tuple(h))
+              for nN, nA, h in d['don_vi']]
+>       assert [x['nhan'] for x in ra] == da['nhan']
+E       AssertionError: assert ['STOPPED', '...ng', 'NEW_OP'] == ['binh_thuong...ng', 'NEW_OP']
+E         
+E         At index 0 diff: 'STOPPED' != 'binh_thuong'
+E         Use -v to get more diff
+
+test_k13_luot5.py:243: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_STP1_huong_cham - AssertionError: assert ['STO...
+1 failed, 341 passed in 14.10s

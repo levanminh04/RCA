@@ -1,0 +1,194 @@
+........................................................................ [ 24%]
+..............................................FF...FF.......F........... [ 49%]
+.......FF............................................................... [ 74%]
+.....F.................................................................. [ 99%]
+.                                                                        [100%]
+================================== FAILURES ===================================
+_____________________________ test_chuoi_kenh[57] _____________________________
+
+i = 57, ma = <function ma.<locals>._gan at 0x000002E4097FAC00>
+
+    @pytest.mark.parametrize('i', [57, 71])
+    def test_chuoi_kenh(i, ma):
+        ca = fx(i)['ca'][0]
+        ma(f'{i}-{ca["ma"]}')
+        p, xh = _chay_E5(ca)
+        da = ca['dap_an']
+        assert xh['thu_tu'] == da['thu_tu']
+        assert {e: list(v) for e, v in xh['K_I'].items()} == da['K_I']
+>       assert xh['tang'] == da['tang']
+E       AssertionError: assert {'Payment': 1...ayment_db': 1} == {'Payment': 2...ayment_db': 1}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'Payment': 1} != {'Payment': 2}
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:49: AssertionError
+_____________________________ test_chuoi_kenh[71] _____________________________
+
+i = 71, ma = <function ma.<locals>._gan at 0x000002E409C953A0>
+
+    @pytest.mark.parametrize('i', [57, 71])
+    def test_chuoi_kenh(i, ma):
+        ca = fx(i)['ca'][0]
+        ma(f'{i}-{ca["ma"]}')
+        p, xh = _chay_E5(ca)
+        da = ca['dap_an']
+        assert xh['thu_tu'] == da['thu_tu']
+        assert {e: list(v) for e, v in xh['K_I'].items()} == da['K_I']
+>       assert xh['tang'] == da['tang']
+E       AssertionError: assert {'A': 1, 'R': 1} == {'A': 2, 'R': 1}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'A': 1} != {'A': 2}
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:49: AssertionError
+_____________________ test_nhom_vong_tu_lap[co_vong-SCC1] _____________________
+
+muc = 'SCC1', doc = 'co_vong'
+ma = <function ma.<locals>._gan at 0x000002E409C95B20>
+
+    @pytest.mark.parametrize('muc', ['SCC1', 'SCC2', 'SCC3', 'SCC4'])
+    @pytest.mark.parametrize('doc', ['co_vong', 'ke_canh'])
+    def test_nhom_vong_tu_lap(muc, doc, ma):
+        """CĐ3: vòng 3 nút như RE2-TT; cách đọc chính (C′) và cách đọc chẩn đoán (A)."""
+        m = tu_lap(DAP_AN_THANH_PHAN, muc)
+        ma(f'{muc}-{doc}')
+        ca = dict(m['dau_vao'], E5=True)
+        p, xh = _chay_E5(ca, doc_nhom_vong=doc)
+        da = m['dap_an'][doc]
+        assert sorted([list(x) for x in p['ke_thua']]) == sorted(da['ke_thua'])
+>       assert xh['thu_tu'] == da['thu_tu']
+E       AssertionError: assert ['cfg', 'seat', 'tr1'] == ['cfg', 'tr1', 'seat']
+E         
+E         At index 1 diff: 'seat' != 'tr1'
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:92: AssertionError
+_____________________ test_nhom_vong_tu_lap[co_vong-SCC2] _____________________
+
+muc = 'SCC2', doc = 'co_vong'
+ma = <function ma.<locals>._gan at 0x000002E409C95DA0>
+
+    @pytest.mark.parametrize('muc', ['SCC1', 'SCC2', 'SCC3', 'SCC4'])
+    @pytest.mark.parametrize('doc', ['co_vong', 'ke_canh'])
+    def test_nhom_vong_tu_lap(muc, doc, ma):
+        """CĐ3: vòng 3 nút như RE2-TT; cách đọc chính (C′) và cách đọc chẩn đoán (A)."""
+        m = tu_lap(DAP_AN_THANH_PHAN, muc)
+        ma(f'{muc}-{doc}')
+        ca = dict(m['dau_vao'], E5=True)
+        p, xh = _chay_E5(ca, doc_nhom_vong=doc)
+        da = m['dap_an'][doc]
+        assert sorted([list(x) for x in p['ke_thua']]) == sorted(da['ke_thua'])
+>       assert xh['thu_tu'] == da['thu_tu']
+E       AssertionError: assert ['tr2', 'seat', 'tr1'] == ['tr2', 'tr1', 'seat']
+E         
+E         At index 1 diff: 'seat' != 'tr1'
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:92: AssertionError
+________________________________ test_E6b[14] _________________________________
+
+i = 14, ma = <function ma.<locals>._gan at 0x000002E409C968E0>
+
+    @pytest.mark.parametrize('i', [14, 15, 16, 69])
+    def test_E6b(i, ma):
+        from m1 import xep_hang
+        f = fx(i)
+        ma(str(i))
+        d, da = f['dau_vao'], f['dap_an']
+        kenh, F_I, ok = _thuc_the_6(d)
+        xh = xep_hang.xep(kenh, F_I=F_I, thuc_the_co_kenh_OK=ok, che_do='E6b', canh=[tuple(c) for c in d['canh']])
+        if 'trang_thai' in da:
+            assert xh['trang_thai_E6b'] == da['trang_thai']
+        if 'thu_tu' in da:
+>           assert xh['thu_tu'] == da['thu_tu']
+E           AssertionError: assert ['P', 'Q'] == ['Q', 'P']
+E             
+E             At index 0 diff: 'P' != 'Q'
+E             Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:134: AssertionError
+___________________ test_nhom_vong_mac_dinh_la_C_phay[SCC1] ___________________
+
+muc = 'SCC1', ma = <function ma.<locals>._gan at 0x000002E409C97B00>
+
+    @pytest.mark.parametrize('muc', ['SCC1', 'SCC2', 'SCC3', 'SCC4'])
+    def test_nhom_vong_mac_dinh_la_C_phay(muc, ma):
+        """CĐ5: không truyền cách đọc thì dùng C′ ('co_vong'), cả ở e5.phan_loai lẫn ở chuỗi khi thiếu tham_so_E5."""
+        from m1 import chuoi
+        m = tu_lap(DAP_AN_THANH_PHAN, muc)
+        ma(f'{muc}-mac-dinh')
+        ca = dict(m['dau_vao'], E5=True)
+        p, xh = _chay_E5(ca)
+        da = m['dap_an']['co_vong']
+        assert sorted([list(x) for x in p['ke_thua']]) == sorted(da['ke_thua'])
+>       assert xh['thu_tu'] == da['thu_tu']
+E       AssertionError: assert ['cfg', 'seat', 'tr1'] == ['cfg', 'tr1', 'seat']
+E         
+E         At index 1 diff: 'seat' != 'tr1'
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:238: AssertionError
+___________________ test_nhom_vong_mac_dinh_la_C_phay[SCC2] ___________________
+
+muc = 'SCC2', ma = <function ma.<locals>._gan at 0x000002E409CE8040>
+
+    @pytest.mark.parametrize('muc', ['SCC1', 'SCC2', 'SCC3', 'SCC4'])
+    def test_nhom_vong_mac_dinh_la_C_phay(muc, ma):
+        """CĐ5: không truyền cách đọc thì dùng C′ ('co_vong'), cả ở e5.phan_loai lẫn ở chuỗi khi thiếu tham_so_E5."""
+        from m1 import chuoi
+        m = tu_lap(DAP_AN_THANH_PHAN, muc)
+        ma(f'{muc}-mac-dinh')
+        ca = dict(m['dau_vao'], E5=True)
+        p, xh = _chay_E5(ca)
+        da = m['dap_an']['co_vong']
+        assert sorted([list(x) for x in p['ke_thua']]) == sorted(da['ke_thua'])
+>       assert xh['thu_tu'] == da['thu_tu']
+E       AssertionError: assert ['tr2', 'seat', 'tr1'] == ['tr2', 'tr1', 'seat']
+E         
+E         At index 1 diff: 'seat' != 'tr1'
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:238: AssertionError
+____________________________ test_45_khoi_tu_kenh _____________________________
+
+ma = <function ma.<locals>._gan at 0x000002E409CE99E0>
+
+    def test_45_khoi_tu_kenh(ma):
+        from m1 import chuoi
+        from m1_danh_gia import rr, chon_khoi, luat_c, m5
+        f = fx(45)
+        ma('45')
+        d, da = f['dau_vao'], f['dap_an']
+        canh = [tuple(c) for c in d['canh']]
+        cau_hinh = {'R0': {'E1': 'tat', 'E5': False}, 'E1': {'E1': 'U', 'E5': False},
+                    'E5': {'E1': 'tat', 'E5': True}, 'E1+E5': {'E1': 'U', 'E5': True}}
+        rr_th = {}
+        blocks_th = {}
+        for ten, ch in cau_hinh.items():
+            rr_th[ten], blocks_th[ten] = {}, {}
+            for th, kenh in d['tinh_huong'].items():
+                k = {'F': kenh['F'], 'R': kenh['R_bat_E1' if ch['E1'] != 'tat' else 'R_tat_E1'], 'X': kenh['X']}
+                kq = chuoi.xep_tu_kenh_fixture(k, canh, bat_E5=ch['E5'])
+                rr_th[ten][th] = rr.rr_ca(kq['blocks'], d['root'])
+                blocks_th[ten][th] = kq['blocks']
+>               assert gan_bang(rr_th[ten][th], da['rr'][ten][th]), (ten, th)
+E               AssertionError: ('E5', 'A')
+E               assert False
+E                +  where False = gan_bang(Fraction(5, 12), 0.5)
+
+test_k11_danh_gia.py:106: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k08_e5_e6_e7_e9.py::test_chuoi_kenh[57] - AssertionError: assert ...
+FAILED test_k08_e5_e6_e7_e9.py::test_chuoi_kenh[71] - AssertionError: assert ...
+FAILED test_k08_e5_e6_e7_e9.py::test_nhom_vong_tu_lap[co_vong-SCC1] - Asserti...
+FAILED test_k08_e5_e6_e7_e9.py::test_nhom_vong_tu_lap[co_vong-SCC2] - Asserti...
+FAILED test_k08_e5_e6_e7_e9.py::test_E6b[14] - AssertionError: assert ['P', '...
+FAILED test_k08_e5_e6_e7_e9.py::test_nhom_vong_mac_dinh_la_C_phay[SCC1] - Ass...
+FAILED test_k08_e5_e6_e7_e9.py::test_nhom_vong_mac_dinh_la_C_phay[SCC2] - Ass...
+FAILED test_k11_danh_gia.py::test_45_khoi_tu_kenh - AssertionError: ('E5', 'A')
+8 failed, 281 passed in 5.77s

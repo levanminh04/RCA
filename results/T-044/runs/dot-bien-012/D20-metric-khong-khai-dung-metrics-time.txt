@@ -1,0 +1,47 @@
+........................................................................ [ 19%]
+........................................................................ [ 39%]
+.....................................F.................................. [ 59%]
+........................................................................ [ 78%]
+........................................................................ [ 98%]
+......                                                                   [100%]
+================================== FAILURES ===================================
+____________________________ test_metric_qua_chuoi ____________________________
+
+ma = <function ma.<locals>._gan at 0x00000131FF3DD580>
+
+    def test_metric_qua_chuoi(ma):
+        """Đ19 điểm 3 và giá trị hữu hạn (đặc tả v1 dòng 110), qua chuỗi từ span (đáp án tự lập MET1)."""
+        from m1 import chuoi
+        import sinh_trace_S
+        from conftest import tu_lap, DAP_AN_THANH_PHAN
+        m = tu_lap(DAP_AN_THANH_PHAN, 'MET1')
+        ma('MET1')
+        d, da = m['dau_vao'], m['dap_an']
+        t = 1000
+        spans, logs = sinh_trace_S.sinh(d['S'], t=t, mau=FIXTURE['trace_mau_S'])
+        metrics = []
+        for i in range(60):
+            if i < 30:
+                v = 10 + 0.1 * (i % 7)
+            else:
+                v = float('nan') if i == 33 else 50.0
+            metrics.append({'time': t - 300 + 10 * i, 'R_cpu': v})
+        U = ['A', 'B', 'F', 'I', 'R', 'X']
+        p = sinh_trace_S.params(CAU_HINH_S[d['cau_hinh']])
+        p.update(d['nguon'])
+        rec = chuoi.chay(spans, metrics, logs, U, {}, t, p)
+        assert rec['error'] is None, rec['error']
+        assert rec['extra']['blocks_P'][0]['groups'][0] == da['co_khai_nguon']['dau']
+        k = next(x for x in rec['extra']['kenh_co'] if x['don_vi'] == 'metric|R_cpu')
+        assert k['huong'] == 'len' and k['lop'] == 'khong_lan'
+        dv = next(x for x in rec['extra']['don_vi_phan_vi'] if x['ma'] == 'metric|R_cpu')
+        assert dv['n_A'] == da['co_khai_nguon']['n_A'] and dv['F_raw_len'] == da['co_khai_nguon']['F_raw_len']
+        p2 = sinh_trace_S.params(CAU_HINH_S[d['cau_hinh']])
+        rec2 = chuoi.chay(spans, metrics, logs, U, {}, t, p2)
+>       assert rec2['extra']['blocks_P'][0]['groups'][0] == da['khong_khai_nguon']['dau']
+E       KeyError: 'blocks_P'
+
+test_k09_chuoi.py:169: KeyError
+=========================== short test summary info ===========================
+FAILED test_k09_chuoi.py::test_metric_qua_chuoi - KeyError: 'blocks_P'
+1 failed, 365 passed in 14.51s

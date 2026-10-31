@@ -1,0 +1,31 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+........................................................................ [ 84%]
+.......................F..............................                   [100%]
+================================== FAILURES ===================================
+___________________________ test_BC2_P_M_trong_E_X ____________________________
+
+ma = <function ma.<locals>._gan at 0x000001ED13E5ED40>
+
+    def test_BC2_P_M_trong_E_X(ma):
+        from m1_danh_gia import luat_c
+        m = tu_lap(DAP_AN_THANH_PHAN, 'BC2')
+        d, da = m['dau_vao'], m['dap_an']
+        ma('BC2')
+        ds = [{'ma': a, 'dataset': b, 'o': c} for a, b, c in d['ca']]
+        t = luat_c.tong_hop(ds, {k: _q(v) for k, v in d['RR_tat'].items()}, {k: _q(v) for k, v in d['RR_bat'].items()},
+                            set(d['E_X']))
+>       assert {k: t[k] for k in ('P', 'M', 'P_phay', 'M_phay')} == da
+E       AssertionError: assert {'M': 1, 'M_p..., 'P_phay': 0} == {'M': 1, 'M_p..., 'P_phay': 2}
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Differing items:
+E         {'P': 2} != {'P': 0}
+E         {'P_phay': 0} != {'P_phay': 2}
+E         Use -v to get more diff
+
+test_k13_luot5.py:332: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_BC2_P_M_trong_E_X - AssertionError: assert {'M...
+1 failed, 341 passed in 13.89s

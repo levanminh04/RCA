@@ -1,0 +1,28 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+...............................................F........................ [ 84%]
+......................................................                   [100%]
+================================== FAILURES ===================================
+___________________ test_Z1_ban_ghi_khong_ghi_duoc_la_ERROR ___________________
+
+ma = <function ma.<locals>._gan at 0x0000022E2A5F8F40>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000022E2A1E5490>
+
+    def test_Z1_ban_ghi_khong_ghi_duoc_la_ERROR(ma, monkeypatch):
+        """Bản ghi có giá trị không ghi được JSON chuẩn thì chuỗi trả ERROR, không để pha 1 dừng (S21)."""
+        from m1 import chuoi, e4
+        ma('Z1-ERROR')
+        rows, p = _ca_metric([0.0] * 20, [10.0] * 20)
+        monkeypatch.setattr(e4, 'm_T4c_phan_vi', lambda N, A: float('inf'))
+        r = chuoi.chay([], rows, [], ['S'], {}, 1000, p)
+>       assert r['status'] == 'ERROR' and 'JSON' in r['error']
+E       AssertionError: assert ('OK' == 'ERROR'
+E         
+E         - ERROR
+E         + OK)
+
+test_k12_luot4.py:119: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k12_luot4.py::test_Z1_ban_ghi_khong_ghi_duoc_la_ERROR - Assertion...
+1 failed, 341 passed in 13.51s

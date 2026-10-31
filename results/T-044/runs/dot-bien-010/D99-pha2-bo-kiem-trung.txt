@@ -1,0 +1,40 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+........................................................................ [ 84%]
+.................................F....................                   [100%]
+================================== FAILURES ===================================
+__________________________ test_P2D2_ban_ghi_pha2[0] __________________________
+
+bien_the = 0, ma = <function ma.<locals>._gan at 0x00000225D5AF7380>
+tmp_path = WindowsPath('C:/Users/84583/AppData/Local/Temp/pytest-of-84583/pytest-535/test_P2D2_ban_ghi_pha2_0_0')
+
+    @pytest.mark.parametrize('bien_the', [0, 1])
+    def test_P2D2_ban_ghi_pha2(bien_the, ma, tmp_path):
+        from m1_danh_gia import pha2
+        m = tu_lap(DAP_AN_THANH_PHAN, 'P2D2')
+        ma(f'P2D2-{bien_the}')
+        b = [{'key': [1.0], 'groups': [['R']]}]
+        rec = lambda c, o: {'config_id': c, 'opaque_id': o, 'status': 'OK', 'verdict': 'CAUSE_FOUND', 'blocks': b,
+                            'worlds': {w: {'blocks': b} for w in ('S_lo', 'S_hi')}, 'extra': {'G_N': []}}
+        du = [rec(c, o) for c in ('C1', 'C2') for o in ('x', 'y')]
+        if bien_the == 0:
+            h = _pha1(tmp_path, [r for r in du if (r['config_id'], r['opaque_id']) != ('C2', 'x')] + [rec('C1', 'x')])
+        else:
+            h = _pha1(tmp_path, du, so_ca=3)
+        nhan = {o: {'root': 'R', 'dataset': 'RE2-TT', 'o': o} for o in ('x', 'y')}
+        try:
+            pha2.cham(tmp_path, h, nhan)
+            kq = 'OK'
+        except pha2.LoiDuLieuPha2:
+            kq = 'LoiDuLieuPha2'
+>       assert kq == m['dap_an']['ket_qua'][bien_the]
+E       AssertionError: assert 'OK' == 'LoiDuLieuPha2'
+E         
+E         - LoiDuLieuPha2
+E         + OK
+
+test_k13_luot5.py:433: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_P2D2_ban_ghi_pha2[0] - AssertionError: assert ...
+1 failed, 341 passed in 16.55s

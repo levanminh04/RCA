@@ -1,0 +1,31 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+........................................................................ [ 84%]
+..........F...........................................                   [100%]
+================================== FAILURES ===================================
+__________________________ test_CU1_verdict_trong_U ___________________________
+
+ma = <function ma.<locals>._gan at 0x00000174AF3C6700>
+
+    def test_CU1_verdict_trong_U(ma):
+        from m1 import chuoi
+        from test_k12_luot4 import _ca_metric
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CU1')
+        da = m['dap_an']
+        ma('CU1')
+        ra = []
+        for U in m['dau_vao']['inventory']:
+            rows, p = _ca_metric([0.0] * 20, [0.0] * 20)
+            r = chuoi.chay([], rows, [], U, {}, 1000, p)
+            ra.append((r['verdict'], r['diagnostics']['so_cham_hop_le']))
+>       assert ra == list(zip(da['verdict'], da['so_cham_hop_le']))
+E       AssertionError: assert [('NO_INTRINS..._ANOMALY', 1)] == [('INSUFFICIE..._ANOMALY', 1)]
+E         
+E         At index 0 diff: ('NO_INTRINSIC_ANOMALY', 1) != ('INSUFFICIENT_EVIDENCE', 0)
+E         Use -v to get more diff
+
+test_k13_luot5.py:222: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_CU1_verdict_trong_U - AssertionError: assert [...
+1 failed, 341 passed in 14.40s

@@ -1,0 +1,158 @@
+...................FFF.................................................. [ 24%]
+........................................................................ [ 49%]
+........................................................................ [ 74%]
+........................................FFFF............................ [ 99%]
+.                                                                        [100%]
+================================== FAILURES ===================================
+__________________________ test_28_doi_nhan_hai_lan ___________________________
+
+ma = <function ma.<locals>._gan at 0x00000245B708D8A0>
+
+    def test_28_doi_nhan_hai_lan(ma):
+        from m1 import e4
+        f = fx(28)
+        ma('28')
+        d, da = f['dau_vao'], f['dap_an']
+        nhan = {}
+        for w in ('P', 'S_lo', 'S_hi'):
+            kq = _cham(d, w)
+            nhan[w] = kq['nhan']
+            huong = {'tang': 'len', 'giam': 'xuong'}.get(da[w]['nhan'])
+            e = kq['e_' + huong] if huong else max(kq['e_len'], kq['e_xuong'])
+>           assert kq['nhan'] == da[w]['nhan'], w
+E           AssertionError: S_lo
+E           assert 'binh_thuong' == 'tang'
+E             
+E             - tang
+E             + binh_thuong
+
+test_k02_quan_sat.py:87: AssertionError
+_________________________ test_29_the_gioi_doi_thu_tu _________________________
+
+ma = <function ma.<locals>._gan at 0x00000245B708E660>
+
+    def test_29_the_gioi_doi_thu_tu(ma):
+        """Fixture 29: phương pháp xuất RANK_CHANGED; bộ đánh giá tính WORLD_DEPENDENT và nguyên nhân."""
+        from m1 import e4, xep_hang
+        from m1.kieu import Kenh
+        from m1_danh_gia import the_gioi
+        f = fx(29)
+        ma('29')
+        d, da = f['dau_vao'], f['dap_an']
+        thu_tu, khoi, kenh_w = {}, {}, {}
+        for w in ('P', 'S_lo', 'S_hi'):
+            T_N, T_A = d['U1']['T'][w]
+            kq = e4.cham_dem(d['U1']['n_N'], d['U1']['n_A'], T_N, T_A, TS)
+>           assert gan_bang(kq['e_len'], da['e_U1'][w]), w
+E           AssertionError: P
+E           assert False
+E            +  where False = gan_bang(0.0, 0.75)
+
+test_k02_quan_sat.py:104: AssertionError
+__________________________ test_30_thu_tu_khong_doi ___________________________
+
+ma = <function ma.<locals>._gan at 0x00000245B708D8A0>
+
+    def test_30_thu_tu_khong_doi(ma):
+        from m1 import e4
+        f = fx(30)
+        ma('30')
+        d, da = f['dau_vao'], f['dap_an']
+        for w in ('P', 'S_lo', 'S_hi'):
+            T_N, T_A = d['T'][w]
+            e1 = e4.cham_dem(d['U1']['n_N'], d['U1']['n_A'], T_N, T_A, TS)['e_len']
+            e2 = e4.cham_dem(d['U2']['n_N'], d['U2']['n_A'], T_N, T_A, TS)['e_len']
+>           assert gan_bang(e1, da['e_U1'][w]) and gan_bang(e2, da['e_U2'][w])
+E           assert (False)
+E            +  where False = gan_bang(0.3333333333333333, 0.8333333333333334)
+
+test_k02_quan_sat.py:137: AssertionError
+__________________________ test_SS2_dem_hoa[590,310] __________________________
+
+T = '590,310', ma = <function ma.<locals>._gan at 0x00000245B73B0B80>
+
+    @pytest.mark.parametrize('T', ['590,310', '610,290', '7,3', '600,300'])
+    def test_SS2_dem_hoa(T, ma):
+        from m1 import e4, xep_hang
+        m = tu_lap(DAP_AN_THANH_PHAN, 'SS2')
+        ma(f'SS2-{T}')
+        da = m['dap_an']
+        T_N, T_A = (int(x) for x in T.split(','))
+        (n1, a1), (n2, a2) = m['dau_vao']['don_vi']
+        x = e4.cham_dem(n1, a1, T_N, T_A, _ts())
+        y = e4.cham_dem(n2, a2, T_N, T_A, _ts())
+        assert x['F_raw_len'] == y['F_raw_len'] == 1
+>       assert x['e_len_q'] == y['e_len_q'] == Fraction(da['e_len_q'][T])
+E       AssertionError: assert Fraction(34, 93) == Fraction(146, 177)
+E        +  where Fraction(146, 177) = Fraction('146/177')
+
+test_k12_luot4.py:53: AssertionError
+__________________________ test_SS2_dem_hoa[610,290] __________________________
+
+T = '610,290', ma = <function ma.<locals>._gan at 0x00000245B73B1620>
+
+    @pytest.mark.parametrize('T', ['590,310', '610,290', '7,3', '600,300'])
+    def test_SS2_dem_hoa(T, ma):
+        from m1 import e4, xep_hang
+        m = tu_lap(DAP_AN_THANH_PHAN, 'SS2')
+        ma(f'SS2-{T}')
+        da = m['dap_an']
+        T_N, T_A = (int(x) for x in T.split(','))
+        (n1, a1), (n2, a2) = m['dau_vao']['don_vi']
+        x = e4.cham_dem(n1, a1, T_N, T_A, _ts())
+        y = e4.cham_dem(n2, a2, T_N, T_A, _ts())
+        assert x['F_raw_len'] == y['F_raw_len'] == 1
+>       assert x['e_len_q'] == y['e_len_q'] == Fraction(da['e_len_q'][T])
+E       AssertionError: assert Fraction(26, 87) == Fraction(154, 183)
+E        +  where Fraction(154, 183) = Fraction('154/183')
+
+test_k12_luot4.py:53: AssertionError
+____________________________ test_SS2_dem_hoa[7,3] ____________________________
+
+T = '7,3', ma = <function ma.<locals>._gan at 0x00000245B73B1A80>
+
+    @pytest.mark.parametrize('T', ['590,310', '610,290', '7,3', '600,300'])
+    def test_SS2_dem_hoa(T, ma):
+        from m1 import e4, xep_hang
+        m = tu_lap(DAP_AN_THANH_PHAN, 'SS2')
+        ma(f'SS2-{T}')
+        da = m['dap_an']
+        T_N, T_A = (int(x) for x in T.split(','))
+        (n1, a1), (n2, a2) = m['dau_vao']['don_vi']
+        x = e4.cham_dem(n1, a1, T_N, T_A, _ts())
+        y = e4.cham_dem(n2, a2, T_N, T_A, _ts())
+        assert x['F_raw_len'] == y['F_raw_len'] == 1
+>       assert x['e_len_q'] == y['e_len_q'] == Fraction(da['e_len_q'][T])
+E       AssertionError: assert Fraction(2, 9) == Fraction(6, 7)
+E        +  where Fraction(6, 7) = Fraction('6/7')
+
+test_k12_luot4.py:53: AssertionError
+__________________________ test_SS2_dem_hoa[600,300] __________________________
+
+T = '600,300', ma = <function ma.<locals>._gan at 0x00000245B73B1F80>
+
+    @pytest.mark.parametrize('T', ['590,310', '610,290', '7,3', '600,300'])
+    def test_SS2_dem_hoa(T, ma):
+        from m1 import e4, xep_hang
+        m = tu_lap(DAP_AN_THANH_PHAN, 'SS2')
+        ma(f'SS2-{T}')
+        da = m['dap_an']
+        T_N, T_A = (int(x) for x in T.split(','))
+        (n1, a1), (n2, a2) = m['dau_vao']['don_vi']
+        x = e4.cham_dem(n1, a1, T_N, T_A, _ts())
+        y = e4.cham_dem(n2, a2, T_N, T_A, _ts())
+        assert x['F_raw_len'] == y['F_raw_len'] == 1
+>       assert x['e_len_q'] == y['e_len_q'] == Fraction(da['e_len_q'][T])
+E       AssertionError: assert Fraction(1, 3) == Fraction(5, 6)
+E        +  where Fraction(5, 6) = Fraction('5/6')
+
+test_k12_luot4.py:53: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k02_quan_sat.py::test_28_doi_nhan_hai_lan - AssertionError: S_lo
+FAILED test_k02_quan_sat.py::test_29_the_gioi_doi_thu_tu - AssertionError: P
+FAILED test_k02_quan_sat.py::test_30_thu_tu_khong_doi - assert (False)
+FAILED test_k12_luot4.py::test_SS2_dem_hoa[590,310] - AssertionError: assert ...
+FAILED test_k12_luot4.py::test_SS2_dem_hoa[610,290] - AssertionError: assert ...
+FAILED test_k12_luot4.py::test_SS2_dem_hoa[7,3] - AssertionError: assert Frac...
+FAILED test_k12_luot4.py::test_SS2_dem_hoa[600,300] - AssertionError: assert ...
+7 failed, 282 passed in 5.77s

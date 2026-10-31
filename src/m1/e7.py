@@ -32,7 +32,7 @@ def vung(T, kenh, canh, inherited_by, cach=1):
         vao.setdefault(b, set()).add(a)
         vh.setdefault(a, set()).add(b)
         vh.setdefault(b, set()).add(a)
-    gt = {(x['thuc_the'], x['kenh'], x['huong']) for x in inherited_by if x['trang_thai'] in ('de_xuat', 'ap_dung')}
+    gt = {x['ma'] for x in inherited_by if x['trang_thai'] in ('de_xuat', 'ap_dung')}  # theo mã kênh (S12)
     out = {}
     for r in T:
         if r not in V:
@@ -42,8 +42,8 @@ def vung(T, kenh, canh, inherited_by, cach=1):
             out[r] = _toi(V, vh, r)
             continue
         len_ = {a for a in _toi(V, vao, r) - {r}
-                if all((k.thuc_the, k.ten, k.huong) in gt for k in co if k.thuc_the == a)}
+                if all(k.ma in gt for k in co if k.thuc_the == a)}
         xuong = {b for b in _toi(V, ra, r) - {r}
-                 if any(k.lop == 'lan_xuoi' and (k.thuc_the, k.ten, k.huong) in gt for k in co if k.thuc_the == b)}
+                 if any(k.lop == 'lan_xuoi' and k.ma in gt for k in co if k.thuc_the == b)}
         out[r] = {r} | len_ | xuong
     return out

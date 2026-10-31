@@ -86,6 +86,9 @@ def phan_loai(kenh, canh, bat=True, doc_nhom_vong='co_vong', pham_vi_nhom_vong='
     e9: {'bat': bool, 'o_s', 'tau', 'canh_E2_bat_thuong': set cạnh} hoặc None."""
     if doc_nhom_vong not in ('co_vong', 'ke_canh'):
         raise ValueError(doc_nhom_vong)
+    ma_all = [k.ma for k in kenh]
+    if len(set(ma_all)) != len(ma_all):  # F_I theo mã: hai kênh trùng mã sẽ ghi đè nhau (S12)
+        raise ValueError(f'mã kênh trùng: {sorted({m for m in ma_all if ma_all.count(m) > 1})}')
     co = sorted((k for k in kenh if k.co), key=lambda k: k.ma)  # thứ tự chuẩn: đầu ra không phụ thuộc thứ tự vào
     theo_e = {}
     for k in co:
@@ -185,8 +188,8 @@ def phan_loai(kenh, canh, bat=True, doc_nhom_vong='co_vong', pham_vi_nhom_vong='
             F_I[c.ma] = 0
             ke_thua.append((e, c.ten))
         for b, ch, duong, qt in B:
-            inherited_by.append({'thuc_the': e, 'kenh': c.ten, 'huong': c.huong, 'diem_truoc_E5': c.s,
-                                 'giai_thich': (b, ch.ten), 'duong': duong, 'quy_tac': qt, 'trang_thai': trang_thai,
-                                 'ly_do_E9': ly_do})
+            inherited_by.append({'thuc_the': e, 'kenh': c.ten, 'huong': c.huong, 'ma': c.ma, 'don_vi': c.don_vi,
+                                 'diem_truoc_E5': c.s, 'giai_thich': (b, ch.ten), 'giai_thich_ma': ch.ma,
+                                 'duong': duong, 'quy_tac': qt, 'trang_thai': trang_thai, 'ly_do_E9': ly_do})
     return {'F_I': F_I, 'inherited_by': inherited_by, 'ke_thua': sorted(set(ke_thua)),
             'nhom_vong': [sorted(c) for c in sorted(nhom, key=lambda x: sorted(x))]}

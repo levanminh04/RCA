@@ -1,0 +1,32 @@
+........................................................................ [ 19%]
+........................................................................ [ 39%]
+........................................................................ [ 59%]
+........................................................................ [ 78%]
+..................................................................F..... [ 98%]
+......                                                                   [100%]
+================================== FAILURES ===================================
+______________________________ test_DO1_du_do_do ______________________________
+
+ma = <function ma.<locals>._gan at 0x000002729F251940>
+tmp_path = WindowsPath('C:/Users/84583/AppData/Local/Temp/pytest-of-84583/pytest-834/test_DO1_du_do_do0')
+
+    def test_DO1_du_do_do(ma, tmp_path):
+        from m1_danh_gia import pha2
+        from test_k13_luot5 import _pha1
+        m = tu_lap(DAP_AN_THANH_PHAN, 'DO1')
+        d, da = m['dau_vao'], m['dap_an']
+        ma('DO1')
+        b = [{'key': [1.0], 'groups': d['blocks']}]
+        rec = {'config_id': 'C', 'opaque_id': 'x', 'status': 'OK', 'verdict': 'CAUSE_FOUND', 'blocks': b,
+               'worlds': {w: {'blocks': b} for w in ('S_lo', 'S_hi')}, 'extra': {'G_N': []}}
+        h = _pha1(tmp_path, [rec])
+        do = pha2.cham(tmp_path, h, {'x': {'root': d['root'], 'dataset': 'RE2-TT', 'o': 'o1'}})[
+            'cau_hinh']['C']['ca']['x']['theo_the_gioi']['P']['do']
+        for k, v in da.items():
+>           assert abs(do[k] - v) <= 1e-12, k
+E           KeyError: 'hit@1'
+
+test_k14_luot5b.py:319: KeyError
+=========================== short test summary info ===========================
+FAILED test_k14_luot5b.py::test_DO1_du_do_do - KeyError: 'hit@1'
+1 failed, 365 passed in 18.20s

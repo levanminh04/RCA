@@ -1,0 +1,27 @@
+........................................................................ [ 19%]
+........................................................................ [ 39%]
+........................................................................ [ 59%]
+........................................................................ [ 78%]
+....................F................................................... [ 98%]
+......                                                                   [100%]
+================================== FAILURES ===================================
+_____________________________ test_CP4_bien_E1CP ______________________________
+
+ma = <function ma.<locals>._gan at 0x000001DAA3EC7F60>
+
+    def test_CP4_bien_E1CP(ma):
+        from m1 import span
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CP4')
+        ma('CP4')
+        for c, u, dg in zip(m['dau_vao']['ca'], m['dap_an']['u_CP'], m['dap_an']['duong_gang']):
+            con = [tuple(x) for x in c['con']]
+>           assert span.doc_quyen_CP(tuple(c['cha']), con, c['tau']) == u
+E           AssertionError: assert 0 == 4
+E            +  where 0 = <function doc_quyen_CP at 0x000001DAA4713060>((0, 10), [(0, 5), (4, 10)], 1)
+E            +    where <function doc_quyen_CP at 0x000001DAA4713060> = <module 'm1.span' from 'C:\\Users\\84583\\AppData\\Local\\Temp\\tmpy0zra65k\\src\\m1\\span.py'>.doc_quyen_CP
+E            +    and   (0, 10) = tuple([0, 10])
+
+test_k13_luot5.py:286: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_CP4_bien_E1CP - AssertionError: assert 0 == 4
+1 failed, 365 passed in 14.50s

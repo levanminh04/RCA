@@ -1,0 +1,31 @@
+........................................................................ [ 19%]
+........................................................................ [ 39%]
+........................................................................ [ 59%]
+...................F.................................................... [ 78%]
+........................................................................ [ 98%]
+......                                                                   [100%]
+================================== FAILURES ===================================
+_____________________________ test_UV6_3_ky_vong ______________________________
+
+ma = <function ma.<locals>._gan at 0x000002793FF8C900>
+
+    def test_UV6_3_ky_vong(ma):
+        """S16: báo kèm UV-6 theo Hit@1 kỳ vọng, gộp và theo dataset, phân số chính xác (CĐ2 dòng 28)."""
+        from m1_danh_gia import uv6
+        m = tu_lap(DAP_AN_THANH_PHAN, 'UV6-3')
+        ma('UV6-3')
+        kq = uv6.dem(_ca_uv6(m['dau_vao']['ca']))
+        da = m['dap_an']
+        assert {k: kq[k] for k in ('hong', 'sua', 'vi_pham')} == {k: da[k] for k in ('hong', 'sua', 'vi_pham')}
+        kv = kq['ky_vong']
+        for k in ('giam_ca_dang_dung', 'tang_ca_loi_ma'):
+>           assert isinstance(kv[k], Fraction) and kv[k] == Fraction(da['ky_vong'][k]), k
+E           AssertionError: tang_ca_loi_ma
+E           assert (True and Fraction(5, 4) == Fraction(9, 4))
+E            +  where True = isinstance(Fraction(5, 4), Fraction)
+E            +  and   Fraction(9, 4) = Fraction('9/4')
+
+test_k11_danh_gia.py:227: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k11_danh_gia.py::test_UV6_3_ky_vong - AssertionError: tang_ca_loi_ma
+1 failed, 365 passed in 14.44s

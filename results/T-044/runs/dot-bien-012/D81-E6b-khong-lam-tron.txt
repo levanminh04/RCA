@@ -1,0 +1,32 @@
+........................................................................ [ 19%]
+........................................................................ [ 39%]
+........................................................................ [ 59%]
+........................................................................ [ 78%]
+..................................F..................................... [ 98%]
+......                                                                   [100%]
+================================== FAILURES ===================================
+___________________________ test_XH1_khoa_xep_hang ____________________________
+
+ma = <function ma.<locals>._gan at 0x000001F6253D07C0>
+
+    def test_XH1_khoa_xep_hang(ma):
+        from m1 import xep_hang
+        from m1.kieu import Kenh
+        m = tu_lap(DAP_AN_THANH_PHAN, 'XH1')
+        da = m['dap_an']
+        ma('XH1')
+        k = lambda e, ten, s, s_q=None: Kenh(e, ten, 'len', 'khong_lan', s, s_q=s_q)
+        x = xep_hang.xep([k('A', 'u1', 0.5), k('A', 'u2', 0.5), k('B', 'u1', 0.5)], thuc_the_co_kenh_OK={'A', 'B'},
+                         che_do='E6b', canh=())
+        assert [b['groups'][0] for b in x['blocks']] == da['E6b']
+        x = xep_hang.xep([k('A', 'u', 0.1, Fraction(1, 10)), k('B', 'u', 0.1, Fraction(1, 10) + Fraction(1, 10 ** 30))],
+                         thuc_the_co_kenh_OK={'A', 'B'})
+        assert [b['groups'][0] for b in x['blocks']] == da['chinh_xac'] and x['gop_khoa_ghi_ra'] == da['gop_khoa_ghi_ra']
+        x = xep_hang.xep([k(e, 'u', 0.5) for e in 'ABC'], thuc_the_co_kenh_OK=set('ABC'), che_do='E6b', canh=())
+>       assert x['blocks'][0]['key'][0] == da['pi_3_khoa_dau'] and [b['groups'][0] for b in x['blocks']] == da['pi_3_nhom']
+E       assert (0.3333333333333333 == 0.333333333333)
+
+test_k13_luot5.py:424: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_XH1_khoa_xep_hang - assert (0.3333333333333333...
+1 failed, 365 passed in 14.32s

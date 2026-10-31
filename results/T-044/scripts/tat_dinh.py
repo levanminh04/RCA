@@ -3,7 +3,8 @@
 Chạy chuỗi M1 trên bộ ca giả (trace S1–S7 của fixture 1, ca metric MET1) với nhiều cấu hình; mỗi bản ghi được băm
 sha256 trên JSON chuẩn hóa. Thứ tự 0 là thứ tự gốc; thứ tự 1–3 xáo mọi danh sách đầu vào ở mọi tầng gọi như
 `tests/conftest.py#XAO`, với cache cổng mới cho từng lượt. In bảng {thứ tự: {mã: sha256}} ra stdout dạng JSON.
-Chạy dưới PYTHONHASHSEED 0, 1, 2 rồi so: mọi sha256 phải giống hệt.
+Chạy dưới PYTHONHASHSEED 0, 1, 2 rồi so: mọi sha256 phải giống hệt. Đầu ra ghi kèm 'hash_seed' (biến môi trường
+PYTHONHASHSEED lúc chạy) để bộ tổng hợp kiểm seed thật (C7).
 
     PYTHONHASHSEED=0 python -B results/T-044/scripts/tat_dinh.py > ban-ghi-h0.json
 """
@@ -11,6 +12,7 @@ import functools
 import hashlib
 import importlib
 import json
+import os
 import random
 import sys
 from pathlib import Path
@@ -128,6 +130,7 @@ def main():
             bang[str(thu_tu)] = h
         finally:
             _tra(goc)
+    bang['hash_seed'] = os.environ.get('PYTHONHASHSEED')
     print(json.dumps(bang, sort_keys=True, indent=1))
 
 

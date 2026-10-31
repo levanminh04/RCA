@@ -1,0 +1,33 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+........................................................................ [ 84%]
+.............F........................................                   [100%]
+================================== FAILURES ===================================
+____________________________ test_BT2_khoa_params _____________________________
+
+ma = <function ma.<locals>._gan at 0x00000247363E68E0>
+
+    def test_BT2_khoa_params(ma):
+        from m1 import chuoi, runner
+        from test_k12_luot4 import _ca_metric
+        m = tu_lap(DAP_AN_THANH_PHAN, 'BT2')
+        ma('BT2')
+        sua = [lambda p: None, lambda p: p.update(nhanh_z='false'), lambda p: p['tham_so_E4'].pop('q_hi'),
+               lambda p: p['tham_so_E4'].update(x=1)]
+        ra = []
+        for f in sua:
+            rows, p = _ca_metric([0.0] * 20, [10.0] * 20)
+            p['tham_so_E4'] = dict(p['tham_so_E4'])
+            f(p)
+            ra.append(chuoi.chay([], rows, [], ['S'], {}, 1000, p)['status'])
+>       assert ra == m['dap_an']['status']
+E       AssertionError: assert ['OK', 'ERROR', 'OK', 'OK'] == ['OK', 'ERROR...ROR', 'ERROR']
+E         
+E         At index 2 diff: 'OK' != 'ERROR'
+E         Use -v to get more diff
+
+test_k13_luot5.py:260: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_BT2_khoa_params - AssertionError: assert ['OK'...
+1 failed, 341 passed in 13.84s

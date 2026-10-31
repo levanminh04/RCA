@@ -59,6 +59,47 @@ LUOT = [
      'ghi_chu': 'sau gói sửa phản biện lượt 2; D28–D35 mới; D26, D27 đổi chỗ theo code mới'},
     {'duong_dan': 'runs/kiem-hash-t043-004', 'script': 'scripts/kiem_hash_t043.py', 'ket_qua': 'PASS 69/69, 10/10',
      'ghi_chu': 'sau gói sửa phản biện lượt 2'},
+    {'duong_dan': 'runs/test-xanh-004', 'script': 'pytest -v, PYTHONHASHSEED=0 (Windows local; scripts/chay_kiem_windows.sh)',
+     'ket_qua': '263/263 qua', 'ghi_chu': 'sau gói sửa phản biện lượt 3; tổng hợp ở bang-phep-kiem.json'},
+    {'duong_dan': 'runs/tat-dinh-005', 'script': 'scripts/tat_dinh.py; pytest 3 hash seed × 4 thứ tự; so_ban_ghi_truoc_sau.py; '
+                                                 'tong_hop_tat_dinh.py',
+     'ket_qua': 'PASS (104 bản ghi, 263 phép); bỏ trường mới và so theo nội dung thì giống 253dbe46',
+     'ghi_chu': 'sau gói sửa phản biện lượt 3; lần so đầu (so theo thứ tự) cho 2 bản ghi lệch chỉ do thứ tự, đầu ra bị ghi đè, ghi ở LOG'},
+    {'duong_dan': 'runs/dot-bien-005', 'script': 'scripts/dot_bien.py', 'ket_qua': 'lượt hỏng (D11 chuỗi cũ; cp1252)',
+     'ghi_chu': 'xem GHI-CHU.txt; đầu ra lần chạy 1 bị xóa nhầm'},
+    {'duong_dan': 'runs/dot-bien-006', 'script': 'scripts/dot_bien.py (41 đột biến)', 'ket_qua': '41/41 bị bắt',
+     'ghi_chu': 'sau gói sửa phản biện lượt 3; D36–D41 mới; D11 đổi chỗ theo code mới'},
+    {'duong_dan': 'runs/kiem-hash-t043-005', 'script': 'scripts/kiem_hash_t043.py', 'ket_qua': 'PASS 69/69, 10/10',
+     'ghi_chu': 'sau gói sửa phản biện lượt 3 (Windows local)'},
+    {'duong_dan': 'runs/test-xanh-005', 'script': 'pytest -v, PYTHONHASHSEED=0 (scripts/chay_kiem_windows.sh)',
+     'ket_qua': '266/266 qua', 'ghi_chu': 'sau sửa E1-CP và bước 5 (Minh duyệt 30/10/2026)'},
+    {'duong_dan': 'runs/tat-dinh-006', 'script': 'scripts/tat_dinh.py; pytest 3 hash seed × 4 thứ tự; so_ban_ghi_truoc_sau.py; '
+                                                 'tong_hop_tat_dinh.py',
+     'ket_qua': 'PASS (104 bản ghi, 266 phép); bỏ trường mới thì giống 253dbe46', 'ghi_chu': 'sau sửa E1-CP và bước 5; so với 253dbe46'},
+    {'duong_dan': 'runs/dot-bien-007', 'script': 'scripts/dot_bien.py (44 đột biến)', 'ket_qua': '44/44 bị bắt',
+     'ghi_chu': 'sau sửa E1-CP và bước 5; D42–D44 mới; D30 đổi chỗ theo code mới'},
+    {'duong_dan': 'runs/kiem-hash-t043-006', 'script': 'scripts/kiem_hash_t043.py', 'ket_qua': 'PASS 69/69, 10/10',
+     'ghi_chu': 'sau sửa E1-CP và bước 5'},
+    {'duong_dan': 'runs/test-xanh-006', 'script': 'pytest -v, PYTHONHASHSEED=0 (scripts/chay_kiem_windows.sh)',
+     'ket_qua': '289/289 qua', 'ghi_chu': 'lượt 4, trước bản cuối (sau đó đổi log T4c sang log1p, khóa C-d2 số thực)'},
+    {'duong_dan': 'runs/tat-dinh-007', 'script': 'scripts/tat_dinh.py; pytest 3 hash seed × 4 thứ tự; so_ban_ghi_truoc_sau.py; '
+                                                 'tong_hop_tat_dinh.py',
+     'ket_qua': 'PASS (104 bản ghi, 289 phép); so với 253dbe46 lệch 104 vì trường mới E6b_pi và khóa C-d2 dạng số',
+     'ghi_chu': 'lượt 4, trước bản cuối; đầu ra so sánh bị ghi đè một lần khi người làm thêm bỏ E6b_pi, ghi ở LOG'},
+    {'duong_dan': 'runs/dot-bien-008', 'script': 'scripts/dot_bien.py (58 đột biến)', 'ket_qua': '58/58 bị bắt',
+     'ghi_chu': 'lượt 4, trước bản cuối'},
+    {'duong_dan': 'runs/kiem-hash-t043-007', 'script': 'scripts/kiem_hash_t043.py', 'ket_qua': 'PASS 69/69, 10/10',
+     'ghi_chu': 'lượt 4, trước bản cuối'},
+    {'duong_dan': 'runs/test-xanh-007', 'script': 'pytest -v, PYTHONHASHSEED=0 (scripts/chay_kiem_windows.sh)',
+     'ket_qua': '289/289 qua', 'ghi_chu': 'sau gói sửa phản biện lượt 4, bản cuối'},
+    {'duong_dan': 'runs/tat-dinh-008', 'script': 'scripts/tat_dinh.py; pytest 3 hash seed × 4 thứ tự; so_ban_ghi_truoc_sau.py; '
+                                                 'tong_hop_tat_dinh.py; so_truong_ban_ghi.py',
+     'ket_qua': 'PASS (104 bản ghi, 289 phép); so với 253dbe46: 16 bản ghi lệch, chỉ m của T4c chữ số cuối',
+     'ghi_chu': 'sau gói sửa phản biện lượt 4, bản cuối'},
+    {'duong_dan': 'runs/dot-bien-009', 'script': 'scripts/dot_bien.py (58 đột biến)', 'ket_qua': '58/58 bị bắt',
+     'ghi_chu': 'sau gói sửa phản biện lượt 4, bản cuối; D45–D58 mới; D03, D13 đổi chỗ theo code mới'},
+    {'duong_dan': 'runs/kiem-hash-t043-008', 'script': 'scripts/kiem_hash_t043.py', 'ket_qua': 'PASS 69/69, 10/10',
+     'ghi_chu': 'sau gói sửa phản biện lượt 4, bản cuối'},
 ]
 
 
@@ -108,9 +149,15 @@ def tao():
                                                   'mục "Phản hồi phản biện lượt 1 và gói sửa"'],
                           ['sua_sau_phan_bien_2', 'lời Minh trong chat ngày 29/10/2026: "NẾU KHÔNG CÓ ĐIỂM NÀO XUNG '
                                                   'ĐỘT THÌ SỬA NGAY"; ghi ở LOG T-044, mục "Phản hồi phản biện lượt 2 '
-                                                  'và gói sửa"']],
+                                                  'và gói sửa"'],
+                          ['sua_sau_phan_bien_3', 'lời Minh trong chat ngày 30/10/2026: "duyệt sửa"; ghi ở LOG T-044, mục '
+                                                  '"Phản hồi phản biện lượt 3 và gói sửa"; S12, S13, S15, S16 (S14, S17 chờ Minh)'],
+                          ['E1CP_buoc5', 'lời Minh trong chat ngày 30/10/2026: "duyệt E1-CP, bước 5 như trên"; biên E1-CP: '
+                                         '"Biên mở"; ghi ở LOG T-044 và dinh-chinh-cai-dat.md mục C5'],
+                          ['sua_sau_phan_bien_4', 'lời Minh trong chat ngày 30/10/2026: "Duyệt cả gói"; ghi ở LOG T-044, '
+                                                  'mục "Phản hồi phản biện lượt 4 và gói sửa"; dinh-chinh-cai-dat.md mục C6']],
         'trang_thai': 'xong các bước 0–9 trong phạm vi SPEC; Phần II mục A của dinh-chinh-cai-dat.md đã được Minh duyệt '
-                      '(29/10/2026); đã sửa sau phản biện lượt 1 (Phần II mục C2) và lượt 2 (mục C3; E1-CP và bước 5 chờ Minh); chờ phản biện kiểm lại',
+                      '(29/10/2026); đã sửa sau phản biện lượt 1 (Phần II mục C2), lượt 2 (mục C3) và lượt 3 (mục C4); E1-CP và bước 5 đã quyết và sửa (mục C5); lượt 4 (mục C6, gồm S14, S17); chờ phản biện kiểm lại',
         'outputs': [dict({'path': str(p.relative_to(ROOT)).replace('\\', '/'), 'sha256': sha(p),
                           'bytes': p.stat().st_size}, **({'git_blob': gb[p]} if p in gb else {}))
                     for p in ds],

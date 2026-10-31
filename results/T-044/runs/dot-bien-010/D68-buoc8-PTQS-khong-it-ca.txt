@@ -1,0 +1,32 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+....................................F................................... [ 84%]
+......................................................                   [100%]
+================================== FAILURES ===================================
+______________________ test_CK8_buoc8_phu_thuoc_quan_sat ______________________
+
+ma = <function ma.<locals>._gan at 0x00000191FE550900>
+
+    def test_CK8_buoc8_phu_thuoc_quan_sat(ma):
+        from m1_danh_gia import chon_khoi, luat_c
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CK8')
+        ma('CK8')
+        d = m['dau_vao']
+        for bien_the, it_ca in m['dau_vao']['it_ca'].items():  # E1 ít ca / không ít ca (C7, Q1)
+            ra = []
+            for c in d['ca']:
+                cap = {'R0|E1': luat_c.ket_hop_the_gioi(c['ket_cuc'], 'khoi_K')}
+                kq = chon_khoi.kiem_cau_hinh_thang(c['thang'], d['thanh_phan'], cap, it_ca)
+                ra.append(next(k for k in ('phu_thuoc_quan_sat', 'nhat_quan', 'xung_dot', 'trinh_Minh') if kq[k] == ['E1']))
+>           assert ra == m['dap_an']['ket_qua'][bien_the], bien_the
+E           AssertionError: E1_khong_it_ca
+E           assert ['nhat_quan',...', 'xung_dot'] == ['phu_thuoc_q...', 'xung_dot']
+E             
+E             At index 0 diff: 'nhat_quan' != 'phu_thuoc_quan_sat'
+E             Use -v to get more diff
+
+test_k11_danh_gia.py:486: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k11_danh_gia.py::test_CK8_buoc8_phu_thuoc_quan_sat - AssertionErr...
+1 failed, 341 passed in 12.42s

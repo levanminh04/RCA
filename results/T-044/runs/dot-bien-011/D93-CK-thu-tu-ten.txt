@@ -1,0 +1,29 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+........................................................................ [ 84%]
+.............................F........................                   [100%]
+================================== FAILURES ===================================
+_________________________ test_CB1_luat_chon_khoi[4] __________________________
+
+i = 4, ma = <function ma.<locals>._gan at 0x0000013597367100>
+
+    @pytest.mark.parametrize('i', range(6))
+    def test_CB1_luat_chon_khoi(i, ma):
+        from m1_danh_gia import chon_khoi
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CB1')
+        da = m['dap_an']
+        c = m['dau_vao']['ca'][i]
+        ma(f'CB1-{i}')
+        tp, MRR, cap = _ca_CB(c)
+        kq = chon_khoi.chon(tp, c['it_ca'], c['do_thi'], MRR, cap)
+>       assert kq['chon'] == da['chon'][i]
+E       AssertionError: assert 'E3' == 'E5'
+E         
+E         - E5
+E         + E3
+
+test_k13_luot5.py:365: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_CB1_luat_chon_khoi[4] - AssertionError: assert...
+1 failed, 341 passed in 14.40s

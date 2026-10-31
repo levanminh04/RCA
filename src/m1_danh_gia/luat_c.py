@@ -29,16 +29,23 @@ NHIEU_THANH_PHAN = 'R0,c'
 
 
 def _fr(x):
-    return x if isinstance(x, Fraction) else Fraction(x)
+    """Số dùng để quyết định phải chính xác (CĐ16): Fraction hoặc int; số thực, chuỗi, bool là lỗi."""
+    if isinstance(x, bool) or not isinstance(x, (Fraction, int)):
+        raise TypeError(f'cần phân số chính xác, nhận {type(x).__name__}: {x!r}')
+    return Fraction(x)
 
 
 def tong_hop(ds, tat, bat, E_X, trong_so=None):
     """ds: [{'ma', 'dataset', 'o'}]; tat, bat: {ma: RR}. Trả ΔMRR theo dataset và gộp, P, M, P′, M′, RR_o."""
     o_cua, ds_cua = {}, {}
     for c in ds:
+        if c['ma'] in o_cua:
+            raise ValueError(f"mã ca trùng trong ds: {c['ma']}")
         o_cua[c['ma']] = c['o']
         if ds_cua.setdefault(c['o'], c['dataset']) != c['dataset']:
             raise ValueError(f"mã ô {c['o']} trùng giữa hai dataset")
+    if isinstance(E_X, str) or not set(E_X) <= set(o_cua.values()):
+        raise ValueError(f'E_X có ô không thuộc ds: {sorted(map(repr, set(E_X) - set(o_cua.values())))[:5]}')
     rt = {c['ma']: _fr(tat[c['ma']]) for c in ds}
     rb = {c['ma']: _fr(bat[c['ma']]) for c in ds}
     datasets = sorted({c['dataset'] for c in ds})
@@ -52,7 +59,7 @@ def tong_hop(ds, tat, bat, E_X, trong_so=None):
     o_t, o_b = rr.rr_o(rt, o_cua, trong_so), rr.rr_o(rb, o_cua, trong_so)
     boi = {}
     for c in ds:
-        w = _fr(trong_so.get(c['ma'], 1)) if trong_so else Fraction(1)
+        w = rr.boi_so(trong_so, c['ma'])  # map thưa là lỗi (S25)
         if w < 0 or w.denominator != 1:
             raise ValueError(f"bội số của ca {c['ma']} phải là số nguyên không âm")
         if boi.setdefault(c['o'], w) != w:

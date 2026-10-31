@@ -1,0 +1,89 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+........................................FFFF............................ [ 84%]
+......................................................                   [100%]
+================================== FAILURES ===================================
+__________________________ test_SS2_dem_hoa[590,310] __________________________
+
+T = '590,310', ma = <function ma.<locals>._gan at 0x0000021419040AE0>
+
+    @pytest.mark.parametrize('T', ['590,310', '610,290', '7,3', '600,300'])
+    def test_SS2_dem_hoa(T, ma):
+        from m1 import e4, xep_hang
+        m = tu_lap(DAP_AN_THANH_PHAN, 'SS2')
+        ma(f'SS2-{T}')
+        da = m['dap_an']
+        T_N, T_A = (int(x) for x in T.split(','))
+        (n1, a1), (n2, a2) = m['dau_vao']['don_vi']
+        x = e4.cham_dem(n1, a1, T_N, T_A, _ts())
+        y = e4.cham_dem(n2, a2, T_N, T_A, _ts())
+        assert x['F_raw_len'] == y['F_raw_len'] == 1
+>       assert x['e_len_q'] == y['e_len_q'] == Fraction(da['e_len_q'][T])
+E       assert 0.824858757062147 == 0.8248587570621468
+
+test_k12_luot4.py:53: AssertionError
+__________________________ test_SS2_dem_hoa[610,290] __________________________
+
+T = '610,290', ma = <function ma.<locals>._gan at 0x0000021419042C00>
+
+    @pytest.mark.parametrize('T', ['590,310', '610,290', '7,3', '600,300'])
+    def test_SS2_dem_hoa(T, ma):
+        from m1 import e4, xep_hang
+        m = tu_lap(DAP_AN_THANH_PHAN, 'SS2')
+        ma(f'SS2-{T}')
+        da = m['dap_an']
+        T_N, T_A = (int(x) for x in T.split(','))
+        (n1, a1), (n2, a2) = m['dau_vao']['don_vi']
+        x = e4.cham_dem(n1, a1, T_N, T_A, _ts())
+        y = e4.cham_dem(n2, a2, T_N, T_A, _ts())
+        assert x['F_raw_len'] == y['F_raw_len'] == 1
+>       assert x['e_len_q'] == y['e_len_q'] == Fraction(da['e_len_q'][T])
+E       assert 0.8415300546448087 == 0.8415300546448088
+
+test_k12_luot4.py:53: AssertionError
+____________________________ test_SS2_dem_hoa[7,3] ____________________________
+
+T = '7,3', ma = <function ma.<locals>._gan at 0x0000021419042F20>
+
+    @pytest.mark.parametrize('T', ['590,310', '610,290', '7,3', '600,300'])
+    def test_SS2_dem_hoa(T, ma):
+        from m1 import e4, xep_hang
+        m = tu_lap(DAP_AN_THANH_PHAN, 'SS2')
+        ma(f'SS2-{T}')
+        da = m['dap_an']
+        T_N, T_A = (int(x) for x in T.split(','))
+        (n1, a1), (n2, a2) = m['dau_vao']['don_vi']
+        x = e4.cham_dem(n1, a1, T_N, T_A, _ts())
+        y = e4.cham_dem(n2, a2, T_N, T_A, _ts())
+        assert x['F_raw_len'] == y['F_raw_len'] == 1
+>       assert x['e_len_q'] == y['e_len_q'] == Fraction(da['e_len_q'][T])
+E       assert 0.8571428571428572 == 0.8571428571428571
+
+test_k12_luot4.py:53: AssertionError
+__________________________ test_SS2_dem_hoa[600,300] __________________________
+
+T = '600,300', ma = <function ma.<locals>._gan at 0x0000021419043240>
+
+    @pytest.mark.parametrize('T', ['590,310', '610,290', '7,3', '600,300'])
+    def test_SS2_dem_hoa(T, ma):
+        from m1 import e4, xep_hang
+        m = tu_lap(DAP_AN_THANH_PHAN, 'SS2')
+        ma(f'SS2-{T}')
+        da = m['dap_an']
+        T_N, T_A = (int(x) for x in T.split(','))
+        (n1, a1), (n2, a2) = m['dau_vao']['don_vi']
+        x = e4.cham_dem(n1, a1, T_N, T_A, _ts())
+        y = e4.cham_dem(n2, a2, T_N, T_A, _ts())
+        assert x['F_raw_len'] == y['F_raw_len'] == 1
+>       assert x['e_len_q'] == y['e_len_q'] == Fraction(da['e_len_q'][T])
+E       AssertionError: assert 0.8333333333333334 == Fraction(5, 6)
+E        +  where Fraction(5, 6) = Fraction('5/6')
+
+test_k12_luot4.py:53: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k12_luot4.py::test_SS2_dem_hoa[590,310] - assert 0.82485875706214...
+FAILED test_k12_luot4.py::test_SS2_dem_hoa[610,290] - assert 0.84153005464480...
+FAILED test_k12_luot4.py::test_SS2_dem_hoa[7,3] - assert 0.8571428571428572 =...
+FAILED test_k12_luot4.py::test_SS2_dem_hoa[600,300] - AssertionError: assert ...
+4 failed, 338 passed in 15.49s

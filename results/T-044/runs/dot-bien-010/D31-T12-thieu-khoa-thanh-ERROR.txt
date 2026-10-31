@@ -1,0 +1,35 @@
+................................F....................................... [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+........................................................................ [ 84%]
+......................................................                   [100%]
+================================== FAILURES ===================================
+_________________________ test_HD1_khai_bao_bat_buoc __________________________
+
+ma = <function ma.<locals>._gan at 0x000001F29B332700>
+
+    def test_HD1_khai_bao_bat_buoc(ma):
+        m = tu_lap(DAP_AN_THANH_PHAN, 'HD1')
+        ma('HD1')
+        bien_the = [lambda p: None,
+                    lambda p: p['don_vi_thoi_gian'].pop('metrics.time'),
+                    lambda p: p.__setitem__('don_vi_thoi_gian', {}),
+                    lambda p: p['don_vi_thoi_gian'].__setitem__('metrics.time', 'ms'),
+                    lambda p: p['ho_so_nguon'].pop('nguon_khoi_phat'),
+                    lambda p: p['ho_so_nguon'].pop('quy_tac_log'),
+                    lambda p: p['ho_so_nguon'].pop('kenh_metric'),
+                    _e3('khop'), _e3('sim_th'), _e3('do_sau'),
+                    _t12(None), _t12({}), _t12({'revision': 'thu'}), _t12({'canh': []}),
+                    _t12({'revision': 'thu', 'canh': 'x'})]
+        assert len(bien_the) == len(m['dau_vao']['bien_the'])
+        ra = [_ca_hd1(f)['status'] for f in bien_the]
+>       assert ra == m['dap_an']['status']
+E       AssertionError: assert ['OK', 'ERROR... 'ERROR', ...] == ['OK', 'ERROR... 'ERROR', ...]
+E         
+E         At index 11 diff: 'ERROR' != 'UNSUPPORTED'
+E         Use -v to get more diff
+
+test_k02_quan_sat.py:339: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k02_quan_sat.py::test_HD1_khai_bao_bat_buoc - AssertionError: ass...
+1 failed, 341 passed in 13.45s

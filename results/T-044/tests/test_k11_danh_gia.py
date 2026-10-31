@@ -198,14 +198,34 @@ def test_M5_G_N_tu_span(ma):
     assert sorted(list(c) for c in m5.G_N_tu_span(d['spans'], d['t'])) == m['dap_an']['G_N']
 
 
+def _ca_uv6(ca):
+    """Hit@1 của fixture viết số thực (0.3333333333333333) đổi về phân số như `phan_so`; uv6.dem chỉ nhận phân số
+    chính xác (C7, G2)."""
+    return [dict(c, hit1_tat=phan_so(c['hit1_tat']), hit1_bat=phan_so(c['hit1_bat'])) for c in ca]
+
+
 @pytest.mark.parametrize('muc', ['UV6-1', 'UV6-2'])
 def test_UV6(muc, ma):
     from m1_danh_gia import uv6
     m = tu_lap(DAP_AN_THANH_PHAN, muc)
     ma(muc)
-    kq = uv6.dem(m['dau_vao']['ca'])
+    kq = uv6.dem(_ca_uv6(m['dau_vao']['ca']))
     for k, v in m['dap_an'].items():
         assert kq[k] == v, k
+
+
+def test_UV6_3_ky_vong(ma):
+    """S16: báo kèm UV-6 theo Hit@1 kỳ vọng, gộp và theo dataset, phân số chính xác (CĐ2 dòng 28)."""
+    from m1_danh_gia import uv6
+    m = tu_lap(DAP_AN_THANH_PHAN, 'UV6-3')
+    ma('UV6-3')
+    kq = uv6.dem(_ca_uv6(m['dau_vao']['ca']))
+    da = m['dap_an']
+    assert {k: kq[k] for k in ('hong', 'sua', 'vi_pham')} == {k: da[k] for k in ('hong', 'sua', 'vi_pham')}
+    kv = kq['ky_vong']
+    for k in ('giam_ca_dang_dung', 'tang_ca_loi_ma'):
+        assert isinstance(kv[k], Fraction) and kv[k] == Fraction(da['ky_vong'][k]), k
+    assert {d: {k: Fraction(v) for k, v in x.items()} for d, x in da['ky_vong']['theo_dataset'].items()} ==         kv['theo_dataset']
 
 
 @pytest.mark.parametrize('muc', ['B8-1', 'B8-2', 'B8-3'])
@@ -214,7 +234,7 @@ def test_buoc_8(muc, ma):
     m = tu_lap(DAP_AN_THANH_PHAN, muc)
     ma(muc)
     d = m['dau_vao']
-    kq = chon_khoi.kiem_cau_hinh_thang(d['thang'], d['thanh_phan'], d['cap'])
+    kq = chon_khoi.kiem_cau_hinh_thang(d['thang'], d['thanh_phan'], d['cap'], d['it_ca'])
     assert sorted(kq['xung_dot']) == sorted(m['dap_an']['xung_dot'])
     assert sorted(kq['trinh_Minh']) == sorted(m['dap_an']['trinh_Minh'])
 
@@ -381,7 +401,8 @@ def test_pha2_giai_thich_WD(ma, tmp_path):
     ma('WD1-pha2')
     d, da = m['dau_vao'], m['dap_an']
     b = lambda xs: [{'key': [len(xs) - i], 'groups': [[e]]} for i, e in enumerate(xs)]
-    kenh = [{'thuc_the': e, 'ten': 'k' + e, 'huong': 'len', 'lop': 'lan_nguoc', 's': 1.0, 'F_I': 1} for e in d['P']]
+    kenh = [{'ma': f'{e}||k{e}|len', 'thuc_the': e, 'ten': 'k' + e, 'huong': 'len', 'don_vi': '', 'lop': 'lan_nguoc',
+             's': 1.0, 'F_I': 1} for e in d['P']]
     rec = {'config_id': 'C', 'opaque_id': 'x', 'status': 'OK', 'verdict': 'CAUSE_FOUND', 'blocks': b(d['P']),
            'worlds': {w: {'blocks': b(d[w])} for w in ('S_lo', 'S_hi')},
            'extra': {'G_N': [], 'kenh_co_the_gioi': {w: kenh for w in ('P', 'S_lo', 'S_hi')}}}
@@ -445,10 +466,10 @@ def test_TS7_boi_so_0(ma):
     assert gan_bang(kq['dMRR']['gop'], da['dMRR_gop']) and (kq['P'], kq['M']) == (da['P'], da['M'])
     assert kq['so_o_E_X'] == da['so_o_E_X'] and sorted(kq['huong_o']) == da['o_co_huong']
     assert (kq['ket_cuc'], kq['buoc']) == (da['ket_cuc'], da['buoc'])
-    # bỏ hẳn ca b (giữ E_X) cho cùng kết quả
-    kq2 = luat_c.ap_dung(ds[:1], {'a': Fraction(1, 2)}, {'a': Fraction(1)}, set(d['E_X']), thanh_phan='X',
-                         trong_so={'a': 2}, delta_d_co_dinh=dd)
-    assert (kq2['dMRR'], kq2['P'], kq2['M'], kq2['ket_cuc']) == (kq['dMRR'], kq['P'], kq['M'], kq['ket_cuc'])
+    # bỏ hẳn ca b mà E_X vẫn giữ ô của b: lỗi; ca không được lấy vào mẫu phải có bội số 0 (C7, G3, Q4)
+    with pytest.raises(ValueError):
+        luat_c.ap_dung(ds[:1], {'a': Fraction(1, 2)}, {'a': Fraction(1)}, set(d['E_X']), thanh_phan='X',
+                       trong_so={'a': 2}, delta_d_co_dinh=dd)
 
 
 def test_CK8_buoc8_phu_thuoc_quan_sat(ma):
@@ -456,9 +477,27 @@ def test_CK8_buoc8_phu_thuoc_quan_sat(ma):
     m = tu_lap(DAP_AN_THANH_PHAN, 'CK8')
     ma('CK8')
     d = m['dau_vao']
-    ra = []
-    for c in d['ca']:
-        cap = {'R0|E1': luat_c.ket_hop_the_gioi(c['ket_cuc'], 'khoi_K')}
-        kq = chon_khoi.kiem_cau_hinh_thang(c['thang'], d['thanh_phan'], cap)
-        ra.append(next(k for k in ('nhat_quan', 'xung_dot', 'trinh_Minh') if kq[k] == ['E1']))
-    assert ra == m['dap_an']['ket_qua']
+    for bien_the, it_ca in m['dau_vao']['it_ca'].items():  # E1 ít ca / không ít ca (C7, Q1)
+        ra = []
+        for c in d['ca']:
+            cap = {'R0|E1': luat_c.ket_hop_the_gioi(c['ket_cuc'], 'khoi_K')}
+            kq = chon_khoi.kiem_cau_hinh_thang(c['thang'], d['thanh_phan'], cap, it_ca)
+            ra.append(next(k for k in ('phu_thuoc_quan_sat', 'nhat_quan', 'xung_dot', 'trinh_Minh') if kq[k] == ['E1']))
+        assert ra == m['dap_an']['ket_qua'][bien_the], bien_the
+
+
+@pytest.mark.parametrize('bien_the', ['a', 'b'])
+def test_CK5_buoc5_phu_thuoc_quan_sat(bien_the, ma):
+    """Bước 5 đọc cặp phụ thuộc quan sát là KHÔNG ĐỦ CA (Minh duyệt 30/10/2026); bước 8 nhất quán với bước 5."""
+    from m1_danh_gia import chon_khoi, luat_c
+    m = tu_lap(DAP_AN_THANH_PHAN, 'CK5')
+    ma(f'CK5-{bien_the}')
+    d, da = m['dau_vao'], m['dap_an'][bien_the]
+    cap = dict(d['cap'])
+    cap['E1|E1+E3'] = luat_c.ket_hop_the_gioi(d['cap_E1|E1+E3_theo_the_gioi'][bien_the], 'khoi_K')
+    kq = chon_khoi.chon(d['thanh_phan'], it_ca=d['it_ca'], do_thi=d['do_thi'],
+                        MRR={k: Fraction(v) for k, v in d['MRR'].items()}, cap=cap)
+    assert kq['thieu_cap'] == []
+    assert {k: kq[k] for k in ('co_dinh', 'loai_luot_hai', 'chon')} == {k: da[k] for k in ('co_dinh', 'loai_luot_hai', 'chon')}
+    b8 = chon_khoi.kiem_cau_hinh_thang(kq['chon'], d['thanh_phan'], cap, d['it_ca'])
+    assert {k: b8[k] for k in ('nhat_quan', 'xung_dot')} == da['buoc8']

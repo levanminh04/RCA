@@ -1,0 +1,119 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+....F.....F............F.........F..................................F... [ 84%]
+......................................................                   [100%]
+================================== FAILURES ===================================
+_______________________________ test_luat_C[60] _______________________________
+
+i = 60, ma = <function ma.<locals>._gan at 0x000001EE2B319EE0>
+
+    @pytest.mark.parametrize('i', [34, 35, 36, 37, 38, 39, 40, 51, 52, 53, 54, 60])
+    def test_luat_C(i, ma):
+        from m1_danh_gia import luat_c
+        f = fx(i)
+        ma(str(i))
+        d, da = f['dau_vao'], f['dap_an']
+        ds, tat, bat = _ca_tu_fixture(d)
+        them = {}
+        if 'M5' in d:
+            them['M5'] = tuple(d['M5'])
+        if 'moc_gia' in d:
+            them['moc_gia'] = (tuple(d['moc_gia']['tat']), tuple(d['moc_gia']['bat']))
+        kq = luat_c.ap_dung(ds, tat, bat, _E_X(d, ds), thanh_phan=d.get('thanh_phan', 'X'), **them)
+>       assert kq['ket_cuc'] == KET_CUC[da['ket_cuc']]
+E       AssertionError: assert 'KHONG_TAC_DUNG' == 'HAI'
+E         
+E         - HAI
+E         + KHONG_TAC_DUNG
+
+test_k11_danh_gia.py:73: AssertionError
+______________________________ test_48_boi_canh _______________________________
+
+ma = <function ma.<locals>._gan at 0x000001EE2B401580>
+
+    def test_48_boi_canh(ma):
+        from m1_danh_gia import luat_c, boi_canh
+        f = fx(48)
+        ma('48')
+        d, da = f['dau_vao'], f['dap_an']
+        t = d['chuoi_cuoi_dao_X']
+        kc = luat_c.ket_cuc_tu_tong_hop({'dMRR': {'gop': phan_so(t['dMRR_gop']),
+                                                  **{k: phan_so(v) for k, v in t['dMRR_dataset'].items()}},
+                                         'P': t['P'], 'M': t['M'], 'P_phay': 0, 'M_phay': 0, 'so_o_E_X': t['E_X_so_o']})
+>       assert kc['ket_cuc'] == da['ket_cuc_dao']
+E       AssertionError: assert 'KHONG_TAC_DUNG' == 'GIUP'
+E         
+E         - GIUP
+E         + KHONG_TAC_DUNG
+
+test_k11_danh_gia.py:161: AssertionError
+________________________________ test_cap_R0_c ________________________________
+
+ma = <function ma.<locals>._gan at 0x000001EE2B402660>
+
+    def test_cap_R0_c(ma):
+        """CĐ6.4: cặp (R0, c) nhiều thành phần chỉ áp vế không gắn với thành phần nào; E_X là hợp."""
+        from m1_danh_gia import luat_c
+        m = tu_lap(DAP_AN_THANH_PHAN, 'R0C1')
+        ma('R0C1')
+        d = m['dau_vao']
+        ds, tat, bat = _ca_tu_fixture(d)
+        E_X = set().union(*[set(x) for x in d['E_X_thanh_phan'].values()])
+        kq = luat_c.ap_dung(ds, tat, bat, E_X, thanh_phan='R0,c', M5=tuple(d['M5']), uv6=d['uv6'])
+>       assert kq['ket_cuc'] == m['dap_an']['ket_cuc']
+E       AssertionError: assert 'KHONG_TAC_DUNG' == 'GIUP'
+E         
+E         - GIUP
+E         + KHONG_TAC_DUNG
+
+test_k11_danh_gia.py:251: AssertionError
+______________________________ test_D17_van_ban _______________________________
+
+ma = <function ma.<locals>._gan at 0x000001EE2B4036A0>
+
+    def test_D17_van_ban(ma):
+        """Đ17 (dinh-chinh-phien10.md dòng 81): một ca 5 → 1, hai ca 9 → 10; người làm bổ sung dataset, ô, |E_X|."""
+        from m1_danh_gia import luat_c
+        m = tu_lap(DAP_AN_VAN_BAN, 'VB-D17')
+        ma('VB-D17')
+        d = m['dau_vao']
+        ds, tat, bat = _ca_tu_fixture({'ca_doi': d['ca_doi']})
+        kq = luat_c.ap_dung(ds, tat, bat, set(d['E_X']), thanh_phan='X')
+        assert (kq['P'], kq['M']) == tuple(m['dap_an']['P_M'])
+        assert gan_bang(kq['dMRR']['gop'], m['dap_an']['dMRR_gop'])
+>       assert kq['ket_cuc'] == m['dap_an']['ket_cuc']
+E       AssertionError: assert 'KHONG_TAC_DUNG' == 'TRAI_CHIEU_O'
+E         
+E         - TRAI_CHIEU_O
+E         + KHONG_TAC_DUNG
+
+test_k11_danh_gia.py:433: AssertionError
+____________________________ test_LC1_so_chinh_xac ____________________________
+
+ma = <function ma.<locals>._gan at 0x000001EE2B45C5E0>
+
+    def test_LC1_so_chinh_xac(ma):
+        from m1_danh_gia import luat_c, rr, uv6
+        m = tu_lap(DAP_AN_THANH_PHAN, 'LC1')
+        da = m['dap_an']
+        ma('LC1')
+        ds, tat, bat = _ds_LC1()
+        E_X = {c['o'] for c in ds}
+        dd = {k: _q(v) for k, v in m['dau_vao']['delta_d'].items()}
+        kq = luat_c.ap_dung(ds, tat, bat, E_X, thanh_phan='X', delta_d_co_dinh=dd)
+        assert kq['dMRR'] == {k: _q(v) for k, v in da['dMRR'].items()}
+>       assert (kq['P'], kq['M'], kq['ket_cuc'], kq['buoc']) == (da['P'], da['M'], da['ket_cuc'], da['buoc'])
+E       AssertionError: assert (1, 2, 'KHONG_TAC_DUNG', 6) == (1, 2, 'HAI', 3)
+E         
+E         At index 2 diff: 'KHONG_TAC_DUNG' != 'HAI'
+E         Use -v to get more diff
+
+test_k13_luot5.py:98: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k11_danh_gia.py::test_luat_C[60] - AssertionError: assert 'KHONG_...
+FAILED test_k11_danh_gia.py::test_48_boi_canh - AssertionError: assert 'KHONG...
+FAILED test_k11_danh_gia.py::test_cap_R0_c - AssertionError: assert 'KHONG_TA...
+FAILED test_k11_danh_gia.py::test_D17_van_ban - AssertionError: assert 'KHONG...
+FAILED test_k13_luot5.py::test_LC1_so_chinh_xac - AssertionError: assert (1, ...
+5 failed, 337 passed in 15.36s

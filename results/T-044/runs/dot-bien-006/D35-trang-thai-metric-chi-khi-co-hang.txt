@@ -1,0 +1,24 @@
+.....................................F.................................. [ 27%]
+........................................................................ [ 54%]
+........................................................................ [ 82%]
+...............................................                          [100%]
+================================== FAILURES ===================================
+____________________ test_MET2_nguon_metric_khong_co_hang _____________________
+
+ma = <function ma.<locals>._gan at 0x0000026021DCDEE0>
+
+    def test_MET2_nguon_metric_khong_co_hang(ma):
+        from m1 import chuoi
+        m = tu_lap(DAP_AN_THANH_PHAN, 'MET2')
+        ma('MET2')
+        bt = m['dau_vao']['bien_the']
+        p = _params(nguon_metric=m['dau_vao']['nguon_metric'], thoi_gian_nguon=bt['co_moc_rong']['thoi_gian_nguon'])
+        p['coverage'] = dict(p['coverage'], S=bt['co_moc_rong']['coverage_S'])
+        r = chuoi.chay(_ca_nho(), [], [], ['P', 'Q'], {}, 1000, p)
+>       assert {k: r['coverage']['S'].get(k) for k in ('trang_thai', 'F', 'H')} == m['dap_an']['co_moc_rong']
+E       KeyError: 'S'
+
+test_k02_quan_sat.py:439: KeyError
+=========================== short test summary info ===========================
+FAILED test_k02_quan_sat.py::test_MET2_nguon_metric_khong_co_hang - KeyError:...
+1 failed, 262 passed in 5.15s

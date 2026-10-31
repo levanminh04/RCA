@@ -1,0 +1,89 @@
+........................................................................ [ 24%]
+........................................................................ [ 49%]
+........................................................................ [ 74%]
+.........................F.F.......F.................................... [ 99%]
+.                                                                        [100%]
+================================== FAILURES ===================================
+_______________________________ test_trong_so_o _______________________________
+
+ma = <function ma.<locals>._gan at 0x00000222C56753A0>
+
+    def test_trong_so_o(ma):
+        """CĐ13; SPEC T-045 dòng 88–89: ô o1 lấy 2 lần cho cùng ΔMRR, P, M, kết cục như thêm một ô bản sao o1′ (mã ô
+        mới, vào E_X). |E_X| khác nhau một ô nhưng cả hai đều >= 6, nên không đổi bước 4."""
+        from m1_danh_gia import luat_c
+        ma('TS1')
+        dd = {'RE2-TT': Fraction(1, 30), 'Nezha-OB': Fraction(1, 22)}
+        for ca_doi in ([['RE2-TT', 'o1', 0.5, 1.0], ['RE2-TT', 'o2', 0.5, 1.0], ['Nezha-OB', 'n1', 1.0, 0.5]],
+                       [['RE2-TT', 'o1', 0.5, 0.25], ['RE2-TT', 'o2', 0.5, 0.25], ['RE2-TT', 'o3', 0.5, 0.25],
+                        ['Nezha-OB', 'n1', 0.5, 1.0]]):
+            d = {'ca_doi': ca_doi, 'E_X_so_o': 8}
+            ds, tat, bat = _ca_tu_fixture(d)
+            E_X = _E_X(d, ds)
+            w = {c['ma']: (2 if c['o'] == 'o1' else 1) for c in ds}
+            kq_w = luat_c.ap_dung(ds, tat, bat, E_X, thanh_phan='X', trong_so=w, delta_d_co_dinh=dd)
+            ds2, tat2, bat2 = list(ds), dict(tat), dict(bat)
+            for c in ds:
+                if c['o'] == 'o1':
+                    c2 = dict(c, ma=c['ma'] + '-x2', o='o1x')
+                    ds2.append(c2)
+                    tat2[c2['ma']], bat2[c2['ma']] = tat[c['ma']], bat[c['ma']]
+            kq_x2 = luat_c.ap_dung(ds2, tat2, bat2, E_X | {'o1x'}, thanh_phan='X', delta_d_co_dinh=dd)
+            assert kq_w['ket_cuc'] == kq_x2['ket_cuc'] and kq_w['buoc'] == kq_x2['buoc']
+            assert kq_w['dMRR'] == kq_x2['dMRR']
+>           assert (kq_w['P'], kq_w['M'], kq_w['P_phay'], kq_w['M_phay']) == \
+                (kq_x2['P'], kq_x2['M'], kq_x2['P_phay'], kq_x2['M_phay'])
+E           assert (2, 1, 0, 0) == (3, 1, 0, 0)
+E             
+E             At index 0 diff: 2 != 3
+E             Use -v to get more diff
+
+test_k11_danh_gia.py:282: AssertionError
+___________________________ test_TS2_luat_c_boi_so ____________________________
+
+ma = <function ma.<locals>._gan at 0x00000222C57B8040>
+
+    def test_TS2_luat_c_boi_so(ma):
+        from m1_danh_gia import luat_c
+        m = tu_lap(DAP_AN_THANH_PHAN, 'TS2')
+        ma('TS2')
+        d, da = m['dau_vao'], m['dap_an']
+        ds = [{'ma': a, 'dataset': b, 'o': c} for a, b, c in d['ca']]
+        tat = {c['ma']: phan_so(d['RR_tat']) for c in ds}
+        bat = dict(tat, **{k: phan_so(v) for k, v in d['RR_bat'].items()})
+        kq = luat_c.ap_dung(ds, tat, bat, set(d['E_X']), thanh_phan='X', trong_so=d['boi_so'],
+                            delta_d_co_dinh={k: phan_so(v) for k, v in d['delta_d'].items()})
+>       assert (kq['M'], kq['P']) == (da['M'], da['P'])
+E       assert (1, 0) == (3, 0)
+E         
+E         At index 0 diff: 1 != 3
+E         Use -v to get more diff
+
+test_k11_danh_gia.py:308: AssertionError
+______________________________ test_TS7_boi_so_0 ______________________________
+
+ma = <function ma.<locals>._gan at 0x00000222C57B8D60>
+
+    def test_TS7_boi_so_0(ma):
+        from m1_danh_gia import luat_c
+        m = tu_lap(DAP_AN_THANH_PHAN, 'TS7')
+        ma('TS7')
+        d, da = m['dau_vao'], m['dap_an']
+        ds = [{'ma': a, 'dataset': b, 'o': c} for a, b, c in d['ca']]
+        dd = {k: Fraction(v) for k, v in d['delta_d'].items()}
+        kq = luat_c.ap_dung(ds, {k: Fraction(v) for k, v in d['RR_tat'].items()},
+                            {k: Fraction(v) for k, v in d['RR_bat'].items()}, set(d['E_X']), thanh_phan='X',
+                            trong_so=d['boi_so'], delta_d_co_dinh=dd)
+>       assert gan_bang(kq['dMRR']['gop'], da['dMRR_gop']) and (kq['P'], kq['M']) == (da['P'], da['M'])
+E       assert (True and (1, 0) == (2, 0)
+E        +  where True = gan_bang(Fraction(1, 2), 0.5)
+E         
+E         At index 0 diff: 1 != 2
+E         Use -v to get more diff)
+
+test_k11_danh_gia.py:460: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k11_danh_gia.py::test_trong_so_o - assert (2, 1, 0, 0) == (3, 1, ...
+FAILED test_k11_danh_gia.py::test_TS2_luat_c_boi_so - assert (1, 0) == (3, 0)
+FAILED test_k11_danh_gia.py::test_TS7_boi_so_0 - assert (True and (1, 0) == (...
+3 failed, 286 passed in 5.70s

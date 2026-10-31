@@ -1,0 +1,29 @@
+........................................................................ [ 19%]
+........................................................................ [ 39%]
+........................................................................ [ 59%]
+........................................................................ [ 78%]
+...................................................F.................... [ 98%]
+......                                                                   [100%]
+================================== FAILURES ===================================
+__________________________ test_T4C2_m_K_I_theo_F_I ___________________________
+
+ma = <function ma.<locals>._gan at 0x000001C18F5D7100>
+
+    def test_T4C2_m_K_I_theo_F_I(ma):
+        from m1 import chuoi
+        import sinh_trace_S
+        from test_k08_e5_e6_e7_e9 import _ca_km3
+        m = tu_lap(DAP_AN_THANH_PHAN, 'T4C2')
+        da = m['dap_an']
+        ma('T4C2')
+        r = chuoi.chay(_ca_km3('cpu'), [], [], ['S', 'B'], {}, 1000, sinh_trace_S.params(m['dau_vao']['bat_tat']))
+        kS = [k for k in r['extra']['kenh_co'] if k['thuc_the'] == 'S']
+        assert (bool(kS) and all(k['F_I'] == 0 for k in kS)) is da['S_chi_ke_thua']
+        mS = r['extra']['T4c']['m_thuc_the']['S']
+>       assert mS[1] == da['m_K_I_S'] and (mS[0] > 0) is da['m_K_raw_S_duong']
+E       assert (0.6931471805599453 == 0.0)
+
+test_k14_luot5b.py:165: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k14_luot5b.py::test_T4C2_m_K_I_theo_F_I - assert (0.6931471805599...
+1 failed, 365 passed in 15.51s

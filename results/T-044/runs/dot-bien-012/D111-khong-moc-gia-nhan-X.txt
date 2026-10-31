@@ -1,0 +1,47 @@
+........................................................................ [ 19%]
+........................................................................ [ 39%]
+........................................................................ [ 59%]
+........................................................................ [ 78%]
+......................F................................................. [ 98%]
+......                                                                   [100%]
+================================== FAILURES ===================================
+______________________ test_CE1_giu_dieu_kien_rieng[E5] _______________________
+
+tp = 'E5', ma = <function ma.<locals>._gan at 0x000001D64BC50040>
+
+    @pytest.mark.parametrize('tp', ['E5', 'E3'])
+    def test_CE1_giu_dieu_kien_rieng(tp, ma):
+        """S34 (C8): khong_moc_gia giữ M5, UV-6 của cặp, chỉ bỏ vế mốc giả."""
+        from m1_danh_gia import pha2
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CE1')
+        d, da = m['dau_vao'][f'ca_{tp}'], m['dap_an'][f'ca_{tp}']
+        ma(f'CE1-{tp}')
+        if tp == 'E5':
+            ca = lambda r, m5: {'a': {'dataset': 'RE2-TT', 'o': 'c1', 'loai_loi': None, 'verdict': 'CAUSE_FOUND',
+                                      'theo_the_gioi': {w: {'RR': r, 'hit1': r, 'hang': None, 'M5': m5}
+                                                        for w in pha2.WORLDS}}}
+            tat, bat = ca(Fraction(1, 2), False), ca(Fraction(1), True)
+        else:
+            ca = lambda h: {'a': {'dataset': 'Nezha-OB', 'o': 'c1', 'loai_loi': 'exception', 'verdict': 'CAUSE_FOUND',
+                                  'theo_the_gioi': {w: {'RR': h, 'hit1': h, 'hang': Fraction(1), 'M5': False}
+                                                    for w in pha2.WORLDS}}}
+            tat, bat = ca(Fraction(1)), ca(Fraction(0))
+        a, b = d['cap']
+        kq = {'cau_hinh': {a: {'ca': tat}, b: {'ca': bat}}}
+        r = pha2.ket_cuc_cap(kq, a, b, {'c1'}, tp, 'khoi_K', moc_gia=tuple(tuple(x) for x in d['moc_gia']))
+        for w in pha2.WORLDS:
+            t = r['theo_the_gioi'][w]
+            assert (t['ket_cuc'], t['ly_do_hai_rieng'], t['moc_gia']['ve']) == (da['ket_cuc'], da['ly_do'], da['moc_gia'])
+>       assert r['khong_moc_gia'] == {w: da['khong_moc_gia'] for w in pha2.WORLDS}
+E       AssertionError: assert {'P': 'KHONG_...'KHONG_DU_CA'} == {'P': 'HAI', ...'S_lo': 'HAI'}
+E         
+E         Differing items:
+E         {'S_lo': 'KHONG_DU_CA'} != {'S_lo': 'HAI'}
+E         {'P': 'KHONG_DU_CA'} != {'P': 'HAI'}
+E         {'S_hi': 'KHONG_DU_CA'} != {'S_hi': 'HAI'}
+E         Use -v to get more diff
+
+test_k13_luot5.py:332: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_CE1_giu_dieu_kien_rieng[E5] - AssertionError: ...
+1 failed, 365 passed in 13.52s

@@ -1,0 +1,33 @@
+........................................................................ [ 24%]
+........................................................................ [ 49%]
+........................................................................ [ 74%]
+............................F........................................... [ 99%]
+.                                                                        [100%]
+================================== FAILURES ===================================
+_____________________________ test_TS3_M5_boi_so ______________________________
+
+ma = <function ma.<locals>._gan at 0x00000173E68354E0>
+
+    def test_TS3_M5_boi_so(ma):
+        from m1_danh_gia import pha2
+        m = tu_lap(DAP_AN_THANH_PHAN, 'TS3')
+        ma('TS3')
+        d, da = m['dau_vao'], m['dap_an']
+        tat = {a: {'dataset': b, 'o': o, 'M5': m_t, 'RR': phan_so(d['RR'])} for a, b, o, _, m_t, _ in d['ca']}
+        bat = {a: {'dataset': b, 'o': o, 'M5': m_b, 'RR': phan_so(d['RR'])} for a, b, o, _, _, m_b in d['ca']}
+        w = {a: k for a, _, _, k, _, _ in d['ca']}
+        kq = _kq_tu_ca(tat, bat)
+        E_X = {o for _, _, o, _, _, _ in d['ca']}
+        cap = pha2.ket_cuc_cap(kq, 'T', 'B', E_X, 'E5', 'khoi_K', trong_so=w)
+        cap0 = pha2.ket_cuc_cap(kq, 'T', 'B', E_X, 'E5', 'khoi_K')
+        for x in ('P', 'S_lo', 'S_hi'):
+>           assert cap['theo_the_gioi'][x]['dieu_kien_E5'] == da['dieu_kien_E5']
+E           AssertionError: assert 'HAI' == 'KHONG_HAI'
+E             
+E             - KHONG_HAI
+E             + HAI
+
+test_k11_danh_gia.py:337: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k11_danh_gia.py::test_TS3_M5_boi_so - AssertionError: assert 'HAI...
+1 failed, 288 passed in 8.10s

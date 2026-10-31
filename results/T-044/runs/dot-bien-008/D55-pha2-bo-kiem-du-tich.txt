@@ -1,0 +1,38 @@
+........................................................................ [ 24%]
+........................................................................ [ 49%]
+........................................................................ [ 74%]
+.......................................................F................ [ 99%]
+.                                                                        [100%]
+================================== FAILURES ===================================
+__________________________ test_P2D_ban_ghi_pha2[2] ___________________________
+
+bien_the = 2, ma = <function ma.<locals>._gan at 0x000001AFE76C6D40>
+tmp_path = WindowsPath('C:/Users/84583/AppData/Local/Temp/pytest-of-84583/pytest-209/test_P2D_ban_ghi_pha2_2_0')
+
+    @pytest.mark.parametrize('bien_the', [0, 1, 2, 3])
+    def test_P2D_ban_ghi_pha2(bien_the, ma, tmp_path):
+        from m1_danh_gia import pha2
+        m = tu_lap(DAP_AN_THANH_PHAN, 'P2D')
+        ma(f'P2D-{bien_the}')
+        b = [{'key': [1.0], 'groups': [['R']]}]
+        rec = lambda c, o: {'config_id': c, 'opaque_id': o, 'status': 'OK', 'verdict': 'CAUSE_FOUND', 'blocks': b,
+                            'worlds': {w: {'blocks': b} for w in ('S_lo', 'S_hi')}, 'extra': {'G_N': []}}
+        du = [rec(c, o) for c in ('C1', 'C2') for o in ('x', 'y')]
+        recs, so = {0: (du, None), 1: (du + [rec('C1', 'x')], None), 2: (du[:3], None), 3: (du, 99)}[bien_the]
+        h = _pha1(tmp_path, recs, so)
+        nhan = {o: {'root': 'R', 'dataset': 'RE2-TT', 'o': o} for o in ('x', 'y')}
+        try:
+            pha2.cham(tmp_path, h, nhan)
+            kq = 'OK'
+        except pha2.LoiDuLieuPha2:
+            kq = 'LoiDuLieuPha2'
+>       assert kq == m['dap_an']['ket_qua'][bien_the]
+E       AssertionError: assert 'OK' == 'LoiDuLieuPha2'
+E         
+E         - LoiDuLieuPha2
+E         + OK
+
+test_k12_luot4.py:222: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k12_luot4.py::test_P2D_ban_ghi_pha2[2] - AssertionError: assert '...
+1 failed, 288 passed in 6.00s

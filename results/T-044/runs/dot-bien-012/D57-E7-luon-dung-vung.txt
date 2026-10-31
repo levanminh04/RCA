@@ -1,0 +1,53 @@
+........................................................................ [ 19%]
+........................................................................ [ 39%]
+........................................................................ [ 59%]
+.........................................................FF............. [ 78%]
+........................................................................ [ 98%]
+......                                                                   [100%]
+================================== FAILURES ===================================
+__________________________ test_CA0E7_khong_vung[0] ___________________________
+
+i = 0, ma = <function ma.<locals>._gan at 0x000002659D3FA520>
+
+    @pytest.mark.parametrize('i', [0, 1, 2])
+    def test_CA0E7_khong_vung(i, ma):
+        from m1 import chuoi
+        import sinh_trace_S
+        from test_k08_e5_e6_e7_e9 import _ca_km3
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CA0E7')
+        dc = m['dau_vao']['doi_chung'][i]
+        ma(f'CA0E7-{dc}')
+        p = sinh_trace_S.params({'E5': False})
+        if dc:
+            p['doi_chung'] = dc
+        r = chuoi.chay(_ca_km3('cpu'), [], [], ['S', 'B'], {}, 1000, p)
+        assert r['status'] == 'OK'
+>       assert (r['region'] is None) is m['dap_an']['region_none'][i]
+E       AssertionError: assert ({'T': ['B', 'S'], 'cach_1': {'B': ['B', 'S'], 'S': ['S']}, 'cach_2': {'B': ['B', 'S'], 'S': ['B', 'S']}, 'hop_cach_1': ['B', 'S'], ...} is None) is True
+
+test_k12_luot4.py:246: AssertionError
+__________________________ test_CA0E7_khong_vung[1] ___________________________
+
+i = 1, ma = <function ma.<locals>._gan at 0x000002659D9C4AE0>
+
+    @pytest.mark.parametrize('i', [0, 1, 2])
+    def test_CA0E7_khong_vung(i, ma):
+        from m1 import chuoi
+        import sinh_trace_S
+        from test_k08_e5_e6_e7_e9 import _ca_km3
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CA0E7')
+        dc = m['dau_vao']['doi_chung'][i]
+        ma(f'CA0E7-{dc}')
+        p = sinh_trace_S.params({'E5': False})
+        if dc:
+            p['doi_chung'] = dc
+        r = chuoi.chay(_ca_km3('cpu'), [], [], ['S', 'B'], {}, 1000, p)
+        assert r['status'] == 'OK'
+>       assert (r['region'] is None) is m['dap_an']['region_none'][i]
+E       AssertionError: assert ({'T': ['B', 'S'], 'cach_1': {'B': ['B', 'S'], 'S': ['S']}, 'cach_2': {'B': ['B', 'S'], 'S': ['B', 'S']}, 'hop_cach_1': ['B', 'S'], ...} is None) is True
+
+test_k12_luot4.py:246: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k12_luot4.py::test_CA0E7_khong_vung[0] - AssertionError: assert (...
+FAILED test_k12_luot4.py::test_CA0E7_khong_vung[1] - AssertionError: assert (...
+2 failed, 364 passed in 15.09s

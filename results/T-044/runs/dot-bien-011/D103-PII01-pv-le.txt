@@ -1,0 +1,46 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+........................................................................ [ 84%]
+...................................F..................                   [100%]
+================================== FAILURES ===================================
+______________________________ test_E4B_bien_E4 _______________________________
+
+ma = <function ma.<locals>._gan at 0x000001E9C38C34C0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001E9C34D6BA0>
+
+    def test_E4B_bien_E4(ma, monkeypatch):
+        from m1 import e4, runner
+        m = tu_lap(DAP_AN_THANH_PHAN, 'E4B')
+        da = m['dap_an']
+        ma('E4B')
+        ts = dict(runner.TS_HOP_DONG)
+        N = [10 + 0.1 * i for i in range(20)]
+        A = [1 + 0.1 * i for i in range(20)]
+        co = e4.cham_phan_vi(N, A, 5, ts, huong_cham=('len', 'xuong'), cache=e4.CacheCong(), khoa_don_vi='u')
+        khong = e4.cham_phan_vi(N, A, 5, ts, huong_cham=('len', 'xuong'))
+        for k in ('F_raw_len', 'F_raw_xuong', 'e_len_q', 'e_xuong_q'):
+            assert co[k] == khong[k], k
+        assert (co['F_raw_len'], co['F_raw_xuong'], co['e_xuong_q']) == \
+            (da['phan_vi']['F_raw_len'], da['phan_vi']['F_raw_xuong'], _q(da['phan_vi']['e_xuong_q']))
+        for (nN, nA, TN, TA), (nhan, F) in zip(m['dau_vao']['dem'], da['dem']):
+            x = e4.cham_dem(nN, nA, TN, TA, ts)
+            assert (x['nhan'] if x['trang_thai'] == 'OK' else x['trang_thai'], x['F_raw_len']) == (nhan, F)
+        ra, ra_pv = [], []
+        for p in (ts['alpha'], 0.0099):
+            monkeypatch.setattr(e4, 'p_nhi_thuc', lambda n_A, n, p0, huong, p=p: p)
+            ra.append(e4.cham_dem(10, 30, 300, 300, ts)['F_raw_len'])
+            monkeypatch.setattr(e4, 'p_cong', lambda A, N, huong, n_exact_max=100, p=p: (p, 'chinh_xac'))
+            ra_pv.append(e4.cham_phan_vi([0.0] * 20, [10.0] * 20, 5, ts)['F_raw_len'])
+>       assert ra == da['p_bang_alpha'] and ra_pv == da['p_bang_alpha_phan_vi']
+E       assert ([0, 1] == [0, 1]
+E         
+E         Use -v to get more diff and [1, 1] == [0, 1]
+E         
+E         At index 0 diff: 1 != 0
+E         Use -v to get more diff)
+
+test_k13_luot5.py:461: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_E4B_bien_E4 - assert ([0, 1] == [0, 1]
+1 failed, 341 passed in 14.83s

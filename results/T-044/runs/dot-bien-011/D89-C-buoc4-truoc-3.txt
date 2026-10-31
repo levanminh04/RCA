@@ -1,0 +1,58 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+........................................................................ [ 84%]
+....F.................F...............................                   [100%]
+================================== FAILURES ===================================
+_________________________ test_P2K_nhan_thanh_phan[3] _________________________
+
+i = 3, ma = <function ma.<locals>._gan at 0x000001BD9916E160>
+
+    @pytest.mark.parametrize('i', range(7))
+    def test_P2K_nhan_thanh_phan(i, ma):
+        from m1_danh_gia import pha2
+        m = tu_lap(DAP_AN_THANH_PHAN, 'P2K')
+        a, b, tp = m['dau_vao']['bien_the'][i]
+        ma(f'P2K-{i}')
+        ca = lambda h: {'o1': {'dataset': 'Nezha-OB', 'o': 'c1', 'loai_loi': 'exception', 'verdict': 'CAUSE_FOUND',
+                               'theo_the_gioi': {w: {'RR': Fraction(h), 'hit1': Fraction(h), 'hang': Fraction(1),
+                                                     'M5': False} for w in pha2.WORLDS}}}
+        kq = {'cau_hinh': {a: {'ca': ca(1)}, b: {'ca': ca(0)}}}
+        mong = m['dap_an']['ket_qua'][i]
+        if mong == 'ValueError':
+            with pytest.raises(ValueError):
+                pha2.ket_cuc_cap(kq, a, b, set(m['dau_vao']['E_X']), tp, 'khoi_K')
+            return
+        r = pha2.ket_cuc_cap(kq, a, b, set(m['dau_vao']['E_X']), tp, 'khoi_K')['theo_the_gioi']['P']
+>       assert [r['ket_cuc'], r['buoc'], r['UV6']] == mong
+E       AssertionError: assert ['KHONG_DU_CA', 4, 'KHONG_AP'] == ['HAI', 3, 'KHONG_AP']
+E         
+E         At index 0 diff: 'KHONG_DU_CA' != 'HAI'
+E         Use -v to get more diff
+
+test_k13_luot5.py:157: AssertionError
+____________________________ test_BC1_bien_luat_C _____________________________
+
+ma = <function ma.<locals>._gan at 0x000001BD992D96C0>
+
+    def test_BC1_bien_luat_C(ma):
+        from m1_danh_gia import luat_c
+        m = tu_lap(DAP_AN_THANH_PHAN, 'BC1')
+        ma('BC1')
+        dd = {k: _q(v) for k, v in m['dau_vao']['delta_d'].items()}
+        ra = []
+        for c in m['dau_vao']['ca']:
+            t = dict(c, dMRR={k: _q(v) for k, v in c['dMRR'].items()})
+            kc = luat_c.ket_cuc_tu_tong_hop(t, delta_d={k: dd[k] for k in t['dMRR'] if k != 'gop'})
+            ra.append([kc['ket_cuc'], kc['buoc']])
+>       assert ra == m['dap_an']['ket_cuc']
+E       AssertionError: assert [['KHONG_TAC_...HAI', 1], ...] == [['KHONG_TAC_...HAI', 1], ...]
+E         
+E         At index 4 diff: ['KHONG_DU_CA', 4] != ['HAI', 3]
+E         Use -v to get more diff
+
+test_k13_luot5.py:321: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_P2K_nhan_thanh_phan[3] - AssertionError: asser...
+FAILED test_k13_luot5.py::test_BC1_bien_luat_C - AssertionError: assert [['KH...
+2 failed, 340 passed in 13.73s

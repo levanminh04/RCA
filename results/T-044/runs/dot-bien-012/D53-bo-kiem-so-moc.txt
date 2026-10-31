@@ -1,0 +1,28 @@
+........................................................................ [ 19%]
+........................................................................ [ 39%]
+........................................................................ [ 59%]
+..................................................F..................... [ 78%]
+........................................................................ [ 98%]
+......                                                                   [100%]
+================================== FAILURES ===================================
+_________________________ test_MET3_moc_lech_so_hang __________________________
+
+ma = <function ma.<locals>._gan at 0x0000024D110FE5C0>
+
+    def test_MET3_moc_lech_so_hang(ma):
+        from m1 import chuoi
+        m = tu_lap(DAP_AN_THANH_PHAN, 'MET3')
+        ma('MET3')
+        rows, p = _ca_metric([0.0] * 5, [10.0] * 5)
+        p['thoi_gian_nguon'] = {'S': [r['time'] * 10 ** 9 for r in rows[:5]]}
+        p['don_vi_thoi_gian'] = dict(p['don_vi_thoi_gian'])
+>       assert chuoi.chay([], rows, [], ['S'], {}, 1000, p)['status'] == m['dap_an']['status']
+E       AssertionError: assert 'NO_EVIDENCE' == 'ERROR'
+E         
+E         - ERROR
+E         + NO_EVIDENCE
+
+test_k12_luot4.py:165: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k12_luot4.py::test_MET3_moc_lech_so_hang - AssertionError: assert...
+1 failed, 365 passed in 15.06s

@@ -22,7 +22,11 @@ MOD = {'test_k01_hop_dong.py': 'm1.hop_dong',
        'test_k10_doi_chung.py': 'm1.doi_chung, m1_danh_gia.moc_gia, m1.chuoi',
        'test_k11_danh_gia.py': 'm1_danh_gia.luat_c, chon_khoi, boi_canh, m5, uv6, dau_vet, rr, pha2',
        'test_runner.py': 'm1.runner, m1_danh_gia.pha2', 'test_adapter.py': 'm1.adapter, m1.runner',
-       'test_tinh.py': 'kiểm tĩnh src/m1'}
+       'test_tinh.py': 'kiểm tĩnh src/m1',
+       'test_k12_luot4.py': 'm1.e4, m1.xep_hang, m1.chuoi, m1.runner, m1_danh_gia.rr, luat_c, uv6, pha2, chon_khoi (lượt 4)',
+       'test_k13_luot5.py': 'm1_danh_gia.chon_khoi, luat_c, rr, uv6, pha2, moc_gia; m1.runner, chuoi, e4, e5, e9, span, '
+                            'xep_hang, e3 (lượt 5)',
+       'test_k14_luot5b.py': 'm1_danh_gia.chon_khoi, pha2, rr, m5, the_gioi; m1.runner, chuoi, e5 (lượt 5b)'}
 
 
 def _ids(ten):

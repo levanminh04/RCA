@@ -1,0 +1,49 @@
+........................................................................ [ 27%]
+.....................................FF................................. [ 54%]
+........................................................................ [ 81%]
+..................................................                       [100%]
+================================== FAILURES ===================================
+_____________________ test_ba_cach_khop[hoan_toan-KHOP1] ______________________
+
+muc = 'KHOP1', khop = 'hoan_toan'
+ma = <function ma.<locals>._gan at 0x000001C2CA5699E0>
+
+    @pytest.mark.parametrize('muc', ['KHOP1', 'KHOP2'])
+    @pytest.mark.parametrize('khop', ['hoan_toan', 'nguong', 'nguong_cung_lop'])
+    def test_ba_cach_khop(muc, khop, ma):
+        from m1 import e3
+        m = tu_lap(DAP_AN_THANH_PHAN, muc)
+        ma(f'{muc}-{khop}')
+        d = m['dau_vao']
+        kq = e3.hoc_va_dem(d['N'], d['A'], {'khop': khop, 'sim_th': 0.4, 'do_sau': 4},
+                           {'kieu': 'severity', 'loi': ['ERROR'], 'khong_loi': ['INFO']})
+>       assert kq['mau_moi'].get(d['thuc_the'], 0) == m['dap_an'][khop]['mau_moi']
+E       AssertionError: assert 0 == 1
+E        +  where 0 = <built-in method get of dict object at 0x000001C2CA542480>('C', 0)
+E        +    where <built-in method get of dict object at 0x000001C2CA542480> = {}.get
+
+test_k07_e3.py:77: AssertionError
+_____________________ test_ba_cach_khop[hoan_toan-KHOP2] ______________________
+
+muc = 'KHOP2', khop = 'hoan_toan'
+ma = <function ma.<locals>._gan at 0x000001C2CA56ACA0>
+
+    @pytest.mark.parametrize('muc', ['KHOP1', 'KHOP2'])
+    @pytest.mark.parametrize('khop', ['hoan_toan', 'nguong', 'nguong_cung_lop'])
+    def test_ba_cach_khop(muc, khop, ma):
+        from m1 import e3
+        m = tu_lap(DAP_AN_THANH_PHAN, muc)
+        ma(f'{muc}-{khop}')
+        d = m['dau_vao']
+        kq = e3.hoc_va_dem(d['N'], d['A'], {'khop': khop, 'sim_th': 0.4, 'do_sau': 4},
+                           {'kieu': 'severity', 'loi': ['ERROR'], 'khong_loi': ['INFO']})
+>       assert kq['mau_moi'].get(d['thuc_the'], 0) == m['dap_an'][khop]['mau_moi']
+E       AssertionError: assert 0 == 1
+E        +  where 0 = <built-in method get of dict object at 0x000001C2C9481FC0>('O', 0)
+E        +    where <built-in method get of dict object at 0x000001C2C9481FC0> = {}.get
+
+test_k07_e3.py:77: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k07_e3.py::test_ba_cach_khop[hoan_toan-KHOP1] - AssertionError: a...
+FAILED test_k07_e3.py::test_ba_cach_khop[hoan_toan-KHOP2] - AssertionError: a...
+2 failed, 264 passed in 5.35s

@@ -1,0 +1,39 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+...................................................FF................... [ 84%]
+......................................................                   [100%]
+================================== FAILURES ===================================
+_____________________________ test_BS1_map_boi_so _____________________________
+
+ma = <function ma.<locals>._gan at 0x0000013A1E48D300>
+
+    def test_BS1_map_boi_so(ma):
+        from m1_danh_gia import rr, uv6
+        m = tu_lap(DAP_AN_THANH_PHAN, 'BS1')
+        ma('BS1')
+        d, da = m['dau_vao'], m['dap_an']
+        RR = {k: Fraction(v) for k, v in d['RR'].items()}
+        assert rr.mrr(RR, trong_so=d['bien_the']['du']) == Fraction(da['du_MRR'])
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+test_k12_luot4.py:177: Failed
+__________________________ test_BS1_luat_c_map_thua ___________________________
+
+ma = <function ma.<locals>._gan at 0x0000013A1E48F240>
+
+    def test_BS1_luat_c_map_thua(ma):
+        from m1_danh_gia import luat_c
+        ma('BS1-luat-c')
+        ds = [{'ma': 'a', 'dataset': 'RE2-TT', 'o': 'o1'}, {'ma': 'b', 'dataset': 'RE2-TT', 'o': 'o2'}]
+        tat = {'a': Fraction(1, 2), 'b': Fraction(1, 2)}
+        bat = {'a': Fraction(1), 'b': Fraction(0)}
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+test_k12_luot4.py:194: Failed
+=========================== short test summary info ===========================
+FAILED test_k12_luot4.py::test_BS1_map_boi_so - Failed: DID NOT RAISE <class ...
+FAILED test_k12_luot4.py::test_BS1_luat_c_map_thua - Failed: DID NOT RAISE <c...
+2 failed, 340 passed in 12.96s

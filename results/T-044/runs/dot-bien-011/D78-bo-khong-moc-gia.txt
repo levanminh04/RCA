@@ -1,0 +1,29 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+........................................................................ [ 84%]
+.....................F................................                   [100%]
+================================== FAILURES ===================================
+___________________________ test_CE1_khong_moc_gia ____________________________
+
+ma = <function ma.<locals>._gan at 0x0000029FABD8ECA0>
+
+    def test_CE1_khong_moc_gia(ma):
+        from m1_danh_gia import pha2
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CE1')
+        da = m['dap_an']
+        ma('CE1')
+        ca = lambda r: {'a': {'dataset': 'RE2-TT', 'o': 'c1', 'loai_loi': None, 'verdict': 'CAUSE_FOUND',
+                              'theo_the_gioi': {w: {'RR': r, 'hit1': r, 'hang': None, 'M5': False} for w in pha2.WORLDS}}}
+        kq = {'cau_hinh': {'T': {'ca': ca(Fraction(1, 2))}, 'B': {'ca': ca(Fraction(1))}}}
+        mg = tuple(tuple(x) for x in m['dau_vao']['moc_gia'])
+        r = pha2.ket_cuc_cap(kq, 'T', 'B', {'c1'}, 'X', 'khoi_K', moc_gia=mg)
+        assert all((r['theo_the_gioi'][w]['ket_cuc'], r['theo_the_gioi'][w]['buoc']) == (da['ket_cuc'], da['buoc'])
+                   for w in pha2.WORLDS)
+>       assert r['khong_moc_gia'] == {w: da['khong_moc_gia'] for w in pha2.WORLDS}
+E       KeyError: 'khong_moc_gia'
+
+test_k13_luot5.py:304: KeyError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_CE1_khong_moc_gia - KeyError: 'khong_moc_gia'
+1 failed, 341 passed in 14.47s

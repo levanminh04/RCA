@@ -26,6 +26,13 @@ def _khoi(items):
     return xep_hang._nhom(items)
 
 
+def _q(x):
+    """Số dùng để so khóa: số nguyên giữ nguyên, Fraction giữ nguyên, số thực đổi sang giá trị đúng (S20)."""
+    if isinstance(x, (int, Fraction)) and not isinstance(x, bool):
+        return x
+    return Fraction(float(x))
+
+
 def _theo_e(kenh):
     co = {}
     for k in kenh:
@@ -39,7 +46,7 @@ def _theo_e(kenh):
 def cd1(kenh, canh, quan_sat):
     co = _theo_e(kenh)
     V = set(co)
-    K = {e: xep_hang.khoa(co.get(e, [])) for e in V | set(quan_sat)}
+    K = {e: xep_hang.khoa_q(co.get(e, [])) for e in V | set(quan_sat)}
     goi_co = {a for a, b in canh if a != b and a in V and b in V}
     items = []
     for e in sorted(K):
@@ -58,8 +65,8 @@ def cd2(thuc_the):
     """thuc_the: [(tên, khởi phát hoặc None, K_raw)] với K_raw là bộ (max s, số kênh, Σs) hoặc phần đầu của nó."""
     items = []
     for ten, kp, K in thuc_the:
-        K = tuple(float(x) for x in K)
-        items.append((ten, (1.0, -float(kp)) + K if kp is not None else (0.0, 0.0) + K))
+        K = tuple(Fraction(_q(x)) for x in K)  # khóa ghi ra là số thực ở mọi phần, như trước (_thuc)
+        items.append((ten, (Fraction(1), -Fraction(_q(kp))) + K if kp is not None else (Fraction(0), Fraction(0)) + K))
     blocks = _khoi(items)
     return {'trang_thai': 'OK' if blocks else 'NO_EVIDENCE', 'blocks': blocks}
 
@@ -70,7 +77,7 @@ def cd2_tu_kenh(kenh, quan_sat):
     for e in sorted(set(co) | set(quan_sat)):
         ds = co.get(e, [])
         kp = [k.khoi_phat for k in ds if k.loai == 'phan_vi' and k.khoi_phat is not None]
-        out.append((e, min(kp) if kp else None, xep_hang.khoa(ds)))
+        out.append((e, min(kp) if kp else None, xep_hang.khoa_q(ds)))
     kq = cd2(out)
     kq['so_thuc_the_co_khoi_phat'] = sum(1 for _, kp, _ in out if kp is not None)
     kq['so_thuc_the_co_co'] = len(co)
@@ -103,14 +110,15 @@ def cd3(canh_goi, diem, dich):
             best = None
             for path in nx.all_simple_paths(G, c, d):
                 if all(x in bt for x in path):
-                    s = math.fsum(diem[x] for x in path)
+                    s = sum((_q(diem[x]) for x in path), Fraction(0))  # cộng chính xác (S20)
                     best = s if best is None or s > best else best
             if best is not None:
                 diem_ung[c] = max(diem_ung.get(c, best), best)
     if not diem_ung:
         return {'trang_thai': 'NO_EVIDENCE', 'diem_ung_vien': {}, 'blocks': [], 'ung_vien': ung}
     blocks = _khoi([(e, (s,)) for e, s in diem_ung.items()])
-    return {'trang_thai': 'OK', 'diem_ung_vien': diem_ung, 'blocks': blocks, 'ung_vien': ung}
+    return {'trang_thai': 'OK', 'diem_ung_vien': {e: float(s) for e, s in diem_ung.items()}, 'blocks': blocks,
+            'ung_vien': ung}
 
 
 # ---------------------------------------------------------------- C-g

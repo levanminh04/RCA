@@ -1,0 +1,35 @@
+........................................................................ [ 19%]
+........................................................................ [ 39%]
+........................................................................ [ 59%]
+........................................................................ [ 78%]
+................................F....................................... [ 98%]
+......                                                                   [100%]
+================================== FAILURES ===================================
+_________________________ test_CB1_luat_chon_khoi[5] __________________________
+
+i = 5, ma = <function ma.<locals>._gan at 0x00000254CFB60680>
+
+    @pytest.mark.parametrize('i', range(6))
+    def test_CB1_luat_chon_khoi(i, ma):
+        from m1_danh_gia import chon_khoi
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CB1')
+        da = m['dap_an']
+        c = m['dau_vao']['ca'][i]
+        ma(f'CB1-{i}')
+        tp, MRR, cap = _ca_CB(c)
+        kq = chon_khoi.chon(tp, c['it_ca'], c['do_thi'], MRR, cap)
+        assert kq['chon'] == da['chon'][i]
+        if i == 0:
+            assert kq['loai_luot_mot'] == da['loai_luot_mot_N49']
+            assert kq['cau_hinh_do_thi_tot_nhat'] == da['do_thi_tot_nhat_N49']
+        if i == 5:
+>           assert kq['ly_do_trinh_Minh'] == da['ly_do_trinh_Minh_N48']
+E           AssertionError: assert [] == ['trai_chieu_dataset']
+E             
+E             Right contains one more item: 'trai_chieu_dataset'
+E             Use -v to get more diff
+
+test_k13_luot5.py:396: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_CB1_luat_chon_khoi[5] - AssertionError: assert...
+1 failed, 365 passed in 14.78s

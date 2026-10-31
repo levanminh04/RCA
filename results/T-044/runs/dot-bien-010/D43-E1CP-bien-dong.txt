@@ -1,0 +1,30 @@
+........................................................................ [ 21%]
+.......................F................................................ [ 42%]
+........................................................................ [ 63%]
+........................................................................ [ 84%]
+......................................................                   [100%]
+================================== FAILURES ===================================
+_____________________________ test_CP2_quy_tac_M1 _____________________________
+
+ma = <function ma.<locals>._gan at 0x0000025A11D9D440>
+
+    def test_CP2_quy_tac_M1(ma):
+        """E1-CP theo quy tắc M1 Minh duyệt 30/10/2026: xét cả con đã chọn khi kiểm vùng chồng lấn; biên mở; mọi thứ tự."""
+        import itertools
+        from m1 import span
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CP2')
+        ma('CP2')
+        d, da = m['dau_vao'], m['dap_an']
+        cha, con = tuple(d['cha']), [tuple(c) for c in d['con']]
+        for p in itertools.permutations(con):
+>           assert span.doc_quyen_CP(cha, list(p), tau=d['tau']) == da['CP'], p
+E           AssertionError: ((0, 1500), (600, 1500), (0, 2100), (1000, 3000))
+E           assert 3000 == 2600
+E            +  where 3000 = <function doc_quyen_CP at 0x0000025A12569DA0>((0, 5000), [(0, 1500), (600, 1500), (0, 2100), (1000, 3000)], tau=1000)
+E            +    where <function doc_quyen_CP at 0x0000025A12569DA0> = <module 'm1.span' from 'C:\\Users\\84583\\AppData\\Local\\Temp\\tmp9_7uv8ll\\src\\m1\\span.py'>.doc_quyen_CP
+E            +    and   [(0, 1500), (600, 1500), (0, 2100), (1000, 3000)] = list(((0, 1500), (600, 1500), (0, 2100), (1000, 3000)))
+
+test_k06_e1_e2.py:109: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k06_e1_e2.py::test_CP2_quy_tac_M1 - AssertionError: ((0, 1500), (...
+1 failed, 341 passed in 13.46s

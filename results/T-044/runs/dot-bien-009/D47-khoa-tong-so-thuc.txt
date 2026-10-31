@@ -1,0 +1,30 @@
+........................................................................ [ 24%]
+........................................................................ [ 49%]
+........................................................................ [ 74%]
+............................................F........................... [ 99%]
+.                                                                        [100%]
+================================== FAILURES ===================================
+___________________________ test_SS3_tong_chinh_xac ___________________________
+
+ma = <function ma.<locals>._gan at 0x000001E2F206A520>
+
+    def test_SS3_tong_chinh_xac(ma):
+        from m1 import xep_hang
+        from m1.kieu import Kenh
+        m = tu_lap(DAP_AN_THANH_PHAN, 'SS3')
+        ma('SS3')
+        d, da = m['dau_vao'], m['dap_an']
+        ks = [Kenh(e, f'k{i}', 'len', 'khong_lan', float(Fraction(v)), s_q=Fraction(v), don_vi=f'x|{e}|{i}')
+              for e in ('A', 'B') for i, v in enumerate(d[e])]
+        for e in ('A', 'B'):
+            K = xep_hang.khoa_q([k for k in ks if k.thuc_the == e])
+>           assert K == (Fraction(da['K'][0]), da['K'][1], Fraction(da['K'][2]))
+E           assert (Fraction(9, ...799813685248)) == (Fraction(9, ...ction(19, 10))
+E             
+E             At index 2 diff: Fraction(4278419646001971, 2251799813685248) != Fraction(19, 10)
+E             Use -v to get more diff
+
+test_k12_luot4.py:69: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k12_luot4.py::test_SS3_tong_chinh_xac - assert (Fraction(9, ...79...
+1 failed, 288 passed in 5.84s

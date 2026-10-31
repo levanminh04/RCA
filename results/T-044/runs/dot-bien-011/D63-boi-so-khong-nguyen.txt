@@ -1,0 +1,33 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+....................................................................F... [ 84%]
+......................................................                   [100%]
+================================== FAILURES ===================================
+____________________________ test_LC1_so_chinh_xac ____________________________
+
+ma = <function ma.<locals>._gan at 0x000001DDA1389D00>
+
+    def test_LC1_so_chinh_xac(ma):
+        from m1_danh_gia import luat_c, rr, uv6
+        m = tu_lap(DAP_AN_THANH_PHAN, 'LC1')
+        da = m['dap_an']
+        ma('LC1')
+        ds, tat, bat = _ds_LC1()
+        E_X = {c['o'] for c in ds}
+        dd = {k: _q(v) for k, v in m['dau_vao']['delta_d'].items()}
+        kq = luat_c.ap_dung(ds, tat, bat, E_X, thanh_phan='X', delta_d_co_dinh=dd)
+        assert kq['dMRR'] == {k: _q(v) for k, v in da['dMRR'].items()}
+        assert (kq['P'], kq['M'], kq['ket_cuc'], kq['buoc']) == (da['P'], da['M'], da['ket_cuc'], da['buoc'])
+        with pytest.raises(TypeError):
+            luat_c.ap_dung(ds, tat, bat, E_X, thanh_phan='X', delta_d_co_dinh={'RE2-TT': 1 / 30, 'Nezha-OB': 1 / 22})
+        with pytest.raises(TypeError):
+            luat_c.ap_dung(ds, tat, dict(bat, r1=1.0), E_X, thanh_phan='X', delta_d_co_dinh=dd)
+        for w in ('2', 2.5, True, -1):
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+test_k13_luot5.py:104: Failed
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_LC1_so_chinh_xac - Failed: DID NOT RAISE <clas...
+1 failed, 341 passed in 14.10s

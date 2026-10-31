@@ -1,0 +1,30 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+........................................................................ [ 84%]
+...................................F..................                   [100%]
+================================== FAILURES ===================================
+______________________________ test_E4B_bien_E4 _______________________________
+
+ma = <function ma.<locals>._gan at 0x000001E55B9EF4C0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001E55B629460>
+
+    def test_E4B_bien_E4(ma, monkeypatch):
+        from m1 import e4, runner
+        m = tu_lap(DAP_AN_THANH_PHAN, 'E4B')
+        da = m['dap_an']
+        ma('E4B')
+        ts = dict(runner.TS_HOP_DONG)
+        N = [10 + 0.1 * i for i in range(20)]
+        A = [1 + 0.1 * i for i in range(20)]
+        co = e4.cham_phan_vi(N, A, 5, ts, huong_cham=('len', 'xuong'), cache=e4.CacheCong(), khoa_don_vi='u')
+        khong = e4.cham_phan_vi(N, A, 5, ts, huong_cham=('len', 'xuong'))
+        for k in ('F_raw_len', 'F_raw_xuong', 'e_len_q', 'e_xuong_q'):
+>           assert co[k] == khong[k], k
+E           AssertionError: F_raw_xuong
+E           assert 0 == 1
+
+test_k13_luot5.py:449: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_E4B_bien_E4 - AssertionError: F_raw_xuong
+1 failed, 341 passed in 15.06s

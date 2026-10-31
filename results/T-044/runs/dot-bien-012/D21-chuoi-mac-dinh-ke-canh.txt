@@ -1,0 +1,44 @@
+........................................................................ [ 19%]
+........................................................................ [ 39%]
+...........F............................................................ [ 59%]
+........................................................................ [ 78%]
+........................................................................ [ 98%]
+......                                                                   [100%]
+================================== FAILURES ===================================
+___________________ test_chuoi_thieu_tham_so_E5_dung_C_phay ___________________
+
+ma = <function ma.<locals>._gan at 0x00000143EEC58360>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000143EDB86DE0>
+
+    def test_chuoi_thieu_tham_so_E5_dung_C_phay(ma, monkeypatch):
+        """Chuỗi: thiếu tham_so_E5 thì gọi E5 với cách đọc C′ ('co_vong'); có thì truyền đúng giá trị (CĐ5)."""
+        from m1 import chuoi, e5
+        import sinh_trace_S
+        from conftest import FIXTURE
+        ma('E5-mac-dinh-chuoi')
+        spans, logs = sinh_trace_S.sinh('S3', t=1000, mau=FIXTURE['trace_mau_S'])
+        p1 = sinh_trace_S.params({'E1': 'U', 'E2': 'VC', 'E3b': True, 'E5': True})
+        p0 = {k: v for k, v in p1.items() if k != 'tham_so_E5'}
+        pA = dict(p1, tham_so_E5={'doc_nhom_vong': 'ke_canh'})
+        goc, nhan = e5.phan_loai, []
+    
+        def ghi(*a, **kw):
+            nhan.append(kw.get('doc_nhom_vong'))
+            return goc(*a, **kw)
+        monkeypatch.setattr(e5, 'phan_loai', ghi)
+        for p, mong in ((p0, 'co_vong'), (p1, 'co_vong'), (pA, 'ke_canh')):
+            nhan.clear()
+            rec = chuoi.chay(spans, [], logs, ['A', 'B', 'F', 'I', 'R', 'X'], {}, 1000, p)
+>           assert rec['error'] is None and nhan and set(nhan) == {mong}
+E           AssertionError: assert (None is None and ['ke_canh', 'ke_canh', 'ke_canh'] and {'ke_canh'} == {'co_vong'}
+E             
+E             Extra items in the left set:
+E             'ke_canh'
+E             Extra items in the right set:
+E             'co_vong'
+E             Use -v to get more diff)
+
+test_k08_e5_e6_e7_e9.py:263: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k08_e5_e6_e7_e9.py::test_chuoi_thieu_tham_so_E5_dung_C_phay - Ass...
+1 failed, 365 passed in 14.47s

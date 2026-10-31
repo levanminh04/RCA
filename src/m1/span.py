@@ -72,7 +72,7 @@ def doc_quyen_U(cha, con):
 
 def _happens_before(c, d, khac, tau):
     """CRISP §5.2 (thẻ đọc): c_end − τ < d_start và không con nào khác bắt đầu hay kết thúc trong vùng chồng lấn."""
-    if not (c[1] - tau < d[0]):
+    if c[0] > d[0] or not (c[1] - tau < d[0]):  # con bắt đầu trong khoảng của nút đang xét: bỏ qua (CRISP)
         return False
     if c[1] <= d[0]:
         return True
@@ -81,24 +81,27 @@ def _happens_before(c, d, khac, tau):
 
 
 def duong_gang(cha, con, tau):
-    """Đường găng CRISP trên các con đã cắt: LFC, rồi lùi dần theo happensBefore, mỗi bước chọn con kết thúc muộn nhất."""
+    """Đường găng CRISP trên các con đã cắt: LFC, rồi lùi dần theo happensBefore, mỗi bước chọn con kết thúc muộn nhất.
+    Quy tắc M1 (CĐ1; Minh duyệt 30/10/2026, dinh-chinh-cai-dat.md C5): τ = 1 ms; khi kiểm vùng chồng lấn xét mọi con
+    khác của cùng cha, kể cả con đã chọn vào đường găng; biên mở (đầu mút trùng mút vùng không tính); phá hòa PII-04."""
     cat, _ = cat_con(cha, con, float('inf'))
     if not cat:
         return []
-    con_lai = sorted(cat, key=lambda x: (x[1], x[0]))
-    cur = con_lai.pop()  # kết thúc muộn nhất; hòa thì bắt đầu muộn hơn
-    duong = [cur]
+    tat_ca = sorted(cat, key=lambda x: (x[1], x[0]))
+    con_lai = list(range(len(tat_ca)))  # chỉ số trong tat_ca; hai con trùng khoảng vẫn là hai con khác nhau
+    k = con_lai.pop()  # kết thúc muộn nhất; hòa thì bắt đầu muộn hơn
+    duong = [tat_ca[k]]
     while True:
         ung = []
-        for i, c in enumerate(con_lai):
-            khac = [e for j, e in enumerate(con_lai) if j != i]
-            if _happens_before(c, cur, khac, tau):
-                ung.append((c[1], c[0], i))
+        for j in con_lai:
+            khac = [e for i, e in enumerate(tat_ca) if i not in (j, k)]  # gồm cả con đã chọn
+            if _happens_before(tat_ca[j], tat_ca[k], khac, tau):
+                ung.append((tat_ca[j][1], tat_ca[j][0], j))
         if not ung:
             break
-        _, _, i = max(ung)
-        cur = con_lai.pop(i)
-        duong.append(cur)
+        k = max(ung)[2]
+        con_lai.remove(k)
+        duong.append(tat_ca[k])
     return duong
 
 

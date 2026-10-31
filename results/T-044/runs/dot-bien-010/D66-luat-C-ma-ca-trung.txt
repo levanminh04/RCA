@@ -1,0 +1,38 @@
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 63%]
+........................................................................ [ 84%]
+F.....................................................                   [100%]
+================================== FAILURES ===================================
+__________________________ test_LC2_E_X_va_ma_ca[2] ___________________________
+
+bien_the = 2, ma = <function ma.<locals>._gan at 0x000001AAECFF1EE0>
+
+    @pytest.mark.parametrize('bien_the', [None, 0, 1, 2])
+    def test_LC2_E_X_va_ma_ca(bien_the, ma):
+        from m1_danh_gia import luat_c
+        m = tu_lap(DAP_AN_THANH_PHAN, 'LC2')
+        da = m['dap_an']
+        ma(f'LC2-{bien_the}')
+        ds = [{'ma': f'c{i}', 'dataset': 'RE2-TT', 'o': i} for i in range(8)]
+        tat = {c['ma']: Fraction(1, 2) for c in ds}
+        bat = {c['ma']: Fraction(1) for c in ds}
+        E_X = set(m['dau_vao']['E_X'])
+        if bien_the is None:
+            kq = luat_c.ap_dung(ds, tat, bat, E_X, thanh_phan='X')
+            assert (kq['ket_cuc'], kq['buoc'], kq['P'], kq['M']) == (da['ket_cuc'], da['buoc'], da['P'], da['M'])
+            return
+        if bien_the == 0:
+            E_X = {str(o) for o in E_X}
+        elif bien_the == 1:
+            E_X = 'o1'
+        else:
+            ds = ds + [dict(ds[0])]
+        assert da['bien_the'] == 'ValueError'
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+test_k13_luot5.py:135: Failed
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_LC2_E_X_va_ma_ca[2] - Failed: DID NOT RAISE <c...
+1 failed, 341 passed in 16.35s
