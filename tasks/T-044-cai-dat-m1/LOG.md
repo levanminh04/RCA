@@ -2002,3 +2002,59 @@ Bạn là người kiểm lại độc lập của T-044 (repo D:\RCA-flashticke
 6. Prompt cho người làm đáp lượt này.
 Không báo chính tả, văn phong; không thêm phép kiểm "cho chắc"; không có lỗi đáng kể thì nói thẳng.
 ```
+
+### Kiểm lại gói C8 và ghi sổ (31/10/2026; Claude; local Windows; người làm)
+
+**Quyết định của Minh trong phiên** (chat 31/10/2026, nguyên văn): "triển khai 1 2 3 4 giúp tôi, 045 sẽ là claude làm". Bốn việc theo đề xuất trong chat:
+1. commit và push;
+2. kiểm lại gói C8, thu hẹp;
+3. nghiệm thu T-044 nếu không còn điểm CHẶN;
+4. ghi sổ (DECISIONS, dòng mặc định bước 8 của SPEC T-045).
+
+**1. Commit.** `2426032f` ("T-044: gói sửa lượt 3, 4, 5 và kiểm lại lượt 5 (C4–C8)"), đã push lên `claude/sweet-hawking-dy078d`. Gồm `src/m1`, `src/m1_danh_gia`, `results/T-044` (kể cả mọi lượt chạy), LOG và STATE. Không gồm phần chưa theo dõi của T-032, T-041, T-042.
+
+**2. Kiểm lại gói C8.** Hai subagent ngữ cảnh mới, chỉ đọc repo, script ngoài repo. Đây là kiểm trong phiên của người làm, không thay phản biện chính thức. Người làm đã chạy lại từng phản ví dụ.
+- **Code (subagent 1):**
+  - S34, S36–S42 đạt; S35 đạt một phần.
+  - **F1 (KHÔNG CHẶN, lỗi đã xảy ra, có từ S20):** `xep_hang` sắp theo khóa chính xác từ trái sang phải. Khi hai `max s` khác nhau chính xác nhưng ghi ra cùng số thực, phần sau của khóa quyết định thứ tự. Khóa ghi ra khi đó có thể **tăng**, và hai khóa ghi ra bằng nhau có thể không liền nhau.
+  - Phản ví dụ chạy lại (s = 1/2 + 10⁻¹⁸, 1/2, 1/2 − 10⁻¹⁸): khối `[2, 0.5, 1, 0.5]`, `[2, 0.5, 2, 0.6]`, `[2, 0.5, 1, 0.5]`; `gop_khoa_ghi_ra = 0`. `src/p3/danh_gia.khoi_tu_ban_ghi` ném "khối không giảm dần theo khóa" ở E6a, E6b và T4c.
+  - Hậu quả: pha 1 vẫn ghi, pha 2 (`cham`) dừng cho mọi cấu hình. Lỗi lộ ra, không sai im lặng, nhưng phải chạy lại pha 1. Rất hiếm trên dữ liệu thật.
+  - Câu "khóa ghi ra bằng nhau luôn liền nhau" trong docstring và trong C8 là sai.
+  - **F2 (KHÔNG CHẶN):** số lần gộp của T4c và C-d* không được ghi.
+  - Nguy cơ cho T-045: `chon(..., the_gioi)` không tự biết MRR có đúng thế giới không; chưa có hàm dựng G_N cho baseline từ `call_rows` (SPEC T-045 bước 6); `do` là số thực, không dùng để quyết.
+- **Test (subagent 2):**
+  - 366/366 qua. Mọi đáp án có số tính lại đều khớp.
+  - CW1, XH1, WD5, E2V (`don_vi`) dựa trên diễn giải của đính chính, cùng tác giả với code (rủi ro đọc sai chung, không phải lỗi số).
+  - 17 đột biến mới nhắm vào code C8: 15 sống sót. Đọc `kl7b_kq.jsonl` của subagent: K01–K08, K10–K15 qua 366/366; K17 chạy riêng.
+  - Quan trọng nhất:
+    - K01: `khong_moc_gia` cặp E3 bỏ UV-6. CE1-E3 có ΔMRR = −1 nên tự cho HẠI, không phân biệt được.
+    - K02: `khong_moc_gia` chép P.
+    - K07: `mrr_cau_hinh` luôn đọc P.
+    - K08: `lay_mau_o` không bao giờ lấy ô cuối.
+    - K10: `lay_mau_o` duyệt dataset theo `set`, mẫu đổi theo hash seed.
+  - Code hiện tại đúng ở cả 15 chỗ; đây là chỗ test yếu.
+
+**3. Nghiệm thu.** Không có điểm CHẶN, nên điều kiện của việc 3 thỏa về hình thức. Nhưng F1 làm pha 2 của T-045 có thể dừng, và bản vá đã thử cho kết quả tốt. Vì vậy người làm **chưa đánh dấu T-044 xong**: trình gói sửa nhỏ dưới đây và hỏi Minh chọn nghiệm thu trước hay sau gói này.
+
+**4. Ghi sổ.**
+- `docs/DECISIONS.md`: Q-213 (lượt 5), Q-214 (lượt 5b), Q-215 (lời Minh ở trên, gồm đổi người làm T-045).
+- SPEC T-045:
+  - người làm Claude, người phản biện Codex;
+  - thêm dòng mặc định "Bước 8: cặp phụ thuộc quan sát của thành phần không ít ca | Giữ cấu hình thắng; ghi 'phụ thuộc quan sát' | Không".
+- STATE: dòng T-045.
+- Các duyệt cũ của T-044 (phiên 1 và lượt 1–4, gồm dòng đề xuất ở mục kết thúc giai đoạn 2) vẫn chưa có dòng DECISIONS riêng.
+
+**Gói sửa người làm trình** (chờ Minh duyệt; chưa sửa repo):
+- **S43 (F1):** hàm `xep_hang.sap_khoa` sắp theo khóa ghi ra giảm dần, rồi khóa chính xác, rồi tên. Dùng ở hai chỗ sắp của `xep` và ở `doi_chung._khoi`. Sửa docstring và câu tương ứng của C8.
+  - Vá thử ngoài repo: 366/366 qua; 104 bản ghi tất định giống bản hiện tại ở mọi trường; phản ví dụ cho khối `[B]`, `[A, C]` (gộp 1), bộ đánh giá đọc được.
+  - Ca kiểm từ phản ví dụ. Đột biến: trả lại cách sắp cũ.
+- **S44 (F2):** ghi số lần gộp của T4c vào `diagnostics`.
+- **S45 (test):** ca kiểm cho 15 đột biến sống sót của subagent 2, và đưa các đột biến đó vào `dot_bien.py`. Gồm:
+  - CE1-E3 có ΔMRR = 0;
+  - CE1, MB1, DO1 có thế giới S_lo khác P;
+  - LM1 ghim mẫu theo seed, đủ mọi ô qua nhiều seed, hai PYTHONHASHSEED, ô trùng giữa dataset;
+  - RN1 kiểm `chuoi.CACHE` và mã mờ trùng;
+  - BT3 thêm `m_span = True`, α = 0, α = 1, ε = 1;
+  - XH1 thêm số gộp bằng 0 khi hòa chính xác và ca ba thực thể;
+  - CW1 kiểm trường `the_gioi`.
+- **Sau đó:** chạy lại gói kiểm (khoảng 40 phút), cập nhật C9, báo cáo, manifest, LOG, STATE; commit và push.

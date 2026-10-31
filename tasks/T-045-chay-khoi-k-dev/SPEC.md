@@ -1,7 +1,7 @@
 # T-045 — Chạy T1, T4, T4b và khối K của M1 trên 52 ca dev
 
 - **Trạng thái:** đã duyệt (29/10/2026, lời Minh trong chat: "duyệt toàn bộ các đề xuất, ngoài trừ 9 10 hoãn"), gồm bảng mặc định cho các điểm "Minh quyết" và phép độ bền. Bản này đã sửa theo lượt rà SPEC của Codex trong chat ngày 29/10/2026 (điểm 1: đặc tả phép độ bền). Triển khai sau khi T-044 được nghiệm thu.
-- **Người làm:** Codex, chạy local trên máy của Minh (đề xuất; Minh chọn). **Người phản biện:** Claude.
+- **Người làm:** Claude, chạy local trên máy của Minh. **Người phản biện:** Codex. Đổi ngày 31/10/2026 theo lời Minh: "045 sẽ là claude làm" (Q-215); trước đó Codex làm, Claude phản biện.
 - **Thuộc gói MRP:** P6 (M1). **Cổng:** chuẩn bị G3.
 - **Phụ thuộc:** T-044 đã nghiệm thu; code `src/m1`, `src/m1_danh_gia` lấy đúng commit được ghi khi nghiệm thu T-044.
 - **Nguồn chia task:** D1 của SPEC T-043 (Q-199); Minh chốt tách task (1) thành T-044 và T-045 trong chat ngày 29/10/2026.
@@ -104,6 +104,7 @@ Không ghi `results/T-043/`, `results/T-044/`, `src/p3`, DECISIONS, WHY, MRP, KE
 | Bước 7: không còn cấu hình nào (xung đột) | — | **Có** |
 | Bước 8: cấu hình thắng không có E1, E2 hay E5 (mâu thuẫn MRP P6 tầng 2) | — | **Có** |
 | Bước 8: kết cục đảo trạng thái mâu thuẫn với lựa chọn | Giữ cấu hình thắng; ghi xung đột kèm cặp liên quan | Không |
+| Bước 8: cặp phụ thuộc quan sát của thành phần không ít ca (`kiem_cau_hinh_thang` ghi `phu_thuoc_quan_sat`; T-044 C7, G5) | Giữ cấu hình thắng; ghi "phụ thuộc quan sát" | Không |
 | Bước 10: S_lo hoặc S_hi cho cấu hình thắng khác P | Giữ lựa chọn tại P; ghi "phụ thuộc quan sát" | Không |
 | Luật C bước 7 (TRÁI CHIỀU theo ô) ở một cặp trong khối | Không là căn cứ loại (luật khối chỉ loại theo HẠI); ghi cờ | Không |
 
