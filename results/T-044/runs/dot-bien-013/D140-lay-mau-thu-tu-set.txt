@@ -1,0 +1,39 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 77%]
+........................................................................ [ 96%]
+.F............                                                           [100%]
+================================== FAILURES ===================================
+______________________________ test_LM1_mo_rong _______________________________
+
+ma = <function ma.<locals>._gan at 0x000001C98D012F20>
+
+    def test_LM1_mo_rong(ma):
+        from m1_danh_gia import rr
+        m = tu_lap(DAP_AN_THANH_PHAN, 'LM1')
+        d, da = m['dau_vao'], m['dap_an']
+        ma('LM1-mo-rong')
+        ds = _ds_LM1(m)
+        assert all(rr.lay_mau_o(ds, np.random.default_rng(s)) == _mau_theo_SPEC(ds, s) for s in d['seed']) is \
+            da['khop_cach_lay_theo_SPEC']
+        duoc_lay = set()
+        for s in range(d['nhieu_seed']):
+            duoc_lay |= {c['o'] for c in ds if rr.lay_mau_o(ds, np.random.default_rng(s))[c['ma']] > 0}
+        assert (duoc_lay == {c['o'] for c in ds}) is da['moi_o_duoc_lay_qua_50_seed']
+        src = str(Path(__file__).resolve().parents[3] / 'src')
+        ra = set()
+        for hs in d['hash_seed']:
+            xao = list(ds)
+            random.Random(hs).shuffle(xao)
+            ra.add(subprocess.run([sys.executable, '-B', '-c', MA_LM1, src, json.dumps(xao)],
+                                  env=dict(os.environ, PYTHONHASHSEED=str(hs)), capture_output=True, text=True,
+                                  check=True).stdout)
+>       assert (len(ra) == 1) is da['khong_phu_thuoc_hash_seed']
+E       assert (2 == 1) is True
+E        +  where 2 = len({'{"n1": 1, "n2": 1, "r1": 3, "r2": 3, "r3": 0, "r4": 0}\n', '{"n1": 2, "n2": 0, "r1": 2, "r2": 2, "r3": 0, "r4": 1}\n'})
+
+test_k15_luot5c.py:189: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k15_luot5c.py::test_LM1_mo_rong - assert (2 == 1) is True
+1 failed, 373 passed in 15.82s

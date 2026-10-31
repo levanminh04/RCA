@@ -1,0 +1,34 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 77%]
+...........................................F............................ [ 96%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+___________________________ test_TD2_log_trung_moc ____________________________
+
+ma = <function ma.<locals>._gan at 0x0000021B0928D760>
+
+    def test_TD2_log_trung_moc(ma):
+        from m1 import e3
+        m = tu_lap(DAP_AN_THANH_PHAN, 'TD2')
+        ma('TD2-log')
+        dong = [{'moc': 5, 'thuc_the': 'A', 'noi_dung': 'payment failed for order 17', 'lop': None, 'severity_raw': None},
+                {'moc': 5, 'thuc_the': 'A', 'noi_dung': 'cache refreshed in 3 ms', 'lop': None, 'severity_raw': None}]
+        ts3 = {'khop': 'hoan_toan', 'sim_th': 0.4, 'do_sau': 4}
+        ql = {'kieu': 'tu_khoa', 'tu_khoa': ['FAIL']}
+        a = e3.hoc_va_dem(dong, dong, ts3, ql)
+        b = e3.hoc_va_dem(dong[::-1], dong[::-1], ts3, ql)
+>       assert (a == b) is m['dap_an']['log_giong_nhau']
+E       AssertionError: assert ({'cap': {('A'...the_N': ['A']} == {'cap': {('A'...the_N': ['A']}
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Differing items:
+E         {'mau': {1: 'payment failed for order <NUM>', 2: 'cache refreshed in <NUM> ms'}} != {'mau': {1: 'cache refreshed in <NUM> ms', 2: 'payment failed for order <NUM>'}}
+E         {'cap': {('A', 1): {'loi_xac_dinh_A': 1, 'loi_xac_dinh_N': 1, 'lop': 'loi', 'n_A': 1, ...}, ('A', 2): {'loi_xac_dinh_A': 0, 'loi_xac_dinh_N': 0, 'lop': 'thuong', 'n_A': 1, ...}}} != {'cap': {('A', 1): {'loi_xac_dinh_A': 0, 'loi_xac_dinh_N': 0, 'lop': 'thuong', 'n_A': 1, ...}, ('A', 2): {'loi_xac_dinh_A': 1, 'loi_xac_dinh_N': 1, 'lop': 'loi', 'n_A': 1, ...}}}
+E         Use -v to get more diff) is True
+
+test_k13_luot5.py:578: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_TD2_log_trung_moc - AssertionError: assert ({'...
+1 failed, 373 passed in 15.60s

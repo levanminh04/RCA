@@ -1,0 +1,54 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 77%]
+..............................................F......................... [ 96%]
+F.............                                                           [100%]
+================================== FAILURES ===================================
+____________________________ test_MB1_mrr_cau_hinh ____________________________
+
+ma = <function ma.<locals>._gan at 0x000001E1F5D8D8A0>
+
+    def test_MB1_mrr_cau_hinh(ma):
+        from m1_danh_gia import pha2
+        m = tu_lap(DAP_AN_THANH_PHAN, 'MB1')
+        d, da = m['dau_vao'], m['dap_an']
+        ma('MB1')
+        ca = {o: {'dataset': ds, 'theo_the_gioi': {w: {'RR': _q(d['RR_T'][o])} for w in pha2.WORLDS}} for o, ds in d['ca']}
+        kq = {'cau_hinh': {'T': {'ca': ca}}}
+        assert pha2.mrr_cau_hinh(kq)['T'] == {k: _q(v) for k, v in da['khong_boi_so'].items()}
+>       assert pha2.mrr_cau_hinh(kq, d['boi_so'], 'S_lo')['T'] == {k: _q(v) for k, v in da['boi_so'].items()}
+E       AssertionError: assert {'Nezha-OB': ...raction(1, 2)} == {'Nezha-OB': ...raction(5, 6)}
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Differing items:
+E         {'gop': Fraction(1, 2)} != {'gop': Fraction(5, 6)}
+E         Use -v to get more diff
+
+test_k14_luot5b.py:56: AssertionError
+______________________________ test_MB1_the_gioi ______________________________
+
+ma = <function ma.<locals>._gan at 0x000001E1F5DE5440>
+
+    def test_MB1_the_gioi(ma):
+        from m1_danh_gia import pha2
+        m = tu_lap(DAP_AN_THANH_PHAN, 'MB1')
+        d, da = m['dau_vao'], m['dap_an']
+        ma('MB1-the-gioi')
+        ca = {o: {'dataset': ds, 'theo_the_gioi': {w: {'RR': Fraction(d['RR_T_S_lo' if w == 'S_lo' else 'RR_T'][o])}
+                                                   for w in pha2.WORLDS}} for o, ds in d['ca']}
+        kq = {'cau_hinh': {'T': {'ca': ca}}}
+        assert pha2.mrr_cau_hinh(kq, d['boi_so'], 'S_lo')['T'] == {k: Fraction(v) for k, v in da['S_lo_boi_so'].items()}
+>       assert pha2.mrr_cau_hinh(kq, d['boi_so'], 'P')['T'] == {k: Fraction(v) for k, v in da['boi_so'].items()}
+E       AssertionError: assert {'Nezha-OB': ...raction(1, 2)} == {'Nezha-OB': ...raction(5, 6)}
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Differing items:
+E         {'gop': Fraction(1, 2)} != {'gop': Fraction(5, 6)}
+E         Use -v to get more diff
+
+test_k15_luot5c.py:138: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k14_luot5b.py::test_MB1_mrr_cau_hinh - AssertionError: assert {'N...
+FAILED test_k15_luot5c.py::test_MB1_the_gioi - AssertionError: assert {'Nezha...
+2 failed, 372 passed in 18.53s

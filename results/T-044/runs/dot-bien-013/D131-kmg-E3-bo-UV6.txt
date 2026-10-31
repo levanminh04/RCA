@@ -1,0 +1,38 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 77%]
+......................................................................F. [ 96%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+_______________________________ test_CE1_E3_dM0 _______________________________
+
+ma = <function ma.<locals>._gan at 0x00000187AC3C2C00>
+
+    def test_CE1_E3_dM0(ma):
+        from m1_danh_gia import pha2
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CE1')
+        d, da = m['dau_vao']['ca_E3_dM0'], m['dap_an']['ca_E3_dM0']
+        ma('CE1-E3-dM0')
+        a, b = d['cap']
+        tat = {'a': {'dataset': 'Nezha-OB', 'o': 'c1', 'loai_loi': 'exception', 'RR': Fraction(1)},
+               'b': {'dataset': 'Nezha-OB', 'o': 'c2', 'loai_loi': 'cpu', 'RR': Fraction(0)}}
+        bat = {'a': dict(tat['a'], RR=Fraction(0)), 'b': dict(tat['b'], RR=Fraction(1))}
+        r = pha2.ket_cuc_cap(_kq(tat, bat, a, b), a, b, set(d['E_X']), 'E3', 'khoi_K',
+                             moc_gia=tuple(tuple(x) for x in d['moc_gia']))
+        for w in pha2.WORLDS:
+            t = r['theo_the_gioi'][w]
+            assert (t['ket_cuc'], t['ly_do_hai_rieng']) == (da['ket_cuc'], da['ly_do'])
+>       assert r['khong_moc_gia'] == {w: da['khong_moc_gia'] for w in pha2.WORLDS}
+E       AssertionError: assert {'P': 'KHONG_...'KHONG_DU_CA'} == {'P': 'HAI', ...'S_lo': 'HAI'}
+E         
+E         Differing items:
+E         {'S_lo': 'KHONG_DU_CA'} != {'S_lo': 'HAI'}
+E         {'P': 'KHONG_DU_CA'} != {'P': 'HAI'}
+E         {'S_hi': 'KHONG_DU_CA'} != {'S_hi': 'HAI'}
+E         Use -v to get more diff
+
+test_k15_luot5c.py:111: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k15_luot5c.py::test_CE1_E3_dM0 - AssertionError: assert {'P': 'KH...
+1 failed, 373 passed in 18.39s

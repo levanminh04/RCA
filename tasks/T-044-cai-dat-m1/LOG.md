@@ -2058,3 +2058,8 @@ Không báo chính tả, văn phong; không thêm phép kiểm "cho chắc"; kh�
   - XH1 thêm số gộp bằng 0 khi hòa chính xác và ca ba thực thể;
   - CW1 kiểm trường `the_gioi`.
 - **Sau đó:** chạy lại gói kiểm (khoảng 40 phút), cập nhật C9, báo cáo, manifest, LOG, STATE; commit và push.
+
+**Quyết định của Minh** (chat 31/10/2026, nguyên văn): "Sửa rồi nghiệm thu". Người làm đọc là duyệt S43–S45 như đã trình, rồi nghiệm thu T-044 theo Q-215 nếu gói kiểm sau sửa xanh và không còn điểm CHẶN.
+
+- 31/10/2026, lượt 5c: bắt đầu sửa S43–S45.
+- 31/10/2026, lượt 5c: sửa S43 (`xep_hang.sap_khoa`, dùng ở `xep` và `doi_chung._khoi`), S44 (số gộp của T4c trong `diagnostics` và `extra.T4c`); test mới `tests/test_k15_luot5c.py`; mở rộng CW1, BT3, DO1 (test_k14); đáp án FX1 mới, mở rộng CE1, MB1, LM1, RN1, BT3, XH1, DO1 (126 mục); đột biến D129–D147. pytest 374/374 (chưa ghi lượt chạy).

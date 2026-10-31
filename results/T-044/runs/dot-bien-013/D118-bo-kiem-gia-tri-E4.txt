@@ -1,0 +1,33 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 77%]
+.................................................F...................... [ 96%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+_________________________ test_BT3_gia_tri_tham_so_E4 _________________________
+
+ma = <function ma.<locals>._gan at 0x000001E67496A340>
+
+    def test_BT3_gia_tri_tham_so_E4(ma):
+        from m1 import chuoi
+        from test_k12_luot4 import _ca_metric
+        m = tu_lap(DAP_AN_THANH_PHAN, 'BT3')
+        ma('BT3')
+        sua = [{}, {'alpha': True}, {'alpha': 1.5}, {'m_span': 20.0}, {'count_min': 0}, {'q_lo': 0.5, 'q_hi': 0.5},
+               {'epsilon': 0.0}, {'m_span': True}, {'count_min': True}, {'alpha': 0}, {'alpha': 1}, {'epsilon': 1}]
+        ra = []
+        for s in sua:
+            rows, p = _ca_metric([0.0] * 20, [10.0] * 20)
+            p['tham_so_E4'] = dict(p['tham_so_E4'], **s)
+            ra.append(chuoi.chay([], rows, [], ['S'], {}, 1000, p)['status'])
+>       assert ra == m['dap_an']['status']
+E       AssertionError: assert ['OK', 'ERROR...R', 'OK', ...] == ['OK', 'ERROR... 'ERROR', ...]
+E         
+E         At index 2 diff: 'OK' != 'ERROR'
+E         Use -v to get more diff
+
+test_k14_luot5b.py:138: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k14_luot5b.py::test_BT3_gia_tri_tham_so_E4 - AssertionError: asse...
+1 failed, 373 passed in 16.65s

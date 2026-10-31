@@ -1,0 +1,31 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 77%]
+.............................................F.......................... [ 96%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+_________________________ test_CW1_chon_theo_the_gioi _________________________
+
+ma = <function ma.<locals>._gan at 0x000002990E221D00>
+
+    def test_CW1_chon_theo_the_gioi(ma):
+        from m1_danh_gia import chon_khoi
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CW1')
+        d, da = m['dau_vao'], m['dap_an']
+        ma('CW1')
+        cap = _cap_CW1(d)
+        MRR = {k: _q(v) for k, v in d['MRR'].items()}
+        kq = {w: chon_khoi.chon(d['thanh_phan'], d['it_ca'], d['do_thi'], MRR, cap, the_gioi=w) for w in ('P', 'S_lo', 'S_hi')}
+>       assert {w: x['chon'] for w, x in kq.items()} == da['chon']
+E       AssertionError: assert {'P': 'E1', '... 'S_lo': 'E1'} == {'P': 'E1', '... 'S_lo': 'R0'}
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Differing items:
+E         {'S_lo': 'E1'} != {'S_lo': 'R0'}
+E         Use -v to get more diff
+
+test_k14_luot5b.py:38: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k14_luot5b.py::test_CW1_chon_theo_the_gioi - AssertionError: asse...
+1 failed, 373 passed in 23.68s

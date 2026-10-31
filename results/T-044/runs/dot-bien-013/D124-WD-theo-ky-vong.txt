@@ -1,0 +1,25 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 77%]
+......................................................F................. [ 96%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+____________________________ test_WD5_theo_phan_bo ____________________________
+
+ma = <function ma.<locals>._gan at 0x0000019D1723AB60>
+
+    def test_WD5_theo_phan_bo(ma):
+        from m1_danh_gia import the_gioi
+        m = tu_lap(DAP_AN_THANH_PHAN, 'WD5')
+        d, da = m['dau_vao'], m['dap_an']
+        ma('WD5')
+        bw = {w: [{'key': [float(10 - i)], 'groups': [g]} for i, g in enumerate(d[w])] for w in ('P', 'S_lo', 'S_hi')}
+        kq = the_gioi.world_dependent(bw, d['root'])
+>       assert kq['WORLD_DEPENDENT'] is da['WORLD_DEPENDENT']
+E       assert False is True
+
+test_k14_luot5b.py:218: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k14_luot5b.py::test_WD5_theo_phan_bo - assert False is True
+1 failed, 373 passed in 18.79s

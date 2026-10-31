@@ -1,0 +1,36 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 77%]
+........F............................................................... [ 96%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+____________________________ test_MND1_ma_noi_dung ____________________________
+
+ma = <function ma.<locals>._gan at 0x000001D77A18C180>
+
+    def test_MND1_ma_noi_dung(ma):
+        from m1 import runner
+        from conftest import T043, _doc
+        m = tu_lap(DAP_AN_THANH_PHAN, 'MND1')
+        da = m['dap_an']
+        ma('MND1')
+        mt = runner.ap_dinh_chinh(_doc(T043 / 'ma-tran-thu.json'))
+        ch = runner.sinh_cau_hinh(mt, dict(m['dau_vao']['thang']), dict(runner.R0, E1='U'))
+        theo_ma = {}
+        for ds in ch.values():
+            for c in ds:
+                if 'ma_noi_dung' in c:
+                    theo_ma.setdefault(c['ma_noi_dung'], []).append(c['config_id'])
+        ma_cua = {c['config_id']: c['ma_noi_dung'] for ds in ch.values() for c in ds if 'ma_noi_dung' in c}
+>       assert sorted(theo_ma[ma_cua['T13-C-a0']]) == da['cung_ma_T13-C-a0']
+E       AssertionError: assert ['K-R0', 'KB-...-e0.05-a0.01'] == ['T13-C-a0']
+E         
+E         At index 0 diff: 'K-R0' != 'T13-C-a0'
+E         Left contains 5 more items, first extra item: 'KB-dao-E1'
+E         Use -v to get more diff
+
+test_k13_luot5.py:178: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_MND1_ma_noi_dung - AssertionError: assert ['K-...
+1 failed, 373 passed in 16.16s

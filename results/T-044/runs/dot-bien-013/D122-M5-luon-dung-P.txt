@@ -1,0 +1,36 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 77%]
+....................................................F................... [ 96%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+__________________________ test_M5W_M5_theo_the_gioi __________________________
+
+ma = <function ma.<locals>._gan at 0x000001F453EF22A0>
+tmp_path = WindowsPath('C:/Users/84583/AppData/Local/Temp/pytest-of-84583/pytest-1004/test_M5W_M5_theo_the_gioi0')
+
+    def test_M5W_M5_theo_the_gioi(ma, tmp_path):
+        from m1_danh_gia import pha2
+        from test_k13_luot5 import _pha1
+        m = tu_lap(DAP_AN_THANH_PHAN, 'M5W')
+        d = m['dau_vao']
+        ma('M5W')
+        kh = {w: [{'key': [float(len(g) - i)], 'groups': [g]} for i, g in enumerate(bl)] for w, bl in d['blocks'].items()}
+        rec = {'config_id': 'C', 'opaque_id': 'x', 'status': 'OK', 'verdict': 'CAUSE_FOUND', 'blocks': kh['P'],
+               'worlds': {w: {'blocks': kh[w]} for w in ('S_lo', 'S_hi')}, 'extra': {'G_N': d['G_N']}}
+        h = _pha1(tmp_path, [rec])
+        kq = pha2.cham(tmp_path, h, {'x': {'root': d['root'], 'dataset': 'RE2-TT', 'o': 'o1'}})
+        tw = kq['cau_hinh']['C']['ca']['x']['theo_the_gioi']
+>       assert {w: tw[w]['M5'] for w in pha2.WORLDS} == m['dap_an']['M5']
+E       AssertionError: assert {'P': False, ...'S_lo': False} == {'P': False, ... 'S_lo': True}
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Differing items:
+E         {'S_lo': False} != {'S_lo': True}
+E         Use -v to get more diff
+
+test_k14_luot5b.py:180: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k14_luot5b.py::test_M5W_M5_theo_the_gioi - AssertionError: assert...
+1 failed, 373 passed in 16.61s

@@ -1,0 +1,29 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 77%]
+.....................................................F.................. [ 96%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+_________________________ test_E2V_canh_diem_cao_nhat _________________________
+
+ma = <function ma.<locals>._gan at 0x000001E03081E3E0>
+
+    def test_E2V_canh_diem_cao_nhat(ma):
+        from m1 import chuoi
+        import sinh_trace_S
+        m = tu_lap(DAP_AN_THANH_PHAN, 'E2V')
+        da = m['dap_an']
+        ma('E2V')
+        r = chuoi.chay(_ca_E2V(), [], [], ['A', 'B', 'V'], {}, 1000, sinh_trace_S.params(m['dau_vao']['bat_tat']))
+        k = [x for x in r['extra']['kenh_co'] if x['ten'] == da['kenh']]
+>       assert [(x['s'], x['don_vi']) for x in k] == [(da['s'], da['don_vi'])]
+E       AssertionError: assert [(1.0, 'canh|B|V')] == [(1.0, 'canh|A|V')]
+E         
+E         At index 0 diff: (1.0, 'canh|B|V') != (1.0, 'canh|A|V')
+E         Use -v to get more diff
+
+test_k14_luot5b.py:208: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k14_luot5b.py::test_E2V_canh_diem_cao_nhat - AssertionError: asse...
+1 failed, 373 passed in 15.81s

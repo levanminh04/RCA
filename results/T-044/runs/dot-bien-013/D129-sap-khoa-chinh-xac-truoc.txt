@@ -1,0 +1,31 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 77%]
+...................................................................F.... [ 96%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+__________________________ test_FX1_khoa_ghi_ra_giam __________________________
+
+ma = <function ma.<locals>._gan at 0x0000029EFF78A840>
+
+    def test_FX1_khoa_ghi_ra_giam(ma):
+        from m1 import xep_hang
+        from m1_danh_gia import rr
+        m = tu_lap(DAP_AN_THANH_PHAN, 'FX1')
+        da = m['dap_an']
+        ma('FX1')
+        e = Fraction(1, 10 ** 18)
+        x = xep_hang.xep([_k('A', 'a', Fraction(1, 2) + e), _k('B', 'b1', Fraction(1, 2)), _k('B', 'b2', Fraction(1, 10)),
+                          _k('C', 'c', Fraction(1, 2) - e)])
+>       assert [b['groups'][0] for b in x['blocks']] == da['E6a_blocks'] and x['gop_khoa_ghi_ra'] == da['E6a_gop']
+E       AssertionError: assert ([['A'], ['B'], ['C']] == [['B'], ['A', 'C']]
+E         
+E         At index 0 diff: ['A'] != ['B']
+E         Left contains one more item: ['C']
+E         Use -v to get more diff)
+
+test_k15_luot5c.py:39: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k15_luot5c.py::test_FX1_khoa_ghi_ra_giam - AssertionError: assert...
+1 failed, 373 passed in 19.17s

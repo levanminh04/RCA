@@ -1,0 +1,78 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 77%]
+..................................F................................F.F.. [ 96%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+___________________________ test_XH1_khoa_xep_hang ____________________________
+
+ma = <function ma.<locals>._gan at 0x00000158363AD1C0>
+
+    def test_XH1_khoa_xep_hang(ma):
+        from m1 import xep_hang
+        from m1.kieu import Kenh
+        m = tu_lap(DAP_AN_THANH_PHAN, 'XH1')
+        da = m['dap_an']
+        ma('XH1')
+        k = lambda e, ten, s, s_q=None: Kenh(e, ten, 'len', 'khong_lan', s, s_q=s_q)
+        x = xep_hang.xep([k('A', 'u1', 0.5), k('A', 'u2', 0.5), k('B', 'u1', 0.5)], thuc_the_co_kenh_OK={'A', 'B'},
+                         che_do='E6b', canh=())
+        assert [b['groups'][0] for b in x['blocks']] == da['E6b']
+        x = xep_hang.xep([k('A', 'u', 0.1, Fraction(1, 10)), k('B', 'u', 0.1, Fraction(1, 10) + Fraction(1, 10 ** 30))],
+                         thuc_the_co_kenh_OK={'A', 'B'})
+>       assert [b['groups'][0] for b in x['blocks']] == da['chinh_xac'] and x['gop_khoa_ghi_ra'] == da['gop_khoa_ghi_ra']
+E       AssertionError: assert ([['B'], ['A']] == [['A', 'B']]
+E         
+E         At index 0 diff: ['B'] != ['A', 'B']
+E         Left contains one more item: ['A']
+E         Use -v to get more diff)
+
+test_k13_luot5.py:422: AssertionError
+__________________________ test_FX1_khoa_ghi_ra_giam __________________________
+
+ma = <function ma.<locals>._gan at 0x0000015836431800>
+
+    def test_FX1_khoa_ghi_ra_giam(ma):
+        from m1 import xep_hang
+        from m1_danh_gia import rr
+        m = tu_lap(DAP_AN_THANH_PHAN, 'FX1')
+        da = m['dap_an']
+        ma('FX1')
+        e = Fraction(1, 10 ** 18)
+        x = xep_hang.xep([_k('A', 'a', Fraction(1, 2) + e), _k('B', 'b1', Fraction(1, 2)), _k('B', 'b2', Fraction(1, 10)),
+                          _k('C', 'c', Fraction(1, 2) - e)])
+>       assert [b['groups'][0] for b in x['blocks']] == da['E6a_blocks'] and x['gop_khoa_ghi_ra'] == da['E6a_gop']
+E       AssertionError: assert ([['B'], ['A'], ['C']] == [['B'], ['A', 'C']]
+E         
+E         At index 1 diff: ['A'] != ['A', 'C']
+E         Left contains one more item: ['C']
+E         Use -v to get more diff)
+
+test_k15_luot5c.py:39: AssertionError
+_______________________________ test_XH1_so_gop _______________________________
+
+ma = <function ma.<locals>._gan at 0x00000158364328E0>
+
+    def test_XH1_so_gop(ma):
+        from m1 import xep_hang
+        m = tu_lap(DAP_AN_THANH_PHAN, 'XH1')
+        da = m['dap_an']
+        ma('XH1-gop')
+        x = xep_hang.xep([_k(e, e, Fraction(1, 2)) for e in 'ABC'], thuc_the_co_kenh_OK=set('ABC'), che_do='E6b', canh=())
+        assert x['gop_khoa_ghi_ra'] == da['pi_3_gop']
+        x = xep_hang.xep([_k('A', 'a', Fraction(1, 2) + Fraction(1, 10 ** 18)), _k('B', 'b', Fraction(1, 2)),
+                          _k('C', 'c', Fraction(1, 2))])
+>       assert ([b['groups'][0] for b in x['blocks']], x['gop_khoa_ghi_ra']) == \
+            (da['ba_thuc_the']['blocks'], da['ba_thuc_the']['gop_khoa_ghi_ra'])
+E       AssertionError: assert ([['A'], ['B', 'C']], 0) == ([['A', 'B', 'C']], 1)
+E         
+E         At index 0 diff: [['A'], ['B', 'C']] != [['A', 'B', 'C']]
+E         Use -v to get more diff
+
+test_k15_luot5c.py:79: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_XH1_khoa_xep_hang - AssertionError: assert ([[...
+FAILED test_k15_luot5c.py::test_FX1_khoa_ghi_ra_giam - AssertionError: assert...
+FAILED test_k15_luot5c.py::test_XH1_so_gop - AssertionError: assert ([['A'], ...
+3 failed, 371 passed in 17.17s

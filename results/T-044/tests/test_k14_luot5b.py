@@ -34,9 +34,9 @@ def test_CW1_chon_theo_the_gioi(ma):
     ma('CW1')
     cap = _cap_CW1(d)
     MRR = {k: _q(v) for k, v in d['MRR'].items()}
-    ra = {w: chon_khoi.chon(d['thanh_phan'], d['it_ca'], d['do_thi'], MRR, cap, the_gioi=w)['chon']
-          for w in ('P', 'S_lo', 'S_hi')}
-    assert ra == da['chon']
+    kq = {w: chon_khoi.chon(d['thanh_phan'], d['it_ca'], d['do_thi'], MRR, cap, the_gioi=w) for w in ('P', 'S_lo', 'S_hi')}
+    assert {w: x['chon'] for w, x in kq.items()} == da['chon']
+    assert all(x['the_gioi'] == w for w, x in kq.items())  # C9, S45
     chuoi_cap = {k: v['ket_cuc_dung'] for k, v in cap.items()}
     for kw in ({'cap': chuoi_cap, 'the_gioi': 'S_lo'}, {'cap': cap, 'the_gioi': 'X'}):
         with pytest.raises(ValueError):
@@ -129,7 +129,7 @@ def test_BT3_gia_tri_tham_so_E4(ma):
     m = tu_lap(DAP_AN_THANH_PHAN, 'BT3')
     ma('BT3')
     sua = [{}, {'alpha': True}, {'alpha': 1.5}, {'m_span': 20.0}, {'count_min': 0}, {'q_lo': 0.5, 'q_hi': 0.5},
-           {'epsilon': 0.0}]
+           {'epsilon': 0.0}, {'m_span': True}, {'count_min': True}, {'alpha': 0}, {'alpha': 1}, {'epsilon': 1}]
     ra = []
     for s in sua:
         rows, p = _ca_metric([0.0] * 20, [10.0] * 20)
@@ -310,11 +310,16 @@ def test_DO1_du_do_do(ma, tmp_path):
     d, da = m['dau_vao'], m['dap_an']
     ma('DO1')
     b = [{'key': [1.0], 'groups': d['blocks']}]
+    b_lo = [{'key': [float(2 - i)], 'groups': [g]} for i, g in enumerate(d['S_lo'])]
     rec = {'config_id': 'C', 'opaque_id': 'x', 'status': 'OK', 'verdict': 'CAUSE_FOUND', 'blocks': b,
-           'worlds': {w: {'blocks': b} for w in ('S_lo', 'S_hi')}, 'extra': {'G_N': []}}
+           'worlds': {'S_lo': {'blocks': b_lo}, 'S_hi': {'blocks': b}}, 'extra': {'G_N': []}}
     h = _pha1(tmp_path, [rec])
-    do = pha2.cham(tmp_path, h, {'x': {'root': d['root'], 'dataset': 'RE2-TT', 'o': 'o1'}})[
-        'cau_hinh']['C']['ca']['x']['theo_the_gioi']['P']['do']
+    tw = pha2.cham(tmp_path, h, {'x': {'root': d['root'], 'dataset': 'RE2-TT', 'o': 'o1'}})[
+        'cau_hinh']['C']['ca']['x']['theo_the_gioi']
+    do = tw['P']['do']
     for k, v in da.items():
-        assert abs(do[k] - v) <= 1e-12, k
+        if k != 'S_lo':
+            assert abs(do[k] - v) <= 1e-12, k
+    for k, v in da['S_lo'].items():  # độ đo theo khối của đúng thế giới (C9, S45)
+        assert abs(tw['S_lo']['do'][k] - v) <= 1e-12, k
     json.dumps(pha2.ma_hoa_json(do), allow_nan=False)

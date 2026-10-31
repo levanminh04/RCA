@@ -1,0 +1,41 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+...................................................................F.... [ 77%]
+........................................................................ [ 96%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+__________________________ test_CK10_du_cau_hinh[5] ___________________________
+
+i = 5, ma = <function ma.<locals>._gan at 0x0000021024DC3920>
+
+    @pytest.mark.parametrize('i', range(6))
+    def test_CK10_du_cau_hinh(i, ma):
+        from m1_danh_gia import chon_khoi
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CK10')
+        d, da = m['dau_vao'], m['dap_an']
+        ma(f'CK10-{i}')
+        MRR = {k: _q(v) for k, v in d['MRR'].items()}
+        cap, it_ca, do_thi = dict(d['cap']), list(d['it_ca']), list(d['do_thi'])
+        if i == 0:
+            kq = chon_khoi.chon(d['thanh_phan'], it_ca, do_thi, MRR, cap)
+            assert {k: kq[k] for k in ('co_dinh', 'loai_luot_hai', 'chon')} == da['du']
+            return
+        if i == 1:
+            MRR.pop('E1+E3')
+            cap = {k: v for k, v in cap.items() if not k.endswith('|E1+E3')}
+        elif i == 2:
+            it_ca = 'E3'
+        elif i == 3:
+            it_ca = ['E3b']
+        elif i == 4:
+            do_thi = ['E2']
+        if i == 5:
+            cap.pop('E3|E1+E3')
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+test_k13_luot5.py:70: Failed
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_CK10_du_cau_hinh[5] - Failed: DID NOT RAISE <c...
+1 failed, 373 passed in 16.11s

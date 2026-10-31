@@ -1,0 +1,63 @@
+........................................................................ [ 19%]
+................................................................F.F..... [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 77%]
+........................................................................ [ 96%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+__________________________ test_E6b_van_ban[VB-D10a] __________________________
+
+muc = 'VB-D10a', ma = <function ma.<locals>._gan at 0x000002CAC1ED42C0>
+
+    @pytest.mark.parametrize('muc', ['VB-D10a', 'VB-D10b', 'VB-349'])
+    def test_E6b_van_ban(muc, ma):
+        """Đáp án trong văn bản: Đ10 (dinh-chinh-phien9.md dòng 74–76), đặc tả v1 dòng 349."""
+        from m1 import xep_hang
+        from m1.kieu import Kenh
+        m = tu_lap(DAP_AN_VAN_BAN, muc)
+        ma(muc)
+        d = m['dau_vao']
+        kenh = [Kenh(e, 'c', 'len', 'khong_lan', s) for e, s in d['diem'].items()]
+        for truong_hop, canh in d['canh'].items():
+            xh = xep_hang.xep(kenh, thuc_the_co_kenh_OK=set(d['diem']), che_do='E6b', canh=[tuple(c) for c in canh])
+            da = m['dap_an'][truong_hop]
+            if 'pi' in da:
+                for e, v in da['pi'].items():
+>                   assert abs(xh['pi'][e] - v) <= da.get('sai_so', 5e-5), (truong_hop, e)
+E                   AssertionError: ('them_A_B', 'A')
+E                   assert 0.041930769231686205 <= 5e-05
+E                    +  where 0.041930769231686205 = abs((0.3692307692316862 - 0.3273))
+E                    +  and   5e-05 = <built-in method get of dict object at 0x000002CAFCEC7A40>('sai_so', 5e-05)
+E                    +    where <built-in method get of dict object at 0x000002CAFCEC7A40> = {'hang_root': 1, 'pi': {'A': 0.3273, 'B': 0.2727, 'R': 0.4}, 'sai_so': 5e-05}.get
+
+test_k08_e5_e6_e7_e9.py:157: AssertionError
+__________________________ test_E6b_van_ban[VB-349] ___________________________
+
+muc = 'VB-349', ma = <function ma.<locals>._gan at 0x000002CAC1ED6520>
+
+    @pytest.mark.parametrize('muc', ['VB-D10a', 'VB-D10b', 'VB-349'])
+    def test_E6b_van_ban(muc, ma):
+        """Đáp án trong văn bản: Đ10 (dinh-chinh-phien9.md dòng 74–76), đặc tả v1 dòng 349."""
+        from m1 import xep_hang
+        from m1.kieu import Kenh
+        m = tu_lap(DAP_AN_VAN_BAN, muc)
+        ma(muc)
+        d = m['dau_vao']
+        kenh = [Kenh(e, 'c', 'len', 'khong_lan', s) for e, s in d['diem'].items()]
+        for truong_hop, canh in d['canh'].items():
+            xh = xep_hang.xep(kenh, thuc_the_co_kenh_OK=set(d['diem']), che_do='E6b', canh=[tuple(c) for c in canh])
+            da = m['dap_an'][truong_hop]
+            if 'pi' in da:
+                for e, v in da['pi'].items():
+>                   assert abs(xh['pi'][e] - v) <= da.get('sai_so', 5e-5), (truong_hop, e)
+E                   AssertionError: ('A_R', 'R')
+E                   assert 0.043526315789682135 <= 0.0005
+E                    +  where 0.043526315789682135 = abs((0.7894736842103178 - 0.833))
+E                    +  and   0.0005 = <built-in method get of dict object at 0x000002CAFCEC7480>('sai_so', 5e-05)
+E                    +    where <built-in method get of dict object at 0x000002CAFCEC7480> = {'hang_root': 1, 'pi': {'R': 0.833}, 'sai_so': 0.0005}.get
+
+test_k08_e5_e6_e7_e9.py:157: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k08_e5_e6_e7_e9.py::test_E6b_van_ban[VB-D10a] - AssertionError: (...
+FAILED test_k08_e5_e6_e7_e9.py::test_E6b_van_ban[VB-349] - AssertionError: ('...
+2 failed, 372 passed in 16.03s

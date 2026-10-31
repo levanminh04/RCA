@@ -1,0 +1,26 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 77%]
+...........F............................................................ [ 96%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+_________________________ test_E4T_nguong_khong_tran __________________________
+
+ma = <function ma.<locals>._gan at 0x000001CB9C2B8220>
+
+    def test_E4T_nguong_khong_tran(ma):
+        from m1 import chuoi, e4, runner
+        from test_k12_luot4 import _ca_metric
+        m = tu_lap(DAP_AN_THANH_PHAN, 'E4T')
+        ma('E4T')
+        ng = e4.nguong([1.75e308] * 20, dict(runner.TS_HOP_DONG))
+>       assert ng['h'] == sys.float_info.max and (abs(ng['l']) < float('inf')) is m['dap_an']['l_huu_han']
+E       assert (inf == 1.7976931348623157e+308)
+E        +  where 1.7976931348623157e+308 = sys.float_info(max=1.7976931348623157e+308, max_exp=1024, max_10_exp=308, min=2.2250738585072014e-308, min_exp=-1021, min_10_exp=-307, dig=15, mant_dig=53, epsilon=2.220446049250313e-16, radix=2, rounds=1).max
+E        +    where sys.float_info(max=1.7976931348623157e+308, max_exp=1024, max_10_exp=308, min=2.2250738585072014e-308, min_exp=-1021, min_10_exp=-307, dig=15, mant_dig=53, epsilon=2.220446049250313e-16, radix=2, rounds=1) = sys.float_info
+
+test_k13_luot5.py:231: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_E4T_nguong_khong_tran - assert (inf == 1.79769...
+1 failed, 373 passed in 15.34s

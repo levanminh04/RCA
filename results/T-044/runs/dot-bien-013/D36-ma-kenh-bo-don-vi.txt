@@ -1,0 +1,324 @@
+....................F..........F....F................................... [ 19%]
+........................................................................ [ 38%]
+............FFFF.F...................................................... [ 57%]
+........................................................................ [ 77%]
+.......................................FF............................... [ 96%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+_________________________ test_29_the_gioi_doi_thu_tu _________________________
+
+ma = <function ma.<locals>._gan at 0x0000022B15115D00>
+
+    def test_29_the_gioi_doi_thu_tu(ma):
+        """Fixture 29: phương pháp xuất RANK_CHANGED; bộ đánh giá tính WORLD_DEPENDENT và nguyên nhân."""
+        from m1 import e4, xep_hang
+        from m1.kieu import Kenh
+        from m1_danh_gia import the_gioi
+        f = fx(29)
+        ma('29')
+        d, da = f['dau_vao'], f['dap_an']
+        thu_tu, khoi, kenh_w = {}, {}, {}
+        for w in ('P', 'S_lo', 'S_hi'):
+            T_N, T_A = d['U1']['T'][w]
+            kq = e4.cham_dem(d['U1']['n_N'], d['U1']['n_A'], T_N, T_A, TS)
+            assert gan_bang(kq['e_len'], da['e_U1'][w]), w
+            kenh = [Kenh('A', 'U1', 'len', 'lan_nguoc', kq['e_len'], F_raw=kq['F_raw_len'], loai='dem'),
+                    Kenh('B', 'U2', 'len', 'lan_nguoc', d['U2']['e'])]
+            xh = xep_hang.xep(kenh, thuc_the_co_kenh_OK={'A', 'B'})
+            thu_tu[w] = xh['thu_tu']
+            khoi[w] = xh['blocks']
+            kenh_w[w] = kenh
+        assert thu_tu == da['thu_tu']
+        assert xep_hang.rank_changed(thu_tu) == da['RANK_CHANGED']
+        wd = the_gioi.world_dependent(khoi, d['root'])
+        assert wd['WORLD_DEPENDENT'] == da['WORLD_DEPENDENT']
+        # da['nguyen_nhan'] = "chỉ điểm đổi (cổng qua ở cả ba thế giới); cặp (U1 của A, U2 của B)", viết thành cấu trúc.
+        # Sửa S13 (lượt 3): cặp ghi mã kênh (gồm đơn vị); U1 của A là kênh đổi điểm, U2 của B không đổi.
+        nn = the_gioi.nguyen_nhan(kenh_w, d['root'], khoi)
+>       assert nn['loai'] == 'chi_diem_doi' and nn['cap'] == (('A', ['A||U1|len']), ('B', ['B||U2|len']))
+E       AssertionError: assert ('chi_diem_doi' == 'chi_diem_doi'
+E         
+E           chi_diem_doi and (('A', ['A|U1...['B|U2|len'])) == (('A', ['A||U...'B||U2|len']))
+E         
+E         At index 0 diff: ('A', ['A|U1|len']) != ('A', ['A||U1|len'])
+E         Use -v to get more diff)
+
+test_k02_quan_sat.py:118: AssertionError
+___________________________ test_WD1_cap_dao_thu_tu ___________________________
+
+ma = <function ma.<locals>._gan at 0x0000022B7FE4E7A0>
+
+    def test_WD1_cap_dao_thu_tu(ma):
+        from m1.kieu import Kenh
+        from m1_danh_gia import the_gioi
+        m = tu_lap(DAP_AN_THANH_PHAN, 'WD1')
+        ma('WD1')
+        d, da = m['dau_vao'], m['dap_an']
+        b = lambda xs: [{'key': [len(xs) - i], 'groups': [[e]]} for i, e in enumerate(xs)]
+        k = {w: [Kenh(e, 'k' + e, 'len', 'lan_nguoc', 1.0) for e in d['P']] for w in ('P', 'S_lo', 'S_hi')}
+        nn = the_gioi.nguyen_nhan(k, d['root'], {w: b(d[w]) for w in ('P', 'S_lo', 'S_hi')})
+>       assert nn['loai'] == da['loai'] and [list(x) for x in nn['cap']] == da['cap']
+E       AssertionError: assert ('chi_diem_doi' == 'chi_diem_doi'
+E         
+E           chi_diem_doi and [['R', ['R|kR...['B|kB|len']]] == [['R', ['R||k...'B||kB|len']]]
+E         
+E         At index 0 diff: ['R', ['R|kR|len']] != ['R', ['R||kR|len']]
+E         Use -v to get more diff)
+
+test_k02_quan_sat.py:290: AssertionError
+_______________________ test_WD4_kenh_doi_va_phan_khoa ________________________
+
+ma = <function ma.<locals>._gan at 0x0000022B7FE4E8E0>
+
+    def test_WD4_kenh_doi_va_phan_khoa(ma):
+        """S13: cặp giải thích chỉ ra kênh đổi và phần khóa phân định, không chỉ kênh mạnh nhất (WD4)."""
+        from fractions import Fraction
+        from m1 import xep_hang
+        from m1.kieu import Kenh
+        from m1_danh_gia import the_gioi
+        m = tu_lap(DAP_AN_THANH_PHAN, 'WD4')
+        ma('WD4')
+        d, da = m['dau_vao'], m['dap_an']
+        k, b = {}, {}
+        for w in ('P', 'S_lo', 'S_hi'):
+            ks = [Kenh(e, x['ten'], 'len', x['lop'], x['s'], don_vi=x['don_vi']) for e in sorted(d['kenh'])
+                  for x in d['kenh'][e] if w in x.get('chi_o', ('P', 'S_lo', 'S_hi'))]
+            xh = xep_hang.xep(ks, thuc_the_co_kenh_OK=set(d['kenh']))
+            b[w] = xh['blocks']
+            k[w] = [{'ma': x.ma, 'thuc_the': x.thuc_the, 'ten': x.ten, 'huong': x.huong, 'don_vi': x.don_vi, 'lop': x.lop,
+                     's': x.s, 'F_I': 1} for x in ks]
+        wd = the_gioi.world_dependent(b, d['root'])
+        assert wd['WORLD_DEPENDENT'] is True
+        assert wd['hang_ky_vong'] == {w: Fraction(v) for w, v in da['hang_ky_vong'].items()}
+        nn = the_gioi.nguyen_nhan(k, d['root'], b)
+>       assert nn['loai'] == da['loai'] and [list(x) for x in nn['cap']] == da['cap']
+E       AssertionError: assert ('cong_doi' == 'cong_doi'
+E         
+E           cong_doi and [['R', ['R|p9...og_loi|len']]] == [['R', ['R|op...og_loi|len']]]
+E         
+E         At index 0 diff: ['R', ['R|p99|len']] != ['R', ['R|op|R|p99|p99|len']]
+E         Use -v to get more diff)
+
+test_k02_quan_sat.py:425: AssertionError
+______________________ test_KM1_ma_kenh_theo_don_vi[goc] ______________________
+
+bien_the = 'goc', ma = <function ma.<locals>._gan at 0x0000022B7FE7F740>
+
+    @pytest.mark.parametrize('bien_the', ['goc', 'dao', 'request'])
+    def test_KM1_ma_kenh_theo_don_vi(bien_the, ma):
+        """Thao tác `cpu` của S và metric `S_cpu` không dùng chung F_I; kết quả không phụ thuộc thứ tự hay tên thao tác."""
+        from m1 import e5, e7, xep_hang
+        m = tu_lap(DAP_AN_THANH_PHAN, 'KM1')
+        ma(f'KM1-{bien_the}')
+        d, da = m['dau_vao'], m['dap_an']
+        ds = [dict(x) for x in d['kenh']]
+        F_I_dap_an = dict(da['F_I'])
+        if bien_the == 'dao':
+            ds[0], ds[1] = ds[1], ds[0]
+        if bien_the == 'request':
+            ds[0] = dict(ds[0], ten='request', don_vi='op|S|request')
+            F_I_dap_an = {k.replace('op|S|cpu|cpu', 'op|S|request|request'): v for k, v in F_I_dap_an.items()}
+        kenh = _kenh_km(ds)
+        canh = [tuple(c) for c in d['canh']]
+>       p = e5.phan_loai(kenh, canh, bat=d['E5'])
+
+test_k08_e5_e6_e7_e9.py:289: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+kenh = [Kenh(thuc_the='S', ten='cpu', huong='len', lop='lan_nguoc', s=0.9, F_raw=1, trang_thai='OK', loai='phan_vi', hop_le=T...F_raw=1, trang_thai='OK', loai='phan_vi', hop_le=True, khoi_phat=None, nhom='metric', don_vi='metric|B_mem', s_q=None)]
+canh = [('S', 'B')], bat = True, doc_nhom_vong = 'co_vong'
+pham_vi_nhom_vong = 'F_raw', e9 = None
+
+    def phan_loai(kenh, canh, bat=True, doc_nhom_vong='co_vong', pham_vi_nhom_vong='F_raw', e9=None):
+        """kenh: [Kenh]; canh: [(bên gọi, bên được gọi)]. Trả F_I, inherited_by, ke_thua, nhom_vong.
+        e9: {'bat': bool, 'o_s', 'tau', 'canh_E2_bat_thuong': set cạnh} hoặc None."""
+        if doc_nhom_vong not in ('co_vong', 'ke_canh'):
+            raise ValueError(doc_nhom_vong)
+        ma_all = [k.ma for k in kenh]
+        if len(set(ma_all)) != len(ma_all):  # F_I theo mã: hai kênh trùng mã sẽ ghi đè nhau (S12)
+>           raise ValueError(f'mã kênh trùng: {sorted({m for m in ma_all if ma_all.count(m) > 1})}')
+E           ValueError: mã kênh trùng: ['S|cpu|len']
+
+..\..\..\src\m1\e5.py:91: ValueError
+______________________ test_KM1_ma_kenh_theo_don_vi[dao] ______________________
+
+bien_the = 'dao', ma = <function ma.<locals>._gan at 0x0000022B153C8360>
+
+    @pytest.mark.parametrize('bien_the', ['goc', 'dao', 'request'])
+    def test_KM1_ma_kenh_theo_don_vi(bien_the, ma):
+        """Thao tác `cpu` của S và metric `S_cpu` không dùng chung F_I; kết quả không phụ thuộc thứ tự hay tên thao tác."""
+        from m1 import e5, e7, xep_hang
+        m = tu_lap(DAP_AN_THANH_PHAN, 'KM1')
+        ma(f'KM1-{bien_the}')
+        d, da = m['dau_vao'], m['dap_an']
+        ds = [dict(x) for x in d['kenh']]
+        F_I_dap_an = dict(da['F_I'])
+        if bien_the == 'dao':
+            ds[0], ds[1] = ds[1], ds[0]
+        if bien_the == 'request':
+            ds[0] = dict(ds[0], ten='request', don_vi='op|S|request')
+            F_I_dap_an = {k.replace('op|S|cpu|cpu', 'op|S|request|request'): v for k, v in F_I_dap_an.items()}
+        kenh = _kenh_km(ds)
+        canh = [tuple(c) for c in d['canh']]
+>       p = e5.phan_loai(kenh, canh, bat=d['E5'])
+
+test_k08_e5_e6_e7_e9.py:289: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+kenh = [Kenh(thuc_the='S', ten='cpu', huong='len', lop='khong_lan', s=0.5, F_raw=1, trang_thai='OK', loai='phan_vi', hop_le=T...F_raw=1, trang_thai='OK', loai='phan_vi', hop_le=True, khoi_phat=None, nhom='metric', don_vi='metric|B_mem', s_q=None)]
+canh = [('S', 'B')], bat = True, doc_nhom_vong = 'co_vong'
+pham_vi_nhom_vong = 'F_raw', e9 = None
+
+    def phan_loai(kenh, canh, bat=True, doc_nhom_vong='co_vong', pham_vi_nhom_vong='F_raw', e9=None):
+        """kenh: [Kenh]; canh: [(bên gọi, bên được gọi)]. Trả F_I, inherited_by, ke_thua, nhom_vong.
+        e9: {'bat': bool, 'o_s', 'tau', 'canh_E2_bat_thuong': set cạnh} hoặc None."""
+        if doc_nhom_vong not in ('co_vong', 'ke_canh'):
+            raise ValueError(doc_nhom_vong)
+        ma_all = [k.ma for k in kenh]
+        if len(set(ma_all)) != len(ma_all):  # F_I theo mã: hai kênh trùng mã sẽ ghi đè nhau (S12)
+>           raise ValueError(f'mã kênh trùng: {sorted({m for m in ma_all if ma_all.count(m) > 1})}')
+E           ValueError: mã kênh trùng: ['S|cpu|len']
+
+..\..\..\src\m1\e5.py:91: ValueError
+____________________ test_KM1_ma_kenh_theo_don_vi[request] ____________________
+
+bien_the = 'request', ma = <function ma.<locals>._gan at 0x0000022B153C87C0>
+
+    @pytest.mark.parametrize('bien_the', ['goc', 'dao', 'request'])
+    def test_KM1_ma_kenh_theo_don_vi(bien_the, ma):
+        """Thao tác `cpu` của S và metric `S_cpu` không dùng chung F_I; kết quả không phụ thuộc thứ tự hay tên thao tác."""
+        from m1 import e5, e7, xep_hang
+        m = tu_lap(DAP_AN_THANH_PHAN, 'KM1')
+        ma(f'KM1-{bien_the}')
+        d, da = m['dau_vao'], m['dap_an']
+        ds = [dict(x) for x in d['kenh']]
+        F_I_dap_an = dict(da['F_I'])
+        if bien_the == 'dao':
+            ds[0], ds[1] = ds[1], ds[0]
+        if bien_the == 'request':
+            ds[0] = dict(ds[0], ten='request', don_vi='op|S|request')
+            F_I_dap_an = {k.replace('op|S|cpu|cpu', 'op|S|request|request'): v for k, v in F_I_dap_an.items()}
+        kenh = _kenh_km(ds)
+        canh = [tuple(c) for c in d['canh']]
+        p = e5.phan_loai(kenh, canh, bat=d['E5'])
+>       assert p['F_I'] == F_I_dap_an
+E       AssertionError: assert {'B|mem|len':...quest|len': 0} == {'B|metric|B_...quest|len': 0}
+E         
+E         Left contains 3 more items:
+E         {'B|mem|len': 1, 'S|cpu|len': 1, 'S|request|len': 0}
+E         Right contains 3 more items:
+E         {'B|metric|B_mem|mem|len': 1,
+E          'S|metric|S_cpu|cpu|len': 1,
+E          'S|op|S|request|request|len': 0}
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:290: AssertionError
+_________________________ test_KM2_alias_va_trung_ma __________________________
+
+ma = <function ma.<locals>._gan at 0x0000022B153C8FE0>
+
+    def test_KM2_alias_va_trung_ma(ma):
+        from m1 import e5, xep_hang
+        m = tu_lap(DAP_AN_THANH_PHAN, 'KM2')
+        ma('KM2')
+        d, da = m['dau_vao'], m['dap_an']
+        kenh = _kenh_km(d['kenh_alias'])
+>       p = e5.phan_loai(kenh, [], bat=True)
+
+test_k08_e5_e6_e7_e9.py:304: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+kenh = [Kenh(thuc_the='S', ten='cpu', huong='len', lop='khong_lan', s=0.4, F_raw=1, trang_thai='OK', loai='phan_vi', hop_le=T..._raw=1, trang_thai='OK', loai='phan_vi', hop_le=True, khoi_phat=None, nhom='metric', don_vi='metric|S2_cpu', s_q=None)]
+canh = [], bat = True, doc_nhom_vong = 'co_vong', pham_vi_nhom_vong = 'F_raw'
+e9 = None
+
+    def phan_loai(kenh, canh, bat=True, doc_nhom_vong='co_vong', pham_vi_nhom_vong='F_raw', e9=None):
+        """kenh: [Kenh]; canh: [(bên gọi, bên được gọi)]. Trả F_I, inherited_by, ke_thua, nhom_vong.
+        e9: {'bat': bool, 'o_s', 'tau', 'canh_E2_bat_thuong': set cạnh} hoặc None."""
+        if doc_nhom_vong not in ('co_vong', 'ke_canh'):
+            raise ValueError(doc_nhom_vong)
+        ma_all = [k.ma for k in kenh]
+        if len(set(ma_all)) != len(ma_all):  # F_I theo mã: hai kênh trùng mã sẽ ghi đè nhau (S12)
+>           raise ValueError(f'mã kênh trùng: {sorted({m for m in ma_all if ma_all.count(m) > 1})}')
+E           ValueError: mã kênh trùng: ['S|cpu|len']
+
+..\..\..\src\m1\e5.py:91: ValueError
+_______________________ test_KM3_ma_kenh_qua_chuoi[cpu] _______________________
+
+ten_op = 'cpu', ma = <function ma.<locals>._gan at 0x0000022B153C9300>
+
+    @pytest.mark.parametrize('ten_op', ['cpu', 'request'])
+    def test_KM3_ma_kenh_qua_chuoi(ten_op, ma):
+        from m1 import chuoi
+        import sinh_trace_S
+        m = tu_lap(DAP_AN_THANH_PHAN, 'KM3')
+        ma(f'KM3-{ten_op}')
+        da = m['dap_an']
+        metrics = [{'time': 950 + i, 'S_cpu': 0.0} for i in range(5)] + [{'time': 1050 + i, 'S_cpu': 10.0} for i in range(5)]
+        p = sinh_trace_S.params({'E5': True})
+        p['nguon_metric'] = {'S_cpu': 'metric:S'}
+        p['thoi_gian_nguon'] = {'metric:S': 'metrics.time'}
+        p['coverage']['metric:S'] = {'khoang': [[700 * 10 ** 9, 1300 * 10 ** 9]], 'r_ns': 10 ** 9}
+        r = chuoi.chay(_ca_km3(ten_op), metrics, [], ['S', 'B'], {}, 1000, p)
+>       assert r['status'] == 'OK'
+E       AssertionError: assert 'ERROR' == 'OK'
+E         
+E         - OK
+E         + ERROR
+
+test_k08_e5_e6_e7_e9.py:349: AssertionError
+______________________________ test_E5X_lan_xuoi ______________________________
+
+ma = <function ma.<locals>._gan at 0x0000022B1535C9A0>
+
+    def test_E5X_lan_xuoi(ma):
+        from m1 import e5
+        from m1.kieu import Kenh
+        m = tu_lap(DAP_AN_THANH_PHAN, 'E5X')
+        ma('E5X')
+        kenh = [Kenh(e, ten, h, lop, 0.5) for e, ten, h, lop in m['dau_vao']['kenh']]
+        p = e5.phan_loai(kenh, [tuple(c) for c in m['dau_vao']['canh']], bat=True)
+>       assert p['F_I'] == m['dap_an']['F_I']
+E       AssertionError: assert {'A|a|xuong':...B|b|xuong': 0} == {'A||a|xuong'...||b|xuong': 0}
+E         
+E         Left contains 2 more items:
+E         {'A|a|xuong': 1, 'B|b|xuong': 0}
+E         Right contains 2 more items:
+E         {'A||a|xuong': 1, 'B||b|xuong': 0}
+E         Use -v to get more diff
+
+test_k13_luot5.py:507: AssertionError
+_____________________________ test_E9X_phu_quyet ______________________________
+
+ma = <function ma.<locals>._gan at 0x0000022B1535E160>
+
+    def test_E9X_phu_quyet(ma):
+        from m1 import e9
+        m = tu_lap(DAP_AN_THANH_PHAN, 'E9X')
+        d = m['dau_vao']
+        ma('E9X')
+        assert [e9.phu_quyet(e, B, o_s=d['o_s'], tau=d['tau'])[0] for e, B in d['ca']] == m['dap_an']['phu_quyet']
+        # qua E5: mọi bên giải thích đều được xét, không chỉ bên đầu
+        from m1 import e5
+        from m1.kieu import Kenh
+        kenh = [Kenh('e', 'k', 'len', 'lan_nguoc', 0.5, khoi_phat=0), Kenh('b1', 'k', 'len', 'khong_lan', 0.5, khoi_phat=30),
+                Kenh('b2', 'k', 'len', 'khong_lan', 0.5, khoi_phat=5)]
+        p = e5.phan_loai(kenh, [('e', 'b1'), ('e', 'b2')], bat=True,
+                         e9={'bat': True, 'o_s': d['o_s'], 'tau': d['tau'], 'canh_E2_bat_thuong': set()})
+        da = m['dap_an']['qua_E5']
+>       assert p['F_I']['e||k|len'] == da['F_I_e']
+E       KeyError: 'e||k|len'
+
+test_k13_luot5.py:524: KeyError
+=========================== short test summary info ===========================
+FAILED test_k02_quan_sat.py::test_29_the_gioi_doi_thu_tu - AssertionError: as...
+FAILED test_k02_quan_sat.py::test_WD1_cap_dao_thu_tu - AssertionError: assert...
+FAILED test_k02_quan_sat.py::test_WD4_kenh_doi_va_phan_khoa - AssertionError:...
+FAILED test_k08_e5_e6_e7_e9.py::test_KM1_ma_kenh_theo_don_vi[goc] - ValueErro...
+FAILED test_k08_e5_e6_e7_e9.py::test_KM1_ma_kenh_theo_don_vi[dao] - ValueErro...
+FAILED test_k08_e5_e6_e7_e9.py::test_KM1_ma_kenh_theo_don_vi[request] - Asser...
+FAILED test_k08_e5_e6_e7_e9.py::test_KM2_alias_va_trung_ma - ValueError: mã k...
+FAILED test_k08_e5_e6_e7_e9.py::test_KM3_ma_kenh_qua_chuoi[cpu] - AssertionEr...
+FAILED test_k13_luot5.py::test_E5X_lan_xuoi - AssertionError: assert {'A|a|xu...
+FAILED test_k13_luot5.py::test_E9X_phu_quyet - KeyError: 'e||k|len'
+10 failed, 364 passed in 16.41s

@@ -1,0 +1,136 @@
+........................................................................ [ 19%]
+.....................................................................F.. [ 38%]
+............FFF......................................................... [ 57%]
+........................................................................ [ 77%]
+........................................................................ [ 96%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+___________________________ test_E7_dung_vung[E7-2] ___________________________
+
+muc = 'E7-2', ma = <function ma.<locals>._gan at 0x000001C89A0B0720>
+
+    @pytest.mark.parametrize('muc', ['E7-1', 'E7-2', 'E7-3'])
+    def test_E7_dung_vung(muc, ma):
+        from m1 import e5, e7
+        m = tu_lap(DAP_AN_THANH_PHAN, muc)
+        ma(muc)
+        d = m['dau_vao']
+        kenh = kenh_tu_fixture(d['kenh'])
+        canh = [tuple(c) for c in d['canh']]
+        p = e5.phan_loai(kenh, canh, bat=d['E5'])
+        for cach in ('1', '2'):
+            R = e7.vung(d['T'], kenh, canh, p['inherited_by'], cach=int(cach))
+>           assert {r: sorted(v) for r, v in R.items()} == m['dap_an'][cach], cach
+E           AssertionError: 1
+E           assert {'R': ['A', 'F', 'R', 'X']} == {'R': ['A', 'R', 'X']}
+E             
+E             Differing items:
+E             {'R': ['A', 'F', 'R', 'X']} != {'R': ['A', 'R', 'X']}
+E             Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:185: AssertionError
+______________________ test_KM1_ma_kenh_theo_don_vi[goc] ______________________
+
+bien_the = 'goc', ma = <function ma.<locals>._gan at 0x000001C89A0B2FC0>
+
+    @pytest.mark.parametrize('bien_the', ['goc', 'dao', 'request'])
+    def test_KM1_ma_kenh_theo_don_vi(bien_the, ma):
+        """Thao tác `cpu` của S và metric `S_cpu` không dùng chung F_I; kết quả không phụ thuộc thứ tự hay tên thao tác."""
+        from m1 import e5, e7, xep_hang
+        m = tu_lap(DAP_AN_THANH_PHAN, 'KM1')
+        ma(f'KM1-{bien_the}')
+        d, da = m['dau_vao'], m['dap_an']
+        ds = [dict(x) for x in d['kenh']]
+        F_I_dap_an = dict(da['F_I'])
+        if bien_the == 'dao':
+            ds[0], ds[1] = ds[1], ds[0]
+        if bien_the == 'request':
+            ds[0] = dict(ds[0], ten='request', don_vi='op|S|request')
+            F_I_dap_an = {k.replace('op|S|cpu|cpu', 'op|S|request|request'): v for k, v in F_I_dap_an.items()}
+        kenh = _kenh_km(ds)
+        canh = [tuple(c) for c in d['canh']]
+        p = e5.phan_loai(kenh, canh, bat=d['E5'])
+        assert p['F_I'] == F_I_dap_an
+        xh = xep_hang.xep(kenh, F_I=p['F_I'], thuc_the_co_kenh_OK={k.thuc_the for k in kenh})
+        assert [[b['key'], b['groups'][0]] for b in xh['blocks']] == da['blocks']
+        R = e7.vung(xh['T'], kenh, canh, p['inherited_by'], cach=1)
+>       assert {r: sorted(v) for r, v in R.items()} == da['vung_1']
+E       AssertionError: assert {'B': ['B', 'S']} == {'B': ['B']}
+E         
+E         Differing items:
+E         {'B': ['B', 'S']} != {'B': ['B']}
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:294: AssertionError
+______________________ test_KM1_ma_kenh_theo_don_vi[dao] ______________________
+
+bien_the = 'dao', ma = <function ma.<locals>._gan at 0x000001C89A0B3240>
+
+    @pytest.mark.parametrize('bien_the', ['goc', 'dao', 'request'])
+    def test_KM1_ma_kenh_theo_don_vi(bien_the, ma):
+        """Thao tác `cpu` của S và metric `S_cpu` không dùng chung F_I; kết quả không phụ thuộc thứ tự hay tên thao tác."""
+        from m1 import e5, e7, xep_hang
+        m = tu_lap(DAP_AN_THANH_PHAN, 'KM1')
+        ma(f'KM1-{bien_the}')
+        d, da = m['dau_vao'], m['dap_an']
+        ds = [dict(x) for x in d['kenh']]
+        F_I_dap_an = dict(da['F_I'])
+        if bien_the == 'dao':
+            ds[0], ds[1] = ds[1], ds[0]
+        if bien_the == 'request':
+            ds[0] = dict(ds[0], ten='request', don_vi='op|S|request')
+            F_I_dap_an = {k.replace('op|S|cpu|cpu', 'op|S|request|request'): v for k, v in F_I_dap_an.items()}
+        kenh = _kenh_km(ds)
+        canh = [tuple(c) for c in d['canh']]
+        p = e5.phan_loai(kenh, canh, bat=d['E5'])
+        assert p['F_I'] == F_I_dap_an
+        xh = xep_hang.xep(kenh, F_I=p['F_I'], thuc_the_co_kenh_OK={k.thuc_the for k in kenh})
+        assert [[b['key'], b['groups'][0]] for b in xh['blocks']] == da['blocks']
+        R = e7.vung(xh['T'], kenh, canh, p['inherited_by'], cach=1)
+>       assert {r: sorted(v) for r, v in R.items()} == da['vung_1']
+E       AssertionError: assert {'B': ['B', 'S']} == {'B': ['B']}
+E         
+E         Differing items:
+E         {'B': ['B', 'S']} != {'B': ['B']}
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:294: AssertionError
+____________________ test_KM1_ma_kenh_theo_don_vi[request] ____________________
+
+bien_the = 'request', ma = <function ma.<locals>._gan at 0x000001C89A0B37E0>
+
+    @pytest.mark.parametrize('bien_the', ['goc', 'dao', 'request'])
+    def test_KM1_ma_kenh_theo_don_vi(bien_the, ma):
+        """Thao tác `cpu` của S và metric `S_cpu` không dùng chung F_I; kết quả không phụ thuộc thứ tự hay tên thao tác."""
+        from m1 import e5, e7, xep_hang
+        m = tu_lap(DAP_AN_THANH_PHAN, 'KM1')
+        ma(f'KM1-{bien_the}')
+        d, da = m['dau_vao'], m['dap_an']
+        ds = [dict(x) for x in d['kenh']]
+        F_I_dap_an = dict(da['F_I'])
+        if bien_the == 'dao':
+            ds[0], ds[1] = ds[1], ds[0]
+        if bien_the == 'request':
+            ds[0] = dict(ds[0], ten='request', don_vi='op|S|request')
+            F_I_dap_an = {k.replace('op|S|cpu|cpu', 'op|S|request|request'): v for k, v in F_I_dap_an.items()}
+        kenh = _kenh_km(ds)
+        canh = [tuple(c) for c in d['canh']]
+        p = e5.phan_loai(kenh, canh, bat=d['E5'])
+        assert p['F_I'] == F_I_dap_an
+        xh = xep_hang.xep(kenh, F_I=p['F_I'], thuc_the_co_kenh_OK={k.thuc_the for k in kenh})
+        assert [[b['key'], b['groups'][0]] for b in xh['blocks']] == da['blocks']
+        R = e7.vung(xh['T'], kenh, canh, p['inherited_by'], cach=1)
+>       assert {r: sorted(v) for r, v in R.items()} == da['vung_1']
+E       AssertionError: assert {'B': ['B', 'S']} == {'B': ['B']}
+E         
+E         Differing items:
+E         {'B': ['B', 'S']} != {'B': ['B']}
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:294: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k08_e5_e6_e7_e9.py::test_E7_dung_vung[E7-2] - AssertionError: 1
+FAILED test_k08_e5_e6_e7_e9.py::test_KM1_ma_kenh_theo_don_vi[goc] - Assertion...
+FAILED test_k08_e5_e6_e7_e9.py::test_KM1_ma_kenh_theo_don_vi[dao] - Assertion...
+FAILED test_k08_e5_e6_e7_e9.py::test_KM1_ma_kenh_theo_don_vi[request] - Asser...
+4 failed, 370 passed in 18.84s

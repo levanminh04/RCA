@@ -5,8 +5,9 @@
 - Khóa khối ghi cho src/p3/danh_gia (khóa không tăng): E6a (3 − tầng, khóa của tầng); E6b (π làm tròn 12 chữ số
   có nghĩa, K_I, K_raw). Hòa theo khóa ghi ra; trong nhóm hòa sắp theo tên chỉ để hiển thị.
 - T4c (CĐ7): khóa (max s, max m, số kênh, Σs).
-- Sắp theo khóa chính xác (`khoa_q`: điểm Fraction, Σs cộng chính xác); khóa ghi ra là số thực (`khoa`). Hai điểm
-  bằng nhau theo công thức không bị tách vì sai số làm tròn (dinh-chinh-cai-dat.md C6, S20). Gộp hòa theo khóa ghi ra:
+- Khóa chính xác (`khoa_q`: điểm Fraction, Σs cộng chính xác); khóa ghi ra là số thực (`khoa`). Hai điểm bằng nhau
+  theo công thức không bị tách vì sai số làm tròn (dinh-chinh-cai-dat.md C6, S20). Sắp theo khóa ghi ra rồi khóa chính
+  xác (`sap_khoa`; C9, S43), để khóa ghi ra luôn giảm dần. Gộp hòa theo khóa ghi ra:
   hai khóa chính xác khác nhau mà ghi ra cùng số thực là một nhóm hòa, như src/p3/danh_gia đọc hai khối liền nhau cùng
   khóa (C8, S35); số lần gộp như vậy ghi ở `gop_khoa_ghi_ra`. m của T4c vẫn là số thực (log), chỉ báo cáo (giới hạn N2).
 """
@@ -40,10 +41,16 @@ def _lam_tron_12(x):
     return float(format(x, '.12g'))
 
 
+def sap_khoa(items):
+    """Sắp [(entity, key)] giảm theo khóa ghi ra (`_thuc`), rồi khóa chính xác, rồi tên. Khóa ghi ra giảm dần như
+    src/p3/danh_gia đòi, và khóa ghi ra bằng nhau nằm liền nhau để `_nhom` gộp. Sắp theo khóa chính xác trước thì hai
+    phần đầu khác nhau dưới một ulp để phần sau quyết định, khóa ghi ra có thể tăng (C9, S43)."""
+    return sorted(items, key=lambda x: (tuple(-v for v in _thuc(x[1])), tuple(-v for v in x[1]), x[0]))
+
+
 def _nhom(items, dem=None):
-    """items: [(entity, key)] đã sắp giảm theo key chính xác; gộp khóa ghi ra (số thực, `_thuc`) bằng nhau thành nhóm
-    hòa. Làm tròn đơn điệu nên khóa ghi ra bằng nhau luôn liền nhau. `dem`: danh sách, thêm một phần tử mỗi lần gộp
-    hai khóa chính xác khác nhau (C8, S35)."""
+    """items: [(entity, key)] đã sắp bằng `sap_khoa`; gộp khóa ghi ra (số thực, `_thuc`) bằng nhau, nằm liền nhau, thành
+    nhóm hòa. `dem`: danh sách, thêm một phần tử mỗi lần gộp hai khóa chính xác khác nhau (C8, S35; C9, S43)."""
     blocks, cu, cu_q = [], None, None
     for e, k in items:
         if blocks and cu == _thuc(k):
@@ -130,11 +137,11 @@ def xep(kenh, F_I=None, thuc_the_co_kenh_OK=(), che_do='E6a', canh=(), khoa_T4c=
             for e in ten:
                 p = _lam_tron_12(pi.get(e, 0.0))
                 items.append((e, (p,) + tuple(K_I[e]) + tuple(K_raw[e])))
-            items.sort(key=lambda x: (tuple(-v for v in x[1]), x[0]))
+            items = sap_khoa(items)
             out['blocks'] = _nhom(items, gop)
     if dung_e6a:
         items = [(e, (3 - tang[e],) + tuple(k_tang(e))) for e in ten]
-        items.sort(key=lambda x: (tuple(-v for v in x[1]), x[0]))
+        items = sap_khoa(items)
         out['blocks'] = _nhom(items, gop)
     out['gop_khoa_ghi_ra'] = len(gop)
     out['thu_tu'] = [e for b in out['blocks'] for g in b['groups'] for e in g]

@@ -1,0 +1,33 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 77%]
+.......................................................................F [ 96%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+__________________________ test_CE1_E5_theo_the_gioi __________________________
+
+ma = <function ma.<locals>._gan at 0x0000023E05362CA0>
+
+    def test_CE1_E5_theo_the_gioi(ma):
+        from m1_danh_gia import pha2
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CE1')
+        d, da = m['dau_vao']['ca_E5_the_gioi'], m['dap_an']['ca_E5_the_gioi']
+        ma('CE1-E5-the-gioi')
+        a, b = d['cap']
+        tat = {'a': {'dataset': 'RE2-TT', 'o': 'c1', 'RR': Fraction(1, 2), 'M5': False}}
+        bat = {'a': {'dataset': 'RE2-TT', 'o': 'c1', 'RR': Fraction(1), 'M5': {'P': True, 'S_lo': False, 'S_hi': True}}}
+        r = pha2.ket_cuc_cap(_kq(tat, bat, a, b), a, b, {'c1'}, 'E5', 'khoi_K',
+                             moc_gia=tuple(tuple(x) for x in d['moc_gia']))
+>       assert r['khong_moc_gia'] == da['khong_moc_gia']
+E       AssertionError: assert {'P': 'HAI', ...'S_lo': 'HAI'} == {'P': 'HAI', ...'KHONG_DU_CA'}
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Differing items:
+E         {'S_lo': 'HAI'} != {'S_lo': 'KHONG_DU_CA'}
+E         Use -v to get more diff
+
+test_k15_luot5c.py:124: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k15_luot5c.py::test_CE1_E5_theo_the_gioi - AssertionError: assert...
+1 failed, 373 passed in 17.73s

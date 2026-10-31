@@ -1,0 +1,40 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 77%]
+........................................................................ [ 96%]
+..........F...                                                           [100%]
+================================== FAILURES ===================================
+___________________________ test_pha2_M5_va_luat_C ____________________________
+
+ma = <function ma.<locals>._gan at 0x000002AE953277E0>
+tmp_path = WindowsPath('C:/Users/84583/AppData/Local/Temp/pytest-of-84583/pytest-910/test_pha2_M5_va_luat_C0')
+
+    def test_pha2_M5_va_luat_C(ma, tmp_path):
+        """Pha 2 trên S1: cờ M5 đọc G_N từ bản ghi (R0: A, F đứng trước R và có đường tới R); luật C ba thế giới."""
+        from fractions import Fraction
+        from m1 import runner
+        from m1_danh_gia import pha2
+        import sinh_trace_S
+        from conftest import FIXTURE
+        ma('pha2-M5-luat-C')
+        spans, logs = sinh_trace_S.sinh('S1', t=1000, mau=FIXTURE['trace_mau_S'])
+        ca = [{'opaque_id': 'gia-001', 'spans': spans, 'metrics': [], 'logs': logs,
+               'inventory': ['A', 'B', 'F', 'I', 'R', 'X'], 'aliases': {}}]
+        cau_hinh = [{'config_id': 'R0', 'params': sinh_trace_S.params({})},
+                    {'config_id': 'C1', 'params': sinh_trace_S.params({'E1': 'U'})}]
+        h = runner.pha1(ca, {'gia-001': 1000}, cau_hinh, tmp_path / 'l')
+        nhan = {'gia-001': {'root': 'R', 'dataset': 'RE2-TT', 'o': 'o1'}}
+        kq = pha2.cham(tmp_path / 'l', h['sha256'], nhan)
+        r0, c1 = kq['cau_hinh']['R0']['ca']['gia-001'], kq['cau_hinh']['C1']['ca']['gia-001']
+        assert r0['theo_the_gioi']['P']['RR'] == Fraction(1, 3) and r0['theo_the_gioi']['P']['M5'] is True
+        assert c1['theo_the_gioi']['P']['RR'] == 1 and c1['theo_the_gioi']['P']['M5'] is False
+        # MRR giữ phân số chính xác (CĐ16; TS6)
+>       assert kq['cau_hinh']['R0']['MRR']['gop'] == Fraction(1, 3) and isinstance(kq['cau_hinh']['R0']['MRR']['gop'], Fraction)
+E       AssertionError: assert (0.3333333333333333 == Fraction(1, 3))
+E        +  where Fraction(1, 3) = <class 'fractions.Fraction'>(1, 3)
+
+test_runner.py:136: AssertionError
+=========================== short test summary info ===========================
+FAILED test_runner.py::test_pha2_M5_va_luat_C - AssertionError: assert (0.333...
+1 failed, 373 passed in 16.67s

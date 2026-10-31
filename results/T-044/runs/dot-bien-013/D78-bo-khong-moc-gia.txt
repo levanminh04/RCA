@@ -1,0 +1,136 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 77%]
+.....................FFF..............................................FF [ 96%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+___________________________ test_CE1_khong_moc_gia ____________________________
+
+ma = <function ma.<locals>._gan at 0x00000252F9F88A40>
+
+    def test_CE1_khong_moc_gia(ma):
+        from m1_danh_gia import pha2
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CE1')
+        da = m['dap_an']
+        ma('CE1')
+        ca = lambda r: {'a': {'dataset': 'RE2-TT', 'o': 'c1', 'loai_loi': None, 'verdict': 'CAUSE_FOUND',
+                              'theo_the_gioi': {w: {'RR': r, 'hit1': r, 'hang': None, 'M5': False} for w in pha2.WORLDS}}}
+        kq = {'cau_hinh': {'T': {'ca': ca(Fraction(1, 2))}, 'B': {'ca': ca(Fraction(1))}}}
+        mg = tuple(tuple(x) for x in m['dau_vao']['moc_gia'])
+        r = pha2.ket_cuc_cap(kq, 'T', 'B', {'c1'}, 'X', 'khoi_K', moc_gia=mg)
+        assert all((r['theo_the_gioi'][w]['ket_cuc'], r['theo_the_gioi'][w]['buoc']) == (da['ket_cuc'], da['buoc'])
+                   for w in pha2.WORLDS)
+>       assert r['khong_moc_gia'] == {w: da['khong_moc_gia'] for w in pha2.WORLDS}
+E       KeyError: 'khong_moc_gia'
+
+test_k13_luot5.py:304: KeyError
+______________________ test_CE1_giu_dieu_kien_rieng[E5] _______________________
+
+tp = 'E5', ma = <function ma.<locals>._gan at 0x00000252F9F8B880>
+
+    @pytest.mark.parametrize('tp', ['E5', 'E3'])
+    def test_CE1_giu_dieu_kien_rieng(tp, ma):
+        """S34 (C8): khong_moc_gia giữ M5, UV-6 của cặp, chỉ bỏ vế mốc giả."""
+        from m1_danh_gia import pha2
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CE1')
+        d, da = m['dau_vao'][f'ca_{tp}'], m['dap_an'][f'ca_{tp}']
+        ma(f'CE1-{tp}')
+        if tp == 'E5':
+            ca = lambda r, m5: {'a': {'dataset': 'RE2-TT', 'o': 'c1', 'loai_loi': None, 'verdict': 'CAUSE_FOUND',
+                                      'theo_the_gioi': {w: {'RR': r, 'hit1': r, 'hang': None, 'M5': m5}
+                                                        for w in pha2.WORLDS}}}
+            tat, bat = ca(Fraction(1, 2), False), ca(Fraction(1), True)
+        else:
+            ca = lambda h: {'a': {'dataset': 'Nezha-OB', 'o': 'c1', 'loai_loi': 'exception', 'verdict': 'CAUSE_FOUND',
+                                  'theo_the_gioi': {w: {'RR': h, 'hit1': h, 'hang': Fraction(1), 'M5': False}
+                                                    for w in pha2.WORLDS}}}
+            tat, bat = ca(Fraction(1)), ca(Fraction(0))
+        a, b = d['cap']
+        kq = {'cau_hinh': {a: {'ca': tat}, b: {'ca': bat}}}
+        r = pha2.ket_cuc_cap(kq, a, b, {'c1'}, tp, 'khoi_K', moc_gia=tuple(tuple(x) for x in d['moc_gia']))
+        for w in pha2.WORLDS:
+            t = r['theo_the_gioi'][w]
+            assert (t['ket_cuc'], t['ly_do_hai_rieng'], t['moc_gia']['ve']) == (da['ket_cuc'], da['ly_do'], da['moc_gia'])
+>       assert r['khong_moc_gia'] == {w: da['khong_moc_gia'] for w in pha2.WORLDS}
+E       KeyError: 'khong_moc_gia'
+
+test_k13_luot5.py:332: KeyError
+______________________ test_CE1_giu_dieu_kien_rieng[E3] _______________________
+
+tp = 'E3', ma = <function ma.<locals>._gan at 0x00000252F9F8BE20>
+
+    @pytest.mark.parametrize('tp', ['E5', 'E3'])
+    def test_CE1_giu_dieu_kien_rieng(tp, ma):
+        """S34 (C8): khong_moc_gia giữ M5, UV-6 của cặp, chỉ bỏ vế mốc giả."""
+        from m1_danh_gia import pha2
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CE1')
+        d, da = m['dau_vao'][f'ca_{tp}'], m['dap_an'][f'ca_{tp}']
+        ma(f'CE1-{tp}')
+        if tp == 'E5':
+            ca = lambda r, m5: {'a': {'dataset': 'RE2-TT', 'o': 'c1', 'loai_loi': None, 'verdict': 'CAUSE_FOUND',
+                                      'theo_the_gioi': {w: {'RR': r, 'hit1': r, 'hang': None, 'M5': m5}
+                                                        for w in pha2.WORLDS}}}
+            tat, bat = ca(Fraction(1, 2), False), ca(Fraction(1), True)
+        else:
+            ca = lambda h: {'a': {'dataset': 'Nezha-OB', 'o': 'c1', 'loai_loi': 'exception', 'verdict': 'CAUSE_FOUND',
+                                  'theo_the_gioi': {w: {'RR': h, 'hit1': h, 'hang': Fraction(1), 'M5': False}
+                                                    for w in pha2.WORLDS}}}
+            tat, bat = ca(Fraction(1)), ca(Fraction(0))
+        a, b = d['cap']
+        kq = {'cau_hinh': {a: {'ca': tat}, b: {'ca': bat}}}
+        r = pha2.ket_cuc_cap(kq, a, b, {'c1'}, tp, 'khoi_K', moc_gia=tuple(tuple(x) for x in d['moc_gia']))
+        for w in pha2.WORLDS:
+            t = r['theo_the_gioi'][w]
+            assert (t['ket_cuc'], t['ly_do_hai_rieng'], t['moc_gia']['ve']) == (da['ket_cuc'], da['ly_do'], da['moc_gia'])
+>       assert r['khong_moc_gia'] == {w: da['khong_moc_gia'] for w in pha2.WORLDS}
+E       KeyError: 'khong_moc_gia'
+
+test_k13_luot5.py:332: KeyError
+_______________________________ test_CE1_E3_dM0 _______________________________
+
+ma = <function ma.<locals>._gan at 0x00000252FA001DA0>
+
+    def test_CE1_E3_dM0(ma):
+        from m1_danh_gia import pha2
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CE1')
+        d, da = m['dau_vao']['ca_E3_dM0'], m['dap_an']['ca_E3_dM0']
+        ma('CE1-E3-dM0')
+        a, b = d['cap']
+        tat = {'a': {'dataset': 'Nezha-OB', 'o': 'c1', 'loai_loi': 'exception', 'RR': Fraction(1)},
+               'b': {'dataset': 'Nezha-OB', 'o': 'c2', 'loai_loi': 'cpu', 'RR': Fraction(0)}}
+        bat = {'a': dict(tat['a'], RR=Fraction(0)), 'b': dict(tat['b'], RR=Fraction(1))}
+        r = pha2.ket_cuc_cap(_kq(tat, bat, a, b), a, b, set(d['E_X']), 'E3', 'khoi_K',
+                             moc_gia=tuple(tuple(x) for x in d['moc_gia']))
+        for w in pha2.WORLDS:
+            t = r['theo_the_gioi'][w]
+            assert (t['ket_cuc'], t['ly_do_hai_rieng']) == (da['ket_cuc'], da['ly_do'])
+>       assert r['khong_moc_gia'] == {w: da['khong_moc_gia'] for w in pha2.WORLDS}
+E       KeyError: 'khong_moc_gia'
+
+test_k15_luot5c.py:111: KeyError
+__________________________ test_CE1_E5_theo_the_gioi __________________________
+
+ma = <function ma.<locals>._gan at 0x00000252FA002AC0>
+
+    def test_CE1_E5_theo_the_gioi(ma):
+        from m1_danh_gia import pha2
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CE1')
+        d, da = m['dau_vao']['ca_E5_the_gioi'], m['dap_an']['ca_E5_the_gioi']
+        ma('CE1-E5-the-gioi')
+        a, b = d['cap']
+        tat = {'a': {'dataset': 'RE2-TT', 'o': 'c1', 'RR': Fraction(1, 2), 'M5': False}}
+        bat = {'a': {'dataset': 'RE2-TT', 'o': 'c1', 'RR': Fraction(1), 'M5': {'P': True, 'S_lo': False, 'S_hi': True}}}
+        r = pha2.ket_cuc_cap(_kq(tat, bat, a, b), a, b, {'c1'}, 'E5', 'khoi_K',
+                             moc_gia=tuple(tuple(x) for x in d['moc_gia']))
+>       assert r['khong_moc_gia'] == da['khong_moc_gia']
+E       KeyError: 'khong_moc_gia'
+
+test_k15_luot5c.py:124: KeyError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_CE1_khong_moc_gia - KeyError: 'khong_moc_gia'
+FAILED test_k13_luot5.py::test_CE1_giu_dieu_kien_rieng[E5] - KeyError: 'khong...
+FAILED test_k13_luot5.py::test_CE1_giu_dieu_kien_rieng[E3] - KeyError: 'khong...
+FAILED test_k15_luot5c.py::test_CE1_E3_dM0 - KeyError: 'khong_moc_gia'
+FAILED test_k15_luot5c.py::test_CE1_E5_theo_the_gioi - KeyError: 'khong_moc_gia'
+5 failed, 369 passed in 15.40s

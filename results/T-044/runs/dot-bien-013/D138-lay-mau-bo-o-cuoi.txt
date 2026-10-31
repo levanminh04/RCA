@@ -1,0 +1,26 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 77%]
+........................................................................ [ 96%]
+.F............                                                           [100%]
+================================== FAILURES ===================================
+______________________________ test_LM1_mo_rong _______________________________
+
+ma = <function ma.<locals>._gan at 0x000002A3D7AFEF20>
+
+    def test_LM1_mo_rong(ma):
+        from m1_danh_gia import rr
+        m = tu_lap(DAP_AN_THANH_PHAN, 'LM1')
+        d, da = m['dau_vao'], m['dap_an']
+        ma('LM1-mo-rong')
+        ds = _ds_LM1(m)
+>       assert all(rr.lay_mau_o(ds, np.random.default_rng(s)) == _mau_theo_SPEC(ds, s) for s in d['seed']) is \
+            da['khop_cach_lay_theo_SPEC']
+E       assert False is True
+E        +  where False = all(<generator object test_LM1_mo_rong.<locals>.<genexpr> at 0x000002A3D78DB640>)
+
+test_k15_luot5c.py:175: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k15_luot5c.py::test_LM1_mo_rong - assert False is True
+1 failed, 373 passed in 15.40s

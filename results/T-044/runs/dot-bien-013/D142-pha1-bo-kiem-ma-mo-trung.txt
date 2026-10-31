@@ -1,0 +1,41 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 77%]
+........................................................................ [ 96%]
+..F...........                                                           [100%]
+================================== FAILURES ===================================
+______________________________ test_RN1_mo_rong _______________________________
+
+ma = <function ma.<locals>._gan at 0x0000021CE0026DE0>
+tmp_path = WindowsPath('C:/Users/84583/AppData/Local/Temp/pytest-of-84583/pytest-1024/test_RN1_mo_rong0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000021CDFC3F950>
+
+    def test_RN1_mo_rong(ma, tmp_path, monkeypatch):
+        from m1 import chuoi, e4, runner
+        import sinh_trace_S
+        from conftest import FIXTURE
+        m = tu_lap(DAP_AN_THANH_PHAN, 'RN1')
+        da = m['dap_an']
+        ma('RN1-mo-rong')
+        spans, logs = sinh_trace_S.sinh('S1', t=1000, mau=FIXTURE['trace_mau_S'])
+        ca = [{'opaque_id': f'gia-00{i}', 'spans': spans, 'metrics': [], 'logs': logs,
+               'inventory': ['A', 'B', 'F', 'I', 'R', 'X'], 'aliases': {}} for i in (1, 2)]
+        moc = {c['opaque_id']: 1000 for c in ca}
+        cau_hinh = [{'config_id': 'R0', 'params': sinh_trace_S.params({})}]
+        tao = []
+    
+        class Dem(e4.CacheCong):
+            def __init__(self):
+                super().__init__()
+                tao.append(self)
+        monkeypatch.setattr(e4, 'CacheCong', Dem)
+        runner.pha1(ca, moc, cau_hinh, tmp_path / 'l1')
+        assert (chuoi.CACHE is tao[-1] and len(tao) == 2) is da['cache_la_doi_tuong_moi_nhat']
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+test_k15_luot5c.py:217: Failed
+=========================== short test summary info ===========================
+FAILED test_k15_luot5c.py::test_RN1_mo_rong - Failed: DID NOT RAISE <class 'V...
+1 failed, 373 passed in 16.98s

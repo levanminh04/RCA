@@ -1,0 +1,33 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+................................................F....................... [ 77%]
+........................................................................ [ 96%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+______________________________ test_BT1_bat_tat _______________________________
+
+ma = <function ma.<locals>._gan at 0x0000020B0B76AE80>
+
+    def test_BT1_bat_tat(ma):
+        from m1 import chuoi
+        m = tu_lap(DAP_AN_THANH_PHAN, 'BT1')
+        ma('BT1')
+        sua = [lambda b: None, lambda b: b.update(E1='typo'), lambda b: b.pop('E5'), lambda b: b.update(E5='false'),
+               lambda b: b.update(E6='c'), lambda b: b.update(E3=1), lambda b: b.update(E7=False)]
+        rows, _ = _ca_metric([0.0] * 20, [10.0] * 20)
+        ra = []
+        for f in sua:
+            _, p = _ca_metric([0.0] * 20, [10.0] * 20)
+            f(p['bat_tat'])
+            ra.append(chuoi.chay([], rows, [], ['S'], {}, 1000, p)['status'])
+>       assert ra == m['dap_an']['status']
+E       AssertionError: assert ['OK', 'OK', ...K', 'OK', ...] == ['OK', 'ERROR... 'ERROR', ...]
+E         
+E         At index 1 diff: 'OK' != 'ERROR'
+E         Use -v to get more diff
+
+test_k12_luot4.py:136: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k12_luot4.py::test_BT1_bat_tat - AssertionError: assert ['OK', 'O...
+1 failed, 373 passed in 21.56s

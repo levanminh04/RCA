@@ -1,0 +1,30 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 77%]
+.......................................F................................ [ 96%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+______________________________ test_E5X_lan_xuoi ______________________________
+
+ma = <function ma.<locals>._gan at 0x000001D76842D440>
+
+    def test_E5X_lan_xuoi(ma):
+        from m1 import e5
+        from m1.kieu import Kenh
+        m = tu_lap(DAP_AN_THANH_PHAN, 'E5X')
+        ma('E5X')
+        kenh = [Kenh(e, ten, h, lop, 0.5) for e, ten, h, lop in m['dau_vao']['kenh']]
+        p = e5.phan_loai(kenh, [tuple(c) for c in m['dau_vao']['canh']], bat=True)
+>       assert p['F_I'] == m['dap_an']['F_I']
+E       AssertionError: assert {'A||a|xuong'...||b|xuong': 1} == {'A||a|xuong'...||b|xuong': 0}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'B||b|xuong': 1} != {'B||b|xuong': 0}
+E         Use -v to get more diff
+
+test_k13_luot5.py:507: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k13_luot5.py::test_E5X_lan_xuoi - AssertionError: assert {'A||a|x...
+1 failed, 373 passed in 16.59s

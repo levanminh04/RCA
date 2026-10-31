@@ -1,0 +1,300 @@
+........................................................................ [ 19%]
+.........................F..................FFFFF....................... [ 38%]
+............FFFF........................................................ [ 57%]
+.......................................F....F........................... [ 77%]
+........................................................................ [ 96%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+_____________________________ test_73_huong_xuong _____________________________
+
+ma = <function ma.<locals>._gan at 0x0000018F52033420>
+
+    def test_73_huong_xuong(ma):
+        from m1 import kenh
+        from m1.kieu import Kenh
+        from m1 import xep_hang
+        f = fx(73)
+        ma('73')
+        d, da = f['dau_vao'], f['dap_an']
+        (ten, huong, s), = d['kenh']['A']
+        for e3_bat, nhanh in ((True, 'E3_bat'), (False, 'E3_tat')):
+            huong_cham = kenh.huong_cham('op_full', E3_bat=e3_bat)
+            cham = huong in huong_cham
+            assert cham == da[nhanh]['cham']
+            ds = [Kenh('A', ten, huong, kenh.lop('op_full', huong), s)] if cham else []
+            if cham:
+                assert ds[0].lop == da[nhanh]['lop']
+            xh = xep_hang.xep(ds, thuc_the_co_kenh_OK={'A'})
+>           assert list(xh['K_raw']['A']) == da[nhanh]['K_raw']
+E           assert [0.6, 0.6, 1] == [0.6, 1, 0.6]
+E             
+E             At index 1 diff: 0.6 != 1
+E             Use -v to get more diff
+
+test_k07_e3.py:49: AssertionError
+_______________________________ test_8_scc[8a] ________________________________
+
+ma_ca = '8a', ma = <function ma.<locals>._gan at 0x0000018F517D0F40>
+
+    @pytest.mark.parametrize('ma_ca', ['8a', '8b'])
+    def test_8_scc(ma_ca, ma):
+        ca = next(c for c in fx(8)['ca'] if c['ma'] == ma_ca)
+        ma(f'8-{ma_ca}')
+        p, xh = _chay_E5(ca)
+        da = ca['dap_an']
+        assert xh['thu_tu'] == da['thu_tu']
+>       assert {e: list(v) for e, v in xh['K_I'].items()} == da['K_I']
+E       AssertionError: assert {'A': [0.9, 0...[0.8, 0.8, 1]} == {'A': [0.9, 1...[0.8, 1, 0.8]}
+E         
+E         Differing items:
+E         {'B': [0.8, 0.8, 1]} != {'B': [0.8, 1, 0.8]}
+E         {'A': [0.9, 0.9, 1]} != {'A': [0.9, 1, 0.9]}
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:37: AssertionError
+_______________________________ test_8_scc[8b] ________________________________
+
+ma_ca = '8b', ma = <function ma.<locals>._gan at 0x0000018F517D1D00>
+
+    @pytest.mark.parametrize('ma_ca', ['8a', '8b'])
+    def test_8_scc(ma_ca, ma):
+        ca = next(c for c in fx(8)['ca'] if c['ma'] == ma_ca)
+        ma(f'8-{ma_ca}')
+        p, xh = _chay_E5(ca)
+        da = ca['dap_an']
+        assert xh['thu_tu'] == da['thu_tu']
+>       assert {e: list(v) for e, v in xh['K_I'].items()} == da['K_I']
+E       AssertionError: assert {'A': [0.0, 0...[0.8, 1.3, 2]} == {'A': [0, 0, ...[0.8, 2, 1.3]}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'B': [0.8, 1.3, 2]} != {'B': [0.8, 2, 1.3]}
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:37: AssertionError
+_____________________________ test_chuoi_kenh[57] _____________________________
+
+i = 57, ma = <function ma.<locals>._gan at 0x0000018F52033560>
+
+    @pytest.mark.parametrize('i', [57, 71])
+    def test_chuoi_kenh(i, ma):
+        ca = fx(i)['ca'][0]
+        ma(f'{i}-{ca["ma"]}')
+        p, xh = _chay_E5(ca)
+        da = ca['dap_an']
+        assert xh['thu_tu'] == da['thu_tu']
+>       assert {e: list(v) for e, v in xh['K_I'].items()} == da['K_I']
+E       AssertionError: assert {'Payment': [....05, 0.05, 1]} == {'Payment': [....05, 1, 0.05]}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'payment_db': [0.05, 0.05, 1]} != {'payment_db': [0.05, 1, 0.05]}
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:48: AssertionError
+_____________________________ test_chuoi_kenh[71] _____________________________
+
+i = 71, ma = <function ma.<locals>._gan at 0x0000018F517D1EE0>
+
+    @pytest.mark.parametrize('i', [57, 71])
+    def test_chuoi_kenh(i, ma):
+        ca = fx(i)['ca'][0]
+        ma(f'{i}-{ca["ma"]}')
+        p, xh = _chay_E5(ca)
+        da = ca['dap_an']
+        assert xh['thu_tu'] == da['thu_tu']
+>       assert {e: list(v) for e, v in xh['K_I'].items()} == da['K_I']
+E       AssertionError: assert {'A': [0.0, 0...[0.6, 0.6, 1]} == {'A': [0, 0, ...[0.6, 1, 0.6]}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'R': [0.6, 0.6, 1]} != {'R': [0.6, 1, 0.6]}
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:48: AssertionError
+_________________________________ test_58_d19 _________________________________
+
+ma = <function ma.<locals>._gan at 0x0000018F517D2200>
+
+    def test_58_d19(ma):
+        ca = fx(58)['ca'][0]
+        ma('58-58')
+        p, xh = _chay_E5(ca)
+        assert xh['thu_tu'] == ca['dap_an']['thu_tu']
+>       assert {e: list(v) for e, v in xh['K_I'].items()} == ca['dap_an']['K_I']
+E       AssertionError: assert {'A': [0.8, 0...[0.0, 0, 0.0]} == {'A': [0.8, 1...B': [0, 0, 0]}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'A': [0.8, 0.8, 1]} != {'A': [0.8, 1, 0.8]}
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:59: AssertionError
+______________________ test_KM1_ma_kenh_theo_don_vi[goc] ______________________
+
+bien_the = 'goc', ma = <function ma.<locals>._gan at 0x0000018F52033560>
+
+    @pytest.mark.parametrize('bien_the', ['goc', 'dao', 'request'])
+    def test_KM1_ma_kenh_theo_don_vi(bien_the, ma):
+        """Thao tác `cpu` của S và metric `S_cpu` không dùng chung F_I; kết quả không phụ thuộc thứ tự hay tên thao tác."""
+        from m1 import e5, e7, xep_hang
+        m = tu_lap(DAP_AN_THANH_PHAN, 'KM1')
+        ma(f'KM1-{bien_the}')
+        d, da = m['dau_vao'], m['dap_an']
+        ds = [dict(x) for x in d['kenh']]
+        F_I_dap_an = dict(da['F_I'])
+        if bien_the == 'dao':
+            ds[0], ds[1] = ds[1], ds[0]
+        if bien_the == 'request':
+            ds[0] = dict(ds[0], ten='request', don_vi='op|S|request')
+            F_I_dap_an = {k.replace('op|S|cpu|cpu', 'op|S|request|request'): v for k, v in F_I_dap_an.items()}
+        kenh = _kenh_km(ds)
+        canh = [tuple(c) for c in d['canh']]
+        p = e5.phan_loai(kenh, canh, bat=d['E5'])
+        assert p['F_I'] == F_I_dap_an
+        xh = xep_hang.xep(kenh, F_I=p['F_I'], thuc_the_co_kenh_OK={k.thuc_the for k in kenh})
+>       assert [[b['key'], b['groups'][0]] for b in xh['blocks']] == da['blocks']
+E       AssertionError: assert [[[2, 0.7, 0....5, 1], ['S']]] == [[[2, 0.7, 1,... 0.5], ['S']]]
+E         
+E         At index 0 diff: [[2, 0.7, 0.7, 1], ['B']] != [[2, 0.7, 1, 0.7], ['B']]
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:292: AssertionError
+______________________ test_KM1_ma_kenh_theo_don_vi[dao] ______________________
+
+bien_the = 'dao', ma = <function ma.<locals>._gan at 0x0000018F517D2B60>
+
+    @pytest.mark.parametrize('bien_the', ['goc', 'dao', 'request'])
+    def test_KM1_ma_kenh_theo_don_vi(bien_the, ma):
+        """Thao tác `cpu` của S và metric `S_cpu` không dùng chung F_I; kết quả không phụ thuộc thứ tự hay tên thao tác."""
+        from m1 import e5, e7, xep_hang
+        m = tu_lap(DAP_AN_THANH_PHAN, 'KM1')
+        ma(f'KM1-{bien_the}')
+        d, da = m['dau_vao'], m['dap_an']
+        ds = [dict(x) for x in d['kenh']]
+        F_I_dap_an = dict(da['F_I'])
+        if bien_the == 'dao':
+            ds[0], ds[1] = ds[1], ds[0]
+        if bien_the == 'request':
+            ds[0] = dict(ds[0], ten='request', don_vi='op|S|request')
+            F_I_dap_an = {k.replace('op|S|cpu|cpu', 'op|S|request|request'): v for k, v in F_I_dap_an.items()}
+        kenh = _kenh_km(ds)
+        canh = [tuple(c) for c in d['canh']]
+        p = e5.phan_loai(kenh, canh, bat=d['E5'])
+        assert p['F_I'] == F_I_dap_an
+        xh = xep_hang.xep(kenh, F_I=p['F_I'], thuc_the_co_kenh_OK={k.thuc_the for k in kenh})
+>       assert [[b['key'], b['groups'][0]] for b in xh['blocks']] == da['blocks']
+E       AssertionError: assert [[[2, 0.7, 0....5, 1], ['S']]] == [[[2, 0.7, 1,... 0.5], ['S']]]
+E         
+E         At index 0 diff: [[2, 0.7, 0.7, 1], ['B']] != [[2, 0.7, 1, 0.7], ['B']]
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:292: AssertionError
+____________________ test_KM1_ma_kenh_theo_don_vi[request] ____________________
+
+bien_the = 'request', ma = <function ma.<locals>._gan at 0x0000018F517D1F80>
+
+    @pytest.mark.parametrize('bien_the', ['goc', 'dao', 'request'])
+    def test_KM1_ma_kenh_theo_don_vi(bien_the, ma):
+        """Thao tác `cpu` của S và metric `S_cpu` không dùng chung F_I; kết quả không phụ thuộc thứ tự hay tên thao tác."""
+        from m1 import e5, e7, xep_hang
+        m = tu_lap(DAP_AN_THANH_PHAN, 'KM1')
+        ma(f'KM1-{bien_the}')
+        d, da = m['dau_vao'], m['dap_an']
+        ds = [dict(x) for x in d['kenh']]
+        F_I_dap_an = dict(da['F_I'])
+        if bien_the == 'dao':
+            ds[0], ds[1] = ds[1], ds[0]
+        if bien_the == 'request':
+            ds[0] = dict(ds[0], ten='request', don_vi='op|S|request')
+            F_I_dap_an = {k.replace('op|S|cpu|cpu', 'op|S|request|request'): v for k, v in F_I_dap_an.items()}
+        kenh = _kenh_km(ds)
+        canh = [tuple(c) for c in d['canh']]
+        p = e5.phan_loai(kenh, canh, bat=d['E5'])
+        assert p['F_I'] == F_I_dap_an
+        xh = xep_hang.xep(kenh, F_I=p['F_I'], thuc_the_co_kenh_OK={k.thuc_the for k in kenh})
+>       assert [[b['key'], b['groups'][0]] for b in xh['blocks']] == da['blocks']
+E       AssertionError: assert [[[2, 0.7, 0....5, 1], ['S']]] == [[[2, 0.7, 1,... 0.5], ['S']]]
+E         
+E         At index 0 diff: [[2, 0.7, 0.7, 1], ['B']] != [[2, 0.7, 1, 0.7], ['B']]
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:292: AssertionError
+_________________________ test_KM2_alias_va_trung_ma __________________________
+
+ma = <function ma.<locals>._gan at 0x0000018F51DDC040>
+
+    def test_KM2_alias_va_trung_ma(ma):
+        from m1 import e5, xep_hang
+        m = tu_lap(DAP_AN_THANH_PHAN, 'KM2')
+        ma('KM2')
+        d, da = m['dau_vao'], m['dap_an']
+        kenh = _kenh_km(d['kenh_alias'])
+        p = e5.phan_loai(kenh, [], bat=True)
+        assert p['F_I'] == da['alias_F_I']
+        xh = xep_hang.xep(kenh, F_I=p['F_I'], thuc_the_co_kenh_OK={'S'})
+>       assert list(xh['K_I']['S']) == da['alias_K_I_S']
+E       assert [0.6, 1.0, 2] == [0.6, 2, 1.0]
+E         
+E         At index 1 diff: 1.0 != 2
+E         Use -v to get more diff
+
+test_k08_e5_e6_e7_e9.py:307: AssertionError
+____________________________ test_SS1_phan_vi_hoa _____________________________
+
+ma = <function ma.<locals>._gan at 0x0000018F51DBC9A0>
+
+    def test_SS1_phan_vi_hoa(ma):
+        from m1 import e4, xep_hang
+        from m1_danh_gia import rr
+        m = tu_lap(DAP_AN_THANH_PHAN, 'SS1')
+        ma('SS1')
+        da = m['dap_an']
+        a = e4.cham_phan_vi([0] * 19 + [100], [1] * 17 + [200] * 3, 5, _ts())
+        b = e4.cham_phan_vi([100] * 20, [101] * 18 + [200] * 2, 5, _ts())
+        assert a['F_raw_len'] == b['F_raw_len'] == 1
+        assert a['e_len_q'] == b['e_len_q'] == Fraction(da['e_len_q'])
+        assert (a['e_len'] == b['e_len']) is da['hai_e_len_bang_nhau']
+        xh = xep_hang.xep([_kenh('A', a), _kenh('B', b)], thuc_the_co_kenh_OK={'A', 'B'})
+>       assert [[x['key'], x['groups'][0]] for x in xh['blocks']] == da['blocks']
+E       AssertionError: assert [[[2, 0.1, 0...., ['A', 'B']]] == [[[2, 0.1, 1,..., ['A', 'B']]]
+E         
+E         At index 0 diff: [[2, 0.1, 0.1, 1], ['A', 'B']] != [[2, 0.1, 1, 0.1], ['A', 'B']]
+E         Use -v to get more diff
+
+test_k12_luot4.py:38: AssertionError
+___________________________ test_SS3_tong_chinh_xac ___________________________
+
+ma = <function ma.<locals>._gan at 0x0000018F51DBD6C0>
+
+    def test_SS3_tong_chinh_xac(ma):
+        from m1 import xep_hang
+        from m1.kieu import Kenh
+        m = tu_lap(DAP_AN_THANH_PHAN, 'SS3')
+        ma('SS3')
+        d, da = m['dau_vao'], m['dap_an']
+        ks = [Kenh(e, f'k{i}', 'len', 'khong_lan', float(Fraction(v)), s_q=Fraction(v), don_vi=f'x|{e}|{i}')
+              for e in ('A', 'B') for i, v in enumerate(d[e])]
+        for e in ('A', 'B'):
+            K = xep_hang.khoa_q([k for k in ks if k.thuc_the == e])
+>           assert K == (Fraction(da['K'][0]), da['K'][1], Fraction(da['K'][2]))
+E           assert (Fraction(9, ...on(19, 10), 3) == (Fraction(9, ...ction(19, 10))
+E             
+E             At index 1 diff: Fraction(19, 10) != 3
+E             Use -v to get more diff
+
+test_k12_luot4.py:69: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k07_e3.py::test_73_huong_xuong - assert [0.6, 0.6, 1] == [0.6, 1,...
+FAILED test_k08_e5_e6_e7_e9.py::test_8_scc[8a] - AssertionError: assert {'A':...
+FAILED test_k08_e5_e6_e7_e9.py::test_8_scc[8b] - AssertionError: assert {'A':...
+FAILED test_k08_e5_e6_e7_e9.py::test_chuoi_kenh[57] - AssertionError: assert ...
+FAILED test_k08_e5_e6_e7_e9.py::test_chuoi_kenh[71] - AssertionError: assert ...
+FAILED test_k08_e5_e6_e7_e9.py::test_58_d19 - AssertionError: assert {'A': [0...
+FAILED test_k08_e5_e6_e7_e9.py::test_KM1_ma_kenh_theo_don_vi[goc] - Assertion...
+FAILED test_k08_e5_e6_e7_e9.py::test_KM1_ma_kenh_theo_don_vi[dao] - Assertion...
+FAILED test_k08_e5_e6_e7_e9.py::test_KM1_ma_kenh_theo_don_vi[request] - Asser...
+FAILED test_k08_e5_e6_e7_e9.py::test_KM2_alias_va_trung_ma - assert [0.6, 1.0...
+FAILED test_k12_luot4.py::test_SS1_phan_vi_hoa - AssertionError: assert [[[2,...
+FAILED test_k12_luot4.py::test_SS3_tong_chinh_xac - assert (Fraction(9, ...on...
+12 failed, 362 passed in 15.47s

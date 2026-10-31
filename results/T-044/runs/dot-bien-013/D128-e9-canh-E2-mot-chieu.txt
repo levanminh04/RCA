@@ -1,0 +1,31 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 77%]
+..........................................................F............. [ 96%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+________________________ test_E9E2B_canh_E2_hai_chieu _________________________
+
+ma = <function ma.<locals>._gan at 0x0000021CED0D2700>
+
+    def test_E9E2B_canh_E2_hai_chieu(ma):
+        from m1 import e5
+        from m1.kieu import Kenh
+        m = tu_lap(DAP_AN_THANH_PHAN, 'E9E2B')
+        da = m['dap_an']
+        ma('E9E2B')
+        kenh = [Kenh('e', 'k', 'len', 'lan_nguoc', 0.5, khoi_phat=0), Kenh('b', 'k', 'len', 'khong_lan', 0.5, khoi_phat=100)]
+        p = e5.phan_loai(kenh, [('e', 'b')], bat=True,
+                         e9={'bat': True, 'o_s': 10, 'tau': 0.001,
+                             'canh_E2_bat_thuong': {tuple(c) for c in m['dau_vao']['canh_E2_bat_thuong']}})
+>       assert [(x['trang_thai'], x['ly_do_E9']) for x in p['inherited_by']] == [(da['trang_thai'], da['ly_do_E9'])]
+E       AssertionError: assert [('bi_E9_phu_...t_phu_quyet')] == [('ap_dung', ...ren_canh_E2')]
+E         
+E         At index 0 diff: ('bi_E9_phu_quyet', 'da_xet_phu_quyet') != ('ap_dung', 'tat_tren_canh_E2')
+E         Use -v to get more diff
+
+test_k14_luot5b.py:283: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k14_luot5b.py::test_E9E2B_canh_E2_hai_chieu - AssertionError: ass...
+1 failed, 373 passed in 18.29s

@@ -536,7 +536,7 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
                 a, b = kT.get(k.thuc_the, (0.0, 0.0))
                 kT[k.thuc_the] = (max(a, m), max(b, m) if F_I_P.get(k.ma, 1) == 1 else b)
         x4 = xep_hang.xep(kenh_P_U, F_I=F_I_P, thuc_the_co_kenh_OK=co_OK_P, che_do='E6a', canh=canh, khoa_T4c=kT)
-        T4c = {'blocks': x4['blocks'], 'm_thuc_the': {e: list(v) for e, v in sorted(kT.items())},
+        T4c = {'blocks': x4['blocks'], 'gop_khoa_ghi_ra': x4['gop_khoa_ghi_ra'], 'm_thuc_the': {e: list(v) for e, v in sorted(kT.items())},
                'm_don_vi': dict(sorted(m_dv.items()))}
     kenh_co = [{'ma': k.ma, 'thuc_the': k.thuc_the, 'ten': k.ten, 'huong': k.huong, 'lop': k.lop, 's': k.s,
                 'F_I': F_I_P.get(k.ma, 1), 'don_vi': k.don_vi, 'khoi_phat': k.khoi_phat}
@@ -598,7 +598,8 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
                         'E6b': xP['trang_thai_E6b'], 'so_cham_hop_le': so_hop_le,
                         'NO_VALID_CHANNEL': sorted(set(O) - co_OK_P),
                         # khóa chính xác khác nhau nhưng ghi ra cùng số thực, gộp thành hòa (C8, S35)
-                        'gop_khoa_ghi_ra': {w: xh_w[w]['gop_khoa_ghi_ra'] for w in WORLDS}},
+                        'gop_khoa_ghi_ra': {w: xh_w[w]['gop_khoa_ghi_ra'] for w in WORLDS},
+                        'gop_khoa_ghi_ra_T4c': T4c['gop_khoa_ghi_ra'] if T4c else None},  # C9, S44
         'extra': {'blocks_P': blocks, 'tang_P': xP['tang'],
                   'K_I_P': {e: list(v) for e, v in xP['K_I'].items()},
                   'K_raw_P': {e: list(v) for e, v in xP['K_raw'].items()},

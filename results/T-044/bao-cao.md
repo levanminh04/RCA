@@ -1,17 +1,17 @@
 # T-044 — Cài chuỗi M1 và kiểm đặc tả (báo cáo)
 
-- **Người làm:** Claude, phiên cloud rồi máy local Windows (từ 30/10/2026), branch `claude/sweet-hawking-dy078d`. **Người phản biện:** Codex (lượt 1 trong chat 29/10/2026: 3 CHẶN, 1 KHÔNG CHẶN; lượt 2: 7 CHẶN, 1 KHÔNG CHẶN, rồi kiểm phản hồi; lượt 3 ngày 30/10/2026: 2 CHẶN, 3 KHÔNG CHẶN, 1 nguy cơ có điều kiện; lượt 4 cùng ngày: 2 CHẶN, 6 KHÔNG CHẶN). Lượt 5 ngày 31/10/2026 do một phiên Claude soát theo yêu cầu của Minh (Claude là người làm nên lượt này không thay phản biện chính thức): 4 điểm CHẶN bắt đầu T-045, 9 điểm KHÔNG CHẶN, 28 đột biến đổi hành vi sống sót; đã sửa theo duyệt của Minh. Phiên Claude mới kiểm lại (31/10/2026): S33 chưa đạt, cách ghi khóa lệch bộ đánh giá, bốn nguy cơ cho T-045, 9 đột biến sống sót; đã sửa theo duyệt của Minh ("Duyệt cả gói", mục C8), chờ kiểm lại.
-- **Ngày:** 29–31/10/2026. **SPEC:** `tasks/T-044-cai-dat-m1/SPEC.md` (đã duyệt; sửa theo các mục Minh duyệt ngày 29/10/2026, LOG giai đoạn 2).
+- **Người làm:** Claude, phiên cloud rồi máy local Windows (từ 30/10/2026), branch `claude/sweet-hawking-dy078d`. **Người phản biện:** Codex (lượt 1 trong chat 29/10/2026: 3 CHẶN, 1 KHÔNG CHẶN; lượt 2: 7 CHẶN, 1 KHÔNG CHẶN, rồi kiểm phản hồi; lượt 3 ngày 30/10/2026: 2 CHẶN, 3 KHÔNG CHẶN, 1 nguy cơ có điều kiện; lượt 4 cùng ngày: 2 CHẶN, 6 KHÔNG CHẶN). Lượt 5 ngày 31/10/2026 do một phiên Claude soát theo yêu cầu của Minh (Claude là người làm nên lượt này không thay phản biện chính thức): 4 điểm CHẶN bắt đầu T-045, 9 điểm KHÔNG CHẶN, 28 đột biến đổi hành vi sống sót; đã sửa theo duyệt của Minh. Phiên Claude mới kiểm lại (31/10/2026): S33 chưa đạt, cách ghi khóa lệch bộ đánh giá, bốn nguy cơ cho T-045, 9 đột biến sống sót; đã sửa theo duyệt của Minh ("Duyệt cả gói", mục C8). Kiểm lại gói C8 bằng hai subagent trong phiên người làm: không có CHẶN; lỗi thứ tự khóa ghi ra (F1) và 15 chỗ test yếu, đã sửa ("Sửa rồi nghiệm thu", mục C9). **Nghiệm thu ngày 31/10/2026 (Q-215).**
+- **Ngày:** 29–31/10/2026. **Trạng thái:** đã nghiệm thu (31/10/2026). **SPEC:** `tasks/T-044-cai-dat-m1/SPEC.md` (đã duyệt; sửa theo các mục Minh duyệt ngày 29/10/2026, LOG giai đoạn 2).
 - **Quyền dữ liệu:** không đọc `data/`, không tải dữ liệu, không đọc bản ghi P3 có nhãn. Mọi phép kiểm dùng ca giả.
 
 ## 1. Tóm tắt
 
 **Task đạt gì (trong phạm vi fixture):**
 - Code `src/m1/` (phương pháp, đối chứng, runner, adapter) và `src/m1_danh_gia/` (bộ đánh giá) theo đặc tả v1, ba bản đính chính T-043 và Phần I của `dinh-chinh-cai-dat.md`.
-- 366/366 phép kiểm qua (`bang-phep-kiem.json#/tong`). Trong đó 97/97 phép của T-043 trong phạm vi (`#/T043/qua_trong_pham_vi`); 12 phép của fixture D13 loại theo ngoại lệ đã duyệt (`#/T043/loai_tru_D13`); B1–B8, U1–U6, H1–H6 và 145 mục đáp án tự lập qua (`#/theo_nhom`, `#/dap_an_tu_lap`).
+- 374/374 phép kiểm qua (`bang-phep-kiem.json#/tong`). Trong đó 97/97 phép của T-043 trong phạm vi (`#/T043/qua_trong_pham_vi`); 12 phép của fixture D13 loại theo ngoại lệ đã duyệt (`#/T043/loai_tru_D13`); B1–B8, U1–U6, H1–H6 và 146 mục đáp án tự lập qua (`#/theo_nhom`, `#/dap_an_tu_lap`).
 - Không sửa đáp án đặc tả nào; không có đáp án đặc tả nào lệch với code. Đáp án tự lập WD1–WD3 đổi ở lượt 3 theo định nghĩa cặp mới của S13 (`dinh-chinh-cai-dat.md` mục C4); TS2 ghi đủ map bội số ở lượt 4 (S25, đáp án không đổi); T4C1 ca 2 do người làm tính tay sai lúc đầu (quên r_u = 2e308), đã sửa thành ln 2 trước khi chạy lượt cuối.
-- Tất định: 104 bản ghi và 366 phép kiểm giống hệt qua 4 thứ tự hàng × PYTHONHASHSEED 0, 1, 2 (`runs/tat-dinh-011/tong-hop.json#/ket_luan`); hash seed ghi trong đầu ra và khớp (`#/ban_ghi/hash_seed_khop`).
-- Đột biến: 128/128 bị bắt, trong đó 126/126 đột biến đổi hành vi (D07, D08 chỉ bị phép quét tĩnh bắt) (`runs/dot-bien-012/tong-hop.json#/so_bi_bat`, `#/so_bi_bat_hanh_vi`); 93 đột biến chỉ bị đúng một phép bắt (`#/so_bi_bat_dung_mot_phep`), sau khi lượt đầu lộ 2 lỗ hổng test và đã vá (`runs/dot-bien-001/tong-hop.json#/song_sot`). D22–D27 thêm sau phản biện lượt 1; D28–D35 sau lượt 2; D36–D41 sau lượt 3; D42–D44 sau khi Minh quyết E1-CP và bước 5; D45–D58 sau lượt 4; D59–D110 sau lượt 5; D111–D128 sau kiểm lại lượt 5 (D80 đổi thành đột biến ngược).
+- Tất định: 104 bản ghi và 374 phép kiểm giống hệt qua 4 thứ tự hàng × PYTHONHASHSEED 0, 1, 2 (`runs/tat-dinh-012/tong-hop.json#/ket_luan`); hash seed ghi trong đầu ra và khớp (`#/ban_ghi/hash_seed_khop`).
+- Đột biến: 147/147 bị bắt, trong đó 145/145 đột biến đổi hành vi (D07, D08 chỉ bị phép quét tĩnh bắt) (`runs/dot-bien-013/tong-hop.json#/so_bi_bat`, `#/so_bi_bat_hanh_vi`); 103 đột biến chỉ bị đúng một phép bắt (`#/so_bi_bat_dung_mot_phep`), sau khi lượt đầu lộ 2 lỗ hổng test và đã vá (`runs/dot-bien-001/tong-hop.json#/song_sot`). D22–D27 thêm sau phản biện lượt 1; D28–D35 sau lượt 2; D36–D41 sau lượt 3; D42–D44 sau khi Minh quyết E1-CP và bước 5; D45–D58 sau lượt 4; D59–D110 sau lượt 5; D111–D128 sau kiểm lại lượt 5 (D80 đổi thành đột biến ngược); D129–D147 sau kiểm lại gói C8.
 - Sau phản biện lượt 1: đã sửa ba lỗi CHẶN (bội số ô trong luật C, M5, UV-6, mốc giả; trạng thái quan sát của nguồn metric; cặp giải thích WORLD_DEPENDENT), thu hẹp lập luận E3 trong đề xuất WHY, và cho manifest kiểm được trên checkout CRLF (giả lập trên Linux, `runs/manifest-crlf-001`; chưa chạy trên Windows thật) (`dinh-chinh-cai-dat.md` Phần II mục C2).
 - Sau phản biện lượt 2: đã sửa MRR chính xác tới hết luật chọn, ô bội số 0, bước 8 với cặp phụ thuộc quan sát, kiểm khai báo bắt buộc, thống kê severity và cặp Drain trong bản ghi, giải thích WORLD_DEPENDENT khi hòa hoặc vắng, trạng thái nguồn metric rỗng (mục C3). Chưa sửa, chờ Minh: quy tắc E1-CP; cách đọc cặp phụ thuộc quan sát ở bước 5 (mục D).
 - Sau phản biện lượt 3: định danh kênh theo đơn vị (S12; lỗi làm đổi thứ hạng khi hai kênh khác đơn vị cùng tên), giải thích WORLD_DEPENDENT theo kênh đổi và phần khóa (S13), freeze dùng được trên máy khác (S15), báo kèm UV-6 theo Hit@1 kỳ vọng (S16) (mục C4). Chưa sửa: E7 ở C-a0/C-a1 (S14, cách sửa lệch hợp đồng, trình lại); `chon` khi thiếu cặp (S17, chờ Minh).
@@ -19,6 +19,7 @@
 - Sau phản biện lượt 4 (mục C6): điểm và khóa xếp hạng so chính xác, hai điểm bằng nhau theo công thức không còn bị tách hòa vì số thực (S20); giá trị không hữu hạn không còn làm dừng pha 1 (S21); kiểm `bat_tat` (S22); lưu π gốc E6b (S23); kiểm số mốc metric (S24); map bội số phải đủ (S25); pha 2 kiểm bản ghi trùng, thiếu (S26); S14 (C-a0/C-a1 không dựng vùng) và S17 (thiếu cặp là lỗi).
 - Sau phản biện lượt 5 (mục C7): luật chọn khối đòi đủ 2^n cấu hình, it_ca, do_thi hợp lệ (G1); luật C, bội số, UV-6 chỉ nhận số chính xác (G2); E_X phải thuộc tập ô của ca, mã ca không trùng (G3); pha 2 kiểm nhãn thành phần của cặp khối K (G4); bước 8 ghi riêng cặp phụ thuộc quan sát của thành phần không ít ca (G5, Q1); mã nội dung gồm `doi_chung` (G6); trùng mã đơn vị là ERROR (S27); verdict chỉ đếm phép chấm trong U (S28, Q2); ngưỡng E4 không tràn (S29); NEW_OP/STOPPED chỉ ở hướng được chấm (S30, Q5); kiểm khóa `nhanh_z`, `tham_so_E4`, `params_ca` (S31); E1-CP bỏ con bắt đầu trong khoảng của nút đang xét (S32, Q3); báo kèm kết cục khi chưa áp mốc giả (S33). Ca biên cho 28 đột biến đổi hành vi còn sống của lượt 5; sửa ba test tự so với chính nó. Trên bộ ca tất định, 104 bản ghi giống bản trước sửa ở mọi trường (`runs/tat-dinh-010/so-truong-truoc-luot5.json`).
 - Sau kiểm lại lượt 5 (mục C8): `khong_moc_gia` giữ điều kiện riêng E5/E3 (S34); gộp hòa theo khóa ghi ra, như bộ đánh giá đọc (S35; RR không đổi); luật chọn khối theo thế giới (S36); MRR theo bội số và lấy mẫu ô (S37); cache cổng theo ca (S38); giá trị `tham_so_E4` (S39); ca cho 9 đột biến sống sót của phiên kiểm lại (S40); ghi rõ hai cách dựng G_N (S41); pha 2 lưu đủ độ đo của `src/p3/danh_gia` (S42). Trên bộ ca tất định, 104 bản ghi chỉ khác bản trước lượt 5 ở trường mới `diagnostics.gop_khoa_ghi_ra` (`runs/tat-dinh-011/so-truong-truoc-luot5.json`).
+- Sau kiểm lại gói C8 (mục C9): khóa ghi ra luôn giảm dần (S43; trước đó hai phần đầu khác nhau dưới một ulp có thể làm pha 2 dừng); số lần gộp của T4c (S44); làm mạnh test của C8 (S45). Trên bộ ca tất định, 104 bản ghi chỉ khác bản trước lượt 5 ở ba trường số gộp mới (`runs/tat-dinh-012/so-truong-truoc-luot5.json`).
 - Runner sinh đúng số cấu hình theo `ma-tran-thu.json` sau Đ16; hai pha tách được; hash pha 1 ổn định.
 
 **Câu hỏi của SPEC trả lời tới đâu:**
@@ -30,7 +31,7 @@
 
 **Không trả lời:** hiệu quả của M1 (RQ3b, RQ3c, RQ3d); hành vi, thời gian, RAM trên dữ liệu thật (T-045).
 
-**Trạng thái:** Phần II mục A đã được Minh duyệt (29/10/2026); đã sửa sau phản biện lượt 1–4 (mục C2–C4, C6), lượt 5 (mục C7) và kiểm lại lượt 5 (mục C8); E1-CP và bước 5 đã quyết và sửa (mục C5); chờ kiểm lại gói C8.
+**Trạng thái:** Phần II mục A đã được Minh duyệt (29/10/2026); đã sửa sau phản biện lượt 1–4 (mục C2–C4, C6), lượt 5 (mục C7), kiểm lại lượt 5 (mục C8) và kiểm lại gói C8 (mục C9); E1-CP và bước 5 đã quyết và sửa (mục C5); nghiệm thu ngày 31/10/2026 theo Q-215 (lời Minh "Sửa rồi nghiệm thu"). Nghiệm thu trong phạm vi fixture; không xác nhận hiệu quả hay hành vi trên dữ liệu thật (T-045).
 
 ## 2. Đầu vào, môi trường, kiểm hash
 
@@ -45,7 +46,7 @@
 
 ## 3. Kết quả phép kiểm
 
-Nguồn: `runs/test-xanh-010/ket-qua.json` (từng phép), tổng hợp ở `bang-phep-kiem.json` (`scripts/tao_bang_phep_kiem.py`). Các lượt trước: `runs/test-xanh-001` (235/235), `runs/test-xanh-002` (246/246), `runs/test-xanh-003` (254/254), `runs/test-xanh-004` (263/263), `runs/test-xanh-005` (266/266), `runs/test-xanh-006` (289/289, trước bản cuối), `runs/test-xanh-007` (289/289), `runs/test-xanh-008` (342/342, lượt 5 trước bản cuối), `runs/test-xanh-009` (342/342, lượt 5).
+Nguồn: `runs/test-xanh-011/ket-qua.json` (từng phép), tổng hợp ở `bang-phep-kiem.json` (`scripts/tao_bang_phep_kiem.py`). Các lượt trước: `runs/test-xanh-001` (235/235), `runs/test-xanh-002` (246/246), `runs/test-xanh-003` (254/254), `runs/test-xanh-004` (263/263), `runs/test-xanh-005` (266/266), `runs/test-xanh-006` (289/289, trước bản cuối), `runs/test-xanh-007` (289/289), `runs/test-xanh-008` (342/342, lượt 5 trước bản cuối), `runs/test-xanh-009` (342/342, lượt 5), `runs/test-xanh-010` (366/366, lượt 5b).
 
 | Nhóm | Số phép | Qua | Con trỏ |
 |---|---|---|---|
@@ -53,11 +54,11 @@ Nguồn: `runs/test-xanh-010/ket-qua.json` (từng phép), tổng hợp ở `ban
 | Fixture bổ sung B1–B8 | 8 | 8 | `#/theo_nhom/B` |
 | U1–U6 (Đ15), H1–H6 (Đ19) | 12 | 12 | `#/theo_nhom/U`, `#/theo_nhom/H` |
 | H1–H3 chạy qua chuỗi (trạng thái quan sát của nguồn metric) | 3 | 3 | `#/theo_nhom/H_qua_chuoi` |
-| Đáp án tự lập, thành phần (125 mục) | 190 | 190 | `#/theo_nhom/tu_lap_thanh_phan` |
+| Đáp án tự lập, thành phần (126 mục) | 197 | 197 | `#/theo_nhom/tu_lap_thanh_phan` |
 | Đáp án tự lập, đối chứng (15 mục) | 15 | 15 | `#/theo_nhom/tu_lap_doi_chung` |
 | Đáp án từ văn bản đặc tả (5 mục) | 5 | 5 | `#/theo_nhom/tu_lap_van_ban` |
-| Phép bổ sung của người làm (đầu-cuối từ span, runner, adapter, kiểm tĩnh, cache…) | 36 | 36 | `#/theo_nhom/bo_sung_nguoi_lam` |
-| **Tổng** | **366** | **366** | `#/tong` |
+| Phép bổ sung của người làm (đầu-cuối từ span, runner, adapter, kiểm tĩnh, cache…) | 37 | 37 | `#/theo_nhom/bo_sung_nguoi_lam` |
+| **Tổng** | **374** | **374** | `#/tong` |
 
 - Đáp án tự lập ở `fixture/dap-an-thanh-phan.json`, `dap-an-doi-chung.json`, `dap-an-van-ban.json` mang dấu "đáp án của người làm T-044, chưa qua phản biện". Codex cần kiểm từng mục (Q-212).
 - `fixture/dap-an-u-h.json`: U1–U6, H1–H6 chép từ `results/T-043/dinh-chinh-phien10.md` dòng 42–47 và 144–149; cột `van_ban` tách nguyên văn, cột `may_doc` chép tay; chờ người phản biện đối chiếu.
@@ -116,10 +117,11 @@ Nguồn: `runs/test-xanh-010/ket-qua.json` (từng phép), tổng hợp ở `ban
 - Lượt cuối `runs/tat-dinh-008/tong-hop.json` (sau gói sửa lượt 4): 0 sha256 lệch; 289 phép giống hệt ở 12 biến thể. So với 253dbe46 sau khi bỏ trường mới: 16 bản ghi lệch, và `so-truong-253dbe46.json` (`scripts/so_truong_ban_ghi.py`) cho thấy mọi chỗ lệch chỉ ở m của T4c, chữ số cuối, do đổi sang log1p của x chính xác (S21). Khóa xếp hạng, thứ tự, kênh, verdict không đổi trên bộ ca này.
 - Lượt cuối `runs/tat-dinh-010/tong-hop.json` (sau gói sửa lượt 5): 0 sha256 lệch; 342 phép giống hệt ở 12 biến thể; hash seed ghi trong đầu ra khớp 0, 1, 2. So với cây trước sửa (bản chụp cây làm việc lúc bắt đầu lượt 5, chưa commit; `CAY_CU`), so đủ mọi trường (`so_truong_ban_ghi.py --day-du`): 0/104 bản ghi lệch (`so-truong-truoc-luot5.json`); vậy gói sửa không đổi bản ghi nào của bộ ca này, chỉ đổi kết quả ở các ca phản ví dụ. Phụ thuộc hash seed ở mức thành phần kiểm thêm bằng TD2 (đường E5 qua 8 seed) và TD3 (đầu ra luật chọn khối, luật C qua 4 seed và hai thứ tự khóa). Lượt `runs/tat-dinh-009` (lần 1 của lượt 5) cho cùng kết quả.
 - Lượt cuối `runs/tat-dinh-011/tong-hop.json` (sau gói sửa C8): 0 sha256 lệch; 366 phép giống hệt ở 12 biến thể; hash seed khớp. So đủ mọi trường với cây trước lượt 5: 104 bản ghi khác đúng một đường dẫn, trường mới `/diagnostics/gop_khoa_ghi_ra` (`so-truong-truoc-luot5.json#/duong_dan_lech`); bộ ca này không có hai khóa chính xác khác nhau mà ghi ra cùng số thực.
+- Lượt cuối `runs/tat-dinh-012/tong-hop.json` (sau gói sửa C9): 0 sha256 lệch; 374 phép giống hệt ở 12 biến thể; hash seed khớp. So đủ mọi trường với cây trước lượt 5: 104 bản ghi chỉ khác ở ba trường số gộp mới (`so-truong-truoc-luot5.json#/duong_dan_lech`).
 
 ## 8. Đột biến
 
-Nguồn: `runs/dot-bien-012/tong-hop.json`. Mỗi đột biến thay đúng một chuỗi trong bản sao tạm của `src/`; lượt đối chứng không đột biến xanh 366/366. Số phép trượt dưới đây theo lượt 012 (Windows local). D80 đổi thành đột biến ngược theo S35 (gộp theo khóa chính xác); D111–D119 bỏ từng sửa của C8; D120–D128 là 9 đột biến sống sót của phiên kiểm lại lượt 5 (tên gốc trong mô tả). Lượt 011 (lượt 5): 110/110. D09 đổi chỗ theo dòng mới của S32 (cùng ý). D59–D78 bỏ từng chặn của gói sửa lượt 5; D79–D110 là các đột biến đổi hành vi sống sót mà phiên phản biện lượt 5 tìm ra (tên gốc trong mô tả). Lượt `runs/dot-bien-010` (lần 1 của lượt 5): 108/110, D103 và D107 sống sót vì ca E4B chỉ giả lập p của đơn vị đếm và ca E9X chỉ gọi `e9.phu_quyet` trực tiếp; đã thêm hai phép vào E4B, E9X. Lượt 012: 93/128 đột biến chỉ bị đúng một phép bắt: sức bắt lỗi theo từng điểm, chưa phủ đều các biên. D03, D13 đổi chỗ theo dòng mới của lượt 4 (cùng ý). D30 đổi chỗ theo hàm dùng chung của bước 5 và bước 8 (S19). D26, D27 đổi chỗ đột biến theo code mới của lượt 2; D11 đổi chỗ theo dòng E7 mới của lượt 3 (cùng ý).
+Nguồn: `runs/dot-bien-013/tong-hop.json`. Mỗi đột biến thay đúng một chuỗi trong bản sao tạm của `src/`; lượt đối chứng không đột biến xanh 374/374. Số phép trượt dưới đây theo lượt 013 (Windows local). D129 trả lại cách sắp theo khóa chính xác trước (S43), D130 bỏ số gộp của T4c (S44), D131–D147 là 17 đột biến của lượt kiểm lại gói C8 (tên gốc K01–K17). Lượt 012 (lượt 5b): 128/128. D80 đổi thành đột biến ngược theo S35 (gộp theo khóa chính xác); D111–D119 bỏ từng sửa của C8; D120–D128 là 9 đột biến sống sót của phiên kiểm lại lượt 5 (tên gốc trong mô tả). Lượt 011 (lượt 5): 110/110. D09 đổi chỗ theo dòng mới của S32 (cùng ý). D59–D78 bỏ từng chặn của gói sửa lượt 5; D79–D110 là các đột biến đổi hành vi sống sót mà phiên phản biện lượt 5 tìm ra (tên gốc trong mô tả). Lượt `runs/dot-bien-010` (lần 1 của lượt 5): 108/110, D103 và D107 sống sót vì ca E4B chỉ giả lập p của đơn vị đếm và ca E9X chỉ gọi `e9.phu_quyet` trực tiếp; đã thêm hai phép vào E4B, E9X. Lượt 013: 103/147 đột biến chỉ bị đúng một phép bắt: sức bắt lỗi theo từng điểm, chưa phủ đều các biên. D03, D13 đổi chỗ theo dòng mới của lượt 4 (cùng ý). D30 đổi chỗ theo hàm dùng chung của bước 5 và bước 8 (S19). D26, D27 đổi chỗ đột biến theo code mới của lượt 2; D11 đổi chỗ theo dòng E7 mới của lượt 3 (cùng ý).
 
 | Mã | Đột biến | Tệp | Phép trượt |
 |---|---|---|---|
@@ -128,7 +130,7 @@ Nguồn: `runs/dot-bien-012/tong-hop.json`. Mỗi đột biến thay đúng mộ
 | D03 | Khóa K: đổi chỗ số kênh và tổng điểm | `m1/xep_hang.py` | 12 |
 | D04 | Bộ kiểm trường cấm không duyệt list, tuple | `m1/hop_dong.py` | 3 |
 | D05 | Luật C: δ = 0,02 | `m1_danh_gia/luat_c.py` | 5 |
-| D06 | Pha 1 đưa mã mờ vào params | `m1/runner.py` | 6 |
+| D06 | Pha 1 đưa mã mờ vào params | `m1/runner.py` | 7 |
 | D07 | `src/m1` import bộ đánh giá | `m1/chuoi.py` | 1 |
 | D08 | Pha 1 trỏ tới file nhãn | `m1/runner.py` | 1 |
 | D09 | E1-CP bỏ dung sai τ | `m1/span.py` | 3 |
@@ -200,9 +202,9 @@ Nguồn: `runs/dot-bien-012/tong-hop.json`. Mỗi đột biến thay đúng mộ
 | D75 | Chuỗi: không kiểm khóa tham_so_E4 (S31) | `m1/chuoi.py` | 1 |
 | D76 | Runner: params_ca được mang doi_chung (S31) | `m1/runner.py` | 1 |
 | D77 | E1-CP: nhận con bắt đầu trong khoảng của nút đang xét (S32, Q3) | `m1/span.py` | 6 |
-| D78 | Pha 2: không báo kèm kết cục khi chưa áp mốc giả (S33) | `m1_danh_gia/pha2.py` | 3 |
+| D78 | Pha 2: không báo kèm kết cục khi chưa áp mốc giả (S33) | `m1_danh_gia/pha2.py` | 5 |
 | D79 | E6b: không dùng K_I, K_raw phá hòa π (N01) | `m1/xep_hang.py` | 1 |
-| D80 | Gộp hòa theo khóa chính xác thay khóa ghi ra (ngược K07; S35) | `m1/xep_hang.py` | 1 |
+| D80 | Gộp hòa theo khóa chính xác thay khóa ghi ra (ngược K07; S35) | `m1/xep_hang.py` | 3 |
 | D81 | E6b: không làm tròn π 12 chữ số (N02) | `m1/xep_hang.py` | 1 |
 | D82 | E1-CP: happensBefore không chặt (N22) | `m1/span.py` | 1 |
 | D83 | E1-CP: hòa LFC chọn con bắt đầu sớm (N24) | `m1/span.py` | 1 |
@@ -233,13 +235,13 @@ Nguồn: `runs/dot-bien-012/tong-hop.json`. Mỗi đột biến thay đúng mộ
 | D108 | MRR: tổng bội số 0 trả 0 (K01) | `m1_danh_gia/rr.py` | 1 |
 | D109 | E5: đường phụ thuộc hash seed (K09) | `m1/e5.py` | 1 |
 | D110 | E3: log trùng mốc theo thứ tự vào (K17) | `m1/e3.py` | 1 |
-| D111 | khong_moc_gia bỏ điều kiện riêng E5, E3 (S34; lỗi của lượt 5) | `m1_danh_gia/pha2.py` | 1 |
-| D112 | Không đếm lần gộp khóa ghi ra (S35) | `m1/xep_hang.py` | 1 |
+| D111 | khong_moc_gia bỏ điều kiện riêng E5, E3 (S34; lỗi của lượt 5) | `m1_danh_gia/pha2.py` | 3 |
+| D112 | Không đếm lần gộp khóa ghi ra (S35) | `m1/xep_hang.py` | 3 |
 | D113 | Luật chọn khối ở S_lo, S_hi vẫn đọc kết cục tại P (S36) | `m1_danh_gia/chon_khoi.py` | 1 |
-| D114 | MRR gộp của cấu hình bỏ bội số (S37) | `m1_danh_gia/pha2.py` | 1 |
-| D115 | Lấy mẫu ô gộp hai dataset (S37) | `m1_danh_gia/rr.py` | 1 |
-| D116 | Lấy mẫu ô theo thứ tự đầu vào (S37) | `m1_danh_gia/rr.py` | 1 |
-| D117 | Pha 1 không làm mới cache theo ca (S38) | `m1/runner.py` | 1 |
+| D114 | MRR gộp của cấu hình bỏ bội số (S37) | `m1_danh_gia/pha2.py` | 2 |
+| D115 | Lấy mẫu ô gộp hai dataset (S37) | `m1_danh_gia/rr.py` | 2 |
+| D116 | Lấy mẫu ô theo thứ tự đầu vào (S37) | `m1_danh_gia/rr.py` | 2 |
+| D117 | Pha 1 không làm mới cache theo ca (S38) | `m1/runner.py` | 2 |
 | D118 | Chuỗi: không kiểm khoảng giá trị tham_so_E4 (S39) | `m1/chuoi.py` | 1 |
 | D119 | Pha 2 không lưu đủ độ đo (S42) | `m1_danh_gia/pha2.py` | 1 |
 | D120 | Mốc giả giữ cặp có bản ghi lỗi trong mẫu số (X02; PII-13) | `m1_danh_gia/pha2.py` | 1 |
@@ -251,6 +253,25 @@ Nguồn: `runs/dot-bien-012/tong-hop.json`. Mỗi đột biến thay đúng mộ
 | D126 | G_N nhận cạnh có span cha thuộc A (X14) | `m1/chuoi.py` | 1 |
 | D127 | Ô E9 5 giây (X16) | `m1/chuoi.py` | 1 |
 | D128 | E9: cạnh E2 chỉ xét một chiều (X26) | `m1/e5.py` | 1 |
+| D129 | Sắp theo khóa chính xác trước: khóa ghi ra có thể tăng (S43; F1) | `m1/xep_hang.py` | 1 |
+| D130 | Bản ghi không có số lần gộp của T4c (S44) | `m1/chuoi.py` | 1 |
+| D131 | khong_moc_gia cặp E3 bỏ UV-6 (K01) | `m1_danh_gia/pha2.py` | 1 |
+| D132 | khong_moc_gia chép P (K02) | `m1_danh_gia/pha2.py` | 1 |
+| D133 | Đếm cả hòa chính xác là gộp (K03) | `m1/xep_hang.py` | 1 |
+| D134 | Khóa chính xác để so chỉ cập nhật ở đầu khối (K04) | `m1/xep_hang.py` | 1 |
+| D135 | Số gộp theo thế giới lấy của P (K05) | `m1/chuoi.py` | 1 |
+| D136 | Kết quả chọn ghi sai thế giới (K06) | `m1_danh_gia/chon_khoi.py` | 1 |
+| D137 | MRR cấu hình luôn đọc P (K07) | `m1_danh_gia/pha2.py` | 1 |
+| D138 | Lấy mẫu không bao giờ lấy ô cuối (K08) | `m1_danh_gia/rr.py` | 1 |
+| D139 | Lấy mẫu duyệt dataset theo thứ tự vào (K09) | `m1_danh_gia/rr.py` | 2 |
+| D140 | Lấy mẫu duyệt dataset theo set, phụ thuộc hash seed (K10) | `m1_danh_gia/rr.py` | 1 |
+| D141 | Lấy mẫu không kiểm ô trùng giữa hai dataset (K11) | `m1_danh_gia/rr.py` | 1 |
+| D142 | Pha 1 không kiểm mã mờ trùng (K12) | `m1/runner.py` | 1 |
+| D143 | tham_so_E4 nhận bool (K13) | `m1/chuoi.py` | 1 |
+| D144 | tham_so_E4 nhận α = 0, 1 (K14) | `m1/chuoi.py` | 1 |
+| D145 | Độ đo của mọi thế giới tính trên khối P (K15) | `m1_danh_gia/pha2.py` | 1 |
+| D146 | MRR theo dataset bỏ bội số (K16) | `m1_danh_gia/pha2.py` | 2 |
+| D147 | Pha 1 tạo cache mới nhưng không dùng (K17) | `m1/runner.py` | 1 |
 
 - Gồm đủ sáu ví dụ của SPEC bước 7 (D01, D02, D03, D04, D05; rò nhãn D06–D08).
 - Lượt `runs/dot-bien-001` (20 đột biến) có 2 đột biến sống sót: D02 vì fixture 4, 5 chỉ gọi `cat_con` trực tiếp, không đi qua `chuan_bi`; D10 vì test nhóm vòng luôn truyền cách đọc. Đã thêm test, không thêm đáp án.
@@ -258,7 +279,7 @@ Nguồn: `runs/dot-bien-012/tong-hop.json`. Mỗi đột biến thay đúng mộ
 ## 9. Tự diễn giải, giới hạn, phần chưa kiểm
 
 - Tự diễn giải đã duyệt: Phần I của `dinh-chinh-cai-dat.md` (CĐ1–CĐ16).
-- Tự diễn giải lộ ra khi cài: Phần II mục A (PII-01…PII-20), Minh duyệt giữ cả 20 ngày 29/10/2026. Quy ước biểu diễn: mục B. Sửa trong phiên: mục C. Sửa sau phản biện lượt 1: mục C2. Sửa sau lượt 2: mục C3. Sửa sau lượt 3: mục C4. Hai OPEN Minh quyết: mục C5. Sửa sau lượt 4: mục C6. Sửa sau lượt 5: mục C7. Sửa sau kiểm lại lượt 5: mục C8.
+- Tự diễn giải lộ ra khi cài: Phần II mục A (PII-01…PII-20), Minh duyệt giữ cả 20 ngày 29/10/2026. Quy ước biểu diễn: mục B. Sửa trong phiên: mục C. Sửa sau phản biện lượt 1: mục C2. Sửa sau lượt 2: mục C3. Sửa sau lượt 3: mục C4. Hai OPEN Minh quyết: mục C5. Sửa sau lượt 4: mục C6. Sửa sau lượt 5: mục C7. Sửa sau kiểm lại lượt 5: mục C8. Sửa sau kiểm lại gói C8: mục C9.
 - Chưa kiểm (Phần II mục D):
   - biên p = α không có fixture; lượt 5 thêm phép giả lập p = α cho cả đơn vị phân vị và đơn vị đếm (E4B; D103, D104 bị bắt) (PII-01);
   - khoảng tin cậy bootstrap theo ô chưa nằm trong `luat_c` (báo kèm; T-045 dùng `p3.danh_gia.bootstrap`);
@@ -271,6 +292,7 @@ Nguồn: `runs/dot-bien-012/tong-hop.json`. Mỗi đột biến thay đúng mộ
   - C-e theo verdict tại P; ứng viên E5 giữ phần dư và tối ưu C-d3 chưa kiểm (mục C6);
   - dữ liệu dev có ca hai kênh trùng tên không: chưa biết (không đọc dữ liệu); sau S12 không còn trùng mã;
   - lượt 5: cặp giải thích WORLD_DEPENDENT có thể ghi kênh đổi không phân định phần khóa (Q6, ghi giới hạn); trùng tên cạnh E2-VC khi tên chứa `->` chỉ kiểm bằng đọc code; phép độ bền 1.000 mẫu và bước 10 luật chọn khối do T-045 tự viết, với các điều kiện ở mục D của đính chính; lượt 5b thêm `chon(..., the_gioi)`, `pha2.mrr_cau_hinh`, `rr.lay_mau_o` làm phần nền;
+  - lượt 5c: G_N cho baseline từ `call_rows` (SPEC T-045 bước 6) chưa có hàm; MRR truyền cho `chon` ở S_lo, S_hi phải lấy từ `pha2.mrr_cau_hinh` của đúng thế giới; `do` chỉ báo cáo;
   - lượt 5b: hai khóa chính xác khác nhau mà ghi ra cùng số thực nay là hòa (S35), đếm ở `diagnostics.gop_khoa_ghi_ra`; tần suất trên dev chưa biết; dòng mặc định cho SPEC T-045 (bước 8, cặp phụ thuộc quan sát của thành phần không ít ca) chưa áp, vì SPEC T-045 ngoài phạm vi ghi.
 - Kết luận "code đúng" chỉ trong phạm vi fixture. Đáp án tự lập chưa qua phản biện; nếu một đáp án tự lập sai thì code đang khớp cùng cách hiểu sai đó.
 
@@ -317,6 +339,10 @@ Nguồn: `runs/dot-bien-012/tong-hop.json`. Mỗi đột biến thay đúng mộ
 | `runs/tat-dinh-011` | sau gói sửa C8: PASS (366 phép, 104 bản ghi); so với cây trước lượt 5: chỉ khác trường mới `diagnostics.gop_khoa_ghi_ra` |
 | `runs/dot-bien-012` | sau gói sửa C8: 128/128 bị bắt (126/126 hành vi) |
 | `runs/kiem-hash-t043-011` | sau gói sửa C8: PASS |
+| `runs/test-xanh-011` | sau gói sửa C9: 374/374 qua |
+| `runs/tat-dinh-012` | sau gói sửa C9: PASS (374 phép, 104 bản ghi); so với cây trước lượt 5: chỉ khác ba trường số gộp mới |
+| `runs/dot-bien-013` | sau gói sửa C9: 147/147 bị bắt (145/145 hành vi) |
+| `runs/kiem-hash-t043-012` | sau gói sửa C9: PASS |
 | `runs/kiem-hash-t043-003` | sau gói sửa: PASS |
 | `runs/manifest-crlf-001` | manifest trên checkout CRLF giả lập: thiếu `.gitattributes` FAIL (lượt hỏng); có `.gitattributes` PASS, 29 file `src/` khớp `git_blob` |
 
@@ -332,4 +358,4 @@ python -B results/T-044/scripts/kiem_hash_t043.py
 python -B results/T-044/scripts/tao_bang_phep_kiem.py <ket-qua.json>
 python -B results/T-044/scripts/tao_manifest.py --kiem
 ```
-Trên máy cloud dùng `$HOME/m1env/bin/python`; trên Windows dùng `py -3`, hoặc môi trường ghim ở mục 2. Lượt 3 chạy cả gói bằng `bash results/T-044/scripts/chay_kiem_windows.sh` (Git Bash), rồi `python -B results/T-044/scripts/tong_hop_tat_dinh.py results/T-044/runs/tat-dinh-005`. Lượt 5: `TX_LUOT=test-xanh-009 TD_LUOT=tat-dinh-010 DB_LUOT=dot-bien-011 KH_LUOT=kiem-hash-t043-010 GOC_CU=truoc-luot5 SO_DAY_DU=1 CAY_CU=<bản chụp cây trước sửa> bash results/T-044/scripts/chay_kiem_windows.sh`, rồi `tong_hop_tat_dinh.py results/T-044/runs/tat-dinh-010 truoc-luot5`. Lượt 5b: cùng lệnh với `TX_LUOT=test-xanh-010 TD_LUOT=tat-dinh-011 DB_LUOT=dot-bien-012 KH_LUOT=kiem-hash-t043-011`. Bản chụp cây trước sửa nằm ngoài repo (thư mục tạm của phiên), không dựng lại được trên máy khác; kết quả so đã ghi trong `runs/tat-dinh-009`, `tat-dinh-010`.
+Trên máy cloud dùng `$HOME/m1env/bin/python`; trên Windows dùng `py -3`, hoặc môi trường ghim ở mục 2. Lượt 3 chạy cả gói bằng `bash results/T-044/scripts/chay_kiem_windows.sh` (Git Bash), rồi `python -B results/T-044/scripts/tong_hop_tat_dinh.py results/T-044/runs/tat-dinh-005`. Lượt 5: `TX_LUOT=test-xanh-009 TD_LUOT=tat-dinh-010 DB_LUOT=dot-bien-011 KH_LUOT=kiem-hash-t043-010 GOC_CU=truoc-luot5 SO_DAY_DU=1 CAY_CU=<bản chụp cây trước sửa> bash results/T-044/scripts/chay_kiem_windows.sh`, rồi `tong_hop_tat_dinh.py results/T-044/runs/tat-dinh-010 truoc-luot5`. Lượt 5b: cùng lệnh với `TX_LUOT=test-xanh-010 TD_LUOT=tat-dinh-011 DB_LUOT=dot-bien-012 KH_LUOT=kiem-hash-t043-011`. Lượt 5c: `TX_LUOT=test-xanh-011 TD_LUOT=tat-dinh-012 DB_LUOT=dot-bien-013 KH_LUOT=kiem-hash-t043-012`. Bản chụp cây trước sửa nằm ngoài repo (thư mục tạm của phiên), không dựng lại được trên máy khác; kết quả so đã ghi trong `runs/tat-dinh-009`, `tat-dinh-010`.

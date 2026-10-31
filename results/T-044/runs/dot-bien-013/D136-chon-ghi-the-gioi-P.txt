@@ -1,0 +1,28 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 77%]
+.............................................F.......................... [ 96%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+_________________________ test_CW1_chon_theo_the_gioi _________________________
+
+ma = <function ma.<locals>._gan at 0x0000021799371C60>
+
+    def test_CW1_chon_theo_the_gioi(ma):
+        from m1_danh_gia import chon_khoi
+        m = tu_lap(DAP_AN_THANH_PHAN, 'CW1')
+        d, da = m['dau_vao'], m['dap_an']
+        ma('CW1')
+        cap = _cap_CW1(d)
+        MRR = {k: _q(v) for k, v in d['MRR'].items()}
+        kq = {w: chon_khoi.chon(d['thanh_phan'], d['it_ca'], d['do_thi'], MRR, cap, the_gioi=w) for w in ('P', 'S_lo', 'S_hi')}
+        assert {w: x['chon'] for w, x in kq.items()} == da['chon']
+>       assert all(x['the_gioi'] == w for w, x in kq.items())  # C9, S45
+E       assert False
+E        +  where False = all(<generator object test_CW1_chon_theo_the_gioi.<locals>.<genexpr> at 0x0000021799337780>)
+
+test_k14_luot5b.py:39: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k14_luot5b.py::test_CW1_chon_theo_the_gioi - assert False
+1 failed, 373 passed in 15.88s

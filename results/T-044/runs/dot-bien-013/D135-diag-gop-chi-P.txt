@@ -1,0 +1,39 @@
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 77%]
+....................................................................F... [ 96%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+_________________________ test_GK1_so_gop_vao_ban_ghi _________________________
+
+ma = <function ma.<locals>._gan at 0x0000018511392D40>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001857FBB31A0>
+
+    def test_GK1_so_gop_vao_ban_ghi(ma, monkeypatch):
+        from m1 import chuoi, xep_hang
+        from test_k12_luot4 import _ca_metric
+        ma('GK1')
+        goc, dem = xep_hang.xep, []
+    
+        def xep(*a, **k):
+            out = goc(*a, **k)
+            dem.append(1)
+            out['gop_khoa_ghi_ra'] = len(dem)  # lần gọi thứ n: P, S_lo, S_hi rồi T4c
+            return out
+        monkeypatch.setattr(chuoi.xep_hang, 'xep', xep)
+        rows, p = _ca_metric([0.0] * 20, [10.0] * 20)
+        r = chuoi.chay([], rows, [], ['S'], {}, 1000, p)
+>       assert r['diagnostics']['gop_khoa_ghi_ra'] == {'P': 1, 'S_lo': 2, 'S_hi': 3}
+E       AssertionError: assert {'P': 1, 'S_hi': 1, 'S_lo': 1} == {'P': 1, 'S_hi': 3, 'S_lo': 2}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'S_lo': 1} != {'S_lo': 2}
+E         {'S_hi': 1} != {'S_hi': 3}
+E         Use -v to get more diff
+
+test_k15_luot5c.py:66: AssertionError
+=========================== short test summary info ===========================
+FAILED test_k15_luot5c.py::test_GK1_so_gop_vao_ban_ghi - AssertionError: asse...
+1 failed, 373 passed in 15.76s

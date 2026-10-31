@@ -22,7 +22,7 @@ from m1 import xep_hang
 
 def _khoi(items):
     """items: [(thực thể, khóa)] → khối; khóa bằng nhau là hòa; trong nhóm sắp theo tên chỉ để hiển thị."""
-    items = sorted(items, key=lambda x: (tuple(-v for v in x[1]), x[0]))
+    items = xep_hang.sap_khoa(items)
     return xep_hang._nhom(items)
 
 
