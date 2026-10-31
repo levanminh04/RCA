@@ -109,9 +109,10 @@ def doc_quyen_CP(cha, con, tau):
     return (cha[1] - cha[0]) - _dai(duong_gang(cha, con, tau))
 
 
-def chuan_bi(rows, t, tau, mien=None):
+def chuan_bi(rows, t, tau, mien=None, tinh_CP=True):
     """Chuẩn bị span cho mọi thành phần. rows: dict theo COT; mien: (lo, hi) lọc span vào miền nếu có
-    (start >= lo và end < hi). Trả {'loi', 'spans': {khóa: span}, 'chan_doan'}."""
+    (start >= lo và end < hi). tinh_CP: tính u_CP (đường găng E1-CP); False thì u_CP = None, vì chỉ E1 = CP đọc nó
+    và đường găng tốn bậc ba theo số con (T-045 ĐC3). Trả {'loi', 'spans': {khóa: span}, 'chan_doan'}."""
     if mien is not None:
         lo, hi = mien
         rows = [r for r in rows if r['start_us'] >= lo and r['start_us'] + r['duration_us'] < hi]
@@ -135,7 +136,7 @@ def chuan_bi(rows, t, tau, mien=None):
         cat, v = cat_con((s['start'], s['end']), khoang, tau)
         vuot += v
         s['u'] = s['d'] - _dai(cat)
-        s['u_CP'] = doc_quyen_CP((s['start'], s['end']), khoang, tau)
+        s['u_CP'] = doc_quyen_CP((s['start'], s['end']), khoang, tau) if tinh_CP else None
     for k, s in spans.items():
         boc = (len(s['con']) == 1 and spans[s['con'][0]]['chu'] != s['chu']
                and s['cha'] is not None and spans[s['cha']]['chu'] == s['chu'])

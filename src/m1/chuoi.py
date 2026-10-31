@@ -251,7 +251,7 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
         if st >= lo_ns and en < hi_ns:
             rows.append(dict(r, owner=_alias(aliases, r['owner'])))
     t_span = t_ns / he_span
-    prep = span.chuan_bi(rows, t=t_span, tau=tau_ns / he_span)
+    prep = span.chuan_bi(rows, t=t_span, tau=tau_ns / he_span, tinh_CP=(E1 == 'CP'))  # T-045 ĐC3
     if prep['loi']:
         raise LoiHopDong('ERROR', prep.get('ly_do') or 'span lỗi')
 
