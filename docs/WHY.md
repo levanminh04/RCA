@@ -883,6 +883,12 @@ F2 NumPy trên một số kênh gần hằng tạo |chênh mean hai cặp|/std5 
   - cổng giả định mẫu độc lập (B1.3; mô phỏng AR(1) cho tỷ lệ qua cổng 7,3–38,6% khi hệ số 0,5–0,98).
   Chỉ có T4, T4b làm phép độ nhạy. Cách chấm của M1 không còn phương án thay thế ở mức quyết định.
 - **Kết luận phụ thuộc:** mọi kết cục khối K và luật C; tỷ lệ `CAUSE_FOUND` ở mốc giả.
+- **Bổ sung 01/11/2026 (T-045; Q-223). Phần trên giữ nguyên làm lịch sử; quyết định D24 chưa đổi.**
+  - T4b trên 52 ca dev: MRR nhánh z 0,8005, R0 0,6385; RE2-TT 0,983 so với 0,718; Nezha-OB 0,551 so với 0,530 (`results/T-045/t4b.json#/MRR_z`, `#/MRR_R0`). Chỉ báo cáo, không dùng để chọn.
+  - R0 và nhánh z dùng cùng cờ, tầng và tập ứng viên; nhánh z chỉ thay điểm của đơn vị phân vị bằng z không bị chặn, kênh đếm vẫn trong [0; 1] (`src/m1/chuoi.py`, khối E4). Vì vậy nhánh z đổi cả cách ghép hai loại kênh, không chỉ sửa bão hòa. Bão hòa của E4 là một ứng viên giải thích, chưa xác lập.
+  - Điều số này hỗ trợ: với cùng cờ, đổi cách chấm cho thứ hạng rất khác; cổng hiện tại không làm thứ hạng tốt thành bất khả thi trên RE2-TT dev. Chưa có phép E1, E2 trên nền z.
+  - Giới hạn đối chứng (LESSONS QT7, MRP §6): R0 (0,718 trên RE2-TT) thấp hơn SimpleRCA (0,891), nên E1+E2 hơn R0 chưa đủ cho khẳng định rộng về lợi ích dùng quan hệ. Nghĩa vụ đối chứng không đồ thị đủ mạnh xử lý trước khi khóa danh sách so sánh ở G3.
+  - Giữ hay đổi thang điểm phải quyết trước bất kỳ lần chạy lại khối K nào (LOG T-045 phiên 2, QĐ-4, chờ Minh). Không chọn z vì MRR dev cao.
 
 ## WHY-57. Luật trạng thái quan sát trên dev (hoàn thiện D12) — Đã quyết (Q-209; WHY-M1-03, T-043)
 
@@ -1014,3 +1020,19 @@ F2 NumPy trên một số kênh gần hằng tạo |chênh mean hai cặp|/std5 
 - **Vì sao:** đây là cách đọc đúng câu "thực thể có ít nhất một kênh OK được xếp theo ba tầng" của B1.6. Xếp thực thể không có phép chấm nào là xếp ngẫu nhiên, trái WHY-26 ("điền phần thiếu cho phương pháp điểm nhờ may").
 - **Phương án đã xét:** đưa vào tầng 3. Không chọn vì tầng 3 là "có phép chấm, không có cờ".
 - **Kết luận phụ thuộc:** MRR khi root chỉ có kênh LOW_SUPPORT.
+
+## WHY-66. Đường xử lý log và Drain của E3: cách khớp (a), ngưỡng 0,4, độ sâu 4 — Đã quyết (Q-223; đề xuất 1, 3 của `results/T-044/de-xuat-why.md`; cách khớp (a) chốt ở D17, Q-218)
+
+- **Chọn:**
+  - Chuỗi vào Drain: Nezha-OB lấy `log` của JSON ngoài, dùng `message` nếu `log` là JSON có `message` kiểu chuỗi; RE2-TT dùng `message` nguyên văn. Adapter làm việc này, không phải lõi.
+  - Che token UUID → IP (kèm cổng) → HEX → NUM, ranh giới không dính chữ hoặc số; tắt phần che sẵn của drain3; bỏ che "chuỗi trong ngoặc" của đặc tả v1.
+  - Một Drain chung học trên mọi dòng N, theo thứ tự (mốc, thực thể, nội dung); đơn vị là cặp (thực thể, mẫu). Khớp dòng A chỉ trên mẫu đã biết của chính thực thể; không học thêm từ A.
+  - Cách khớp (a) khớp hoàn toàn; drain3 0.9.11 với sim_th = 0,4, độ sâu 4, max_children 100, max_clusters không giới hạn, extra_delimiters rỗng, parametrize_numeric_tokens True.
+- **Vì sao:**
+  - Chuỗi vào Drain cho cùng kết quả với `log_parsing.py` của Nezha (commit `d8140101fdb4`, dòng 94–127) mà không gọi tên dịch vụ (WHY-08).
+  - Cách khớp (a) là hàm suy luận của chính drain3 0.9.11 ("Match shall be perfect (sim_th=1.0)"). Lý do chỉ là bám hàm gốc; không có căn cứ (a) an toàn hơn (b) về mất dòng lỗi.
+  - Ngưỡng 0,4: mặc định của drain3 cho 95 mẫu so với 73 của tác giả trên log Online Boutique dùng cho bài TORAI; ngưỡng cao hơn tách tới 1.398 mẫu (`results/T-016/dung-logts-tracets.md` dòng 44–60). Với cách khớp (a), sim_th chỉ ảnh hưởng lúc học mẫu từ N.
+- **Phương án đã xét:** truyền nguyên cột `Log` như adapter P3; mỗi thực thể một Drain riêng; khớp theo ngưỡng (b) hoặc theo ngưỡng trong mẫu cùng lớp (c); giữ che ngoặc; mẫu che riêng của Nezha (gắn câu log cụ thể, trái WHY-08); ngưỡng của Nezha 0,9 (OB), 0,8 (TT).
+- **Bằng chứng:** fixture MASK1–7, NEZ1–4, KHOP1–2, U1–U6 của T-044. Trên dev (T-045, không nhãn, đo trước khối K): RE2-TT ba cách khớp gần như trùng, 0/997 dòng lỗi A vào mẫu thường; Nezha-OB ngưỡng 0,4 thì dòng lỗi A vào mẫu thường (a) 1.706/4.128, (b) 2.833, (c) 0; ngưỡng 0,9 thì 0 ở mọi cách (`results/T-045/e3-khong-nhan.json`). Minh chốt cách khớp (a) ở D17 sau khi xem các số này (Q-218).
+- **Giới hạn đã quan sát (T-045, mô tả):** ô "mẫu mới" bật cả ở cửa sổ không lỗi (RE2-TT 83 thực thể trong 24/30 cửa sổ giả). Dòng rơi vào ô này ở thực thể vượt lên trên root hiếm khi có tên lỗi theo luật phân loại; phần lớn khác số token với mọi mẫu đã học, nên với cách khớp (a) không thể khớp (`results/T-045/e3-noi-dung-mau.json`; báo cáo T-045 mục 6.7). Ngoại lệ Java nhiều dòng bị tách thành từng dòng log. Đây là suy luận chưa phân xử về nguyên nhân gây hại.
+- **Kết luận phụ thuộc:** kênh log khi E3 bật ở 8/16 cấu hình khối K; UV-6; kết cục của E3 theo luật C ở T-045 (E3 không vào bản P7 ở bản hiện tại). Nếu thử lại E3, thay đổi tách mẫu hay cách chấm ô "mẫu mới" là thiết kế mới, cần mục WHY mới trước khi chạy.

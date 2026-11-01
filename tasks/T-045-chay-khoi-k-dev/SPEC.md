@@ -1,7 +1,7 @@
 # T-045 — Chạy T1, T4, T4b và khối K của M1 trên 52 ca dev
 
 - **Trạng thái:** đã duyệt (29/10/2026, lời Minh trong chat: "duyệt toàn bộ các đề xuất, ngoài trừ 9 10 hoãn"), gồm bảng mặc định cho các điểm "Minh quyết" và phép độ bền. Bản này đã sửa theo lượt rà SPEC của Codex trong chat ngày 29/10/2026 (điểm 1: đặc tả phép độ bền). Triển khai sau khi T-044 được nghiệm thu.
-- **Người làm:** Claude, chạy local trên máy của Minh. **Người phản biện:** Codex. Đổi ngày 31/10/2026 theo lời Minh: "045 sẽ là claude làm" (Q-215); trước đó Codex làm, Claude phản biện.
+- **Người làm:** Claude, chạy local trên máy của Minh. **Người phản biện:** Codex. Đổi ngày 31/10/2026 theo lời Minh: "045 sẽ là claude làm" (Q-215); trước đó Codex làm, Claude phản biện. Ngày 01/11/2026 Minh đổi người phản biện chính thức sang một phiên Claude mới độc lập với phiên người làm (Q-219); phiên 2 do một phiên Claude khác tiếp nhận vai người làm (Q-220). Lượt kiểm lại thứ hai do một phiên Claude mới và một phiên Codex mới cùng làm (Q-221).
 - **Thuộc gói MRP:** P6 (M1). **Cổng:** chuẩn bị G3.
 - **Phụ thuộc:** T-044 đã nghiệm thu; code `src/m1`, `src/m1_danh_gia` lấy đúng commit được ghi khi nghiệm thu T-044.
 - **Nguồn chia task:** D1 của SPEC T-043 (Q-199); Minh chốt tách task (1) thành T-044 và T-045 trong chat ngày 29/10/2026.
