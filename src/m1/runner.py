@@ -179,6 +179,8 @@ def _params(cau_hinh, ca):
         'tham_so_E3': dict(cau_hinh.get('tham_so_E3') or TS_E3), 'tham_so_E5': dict(cau_hinh.get('tham_so_E5') or TS_E5),
         'the_gioi': ['P', 'S_lo', 'S_hi']}
     p['config_id'] = cau_hinh['config_id']
+    if cau_hinh.get('che_do'):  # T-046 (WHY-67, WHY-69): cấu hình mang khóa này để bật chế độ mới; không sửa results/T-043
+        p['che_do'] = dict(cau_hinh['che_do'])
     if cau_hinh.get('chay_M1') and cau_hinh.get('doi_chung'):  # C-a0, C-a1: chuỗi không dựng vùng E7 (S14)
         p['doi_chung'] = cau_hinh['doi_chung']
     rieng = ca.get('params_ca') or {}
