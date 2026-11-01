@@ -107,7 +107,8 @@ def _khop(drain, tokens, ung_vien, khop, sim_th):
 
 def hoc_va_dem(dong_N, dong_A, tham_so_E3, quy_tac):
     """dong_*: [{'moc', 'thuc_the', 'noi_dung', 'lop' (LOI | KHONG_LOI | UNKNOWN | None), 'severity_raw'?}].
-    Trả cặp (thực thể, mã mẫu) với lớp, phiếu, số dòng N/A; số dòng A vào ô mẫu mới theo thực thể."""
+    Trả cặp (thực thể, mã mẫu) với lớp, phiếu, số dòng N/A; số dòng A vào ô mẫu mới theo thực thể; mốc dòng N của từng
+    cặp (`moc_N`, cho hệ số phân tán của D1; WHY-67)."""
     khop = tham_so_E3['khop']  # CĐ5: không có mặc định; chuoi._kiem_params kiểm trước
     if khop not in ('hoan_toan', 'nguong', 'nguong_cung_lop'):
         raise ValueError(f'cách khớp lạ: {khop}')
@@ -116,6 +117,7 @@ def hoc_va_dem(dong_N, dong_A, tham_so_E3, quy_tac):
                   extra_delimiters=(), parametrize_numeric_tokens=True)
     cap = {}
     biet = {}
+    moc_N = {}
     for d in sorted(dong_N, key=lambda x: (x['moc'], x['thuc_the'], x['noi_dung'])):
         cl, _ = drain.add_log_message(che_token(d['noi_dung']))
         e, cid = d['thuc_the'], cl.cluster_id
@@ -123,6 +125,7 @@ def hoc_va_dem(dong_N, dong_A, tham_so_E3, quy_tac):
         c = cap.setdefault((e, cid), {'n_N': 0, 'n_A': 0, 'phieu_loi': 0, 'phieu_khong': 0, 'unknown_N': 0,
                                       'unknown_A': 0, 'loi_xac_dinh_N': 0, 'loi_xac_dinh_A': 0})
         c['n_N'] += 1
+        moc_N.setdefault((e, cid), []).append(d['moc'])
         lop = _lop_dong(d, quy_tac)
         if lop == LOI:
             c['phieu_loi'] += 1
@@ -158,4 +161,4 @@ def hoc_va_dem(dong_N, dong_A, tham_so_E3, quy_tac):
         elif lop == UNKNOWN:
             c['unknown_A'] += 1
     mau = {cl.cluster_id: cl.get_template() for cl in drain.clusters}
-    return {'cap': cap, 'mau_moi': mau_moi, 'mau': mau, 'thuc_the_N': sorted(biet)}
+    return {'cap': cap, 'mau_moi': mau_moi, 'mau': mau, 'thuc_the_N': sorted(biet), 'moc_N': moc_N}
