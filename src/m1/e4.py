@@ -13,6 +13,7 @@ from fractions import Fraction
 from math import comb
 
 import numpy as np
+from scipy.special import betainc
 from scipy.stats import binom, mannwhitneyu, rankdata
 
 EPS_MACH = np.finfo(np.float64).eps
@@ -76,6 +77,16 @@ class CacheCong:
         self._d[k] = kq
         return kq
 
+    def theo_khoa(self, k, ham):
+        """Cổng của chế độ mới (WHY-67): k do bên gọi dựng, phải gồm mọi thứ p phụ thuộc."""
+        if k in self._d:
+            self.trung += 1
+            return self._d[k]
+        self.moi += 1
+        kq = ham()
+        self._d[k] = kq
+        return kq
+
 
 def nguong(XN, ts):
     q_hi = float(np.percentile(XN, 100 * ts.get('q_hi', 0.95)))
@@ -100,8 +111,9 @@ def ty_le_vuot_q(X, h=None, l=None):
     return r_len, r_xuong
 
 
-def cham_phan_vi(N, A, m, ts, huong_cham=('len',), cache=None, khoa_don_vi=None):
-    """Chấm một đơn vị phân vị (B1.3). Trả trạng thái, ngưỡng, tỷ lệ vượt, p, e, F_raw theo từng hướng chấm."""
+def cham_phan_vi(N, A, m, ts, huong_cham=('len',), cache=None, khoa_don_vi=None, ham_p=None):
+    """Chấm một đơn vị phân vị (B1.3). Trả trạng thái, ngưỡng, tỷ lệ vượt, p, e, F_raw theo từng hướng chấm.
+    ham_p(hướng) → (p, cách): cổng của chế độ mới (WHY-67); None giữ cổng tổng hạng."""
     XN = [float(x) for x in N if x is not None and math.isfinite(float(x))]
     XA = [float(x) for x in A if x is not None and math.isfinite(float(x))]
     out = {'n_N': len(XN), 'n_A': len(XA), 'loai': 'phan_vi'}
@@ -130,7 +142,9 @@ def cham_phan_vi(N, A, m, ts, huong_cham=('len',), cache=None, khoa_don_vi=None)
                 'r_xuong_N': float(rN_xuong)})
     alpha = ts['alpha']
     for d in huong_cham:
-        if cache is not None:
+        if ham_p is not None:
+            p, cach = ham_p(d)
+        elif cache is not None:
             p, cach = cache.p(khoa_don_vi, XA, XN, d, ts)
         else:
             p, cach = p_cong(XA, XN, d, int(ts.get('n_exact_max', 100)))
@@ -153,8 +167,20 @@ def p_nhi_thuc(n_A, n, p0, huong):
     return float(binom.cdf(n_A, n, p0))
 
 
-def cham_dem(n_N, n_A, T_N, T_A, ts, trang_thai_ep=None, huong_cham=('len', 'xuong')):
-    """Chấm một đơn vị đếm (B1.3; đặc tả v1 §4). trang_thai_ep: NO_BASELINE/NO_A do quy tắc severity (B2 E3)."""
+def p_D1(n_N, n_A, T_N, T_A, phi, huong):
+    """D1 (WHY-67; SPEC T-046 B2): đuôi nhị thức mở rộng cho số đếm chia φ. Khi phi = 1 trùng p_nhi_thuc."""
+    p0 = T_A / (T_N + T_A)
+    k = n_A / phi
+    n = (n_N + n_A) / phi
+    if huong == 'len':
+        return 1.0 if n_A <= 0 else float(betainc(k, n - k + 1, p0))
+    # P(X <= k) = I_{1−p0}(n − k, k + 1): tránh trừ hai số gần nhau khi p nhỏ
+    return 1.0 if n - k <= 0 else float(betainc(n - k, k + 1, 1 - p0))
+
+
+def cham_dem(n_N, n_A, T_N, T_A, ts, trang_thai_ep=None, huong_cham=('len', 'xuong'), phi_d=None):
+    """Chấm một đơn vị đếm (B1.3; đặc tả v1 §4). trang_thai_ep: NO_BASELINE/NO_A do quy tắc severity (B2 E3).
+    phi_d: hệ số phân tán của D1 (WHY-67); None giữ nhị thức. NEW_OP, STOPPED không đổi."""
     out = {'n_N': n_N, 'n_A': n_A, 'T_N': T_N, 'T_A': T_A, 'loai': 'dem', 'lam': None}
     for d in ('len', 'xuong'):
         out[f'e_{d}'] = 0.0
@@ -199,7 +225,7 @@ def cham_dem(n_N, n_A, T_N, T_A, ts, trang_thai_ep=None, huong_cham=('len', 'xuo
     e_len = max(Fraction(0), (n_A - lam) / max(n_A, 1))
     e_xuong = max(Fraction(0), (lam - n_A) / max(lam, 1))
     for d, e, cheng in (('len', e_len, n_A - lam), ('xuong', e_xuong, lam - n_A)):
-        p = p_nhi_thuc(n_A, n, p0, d)
+        p = p_nhi_thuc(n_A, n, p0, d) if phi_d is None else p_D1(n_N, n_A, T_N, T_A, phi_d, d)
         out[f'p_{d}'] = p
         out[f'e_{d}_tho'] = float(e)
         qua = (d in huong_cham) and p < alpha and cheng > 0
