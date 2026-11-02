@@ -326,3 +326,17 @@ Chỉ ghi điều Minh đã quyết, theo lời Minh. Đề xuất của agent n
 | Q-222 | 01/11/2026 | “Nghiệm thu ngay” | Nghiệm thu T-045 (chạy T1, T4, T4b, khối K trên 52 ca dev) trong phạm vi chạy, chấm, chọn theo luật khai trước, với ngoại lệ D17 (cổng và `verdict` chưa sửa); không kiểm lại phần sửa của lượt 2. Không xác nhận cơ chế hay hiệu quả. Cấu hình thắng khối K hiện hành E1+E2; E3, E5 không vào bản P7 ở bản hiện tại; nếu khối K chạy lại sau khi đổi cổng hoặc thang điểm thì kết cục theo lượt mới. Việc mở chuyển theo LOG T-045 phiên 2. Nguồn: chat 01/11/2026; LOG T-045. |
 
 | Q-223 | 01/11/2026 | “duyệt cả 2 sau đó cho tôi kế hoạch nên làm gì tiếp để sang (2)” | T-045: duyệt ghi sổ theo QĐ-7 (DECISIONS Q-216–Q-222; câu nối SPEC T-045 dòng 4; WHY-66 cho đường xử lý log và Drain của E3 từ đề xuất 1, 3 của `results/T-044/de-xuat-why.md`; bổ sung WHY-56 theo thời điểm với kết quả T4b và giới hạn đối chứng) và duyệt commit, push theo QĐ-9. QĐ-2–QĐ-6, QĐ-8 chưa quyết. Nguồn: chat 01/11/2026; LOG T-045. |
+
+| Q-225 | 01/11/2026 | “tiếp tục trong T-046, tôi để bạn quyết định nhưng theo hướng không được phép chọn dễ bỏ khó, trừ khi điều đó mang lại ít giá trị hoặc không xứng đang với thời lượng bỏ ra …” | T-046 điểm dừng D-1: giao người làm quyết QĐ-D1a–QĐ-D1d (thêm ứng viên cổng, sửa SPEC thành bản 3); giữ D-2. Nguồn: chat 01/11/2026; LOG T-046 phiên 1 (tiếp). |
+
+| Q-226 | 01/11/2026 | “tôi để bạn quyết định nhưng theo hướng không được phép chọn dễ bỏ khó, trừ khi … hoặc đó đã là cách tốt nhất có thể đối với bộ dữ liệu hiện tại rồi …” | T-046 sau luật chọn bản 3: giao người làm quyết QĐ-L3. Người làm chọn nới (a) bằng luật minimax và hiệu chuẩn `verdict` ở mức cửa sổ; giữ D-2. Nguồn: chat 01/11/2026; LOG T-046 phiên 1 (tiếp 2). |
+
+| Q-227 | 01/11/2026 | “duyệt theo đề xuất, hiện chuyển sang t047 luôn ? tôi quyết định để claude làm 047 nhé” | Vế mốc giả T-047 báo V0 và số thực thể tầng 1 ở C-e; luật C dùng số đó với mức HẠI khai trước trong SPEC T-047. T-047 đổi: Claude làm, Codex phản biện. Ghi vào SPEC T-047 khi mở, câu chữ và mức HẠI trình Minh. Nguồn: chat 01/11/2026; LOG T-046 phiên 1 (tiếp 3). |
+
+| Q-228 | 02/11/2026 | “nếu không có bất đồng nào thì duyệt triển khai luôn” | D-2 của T-046: duyệt WHY-67 (giữ G3, D1 là lựa chọn thực dụng theo luật cũ), WHY-68, WHY-69 (S1, sửa D24), sửa `e3.py`, kế hoạch cài vào `src`; hai ô đếm log_loi, mau_loi RE2-TT 30 phép ghi OPEN. Không nghiệm thu T-046, không mở T-047. Điều kiện "không bất đồng" đã kiểm: LOG T-046 phiên 1 (tiếp 4). Nguồn: chat 02/11/2026. |
+
+| Q-224 | 01/11/2026 | “t46 claude làm, 47 codex làm” | Chia T-046 cho Claude làm, Codex phản biện; T-047 cho Codex làm, Claude phản biện. Ghi muộn, sau Q-228. Nguồn: chat 01/11/2026; SPEC T-047 dòng 7. |
+
+| Q-229 | 02/11/2026 | “tôi quyết định để codex làm t47” | T-047 giữ Codex làm, Claude phản biện; thay phần phân công của Q-227. Phần vế mốc giả của Q-227 giữ nguyên. Nguồn: chat 02/11/2026; LOG T-046 phiên 1 (tiếp 5). |
+
+| Q-230 | 02/11/2026 | “Duyệt tất cả” | Trả lời câu hỏi “Bạn nghiệm thu T-046 và duyệt ghi Q-224, Q-229 kèm commit, push chứ?”. Nghiệm thu T-046 tới bước 10, code `c298188e`; ghi Q-224, Q-229; commit và push phần còn lại trên nhánh hiện tại. Không xác nhận cổng đã hiệu chuẩn, hiệu quả RCA hay quyền mở G3 hoặc test. C1, mức (a), `verdict` cho bản P7, lợi ích S1 vẫn mở. Sửa SPEC T-047 và mức HẠI chưa duyệt. Nguồn: chat 02/11/2026; LOG T-046 phiên 1 (tiếp 6). |

@@ -1036,3 +1036,40 @@ F2 NumPy trên một số kênh gần hằng tạo |chênh mean hai cặp|/std5 
 - **Bằng chứng:** fixture MASK1–7, NEZ1–4, KHOP1–2, U1–U6 của T-044. Trên dev (T-045, không nhãn, đo trước khối K): RE2-TT ba cách khớp gần như trùng, 0/997 dòng lỗi A vào mẫu thường; Nezha-OB ngưỡng 0,4 thì dòng lỗi A vào mẫu thường (a) 1.706/4.128, (b) 2.833, (c) 0; ngưỡng 0,9 thì 0 ở mọi cách (`results/T-045/e3-khong-nhan.json`). Minh chốt cách khớp (a) ở D17 sau khi xem các số này (Q-218).
 - **Giới hạn đã quan sát (T-045, mô tả):** ô "mẫu mới" bật cả ở cửa sổ không lỗi (RE2-TT 83 thực thể trong 24/30 cửa sổ giả). Dòng rơi vào ô này ở thực thể vượt lên trên root hiếm khi có tên lỗi theo luật phân loại; phần lớn khác số token với mọi mẫu đã học, nên với cách khớp (a) không thể khớp (`results/T-045/e3-noi-dung-mau.json`; báo cáo T-045 mục 6.7). Ngoại lệ Java nhiều dòng bị tách thành từng dòng log. Đây là suy luận chưa phân xử về nguyên nhân gây hại.
 - **Kết luận phụ thuộc:** kênh log khi E3 bật ở 8/16 cấu hình khối K; UV-6; kết cục của E3 theo luật C ở T-045 (E3 không vào bản P7 ở bản hiện tại). Nếu thử lại E3, thay đổi tách mẫu hay cách chấm ô "mẫu mới" là thiết kế mới, cần mục WHY mới trước khi chạy.
+
+## WHY-67. Cổng từng đơn vị của E4 ở chế độ mới: G3 cho đơn vị phân vị, D1 cho đơn vị đếm — Đã quyết (Q-228; T-046)
+
+- **Chọn:** G3 theo SPEC T-046 A3 (khối theo tự tương quan; biên theo bao bản ghi H làm tròn ô 10 giây và khoảng ghi F; 2.000 hoán vị; seed sha256; rơi về G0 khi dưới 5 khối). D1 theo SPEC T-046 B2. α = 0,01. Bật bằng `params.che_do`; thiếu khóa thì giữ G0, D0, để tái lập T-044, T-045.
+- **Vì sao:**
+  - G0 coi mẫu độc lập. Ở A/A dev, G0 qua cổng 0,300 và có cờ 0,127 ở metric RE2-TT (`results/T-046/chan-doan-cong-ban3-sua2.json#/qua_cong_aa/R0|RE2-TT|metric/G0`).
+  - G3 có ô tệ nhất thấp nhất theo luật bản 4 (0,089; `results/T-046/ung-vien-sua2.json#/minimax`).
+  - D1 giảm mẫu log thường từ 0,066 xuống 0,039 ở A/A.
+- **Phương án đã xét:**
+  - G1. Luật bản 4 đếm p < α, là đại lượng không cùng nghĩa giữa G1 và G3: G1 có thể qua cổng mà chênh không vượt biên ε. So theo cờ trên cùng phép, số dev không cho căn cứ chọn G1: ô tệ nhất hiệu −0,0036, khoảng 95% theo ca [−0,0125; 0,0078]; metric RE2-TT G3 ít cờ hơn, hiệu +0,0051, khoảng [0,0017; 0,0085] (`results/T-046/so-cap-g1-g3.json`). G1 nhạy hơn trên dữ liệu tổng hợp, không dùng Monte Carlo, chạy nhanh hơn. Độ nhạy trên dữ liệu thật chưa so. **Giữ G3 là lựa chọn thực dụng giữ kết quả luật cũ**, không phải kết quả của một luật đúng đại lượng.
+  - G4: 0,272 ở A/A dev. GE, DE: không có ngưỡng đạt. D0: hiện hành.
+- **Giới hạn:**
+  - Không đạt mức (a) ≤ 2α ở mọi ô. Luật minimax đặt sau khi nhìn số (a), theo quyền Minh giao (Q-226).
+  - Cờ từng đơn vị không có nghĩa thống kê danh nghĩa. Ở C-e: metric 0,026–0,027; op_full 0,029; op_excl hướng xuống 0,171, chưa rõ nguyên nhân (`results/T-046/kiem-sau-khoa-sua2.json`).
+  - Metric Nezha-OB OPEN: 5 điểm mỗi phía, G3 rơi về G0.
+  - G3 là phép Monte Carlo, lệch nguyên tắc ở SPEC T-043 B1.3; tất định nhờ seed. p nhỏ nhất 1/2.001.
+  - Thiết kế sau khi xem A/A dev. C-e chồng lấn A/A và đã xem từ 16:02, trước hai lần khóa lại.
+- **Cơ chế là ứng viên:** giữ giá trị, động học bền, trôi. Chưa tách được phần đóng góp. Mem qua cổng nhiều nhưng gần như không tạo cờ.
+- **Điều kiện thất bại:** bước 10 không tái lập số; hoặc dữ liệu cùng cỡ về sau cho tỷ lệ cờ ở cửa sổ không lỗi vượt xa mức đã báo.
+- **Kết luận phụ thuộc:** cờ F_raw của mọi cấu hình T-047; E5; mọi câu "đã sửa cổng".
+
+## WHY-68. `verdict`: chưa chọn được trên dev — Đã quyết (Q-228; T-046)
+
+- **Kết quả với (G3, D1)** (`results/T-046/ung-vien-sua2.json#/to_hop`): V0, V3, V1 báo CAUSE_FOUND 30/30 ở A/A RE2-TT, trượt (b). V4 (q* = 0,09) trượt (c1): 22/30, 4/22. q* đổi 0,085; 0,095; 0,09 giữa các lượt chỉ khác biên khối.
+- **Chọn:** không khóa `verdict` cho bản P7 ở T-046. V0 giữ trong mã, ghi rõ: không phân biệt được cửa sổ có lỗi trên dev. Không cài V4 vào `src`, vì không có phần nào dùng.
+- **T-047:** báo V0 và số thực thể tầng 1 ở C-e; luật C dùng số đó với mức HẠI khai trước trong SPEC T-047 (Q-227). Đại lượng này không trung tính với số kênh; ghi giới hạn ở T-047.
+- **Vì sao không thêm ứng viên:** A/A 150 giây không cùng cỡ cửa sổ thật; C-e là phép kiểm lại duy nhất và đã xem. Đây là giới hạn của dữ liệu hiện có.
+- **Kết luận phụ thuộc:** vế mốc giả T-047; đầu ra `verdict` ở P8; hồ sơ G3; FlashTicket cần hiệu chuẩn với dữ liệu cùng cỡ.
+
+## WHY-69. Thang điểm ở chế độ mới: S1 (E4 cộng khóa phụ độ lớn T4c) — Đã quyết (Q-228; T-046; sửa D24)
+
+- **Bằng chứng:** (S) mở: tỷ lệ kênh phân vị có cờ đạt rA = 1 là Nezha-OB 0,271; RE2-TT 0,034 (`results/T-046/thang-diem-sua2.json#/bao_hoa_R0_that`). Luật khai trước (LOG T-046, 16:05): S1 nếu T4c giảm số cửa sổ có khối đầu nhiều thực thể ở ít nhất một dataset. Nezha-OB 1 → 0; RE2-TT 0 → 0.
+- **Tác động không nhãn:** giải được 1 cửa sổ hòa ở khối đầu, nhưng đổi thứ hạng rộng hơn: khối đầu RE2-TT 3/30, Nezha-OB 4/22; thực thể đầu 3/30, 3/22; cặp đổi quan hệ 44/10.277, 12/102 (`#/hoa_khoa_tang1`). Tốt hay xấu cần nhãn (T-047).
+- **Chọn:** khóa (max s, max m, số kênh, Σs), như T4c đã kiểm ở T-044; áp ở mọi thế giới, chỉ khi bật tham số và E6a.
+- **Phương án:** S0 (giữ E4; hợp lý nếu T-047 cho thấy S1 hại). S2: không định nghĩa, không tính (WHY-56; bão hòa nằm ở metric 5 điểm).
+- **Giới hạn:** người làm đã thấy MRR của T4c và nhánh z ở T-045; luật quyết không dùng MRR.
+- **Kết luận phụ thuộc:** nền khối K ở T-047; D24.
