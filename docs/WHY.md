@@ -1073,3 +1073,60 @@ F2 NumPy trên một số kênh gần hằng tạo |chênh mean hai cặp|/std5 
 - **Phương án:** S0 (giữ E4; hợp lý nếu T-047 cho thấy S1 hại). S2: không định nghĩa, không tính (WHY-56; bão hòa nằm ở metric 5 điểm).
 - **Giới hạn:** người làm đã thấy MRR của T4c và nhánh z ở T-045; luật quyết không dùng MRR.
 - **Kết luận phụ thuộc:** nền khối K ở T-047; D24.
+
+## WHY-70. Vế mốc giả T-047 dùng số thực thể tầng 1 và mức HẠI thực dụng — Đã quyết về cách thử (Q-231), chưa hiệu chuẩn
+
+- **Chọn:** thay đại lượng tỷ lệ `CAUSE_FOUND` của vế C-e bằng chênh trung bình số thực thể tầng 1 tại P, trên cùng tập cửa sổ hợp lệ của hai nhánh. HẠI khi chênh lớn hơn 1 thực thể/cửa sổ. Dùng Fraction và dấu `>`; giữ V0 để báo cáo. Phép độ bền dùng cùng đại lượng và helper.
+- **Vì sao dùng đại lượng này:** Q-227 yêu cầu báo V0 và số thực thể tầng 1, dùng số tầng 1 cho vế HẠI. Số tầng 1 mô tả độ rộng tập bị gắn bất thường tự sinh, còn V0 chỉ cho biết tập đó rỗng hay không.
+- **Vì sao mức 1:** đây là dung sai thực dụng cho phép tăng ròng tối đa một thực thể mỗi cửa sổ, không phải ngưỡng suy ra từ xác suất sai đã hiệu chuẩn. Mức này nới so với ứng viên count 0,10 chưa được duyệt. Không chọn mức nhằm giữ hoặc loại E1, E2, E3 hay E5.
+- **Các phương án đã xét:** không cho tăng ròng; ứng viên count 0,10; các mức 0,5 và 2. Các mức này đều chưa có hiệu chuẩn. Mức 0,5 và 2 được dùng để báo độ nhạy bằng cách tính lại toàn bộ luật C và bộ chọn, không dùng để chọn lại mức chính.
+- **Lịch sử bằng chứng đã xem:** trước khi đề xuất mức 1, hai agent đã biết cấu hình thắng T-045, đã xem số C-e G0/D0 và các tóm tắt G3/D1 hiện có. Nguồn là bản ghi C-e T-045 tại `results/T-045/runs/b2b-k16-re2-mocgia-001/ban-ghi.jsonl`, trường `extra.tang_P`, và summary `results/T-046/runs/b10-kiem-src-001/ca/*.json`, trường `cua_so/ce|R0/tom_tat/tang1`, `cua_so/ce|K-du/tom_tat/tang1`; kiểm theo manifest tương ứng. Lựa chọn không độc lập với dữ liệu đã xem.
+- **Điều bằng chứng chưa xác nhận:** số cấu hình bị loại ở từng mức không chứng minh cấu hình thắng đã định sẵn hoặc ngưỡng đúng. Việc một mức phân tách mức tăng của E2 và E3 trong kết quả cũ không xác nhận E2 an toàn, E3 hại hoặc mức đó có căn cứ khoa học. Không dùng kết cục do ngưỡng tạo ra để tự chứng minh ngưỡng.
+- **Giới hạn:** đại lượng phụ thuộc số kênh, tập thực thể và coverage; tăng giảm giữa cửa sổ có thể bù trừ. Bật riêng E5 với cùng tín hiệu/cổng chỉ có thể giữ hoặc giảm số tầng 1, nên vế xét số tăng không bắt được tác hại riêng của E5. S1 chỉ đổi thứ tự trong tầng nên không đổi số tầng 1 hoặc V0. Số tầng 1 giảm không tự chứng minh chất lượng RCA tăng. C-e không có nhãn thực thể bất thường đủ để hiệu chuẩn đại lượng này.
+- **Cách bảo toàn các điều kiện khác:** helper riêng trong `results/T-047/scripts/luat_c_t047.py` giữ UV-6, điều kiện E5, thứ tự luật C và các ngưỡng RR; không sửa `src`. Kiểm hồi quy với vế cũ trước khi chạy dữ liệu. Pha 2 và bootstrap dùng chung helper; giữ `khong_moc_gia` để đối chiếu.
+- **Điều kiện diễn giải thất bại:** kết quả đổi đáng kể ở 0,5 hoặc 2 thì báo phụ thuộc dung sai; không chọn lại mức có kết quả thuận lợi. Nếu hồi quy tích hợp lệch, hoặc đại lượng không tính được do lỗi tính toán, thiếu trường bắt buộc, ERROR hay UNSUPPORTED, dừng phần phụ thuộc và trình bằng chứng thiếu. Riêng mẫu số C-e bằng 0 vì mọi cửa sổ của cặp đều bị loại do INSUFFICIENT_EVIDENCE (D2f): ghi CHUA_KIEM_DUOC, không áp vế này, tiếp tục các vế còn lại và bộ chọn với cờ được giữ; không gọi là đã qua vế C-e. Cấu hình thắng có cặp mang cờ này thì trình Minh trước khi dùng làm nền cho task (2).
+- **Kết luận phụ thuộc:** loại cấu hình và chọn khối T-047, kết cục E1/E2/E3/E5 và đầu vào task (2). Mức 1 không xác nhận hiệu chuẩn cổng, `verdict` P7, cơ chế hay lợi ích RCA; các kết luận đó vẫn cần bằng chứng tương ứng.
+
+
+## WHY-71. D24 hiện hành: z+S1 — Đã quyết để chọn thiết kế trên dev (Q-237)
+
+- **Chọn gì:** thay E4+S1 bằng z+S1; giữ epsilon=0,05, alpha=0,01, G3/D1, khóa S1 và các quy tắc xếp tầng. Không đổi lịch sử WHY-56/WHY-69: các mục đó mô tả lựa chọn tại thời điểm trước T-048/T-053.
+- **Vì sao:** T-048 đã làm T4/T4b và cặp đổi thang ở R0, E1+E2 theo B5; T-053 kiểm ngoại lệ số học, T1 chịu ảnh hưởng và chạy lại đủ khối K. Trên dev đã kiểm, phép đổi giữ cờ/cổng/U/FI/tầng, nên có căn cứ dùng để chọn tiếp. Minh chấp nhận ứng viên cùng các giới hạn đã báo; không lấy đồng thuận hai agent làm bằng chứng khoa học.
+- **Phương án đã xét:** giữ E4+S1; z+S0 báo kèm; đổi epsilon/alpha theo lưới T4 chỉ là phép độ nhạy. Không chọn thêm ngưỡng hoặc cách chuẩn hóa mới sau khi nhìn điểm.
+- **Bằng chứng:** results/T-048/t4.json, t4b.json và luat-c.json#/comparisons; results/T-053/runs/kiem-cuoi-001.json và runs/dap-phan-bien-001/kiem-tra.json#/analysis. Audit lưu tái dựng hạng ở đủ 52 ca, ba thế giới và hồ sơ các ca đổi RR của cấu hình thắng. Hash theo manifest tương ứng; nguồn quản trị trước quyết định lưu tại results/T-049/nguon-truoc-ghi-quyet-dinh/.
+- **Đã xác nhận tới đâu:** có những cặp đổi khóa/kênh quyết định RR; bão hòa và mixed PV/đếm có thể cùng tồn tại. Chưa tách thành phần đóng góp nhân quả hoặc xác định cơ chế vật lý cho mọi ca; không cộng số cờ chồng lấn thành tỷ lệ nguyên nhân. z không bị chặn trên trong khi điểm kênh đếm giữ thang E4. Có cả ca được sửa và bị làm hỏng; không suy việc đếm không thắng max là không có tác hại.
+- **Điều kiện thất bại/cần xử lý:** ngoại lai lớn, mixed PV/đếm, đổi đơn vị không nhất quán hoặc tần suất E3b có thể đổi tương quan điểm. T6 phải lần theo chuỗi kênh/cờ/điểm/khóa và so ca đúng với sai. Kiểm adapter về đơn vị FlashTicket còn ở bước tích hợp; không đòi bất biến khi tùy ý đổi chung các giá trị của kênh đếm. Sai khác cờ/hợp lệ hoặc cần đổi chính sách tràn thì dừng kết luận phụ thuộc và trình Minh.
+- **Số học:** tích hợp cách phục hồi trung gian của results/T-053/scripts/z_on_dinh.py vào src/m1/e4.py ở T-049, kiểm đường native bình thường và các fixture biên. Điểm hoặc tổng khóa thật sự ngoài miền biểu diễn vẫn theo hợp đồng hiện hành; không cắt điểm/cứu riêng một hướng.
+- **Kết luận phụ thuộc:** K-b/T6 và nền cho T-050 trở đi; đối chứng QT7 và hồ sơ G3. Lợi ích trên dữ liệu độc lập, verdict, chế độ (b), RE3-OB và triển khai FlashTicket vẫn chưa được xác nhận.
+
+## WHY-72. Nền đầu T-049: E1-U + E2-C + E5 dưới z+S1 — Đã quyết có điều kiện (Q-237)
+
+- **Chọn gì:** dùng gói thắng của T-053, giữ E3(a) tắt. Đây là điểm xuất phát cho K-b/T6; không thay thế các phép kiểm bối cảnh về sau.
+- **Vì sao:** bộ chọn khai trước chọn E1+E2+E5 trong cả ba thế giới; bước 8 trình E2, không có xung đột khác. Minh chấp nhận đánh đổi theo dataset đã nêu, thay vì để nguồn quyết định tiếp tục ghi OPEN. Cờ TRÁI CHIỀU vẫn được giữ nguyên.
+- **Bằng chứng số:** results/T-053/runs/k-cham-001/khoi-k.json#/chon_khoi và /buoc8; /cap/E1+E5|E1+E2+E5/theo_the_gioi/P/MRR_bat: gộp 1411/1560, RE2-TT 167/180, Nezha-OB 48/55. Thêm E2 trên E1+E5 làm RE2-TT giảm 7/180 và Nezha-OB tăng 1328683/8731800; kết cục là TRÁI CHIỀU theo dataset, không phải GIÚP. Audit T-053 lần theo hai ca mất RR và ca đối chứng đúng; chưa quy nguyên nhân vật lý của lỗi.
+- **Phương án đã xét:** R0 z, gói cũ E1+E2, E1+E5 và các cấu hình còn lại của đủ 16 cấu hình K. K-b còn phải thử VC đúng bối cảnh. E3(a) bị loại theo luật trong lượt này; không suy kết quả đó sang E3b.
+- **Giới hạn độ bền:** results/T-053/runs/bootstrap-ec2-001/do-ben.json#/loai và /tan_suat_thang: 893/1000 mẫu có cấu hình được chọn; 107 mẫu không đạt bước 8 về thành phần đồ thị. Trong 893 mẫu, gói này thắng 249, E2 thắng 281. Không gọi lựa chọn vững trên dữ liệu độc lập. Các cờ N1 và mức h=1 là dung sai thực dụng chưa hiệu chuẩn; h=0,5/2 chỉ báo độ nhạy.
+- **Vai trò đồ thị:** E1 dùng quan hệ cha–con để tạo thời gian độc quyền; E2 gán bằng chứng khoảng ngoài span theo cạnh; E5 dùng quan hệ/lớp kênh để tách bằng chứng kế thừa và tự sinh trước xếp hạng. E6a chưa lan truyền điểm theo đồ thị. Kết quả này chưa phân xử lợi ích riêng của cấu trúc phụ thuộc thật so với các đối chứng P7.
+- **Điều kiện thất bại và phụ thuộc:** K-b có thể đổi gán cạnh, T6 thêm kênh tần suất; nếu nền đổi thì xác định lại phần chạy phụ thuộc. K-b trên nền E5 bật chỉ cho tác dụng C/VC có điều kiện E5 bật, không kiểm đủ tương tác VC × E5. T-051/T-052 và quyết định G3 còn giữ nghĩa vụ này; không tự thêm ô ma trận hoặc đổi nền để đóng câu hỏi.
+
+
+## WHY-73. Nền đầu T-050 sau K-b/T6 — Đã quyết (Q-239)
+
+- **Chọn gì** E1-U + E2-C + E5 trên z+S1, E6a và cạnh quan sát. E3(a), E3b, E9, T12 tắt. Giữ epsilon, alpha và cổng theo WHY-71.
+- **Vì sao** K-b giữ C theo luật. VC khôi phục hai ca RE2 bị C làm hỏng ở T-053 và làm hỏng hai ca Nezha. T6 cho KHÔNG TÁC DỤNG và đề nghị tắt E3b. E1/E2/E5 còn sử dụng quan hệ để tạo và phân loại bằng chứng.
+- **Phương án và bằng chứng** C/VC và bật/tắt E3b đã so trong bối cảnh T-049. Nguồn là `results/T-049/k-b.json#/K-thang-VC`, `results/T-049/t6.json#/T6-C-E3b`, `results/T-049/runs/dap-phan-bien-001/doi-chieu.json` và `results/T-049/nen-de-nghi-T050.json`, kiểm theo manifest T-049.
+- **Giới hạn và phụ thuộc** Cờ đánh đổi của E2 theo WHY-72 vẫn là giới hạn khi diễn giải. C-e của K-b chưa phân xử tác hại khi VC thực sự định danh. Phép 2×2 VC/E5, hiệu quả độc lập, hiệu chuẩn verdict, chế độ (b), RE3-OB và FlashTicket còn OPEN. T9 dùng nền này để chọn cách xếp hạng trên dev.
+
+## WHY-74. Hành động T9 khi E6b KHÔNG TÁC DỤNG — Đã quyết trước pha 1 (Q-240)
+
+- **Chọn gì** Nếu kết cục kết hợp theo luật C là KHÔNG TÁC DỤNG, đề xuất giữ E6a+S1, tắt E6b. HẠI vẫn dẫn tới bỏ E6b. D2a/D2f vẫn áp cho KHÔNG ĐỦ CA và phụ thuộc quan sát.
+- **Vì sao** DT18 §2 và hướng dẫn của cô đòi các đầu ra chẩn đoán có dùng đồ thị, đồng thời nêu PageRank như ví dụ. MRP §2.3 và WHY-02 đặt mục tiêu dùng đồ thị trong chuỗi. MRP P6 tầng 4 giao chọn ứng viên trên dev. E6a xếp theo tầng và điểm mà E1/E2/E5 đã tính từ dữ kiện quan hệ. E7 dùng cạnh để dựng vùng. Bản E6a có xếp hạng dựa trên bằng chứng đã dùng đồ thị, với bước sắp thứ tự cục bộ.
+- **Phương án đã xét** Giữ E6b theo ngoại lệ Phụ lục C bước 6 nếu bước sắp thứ tự phải trực tiếp dùng cạnh để đáp ứng chức năng. Minh duyệt cách hiểu cho phép dùng E6a trong trường hợp lợi ích E6b chưa đạt ngưỡng.
+- **Bằng chứng** T-043 B2/B4 và Phụ lục C, `src/m1/xep_hang.py` phần `k_tang` và `xep`, đối chiếu P1 và bản kiểm lại của Claude trong LOG T-050. Dữ kiện dev về tập trung của v dùng để đặt giả thuyết, chưa có kết quả E6b.
+- **Điều kiện thất bại và phụ thuộc** Nếu E6b thay đổi thứ hạng, phân biệt phần do lan truyền và khóa phá hòa. KHÔNG TÁC DỤNG chỉ cho biết lợi ích chưa đạt ngưỡng trên nền và thang đã khai. T-051 phụ thuộc kết cục T9 và cách xử lý các cờ theo luật.
+
+## WHY-75. Nền và vế mốc giả của T-051 — Đã quyết có điều kiện (Q-241)
+
+- **Nền.** Giữ nền WHY-73 với E6a+S1 và cạnh quan sát. T9 so với E6b trên chiều bên gọi → bên được gọi. Lượt đã ghim cho kết cục HẠI ở bước 3 trên cả ba thế giới, ΔMRR gộp −1/30. Nguồn là `results/T-050/cham-002/luat.json#/theo_the_gioi` theo manifest chạy lại và `results/T-050/dinh-chinh-va-kiem-lai.md`. Cờ đánh đổi E2 theo WHY-72 vẫn còn.
+- **Giới hạn.** Đây là lựa chọn điểm xuất phát trên dev chế độ (a). Biến thể đảo chiều PageRank còn OPEN. Hiệu quả trên dữ liệu độc lập và chất lượng vùng ảnh hưởng còn cần bằng chứng riêng.
+- **N1.** Giữ WHY-70 và hợp đồng T-051. Trên cùng cửa sổ giả RE2 hợp lệ của cặp, dùng chênh trung bình số thực thể tầng 1 tại P, tính bằng Fraction và xét HẠI khi tăng nghiêm quá 1. Dùng N1 để mô tả độ rộng tập tự sinh vì V0 chỉ phân biệt tập rỗng và có phần tử trong trường hợp đủ bằng chứng. Báo V0, mẫu số và độ nhạy h=0,5/2. Mức chính là dung sai thực dụng. Hiệu chuẩn verdict vẫn OPEN. Phân biệt mẫu số bằng 0 do thiếu bằng chứng với lỗi hoặc thiếu trường bắt buộc.

@@ -1,0 +1,42 @@
+diff --git a/src/m1/cong.py b/src/m1/cong.py
+index a4a6f480..fa82d5cb 100644
+--- a/src/m1/cong.py
++++ b/src/m1/cong.py
+@@ -55,7 +55,7 @@ def bien_phia(q, t_ns):
+ 
+ def o_1s(moc_ns, gia_tri, t_ns, phia):
+     """{chỉ số ô: trung bình} của một phía. moc_ns: mốc mẫu (int ns)."""
+-    tong, dem = {}, {}
++    samples = {}
+     for x, v in zip(moc_ns, gia_tri):
+         if phia == 'N':
+             if x >= t_ns:
+@@ -67,23 +67,23 @@ def o_1s(moc_ns, gia_tri, t_ns, phia):
+             j = (x - t_ns) // NS
+         if j >= W:
+             continue
+-        tong[j] = tong.get(j, 0.0) + float(v)
+-        dem[j] = dem.get(j, 0) + 1
+-    return {j: tong[j] / dem[j] for j in tong}
++        samples.setdefault(j, []).append(float(v))
++    return {j: math.fsum(sorted(samples[j])) / len(samples[j]) for j in sorted(samples, reverse=True)}
+ 
+ 
+ def tu_tuong_quan(o):
+     """ρ(k), k = 1…K_MAX trên ô có giá trị (dict chỉ số → giá trị); None khi không xác định. Trả (rho, ly_do)."""
+     if len(o) < CAP_TOI_THIEU:
+         return None, 'it_o'
+-    x = np.array(list(o.values()), float)
++    order = sorted(o, reverse=True)  # thứ tự thời gian tăng, không theo thứ tự chèn dict
++    x = np.array([o[j] for j in order], float)
+     m = float(x.mean())
+     v = float(((x - m) ** 2).mean())
+     if v <= 0:
+         return None, 'phuong_sai_0'
+     rho = {}
+     for k in range(1, K_MAX + 1):
+-        cap = [(o[j] - m) * (o[j + k] - m) for j in o if (j + k) in o]
++        cap = [(o[j] - m) * (o[j + k] - m) for j in order if (j + k) in o]
+         rho[k] = (sum(cap) / len(cap)) / v if len(cap) >= CAP_TOI_THIEU else None
+     return rho, None
+ 

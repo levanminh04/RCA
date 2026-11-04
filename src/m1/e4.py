@@ -258,9 +258,22 @@ def doi_quyet_dinh_khi_T_lech(n_N, n_A, T_N, T_A, ts, ty_le=0.01):
 
 
 def diem_z(N, A):
-    """Nhánh z (T4b, chỉ báo cáo; SPEC B2 E4): s_lên = max(A − med_N)/c; c = IQR_N nếu IQR_N >= 10·ε_mach, ngược lại 1."""
+    """Tính điểm z, phục hồi trung gian tràn theo Q-237."""
     XN = np.asarray([float(x) for x in N], float)
     XA = np.asarray([float(x) for x in A], float)
+    with np.errstate(over='raise', invalid='raise', divide='raise'):
+        try:
+            return _diem_z_native(XN, XA)
+        except FloatingPointError:
+            pass
+    if XN.size and XA.size and np.isfinite(XN).all() and np.isfinite(XA).all():
+        recovered = _diem_z_chinh_xac(XN, XA)
+        if recovered['huu_han']:
+            return recovered
+    return _diem_z_native(XN, XA)
+
+
+def _diem_z_native(XN, XA):
     med = float(np.median(XN))
     iqr = float(np.percentile(XN, 75) - np.percentile(XN, 25))
     c = iqr if iqr >= 10 * EPS_MACH else 1.0
@@ -268,6 +281,31 @@ def diem_z(N, A):
     zx = float(np.max(med - XA) / c)
     return {'med_N': med, 'IQR': iqr, 'c': c, 'z_len': zl, 'z_xuong': zx,
             'huu_han': math.isfinite(zl) and math.isfinite(zx)}
+
+
+def _diem_z_chinh_xac(XN, XA):
+    values = sorted(map(float, XN))
+
+    def quartile(numerator):
+        index, remainder = divmod((len(values) - 1) * numerator, 4)
+        left = Fraction(values[index])
+        if remainder == 0:
+            return left
+        return left + (Fraction(values[index + 1]) - left) * remainder / 4
+
+    def float_or_inf(value):
+        try:
+            return float(value)
+        except OverflowError:
+            return math.inf if value > 0 else -math.inf
+
+    med = quartile(2)
+    iqr = quartile(3) - quartile(1)
+    c = iqr if iqr >= Fraction(10 * EPS_MACH) else Fraction(1)
+    zl = float_or_inf((Fraction(float(max(XA))) - med) / c)
+    zx = float_or_inf((med - Fraction(float(min(XA)))) / c)
+    return {'med_N': float(med), 'IQR': float_or_inf(iqr), 'c': float_or_inf(c),
+            'z_len': zl, 'z_xuong': zx, 'huu_han': math.isfinite(zl) and math.isfinite(zx)}
 
 
 def _log1p_q(x):

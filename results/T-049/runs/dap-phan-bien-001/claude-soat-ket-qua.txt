@@ -1,0 +1,160 @@
+Đang đọc luật kết cục ở Phụ lục C T-043 để đối chiếu với helper và kết quả T-049; chưa sửa file nào.
+
+Đang soát helper luật C/UV-6 trong `src/m1_danh_gia/pha2.py`, rồi tới file kết quả K-b/T6.
+
+Đang kiểm tái sử dụng nền C (máy chạy, hash) và phân bổ cửa sổ giữa laptop/EC2.
+
+Đang lần dấu vết VC theo ca: đỉnh định danh trùng root hay không ở 26 ca có định danh.
+
+Số K-b/T6 tái tính từ `kq.json` khớp báo cáo. Giờ kiểm chuỗi cơ chế T6 ở ca dev-9b9397a4dc.
+
+Đang chạy lại bộ kiểm hồ sơ ở chế độ chỉ đọc (`dong_ho_so.py` không có `--seal`) để đối chiếu hash manifest.
+
+Hash manifest đạt (1005 đầu ra). Đang đối chiếu WHY-70–72 và kế hoạch sau T-047 với kết luận T-049.
+
+Ghi nhận: RE2 tăng đúng 7/180 khi đổi C→VC, bằng mức E2-C làm giảm ở T-053 (WHY-72). Đang kiểm có phải cùng hai ca không.
+
+Xác nhận: hai ca RE2 mà VC sửa đúng là hai ca E2-C làm hỏng ở T-053 (E1+E5 → E1+E2+E5: 1→1/2, 1→1/3). Kiểm thêm lớp kênh của cạnh bị chuyển sang frontend.
+
+Cơ chế hai ca Nezha bị hỏng đã tái lập được từ hồ sơ. Kiểm tiếp ma trận T6 chỉ khác nền ở E3b.
+
+Ma trận sạch: T6 chỉ khác nền ở E3b, VC chỉ khác ở E2. Kiểm thứ tự thời gian: định nghĩa phân tích → seal → chấm nhãn.
+
+Đã đủ bằng chứng cho phần soát. Đang đọc `docs/review-prompt.md` để chép đúng khối prompt bàn giao.
+
+# Phản biện T-049 — soát kết quả (Claude, chỉ trả lời trong chat)
+
+## Kết luận chung
+
+**Không có điểm CHẶN.** Đầu ra đạt Tiêu chí xong 1–6 trong phạm vi task. Hai kết cục K-b và T6 đúng theo luật đã khai trước (T-043 Phụ lục C và bước 9). Có ba điểm KHÔNG CHẶN. Cả ba đều về diễn giải K-b và ảnh hưởng tới việc Minh chốt nền T-050. Không điểm nào đòi chạy thêm: mọi số dưới đây lấy từ trung gian đã lưu.
+
+## Đã kiểm, không thấy lỗi
+
+- **Số học z** ([e4.py:260](src/m1/e4.py:260)). Đường native chạy trước với `errstate` raise. Chỉ khi trung gian tràn trên mẫu hữu hạn mới vào nhánh Fraction. Nhánh này nội suy type 7 chính xác. Nếu điểm cuối vẫn không hữu hạn thì trả về native. Không clip, không cứu riêng một hướng. Hành vi S21 ở `chuoi.py:474` giữ nguyên. Ngoài e4.py, `src` không đổi so với HEAD.
+- **Tái tính ΔMRR từ `runs/*/kq.json`:**
+  - K-b cặp chính: gộp 14603/2358720, RE2 7/180, Nezha −38317/997920.
+  - Nhánh đầy đủ: gộp 779/157248.
+  - T6: gộp 1/390.
+  - Ba thế giới giống nhau, mọi ca đều OK. Tất cả khớp báo cáo.
+- **Áp luật:**
+  - K-b: RE2 7/180 lớn hơn δ_d = 1/30, nhưng Nezha −0,0384 chưa thấp hơn −1/22. Vì vậy không phải TRÁI CHIỀU theo dataset. Gộp 0,0062 ≤ δ, nên KHÔNG TÁC DỤNG và giữ C (bước 9).
+  - T6: KHÔNG TÁC DỤNG, đề xuất bỏ. E3b không phải thành phần cuối cùng đáp ứng P6 tầng 2.
+  - UV-6 và điều kiện E5 đều ghi `KHONG_AP`, đúng với SPEC.
+- **Ma trận** (`ma-tran.json`): T6 chỉ khác nền ở `bat_tat.E3b`; VC chỉ khác ở `bat_tat.E2`.
+- **Nhãn:** `chay_cua_so.py` không đọc nhãn hay E_X. Thứ tự thời gian đúng: `dinh-nghia-phan-tich.json` lúc 23:24, seal K-b 23:34, rồi mới ghép nhãn 23:36. T6 seal 00:17, chấm 00:18.
+- **Cùng máy:** 164/164 vế mới chạy cùng loại máy với nền C tái sử dụng (đối chiếu `tai-su-dung.json` với `command.json`).
+- **Hash:** `dong_ho_so.py` chạy chế độ chỉ đọc cho PASS, gồm 1005 đầu ra, 13 nguồn và 5 manifest upstream. Không sinh thêm tệp.
+- **Quy trình:** chạy dài có duyệt của Minh trong chat ngày 03/11, LOG đã ghi. Thư mục tạm pytest ngoài repo đã khai. Không thấy ghi ngoài phạm vi có hậu quả.
+
+## Các điểm phản biện
+
+**R1 — KHÔNG CHẶN. Ảnh hưởng: diễn giải cờ TRÁI CHIỀU của E2 (WHY-72) và việc chốt nền T-050.**
+- Ở đâu: [bao-cao.md:72–77](results/T-049/bao-cao.md:72).
+- Thiếu gì: hai ca RE2 mà VC sửa là dev-f36d0647d5 và dev-a915aa2424. Đây đúng là hai ca E2-C làm hỏng ở T-053.
+  - Bằng chứng: `results/T-053/runs/k-cham-001/kq.json`, đường `/cau_hinh/K-E1+E5/ca/<ca>/theo_the_gioi/P/RR` cho RR 1 và 1. Cấu hình K-E1+E2+E5 cho 1/2 và 1/3.
+  - Vì vậy MRR RE2 của K-thang-VC (29/30) bằng đúng MRR RE2 của E1+E5.
+  - Nói gọn: trên RE2, VC xóa hết phần hại 7/180 mà WHY-72 ghi cho E2. Đổi lại, Nezha mất hai ca.
+- Hậu quả: Minh chốt nền khi chưa biết rằng phần hại của E2 trên RE2 có một giải thích ở mức tính toán ("gán cho bên được gọi"), và rằng VC là phương án có đánh đổi ngược lại.
+- Sửa tối thiểu: thêm quan sát này vào báo cáo hoặc `nen-de-nghi-T050.json`. Không đổi kết cục. Chuyển sang VC hay đổi cặp so sánh lúc này là chọn lại sau khi nhìn dev.
+
+**R2 — KHÔNG CHẶN. Ảnh hưởng: mức căn cứ của "KHÔNG TÁC DỤNG" và phần cơ chế VC (SPEC hàng 2, dòng 66).**
+- Ở đâu: [bao-cao.md:74, 83](results/T-049/bao-cao.md:74).
+- Báo cáo chỉ ghi 26 ca có định danh. Ghép `co-che.jsonl` (VC, P, ca thật) với `kq.json` cho thêm hai số:
+  - Root nằm trong tập định danh ở 19/26 ca; 7/26 ca thì không. Trong 7 ca đó có hai ca Nezha bị hỏng và bốn ca RE2 ts-route-service, ở đó RR vẫn bằng 1 nhờ kênh khác.
+  - 21/26 ca có RR = 1 ngay ở C. Ở các ca này VC chỉ có thể giữ nguyên hoặc làm hại. Chỉ 5 ca còn chỗ tăng.
+- Ca dev-63c30faf34 còn cho thấy một đường VC×E5 cụ thể. Hai bên được gọi mất cạnh E2 có cờ. Vì thế ba kênh latency lan ngược của frontend đổi F_I từ 0 lên 1, và frontend lên tầng 1. Ở dev-607751ac0a, kênh VC gán cho frontend thuộc lớp `khong_lan`, nên E5 không thể giải thích nó. M5 tăng từ 0 lên 2 đúng ở hai ca này.
+- RR của root trong hai ca vẫn do root mất kênh duy nhất, nên chuỗi cơ chế trong báo cáo không sai.
+- Hậu quả: "phù hợp một số ca, hỏng một số ca" và "chưa kiểm đủ VC×E5" đều đúng nhưng yếu hơn bằng chứng đang có. Phép thử có ít khả năng phân xử vì 21 ca đã ở trần.
+- Sửa tối thiểu: ghi hai số trên và đường VC→E5 ở mức quan sát từng ca. Phép 2×2 VC×E5 vẫn OPEN.
+
+**R3 — KHÔNG CHẶN. Ảnh hưởng: cách đọc vế C-e của VC và bootstrap K-b.**
+- Ở đâu: [bao-cao.md:72](results/T-049/bao-cao.md:72) ("C-e không tăng N1") và dòng 109.
+- Ở 30 mốc giả, đồ thị cạnh có cờ rỗng ở 25 cửa sổ và không có định danh ở 5 cửa sổ (`runs/kb-001-cham/co-che-dem.json`). Vì vậy VC trùng C theo cấu tạo. N1 bằng nhau ở hai nhánh (147/10) là đương nhiên, không phải bằng chứng an toàn. Luật lại ghi `KHONG_KICH_HOAT` chứ không phải "không phân xử được".
+- Hậu quả: 374/1000 mẫu bootstrap "thay VC" sẽ nhận VC khi vế C-e đạt mà không thực sự được thử. Quyết định hiện tại không đổi vì vẫn giữ C.
+- Sửa tối thiểu: thêm một câu nói vế C-e không phân xử được VC trên tập mốc giả này.
+
+**T6:** không có finding. Chuỗi cơ chế ở dev-9b9397a4dc khớp hồ sơ. Hai kênh tần suất của root có F_I = 0. E5 lan xuôi làm emailservice và currencyservice xuống tầng 2. Frontend cũng lên tầng 1 nhưng vẫn đứng sau root. Kết cục bỏ E3b vững: h = 0,5 cho HẠI, cũng dẫn tới bỏ.
+
+## Báo cuối lượt
+
+1. **Đã làm:** đọc AGENTS, STATE, SPEC, LOG, báo cáo, Phụ lục C T-043, WHY-70–72 và kế hoạch sau T-047; đọc diff e4.py và các helper luật; tái tính số liệu và lần theo trung gian theo ca.
+2. **File thay đổi:** không sửa file nào.
+3. **Kiểm đã chạy:** `dong_ho_so.py` (chỉ đọc) cho PASS. Các script Python chỉ đọc tái tính ΔMRR, kiểm cùng máy, ma trận, thời gian, M5 và định danh VC; tất cả khớp, trừ ba điểm thiếu nêu trên.
+4. **Bất đồng và quyết định cần Minh:**
+   - Không có bất đồng chặn tính đúng.
+   - R1–R3 làm mạnh phần diễn giải, không đổi "giữ C" hay "bỏ E3b".
+   - Minh cần quyết: nền T-050, tức có chấp nhận đề nghị của Codex là E2-C và E3b tắt hay không, sau khi xem R1; có yêu cầu sửa báo cáo theo R1–R3 hay không; và nghiệm thu task. Đồng thuận này không mở G3/test và không cho phép commit.
+   - Còn OPEN: phép 2×2 VC×E5, nguyên nhân vật lý, hiệu chuẩn N1/verdict, hiệu quả độc lập, đối chứng dùng quan hệ, FlashTicket.
+
+**Đề xuất:** dừng phản biện về tính đúng. Chỉ cần Codex đáp R1–R3 nếu Minh muốn sửa báo cáo trước khi chốt nền T-050.
+
+## Prompt bàn giao cho Codex (người làm đáp phản biện)
+
+```text
+Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
+Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
+
+Thông tin lượt này:
+- Task hoặc đề xuất: T-049, tasks/T-049-k-b-va-t6/SPEC.md, kết quả tại results/T-049/.
+- Công đoạn: người làm đáp phản biện.
+- Gói/cổng: P6, chuẩn bị P7, G3 chưa mở.
+- Người làm và người phản biện chính thức: Codex là người làm, Claude là người phản biện chính thức.
+- Tài liệu gốc: AGENTS.md, docs/STATE.md, tasks/T-049-k-b-va-t6/SPEC.md và LOG.md, tasks/T-043-thiet-ke-rca-m1/SPEC.md, docs/KE-HOACH-SAU-T047.md và git diff hiện hành.
+- Phản biện và phản hồi trước: phản biện soát kết quả T-049 của Claude ngày 04/11/2026, chỉ nằm trong chat (Minh dán kèm prompt này); chưa có bản REVIEW trong repo.
+- Code và kết quả liên quan: src/m1/, src/m1_danh_gia/, results/T-049/manifest.json, bao-cao.md và runs/; results/T-053/runs/k-cham-001/; revision, môi trường, lệnh và nguồn upstream theo manifest và LOG T-049.
+- Phạm vi ghi được Minh cho phép trong lượt này: chỉ trả lời trong chat nếu Minh chưa cấp quyền ghi khác.
+
+Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
+
+Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
+Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
+Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
+
+Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
+hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
+Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
+số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
+có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
+
+Bổ sung yêu cầu phản biện:
+1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
+2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
+3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
+4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
+5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
+6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
+7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
+8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
+9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
+10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
+
+Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
+Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
+
+Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
+bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
+Tiếng Việt, câu ngắn.
+
+Cuối lượt báo:
+1. Đã làm gì.
+2. File đã thay đổi, hoặc không sửa file nào.
+3. Kiểm đã chạy và kết quả.
+4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
+
+Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
+
+Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
+
+Công đoạn: người làm đáp phản biện. Giữ vai trò người làm, không là người phản biện chính thức của chính task.
+Tự soát yêu cầu và mọi file đầu ra gốc cần để trả lời các câu hỏi như một người chưa từng làm task, TRƯỚC khi mở kết luận các bản phản biện. Ghi danh sách điểm tự tìm được vào LOG trước khi mở các kết luận ấy nếu được phép ghi; phiên chỉ đọc ghi nhận xét trong chat.
+Sau đó kiểm từng điểm phản biện trên file/code/dữ liệu thật; chạy lại khi rẻ và được phép. Kết luận đúng / đúng một phần / sai / chưa kiểm được với bằng chứng riêng. Reviewer có thể sai, nói quá hoặc đề xuất sửa có mặt trái.
+Nếu được Minh cho phép: điền bảng Phản hồi của người làm ở cuối đúng bản phản biện; thêm N1, N2… cho điểm tự tìm được với CHẶN/KHÔNG CHẶN; để trống cột Minh quyết; nối LOG đủ mục 7 của AGENTS, gồm đề xuất sửa gom theo file; chỉ cập nhật dòng task trong STATE khi được phép. Không sửa nội dung hay prompt của reviewer hoặc tự sửa báo cáo/code.
+Nếu chưa có quyền ghi các phần này, trình phản hồi và đề xuất trong chat. Soạn prompt bàn giao cho người phản biện kiểm độc lập.
+
+Với từng thành phần, kiểm mục đích và căn cứ: sửa hạn chế P4, đáp ứng DT18 hay nhu cầu kỹ thuật. Có lý do kỹ thuật, phương án khác, bằng chứng dev và điều kiện thất bại không; có dùng mã hạn chế mô tả như bằng chứng cơ chế hoặc chọn theo mức chênh đồ thị trừ không đồ thị không?
+Nêu rõ nút/cạnh, ánh xạ log/trace/metric và phép tính thực sự sử dụng cạnh. Lần theo thông tin quan hệ và nhãn trong phương pháp lẫn đối chứng; gọi “không đồ thị” có đúng với thông tin còn giữ không?
+Kiểm baseline và đối chứng đủ mạnh, tương đương về tín hiệu/cửa sổ/tập ứng viên/coverage/tiền xử lý/quy tắc chấm/ngân sách chọn cấu hình ở phần không chủ ý thay; yếu tố thay cùng phải giới hạn kết luận.
+Phương pháp và đối chứng đã được cài và kiểm đầu vào, trung gian, hành vi trên dev chưa, hay chỉ chạy không lỗi? Không đòi đồ thị phải thắng để khóa.
+Code/revision, cấu hình, giả thuyết, độ đo, tập ca/tập ứng viên, cách xử lý ca lỗi/UNSUPPORTED/nhánh dự phòng và bảng diễn giải đã khóa trước test chưa? Có bỏ nhóm khó sau khi nhìn điểm hoặc dùng test để chọn thiết kế không?
+Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.
+```

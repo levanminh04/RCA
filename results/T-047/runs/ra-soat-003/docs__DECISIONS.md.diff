@@ -1,0 +1,11 @@
+--- before/docs/DECISIONS.md
+
++++ docs/DECISIONS.md
+
+@@ -342,3 +342,5 @@
+
+ | Q-230 | 02/11/2026 | “Duyệt tất cả” | Trả lời câu hỏi “Bạn nghiệm thu T-046 và duyệt ghi Q-224, Q-229 kèm commit, push chứ?”. Nghiệm thu T-046 tới bước 10, code `c298188e`; ghi Q-224, Q-229; commit và push phần còn lại trên nhánh hiện tại. Không xác nhận cổng đã hiệu chuẩn, hiệu quả RCA hay quyền mở G3 hoặc test. C1, mức (a), `verdict` cho bản P7, lợi ích S1 vẫn mở. Sửa SPEC T-047 và mức HẠI chưa duyệt. Nguồn: chat 02/11/2026; LOG T-046 phiên 1 (tiếp 6). |
+ 
+ | Q-231 | 02/11/2026 | Minh duyệt câu chữ bản sửa SPEC T-047 và WHY-70 được trình trong chat: mức HẠI C-e là tăng trung bình số thực thể tầng 1 lớn hơn 1 thực thể/cửa sổ, dung sai thực dụng chưa hiệu chuẩn; độ nhạy 0,5 và 2 chạy lại toàn bộ luật C và bộ chọn, chỉ báo cáo; helper riêng trong `results/T-047/scripts/luat_c_t047.py`, dùng chung cho pha 2 và độ bền, giữ UV-6/điều kiện E5, không lặp lý do HẠI, có hồi quy và `khong_moc_gia`; bảng 2×2 tại P ghi MRR gộp và theo dataset trong `so-sanh-t045.json`; adapter riêng, kiểm chế độ từng bản ghi và xử lý ERROR/UNSUPPORTED theo SPEC. Cho phép local tối đa 4 tiến trình, lượt dài và qua đêm, trần tổng 7 giờ thời gian thực. | Chỉ thêm một mục WHY-70 và dòng này ngoài phạm vi ghi gốc; không sửa `src`, quyết định cũ hoặc kết quả cũ. Chỉ sang bước 1 sau khi Minh duyệt câu chữ; commit và push chờ duyệt riêng. Không mở G3/test, không xác nhận hiệu chuẩn hoặc hiệu quả RCA. Nguồn: lời Minh duyệt bản câu chữ trong chat ngày 02/11/2026. |
++
++| Q-232 | 02/11/2026 | “Duyệt ghi gói sửa; tiếp tục rà và test, chưa chạy bước 1” | Duyệt gói sửa mẫu số C-e bằng 0 trong WHY-70 và SPEC T-047 theo khối đề xuất Minh chuyển: không áp vế C-e khi mọi cửa sổ bị loại do INSUFFICIENT_EVIDENCE; giữ cờ CHUA_KIEM_DUOC; cấu hình thắng có cặp mang cờ thì trình Minh trước khi dùng làm nền task (2). Helper đưa cờ vào kết quả chọn. Không đổi h, ma trận, mục tiêu; tiếp tục rà a–i và bước 0, có mâu thuẫn thì dừng trình; chưa sang bước 1 trước báo cáo rà. Commit/push chờ duyệt riêng. Nguồn: xác nhận trực tiếp của Minh trong chat 02/11/2026; câu chữ ghi trong LOG T-047 phiên 2 (tiếp). |

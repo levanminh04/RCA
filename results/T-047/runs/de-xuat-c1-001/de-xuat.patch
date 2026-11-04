@@ -1,0 +1,69 @@
+--- a/src/m1/cong.py
++++ b/src/m1/cong.py
+@@ -53,39 +53,33 @@
+     return lo, hi
+ 
+ 
+-def o_1s(moc_ns, gia_tri, t_ns, phia):
+-    """{chỉ số ô: trung bình} của một phía. moc_ns: mốc mẫu (int ns)."""
+-    tong, dem = {}, {}
+-    for x, v in zip(moc_ns, gia_tri):
+-        if phia == 'N':
+-            if x >= t_ns:
+-                raise ValueError('mẫu N có mốc >= t')
+-            j = (t_ns - x - 1) // NS
+-        else:
+-            if x < t_ns:
+-                raise ValueError('mẫu A có mốc < t')
+-            j = (x - t_ns) // NS
+-        if j >= W:
+-            continue
+-        tong[j] = tong.get(j, 0.0) + float(v)
+-        dem[j] = dem.get(j, 0) + 1
+-    return {j: tong[j] / dem[j] for j in tong}
+-
+-
+-def tu_tuong_quan(o):
+-    """ρ(k), k = 1…K_MAX trên ô có giá trị (dict chỉ số → giá trị); None khi không xác định. Trả (rho, ly_do)."""
+-    if len(o) < CAP_TOI_THIEU:
+-        return None, 'it_o'
+-    x = np.array(list(o.values()), float)
+-    m = float(x.mean())
+-    v = float(((x - m) ** 2).mean())
+-    if v <= 0:
+-        return None, 'phuong_sai_0'
+-    rho = {}
+-    for k in range(1, K_MAX + 1):
+-        cap = [(o[j] - m) * (o[j + k] - m) for j in o if (j + k) in o]
+-        rho[k] = (sum(cap) / len(cap)) / v if len(cap) >= CAP_TOI_THIEU else None
+-    return rho, None
++def o_1s(moc_ns,gia_tri,t_ns,phia):
++    samples={}
++    for x,v in zip(moc_ns,gia_tri):
++        if phia=='N':
++            if x>=t_ns:raise ValueError('mẫu N có mốc >= t')
++            j=(t_ns-x-1)//NS
++        else:
++            if x<t_ns:raise ValueError('mẫu A có mốc < t')
++            j=(x-t_ns)//NS
++        if j>=W:continue
++        samples.setdefault(j,[]).append(float(v))
++    return {j:math.fsum(sorted(samples[j]))/len(samples[j]) for j in sorted(samples,reverse=True)}
++
++
++
++def tu_tuong_quan(o):
++    if len(o)<CAP_TOI_THIEU:return None,'it_o'
++    order=sorted(o,reverse=True)
++    x=np.array([o[j] for j in order],float)
++    m=float(x.mean());v=float(((x-m)**2).mean())
++    if v<=0:return None,'phuong_sai_0'
++    rho={}
++    for k in range(1,K_MAX+1):
++        pairs=[(o[j]-m)*(o[j+k]-m) for j in order if j+k in o]
++        rho[k]=(sum(pairs)/len(pairs))/v if len(pairs)>=CAP_TOI_THIEU else None
++    return rho,None
++
+ 
+ 
+ def do_dai_khoi(rho):

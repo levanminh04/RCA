@@ -1,0 +1,51 @@
+.........F.............................................................. [ 55%]
+...........................................F.............                [100%]
+================================== FAILURES ===================================
+__________________ test_duong_ghi_chan_T045_va_thoat_thu_muc __________________
+
+tmp_path = WindowsPath('D:/RCA-flashticket/results/T-047/runs/buoc0-phien4-001/hoi-quy-001/tmp/test_duong_ghi_chan_T045_va_th0')
+
+    def test_duong_ghi_chan_T045_va_thoat_thu_muc(tmp_path):
+        assert ad.duong_ra(ad.OUT / 'runs/test/a.json').is_relative_to(ad.OUT)
+        for p in [ad.ROOT / 'results/T-045/a.json', ad.OUT / '../T-045/a.json', ad.ROOT / 'src/a.py', tmp_path.parent]:
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+results\T-047\tests\test_adapter.py:60: Failed
+________ test_gan_giu_cac_buoc_thu_hang[dataset-TRAI_CHIEU_DATASET-2] _________
+
+scenario = 'dataset', expected = 'TRAI_CHIEU_DATASET', step = 2
+
+    @pytest.mark.parametrize('scenario,expected,step', [('dataset', 'TRAI_CHIEU_DATASET', 2),
+        ('hai_gop', 'HAI', 3), ('it_ca', 'KHONG_DU_CA', 4), ('giup', 'GIUP', 5),
+        ('phang', 'KHONG_TAC_DUNG', 6), ('trai_o', 'TRAI_CHIEU_O', 7)])
+    def test_gan_giu_cac_buoc_thu_hang(scenario, expected, step):
+        ds = [{'ma': str(i), 'dataset': 'RE2-TT' if i < 4 else 'Nezha-OB', 'o': str(i)} for i in range(8)]
+        tat = {str(i): F(1, 2) for i in range(8)}
+        delta = {
+            'dataset': [F(1, 10)] * 4 + [-F(1, 10)] * 4,
+            'hai_gop': [-F(1, 10)] * 4 + [F(1, 100)] * 4,
+            'it_ca': [F(1, 10)] * 8, 'giup': [F(1, 10)] * 8,
+            'phang': [F(1, 200)] * 8,
+            'trai_o': [-F(1, 1000)] * 6 + [F(1, 10)] * 2}[scenario]
+        bat = {str(i): tat[str(i)] + delta[i] for i in range(8)}
+        ex = set(tat) if scenario != 'it_ca' else {'0'}
+        base = luat_c.ap_dung(ds, tat, bat, ex)
+>       assert (base['ket_cuc'], base['buoc']) == (expected, step)
+E       AssertionError: assert ('KHONG_TAC_DUNG', 6) == ('TRAI_CHIEU_DATASET', 2)
+E         
+E         At index 0 diff: 'KHONG_TAC_DUNG' != 'TRAI_CHIEU_DATASET'
+E         Use -v to get more diff
+
+results\T-047\tests\test_luat_c.py:165: AssertionError
+============================== warnings summary ===============================
+..\RCA-ext\envs\py312-pin\Lib\site-packages\networkx\release.py:130
+  D:\RCA-ext\envs\py312-pin\Lib\site-packages\networkx\release.py:130: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+    date_info = datetime.datetime.utcfromtimestamp(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: D:\RCA-flashticket\results\T-047\runs\buoc0-phien4-001\hoi-quy-001\junit.xml -
+=========================== short test summary info ===========================
+FAILED results/T-047/tests/test_adapter.py::test_duong_ghi_chan_T045_va_thoat_thu_muc
+FAILED results/T-047/tests/test_luat_c.py::test_gan_giu_cac_buoc_thu_hang[dataset-TRAI_CHIEU_DATASET-2]
+2 failed, 127 passed, 1 warning in 15.30s

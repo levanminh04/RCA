@@ -1,0 +1,163 @@
+{
+  "schema": "T047-buoc0-v1",
+  "task": "T-047",
+  "step": 0,
+  "status": "PASS",
+  "time": "2026-11-02T12:20:43+07:00",
+  "scope": "kiểm cài đặt bằng dữ liệu giả; không đánh giá hiệu quả RCA",
+  "revision_src": "c298188e",
+  "git_HEAD": "2d908df4ec25e429cd262e266c01985a644afd62",
+  "input_manifests": "results/T-047/runs/buoc0-phien4-001/kiem-hash.json",
+  "frozen_inputs": "results/T-047/runs/buoc0-phien4-001/kiem-dong-bang.json",
+  "old_suites": [
+    {
+      "task": "T-044",
+      "file": "results/T-047/runs/ra-soat-003/test-T-044/junit.xml",
+      "sha256": "37eab662e4045bab6d305f5b8610bcd5a401bb943e08aa65115c25040a4b8d48",
+      "reused": true,
+      "tests": 374,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "task": "T-045",
+      "file": "results/T-047/runs/ra-soat-003/test-T-045/junit.xml",
+      "sha256": "5bc243db846c7dd7345f84ed8b1d78bda6d46b949286a9a519d6e02ed7833e8e",
+      "reused": true,
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "task": "T-046",
+      "file": "results/T-047/runs/ra-soat-003/test-T-046/junit.xml",
+      "sha256": "e7c7db60342aea7001c29194fd5422783926f2d597fdf06f682fcbda6b255f2b",
+      "reused": true,
+      "tests": 46,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "old_suites_note": "Đã chạy ở Phiên 2; kiểm lại JUnit và hash nguồn hiện tại, không chạy lại bộ test cũ trong Phiên 4.",
+  "new_regression": {
+    "attempts": [
+      {
+        "path": "results/T-047/runs/buoc0-phien4-001/hoi-quy-001",
+        "tests": 129,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0,
+        "exit_code": 1,
+        "seconds": 65.35900000002584,
+        "command": "command.json",
+        "junit_sha256": "7acb9c356e7051ea3694be82dbfbe18daa86cd8d85a9ba21a4d8362663a2b96d"
+      },
+      {
+        "path": "results/T-047/runs/buoc0-phien4-001/hoi-quy-002",
+        "tests": 129,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "exit_code": 0,
+        "seconds": 17.23499999998603,
+        "command": "command.json",
+        "junit_sha256": "d2334ee18055dca2eb4c2591954b933baee88377d428c8d64116f882f6aad53d"
+      }
+    ],
+    "final": "hoi-quy-002",
+    "data": "synthetic_only",
+    "failed_attempt_retained": true,
+    "first_attempt_diagnosis": [
+      "Ca đường ghi dùng tmp_path.parent vốn nằm trong T-047; adapter cho phép là đúng. Đổi điểm thử thành ROOT.parent.",
+      "Ca trái chiều dataset dùng +/-1/10 dưới delta_d=1/4 do có 4 ca/dataset; kỳ vọng sai. Đổi đầu vào giả thành +/-1/3."
+    ],
+    "implementation_changes_after_failed_attempt": [],
+    "warning": "Một cảnh báo DeprecationWarning của networkx.release; không trượt hoặc bỏ test."
+  },
+  "coverage": [
+    {
+      "spec": "Helper 1",
+      "tests": "test_luat_c.py::test_gan_ve_cu_bang_ap_dung_truc_tiep; test_gan_giu_cac_buoc_thu_hang",
+      "assertion": "so toàn bộ dict của điểm nối với luat_c.ap_dung; giữ các trường gốc, bao_kem và thứ tự lý do"
+    },
+    {
+      "spec": "Helper 2",
+      "tests": "test_luat_c.py::test_wrapper_cu_toan_bo; test_the_gioi_khac_va_M_khong_lap",
+      "assertion": "E3, E5 bật/tắt điều kiện riêng, R0,c; toàn bộ wrapper ba thế giới, khong_moc_gia, ket_hop; M_cong_M_phay tối đa một lần"
+    },
+    {
+      "spec": "Helper 3",
+      "tests": "test_luat_c.py::test_n1_strict_bien_30; test_bien_do_nhay; test_loai_cap_trong_so_va_mau_so_khong; test_ce_hai_dung_o_buoc1_truoc_cac_ve_thu_hang",
+      "assertion": "Fraction, strict >, không luật trần V0; cặp loại, w=0/>1, n=0 chưa kiểm; C-e HẠI ở bước riêng trước thứ hạng"
+    },
+    {
+      "spec": "Helper 4",
+      "tests": "test_tich_hop.py",
+      "assertion": "43 cặp; pha2/bootstrap chung đường tính và trọng số; RR/UV6/M5/C-e; mọi bội số 1 trùng toàn bộ kết quả chính; mẫu ô ghép cặp, giữ cờ tới cấu hình thắng; độ nhạy tính lại bộ chọn"
+    },
+    {
+      "spec": "Helper 5, Adapter",
+      "tests": "test_adapter.py",
+      "assertion": "cấu hình T1/K, metadata từng bản ghi OK/NO_EVIDENCE; trạng thái trước chế độ; giữ ERROR/UNSUPPORTED rồi dừng phát việc; giới hạn đường ghi; hash và LOG trước đọc nhãn"
+    },
+    {
+      "spec": "Phục dựng S0",
+      "tests": "test_adapter.py::test_phuc_dung_S0_phai_sap_va_gop_lai; test_phuc_dung_bang_xep_hang_S0_truc_tiep",
+      "assertion": "bỏ độ lớn rồi sắp và gộp; khớp xep_hang.xep trực tiếp trên kênh giả, gồm tầng 2/3"
+    }
+  ],
+  "sources": {
+    "results/T-047/scripts/adapter_t047.py": {
+      "sha256": "ccc567940de20d6adcd0de82b70b0e9344661b06f188939e0172c948f0dfdeb5",
+      "bytes": 7677
+    },
+    "results/T-047/scripts/luat_c_t047.py": {
+      "sha256": "7816793fd7c7c0f491c6fcc2b77643d2ef1311f54e7fad6fce49d4e0a0ffb7c5",
+      "bytes": 6178
+    },
+    "results/T-047/tests/conftest.py": {
+      "sha256": "ba9ef61569ad6aab43c2ee9c07b753e3b055e3026274563b67d73fda585f3d35",
+      "bytes": 4374
+    },
+    "results/T-047/tests/test_adapter.py": {
+      "sha256": "25b75773f2a18f7503700abe162063c5628974e4acf17a9f4e053df8d091eba6",
+      "bytes": 8968
+    },
+    "results/T-047/tests/test_luat_c.py": {
+      "sha256": "de647c657bc581662e16f312e7bc080d94f628740af46105e5f81302ee99cc02",
+      "bytes": 8405
+    },
+    "results/T-047/tests/test_tich_hop.py": {
+      "sha256": "4924725d59304bedaaf47be170f74e913d660c35b3c5b3935d2324730f6cd147",
+      "bytes": 6228
+    }
+  },
+  "scripts_unchanged_from_checkpoint": {
+    "results/T-047/scripts/adapter_t047.py": true,
+    "results/T-047/scripts/luat_c_t047.py": true
+  },
+  "environment": {
+    "python_command": "results/T-047/runs/buoc0-phien4-001/hoi-quy-002/command.json",
+    "versions": {
+      "numpy": "1.26.4",
+      "scipy": "1.14.1",
+      "pytest": "8.3.4",
+      "networkx": "2.5"
+    }
+  },
+  "git_diff_check": "PASS",
+  "src_diff_from_c298188e": "EMPTY",
+  "step1": "NOT_RUN",
+  "new_dev_scoring_labels_read": false,
+  "locked_data_read": false,
+  "new_material_decisions": [],
+  "limitations": [
+    "Chỉ xác nhận helper/adapter trên dữ liệu giả; không có kết quả thực nghiệm T-047.",
+    "Phục dựng S0 trên bản ghi dev, T1/QT5/đối chiếu T-046, D2, khối K, độ bền chính và bảng 2x2 còn ở các bước sau.",
+    "Cổng chưa hiệu chuẩn; verdict P7, cơ chế và hiệu quả RCA chưa được xác nhận."
+  ],
+  "next": "Đã hoàn tất bước 0. Giữ dừng trước bước 1 theo chỉ đạo hiện hành; không commit/push."
+}

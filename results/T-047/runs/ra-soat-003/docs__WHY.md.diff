@@ -1,0 +1,12 @@
+--- before/docs/WHY.md
+
++++ docs/WHY.md
+
+@@ -1084,5 +1084,5 @@
+
+ - **Điều bằng chứng chưa xác nhận:** số cấu hình bị loại ở từng mức không chứng minh cấu hình thắng đã định sẵn hoặc ngưỡng đúng. Việc một mức phân tách mức tăng của E2 và E3 trong kết quả cũ không xác nhận E2 an toàn, E3 hại hoặc mức đó có căn cứ khoa học. Không dùng kết cục do ngưỡng tạo ra để tự chứng minh ngưỡng.
+ - **Giới hạn:** đại lượng phụ thuộc số kênh, tập thực thể và coverage; tăng giảm giữa cửa sổ có thể bù trừ. Bật riêng E5 với cùng tín hiệu/cổng chỉ có thể giữ hoặc giảm số tầng 1, nên vế xét số tăng không bắt được tác hại riêng của E5. S1 chỉ đổi thứ tự trong tầng nên không đổi số tầng 1 hoặc V0. Số tầng 1 giảm không tự chứng minh chất lượng RCA tăng. C-e không có nhãn thực thể bất thường đủ để hiệu chuẩn đại lượng này.
+ - **Cách bảo toàn các điều kiện khác:** helper riêng trong `results/T-047/scripts/luat_c_t047.py` giữ UV-6, điều kiện E5, thứ tự luật C và các ngưỡng RR; không sửa `src`. Kiểm hồi quy với vế cũ trước khi chạy dữ liệu. Pha 2 và bootstrap dùng chung helper; giữ `khong_moc_gia` để đối chiếu.
+-- **Điều kiện diễn giải thất bại:** kết quả đổi đáng kể ở 0,5 hoặc 2 thì báo phụ thuộc dung sai; không chọn lại mức có kết quả thuận lợi. Nếu hồi quy tích hợp lệch hoặc đại lượng không tính được, dừng phần phụ thuộc và trình bằng chứng thiếu, không gọi là đã qua vế C-e.
++- **Điều kiện diễn giải thất bại:** kết quả đổi đáng kể ở 0,5 hoặc 2 thì báo phụ thuộc dung sai; không chọn lại mức có kết quả thuận lợi. Nếu hồi quy tích hợp lệch, hoặc đại lượng không tính được do lỗi tính toán, thiếu trường bắt buộc, ERROR hay UNSUPPORTED, dừng phần phụ thuộc và trình bằng chứng thiếu. Riêng mẫu số C-e bằng 0 vì mọi cửa sổ của cặp đều bị loại do INSUFFICIENT_EVIDENCE (D2f): ghi CHUA_KIEM_DUOC, không áp vế này, tiếp tục các vế còn lại và bộ chọn với cờ được giữ; không gọi là đã qua vế C-e. Cấu hình thắng có cặp mang cờ này thì trình Minh trước khi dùng làm nền cho task (2).
+ - **Kết luận phụ thuộc:** loại cấu hình và chọn khối T-047, kết cục E1/E2/E3/E5 và đầu vào task (2). Mức 1 không xác nhận hiệu chuẩn cổng, `verdict` P7, cơ chế hay lợi ích RCA; các kết luận đó vẫn cần bằng chứng tương ứng.

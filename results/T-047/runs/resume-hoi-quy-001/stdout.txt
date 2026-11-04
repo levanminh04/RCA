@@ -1,0 +1,57 @@
+F.                                                                       [100%]
+================================== FAILURES ===================================
+___________________ test_dung_lai_ca_hop_le_khong_chay_lai ____________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000140FCBF3290>
+sandbox_adapter = <module 'adapter_t047' from 'D:\\RCA-flashticket\\results\\T-047\\scripts\\adapter_t047.py'>
+matrix = {'buoc': [{'ma': 'T13', 'so_sanh': ['C-a0', 'C-a1', 'C-d1', 'C-d2', 'C-d3', 'C-c', ...]}], 'co_dinh_moi_buoc': {'tham_so_E4': {}}}
+synthetic_input = ({'aliases': {}, 'case_dir': 'private-case-folder', 'inventory': ['A'], 'logs': [], ...}, {'synthetic-case': 1000})
+
+    def test_dung_lai_ca_hop_le_khong_chay_lai(monkeypatch,sandbox_adapter,matrix,synthetic_input):
+        a,src,case=setup(monkeypatch,sandbox_adapter,matrix,synthetic_input,'good')
+        original=(src/'cases'/case['opaque_id']/'phase1/ban-ghi.jsonl').read_bytes()
+>       d.control(a)
+
+results\T-047\tests\test_resume.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+results\T-047\scripts\chay_t047_v3.py:170: in control
+    source_sha256={str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/RCA-flashticket/results/T-047/scripts/adapter_t047.py')
+other = WindowsPath('D:/RCA-flashticket/results/T-047/runs/resume-hoi-quy-001/tmp/test_dung_lai_ca_hop_le_khong_0')
+walk_up = False, _deprecated = (), step = 0
+
+    def relative_to(self, other, /, *_deprecated, walk_up=False):
+        """Return the relative path to another path identified by the passed
+        arguments.  If the operation is not possible (because this is not
+        related to the other path), raise ValueError.
+    
+        The *walk_up* parameter controls whether `..` may be used to resolve
+        the path.
+        """
+        if _deprecated:
+            msg = ("support for supplying more than one positional argument "
+                   "to pathlib.PurePath.relative_to() is deprecated and "
+                   "scheduled for removal in Python {remove}")
+            warnings._deprecated("pathlib.PurePath.relative_to(*args)", msg,
+                                 remove=(3, 14))
+        other = self.with_segments(other, *_deprecated)
+        for step, path in enumerate([other] + list(other.parents)):
+            if self.is_relative_to(path):
+                break
+            elif not walk_up:
+>               raise ValueError(f"{str(self)!r} is not in the subpath of {str(other)!r}")
+E               ValueError: 'D:\\RCA-flashticket\\results\\T-047\\scripts\\adapter_t047.py' is not in the subpath of 'D:\\RCA-flashticket\\results\\T-047\\runs\\resume-hoi-quy-001\\tmp\\test_dung_lai_ca_hop_le_khong_0'
+
+C:\Users\84583\AppData\Local\Programs\Python\Python312\Lib\pathlib.py:682: ValueError
+============================== warnings summary ===============================
+..\RCA-ext\envs\py312-pin\Lib\site-packages\networkx\release.py:130
+  D:\RCA-ext\envs\py312-pin\Lib\site-packages\networkx\release.py:130: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+    date_info = datetime.datetime.utcfromtimestamp(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: D:\RCA-flashticket\results\T-047\runs\resume-hoi-quy-001\junit.xml -
+=========================== short test summary info ===========================
+FAILED results/T-047/tests/test_resume.py::test_dung_lai_ca_hop_le_khong_chay_lai
+1 failed, 1 passed, 1 warning in 0.47s

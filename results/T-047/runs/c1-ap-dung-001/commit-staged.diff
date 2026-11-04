@@ -1,0 +1,52 @@
+diff --git a/docs/DECISIONS.md b/docs/DECISIONS.md
+index 722c74e8..9b933c8d 100644
+--- a/docs/DECISIONS.md
++++ b/docs/DECISIONS.md
+@@ -340,3 +340,5 @@ Chỉ ghi điều Minh đã quyết, theo lời Minh. Đề xuất của agent n
+ | Q-229 | 02/11/2026 | “tôi quyết định để codex làm t47” | T-047 giữ Codex làm, Claude phản biện; thay phần phân công của Q-227. Phần vế mốc giả của Q-227 giữ nguyên. Nguồn: chat 02/11/2026; LOG T-046 phiên 1 (tiếp 5). |
+ 
+ | Q-230 | 02/11/2026 | “Duyệt tất cả” | Trả lời câu hỏi “Bạn nghiệm thu T-046 và duyệt ghi Q-224, Q-229 kèm commit, push chứ?”. Nghiệm thu T-046 tới bước 10, code `c298188e`; ghi Q-224, Q-229; commit và push phần còn lại trên nhánh hiện tại. Không xác nhận cổng đã hiệu chuẩn, hiệu quả RCA hay quyền mở G3 hoặc test. C1, mức (a), `verdict` cho bản P7, lợi ích S1 vẫn mở. Sửa SPEC T-047 và mức HẠI chưa duyệt. Nguồn: chat 02/11/2026; LOG T-046 phiên 1 (tiếp 6). |
++
++| Q-233 | 02/11/2026 | “Duyệt áp đúng patch C1 (runs/de-xuat-c1-003/de-xuat.patch) vào o_1s và tu_tuong_quan trong src/m1/cong.py, một commit. Ghi Q-233. Nâng trần tổng lên 8 giờ, tính cả phần đã chạy. Chạy lại đủ T1 bằng code đã sửa. Lệch số so với T-046 thì giải thích từng chỗ, không đổi tiêu chí. Đổi công thức, ngưỡng, ma trận hoặc cần vượt 8 giờ thì dừng trình tôi. Push chờ duyệt riêng. nếu có thể tối ưu song song tiến trình thì cứ thực hiện, tôi sẽ tắt bớt các tiến trình khác” | Duyệt đúng patch C1 tại results/T-047/runs/de-xuat-c1-003/de-xuat.patch, chỉ o_1s/tu_tuong_quan trong src/m1/cong.py; một commit cho C1 và dòng này, không kèm thay đổi có sẵn ngoài phạm vi. Nguồn code chạy: c298188e cộng C1; chạy lại đủ T1, giải thích từng lệch T-046, giữ tiêu chí. Trần tổng8giờ tính cả phần đã chạy; tối ưu song song trong giới hạn4tiếntrình local. Đổi công thức/ngưỡng/ma trận hoặc vượt8giờ phải dừng trình. Push chờ duyệt riêng. Không mở G3/test hoặc xác nhận hiệu quả RCA. Nguồn: Minh duyệt trực tiếp trong chat ngày02/11/2026. |
+diff --git a/src/m1/cong.py b/src/m1/cong.py
+index a4a6f480..fa82d5cb 100644
+--- a/src/m1/cong.py
++++ b/src/m1/cong.py
+@@ -55,7 +55,7 @@ def bien_phia(q, t_ns):
+ 
+ def o_1s(moc_ns, gia_tri, t_ns, phia):
+     """{chỉ số ô: trung bình} của một phía. moc_ns: mốc mẫu (int ns)."""
+-    tong, dem = {}, {}
++    samples = {}
+     for x, v in zip(moc_ns, gia_tri):
+         if phia == 'N':
+             if x >= t_ns:
+@@ -67,23 +67,23 @@ def o_1s(moc_ns, gia_tri, t_ns, phia):
+             j = (x - t_ns) // NS
+         if j >= W:
+             continue
+-        tong[j] = tong.get(j, 0.0) + float(v)
+-        dem[j] = dem.get(j, 0) + 1
+-    return {j: tong[j] / dem[j] for j in tong}
++        samples.setdefault(j, []).append(float(v))
++    return {j: math.fsum(sorted(samples[j])) / len(samples[j]) for j in sorted(samples, reverse=True)}
+ 
+ 
+ def tu_tuong_quan(o):
+     """ρ(k), k = 1…K_MAX trên ô có giá trị (dict chỉ số → giá trị); None khi không xác định. Trả (rho, ly_do)."""
+     if len(o) < CAP_TOI_THIEU:
+         return None, 'it_o'
+-    x = np.array(list(o.values()), float)
++    order = sorted(o, reverse=True)  # thứ tự thời gian tăng, không theo thứ tự chèn dict
++    x = np.array([o[j] for j in order], float)
+     m = float(x.mean())
+     v = float(((x - m) ** 2).mean())
+     if v <= 0:
+         return None, 'phuong_sai_0'
+     rho = {}
+     for k in range(1, K_MAX + 1):
+-        cap = [(o[j] - m) * (o[j + k] - m) for j in o if (j + k) in o]
++        cap = [(o[j] - m) * (o[j + k] - m) for j in order if (j + k) in o]
+         rho[k] = (sum(cap) / len(cap)) / v if len(cap) >= CAP_TOI_THIEU else None
+     return rho, None
+ 
