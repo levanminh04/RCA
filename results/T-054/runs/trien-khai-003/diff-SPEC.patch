@@ -1,0 +1,97 @@
+--- SPEC-before
++++ SPEC-current
+@@ -1,6 +1,6 @@
+ # T-054 — Hoàn thiện khóa G3(a), chạy và báo cáo P7(a)
+ 
+-- **Trạng thái:** đã duyệt ghi hồ sơ ngày 05/11/2026 theo quyền có điều kiện của Minh, Q-250. Chưa cấp quyền cài công cụ, pilot/thực nghiệm, SSH, mở test, commit hoặc push. Hồ sơ thiết kế còn các quyết định OPEN trước G3.
++- **Trạng thái:** đã duyệt ghi hồ sơ ngày 05/11/2026 theo quyền có điều kiện của Minh, Q-250. Quyền triển khai công cụ và tiếp tục chuẩn bị/pilot dev local đã được Minh cấp trong các lệnh sau, nguồn tại LOG; chưa khóa G3, chưa mở test/RE3, nguồn TORAI A ngoài đúng một ca dev vừa được Minh cấp (xem LOG), SSH/sync, commit hoặc push. Các lựa chọn khoa học còn OPEN giữ đúng mốc dừng.
+ - **Người làm:** Codex.
+ - **Người phản biện:** Claude.
+ - **Thuộc gói MRP:** chuẩn bị kết thúc P6/G3(a), thực thi P7(a), chuẩn bị trình G4.
+@@ -87,11 +87,11 @@
+ | Tổng hàng chấm ma trận | 4.136+H C-e tại P | Không là số call phương pháp; variants phụ ghi riêng |
+ | CI/nhóm/bản loại lỗi | Theo cặp/nhóm khóa trong matrix | Số ca/ô còn lại phụ thuộc trạng thái; dùng mẫu chung nơi cần so |
+ 
+-Hàng OPEN: nếu giữ TORAI A thì thêm 180 core và 180 prep theo hiện trạng, hoặc 60 prep sau parity; đây là bảng phụ ngoài A4. RE3 biết 30 ca/10 ô nhưng vế/seed/cửa sổ/support chưa khóa: Σca×cửa_sổ×seed×vế, world theo ngữ nghĩa lõi/adapter. Vị trí N dùng C-a0 đã có, **không dự toán mặc định thêm 94 K-R0**. Pilot là tập phủ nhánh liệt kê trước, không phải toàn 52 dev×toàn ma trận; retry cộng attempt thực riêng.
++TORAI B là baseline chính; TORAI A là bảng phụ ngoài A4 theo giao thức baseline đã chạy và lời Minh xác nhận lại trong LOG. A thêm 180 core và 180 prep theo hiện trạng, hoặc 60 prep sau parity; nguồn CSV A cho đúng ca dev-a5cabe5fa7 đã được cấp để pilot; nguồn A của cohort chạy chính vẫn chờ quyền riêng, không chọn lại A hay B. RE3 biết 30 ca/10 ô nhưng vế/seed/cửa sổ/support chưa khóa: Σca×cửa_sổ×seed×vế, world theo ngữ nghĩa lõi/adapter. Vị trí N dùng C-a0 đã có, **không dự toán mặc định thêm 94 K-R0**. Pilot là tập phủ nhánh liệt kê trước, không phải toàn 52 dev×toàn ma trận; retry cộng attempt thực riêng.
+ 
+ ## Đầu ra
+ 
+-Lượt ghi SPEC này chỉ tạo SPEC/LOG, hồ sơ nguồn/đáp phản biện và manifest; nối Q-250/WHY-78 và dòng STATE. Các đầu ra công cụ/thực nghiệm sau đây vẫn là kế hoạch cần quyền triển khai riêng.
++Lượt ghi SPEC này chỉ tạo SPEC/LOG, hồ sơ nguồn/đáp phản biện và manifest; nối Q-250/WHY-78 và dòng STATE. Các đầu ra công cụ sau đây thuộc quyền triển khai Minh đã cấp sau lượt ghi SPEC; thực nghiệm vẫn theo đúng miền và các quyền riêng đã ghi trong LOG.
+ 
+ | Đường dẫn trong results/T-054 | Nội dung |
+ |---|---|
+@@ -125,7 +125,7 @@
+ | Helper T-052 → driver T-054 | Ba liên kết và toàn ma trận còn thiếu | Đánh giá mới, giữ kết quả T-052 |
+ | Payload rời → envelope tại tuyến thực chạy | Tránh gắn nhầm ca/config/window | Seal/nhãn/mẫu số/A4 |
+ | Pending/live RAM → queue/attempt bền đơn máy | Chạy độc lập agent/SSH, tránh chạy đôi | Resume, không dựng queue phân tán động |
+-| OPEN → quyết định trước G3 | Không chọn sau test | Chưa tự chốt TORAI A/ngân sách/giờ |
++| Quyết định trước G3 | Không chọn sau test | B chính/A phụ đã có; nguồn A và chính sách/trần thời gian còn cần đủ trước phần phụ thuộc |
+ | STATE/sổ | Lưu nguồn duyệt và trạng thái | Cập nhật sau nguồn quyết định; giữ dòng task đã đóng |
+ 
+ ## Các bước
+@@ -167,9 +167,9 @@
+    | CI suy biến mà qua biên | Ghi cùng câu “đạt E-04 theo công thức; CI suy biến”, kèm số đếm; không nâng mức OB |
+    | M1 hơn baseline nhưng thua C-a hoặc C-d2 | Giới hạn theo cặp; không khẳng định lợi ích quan hệ chung |
+ 
+-7. **Fixture và pilot đại diện.** Tái dùng bảng/dev/native/fixture phù hợp từ T-052. F3 chỉ gồm hai ca/seed 0 sau selector, không thay driver/guard mới. Pilot-plan chọn theo nguồn dev trước khi chạy: TT nhẹ/nặng thật/C-e, nhánh E1/E2/E5 đổi và ca đối chiếu không đổi; OB E2 giúp/C-d2 đổi và ca đối chiếu; T12 đổi/không đổi vùng; đủ 3 seed TORAI trên ca đại diện; thêm A nếu giữ. C-d3 gồm hỗ trợ/chu trình/thiếu đích. Dùng dữ liệu giả cho lỗi nguồn/timeout, C-e thiếu lịch sử/O=0/world nếu dev không chạm nhánh. Chạy bundle từ chọn nguồn→prep→method→seal→nhãn dev→bảng; mỗi tuyến khác có kiểm nguồn. Nhánh kiểm bằng mẫu giả không được gọi là đã kiểm thật. Dùng chính lượt pilot mới so với các tham chiếu ở bước 4; không nhất thiết thêm lượt.
+-
+-   Local đo 1 worker rồi 2/3 trên lô tương đương. Chỉ dùng 4 khi RAM/đĩa/throughput cả lô tốt hơn và không paging. Cold/warm/tải cạnh tranh lưu riêng. Cache prep TORAI phải kiểm **trên laptop**, gồm byte CSV %.17g và tính độc lập seed; Linux không thay kiểm nơi áp dụng. Trần pilot đề nghị xin riêng là 60 phút trôi/tối đa 180 phút-máy trên ba máy; đây chưa phải quyền. Không đủ phủ nhánh thì giữ outputs và trình đúng phần thiếu.
++7. **Fixture và pilot đại diện.** Tái dùng bảng/dev/native/fixture phù hợp từ T-052. F3 chỉ gồm hai ca/seed 0 sau selector, không thay driver/guard mới. Pilot-plan chọn theo nguồn dev trước khi chạy: TT nhẹ/nặng thật/C-e, nhánh E1/E2/E5 đổi và ca đối chiếu không đổi; OB E2 giúp/C-d2 đổi và ca đối chiếu; T12 đổi/không đổi vùng; đủ 3 seed TORAI trên ca đại diện; kiểm A ở bảng phụ sau grant nguồn riêng; không chọn lại baseline. C-d3 gồm hỗ trợ/chu trình/thiếu đích. Dùng dữ liệu giả cho lỗi nguồn/timeout, C-e thiếu lịch sử/O=0/world nếu dev không chạm nhánh. Chạy bundle từ chọn nguồn→prep→method→seal→nhãn dev→bảng; mỗi tuyến khác có kiểm nguồn. Nhánh kiểm bằng mẫu giả không được gọi là đã kiểm thật. Dùng chính lượt pilot mới so với các tham chiếu ở bước 4; không nhất thiết thêm lượt.
++
++   Local đo 1 worker rồi 2/3 trên lô tương đương. Chỉ dùng 4 khi RAM/đĩa/throughput cả lô tốt hơn và không paging. Cold/warm/tải cạnh tranh lưu riêng. Cache prep TORAI phải kiểm **trên laptop**, gồm byte CSV %.17g và tính độc lập seed; Linux không thay kiểm nơi áp dụng. Mốc đề nghị ban đầu là tối đa 60 phút trôi/180 phút-máy trên ba máy, không phải ETA. Quyền hiện hành theo LOG phiên 4 là pilot dev local trước chạy chính với cap local tối đa một giờ; SSH/sync và lô cloud vẫn riêng. Không đủ phủ nhánh thì giữ outputs và trình đúng phần thiếu.
+ 
+ 8. **Hồ sơ khóa.** Gồm B6/sáu câu G3, code/env/revision/gói đúng byte/config/cohort/U/alias/seed/world/errors/fallback/timeout/mẫu số/statistics/diễn giải/tiếp xúc/lịch/budget. A/B1/B2/C có bằng chứng hoặc điểm chặn rõ. Khóa gói byte thực chạy, hash gói/từng file và blob Git/provenance; không lấy checkout mới khác EOL làm nguồn. Tách `code_root`, `data_root`, `output_root`; gói code không kéo theo data/nhãn. Reviewer kiểm hồ sơ bằng prompt chuẩn, Minh chuyển thủ công. Script dừng WAIT_G3 rồi WAIT_TEST_GRANT nếu thiếu quyết định. Chưa có quyền commit thì chưa commit.
+ 
+@@ -213,7 +213,7 @@
+ 
+ Một báo cáo bàn giao khi ổn định gồm: máy/partition/job/attempt, lô VERIFIED, pin, tài nguyên/ETA và phần chưa đo, lệnh status/drain/resume đã diễn tập, lỗi mới/dấu hiệu dừng, phần cần Minh và mốc WAIT nếu thiếu quyền. Minh tự kiểm khi thức. Tiến độ dễ xem có timestamp cuối/heartbeat/pha/running/verified/tổng/error/resources/phần còn lại/action.
+ 
+-CLI dự kiến, chưa tồn tại/chưa chạy. Trước bàn giao phải điền plan/pin/executable thật cho 3 máy và kiểm lệnh:
++CLI đã cài và kiểm trên fixture; plan/pin/executable thật từng máy phải được điền và kiểm trước dùng. Các placeholder dưới đây không phải lệnh phát chạy chính:
+ 
+ ```text
+ py -3 -B D:\RCA-flashticket\results\T-054\scripts\p7.py status --plan <plan-local> --sha256 <pin>
+@@ -242,7 +242,7 @@
+ 
+ Minh muốn tận dụng cả hai EC2 + laptop để giảm tổng thời gian, ưu tiên EC2 cho việc độc lập/nặng/đủ quyền. Không dựng queue phân tán chỉ để dùng máy. Đầu tiên lập job cần thiết và so setup/sync/hash/parity/receive với phần đường găng tiết kiệm. Không còn việc cloud có ích thì báo Minh có thể Stop, không tự bật/tắt hoặc Terminate. Lịch laptop đơn máy là phương án thay thế nếu không có lô cloud hữu ích; không tự bỏ chỉ đạo Minh.
+ 
+-Nguồn kết nối theo Minh: EC2 1 `13.211.127.97`, PEM `D:/RCA-ext/keys/keys.pem`; EC2 2 `3.107.156.186`, PEM `D:/RCA-ext/keys/key2.pem`. Chỉ lập kế hoạch; không in/nạp nội dung khóa vào log/prompt/manifest/repo. Nếu SSH từ chối do ACL, thực hiện đúng quyền Minh cấp cho bước kết nối; không sửa ACL trong lượt ghi hồ sơ. Ghim executable/Python/gói/RNG/PYTHONHASHSEED/BLAS-OMP threads 1/code upstream/số học Q-237; tách code root và data root. Runner hiện dùng ENVS Windows; Linux wrapper chỉ override đúng env được duyệt, không sửa src để chạy. Chưa đủ parity giữa máy thì cặp so dùng cùng môi trường.
++Nguồn kết nối theo Minh: EC2 1 `13.211.127.97`, PEM `D:/RCA-ext/keys/keys.pem`; EC2 2 `3.107.156.186`, PEM `D:/RCA-ext/keys/key2.pem`. Chỉ lập kế hoạch; không in/nạp nội dung khóa vào log/prompt/manifest/repo. Nếu SSH từ chối do ACL, thực hiện đúng quyền Minh cấp cho bước kết nối; không sửa ACL trong lượt ghi hồ sơ. Ghim executable/Python/gói/RNG/PYTHONHASHSEED/BLAS-OMP threads 1/code upstream/số học Q-237; tách code root và data root. Runner hiện dùng ENVS Windows; Linux wrapper chỉ override đúng env được duyệt, không sửa src để chạy. Chưa đủ parity giữa máy thì cặp so dùng cùng môi trường. Ngoại lệ chỉ để chẩn đoán: Minh đã cấp một lượt MicroRank dev-607751ac0a với thiết lập luồng khác để kiểm sai khác số cuối; chưa duyệt thay cấu hình chính 1 luồng. Kết quả và giới hạn suy luận về thread lịch sử ở runs/trien-khai-003/diagnostic-thread-001/summary.json.
+ 
+ Số worker theo CPU/throughput và `floor((RAM_available − dự_phòng_host/controller)/(1,25 × peak_tree_RSS_bundle))`. Hệ số 1,25 là đề nghị, chưa bảo đảm. Đo sau khi Minh dọn; chỉ giữ 4 worker khi nhanh hơn cả lô và không paging. Đĩa tính output nén + temp + retry + gói nhận + dự phòng, không chỉ kích thước tệp cuối.
+ 
+@@ -275,7 +275,7 @@
+ 
+ - Không triển khai M1(b)/detector/LLM/GNN/đảo PageRank/chọn lại nền từ test; không dựng nhãn lan/không lan sau khi đã xem để kết luận.
+ - Không gọi vùng nghi ngờ là vùng ảnh hưởng đã kiểm đúng. D3/D16 trước kết luận (b)/khóa FT; nhãn vùng độc lập thuộc P10, LLM thuộc P8 và yêu cầu R-01–R-10 thuộc P9/P10.
+-- Không mở RE3 trong grant chính. Pha 1 chỉ chuẩn bị hợp đồng nguồn/adapter từ metadata/schema được phép. Thiếu thì OPEN và trình đúng phần xác minh/dung lượng/quyền riêng. Không lấy 4 root metadata làm U; giữ 30 ca/10 ô cho bản cuối.
++- Không mở RE3 trong grant chính. Pha 1 phải chuẩn bị hợp đồng nguồn/adapter từ metadata/schema được phép; đây là đầu ra chuẩn bị bắt buộc, không đẩy toàn bộ sang sau chạy chính. Cài và kiểm trên telemetry RE3 cần phạm vi/quyền riêng; chưa được coi adapter hiện có đã tương thích. Thiếu thì OPEN và trình đúng phần xác minh/dung lượng/quyền riêng. Không lấy 4 root metadata làm U; giữ 30 ca/10 ô cho bản cuối.
+ - Không chuyển raw/dẫn xuất test lên cloud theo phương án cơ sở, không đọc raw OB trên EC2 trong T-054, không tự xử lý bản sao cũ.
+ - Không sửa nguồn lịch sử/xóa lượt hỏng/commit/push/bật tắt máy/quyền ACL/Scheduled Task ngoài quyền đúng bước. Không coi đóng task là đóng RQ3.
+ 
+@@ -293,7 +293,7 @@
+ | T-052 pilot-f3-summary-001.json | 12 PASS, 404,16 s là upper bound gồm lượt lỗi | Không là runtime sạch/full guard |
+ | T-051/dinh-chinh-luot-1.md | ~821 MB nén→11,55 GB logic; inflate/nạp đáng kể | Cần stream/output/temp/reserve, không chỉ chừa đĩa nén |
+ 
+-Dự toán công pha 1 **chưa kiểm** là 6–10 giờ cho driver/fixture/pilot/hồ sơ/tự kiểm, nếu không sửa lõi/hợp đồng. Chờ Claude/Minh và công sửa tính riêng. Pilot đề nghị 60 phút trôi/180 phút-máy, chưa cấp quyền. Pha 2 chưa có ETA toàn tuyến; ~8 giờ tuần tự từ vài ca mẫu là kịch bản chưa kiểm, không là ETA/cận trên. 3 worker không có nghĩa nhanh gấp 3.
++Dự toán công pha 1 **chưa kiểm** là 6–10 giờ cho driver/fixture/pilot/hồ sơ/tự kiểm, nếu không sửa lõi/hợp đồng. Chờ Claude/Minh và công sửa tính riêng. Pilot ban đầu đề nghị tối đa 60 phút trôi/180 phút-máy; đây là cap, không phải ETA. Đề xuất tăng lên 3 giờ ở checkpoint002 chưa được chốt và không dùng làm dự báo. Lệnh Minh mới cho tiếp tục chuẩn bị/pilot local trước chạy chính được lưu ở LOG; lô local vẫn giữ cap tối đa một giờ, chưa tự nâng cap bằng số. Pha 2 chưa có ETA toàn tuyến. Kịch bản ~8 giờ tuần tự trước đây chưa được xác minh và không dùng xếp lịch; số đo driver lạnh mới nằm trong reports/tu-soat-003/bao-cao.md và tách rõ kịch bản ngoại suy khỏi ETA. 3 worker không có nghĩa nhanh gấp 3.
+ 
+ Tách cấp máy, sync code/chuyển dev, hash, env, prep, run, receive, seal/verify, score/CI và đọc ca/report. Mạng/env EC2/throughput local chưa đo. Lập lịch:
+ 
+@@ -312,7 +312,7 @@
+ | Mục | Nguồn và phương án | Quyết định/điểm dừng |
+ |---|---|---|
+ | Cạn ngân sách | P3 §8.3: “nếu đã cam kết chạy đủ cohort mà hết ngân sách giữa chừng thì ca chưa chạy là `TIMEOUT` (Q-74 Q9).” Đề nghị riêng P7: cạn trần điều phối/toàn đợt thì dừng phát việc; unrun giữ PENDING/BLOCKED, không gán method TIMEOUT; giữ cohort, bảng cần đủ cohort bị chặn. Chỉ method timeout đã chạy/đủ pha mới tính trượt. Phương án khác: giữ P3 và báo riêng phần budget | Minh duyệt ngoại lệ hoặc giữ P3 trước G3; ghi hồ sơ không tự chọn. Chưa quyết thì chặn phần khóa lỗi/budget, không sửa lịch sử P3 |
+-| TORAI A | Q-74 Q3 và P3 §6.6: “Cả A và B đều chạy và báo. Không đổi sau khi thấy số.” Code P7 chỉ có torai_B; vắng A ở T-034 không hủy Q-74. Đề nghị giữ A phụ; phương án khác là Minh loại khỏi phạm vi P7 với lý do | Nếu giữ: grant cụ thể 3 CSV tác giả logts/tracets_err/tracets_lat của đúng thành viên TT tại D:/RCA-ext/work/T-016/data/torai-TT + metric. Chưa xác minh đủ ca/hash/schema; nằm ngoài thư mục locked vẫn không được đọc. Locator có service/fault ở map riêng; method không nhận. Giữ nhãn hồi cứu P3 §4/lưới-ngưỡng toàn file. A ngoài A4 có thể chạy sau seal chính nhưng không tự miễn snapshot/công bố |
++| Nguồn TORAI A | Q-74 Q3/P3 §6.6 đã yêu cầu cả A/B; baseline đã chạy B chính/A phụ. Minh xác nhận giữ A phụ ngoài A4, không mở lại lựa chọn baseline. Driver mới đã kiểm A tự sinh và A thật trên đúng ca dev-a5cabe5fa7 đủ ba seed; chưa kiểm toàn cohort | Đã có grant đúng ca dev-a5cabe5fa7 cho pilot, không phải toàn cohort. Trước phần A chính còn cần grant cụ thể 3 CSV tác giả logts/tracets_err/tracets_lat của đúng thành viên TT tại D:/RCA-ext/work/T-016/data/torai-TT + metric. Chưa xác minh đủ ca/hash/schema; nằm ngoài thư mục locked vẫn không được đọc. Locator có service/fault ở map riêng; method không nhận. Giữ nhãn hồi cứu P3 §4/lưới-ngưỡng toàn file. A ngoài A4 có thể chạy sau seal chính nhưng không tự miễn snapshot/công bố |
+ | Nguồn/nhãn | Ai cấp map/label ref độc lập từ G1/metadata được phép; schema đã thiết kế | Minh chỉ định/quyền materialize trước test; hash không thay provenance |
+ | Chính sách chưa có số | Timeout từng pha/vế, trần method×dataset, monitor-gap threshold/nhịp, worker/đĩa/retry, config/env/revision | Đo/fixture dev và Minh duyệt trước LOCKED; không điền unknown để đóng bảng |
+ | Độ nhạy | Bản loại nguyên cặp và case-permutation ở bước 6 | Minh chốt công thức trước G3; không bỏ nghĩa vụ loại lỗi Q-211 |
+@@ -325,4 +325,4 @@
+ 
+ ## Prompt bàn giao
+ 
+-Prompt trung tính, nguyên văn Prompt chung + Kiểm lại phản hồi và sửa + G3, nằm trong mục LOG hiện hành. Phản biện SPEC có thể đề xuất dừng theo lượt Claude cuối và việc Codex nhận N1–N5; Minh quyết chuyển hay dừng. Không tự gửi. Trước triển khai, trình đúng gói code/fixture/pilot/quyền máy/ngân sách và các OPEN ở trên; không coi SPEC được ghi là G3/test đã mở.
++Prompt trung tính, nguyên văn Prompt chung + Kiểm lại phản hồi và sửa + G3, nằm trong mục LOG hiện hành. Phản biện SPEC có thể đề xuất dừng theo lượt Claude cuối và việc Codex nhận N1–N5; Minh quyết chuyển hay dừng. Không tự gửi. Trước phần chưa có quyền, trình đúng gói/pilot/quyền máy/ngân sách và OPEN còn phụ thuộc; không xin lại quyền công cụ/pilot dev local đã cấp trong LOG. Không coi SPEC được ghi hoặc pilot đạt là G3/test đã mở.

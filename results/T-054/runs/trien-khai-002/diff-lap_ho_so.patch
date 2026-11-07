@@ -1,0 +1,20 @@
+--- results\T-054\runs\freeze-cong-cu-003\code\results\T-054\scripts\lap_ho_so.py
++++ results\T-054\scripts\lap_ho_so.py
+@@ -12,7 +12,7 @@
+ 
+ def preflight():
+     packages = {}
+-    for name in ('numpy', 'pandas', 'pyarrow', 'scipy', 'scikit-learn', 'networkx', 'psutil'):
++    for name in ('numpy', 'pandas', 'pyarrow', 'scipy', 'scikit-learn', 'networkx', 'psutil', 'drain3', 'causal-learn'):
+         try: packages[name] = importlib.metadata.version(name)
+         except importlib.metadata.PackageNotFoundError: packages[name] = None
+     free_ram = None
+@@ -23,7 +23,7 @@
+         pass
+     return {'python': sys.version, 'executable': ref(sys.executable), 'platform': platform.platform(),
+             'packages': packages, 'free_ram': free_ram, 'free_disk': shutil.disk_usage(ROOT).free,
+-            'threads': {k: os.environ.get(k) for k in ('PYTHONHASHSEED', 'OPENBLAS_NUM_THREADS', 'OMP_NUM_THREADS')},
++            'threads': {k: os.environ.get(k) for k in ('PYTHONHASHSEED', 'OPENBLAS_NUM_THREADS', 'OMP_NUM_THREADS', 'MKL_NUM_THREADS')},
+             'test_opened': False, 'ssh_used': False}
+ 
+ 

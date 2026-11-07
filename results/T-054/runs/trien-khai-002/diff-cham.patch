@@ -1,0 +1,91 @@
+--- results\T-054\runs\freeze-cong-cu-003\code\results\T-054\scripts\cham.py
++++ results\T-054\scripts\cham.py
+@@ -6,7 +6,7 @@
+ 
+ from bien_nhan import (ROOT, OUT, Blocked, atomic, append, fingerprint, read_pin, ref,
+                        verify_envelope)
+-from nguon import compare_labels
++from nguon import compare_labels, validate_execution_links
+ 
+ 
+ def verify_snapshot(snapshot, jobs):
+@@ -28,6 +28,7 @@
+             if receipt['job_sha256'] != fingerprint(job):
+                 raise Blocked('receipt không cùng job')
+             results[key] = verify_envelope(envelope, invocation, job['slot'], slot['token'])
++            validate_execution_links(job, invocation)
+     return results
+ 
+ 
+@@ -42,8 +43,50 @@
+     return {'schema': 'T054-SNAPSHOT-1', 'plan_sha256': fingerprint(plan), 'slots': slots}
+ 
+ 
++def validate_a4_slots(plan, runtimes):
++    """Đủ cohort/arm/seed được kiểm bằng metadata trước lần đọc nhãn đầu."""
++    if set(runtimes) != {'RE2-TT', 'Nezha-OB'}:
++        raise Blocked('A4 cần cả hai dataset trước ghép nhãn')
++    wanted = {}; expected_windows = {}; expected_sources = {}
++    for ds, runtime in runtimes.items():
++        if runtime.get('dataset') != ds:
++            raise Blocked('runtime sai dataset')
++        if plan['mode'] == 'test' and len(runtime['cases']) != {'RE2-TT': 60, 'Nezha-OB': 34}[ds]:
++            raise Blocked('A4 khác toàn bộ cohort test đã khai')
++        for oid, row in runtime['cases'].items():
++            t = row.get('t', row.get('t_ns') // 10**9 if row.get('t_ns') is not None else None)
++            if plan['mode'] != 'synthetic' and type(t) is not int:
++                raise Blocked('mốc A4 chưa có nguồn kiểu số trước ghép nhãn')
++            expected_windows[(ds, oid)] = {'t': t, 'half_width_s': 300} if t is not None else None
++            expected_sources[(ds, oid)] = fingerprint(row)
++            wanted[(ds, oid, 'M1', None)] = row['member_sha256']
++            if ds == 'RE2-TT':
++                for seed in (0, 1, 2):
++                    wanted[(ds, oid, 'torai_B', seed)] = row['member_sha256']
++            else:
++                wanted[(ds, oid, 'simplerca', None)] = row['member_sha256']
++    selected = {}
++    for job in plan['jobs']:
++        if not job.get('a4'):
++            continue
++        s = job['slot']; key = (s['dataset'], s['opaque_id'], s['arm'], s['seed'])
++        if (s['view'] != 'main' or key in selected or key not in wanted
++                or s['member_sha256'] != wanted[key]
++                or (s['seed'] is not None and type(s['seed']) is not int)):
++            raise Blocked('A4 trùng/sai arm/seed/window/member trước ghép nhãn')
++        expected_window = expected_windows[(s['dataset'], s['opaque_id'])]
++        if expected_window is not None and s['window'] != expected_window:
++            raise Blocked('cửa sổ A4 khác runtime trước ghép nhãn')
++        if plan['mode'] != 'synthetic' and s['source_sha256'] != expected_sources[(s['dataset'], s['opaque_id'])]:
++            raise Blocked('nguồn slot A4 khác runtime trước ghép nhãn')
++        selected[key] = s['member_sha256']
++    if selected != wanted:
++        raise Blocked('A4 chưa đủ mọi ca/seed trước ghép nhãn')
++
++
+ def evaluate(snapshot, plan, label_refs, canonical_refs, runtimes, aliases, inventories, output):
+     records = verify_snapshot(snapshot, plan['jobs'])  # trước mọi label reader
++    validate_a4_slots(plan, runtimes)
+     if snapshot['plan_sha256'] != fingerprint(plan):
+         raise Blocked('snapshot khác plan')
+     labels = {}
+@@ -202,8 +245,8 @@
+             else:
+                 missing.append([ds, oid, 'position_N', 'MISSING_FIELDS'])
+         for arm, records in sorted(arms.items()):
+-            worlds = ('P', 'S_lo', 'S_hi') if arm not in ('C-c', 'C-g', 'C-d1', 'C-d2', 'C-d3') else ('P',)
+-            if arm == 'torai_B' and ds == 'RE2-TT' and {r.get('seed') for r in records} != {0, 1, 2}:
++            worlds = ('P', 'S_lo', 'S_hi') if arm not in ('C-c', 'C-g', 'C-d1', 'C-d2', 'C-d3', 'torai_A') else ('P',)
++            if arm in ('torai_A', 'torai_B') and ds == 'RE2-TT' and (len(records) != 3 or {r.get('seed') for r in records} != {0, 1, 2}):
+                 raise Blocked('bảng mô tả không bình quân seed sống')
+             for world in worlds:
+                 scored = []
+@@ -214,7 +257,8 @@
+                 mean = {k: sum(r[k] for r in scored) / len(scored) for k in (*danh_gia.DO_DO_BOOT, 'RR', 'Hit5_Q')}
+                 row = {'dataset': ds, 'opaque_id': oid, 'arm': arm, 'world': world, 'seed_count': len(scored),
+                        'statuses': [r['status'] for r in records], 'metrics': mean,
+-                       'cell': labels[ds][oid]['cell'], 'fault': labels[ds][oid]['fault'], 'auxiliary': arm.endswith('_aux')}
++                       'cell': labels[ds][oid]['cell'], 'fault': labels[ds][oid]['fault'],
++                       'auxiliary': arm.endswith('_aux') or arm == 'torai_A'}
+                 rows.append(row)
+                 by_world[(ds, world)].setdefault(arm, {})[oid] = mean
+     summaries = []

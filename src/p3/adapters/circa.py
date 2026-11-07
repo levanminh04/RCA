@@ -22,11 +22,11 @@ VERSION = 'src/circa_kien_truc + RCAEval 259ea41 RHT/DA; CIRCA 0215e18'
 MO_HINH = ('svr', 'ols')
 
 
-def chuan_bi(metric_win):
+def chuan_bi(metric_win, dataset='re2-tt'):
     """Như T-014 run_examples.py:13–16, nhưng cắt trước (D1): tiền xử lý main.py, đổi tên, preprocess."""
     from RCAEval.io.time_series import preprocess
     raw = doi_ten_latency(tien_xu_ly_main(metric_win))
-    clean = preprocess(raw.copy(), dataset='re2-tt')
+    clean = preprocess(raw.copy(), dataset=dataset)
     clean['time'] = raw['time'].to_numpy()
     return clean
 
@@ -104,13 +104,13 @@ def cham(frame, graph, t, current, mo_hinh):
     raise ValueError(mo_hinh)
 
 
-def chay(metric_win, spans, t, mo_hinh):
+def chay(metric_win, spans, t, mo_hinh, dataset='re2-tt'):
     """Trả danh sách hai kết quả: [RHT+DA, RHT-only] từ cùng một lượt."""
     if mo_hinh not in MO_HINH:
         raise LoiRunner(f'mô hình CIRCA lạ: {mo_hinh}')
     shape = {'metric_cols': int(metric_win.shape[1] - 1), 'metric_cols_after_preprocess': None, 'spans': int(len(spans))}
     try:
-        clean = chuan_bi(metric_win)
+        clean = chuan_bi(metric_win, dataset=dataset)
         shape['metric_cols_after_preprocess'] = int(clean.shape[1] - 1)
         graph, grep = do_thi([c for c in clean.columns if c != 'time'], spans, t)
         A = clean[clean['time'] >= t]

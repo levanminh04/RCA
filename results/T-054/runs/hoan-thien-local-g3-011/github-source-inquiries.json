@@ -1,0 +1,40 @@
+[
+  {
+    "number": 64,
+    "url": "https://github.com/phamquiluan/RCAEval/issues/64",
+    "title": "Feature Request: Provide Data Conversion Tools from APM, Prometheus, and Log Systems to Dataset Format",
+    "state": "closed",
+    "updated_at": "2026-11-06T03:36:36Z",
+    "body": "I would like to request the addition of data conversion tools that can help users transform real-world monitoring data into the RCAEval dataset format. Specifically, tools for converting data from:\n\n- **APM systems** (e.g., Jaeger, Zipkin, SkyWalking)\n- **Prometheus** metrics and monitoring data\n- **Log systems** (e.g., ELK Stack, Loki, Fluentd)",
+    "comments": [
+      {
+        "html_url": "https://github.com/phamquiluan/RCAEval/issues/64#issuecomment-6659996848",
+        "created_at": "2026-11-05T14:05:32Z",
+        "updated_at": "2026-11-05T14:05:32Z",
+        "body": "Thanks for the request. A converter is now on `main` as the `rcaeval-convert` command. It turns exported telemetry into an RCAEval case directory:\n\n| Source | Input | Writes |\n|---|---|---|\n| Prometheus | named PromQL range queries, pulled from the server | `metrics.csv` |\n| Jaeger, Zipkin, SkyWalking, any OpenTelemetry SDK | OTLP/JSON from the OpenTelemetry Collector's `file` exporter (the Collector has receivers for all three) | `traces.csv` |\n| ELK, Loki, Fluentd, any log store | a JSON Lines, JSON or CSV export, with a field mapping (`--field container=labels.container`) | `logs.csv` |\n| the files above | `logs.csv`, `traces.csv` and the failure start time | `logts.csv`, `cluster_info.json`, `tracets_err.csv`, `tracets_lat.csv`, `inject_time.txt` |\n\n```bash\nrcaeval-convert metrics --prometheus-url http://localhost:9090 --queries docs/examples/prometheus_queries.json \\\n    --start 2024-01-15T21:12:00Z --end 2024-01-15T21:36:00Z --out case\nrcaeval-convert traces otel-traces.jsonl --out case\nrcaeval-convert logs loki.jsonl --field container=labels.container --field message=line --out case\nrcaeval-convert derive case --inject-time 2024-01-15T21:24:00Z\n```\n\nThe guide is [docs/CONVERT.md](https://github.com/phamquiluan/RCAEval/blob/main/docs/CONVERT.md). It has the field mappings for Loki, Elasticsearch and Fluentd, and [an example queries file](https://github.com/phamquiluan/RCAEval/blob/main/docs/examples/prometheus_queries.json) with the cAdvisor and Istio queries behind RE2/RE3. Until the next release, install from source with `pip install \"RCAEval[convert] @ git+https://github.com/phamquiluan/RCAEval\"`.\n\nA few things to know:\n- Service names must not contain `_`, and each service needs the same name in every source.\n- A converted case has no label. You choose the failure start time (`inject_time.txt`), and to evaluate a method you also need the root cause.\n- The derived `logts`/`tracets` files have the same layout as the released ones, but their values aren't identical. The guide explains the differences.\n\nClosing this one. Please open a new issue if your setup's export format isn't covered.\n"
+      },
+      {
+        "html_url": "https://github.com/phamquiluan/RCAEval/issues/64#issuecomment-6676190238",
+        "created_at": "2026-11-06T03:36:36Z",
+        "updated_at": "2026-11-06T03:36:36Z",
+        "body": "This is now released in [1.12.0](https://github.com/phamquiluan/RCAEval/releases/tag/1.12.0), so you can install it from PyPI with `pip install \"RCAEval[convert]\"`."
+      }
+    ]
+  },
+  {
+    "number": 67,
+    "url": "https://github.com/phamquiluan/RCAEval/issues/67",
+    "title": "fault injection scripts",
+    "state": "open",
+    "updated_at": "2025-12-15T09:42:34Z",
+    "body": "Hello, I would like to reproduce the different types of anomalies that you inject into Train Ticket to compare a RCA method based on Kubernetes events and use the results you present in “RCAEval: A Benchmark for Root Cause Analysis of Microservice Systems with Telemetry Data” as a baseline. Unfortunately, metrics or traces are not sufficient; I need to collect Kubernetes events during the issue. \nAre the scripts used to inject faults when generating your dataset available as open source, and if so, where can I find them?",
+    "comments": [
+      {
+        "html_url": "https://github.com/phamquiluan/RCAEval/issues/67#issuecomment-3654699426",
+        "created_at": "2025-12-15T09:42:34Z",
+        "updated_at": "2025-12-15T09:42:34Z",
+        "body": "Hi @phamquiluan. In line with @nj-apps request above, I wish I could reproduce your RCAEval paper experiments (which is nice, btw) with more grounding.\n\nFor example, in your paper you are referring to \"*we use traffic control*\" (§3.2) but without explicitly saying how or within which data range. And same for resource faults and code-level faults. So, could you please elaborate on the evaluation process and tools?\n\nBest regards."
+      }
+    ]
+  }
+]

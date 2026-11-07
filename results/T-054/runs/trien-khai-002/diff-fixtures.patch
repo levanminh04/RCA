@@ -1,0 +1,17 @@
+--- results\T-054\runs\freeze-cong-cu-003\code\results\T-054\scripts\fixtures.py
++++ results\T-054\scripts\fixtures.py
+@@ -113,7 +113,13 @@
+             if time.monotonic() - started > 8:
+                 controller.kill(); raise AssertionError('controller chưa phát worker')
+             time.sleep(.03)
+-        controller.kill(); controller.wait(timeout=5)
++        import psutil
++        actual_controller = status(target / 'recovery')['controller']
++        process = psutil.Process(actual_controller['pid'])
++        process.kill(); process.wait(timeout=5)
++        controller.wait(timeout=5)
++        atomic(target / 'recovery-target.json', {'launcher_pid': controller.pid,
++               'actual_supervisor': actual_controller, 'actual_supervisor_stopped': True})
+     supervise(recovering, target / 'recovery')
+     recovered = next(iter(status(target / 'recovery')['jobs'].values()))
+     check('controller_restart_adopts_live_worker', lambda: assert_equal(recovered['state'], 'VERIFIED'))

@@ -18,6 +18,11 @@ Cập nhật: 01/11/2026. Mốc quyết định ở [DECISIONS.md](DECISIONS.md)
 
 ## Việc kế tiếp và chờ Minh
 
+- **T-054 — main013-v2 đã chạy và chấm (08/11/2026 02:04).** Claude làm phần chạy/chấm, Codex phản biện. v1 dừng do lỗi phương pháp chưa phân loại → v2 (quy tắc INSUFFICIENT_NORMAL_SPANS, supervisor chạy tiếp); 740/740 slot trùng v1↔v2 giống hệt. TT: đạt E-04 theo công thức, CI chứa 0. OB: ΔHit@5 3/34, chưa đạt mức 0,05. TORAI A tạm dừng (bảng phụ thiếu). Chờ báo cáo P7(a), phản biện Codex; RE3/commit chưa có quyền. [Kết quả](../results/T-054/reports/main-013-v2/a4.json), [LOG](../tasks/T-054-khoa-g3-chay-p7-a/LOG.md).
+
+
+- **T-052 — T13 dev và hồ sơ G3(a): xong — Minh nghiệm thu 05/11/2026.** Phạm vi mô tả T13 dev, lát cắt F3 và đính chính 004. Minh duyệt trực tiếp, bỏ lượt kiểm lại bản 004. G3(a) còn bốn nhóm chặn và chờ SPEC P7. [Hồ sơ 004](../results/T-052/ho-so-g3-004.md), [LOG nghiệm thu và bàn giao](../tasks/T-052-t13-va-ho-so-g3/LOG.md#phiên-12--05112026--codex--windows--người-làm).
+
 - **T-051 — T11, T12, KB:** **xong — Minh nghiệm thu 04/11/2026 (Q-242)** trong phạm vi dev, giữ hai sai lệch lịch sử đã công khai. Giữ E9 tắt, cạnh quan sát, nền Q-241 và cờ E2; không xác nhận Claude đã kiểm gói cuối. [Bàn giao cuối](../results/T-051/hoan-tat-nguoi-lam.md), [manifest](../results/T-051/manifest-dap-phan-bien-002.json). Kế tiếp: phiên Codex mới đọc toàn cảnh và trình SPEC T-052; ưu tiên EC2 để giảm tổng thời gian, tiền máy không là ràng buộc (Q-243). [LOG nghiệm thu và prompt](../tasks/T-051-t11-t12-va-kb/LOG.md). G3/test vẫn khóa.
 
 - **T-053 — Kiểm z+S1 và chạy lại khối K:** **xong — Minh nghiệm thu 03/11/2026 (Q-236)**. Codex làm, Claude phản biện. D24=z+S1; nền T-049=E1-U+E2-C+E5 (Q-237), giữ cờ trái chiều. Bản sửa cuối mới tự kiểm; giới hạn ở [LOG](../tasks/T-053-kiem-z-chay-lai-k/LOG.md). [Báo cáo lịch sử](../results/T-053/bao-cao.md), [audit](../results/T-053/runs/dap-phan-bien-001/kiem-tra.json).

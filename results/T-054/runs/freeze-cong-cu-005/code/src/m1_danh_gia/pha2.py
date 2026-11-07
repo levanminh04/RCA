@@ -1,0 +1,218 @@
+"""Pha 2: đọc bản ghi pha 1 đã băm, kiểm hash, ghép nhãn, tính RR, Hit@1, hạng kỳ vọng, cờ M5 theo ba thế giới,
+MRR theo dataset và gộp, WORLD_DEPENDENT kèm giải thích (cặp thực thể đổi thứ tự với root; SPEC T-044 bước 5;
+SPEC T-043 B1.3b, Phụ lục C; CĐ2, CĐ6).
+Chỉ package này đọc nhãn. Ca không OK có RR = 0 (WHY-28).
+MRR giữ phân số chính xác tới hết luật chọn (CĐ16); chỉ đổi sang số thập phân khi trình bày. Lưu ra JSON dùng
+`ma_hoa_json` (phân số thành {"phan_so": [tử, mẫu]}) và đọc lại bằng `giai_ma_json`.
+"""
+import hashlib
+import json
+from fractions import Fraction
+from pathlib import Path
+
+from m1_danh_gia import luat_c, m5, rr, the_gioi, uv6 as uv6_mod
+from p3 import danh_gia
+
+WORLDS = ('P', 'S_lo', 'S_hi')
+
+
+class LoiHash(ValueError):
+    """Bản ghi pha 1 không khớp hash đã nhận."""
+
+
+class LoiDuLieuPha2(ValueError):
+    """Bản ghi pha 1 thiếu, trùng hoặc lệch metadata (S26)."""
+
+
+def _so(x):
+    return None if x is None else float(x)
+
+
+def doc(thu_muc, sha256):
+    thu_muc = Path(thu_muc)
+    meta = json.loads((thu_muc / 'pha1.json').read_text(encoding='utf-8'))
+    du_lieu = (thu_muc / meta['tep']).read_bytes()
+    h = hashlib.sha256(du_lieu).hexdigest()
+    if h != sha256 or meta['sha256'] != sha256:
+        raise LoiHash(f'hash lệch: tệp {h}, pha1.json {meta["sha256"]}, nhận {sha256}')
+    recs = [json.loads(x) for x in du_lieu.decode('utf-8').splitlines() if x]
+    # đủ và không trùng (S26): số dòng thật khớp metadata; mỗi (cấu hình, ca) đúng một bản ghi; đủ tích cấu hình × ca
+    if len(recs) != meta.get('so_ban_ghi'):
+        raise LoiDuLieuPha2(f"số bản ghi thật {len(recs)} khác pha1.json {meta.get('so_ban_ghi')}")
+    cap = [(r['config_id'], r['opaque_id']) for r in recs]
+    if len(set(cap)) != len(cap):
+        raise LoiDuLieuPha2('có bản ghi trùng (config_id, opaque_id)')
+    cfg = sorted({c for c, _ in cap})
+    ca = sorted({o for _, o in cap})
+    if len(cap) != len(cfg) * len(ca):
+        raise LoiDuLieuPha2(f'thiếu bản ghi: {len(cap)} dòng cho {len(cfg)} cấu hình × {len(ca)} ca')
+    if 'cau_hinh' in meta and sorted(meta['cau_hinh']) != cfg:
+        raise LoiDuLieuPha2('danh sách cấu hình khác pha1.json')
+    if 'so_ca' in meta and meta['so_ca'] != len(ca):
+        raise LoiDuLieuPha2(f"số ca {len(ca)} khác pha1.json {meta['so_ca']}")
+    return meta, recs
+
+
+def _blocks(rec, w):
+    if rec.get('status') != 'OK':
+        return []
+    if w == 'P':
+        return rec.get('blocks') or []
+    return (rec.get('worlds') or {}).get(w, {}).get('blocks') or []
+
+
+def cham(thu_muc, sha256, nhan):
+    """nhan: {mã mờ: {'root', 'dataset', 'o', 'loai_loi'?}}. Trả {'cau_hinh': {config_id: {...}}, 'sha256'}."""
+    meta, recs = doc(thu_muc, sha256)
+    out = {}
+    for rec in recs:
+        cid, oid = rec['config_id'], rec['opaque_id']
+        lab = nhan[oid]
+        root, ok = lab['root'], rec.get('status') == 'OK'
+        G_N = {tuple(c) for c in (rec.get('extra') or {}).get('G_N') or []}
+        kq = out.setdefault(cid, {'ca': {}})
+        theo_w = {}
+        for w in WORLDS:
+            b = _blocks(rec, w)
+            theo_w[w] = {'RR': rr.rr_ca(b, root, ok), 'hit1': rr.hit1_ca(b, root, ok),
+                         'hang': rr.hang_ky_vong(b, root) if ok else None, 'M5': ok and m5.co_M5(b, root, G_N),
+                         # đủ độ đo (Hit@1–10, RR, nDCG@5, Avg@5, cận lạc quan/bi quan), chỉ báo cáo (M-02, M-07; S42)
+                         'do': danh_gia.do_ca(rr.phan_bo(b, root), ok)}
+        bw = {w: _blocks(rec, w) for w in WORLDS}
+        wd = the_gioi.world_dependent(bw, root) if ok else {'WORLD_DEPENDENT': False}
+        nn = None
+        if wd['WORLD_DEPENDENT']:
+            kw = (rec.get('extra') or {}).get('kenh_co_the_gioi') or {}
+            nn = the_gioi.nguyen_nhan({w: kw.get(w, []) for w in WORLDS}, root, bw)
+        kq['ca'][oid] = {'dataset': lab['dataset'], 'o': lab['o'], 'loai_loi': lab.get('loai_loi'),
+                         'status': rec.get('status'), 'verdict': rec.get('verdict'), 'theo_the_gioi': theo_w,
+                         'WORLD_DEPENDENT': wd['WORLD_DEPENDENT'], 'nguyen_nhan_WD': nn}
+    for cid, kq in out.items():
+        ca = kq['ca']
+        kq['MRR'] = {}
+        kq['MRR_the_gioi'] = {}
+        for w in WORLDS:
+            r = {oid: c['theo_the_gioi'][w]['RR'] for oid, c in ca.items()}
+            m = {'gop': rr.mrr(r)}
+            for d in sorted({c['dataset'] for c in ca.values()}):
+                m[d] = rr.mrr(r, {oid for oid, c in ca.items() if c['dataset'] == d})
+            kq['MRR_the_gioi'][w] = m
+        kq['MRR'] = kq['MRR_the_gioi']['P']
+        kq['WORLD_DEPENDENT'] = sorted(oid for oid, c in ca.items() if c['WORLD_DEPENDENT'])
+    return {'cau_hinh': out, 'sha256': sha256, 'so_ban_ghi': len(recs)}
+
+
+def ket_cuc_cap(kq, cid_tat, cid_bat, E_X, thanh_phan, buoc, moc_gia=None, trong_so=None, delta_d_co_dinh=None):
+    """Luật C cho cặp (cid_tat, cid_bat) trong cả ba thế giới, rồi kết hợp theo phụ thuộc quan sát (CĐ6.2).
+    Cặp E5 tự đếm cờ M5 theo thế giới; cặp E3 tự tính UV-6 theo thế giới (CĐ2). moc_gia: số đếm của hai nhánh.
+    trong_so: {mã ca: bội số} (CĐ13; SPEC T-045 bước 7); cờ M5 và UV-6 cũng đếm theo bội số."""
+    a, b = _tp_K(cid_tat), _tp_K(cid_bat)
+    if a is not None and b is not None:
+        them_tp = b - a
+        if not a <= b or not them_tp or (a and len(them_tp) > 1):
+            raise ValueError(f'cặp không hợp lệ cho luật C: {cid_tat}, {cid_bat}')
+        mong = next(iter(them_tp)) if len(them_tp) == 1 else luat_c.NHIEU_THANH_PHAN
+        if thanh_phan != mong:
+            raise ValueError(f'thanh_phan {thanh_phan!r} khác thành phần của cặp ({mong!r})')
+    tat, bat = kq['cau_hinh'][cid_tat]['ca'], kq['cau_hinh'][cid_bat]['ca']
+    if set(tat) != set(bat):
+        raise ValueError('hai cấu hình khác tập ca')
+    ds = [{'ma': oid, 'dataset': tat[oid]['dataset'], 'o': tat[oid]['o']} for oid in sorted(tat)]
+    theo, khong_mg = {}, {}
+    for w in WORLDS:
+        rt = {oid: tat[oid]['theo_the_gioi'][w]['RR'] for oid in tat}
+        rb = {oid: bat[oid]['theo_the_gioi'][w]['RR'] for oid in bat}
+        them = {}
+        if thanh_phan == 'E5':
+            them['M5'] = (sum(_w(trong_so, o) * tat[o]['theo_the_gioi'][w]['M5'] for o in tat),
+                          sum(_w(trong_so, o) * bat[o]['theo_the_gioi'][w]['M5'] for o in bat))
+        if thanh_phan == 'E3':
+            them['uv6'] = uv6_mod.dem([{'dataset': tat[o]['dataset'], 'loai_loi': tat[o]['loai_loi'],
+                                        'hit1_tat': tat[o]['theo_the_gioi'][w]['hit1'],
+                                        'hit1_bat': bat[o]['theo_the_gioi'][w]['hit1'],
+                                        'hang_tat': tat[o]['theo_the_gioi'][w]['hang'],
+                                        'hang_bat': bat[o]['theo_the_gioi'][w]['hang'],
+                                        'trong_so': _w(trong_so, o)} for o in sorted(tat)])
+        theo[w] = luat_c.ap_dung(ds, rt, rb, E_X, thanh_phan=thanh_phan, moc_gia=moc_gia, trong_so=trong_so,
+                                 delta_d_co_dinh=delta_d_co_dinh, **them)
+        if moc_gia is not None:  # cùng cặp, cùng điều kiện riêng (UV-6, M5) của thế giới w, chỉ bỏ vế mốc giả (S34)
+            khong_mg[w] = luat_c.ap_dung(ds, rt, rb, E_X, thanh_phan=thanh_phan, moc_gia=None, trong_so=trong_so,
+                                         delta_d_co_dinh=delta_d_co_dinh, **them)['ket_cuc']
+    out = {'theo_the_gioi': theo,
+           'ket_hop': luat_c.ket_hop_the_gioi({w: theo[w]['ket_cuc'] for w in WORLDS}, buoc)}
+    if moc_gia is not None:  # vế mốc giả theo P áp chung ba thế giới: báo kèm kết cục khi chưa áp (chỉ báo cáo)
+        out['khong_moc_gia'] = khong_mg
+    return out
+
+
+def mrr_cau_hinh(kq, trong_so=None, the_gioi='P'):
+    """MRR gộp và theo dataset của mọi cấu hình trong kết quả `cham`, ở một thế giới, có bội số (`rr.boi_so`; map
+    phải đủ mọi ca). Phân số chính xác, dùng cho `chon_khoi.chon` ở phép độ bền và bước 10 (C8, S37)."""
+    if the_gioi not in WORLDS:
+        raise ValueError(f'thế giới lạ: {the_gioi!r}')
+    out = {}
+    for cid, c in kq['cau_hinh'].items():
+        ca = c['ca']
+        r = {oid: x['theo_the_gioi'][the_gioi]['RR'] for oid, x in ca.items()}
+        m = {'gop': rr.mrr(r, None, trong_so)}
+        for d in sorted({x['dataset'] for x in ca.values()}):
+            m[d] = rr.mrr(r, {oid for oid, x in ca.items() if x['dataset'] == d}, trong_so)
+        out[cid] = m
+    return out
+
+
+KHOI_K = ('E1', 'E2', 'E3', 'E5')
+
+
+def _tp_K(cid):
+    """Tập thành phần của cấu hình khối K ('K-R0', 'K-E1+E3'); None với cấu hình khác."""
+    if not cid.startswith('K-'):
+        return None
+    t = cid[2:]
+    s = frozenset() if t == 'R0' else frozenset(t.split('+'))
+    return s if s <= set(KHOI_K) else None
+
+
+def ma_hoa_json(obj):
+    """Đổi cấu trúc kết quả sang dạng ghi JSON được mà không mất độ chính xác: Fraction → {"phan_so": [tử, mẫu]};
+    tuple → list; khóa dict phải là chuỗi."""
+    if isinstance(obj, Fraction):
+        return {'phan_so': [obj.numerator, obj.denominator]}
+    if isinstance(obj, dict):
+        if not all(isinstance(k, str) for k in obj):
+            raise TypeError('khóa dict phải là chuỗi')
+        return {k: ma_hoa_json(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [ma_hoa_json(v) for v in obj]
+    return obj  # số thực còn lại chỉ là giá trị trình bày (ví dụ tỷ lệ mốc giả); phép quyết định dùng Fraction
+
+
+def giai_ma_json(obj):
+    """Ngược của `ma_hoa_json` (tuple trở thành list)."""
+    if isinstance(obj, dict):
+        if set(obj) == {'phan_so'}:
+            p, q = obj['phan_so']
+            return Fraction(p, q)
+        return {k: giai_ma_json(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [giai_ma_json(v) for v in obj]
+    return obj
+
+
+def _w(trong_so, ma):
+    w = rr.boi_so(trong_so, ma)  # map thưa là lỗi (S25)
+    if w.denominator != 1:
+        raise ValueError(f'bội số của ca {ma} phải là số nguyên không âm')
+    return int(w)
+
+
+def dem_moc_gia(kq_moc_gia, cid_tat, cid_bat, trong_so=None):
+    """Từ kết quả `cham` của lượt mốc giả: (CAUSE_FOUND, n) của hai nhánh trên mẫu số chung (D2f).
+    trong_so: {mã ca: bội số}; mẫu số và số bị báo đếm theo bội số (SPEC T-045 bước 7)."""
+    tat, bat = kq_moc_gia['cau_hinh'][cid_tat]['ca'], kq_moc_gia['cau_hinh'][cid_bat]['ca']
+    cap = [(o, tat[o]['verdict'], bat[o]['verdict']) for o in sorted(set(tat) & set(bat))]
+    giu = [(o, a, b) for o, a, b in cap if 'INSUFFICIENT_EVIDENCE' not in (a, b) and None not in (a, b)]
+    n = sum(_w(trong_so, o) for o, _, _ in giu)
+    return ((sum(_w(trong_so, o) for o, a, _ in giu if a == 'CAUSE_FOUND'), n),
+            (sum(_w(trong_so, o) for o, _, b in giu if b == 'CAUSE_FOUND'), n),
+            {'bi_loai': sum(_w(trong_so, o) for o, _, _ in cap) - n})

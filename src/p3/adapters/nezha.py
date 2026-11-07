@@ -207,9 +207,28 @@ def chay(method, payload=None, trace_guard_s=0):
         if guard:
             raise LoiRunner('bảng độ nhạy trace không áp dụng BARO')
         from .baro import chay as baro
-        result = baro(payload['metric'], _nguyen(payload['t_ns'], 't_ns'))
+        if payload.get('metric_layout') == 'source_native':
+            results = [baro(frame, _nguyen(payload['t_ns'], 't_ns'))
+                       for frame in payload['metric_sources'].values()]
+            failed = next((r for r in results if r['status'] not in ('OK', 'NO_EVIDENCE')), None)
+            if failed is not None:
+                result = dict(failed)
+            else:
+                items = [item for r in results for item in r['items']]
+                items.sort(key=lambda item: item[2], reverse=True)  # stable original channel order at ties
+                result = dict(status='OK' if items else 'NO_EVIDENCE', error=None,
+                              method_status_raw=None, items=items, ranking_native=[x[0] for x in items],
+                              observed_entities=sorted({x[1] for x in items}),
+                              input_shape={'metric_cols': len(payload['metric_arrays']),
+                                           'per_source': [r.get('input_shape') for r in results]},
+                              diagnostics={'key_check': 'pass', 'metric_layout': 'source_native',
+                                           'source_diagnostics': [r.get('diagnostics') for r in results]})
+        else:
+            result = baro(payload['metric'], _nguyen(payload['t_ns'], 't_ns'))
         result.setdefault('diagnostics', {}).update(metric_layout='5N+5A ordinal; front marker ns',
                                                    no_simultaneity_assumption=True)
+        if payload.get('metric_layout') == 'source_native':
+            result['diagnostics']['metric_layout'] = 'source_native; real timestamps; no padding'
     elif method == 'simplerca':
         result = _simple(payload, guard)
     else:

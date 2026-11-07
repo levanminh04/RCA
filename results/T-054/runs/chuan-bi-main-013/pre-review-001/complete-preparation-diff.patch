@@ -1,0 +1,612 @@
+--- before/results/T-054/scripts/p7.py
++++ results/T-054/scripts/p7.py
+@@ -59,7 +59,7 @@
+     authority = read_pin({'path': args.authority, 'sha256': args.authority_sha256}) if args.authority else {}
+     authorize(plan, authority, 'report' if args.command in ('report', 'verify') else 'run')
+     if args.command == '_supervise':
+-        supervise(plan, directory); return
++        supervise(plan, directory, authority=authority); return
+     if args.command in ('run', 'resume'):
+         directory.mkdir(parents=True, exist_ok=True)
+         cmd = [str(OUT / 'scripts/p7.py'), '_supervise', '--plan', str(Path(args.plan).resolve()),
+@@ -76,6 +76,10 @@
+     if snapshot.get('plan_sha256') != fingerprint(plan):
+         raise Blocked('snapshot ghép khác plan toàn đợt')
+     verified = verify_snapshot(snapshot, plan['jobs'])
++    if (plan['mode'] == 'test' and authority.get('torai_A_source_grant') is not True
++            and any(j['slot']['arm'] == 'torai_A'
++                    and fingerprint(j['slot']) in verified for j in plan['jobs'])):
++        raise Blocked('WAIT_TORAI_A_SOURCE_GRANT: chỉ nhận BLOCKED cho A chưa được cấp quyền')
+     if args.command == 'report' and plan['mode'] != 'synthetic':
+         from cham import evaluate
+         required = plan.get('evaluation')
+--- before/results/T-054/scripts/nguon.py
++++ results/T-054/scripts/nguon.py
+@@ -183,6 +183,10 @@
+             raise Blocked('WAIT_G3')
+         if authority.get('test_grant') is not True:
+             raise Blocked('WAIT_TEST_GRANT')
++        if action == 'run' and authority.get('main_dispatch') is not True:
++            raise Blocked('WAIT_MAIN_DISPATCH')
++        if action == 'report' and authority.get('score_grant') is not True:
++            raise Blocked('WAIT_SCORE_GRANT')
+         if not plan.get('protocol_ref') or read_pin(plan['protocol_ref']).get('status') != 'LOCKED_G3':
+             raise Blocked('WAIT_LOCKED_PROTOCOL')
+         locked = read_pin(plan['protocol_ref'])
+@@ -197,10 +201,12 @@
+         raise Blocked('mode chưa được cấp')
+     if any(j.get('evaluation_mode') != mode or j.get('kind') == 'synthetic' for j in plan['jobs']):
+         raise Blocked('miền quyền của job khác plan')
+-    if any(j['slot']['arm'] == 'torai_A' for j in plan['jobs']) and authority.get('torai_A_source_grant') is not True:
++    separate_A = plan.get('auxiliary_A_policy') == 'AFTER_NON_A_VERIFIED_PREFLIGHT_AND_PRESERVE_BLOCKED'
++    if (any(j['slot']['arm'] == 'torai_A' for j in plan['jobs'])
++            and authority.get('torai_A_source_grant') is not True and not separate_A):
+         raise Blocked('WAIT_TORAI_A_SOURCE_GRANT')
+     for job in plan['jobs']:
+-        if job['slot']['arm'] == 'torai_A':
++        if job['slot']['arm'] == 'torai_A' and authority.get('torai_A_source_grant') is True:
+             declared = authority.get('torai_A_source_sha256')
+             if declared != job.get('author_source_ref', {}).get('sha256') or declared != job['slot'].get('author_source_sha256'):
+                 raise Blocked('grant TORAI A không trỏ đúng nguồn đã pin')
+@@ -390,6 +396,8 @@
+         if len(got) != len(set(got)) or set(got) != set(expected):
+             raise Blocked('partition thiếu/thừa/trùng slot; không phát lô khác phạm vi')
+     if (c.get('schema') != 'T054-DISPATCH-CONTRACT-1'
++            or plan.get('auxiliary_A_policy') != c.get('auxiliary_A_policy')
++            or plan.get('ob_sensitivity_ref') != c.get('ob_sensitivity_ref')
+             or plan.get('workers', 1) != c['workers'] or plan.get('monitor') != c['monitor']
+             or plan.get('budget') != c['budget']
+             or plan.get('resources') != c.get('resources')
+--- before/results/T-054/scripts/dieu_phoi.py
++++ results/T-054/scripts/dieu_phoi.py
+@@ -596,13 +596,17 @@
+     return False
+ 
+ 
+-def supervise(plan, directory):
++def supervise(plan, directory, authority=None):
+     """Một supervisor; tối đa hai worker. Plan bất biến quyết số worker."""
+     import threading
+     from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
+     count = plan.get('workers', 1)
+     if type(count) is not int or count not in (1, 2):
+         raise Blocked('workers phải là 1 hoặc 2, khai trong plan')
++    separate_A = plan.get('auxiliary_A_policy') == 'AFTER_NON_A_VERIFIED_PREFLIGHT_AND_PRESERVE_BLOCKED'
++    if separate_A and plan['mode'] == 'test':
++        from nguon import authorize
++        authorize(plan, authority or {}, 'run')
+     directory = Path(directory)
+     directory.mkdir(parents=True, exist_ok=True)
+     with exclusive(directory / 'supervisor.lock'):
+@@ -619,10 +623,44 @@
+                 append(journal, dict(row, wall_clock=time.time()))
+                 if 'job_id' in row and 'state' in row:
+                     current[row['job_id']] = row
++        def block_A(job, reason):
++            row = {'state': 'BLOCKED', 'job_id': fingerprint(job['slot']), 'reason': reason,
++                   'attempt_started': False}
++            emit(row)
++        if separate_A:
++            from nguon import author_source
++            for job in plan['jobs']:
++                job_id = fingerprint(job['slot'])
++                if job['slot']['arm'] != 'torai_A':
++                    continue
++                if job_id in current:
++                    if (current[job_id]['state'] in ('RUNNING', 'COMPLETE_UNVERIFIED')
++                            and (not authority or authority.get('torai_A_source_grant') is not True)):
++                        raise Blocked('A đang chạy nhưng quyền nguồn chưa xác minh')
++                    continue
++                if not authority or authority.get('torai_A_source_grant') is not True:
++                    block_A(job, 'A_SOURCE_NOT_GRANTED')
++                    continue
++                try:
++                    files = author_source(job)
++                    path = directory / 'A-source-checks' / (job_id + '.json')
++                    evidence = {'job_sha256': fingerprint(job), 'source': job['author_source_ref'],
++                                'files': {name: ref(path) for name, path in files.items()}, 'PASS': True}
++                    if path.exists():
++                        if read_pin(ref(path)) != evidence:
++                            raise Blocked('biên nhận nguồn A cũ khác slot')
++                    else:
++                        atomic(path, evidence)
++                except (Blocked, OSError, KeyError, ValueError) as exc:
++                    block_A(job, 'A_SOURCE_VERIFICATION_FAILED: ' + str(exc))
+         # Lượt đang sống được nhận trước lượt mới; không tăng số worker khi resume.
+         pending = sorted(plan['jobs'], key=lambda j: 0 if current.get(fingerprint(j['slot']), {}).get('state')
+                          in ('RUNNING', 'COMPLETE_UNVERIFIED') else 1)
++        if separate_A:
++            pending = [j for j in pending if not (j['slot']['arm'] == 'torai_A'
++                       and current.get(fingerprint(j['slot']), {}).get('state') == 'BLOCKED')]
+         active = {}; groups = set(); stop = False
++        A_halted = False
+         import psutil
+         memory_capacity = psutil.virtual_memory().available - plan.get('resources', {}).get('reserve_bytes', 0)
+         try:
+@@ -635,6 +673,10 @@
+                         for job in list(pending):
+                             if len(active) >= count:
+                                 break
++                            if (separate_A and job['slot']['arm'] == 'torai_A'
++                                    and any(current.get(fingerprint(other['slot']), {}).get('state') != 'VERIFIED'
++                                            for other in plan['jobs'] if other['slot']['arm'] != 'torai_A')):
++                                continue
+                             group = budget_group(job)
+                             if group in groups:
+                                 continue
+@@ -668,5 +710,10 @@
+                             requested_stop = True
+                         if requested_stop:
+                             stop = True
++                            A_halted = separate_A and jobs_by_slot[job_id]['slot']['arm'] == 'torai_A'
++                if A_halted:
++                    for job in pending:
++                        if job['slot']['arm'] == 'torai_A' and fingerprint(job['slot']) not in current:
++                            block_A(job, 'A_QUEUE_HALTED_BEFORE_DISPATCH')
+         finally:
+             append(journal, {'state': 'SUPERVISOR_STOPPED', 'pid': os.getpid(), 'wall_clock': time.time()})
+--- before/results/T-054/scripts/cham.py
++++ results/T-054/scripts/cham.py
+@@ -179,6 +179,8 @@
+     result = a4_v2.evaluate(tables['RE2-TT'], tables['Nezha-OB'], torai_seeds=(0, 1, 2), expected_counts=expected)
+     if plan.get('sensitivity_decision_ref'):
+         approved_sensitivities(result, tables, plan['sensitivity_decision_ref'])
++    if plan.get('ob_sensitivity_ref'):
++        result['OB_group_description'] = ob_group_description(tables['Nezha-OB'], plan['ob_sensitivity_ref'])
+     atomic(Path(output) / 'a4.json', result)
+     descriptive = describe(plan, records, labels)
+     atomic(Path(output) / 'tables.json', descriptive)
+@@ -286,6 +288,27 @@
+                   support_policy=protocol['support_policy'], protocol_ref=plan['protocol_ref'])
+     atomic(Path(output)/'re3-tables.json', result)
+     return result
++
++
++def ob_group_description(table, decision_ref):
++    """Bảng nhóm đã khai trước điểm; không điều khiển A4 hoặc mức kiểm định."""
++    import a4_v2
++    decision = read_pin(decision_ref)
++    left, right, labels = table
++    group = set(decision['affected_opaque_ids'])
++    if (decision.get('status') != 'USER_CONFIRMED' or len(group) != 4
++            or len(left) != 34 or not group <= set(left) or set(left) != set(right)):
++        raise Blocked('nhóm độ nhạy OB khác cohort/nhóm bốn ca đã khai')
++    rows = []
++    for world in ('P', 'S_lo', 'S_hi'):
++        delta = {oid: a4_v2._score(left[oid], labels[oid]['root'], world)['Hit5_Q']
++                 - a4_v2._mean_scores([a4_v2._score(r, labels[oid]['root']) for r in right[oid]])['Hit5_Q']
++                 for oid in left}
++        for name, members in [('all34', set(left)), ('remaining30', set(left) - group), ('affected4', group)]:
++            rows.append({'group': name, 'world': world, 'n': len(members),
++                         'paired_mean_delta_Hit5': sum(delta[o] for o in members) / len(members)})
++    return {'decision': decision_ref, 'rows': rows, 'role': 'DESCRIPTIVE_ONLY',
++            'limit': 'Đổi tập đích theo nhóm; chưa tách tác động adapter khỏi độ khó ca.'}
+ 
+ 
+ def approved_sensitivities(result, tables, decision_ref):
+@@ -470,6 +493,9 @@
+         for arm, records in sorted(arms.items()):
+             worlds = ('P', 'S_lo', 'S_hi') if arm not in ('C-c', 'C-g', 'C-d1', 'C-d2', 'C-d3', 'torai_A') else ('P',)
+             if arm in ('torai_A', 'torai_B') and ds == 'RE2-TT' and (len(records) != 3 or {r.get('seed') for r in records} != {0, 1, 2}):
++                if arm == 'torai_A':
++                    missing.append([ds, oid, view, arm, 'INCOMPLETE_THREE_SEEDS'])
++                    continue
+                 raise Blocked('bảng mô tả không bình quân seed sống')
+             for world in worlds:
+                 scored = []
+--- before/results/T-054/scripts/fixtures.py
++++ results/T-054/scripts/fixtures.py
+@@ -213,6 +213,7 @@
+             else:
+                 check('separate_cd3_' + ds + '_' + arm, lambda r=recs: assert_equal('C-d3' in r[0]['extra']['doi_chung'], False))
+ 
++    checks.extend(auxiliary_policy_checks(target / 'policy013'))
+     atomic(target / 'summary.json', {'checks': checks, 'count': len(checks), 'PASS': True,
+            'scope': 'synthetic transport/source/labels/phase/queue/A4 boundary; no scientific pilot',
+            'test_opened': False, 'real_methods_on_dev': False})
+@@ -223,7 +224,7 @@
+     assert a == b, (a, b)
+ 
+ 
+-def report_checks(target, reader_source):
++def report_checks(target, reader_source, partial_A=False):
+     """Record transport tổng hợp quanh output lõi trên dữ liệu giả; không phải baseline pilot."""
+     from cham import evaluate
+     target = Path(target).resolve(); target.mkdir(parents=True, exist_ok=False)
+@@ -277,6 +278,24 @@
+                 receipt = atomic(target / key / 'receipt.json', {'job_sha256': fingerprint(j), 'invocation': ip, 'result': rp})
+                 slots[key] = {'state': 'VERIFIED', 'receipt': receipt, 'token': token}
+                 jobs.append(j)
++    template = next(j for j in jobs if j['slot']['dataset'] == 'RE2-TT' and j['slot']['arm'] == 'torai_B' and j['slot']['seed'] == 0)
++    for seed in (0, 1, 2):
++        s = dict(template['slot'], arm='torai_A', seed=seed)
++        job = dict(template, slot=s, a4=False)
++        key = fingerprint(s)
++        jobs.append(job)
++        slots[key] = {'state': 'BLOCKED', 'reason': 'A_SOURCE_NOT_GRANTED_FIXTURE'}
++        if partial_A and seed == 0:
++            original = read_pin(slots[fingerprint(template['slot'])]['receipt'])
++            records = copy.deepcopy(read_pin(original['result'])['records'])
++            records[0].update(variant='A', seed=0)
++            invocation = dict(read_pin(original['invocation']), slot_sha256=key)
++            envelope = dict(read_pin(original['result']), slot_sha256=key, records=records,
++                            invocation_sha256=fingerprint(invocation), record_sha256=fingerprint(records))
++            ip = atomic(target / key / 'invocation.json', invocation)
++            rp = atomic(target / key / 'result.json', envelope)
++            receipt = atomic(target / key / 'receipt.json', dict(job_sha256=fingerprint(job), invocation=ip, result=rp))
++            slots[key] = dict(state='VERIFIED', receipt=receipt, token=envelope['token'])
+     plan = {'mode': 'synthetic', 'jobs': jobs, 'inventories': inventories}
+     snapshot = {'schema': 'T054-SNAPSHOT-1', 'plan_sha256': fingerprint(plan), 'slots': slots}
+     result = evaluate(snapshot, plan, labels, canonicals, runtimes, {k: {} for k in runtimes}, inventories, target / 'report')
+@@ -284,10 +303,109 @@
+     assert len(table['regions']) == 4 and len(table['position_N']) == 2
+     assert {r['arm'] for r in table['rows']} >= {'M1', 'C-a0', 'C-a1', 'C-c', 'C-g', 'C-d1', 'C-d2', 'circa_rht_aux'}
+     assert all(r['seed_count'] == 3 for r in table['rows'] if r['dataset'] == 'RE2-TT' and r['arm'] == 'torai_B')
++    assert not any(r['arm'] == 'torai_A' for r in table['rows'])
++    assert any('torai_A' in row for row in table['missing'])
+     atomic(target / 'summary.json', {'PASS': True, 'slots': len(slots), 'rows': len(table['rows']),
+           'regions': len(table['regions']), 'positions': len(table['position_N']),
+-          'scope': 'synthetic labels + synthetic baseline records + real M1 on generated data; not scientific pilot'})
++          'scope': 'synthetic labels + synthetic baseline records + real M1 on generated data; not scientific pilot',
++          'A4_with_missing_A': True, 'A_partial_seed_fixture': partial_A})
+     print(json.dumps({'PASS': True, 'report_rows': len(table['rows']), 'output': str(target)}))
++
++
++def auxiliary_policy_checks(target):
++    """Các hồi quy quyền, hàng chờ hai worker và bảng A thiếu seed."""
++    from fractions import Fraction
++    import nguon
++    import cham
++    from dieu_phoi import supervise
++    target.mkdir(parents=True, exist_ok=False)
++    checks = []
++    policy = 'AFTER_NON_A_VERIFIED_PREFLIGHT_AND_PRESERVE_BLOCKED'
++    slot = {'dataset': 'RE2-TT', 'opaque_id': 'fixture-A', 'arm': 'M1', 'view': 'main', 'seed': None}
++    job = {'slot': slot, 'kind': 'synthetic', 'evaluation_mode': 'test'}
++    source = atomic(target / 'permission.json', {'scope': 'fixture only'})
++    plan = {'mode': 'test', 'host_role': 'local', 'jobs': [dict(job, kind='m1')],
++            'protocol_ref': source, 'budget': {'wall_s': 30}, 'open_before_run': []}
++    authority = {'g3': True, 'test_grant': True, 'source': source, 'plan_sha256': fingerprint(plan)}
++    with patch('nguon.read_pin', return_value={'status': 'LOCKED_G3', 'allowed_hosts': ['local']}), \
++            patch('nguon.validate_locked_plan'), patch('dieu_phoi.check_budget'):
++        for flag in (None, False):
++            try:
++                nguon.authorize(plan, dict(authority, main_dispatch=flag), 'run')
++            except Blocked as exc:
++                assert str(exc) == 'WAIT_MAIN_DISPATCH'
++            else:
++                raise AssertionError('main phát khi thiếu quyền')
++        nguon.authorize(plan, dict(authority, main_dispatch=True), 'run')
++        try:
++            nguon.authorize(plan, authority, 'report')
++        except Blocked as exc:
++            assert str(exc) == 'WAIT_SCORE_GRANT'
++        else:
++            raise AssertionError('chấm khi thiếu quyền')
++        nguon.authorize(plan, dict(authority, score_grant=True), 'report')
++        blocked_A_plan = dict(plan, host_role='aggregate', jobs=[dict(plan['jobs'][0], slot=dict(slot, arm='torai_A'))],
++                              auxiliary_A_policy=policy)
++        with patch('nguon.validate_aggregate_plan'):
++            nguon.authorize(blocked_A_plan, dict(authority, score_grant=True,
++                            plan_sha256=fingerprint(blocked_A_plan)), 'report')
++    checks.append('main_dispatch_checked_before_run_and_resume')
++    checks.append('report_permission_distinct_from_dispatch')
++    checks.append('aggregate_report_can_include_ungranted_blocked_A')
++    afile = target / 'author-fixture.csv'
++    afile.write_text('time,x\n0,1\n', encoding='utf-8')
++    jobs = [dict(job, slot=dict(slot, arm=arm, seed=seed), author_source_ref=source)
++            for arm, seed in [('circa', None), ('microrank', None), ('torai_A', 0), ('torai_A', 1)]]
++    for scenario in ('barrier', 'missing_grant', 'bad_pin', 'unknown_failure'):
++        queue = target / scenario
++        sequence = []
++        def fake_run(item, plan, directory, budget, current, registered, emit):
++            arm = item['slot']['arm']
++            if arm == 'torai_A':
++                assert all(current.get(fingerprint(j['slot']), {}).get('state') == 'VERIFIED'
++                           for j in jobs if j['slot']['arm'] != 'torai_A')
++            sequence.append(('start', arm))
++            if arm != 'torai_A':
++                time.sleep(.04)
++            failed = scenario == 'unknown_failure' and arm == 'torai_A'
++            emit({'job_id': fingerprint(item['slot']), 'state': 'BLOCKED' if failed else 'VERIFIED',
++                  'reason': 'UNKNOWN_METHOD_FAILURE' if failed else None})
++            sequence.append(('finish', arm))
++            return failed
++        mock_source = (Blocked('fixture CSV mismatch') if scenario == 'bad_pin' else None)
++        with patch('nguon.author_source', side_effect=mock_source,
++                   return_value={'logts': str(afile)}) as author, patch('dieu_phoi._run_one', side_effect=fake_run):
++            supervise({'mode': 'synthetic', 'workers': 2, 'jobs': jobs, 'auxiliary_A_policy': policy}, queue,
++                      authority={'torai_A_source_grant': scenario != 'missing_grant'})
++            if scenario == 'missing_grant':
++                author.assert_not_called()
++        state = status(queue)
++        assert all(state['jobs'][fingerprint(j['slot'])]['state'] == 'VERIFIED' for j in jobs[:2])
++        if scenario in ('bad_pin', 'missing_grant'):
++            assert not any(arm == 'torai_A' for event, arm in sequence)
++        if scenario == 'unknown_failure':
++            assert state['jobs'][fingerprint(jobs[-1]['slot'])]['reason'] == 'A_QUEUE_HALTED_BEFORE_DISPATCH'
++            cham.snapshot_from_status({'jobs': jobs}, state)
++        checks.append('A_' + scenario)
++    partial = {fingerprint(jobs[2]['slot']): [{'seed': 0, 'status': 'ERROR'}]}
++    description = cham.describe({'jobs': jobs[2:]}, partial,
++                                {'RE2-TT': {'fixture-A': {'root': 'fixture', 'fault': 'fixture', 'cell': 'fixture'}}})
++    assert not description['rows'] and any('INCOMPLETE_THREE_SEEDS' in row for row in description['missing'])
++    checks.append('A_partial_seeds_preserved_without_partial_mean')
++    decision = atomic(target / 'OB-group-decision.json',
++                      {'status': 'USER_CONFIRMED', 'affected_opaque_ids': [str(i) for i in range(4)]})
++    left = {str(i): {'hit': Fraction(i % 2)} for i in range(34)}
++    right = {oid: [{'hit': Fraction(0)}] for oid in left}
++    labels = {oid: {'root': 'fixture'} for oid in left}
++    sys.path.insert(0, str(ROOT / 'results/T-052/scripts'))
++    with patch('a4_v2._score', side_effect=lambda rec, root, world='P': {'Hit5_Q': rec['hit']}), \
++            patch('a4_v2._mean_scores', side_effect=lambda rows: rows[0]):
++        rows = cham.ob_group_description((left, right, labels), decision)['rows']
++    assert [r['n'] for r in rows] == [34, 30, 4] * 3
++    assert all(r['paired_mean_delta_Hit5'] == Fraction(1, 2) for r in rows)
++    checks.append('OB_group_description_denominators_and_pairs')
++    atomic(target / 'summary.json', {'PASS': True, 'checks': checks})
++    return checks
+ 
+ 
+ def exclusive_probe(path):
+@@ -298,7 +416,7 @@
+ if __name__ == '__main__':
+     try:
+         if '--reports-from' in sys.argv:
+-            report_checks(sys.argv[1], sys.argv[sys.argv.index('--reports-from') + 1])
++            report_checks(sys.argv[1], sys.argv[sys.argv.index('--reports-from') + 1], partial_A='--partial-A-fixture' in sys.argv)
+         else:
+             main(sys.argv[1], readers='--transport-only' not in sys.argv)
+     except BaseException as exc:
+--- before/tasks/T-054-khoa-g3-chay-p7-a/SPEC.md
++++ tasks/T-054-khoa-g3-chay-p7-a/SPEC.md
+@@ -2,7 +2,7 @@
+ 
+ > **Điều chỉnh theo Minh ngày 05/11/2026:** bỏ ràng buộc giữ test/dẫn xuất P7 ở local của Q-42 và phương án local trước đây. Được lập phương án phân chia P7 giữa EC2 và laptop để tối ưu tổng thời gian. Chưa mở test, chưa duyệt G3 hoặc tự phát lô; cần hoàn thiện bố trí nhiều máy, môi trường/đối chiếu đúng phần khác và nguồn/đích truyền cụ thể trước chạy. Các bảng lịch local cũ bên dưới là phương án lịch sử, phải thay bằng lịch nhiều máy trước khóa. Hồ sơ checkpoint004 và driver còn ghi local-only không còn là đề xuất vận hành hiện hành; không dùng nguyên gói ấy để phát main.
+ 
+-- **Trạng thái:** đã duyệt ghi hồ sơ ngày 05/11/2026 theo quyền có điều kiện của Minh, Q-250. Quyền triển khai công cụ và tiếp tục chuẩn bị/pilot dev local đã được Minh cấp trong các lệnh sau, nguồn tại LOG; chưa khóa G3, chưa mở test/RE3, nguồn TORAI A ngoài đúng một ca dev vừa được Minh cấp (xem LOG), SSH/sync, commit hoặc push. Các lựa chọn khoa học còn OPEN giữ đúng mốc dừng.
++- **Trạng thái hiện hành 07/11/2026:** chuẩn bị013 theo Minh duyệt đã có output, chờ Claude kiểm bản cài và Minh duyệt G3/test/nguồn/chuyển/main/chấm. D1–D4/R3 đã chốt; H1 RE3 OPEN theo D2. Không commit/push. Các lịch local/005/011 bên dưới giữ lịch sử; nguồn vận hành sắp trình khóa là hồ sơ/runbook và protocol-candidate013.
+ - **Người làm:** Codex.
+ - **Người phản biện:** Claude.
+ - **Thuộc gói MRP:** chuẩn bị kết thúc P6/G3(a), thực thi P7(a), chuẩn bị trình G4.
+@@ -116,6 +116,12 @@
+ 
+ ## Phạm vi ghi
+ 
++**Bổ sung Minh duyệt 07/11/2026 — chuẩn bị013.** Duyệt sửa `results/T-054/scripts/{p7,nguon,dieu_phoi,cham,fixtures}.py`, ghi `results/T-054/runs/chuan-bi-main-013/`, cập nhật SPEC/LOG và đúng dòng STATE, nối DECISIONS/WHY cùng hồ sơ G3/runbook. Duyệt SSH/dựng môi trường/fixture và đúng pilot dev cần bổ sung trên 16.176.181.251 và 13.236.44.106, vùng `/home/ubuntu/rca-p7/T-054/checkpoint013/`. Tải thêm ≤2 GiB/máy, fixture/dev ≤60 phút/máy. R1 chỉ đổi metadata và công thức chuẩn bị trước grant dữ liệu. D1–D4/R3 theo DECISIONS cùng ngày. TORAI A giữ một plan laptop, quyền theo slot, phát sau toàn phần khác A VERIFIED; thiếu quyền/sai pin A ghi chặn đúng slot, lỗi A chưa rõ giữ lượt và dừng A. Đủ A4 và snapshot mới được chấm, thiếu A không bình quân seed sống. Nguồn quyền chuẩn bị không mở test/main/RE3 hoặc commit/push.
++
++**Đầu ra chuẩn bị013, chờ phản biện bản cài:** `runs/chuan-bi-main-013/candidate-validation.json` kê EC2_1=448job+2support/2worker, EC2_2=450job/1worker, laptop=742job/2worker tối đa. Hai EC2 mới30TT/máy; laptopOB/CIRCA/MicroRank/A. `protocol-candidate.json`, source-bundle, contract và placement013 thay ứng viên011 cho lần xin khóa tiếp theo, vẫn CANDIDATE. Mỗi EC2101fixture mã cuối;15đối chiếuDEV mới với14khớp nghiêm ngặt và một C-e sai khác số học Minh đã duyệt đúng phép. D1/D2/D4 theo DECISIONS ngày07/11 và báo cáo013; H1 chưa có nguồn, không mở RE3. Mọi điều kiện nguồn/quyền main vẫn chờ quyết định cuối, kể cả nguồnA và truyền test. Không lấy mã003/005/011 để phát013.
++
++
++
+ **Bổ sung Minh duyệt ngày 07/11/2026:** phần A trong `results/T-054/runs/hoan-thien-local-g3-011/h1-bo-sung-xin-duyet.md` cho sửa `src/p3/re3.py` và `results/T-054/scripts/worker.py` để nhận nghĩa mã gRPC tường minh, giữ kernel/tổng mã native và mặc định TT/Nezha; nối WHY/DECISIONS. Phần B cho đọc duy nhất column chunk (khối cột) `serviceName` của 30 trace và `container_name` của 30 log RE3 HF đúng revision; tổng metadata và chunk không quá 16 MiB. Chỉ xuất hợp tên toàn cohort, không phân bố theo ca hoặc tín hiệu/thời gian/message/ID/operation/statusCode. Đây là quyền metadata inventory riêng, không mở đánh giá RE3/G3/main. Snapshot và biên nhận ở checkpoint011.
+ 
+ **Bổ sung CIRCA Minh duyệt06/11/2026:** “Duyệt bổ sung 2 file CIRCA”; thêm `results/T-054/scripts/dieu_phoi.py` và `bien_nhan.py` đúng ba điều kiện theo010/bo-sung-circa-xin-duyet.md, nhận/kiểm hai variant/current và tạo hai bản ghi TIMEOUT cho RE3 như TT. Không nới quyền dữ liệu/chính sách lỗi/deadline.
+--- before/tasks/T-054-khoa-g3-chay-p7-a/LOG.md
++++ tasks/T-054-khoa-g3-chay-p7-a/LOG.md
+@@ -2137,3 +2137,31 @@
+ Code/revision, cấu hình, giả thuyết, độ đo, tập ca/tập ứng viên, cách xử lý ca lỗi/UNSUPPORTED/nhánh dự phòng và bảng diễn giải đã khóa trước test chưa? Có bỏ nhóm khó sau khi nhìn điểm hoặc dùng test để chọn thiết kế không?
+ Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.
+ ```
++
++## 07/11/2026 — Codex, Windows điều khiển hai EC2 mới, người làm T-054 — mở chuẩn bị013
++
++Minh duyệt “Duyệt chuẩn bị 013 và chốt D1–D4/R3 theo đề xuất trên”. Đã lưu quyền và snapshot nguyên byte các file trong phạm vi ở runs/chuan-bi-main-013. Ghi quyết định trước khi áp dụng. Chỉ dùng fixture/dev, metadata đã có và công thức chuẩn bị nguồn; chưa grant test/main/A hoặc RE3. Khóa giới hạn tải thêm 2 GiB và fixture/dev 60 phút mỗi EC2. Các bước tiếp là sửa kiểm quyền và A, fixture, môi trường+dev hai máy, metadata R1+ma trận+gói, kiểm diff+manifest và bàn giao Claude.
++
++Checkpoint013 bước công cụ và cloud. Đã ghi D1–D4/R3, snapshot before, sửa năm wrapper trong phạm vi. Policy-fixture-001 đạt8 kiểm. Fixture001 venv gặp PID-parent ở worker giả ngắn;002 thiếu đường dẫn site-packages trong lệnh thử basePython;003 chạy basePython cùng hai site-packages đúng đạt68 kiểm transport, giữ mọi lượt. Hai EC2 dựng env riêng013. Lượt pilot đầu lớn dừng trước method vì nối event đã có utc; r2 chỉ bổ sung phần thiếu. TraceRCA Linux lộ quy tắc phân loại phụ thuộc chuỗi đường dẫn lowercase rcaeval; đổi gốc đóng gói sang upstream/rcaeval, giữ nguyên code upstream. TORAI cần4file causal-learn đã vá từ RCAEval lib đúng byte env py38 nguồn T016/T025; đã sao vào env013, giữ .pre013. TORAI B ba seed đã đối chiếu OK và TraceRCA ERROR có audit/ref gốc. Không sửa src chung, không mở test/main. Các lượt lỗi và archive nguyên bản ở runs/chuan-bi-main-013. Đang khép fixture Linux, đối chiếu nhận, compiler R1 và gói kích hoạt.
++
++
++Checkpoint013 sau đối chiếu và tự kiểm. Hai EC2 mã wrapper cuối đạt101fixture mỗi máy. Đã nhận/kiểm15đối chiếuDEV mới;14khớp nghiêm ngặt, C-e lệch30float tối đa1ULP. Minh duyệt “Duyệt ngoại lệ cho đúng phép C-e này”; quyết định/WHY/audit/lineage/disposition giữ riêng, không sửa output hoặc thêm tolerance chung. M1 chính dùng lại012, C-d3 nối từ seal thật; không rerun phương pháp vì thay wrapper. Ghi đầy đủ lỗi và các lượt sửa môi trường, kể cả pilot có exit1 vì fixture thiếu metadata, và local preflight từng thiếu sys.path của worker.
++
++Đã dựng đầy đủ nguồn chiếu TT60/OB34 và1640job+2support, lịch30/30 ở hai EC2 và742job laptop. Các file candidate-attempt giữ các bản metadata khi bổ sung helper, không là lượt thực nghiệm test. Rà cuối phát hiện helper cần kiểm cả upstream/bản vá local theo đúng pythonpath; đã bổ sung trong phạm vi013, đo lại môi trường không chạy lại method.106file upstream/bản vá local đúng pin;98file khoa học/driver dùng lại ngoài năm wrapper không đổi so011. Báo cáo/hồ sơ/runbook và đề nghị duyệt main tách quyền cuối, mẫu grant vẫnfalse. Chưa test/main/RE3/commit/push. Đang kiểm lần cuối code/metadata trên hai EC2 sau thay helper và đóng manifest.
++
++
++## 07/11/2026 — Codex — kết thúc chuẩn bị013, chờ Claude kiểm bản cài
++
++Đã làm: hoàn tất năm wrapper đúng phạm vi, nguồn chiếu R1 đủcohort,1640job+2support theo30/30TT ở hai EC2 mới và laptopOB/CIRCA/MicroRank/A. Chốt hồ sơ theo D1–D4/R3; lưu ngoại lệ đúng phép C-e Minh duyệt, giữ output/strict audit gốc. Hoàn tất entry kích hoạt/chuyển/phát/nhận/chấm có kiểm quyền và policyA. Bằng chứng nguồn: runs/chuan-bi-main-013/{candidate-validation,parity-disposition,cloud-verification,scope-and-code-self-check}.json và bao-cao.md; chi tiết máy ở các biên nhận final-execution-environment.
++
++File đổi: đúng12file có snapshot trước ở before-pins.json (năm wrapper; SPEC/LOG; STATE/DECISIONS/WHY; ho-so-g3/runbook) và đầu ra mới trong runs/chuan-bi-main-013/. Ngoài laptop, chỉ môi trường/code/fixture/dev/metadata trong checkpoint013 của hai EC2 mới. Không sửa src khoa học/T052, không chạm máy cũ, không tạo quyền test/main/A, không commit/push. Đã kiểm98file code khoa học/driver dùng lại ngoài năm wrapper không đổi; có full diff theo before của phiên, không gộp thay đổi có sẵn của người dùng.
++
++Kiểm:101fixture mỗi EC2 trên năm wrapper cuối;11kiểm kích hoạt cohort sinh giả; hai báo cáo giả thiếuA/partialA đều89hàng và không bình quân seed sống;15đối chiếuDEV,14khớp nghiêm ngặt và một sai khác C-e được duyệt.106pin repo/helper trên mỗi EC2 cùng hai runtime và4file vá đã kiểm lại sau bổ sung helper local.106file upstream/bản vá local và runtime theo đúng pythonpath đạt. Năm wrapper không đổi giữa101fixture và lần ghim helper cuối. AST và full-cohort metadata đạt. Đối chiếu whitespace dùng các dòng mới của diff, giữ CRLF/LF nguyên byte; git no-index có chẩn đoán CR-at-EOL/autocrlf nên không normalize byte code đã kiểm. Tất cả lượt lỗi, partial và candidate metadata trước được giữ.
++
++Đạt: gói chuẩn bị có code/nguồn/ma trận/quyền/lệnh cụ thể để sau phản biện Minh chỉ duyệt đúng đề nghị cuối; không nhận taskT054 hoặc G3 đã xong. RQ3b/RQ3d vẫn chưa có điểm test, chưa khẳng định lợi ích quan hệ. Nhánh OB lệch mẫu chỉ có fixture; dev hiện có không cho ca thật tương ứng. Hành vi A thiếu N và H1 RE3 vẫnOPEN; D1 giới hạn độc lậpOB và D4 không tách adapter/độ khó ca. Bản cài013 mới chưa được Claude kiểm. Không có bất đồng khoa học mới được tự đóng bằng checksum.
++
++Bước tiếp chính xác: Claude đọc AGENTS/STATE, SPEC/LOG và nguồn MRP/DT18/cô, rồi code/diff/output thật của013 để kiểm độc lập trong phạm vi Minh cho phép. Hai lượt kế hoạch đã thống nhất một planA/preflight/Acuối và một C-d3 từ seal thật; bản cài cần kiểm riêng. Không tự gửi hoặc mở lượt phản biện. Nội dung một lần duyệt sau đó ở results/T-054/runs/chuan-bi-main-013/de-nghi-duyet-main.md; Codex ghi lời Minh nguyên văn/grant thật rồi chạy main.py theo runbook, không yêu cầu Minh điền JSON. Nếu có finding thì đáp và chỉ sửa đúng phần Minh duyệt. RE3/commit vẫn riêng.
++
++Claude, phần chuẩn bị đã có đủ đầu ra để anh kiểm trực tiếp từ manifest, diff và các ref gốc. Xin giữ tách việc mã chạy đúng tuyến với việc test trả lời câu hỏi nghiên cứu; kết luận về bản cài013 phải dựa trên kiểm mới của anh. Minh chuyển thủ công khi muốn.
++
++Lệnh cuối phần triển khai: python stage_helper_finish.py, cả hai EC2 báo final helper environment PASS. Lệnh kiểm đóng gói tiếp theo, chỉ đọc: D:/RCA-ext/envs/T-014-main/Scripts/python.exe -X utf8 -B results/T-054/runs/chuan-bi-main-013/verify_manifest.py --documents. Đầu ra lần kiểm được báo trong chat; nếu lệch thì dừng phần phụ thuộc, không phát main. Đề xuất commit: T054: prepare main013 and record approved D1-D4/R3 and C-e exception; danh sách/diff trong commit-proposal.md và commit-files.json, chưa có quyền commit/push.
+--- before/docs/STATE.md
++++ docs/STATE.md
+@@ -18,7 +18,7 @@
+ 
+ ## Việc kế tiếp và chờ Minh
+ 
+-- **T-054 — checkpoint012, đã kiểm hai EC2 mới.** Codex làm, Claude phản biện. Một ca TT dev khớp toàn bản ghi M1 và đầu vào chuẩn hóa với lượt cũ. Fixture/nhận/chấm đạt. Máy trước đây thiếu đĩa đã mở rộng root, còn trống 25,10 GiB lúc đo. Còn D1–D4, triển khai R1, phân máy, parity baseline/OB, quyền nguồn và G3. [012](../results/T-054/runs/danh-gia-ec2-moi-012/bao-cao.md), [LOG](../tasks/T-054-khoa-g3-chay-p7-a/LOG.md).
++- **T-054 — chuẩn bị013 xong phía người làm, chờ Claude kiểm.** Codex làm, Claude phản biện. D1–D4/R3 và ngoại lệ đúng phép C-e đã duyệt; mỗi EC2101fixture, gói30TT/máy và laptopOB/CIRCA/MicroRank/A. Chưa G3/test/main/chấm/commit. [Hồ sơ](../results/T-054/runs/chuan-bi-main-013/bao-cao.md), [LOG](../tasks/T-054-khoa-g3-chay-p7-a/LOG.md).
+ 
+ 
+ - **T-052 — T13 dev và hồ sơ G3(a): xong — Minh nghiệm thu 05/11/2026.** Phạm vi mô tả T13 dev, lát cắt F3 và đính chính 004. Minh duyệt trực tiếp, bỏ lượt kiểm lại bản 004. G3(a) còn bốn nhóm chặn và chờ SPEC P7. [Hồ sơ 004](../results/T-052/ho-so-g3-004.md), [LOG nghiệm thu và bàn giao](../tasks/T-052-t13-va-ho-so-g3/LOG.md#phiên-12--05112026--codex--windows--người-làm).
+--- before/docs/DECISIONS.md
++++ docs/DECISIONS.md
+@@ -452,3 +452,19 @@
+ - **Giới hạn của F9.** Mã xác định có thể dò từ danh sách ca công khai. Biện pháp giảm nguy cơ vô tình dùng nhãn từ đường dẫn. Quyền truy cập và phép kiểm đầu vào vẫn theo SPEC.
+ - **Tiếp xúc 006.** Biên nhận cũ ghi `labels_transferred: false` cho việc tách tệp nhãn chấm. Đường dẫn tệp chuyển lên cả hai EC2 cũ vẫn mang tên ca chứa dịch vụ gốc và dạng lỗi. Đính chính ở LOG, giữ biên nhận gốc làm bằng chứng. Việc giữ hay xóa các bản sao cũ chờ Minh.
+ - **Chuẩn bị khóa.** Giữ đối chiếu và ghim môi trường của các tuyến được chọn trong hồ sơ khóa (D5). Laptop là ứng viên đầu tiên cho OB, chốt sau khi có căn cứ về RAM và tổng thời gian. Số 5 ca TT từng nêu thuộc kịch bản EC2 cũ. Loại tar chứa parquet dev khỏi phạm vi đề xuất commit (F10). Phạm vi commit, D1–D4, phân máy, mở rộng hệ thống tệp EC2, cấp nguồn, G3 và main vẫn chờ quyết định hoặc bằng chứng tương ứng.
++
++## T-054 — duyệt chuẩn bị 013 và D1–D4/R3, 07/11/2026
++
++Minh xác nhận “Duyệt chuẩn bị 013 và chốt D1–D4/R3 theo đề xuất trên”. Phạm vi và giới hạn thao tác ở `results/T-054/runs/chuan-bi-main-013/preparation-permission.json`. Codex làm, Claude phản biện. Duyệt sửa năm wrapper p7/nguon/dieu_phoi/cham/fixtures, dựng R1 và bộ 013, kiểm fixture/dev trên hai EC2 mới, cập nhật SPEC/LOG/STATE/WHY và hồ sơ G3/runbook. Mỗi máy tải thêm tối đa 2 GiB và chạy fixture/dev tối đa 60 phút. Lần này là chuẩn bị trước quyền test/main.
++
++- D1. Khai đúng lần đọc 006 và việc cấu trúc thời gian cohort OB đã được dùng sửa adapter. Phạm vi quyền lịch sử chưa rõ được giữ nguyên như lịch sử. Khi báo OB phải nêu giới hạn tính độc lập của việc sửa adapter đó.
++- D2. Cho phép trình khóa TT/Nezha khi H1 RE3 còn OPEN. RE3 cần nguồn, profile và quyền đánh giá riêng cho bản cuối. Điều kiện main TT/Nezha theo gói được khóa.
++- D3. Giữ AC sleep bằng 0 trong đợt main được duyệt tới khi xong nhận/kiểm/chấm trên laptop, rồi khôi phục 2700 giây. DC theo thiết lập hiện hành.
++- D4. Khóa bảng mô tả chênh Hit@5 cặp M1–M4 trên 34 OB, 30 ca còn lại và nhóm bốn ca từ audit006. A4 giữ đủ 34 ca và mức đã chốt. Bảng nhóm không phân xử riêng tác động adapter với độ khó ca.
++- R3. Giữ bản sao trên hai EC2 cũ, loại hai máy đó khỏi lịch013.
++
++G3, mở/đọc/chuyển test, nguồn A cho main, phát main và chấm cần quyết định cuối có nguồn đúng gói. Commit được chuẩn bị danh sách/diff cho Minh duyệt riêng.
++
++## T-054 — ngoại lệ số học C-e đúng ca dev, 07/11/2026
++
++Minh trả lời “Duyệt ngoại lệ cho đúng phép C-e này”. Phạm vi là M1 C-e RE2-TT dev-a5cabe5fa7 trên EC2 mới đối chiếu tham chiếu đã ghim. Đầu vào chuẩn hóa và mọi trường rời rạc khớp; 30 trường float khác tối đa1ULP, sai khác tuyệt đối tối đa2,7755575615628914e-17. Giữ nguyên byte kết quả. Duyệt ngoại lệ đúng phép đã đo để trình gói013 cho Claude kiểm. Không tạo dung sai chung hoặc suy sang sai khác mới. Nguồn audit và quyết định ở runs/chuan-bi-main-013/numeric-parity-Ce-{audit,decision}.json.
+--- before/docs/WHY.md
++++ docs/WHY.md
+@@ -1194,3 +1194,20 @@
+ **Phương án đã xét.** Cắt bản kê theo máy rồi sửa guard thành hai lớp sẽ phải đổi hợp đồng T-052. Cách đó không cần cho F9 vì kế hoạch ghim đã kiểm đủ tập job của từng máy và mỗi máy chỉ nhận parquet thuộc lô đó. Kiểm trong bộ nhớ xác nhận 60 mã mờ qua guard, bản kê bị cắt và locator sai lệch với nguồn đối chiếu bị chặn, ca chưa có tệp hoặc tệp sai SHA-256 cũng bị chặn.
+ 
+ **Giới hạn và điều kiện sử dụng.** Mã theo `results/T-052/ke-hoach-tap-test.json#/opaque_rule` có thể dò từ tên công khai. Dấu nội dung cũng có thể dùng để đối chiếu với bản nguồn khi có tệp tương ứng. Mục tiêu là bỏ tên có nhãn khỏi đường dẫn mà phương pháp hay nhật ký có thể dùng vô tình. Khả năng tái nhận diện có chủ đích nằm ngoài bảo đảm của biện pháp này. Trước khi dùng gói thật, cần chạy lại phép B1 hiện có và kiểm mọi locator chuyển ra ngoài, gồm bản kê, nguồn đối chiếu, đường dẫn staging và nhật ký chuyển. Đây là điều kiện để coi F9 đã được xử lý cho gói mới. Kiểm trong bộ nhớ chưa xác nhận gói thật, parity (độ tương đương) baseline/OB hoặc câu hỏi RQ3b/RQ3d.
++
++## T-054 — quyền, hàng chờ A và giới hạn trước chạy 013, 07/11/2026
++
++Minh duyệt gói chuẩn bị013 và D1–D4/R3. Kiểm quyền phát main ở CLI cùng quyền G3/test để mọi đường run/resume dùng cùng điều kiện. Một supervisor laptop giữ tập slot bất biến. TORAI A chỉ được phát sau khi các slot khác A đã VERIFIED. Nguồn A thiếu quyền hoặc sai pin có biên nhận theo slot trước phát; lỗi chưa phân loại khi A chạy giữ attempt và dừng theo policy, ghi BLOCKED cho phần A chưa phát. Báo cáo giữ toàn ma trận và khai nhóm A chưa đủ seed/ca. Hai plan cùng host không phù hợp hợp đồng ghép hiện tại. Chỉ sắp A cuối danh sách chưa đủ khi hai worker hoạt động. Lý do là ngăn phần phụ làm mất bảng chính đã đủ điều kiện, giữ nguyên các ngưỡng và mẫu số thống kê.
++
++Tái dùng M1 TT012, fixture C-d3 DAG/cyclic/no-target012, parity OB008 và nguồn CSV A đã audit006 sau kiểm hash. Chỉ chạy các tuyến dev thực sự khác. R1 dùng bản chiếu mờ từ nguồn đối chiếu riêng, giữ đầy đủ cohort/byte/hash, không đổi guard T052. D1 khai tiếp xúc đã dùng sửa adapter; D2 để profile RE3 OPEN cho đợt cuối; D4 là bảng mô tả nhóm đã xác định trước điểm. Hạn chế logts A thiếu N và nhánh OB lệch số mẫu vẫn phải khai theo bằng chứng hiện có. Gói chuẩn bị và đồng thuận phản biện chưa trả lời RQ3b/RQ3d bằng test.
++
++## T-054 — sai khác C-e trên máy mới, 07/11/2026
++
++Phép đối chiếu M1 C-e dev-a5cabe5fa7 khác30trường float, mỗi trường1ULP. Normalized-input digest, cấu trúc/tầng/hạng/nhóm hòa/các trường rời rạc khớp, theo numeric-parity-Ce-audit.json của013. Minh duyệt đúng ngoại lệ đó. Giữ kết quả nguyên bản và công bố giới hạn, dùng tiếp cho bằng chứng tuyến đã đo. Chưa xác định cơ chế số học riêng, không gán nguyên nhân BLAS/CPU hoặc thêm dung sai toàn cục. Các sai khác mới vẫn cần phân xử.
++
++
++## T-054 — căn cứ phân lô và pin vận hành ứng viên013, 07/11/2026
++
++CANDIDATE để Minh xét cùng G3: hai EC2 mới cùng loại máy và đều đã có ổ30GiB; chia TT30/30 để dùng cả hai và giữ trọn nguồn từng ca, EC2_1 tối đa2worker, EC2_2 một worker như phép phủ môi trường đã kiểm. Không dùng lại lịch35/25+OB của011 khi máy cũ không truy cập được. Giữ OB, CIRCA, MicroRank và TORAI A trên tuyến Windows đã có bằng chứng và nguồn riêng; chuyển thêm sẽ cần dựng/parity/truyền mà chưa có bằng chứng giảm tổng thời gian. Laptop tối đa2worker theo pilot004, chỉ chạy đồng thời khi reservation và reserve cho phép. Đây là bố trí vận hành ứng viên, không là kết luận EC2 nào cũng nhanh hơn hoặc hai worker luôn tăng tốc. Kịch bản lặp thời gian DEV chỉ giúp trình chi phí dài hơn1giờ, không là ETA của cohort test.
++
++Để ghim đúng byte thực chạy, giữ106pin code repo/helper và pin106file upstream/bản vá local cùng hai runtime; cloud dùng bản source lowercase rcaeval đúng byte upstream và4file causal-learn đã vá như tuyến gốc. Không đổi công thức hoặc tham số khoa học. Đường nhận vẫn verify snapshot trước nhãn; source-map thật và nhãn ở laptop, chỉ runtime/bản chiếu TT mờ đủcohort vào packet. R1 không sửa guard T052. Bằng chứng, các lần hỏng và giới hạn ở runs/chuan-bi-main-013/bao-cao.md. G3/test/nguồn A/chuyển/main/chấm và commit vẫn theo quyền riêng.
+--- before/results/T-054/ho-so-g3.md
++++ results/T-054/ho-so-g3.md
+@@ -1,20 +1,19 @@
+-# Hồ sơ chuẩn bị G3 hiện hành — đính chính sau checkpoint011
++# Hồ sơ G3(a) — ứng viên checkpoint013
+ 
+-**Chưa đủ hồ sơ trình khóa G3(a).** Cần Minh xác nhận phạm vi đọc các cột thời gian ở 006 và xét các điều kiện còn mở dưới đây. Cloud đang tạm dừng. Mọi quyền G3/main vẫn false. Giao thức hiện hành đã đính chính phần tiếp xúc. Packet, plan và helper 011 ghim bản cũ; trước khi trình khóa cần đóng gói và kiểm bản ghim mới. Giữ 011 làm bằng chứng lịch sử.
++Chuẩn bị013 đã làm theo Minh duyệt; chờ Claude kiểm bản cài và Minh duyệt chạy. Gói hiện hành là `runs/chuan-bi-main-013/`, thay các plan/helper ứng viên011 cho lần chạy sắp tới. Không dùng `protocol.json` ở gốc T054 hoặc helper006/011 để phát013. Các gói đó giữ làm lịch sử.
+ 
+-Đọc `runs/hoan-thien-local-g3-011/bao-cao.md`, `re3-h1-status.md`, `storage-explained.md`, `prepared-validation.json`, `local-checks.json` và manifest011. Kế hoạch/mã nguồn hiện hành nằm trong checkpoint011; không dùng activation helper006 hay materialize_main005 cho plan011.
++[Báo cáo013](runs/chuan-bi-main-013/bao-cao.md) · [Nội dung duyệt cuối](runs/chuan-bi-main-013/de-nghi-duyet-main.md) · [Runbook](runbook.md) · [Manifest013](runs/chuan-bi-main-013/manifest.json).
+ 
+-Minh đã duyệt ghi phân bố ứng viên 35/25 và OB ở EC2_2 ngày 06/11/2026. Bảng 30/30 trong SPEC là lịch cũ. Chuyển thêm TT và đưa OB lên EC2 cần quyền riêng. [Quyết định](../../docs/DECISIONS.md#t-054--duyệt-ghi-bảng-phân-bổ-và-lưu-ý-dung-lượng-ec2-06112026--user_confirmed)
++| Phần trước G3 | Bằng chứng hiện tại | Trạng thái |
++|---|---|---|
++| Nguồn/B1 | TT60+OB34 metadata đối chiếu nguồn riêng; R1 locator mờ; full cohort giữ nguyên | PREPARATION; attestation/kiểm byte test mới sau quyền |
++| A/B2/C | Mỗi EC2101fixture mã cuối; Windows transport68; báo cáo thiếu A/partial seed89hàng; kích hoạt sinh giả11kiểm | Đạt trong phạm vi fixture; không gọi là main |
++| Tuyến DEV thay đổi | 15đối chiếu mới;14khớp nghiêm ngặt, một C-e sai khác số học đã được Minh chấp nhận riêng; M1 chính tái dùng012 | Ghi rõ ở parity-disposition, không đổi tolerance chung |
++| Môi trường/code/phân lô |106pin code, runtime3.12/3.8 và4file vá trên hai EC2 mới;30TT mỗi máy, laptopOB/CIRCA/MicroRank/A | Kiểm cuối đạt; tài nguyên động kiểm lại trước phát |
++| D1–D4/R3 | DECISIONS/WHY ngày07/11, OB-group-decision | Minh đã chốt; H1 RE3 vẫn OPEN theo D2 |
++| Quyền test/nguồn/chuyển/run/chấm | grant-template có mọi cờfalse | Chờ Minh sau phản biện bản cài013 |
+ 
+-| Máy | Phân công ứng viên | Job | C-e thiếu hỗ trợ |
+-|---|---|---:|---:|
+-| EC2_1 | 35 TT: cùng họ M1, baseline và TORAI B | 523 | 2 |
+-| EC2_2 | 25 TT còn lại và toàn bộ 34 Nezha-OB | 817 | 0 |
+-| Laptop | TT: CIRCA, MicroRank và TORAI A | 300 | 0 |
+-
+-Tổng 1.640 job và 2 vị trí C-e thiếu hỗ trợ. Có 68 vị trí UNSUPPORTED đã khai, tối đa 1.572 lần gọi được hỗ trợ. Một lượt M1 tính cả ba world. Đếm theo `prepared-validation.json#/jobs`, `/positions` và ma trận đã khai trong SPEC.
+-
+-Đã kiểm lại hash 406 tệp TT/OB và 180 CSV A bằng cách đọc byte, không giải mã tín hiệu. Các binding trước G3 vẫn là PREPARATION, không phải G3 attestation. Có 105 pin code; ba plan chặn WAIT_G3. Packet code/metadata đã tạo và kiểm nội dung ở local, chưa chuyển. Môi trường cloud trong contract là lịch sử008, phải kiểm lại khi AWS hoạt động.
++Tổng1.640job+2vị trí C-e thiếu hỗ trợ, gồm68UNSUPPORTED đã khai; bảng từng máy và group ở `candidate-validation.json#/hosts`. D4 báo chênh Hit@5 M1–M4 trên34/30/4OB, đủba world, mô tả; giữ A4 và mức thống kê. TORAI A là bảng phụ, một plan laptop, phát sau non-A của plan đó VERIFIED, preflight theo quyền/pin và không bình quân seed sống. Nguồn A cho main chưa được cấp. Hành vi thật của ca logts thiếu N và nhánh OB lệch số mẫu vẫn OPEN.
+ 
+ ## Tiếp xúc trước G3 và ảnh hưởng lên giao thức
+ 
+@@ -23,43 +22,15 @@
+ - **TORAI A, 006:** giải nén đúng 180 CSV tác giả của cohort TT, xem header/thời gian. Audit cho thấy một logts thiếu toàn phần N; giữ đầu vào và ca. A là bảng phụ ngoài A4. Grant một ca dev là lịch sử; receipt 006 ghi phạm vi chuẩn bị cohort. Main A cần quyền riêng. [Nguồn, `/A_csv_files`](runs/chuan-bi-main-006/checkpoint-01-sources.json) · [Hạn chế A](runs/chuan-bi-main-006/A-input-limitation.json) · [Receipt chuẩn bị](runs/chuan-bi-main-006/preparation-grant.json)
+ - **RE3-OB:** TX0 là phân loại lịch sử tại G1. Đã xem metadata/schema; 011 có quyền B riêng và đọc hai cột owner của bản ghim để kiểm kê tên toàn cohort. Kết quả nêu phần còn thiếu cho U/alias/r, chưa chốt profile. [Schema](runs/chuan-bi-re3-009/inventory-schema.json) · [Quyền B](runs/hoan-thien-local-g3-011/checkpoint.json) · [Biên nhận, `/completed_column_reads` và `/measured_signals_or_times_read`](runs/hoan-thien-local-g3-011/inventory-owner-global.json)
+ 
+-**Quyền 006 còn OPEN ở phạm vi đọc giá trị các cột thời gian trước G3.** Minh giao dựng/đối chiếu nguồn thật, chuyển TT và kiểm trước chạy. Người làm đã hiểu kiểm nguồn bao gồm các lần đọc trên. Nguyên văn chưa nêu rõ phạm vi đọc đó. Cần Minh xác nhận cách xử lý, kể cả cách diễn giải kết quả OB. LOG ghi bản kê hồi cứu và phân biệt việc đã xem với việc đã dùng. Công cụ 006 dùng các trường sự kiện native OB (pod, loại lỗi, mốc) để đối chiếu ca nguồn; metadata nhãn được chuẩn bị riêng cho evaluator. Chưa ghép nhãn với kết quả, chưa chạy phương pháp hoặc xem hạng/độ đo main. [Lời Minh](runs/chuan-bi-main-006/quyen-minh.txt) · [Công cụ đối chiếu](runs/chuan-bi-main-006/prepare_sources.py) · [Khai tiếp xúc](protocol.json) · [LOG](../../tasks/T-054-khoa-g3-chay-p7-a/LOG.md#bản-kê-hồi-cứu-tiếp-xúc-trước-g3)
++**D1 đã chốt ngày07/11/2026:** giữ nguyên lịch sử phạm vi quyền006 chưa rõ, không diễn giải thành quyền hồi tố. Minh duyệt cách khai giới hạn tính độc lập của việc dùng cấu trúc thời gian cohort OB sửa adapter. Chưa có hạng/độ đo main. Quyền chạy/chấm hiện tại vẫn cần cấp riêng. [Quyết định](../../docs/DECISIONS.md) · [Nguồn lời chuẩn bị](runs/chuan-bi-main-013/preparation-permission.json).
+ 
+-## Bằng chứng A/B1/B2/C
++## Sáu câu G3 và giới hạn nguồn
+ 
+-Đối chiếu với [hồ sơ T-052 bản 004](../T-052/ho-so-g3-004.md#điều-kiện-còn-chặn-g3a). Pin của lượt tích hợp 008 nằm ở [protocol 008, `/source_code`](runs/cai-ob-source-native-008/protocol-008.json). Pin sau H2 và pin hiện hành lần lượt ở [010, `/code_pins`](runs/cai-re3-h2-010/code-binding-candidate.json) và [011, `/code_pins`](runs/hoan-thien-local-g3-011/current-code-pins.json). Đã kiểm hash bằng chứng dùng lại và toàn bộ 105 pin 011 trên cây làm việc. Lượt kiểm lại bằng môi trường ghim T-014-main đạt 29 phép thuần của fixture và 4 phép biên của monitor. Biên nhận lưu lệnh, mã chạy và đầu ra của cả hai lần gọi. [Biên nhận kiểm lại, `/result` và `/attempts`](runs/kiem-lai-phan-bien-011-001/verification.json)
++1. Câu hỏi chính là RQ3b và phần can thiệp tính toán RQ3d theo MRP, DT18 và hướng dẫn cô; chưa có kết quả test.
++2. Cohort TT/OB, cửa sổ, U/alias, cấu hình, seed/world, policy lỗi/mẫu số và thống kê ghim trong protocol-candidate/contract/source-bundle013. Tiếp xúc OB ở trên giới hạn diễn giải độc lập; nhóm34/30/4 không phân xử riêng tác động adapter.
++3. TT dùng TORAI B ba seed trong A4, OB dùng SimpleRCA M4 với giới hạn tái lập đã khai; A là bảng phụ. Không chọn lại baseline sau nhìn điểm.
++4. Nút là service/thành phần; cạnh caller→callee. Log/metric gắn owner, trace giữ cha–con. E1 dùng hợp khoảng con; E2-C gán cạnh về callee; E5 dùng cạnh/SCC; E6a xếp tầng; E7 duyệt cạnh tạo vùng. T12-on có đúng hai snapshot ghim. C-a1 còn E1, nên không gọi mọi vế bỏ thành phần là bỏ mọi quan hệ.
++5. Sau grant, báo theo dataset/ca/ô/world/support, giữ ERROR/TIMEOUT/UNSUPPORTED và lượt đầu đúng policy. Không có đối chứng đồ thị ngẫu nhiên thì không suy riêng lợi ích cấu trúc thật.
++6. B6 được khóa vào đúng byte code/gói/config/env/cohort và quyết định cuối. H1 RE3 chưa đóng, D2 cho trình main TT/Nezha riêng; RE3 cần nguồn/profile/quyền riêng cho bản cuối. RQ3c chỉ mô tả vùng vì thiếu nhãn; RQ3a/M1(b), LLM và áp dụng FlashTicket còn lại, không coi xong T054 là xong đề tài.
+ 
+-| Nhóm | Phép kiểm và phạm vi đã đạt | Sau thay đổi 010/011 và phần còn chặn |
+-|---|---|---|
+-| A — seal → nhãn/ô | Fixture 008 có bộ đúng; bác root, fault, ô, dataset, revision, alias sai và root ngoài U. Snapshot thiếu A4 chặn mọi bảng. [Tích hợp 008, `/checks`](runs/cai-ob-source-native-008/integrated-001/summary.json) | 010 thêm nhánh chấm RE3 riêng; thứ tự xác minh snapshot trước ghép nhãn ở main TT/OB giữ nguyên. Lượt kiểm lại bằng T-014-main xác nhận phần đối chiếu nhãn đúng/sai trên fixture. Còn cần người cấp nguồn, nhãn/G1/alias/U đúng bản khóa, quy tắc root ngoài U và kiểm binding thật sau quyền riêng. |
+-| B1 — nguồn và đầu vào thực thi → bản ghi | Fixture 008 có đầu vào đúng, tráo mốc/hỗ trợ C-e/thành viên, đổi source/window/seed/config/env và tính lại hash, tráo envelope khác token trước gán. Có kiểm worker là tiến trình riêng và resume. [Tích hợp 008, `/checks`](runs/cai-ob-source-native-008/integrated-001/summary.json) | 010 chạm các file dùng chung; kiểm profile/binding bổ sung chỉ cho RE3. Diff worker 011 giới hạn thay đổi thực thi ở nhánh TORAI RE3. Lượt kiểm lại bằng T-014-main xác nhận các phản ví dụ thuần trên mã hiện hành; chưa chạy lại toàn tuyến worker/receipt sau 010/011. Binding thật vẫn ở PREPARATION. |
+-| B2 — thực thi → seal → bảng | Fixture 008 có worker/reader thật trên nguồn giả cho các vế họ M1 và M4 TT/OB, chặn thiếu seed/ca, C-d3 đúng tra khóa, DAG/chu trình/thiếu đích và lỗi C-d3 giữ hạng chính. Pilot dev và đối chiếu OB ở phạm vi từng biên nhận. [Tích hợp 008, `/checks`](runs/cai-ob-source-native-008/integrated-001/summary.json) · [OB dev](runs/cai-ob-source-native-008/dev-ob-001/parity.json) | 010 thêm nhánh thực thi/chấm RE3, sửa nhận variant CIRCA trong file dùng chung. Cần đối chiếu đúng phần tuyến thay đổi trước phát, nhất là nguồn/nhận/chấm trên máy đích. Nhánh OB lệch số mẫu chưa có bằng chứng hành vi trên ca thật. 011 chỉ xác nhận ba plan bị chặn và schema/phụ thuộc đạt. [Biên nhận 011, `/hosts`](runs/hoan-thien-local-g3-011/prepared-validation.json) |
+-| C — pha hết giờ, ngân sách, độ nhạy | 008 kiểm đúng pha method, thiếu mốc bắt đầu, timeout prep và monitor gap; diễn tập giữ attempt. 010 kiểm mock cách đóng gói biến thể TIMEOUT CIRCA, gồm TT/OB. [Tích hợp 008, `/checks`](runs/cai-ob-source-native-008/integrated-001/summary.json) · [010, `/20`–`/22`](runs/cai-re3-h2-010/edges-005/checks.json) | 010 sửa `finalize_timeout` cho CIRCA RE3, giữ điều kiện TT/OB. Lượt kiểm lại bằng T-014-main xác nhận phân loại trên mã hiện hành theo policy ứng viên, kể cả gap thiếu, bằng hoặc vượt 5 giây. Kiểm mock 010 chưa thay bằng chứng giám sát tiến trình ở tuyến đích. Giữ hai độ nhạy và quyết định không trần tổng đã ghi; policy đúng byte, tài nguyên và điều kiện phát lô còn phải xác nhận. [Quyết định 004](runs/trien-khai-004/quyet-dinh-minh.json) · [Policy ứng viên 011](runs/hoan-thien-local-g3-011/failure-policy-candidate.json) |
+-
+-## B6 và sáu câu G3
+-
+-1. **Câu của cô/DT18.** Gói này chuẩn bị kiểm xếp hạng RQ3b và phần can thiệp tính toán RQ3d. Vùng nghi ngờ chỉ mô tả. Xem phần giới hạn bên dưới.
+-2. **Sức phân xử của dữ liệu.** TT/OB phân xử các phép so xếp hạng theo cohort và giao thức khai trước. Tiếp xúc ở trên giới hạn cách đọc OB và chưa có nhãn vùng độc lập. RE3 giữ riêng.
+-3. **Baseline.** TT dùng TORAI B ba seed cho A4, OB dùng SimpleRCA M4 với giới hạn tái lập Q-192. TORAI A là bảng phụ. Chốt biến thể, mẫu số, lỗi và cách đọc trước khóa theo `protocol.json#/A4`.
+-4. **Trung gian.** Log/metric gắn owner; trace giữ quan hệ cha–con, cạnh hướng bên gọi → bên được gọi. E1 dùng hợp khoảng con, E2-C gán bằng chứng cạnh về bên được gọi, E5 dùng cạnh và nhóm liên thông mạnh, E6a xếp tầng, E7 duyệt cạnh tạo vùng. Bằng chứng dev T13 và phạm vi kiểm mới nằm ở bảng trên. [Căn cứ thành phần và hợp đồng](../T-052/ho-so-g3-002.md)
+-5. **Điều kiện và từng ca.** Chưa có hạng/độ đo main. Khi có quyền chấm, báo theo dataset, ca, ô, world và hỗ trợ; báo các vế bỏ thành phần theo nền đã chọn. C-a1 còn quan hệ cha–con qua E1. [Ma trận](matrix.json) · [Giới hạn T13](../T-052/ho-so-g3-004.md)
+-6. **Các lựa chọn còn mở.** Ghim B6 theo cấu hình, hợp đồng M1, ma trận, bảng diễn giải và C-15 B trong giao thức; ghép với revision/byte gói thật, cohort/G1, U/alias, lỗi, fallback, quyền và policy/tài nguyên trước khóa. Điểm cần Minh xét ở dưới. [B6 nguồn](../../tasks/T-043-thiet-ke-rca-m1/SPEC.md#b6-khóa-trước-g3--để-sau) · [Giao thức ứng viên](protocol.json)
+-
+-## Nội dung Minh cần xét trong G3
+-
+-1. H1: tiếp tục chờ nguồn để đóng units/U/alias/r; hoặc cho phép main TT/Nezha khi H1 còn OPEN, giữ cấm đánh giá RE3 đến khi hoàn tất nguồn và được cấp riêng. Phương án sau sửa điều kiện trước G3, chưa được coi là đã duyệt. H2/gRPC đã cài không thay quyết định này.
+-2. Policy ứng viên hiện có: timeout method 600 giây, C-d3 60 giây; tối đa hai worker khi RAM cho phép; một luồng số học; monitor 0,1 giây, gap phải nhỏ hơn 5 giây. Không trần cộng dồn theo quyết định đã có; lỗi chưa biết BLOCKED, dừng phát và báo; không retry tự động. Giữ một ca A thiếu toàn phần N của logts như hạn chế đầu vào đã khai006, không bỏ/bù/dịch ca. Quyền dùng A riêng phải được ghi rõ cùng nguồn.
+-3. Khi nguồn cloud/môi trường hiện tại được xác minh và phản biện/Minh xét hồ sơ xong: quyền khóa G3, mở đúng test TT/Nezha và phát main phải chỉ đúng candidate protocol/source bundle. Lệnh chuẩn bị local không thay các quyền này. RE3 giữ ngoài cho bản cuối; commit/push riêng.
+-4. RAM tại lần đo 011 ở trạng thái `WAIT_RESOURCE`; cần đo lại trước phát. Dự toán gồm **6,851 GiB** cho phần kết quả/trung gian và **10,062 GiB** cho tổng kịch bản. Cả hai dùng dấu phẩy thập phân. [Tài nguyên, `/checks/6/observation`](runs/hoan-thien-local-g3-011/local-checks.json) · [Cách tính dung lượng](runs/hoan-thien-local-g3-011/storage-explained.md)
+-
+-Đây là các mục của G3 đã có, không thêm cổng nghiên cứu mới. Mẫu nguồn quyết định trong runbook chỉ là cấu trúc đề nghị, không phải quyền thật. `activate_after_g3.py` là helper ứng viên; chỉ kiểm đường chặn khi thiếu quyền, chưa chạy nhánh kích hoạt do chưa có grant thật. Không nhận nó là một lần main hay G3 đã thành công.
+-
+-## Phần cloud còn lại, đang tạm dừng
+-
+-Xác nhận máy/IP/identity; pin môi trường và upstream đã đóng băng; code packet; RAM/đĩa; dữ liệu thực có và phần thiếu theo phân vùng35/25/OB. TT cũ đã từng chuyển30/30 không tự đủ cho35/25; OB cần đúng226tệp trên EC2_2 nếu chưa có. Dùng lại tệp/hash hợp lệ, chỉ chuyển phần thiếu; không rerun baseline diện rộng. Không SSH/check/sync trong checkpoint011.
+-
+-T-048 đã xong và kết quả tổng hợp local đã lưu; không phải chờ raw T-048 trên EC2 để cấp đầu vào main. Mất cloud ảnh hưởng khả năng tái kiểm toàn bộ raw lịch sử chưa sao lưu và phải dựng lại môi trường/nguồn còn thiếu; không đồng nghĩa mọi dữ liệu mất đều chặn main. Không mở lại nghiệm thu T-048 hay chạy lại vì đổi máy/phiên.
+-
+-## Giới hạn câu hỏi nghiên cứu
+-
+-Gói này chuẩn bị đánh giá RQ3b và phần can thiệp tính toán của RQ3d, chưa có kết quả test. RQ3c chỉ mô tả vùng; chưa có nhãn vùng độc lập. RQ3a/M1(b), Precision/Recall/F1 phát hiện công khai chưa được trả lời theo phạm vi đã quyết. LLM, quan hệ messaging/data đầy đủ và áp dụng FlashTicket thuộc các phần tiếp theo. DT18/cô vẫn yêu cầu chúng; chuẩn bị hoặc hoàn thành T054 không tự hoàn tất đề tài.
++Claude đã góp ý và thống nhất phần kế hoạch trước triển khai, chưa kiểm các output013 mới. Đồng thuận không thay bằng chứng. Chưa commit/push, chưa mở test hoặc phát main.
+--- before/results/T-054/runbook.md
++++ results/T-054/runbook.md
+@@ -1,25 +1,35 @@
+-# Vận hành hiện hành — checkpoint011, chưa phát main
++# Vận hành — ứng viên checkpoint013
+ 
+-Đọc `runs/hoan-thien-local-g3-011/bao-cao.md`, `checkpoint.json`, `re3-h1-status.md` và `ho-so-g3.md`. EC2 tạm dừng theo Minh; không SSH/sync/kiểm trong phiên này. Không dùng plan/helper006 với pin011. H2/gRPC và OB source-native đã cài, nhưng H1, cloud và G3 còn mở.
++Đọc [báo cáo013](runs/chuan-bi-main-013/bao-cao.md), [nội dung duyệt cuối](runs/chuan-bi-main-013/de-nghi-duyet-main.md) và manifest. Gói011/006 là lịch sử. Chuẩn bị013 đã được duyệt, G3/test/main/chấm chưa được cấp; mọi lệnh phát/nhận/chấm dưới đây chỉ dùng sau lời duyệt cuối đúng gói.
+ 
+-Kiểm checkpoint chỉ đọc, từ repo D:/RCA-flashticket:
++Từ `D:/RCA-flashticket`, kiểm manifest chỉ đọc:
+ 
+ ```powershell
+-& D:/RCA-ext/envs/T-014-main/Scripts/python.exe -X utf8 -B results/T-054/runs/hoan-thien-local-g3-011/verify_manifest.py
++& D:/RCA-ext/envs/T-014-main/Scripts/python.exe -X utf8 -B results/T-054/runs/chuan-bi-main-013/verify_manifest.py
+ ```
+ 
+-Plan ứng viên trong `011/prepared/` theo đường dẫn đầy đủ `runs/hoan-thien-local-g3-011/`; packet trong `packets/`. Không chạy lại prepare_local.py/package_candidates.py/check_local.py vào cùng thư mục: đầu ra create-only đã có. Không có queue main hoặc auto-resume nền. Tái dùng pin và kết quả kiểm hợp lệ; chỉ kiểm phần thay đổi hoặc trạng thái động trước chạy.
++Phân lô: EC2_1=16.176.181.251/key4,448job+2support,2worker; EC2_2=13.236.44.106/key3,450job,1worker; local742job,2worker tối đa. Mỗi EC230TT, toànOB/CIRCA/MicroRank/A ở laptop. Khóa SSH chỉ đọc từ `D:/RCA-ext/keys/`, không chép vào repo. Giữ strict host key/instance ID; không bật/tắt máy. Code=`checkpoint013/work`, data=`checkpoint013/data-root`, output=`work/results/T-054/runs/main-013/queue`. Python main trên EC2 phụ thuộc interpreter ở012: giữ012.
+ 
+-Đĩa: đọc storage-copy-accounting.json; khoảng10,1GiB là kịch bản có dự phòng, không cận trên. D đủ cho kịch bản tại lần đo. Đề xuất C rút lại, chưa tạo thư mục. Giữ mọi attempt/hỏng và raw kết quả; báo cáo không clone cả cohort. Mỗi lần nhận giữ archive truyền và một bản nhận có hash/receipt.
++Sau Minh duyệt, Codex lưu nguyên văn lời duyệt ở `013/grants/minh-main.txt`, dựng grant thật `013/grants/main-grant.json` từ mẫu và ghi các quyền riêng theo đề nghị. Ghim protocol/source-bundle/manifest và nguồn quyết định; A giữ pin riêng. Nối DECISIONS/WHY/LOG và dòng STATE đúng quyền cuối; không sửa đầu ra chuẩn bị đã ghim. Minh không cần tự điền JSON. Dùng hash thật của file grant, không dùng chuỗi ví dụ dưới đây làm giá trị.
+ 
+-RAM: snapshot cuối thiếu cho slot lớn. Không giảm reservation để ép chạy và không tự tắt ứng dụng của Minh. Trước main đo lại; driver giữ reserve và chỉ phát khi đủ RAM, tối đa2worker. AC sleep đã đổi45phút thànhkhôngngủ; DC45phút giữ nguyên. Lệnh hoàn tác ở `011/restore-ac-sleep.ps1`; không tự khôi phục khi đang chạy cần thức.
++```powershell
++$grant013 = 'results/T-054/runs/chuan-bi-main-013/grants/main-grant.json'
++$grant013Sha = (Get-FileHash -LiteralPath $grant013 -Algorithm SHA256).Hash.ToLowerInvariant()
++& D:/RCA-ext/envs/T-014-main/Scripts/python.exe -X utf8 -B results/T-054/runs/chuan-bi-main-013/main.py --grant $grant013 --sha256 $grant013Sha
++```
+ 
+-Sau AWS hoạt động, chỉ tiếp tục kiểm/staging cloud khi Minh cho phép: kiểm identity, code, nguồn, môi trường, RAM/đĩa cho candidate011; dùng lại dữ liệu đã đúng, chuyển phần thiếu. Không suy haiIP lịch sử vẫn đúng. Lưu biên nhận current cloud gắn candidate protocol và packet hash. Không dùng receipt008 như current verification.
++Entry kiểm toàn vẹn gói/tài nguyên/identity, tạo metadata LOCKED và attestation đầy đủ cohort, kiểm plan/union, stage đúng code và grant, kiểm môi trường cùng106file upstream/bản vá local, kiểm nguồn/chuyển đúng phân lô, materialize hardlink local rồi phát CLI ba máy. Truyền qua stdin với kê byte/hash, đích mờ; không đóng gói bản đồ thật/nhãn. Giữ biên nhận và đầu ra; bước lỗi không tự bỏ qua. Không tự gọi lại helper create-only khi đã có output dở: đọc receipt/queue trước, giữ lỗi và trình đúng sửa cần thiết.
+ 
+-Sau Minh xét H1/policy và cấp G3/main/A nguồn riêng: lưu đúng lời quyết định, pin exact candidate protocol/sourcebundle và source quyết định. Grant cần g3/test_grant/main_dispatch/torai_A_source_grant=true; cloud_readiness_refs cho haihost; pre_G3_decisions_ref chỉ rõ policy được duyệt và H1 đã có nguồn hoặc được Minh chấp nhận OPEN cho main TT/Nezha. Không tự tạo true hoặc thay missing bằng lời tóm tắt.
++Theo dõi `p7.py status --plan <activated-host-plan> --sha256 <pin-thật>` trên đúng host/root. Lệnh status chỉ đọc. Lần trả launcher_pid không chứng minh supervisor còn sống: kiểm status.controller và tiến độ/monitor. Mất SSH không nghĩa worker chết. DRAIN bằng `p7.py drain` với cùng plan/pin; giữ active đóng. Resume bằng `p7.py resume --plan ... --sha256 ... --authority ... --authority-sha256 ...` trên đúng runtime/host/root, một luồng số học như khi phát; đối chiếu PID/token trước, không retry hỏng hoặc phát bản sao.
+ 
+-Helper ứng viên011/activate_after_g3.py nhận --grant <filequyềnthật> --sha256 <hashđúng>; chỉ tạo metadata LOCKED/attestation/plan, khôngSSH hoặcphátqueue. Nhánh có quyền thật chưa được chạy; khi có quyền phải kiểm output và full locked validator, dừng nếu lỗi, giữ lượt hỏng và trình sửa ngoài quyền. Không gọi thành công kích hoạt chỉ từ kiểm đường chặn. Phần metadata khóa cuối và nguồn quyền phải được đưa/kiểm đúng từnghost trước lệnh run riêng theo CLI p7.py --help; không phát lệnh từ plan candidate.
++Monitor poll0,1giây, maxgap<5giây, method600giây/C-d3=60giây; không trần cộng dồn, không tựretry. Theo dõi RAM/đĩa và nhóm ERROR/BLOCKED; thiếu nguồn, clock, mất monitor hoặc không tiến triển thì dừng/báo. Chưa chạy không gán TIMEOUT. TORAI A preflight nguồn theo grant, chỉ phát sau mọi non-A của laptop VERIFIED; thiếu quyền/sai pinA giữ BLOCKED, lỗi lạ dừngA và ghi phần chưa phát. Không bình quân A thiếu seed. Không sửa thiết kế sau dùng test; giữ kết quả đầu và khai riêng mọi bản sửa theo C-15 B.
+ 
+-Vận hành đã khai: per-method600s, C-d360s; một luồng số học, poll0,1s, gap<5s. Không trầncộngdồn, không tựretry. DRAIN dừng phát mới, giữ active đóng/ghi; resume cùng plan/root saukiểm PID/token, không suy SSHngắt là workerchết. Lỗi/chưa rõ nguồn/clock/monitor/RAMđĩa/khôngtiếntriển thìdừng/báo; lượtchưachạy khôngTIMEOUT. KhôngtạoScheduledTask/restartsaureboot.
++Sau cả ba queue dừng và có đủ snapshot, nhận và chấm từ laptop (thư mục nhận mới):
+ 
+-Nhận/merge theo các receipt/phân vùng đã kiểm005: hash archive và từngtệp, giữ path/lineage và ánhxạ receive_paths, chỉmerge khiđủ union; nhãn evaluator ghép sau. M1sealtrướcC-d3; không phân bổ trùng. RE3 grant/profile/ma trận và bảng cuối riêng, không mở từ quyềnmainTT/Nezha. Khôngcommit/push hoặcxóaresult khi chưaMinhduyệt. PromptClaude trongLOG/011/prompt-claude.md đểMinhchuyểnthủcông.
++```powershell
++& D:/RCA-ext/envs/T-014-main/Scripts/python.exe -X utf8 -B results/T-054/runs/chuan-bi-main-013/receive_main.py --grant $grant013 --sha256 $grant013Sha --destination D:/RCA-flashticket/results/T-054/runs/chuan-bi-main-013/received-main-001
++```
++
++Helper giữ archive và bản nhận, xác minh receipt/seal, union đủ từng slot rồi mới đọc nhãn evaluator. A4 còn thiếu/chặn thì chưa tạo bảng; thiếuA ngoài A4 được khai trong bảng thiếu, không bình quân seed sống. Báo cáo ở `results/T-054/reports/main-013/`, D4 trong a4.json#/OB_group_description. Nếu bước nhận/kiểm/chấm lỗi thì giữ output, chọn tên lượt mới khi được phép sửa; không ghi đè report.
++
++D3: main giữ AC sleep0, DC giữ hiện hành; chỉ khôi phục AC2700giây sau nhận/kiểm/chấm thành công. receive_main làm và ghi receipt. Nếu bị chặn trước đó, giữ máy thức, báo Minh; không tự khôi phục giữa lượt cần laptop. Không tạo ScheduledTask hoặc tựresume sau reboot. RE3 không thuộc grant main TT/OB. Commit/push chỉ sau Minh duyệt riêng danh sách đã rà, không dùng packet cũ có mapping thật hoặc archive/raw data.

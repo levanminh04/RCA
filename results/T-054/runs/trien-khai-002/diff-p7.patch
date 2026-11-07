@@ -1,0 +1,26 @@
+--- results\T-054\runs\freeze-cong-cu-003\code\results\T-054\scripts\p7.py
++++ results\T-054\scripts\p7.py
+@@ -17,6 +17,12 @@
+         validate_slot(job['slot'], p)
+         if not isinstance(job['timeout_s'], (int, float)) or not 0 < job['timeout_s'] <= 3600:
+             raise Blocked('deadline chưa khai hoặc vượt quyền lượt dài')
++    registered = {fingerprint(j['slot']): (n, j) for n, j in enumerate(p['jobs'])}
++    for n, job in enumerate(p['jobs']):
++        if job.get('main_dependency'):
++            dep = job['main_dependency']; parent = registered.get(fingerprint(dep['slot']))
++            if not parent or parent[0] >= n or fingerprint(parent[1]) != dep['job_sha256']:
++                raise Blocked('dependency thiếu/sai pin/thứ tự trong plan bất biến')
+     return p
+ 
+ 
+@@ -56,7 +62,9 @@
+         if args.authority:
+             cmd += ['--authority', str(Path(args.authority).resolve()), '--authority-sha256', args.authority_sha256]
+         p = launch(sys.executable, cmd, directory / 'supervisor.stdout.txt', directory / 'supervisor.stderr.txt')
+-        print(canonical({'supervisor_pid': p.pid, 'directory': str(directory), 'plan_sha256': args.sha256}).decode('utf-8')); return
++        print(canonical({'launcher_pid': p.pid, 'supervisor_pid': None,
++                         'resolve_actual_supervisor': 'status.controller.pid',
++                         'directory': str(directory), 'plan_sha256': args.sha256}).decode('utf-8')); return
+     from cham import snapshot_from_status, verify_snapshot
+     snapshot = snapshot_from_status(plan, status(directory))
+     verified = verify_snapshot(snapshot, plan['jobs'])

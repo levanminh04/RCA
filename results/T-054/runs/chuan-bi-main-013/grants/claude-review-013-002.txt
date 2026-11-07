@@ -1,0 +1,31 @@
+Claude — kiểm lại phản hồi và sửa checkpoint013 (pha 1), 07/11/2026. Người phản biện; chỉ đọc khi lập kết luận.
+Lưu theo lời Minh "Ghi nguyên văn quyền này và kết luận pha 1 vào hồ sơ".
+
+KẾT LUẬN: Không có điểm CHẶN. Đề xuất dừng phản biện chuẩn bị013. Minh đã duyệt kết thúc lượt và đổi vai trong cùng tin nhắn.
+
+Kiểm đã chạy (chỉ đọc):
+- sha256(manifest.json) = 752da8e5870ad27b92ed82e846d54d9570b7f58664661259f1a33ecb718d40dd, khớp manifest đích.
+- verify_manifest.py --documents: PASS, checked=3245, mismatches=[], real_test_payloads_read=false.
+- So từng plan pre-review-001/prepared ↔ prepared: ec2_1 đổi workers 2→1, protocol_ref; job chỉ đổi protocol_ref,
+  main_dependency. ec2_2/aggregate: protocol_ref, main_dependency (aggregate thêm execution_plan_refs). local: protocol_ref.
+  Số job và ce_support giữ nguyên. Slot/config/seed/source/window/env không đổi.
+- protocol-candidate: chỉ đổi dispatch_contract_ref/execution_candidate.contract sha và fingerprint.
+- dispatch-contract và launch-conditions: chỉ /hosts/ec2_1/workers 2→1. grant-template: chỉ hash protocol mới, mọi cờ false.
+- source-bundle, failure-policy, environments, code-pins, placement: không đổi.
+- grant-template khớp sha protocol-candidate (324ba001…) và source-bundle (495134c5…).
+- Không có file .md trong main-packet; đổi báo cáo/đề nghị không đổi gói gửi EC2.
+
+Phản hồi các điểm trước:
+- F1 (013-001): Codex nhận (a). Đúng; đã thực hiện đúng phạm vi metadata. Cách ghi giới hạn (không suy TIMEOUT/tổng thời gian
+  không đổi) chính xác hơn câu "số worker không đổi đầu ra" trong bản 013-001 của Claude. Đồng ý với hiệu chỉnh đó.
+- F2: Đúng, đã bổ sung. Kịch bản local dùng max DEV từng nhóm (≤55,2 s/job), ≪600 s; nguy cơ TIMEOUT do 2 worker laptop thấp,
+  chưa kiểm trên test. Chấm full cohort vẫn chưa đo; đã khai OPEN trong cost-scenario#/uncertainty.
+- Bất đồng còn lại: không có.
+
+KHÔNG CHẶN — ghi chú vận hành cho pha 2 (không phải lỗi của gói):
+- activate.require_grant đối chiếu từng file trong manifest['outputs'], gồm bao-cao.md và de-nghi-duyet-main.md. Sửa tài liệu
+  được Minh cho phép phải đi kèm manifest mới và grant ghim manifest mới; giữ manifest cũ.
+- main.py không chặn chạy lại phần dở ngoài các kiểm create-only; không gọi lại main.py khi đã có receipt/queue dở.
+
+Phần còn OPEN, không đổi: OB lệch mẫu chỉ có fixture; TORAI A ca logts N=0; H1 RE3 (D2); không có đối chứng đồ thị ngẫu nhiên,
+C-a1 còn E1; RQ3b/RQ3d chưa có điểm test. Dừng phản biện không tự nghiệm thu T-054 hay G4.

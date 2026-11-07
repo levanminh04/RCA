@@ -1,0 +1,56 @@
+{
+  "status": "CANDIDATE_WITH_EXPLICIT_OPEN_FIELDS_NOT_G3_READY",
+  "telemetry_opened": false,
+  "fields": {
+    "metrics.time": {
+      "unit": "s",
+      "classification": "FACT_PUBLISHER_DECLARATION",
+      "source": "../cai-ob-source-native-008/re3-dataset-card.json#/text",
+      "measured_RE3_values_checked": false
+    },
+    "traces.startTime": {
+      "unit_candidate": "us",
+      "classification": "CANDIDATE_INFERENCE",
+      "evidence": [
+        "RCAEval paper: Jaeger collection",
+        "Jaeger JSON Span startTime declares microseconds since epoch",
+        "RCAEval TraceRCA expected method contract"
+      ],
+      "missing": "original RCAEval export transformation or explicit RE3 declaration; Jaeger alone does not prove exported units"
+    },
+    "traces.duration": {
+      "unit_candidate": "us",
+      "classification": "CANDIDATE_INFERENCE",
+      "evidence": "Jaeger JSON model; RCAEval duration/1000; export transformation not established"
+    },
+    "traces.startTimeMillis": {
+      "unit_candidate": "ms",
+      "classification": "OPEN",
+      "reason": "field name is not proof; no fallback clock"
+    },
+    "logs.timestamp": {
+      "unit_candidate": "s",
+      "classification": "OPEN",
+      "evidence": "RE2-TT adapter expects seconds; not proof for held-out RE3"
+    },
+    "traces.time": {
+      "use_candidate": "not a computation clock",
+      "classification": "CANDIDATE",
+      "reason": "large_string format/timezone unspecified; no heuristic parsing"
+    }
+  },
+  "cadence_vs_resolution": {
+    "classification": "OPEN",
+    "metric_encoding": "int64 seconds does not establish cadence or observation r",
+    "do_not_copy": "RE2-TT r=1s log/metric and 1us span without RE3 basis",
+    "impact": "M1 coverage/T, E2 rate, c=1 z branch, window assignment and baseline aggregation"
+  },
+  "proposed_adapter_rules": [
+    "require pinned declared time/observation profile; missing profile blocks before method",
+    "integer arithmetic; never auto-guess unit by magnitude",
+    "preserve duration in declared unit until explicit conversion; no score-dependent rescaling",
+    "metrics/log [t-300,t+300); complete span start>=lo and end<hi; no padding/resampling",
+    "schema-compatible is not valid signal; M1 retains missing/nonfinite; baseline preprocessing declared separately"
+  ],
+  "resolution_owner": "export/source documentation; Minh decides any explicitly unverified assumption; actual-data validation only in separately authorized final RE3 opening"
+}

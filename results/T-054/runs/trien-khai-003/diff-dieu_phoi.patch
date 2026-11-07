@@ -1,0 +1,26 @@
+--- D:\RCA-flashticket\results\T-054\runs\freeze-cong-cu-004\code\results\T-054\scripts\dieu_phoi.py
++++ D:\RCA-flashticket\results\T-054\scripts\dieu_phoi.py
+@@ -297,6 +297,10 @@
+         if [r.get('variant') for r in records] != expected_variants:
+             raise Blocked('variant thiếu/sai/thừa so với slot')
+         for record in records:
++            if s['arm'] == 'circa' and s['dataset'] == 'RE2-TT' and record.get('status') == 'OK':
++                current = record.get('diagnostics', {}).get('circa_current')
++                if type(current) is not int or record.get('window', {}).get('circa_current') != current:
++                    raise Blocked('CIRCA thiếu/sai mốc current thực dùng trong window')
+             if record.get('method') != expected_method or record.get('mode') != 'a' or record.get('seed') != s['seed']:
+                 raise Blocked('method/mode/seed thực chạy khác slot')
+             if family and record.get('config_id') != s['arm']:
+@@ -306,7 +310,11 @@
+                 if any(not danh_gia.khoi_tu_ban_ghi(v) for v in views):
+                     raise Blocked('record OK không có thứ hạng hợp lệ')
+     if any(r.get('status') in ('ERROR', 'TIMEOUT') for r in records):
+-        raise Blocked('lỗi phương pháp cần phân loại với bằng chứng, chưa tự tính trượt')
++        from bien_nhan import verify_dev_error_reproduction
++        path = attempt / 'dev-error-reproduction.json'
++        if not path.is_file():
++            raise Blocked('lỗi phương pháp cần phân loại với bằng chứng, chưa tự tính trượt')
++        verify_dev_error_reproduction(ref(path), job, envelope, invocation)
+     return records
+ 
+ 

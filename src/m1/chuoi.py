@@ -150,6 +150,8 @@ def _kiem_params(params):
     dc = params.get('doi_chung')
     if dc is not None and dc not in DOI_CHUNG_KHONG_E7:
         raise LoiHopDong('ERROR', f'params.doi_chung lạ: {dc!r}')
+    if not isinstance(params.get('tach_cd3', False), bool):
+        raise LoiHopDong('ERROR', 'params.tach_cd3 phải là bool')
     if bt.get('T12'):
         # Đ19 điểm 5: thiếu khóa khi T12 bật là UNSUPPORTED; khóa có mặt nhưng sai kiểu là ERROR
         ct = params.get('canh_tinh')
@@ -362,10 +364,32 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
     tg = quan_sat.thoi_gian_nguon_metric(
         dict(params, nguon_metric=(params.get('nguon_metric') or {})),
         [int(r['time'] * he_m) for r in metrics])
+    indices = params.get('chi_so_hang_metric')
+    if indices is not None:
+        if not isinstance(indices, dict) or set(indices) != set(tg):
+            raise LoiHopDong('ERROR', 'chi_so_hang_metric: tập nguồn không khớp')
+        used = set()
+        owners = params.get('nguon_metric') or {}
+        for source, ix in indices.items():
+            if not isinstance(ix, list) or any(type(i) is not int or not 0 <= i < len(metrics) for i in ix):
+                raise LoiHopDong('ERROR', 'chi_so_hang_metric: index không hợp lệ')
+            if len(set(ix)) != len(ix) or used.intersection(ix):
+                raise LoiHopDong('ERROR', 'chi_so_hang_metric: index trùng')
+            used.update(ix)
+            info = tg[source]
+            if info['trang_thai'] != 'OK' or len(info['moc']) != len(ix):
+                raise LoiHopDong('ERROR', 'chi_so_hang_metric: thiếu/sai độ dài mốc nguồn')
+            for i, mc in zip(ix, info['moc']):
+                if int(metrics[i]['time'] * he_m) != mc or any(
+                        owners.get(c) != source for c in metrics[i] if c != 'time'):
+                    raise LoiHopDong('ERROR', 'chi_so_hang_metric: sai timestamp/owner')
+        if used != set(range(len(metrics))):
+            raise LoiHopDong('ERROR', 'chi_so_hang_metric: hàng không thuộc nguồn')
     for ng_s in sorted(tg):
         if ng_s in ('trace', 'log'):
             raise LoiHopDong('ERROR', f'tên nguồn metric trùng nguồn trace/log: {ng_s}')
-        if tg[ng_s]['trang_thai'] == 'OK' and len(tg[ng_s]['moc']) != len(metrics):  # mốc ghép theo hàng (S24)
+        if tg[ng_s]['trang_thai'] == 'OK' and len(tg[ng_s]['moc']) != (
+                len(metrics) if indices is None else len(indices[ng_s])):  # S24, source-native opt-in
             raise LoiHopDong('ERROR', f"mốc thời gian của nguồn {ng_s}: {len(tg[ng_s]['moc'])} mốc cho "
                                       f'{len(metrics)} hàng metric')
         if tg[ng_s]['trang_thai'] != 'OK':
@@ -393,7 +417,8 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
                 continue
             moc = thong_tin['moc'] if thong_tin['trang_thai'] == 'OK' else [int(r['time'] * he_m) for r in metrics]
             N, A, mocN, mocA = [], [], [], []
-            for r, mc in zip(metrics, moc):
+            source_rows = metrics if indices is None else [metrics[i] for i in indices[ng]]
+            for r, mc in zip(source_rows, moc):
                 v = r.get(cot)
                 if v is None or not math.isfinite(v) or not (lo_ns <= mc < hi_ns):  # đặc tả v1 dòng 110: giá trị hữu hạn
                     continue
@@ -592,10 +617,10 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
     spans_A = [{'parent': None if (s['cha'] is None and not s['mo_coi']) else 'co', 'chu': s['chu']}
                for s in prep['spans'].values() if s['phia'] == 'A']
     dich = doi_chung.dich_cd3(spans_A, lan_nguoc)
-    d3 = dict(doi_chung.cd3(canh, diem_d3, dich), dich=dich,
-              so_span_goc_A=sum(1 for s in spans_A if s['parent'] is None))
-    dc = {'C-d1': doi_chung.cd1(kenh_P_U, canh, co_OK_P), 'C-d2': doi_chung.cd2_tu_kenh(kenh_P_U, co_OK_P),
-          'C-d3': d3}
+    thong_tin_d3 = {'dich': dich, 'so_span_goc_A': sum(1 for s in spans_A if s['parent'] is None)}
+    dc = {'C-d1': doi_chung.cd1(kenh_P_U, canh, co_OK_P), 'C-d2': doi_chung.cd2_tu_kenh(kenh_P_U, co_OK_P)}
+    if not params.get('tach_cd3', False):
+        dc['C-d3'] = dict(doi_chung.cd3(canh, diem_d3, dich), **thong_tin_d3)
     # ---- T4c (CĐ7): thứ tự thứ hai trên cùng phép chấm, chỉ khi E6a; thế giới P; không chấm lại
     F_I_P = e5_w['P']['F_I']
     T4c = None
@@ -677,6 +702,9 @@ def _chay(spans, metrics, logs, inventory, aliases, t, params):
                   'G_N': [list(c) for c in G_N],
                   'don_vi_phan_vi': [_gon_pv(u['ma'], kq_pv[u['ma']]) for u in don_vi if u['loai'] == 'phan_vi']},
     }
+    if params.get('tach_cd3', False):
+        rec['extra']['dau_vao_cd3'] = dict(thong_tin_d3, diem={e: [s.numerator, s.denominator]
+                                                           for e, s in diem_d3.items()})
     if che_do:
         rec['method_version'] = PHIEN_BAN_CHE_DO
         rec['why_ids'] = rec['why_ids'] + ['WHY-67', 'WHY-68', 'WHY-69']

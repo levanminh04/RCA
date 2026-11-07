@@ -53,6 +53,7 @@ Mẫu một mục: chọn gì → vì sao → đã xét phương án nào → b�
 - **Vì sao chia theo ô:** chọn cấu hình rồi báo kết quả trên cùng dữ liệu thì số đẹp hơn thực tế. Ba lần lặp của một ô gần như giống nhau, nên phải đi cùng nhau về một phía.
 - **Vì sao cần dataset giữ ngoài:** nó kiểm phương pháp có phải chỉ khớp với một hệ không.
 - **Phương án đã xét:** chia ngẫu nhiên theo ca. Cách này để lộ đáp án qua các lần lặp của cùng một ô.
+- **Cách dùng sau G3 — C-15 B, Q-247 (ghi 04/11/2026):** giữ kết quả đầu của bản khóa và báo nguyên. Bản sửa sau khi dùng test để thiết kế khai rõ, báo riêng, không gọi là kiểm độc lập. Tách sửa lỗi cài đặt khỏi sửa thiết kế, giữ lịch sử và chạy lại các phương pháp chịu ảnh hưởng trong phạm vi Minh duyệt. Kiểm độc lập bản sửa dùng dữ liệu phù hợp chưa dùng sau khóa, gồm lượt FlashTicket mới. RE3-OB chỉ mở một lần cho bản cuối. Quyền mở test/giữ ngoài vẫn cần Minh duyệt riêng. “Đã xem” và “đã dùng để thiết kế” phải khai riêng; TX1 được chấp nhận có khai báo Q-60, không gọi toàn test là mù hoàn toàn. RE3 kiểm tổ hợp hệ OB/công cụ RCAEval/lỗi mã nguồn chưa có ở dev, không tách được hiệu ứng riêng hệ hoặc công cụ (T-021 §5).
 
 ## WHY-05. Vì sao chạy baseline bằng code chính thức, bản mới nhất — Đề xuất (G1)
 
@@ -60,7 +61,7 @@ Mẫu một mục: chọn gì → vì sao → đã xét phương án nào → b�
 - **Vì sao:** tự cài lại thì dễ đơn giản hóa đúng chỗ tạo ra giá trị của phương pháp. v1 làm vậy với MicroRCA (SL7). RCAEval cũng đã nhận rằng các baseline PageRank và CIRCA của họ âm thầm trả về thứ tự cột khi lỗi. Bản mới chỉ in thêm cảnh báo; đường trả thứ tự cột vẫn còn, nên adapter của nhóm phải tự đánh dấu ca lỗi (MRP P3). Dùng bản mới không tự bảo đảm số đúng.
 - **Phương án đã xét:** dùng lại số công bố mà không chạy. Cách này không so được trên cùng giao thức, và không làm được phân tích từng ca ở P4.
 
-## WHY-06. Vì sao đánh giá ba đầu ra bằng các độ đo khác nhau, và vì sao MRR là độ đo chính của xếp hạng — Một phần đã quyết: độ đo chính và biên E-04 (M-30, M-44, M-45); phép thống kê P7 theo A4 (Q-211)
+## WHY-06. Vì sao đánh giá ba đầu ra bằng các độ đo khác nhau, và vì sao MRR là độ đo chính của xếp hạng — Độ đo/biên E-04 theo M-30, M-44, M-45; A4 cập nhật Q-246 (Q-211 giữ lịch sử)
 
 - **Chọn:**
   - Phát hiện: Precision, Recall, F1 theo cửa sổ thời gian; số báo động giả mỗi giờ bình thường; độ trễ phát hiện (MRP P7). Độ đo chính của phát hiện chốt ở SPEC phát hiện (D3 của T-043).
@@ -71,19 +72,20 @@ Mẫu một mục: chọn gì → vì sao → đã xét phương án nào → b�
 - **Biên E-04 trên RE2-TT** (đã duyệt, M-44, M-45; đầy đủ ở KE-HOACH D.1):
   - So với TORAI B, khai trước. Không chọn lại baseline theo từng độ đo sau khi xem kết quả.
   - MRR: Δ = 0,05, dùng để kết luận. Hit@1: Δ = 2/30 ca dev, 4/60 ca test, chỉ để mô tả.
-  - Cách đọc: khoảng tin cậy 95% của chênh MRR (phương pháp mới trừ TORAI B). Báo đồng thời hai câu. (1) Cận dưới lớn hơn −Δ thì đạt E-04; ngược lại "chưa chứng minh được". (2) Khoảng nằm trọn trên 0 là hơn; trọn dưới 0 là kém; chứa 0 là "chưa phân biệt được". E-04 chỉ xét câu (1).
+  - Cách đọc: khoảng tin cậy 95% của chênh MRR (phương pháp mới trừ TORAI B). Báo đồng thời hai câu. (1) Cận dưới lớn hơn −Δ thì đạt E-04 theo công thức; ngược lại "chưa chứng minh được". (2) Khoảng nằm trọn trên 0 là hơn; trọn dưới 0 là kém; chứa 0 là "chưa phân biệt được" theo CI danh nghĩa của giao thức. E-04 chỉ xét câu (1). Theo Q-246, lưu cận thô và cận làm tròn 12 chữ số thập phân ROUND_HALF_EVEN; dùng cận làm tròn để so strict, bằng biên không đạt. CI suy biến (lo = hi ở cùng độ chính xác) mà qua biên phải ghi cùng câu "đạt E-04 theo công thức; CI suy biến", kèm số ô khác 0, số ô tổng chênh âm, số ca cả hai trượt và giới hạn bootstrap. Ít ô/rời rạc có thể undercoverage cả khi lo < hi; kết quả không tự bảo đảm hiệu chuẩn sai số.
   - Điểm ước lượng chênh không vượt Δ chỉ báo kèm; không gọi là phép kiểm không thua.
   - Sức phân biệt thấp: power của câu (1) khoảng 0,19 theo giả định ở KE-HOACH D.1 (công thức ở Phụ lục C của `docs/KHAO-SAT-SAU-K1-K6.md`). Vì vậy "chưa chứng minh được" là khả năng lớn và phải báo đúng như vậy.
-  - Khi không đạt (Q-211): làm phương án (b) của KE-HOACH D.1 trong hồ sơ G3, tức suy biên từ mức TORAI B hơn một phương pháp đơn giản trên dev. Nếu biên suy ra khác 0,05 thì Minh chọn trước G3; chưa chọn thì 0,05 giữ hiệu lực. Nếu không làm (b) thì dùng (c) (cỡ hiệu ứng kèm khoảng tin cậy), và câu đầu của báo cáo bắt buộc là "không đạt E-04". Lý do không chọn (c) làm mặc định: (c) không bao giờ "trượt", nên dễ làm mềm một kết quả không đạt.
+  - Khi không đạt, Q-246 chọn phương án (c) của KE-HOACH D.1: báo cỡ hiệu ứng/CI, câu đầu "Không đạt E-04. Chưa chứng minh được không thua quá 0,05". Đã đối chiếu mức TORAI B hơn SimpleRCA TT dev khoảng 0,02556 MRR (T-034/bang-baseline.json#/ranking_mode_a/RE2-TT_dev30/methods). Mức đó chưa đủ thiết lập biên M1/M2 mới, nên giữ 0,05. Q-211 mục 8 và lý do từng không chọn (c) giữ là lịch sử; cách mới giữ câu thất bại bắt buộc để không làm mềm kết quả. Phương án thống kê (b)/(c) này khác RCA chế độ (b) được hoãn Q-245.
   - Nezha-OB không đặt Δ.
-- **Phép thống kê** (A4, Q-211; khóa trước G3):
-  - Một giả thuyết chính: E-04 trên 60 ca test RE2-TT, đo bằng MRR. Một giả thuyết phụ: Hit@5 trên test Nezha-OB. Hiệu chỉnh Holm cho hai giả thuyết. Không đặt giả thuyết Hit@5 trên RE2-TT, vì TORAI B đã đạt Hit@5 = 1,0 trên dev (`results/T-034/bang-baseline.json`, mục `ranking_mode_a`).
-  - Phép kiểm chính: đảo dấu chính xác theo ô trên chênh nghịch đảo hạng (KS-08). Phép phụ: hoán vị theo ca; McNemar cho Hit@1. Bỏ Wilcoxon.
-  - Khoảng tin cậy bootstrap theo ô, 10.000 mẫu, kèm cảnh báo khi số ô ít. Khoảng chứa 0 thì ghi "chưa phân biệt được".
+- **Phép thống kê** (A4, Q-246; khóa trước G3; Q-211 là lịch sử của phần được thay):
+  - Giữ câu chính E-04 trên 60 ca TT so TORAI B và câu phụ Hit@5 trên test Nezha-OB so SimpleRCA M4. Thay Holm bằng chuyển mức một chiều: OB ban đầu p ≤ 0,025, nâng 0,05 chỉ khi E-04 tại P qua biên và lo < hi. TT không nhận mức từ OB. Chỉ P quyết A4, S_lo/S_hi là độ nhạy; không chọn world thuận lợi. TORAI B đã Hit@5 = 1 trên TT dev nên không đặt giả thuyết Hit@5 TT.
+  - E-04 dùng cận bootstrap trên, mức một phía danh nghĩa 0,025. OB đảo dấu nguyên ô một phía tại 0, trọng số theo ca, H0 là bất biến dấu vector tổng chênh theo ô (KS-08); liệt kê p chính xác không tự chứng minh kiểm định chính xác dưới giả thuyết chỉ nói trung bình ≤ 0. Hiệu lực chuyển mức danh nghĩa 0,05 phụ thuộc từng phép kiểm; bộ lọc lo < hi không sửa undercoverage bootstrap. Chuyển đảo dấu TT quanh 0 thành phép nhạy, không dùng đảo dấu dịch biên làm kiểm E-04. Đây là cả hai thay đổi so Q-211, không chỉ đổi Holm.
+  - Bootstrap cặp theo ô dùng lại src/p3/danh_gia.bootstrap, 10.000 mẫu, seed 20261005 theo WHY-28, trung bình seed mỗi ca trước lấy lại ô. Lưu code/numpy/thuật toán/phân vị/thứ tự ca/ô. Báo số ô hữu hiệu/cả hai trượt/CI suy biến và cảnh báo ít ô. Số mô hình giả về ô thưa không là ước lượng xác suất trên test. Khoảng chứa 0 ghi "chưa phân biệt được".
+  - Hoán vị theo ca và McNemar Hit@1 là phụ, báo giới hạn phụ thuộc giữa ca cùng ô. McNemar hai phía dùng một cặp nhị phân/ca: seed TORAI đạt nếu status OK và root chắc hạng 1; ca đạt nếu ≥2/3 seed, all-3 báo độ nhạy; M1 đạt khi root chắc hạng 1. Lỗi là 0. Bảng chính vẫn kỳ vọng hòa/trung bình seed. Không coi ba seed là ba ca. Bỏ Wilcoxon như Q-211.
   - Các phép so khác (Nezha-OB, RE3-OB, T13, đối chứng): chỉ báo cỡ chênh kèm khoảng tin cậy. Không gộp dataset.
   - Ca lỗi tính là trượt; báo thêm bản loại ca lỗi để xem độ nhạy. Ghi sổ mỗi lần xem test.
   - Vì sao một giả thuyết chính: thử nhiều giả thuyết rồi chọn cái đạt dễ cho kết quả may. Cái giá: kết luận chính hẹp.
-  - Chế độ (b) ở P7 và dataset giữ ngoài RE3-OB: Minh hoãn quyết (Q-211).
+  - Chế độ (b) đợt P7 chính hoãn Q-245, G4 báo thiếu P/R/F1 M1 công khai. RE3-OB nguyên bộ cho bản cuối theo Q-247/Q-248, chưa có quyền mở. C-e TT mô tả và cặp quan sát↔hợp snapshot D8 nằm trong hồ sơ xin P7, ngoài A4; quyền chạy cấp riêng.
 - **Vì sao:**
   - DT18 yêu cầu ba đầu ra. Cô nêu năm độ đo. Mỗi độ đo chỉ có nghĩa với một loại đầu ra: Precision, Recall, F1 cần nhãn đúng/sai cho từng đơn vị; MRR và NDCG cần một danh sách xếp hạng và đáp án (K1 §J).
   - MRR có trong danh sách của cô, MRP P6 đã khai từ trước, và dùng toàn bộ thứ hạng.
@@ -1130,3 +1132,99 @@ F2 NumPy trên một số kênh gần hằng tạo |chênh mean hai cặp|/std5 
 - **Nền.** Giữ nền WHY-73 với E6a+S1 và cạnh quan sát. T9 so với E6b trên chiều bên gọi → bên được gọi. Lượt đã ghim cho kết cục HẠI ở bước 3 trên cả ba thế giới, ΔMRR gộp −1/30. Nguồn là `results/T-050/cham-002/luat.json#/theo_the_gioi` theo manifest chạy lại và `results/T-050/dinh-chinh-va-kiem-lai.md`. Cờ đánh đổi E2 theo WHY-72 vẫn còn.
 - **Giới hạn.** Đây là lựa chọn điểm xuất phát trên dev chế độ (a). Biến thể đảo chiều PageRank còn OPEN. Hiệu quả trên dữ liệu độc lập và chất lượng vùng ảnh hưởng còn cần bằng chứng riêng.
 - **N1.** Giữ WHY-70 và hợp đồng T-051. Trên cùng cửa sổ giả RE2 hợp lệ của cặp, dùng chênh trung bình số thực thể tầng 1 tại P, tính bằng Fraction và xét HẠI khi tăng nghiêm quá 1. Dùng N1 để mô tả độ rộng tập tự sinh vì V0 chỉ phân biệt tập rỗng và có phần tử trong trường hợp đủ bằng chứng. Báo V0, mẫu số và độ nhạy h=0,5/2. Mức chính là dung sai thực dụng. Hiệu chuẩn verdict vẫn OPEN. Phân biệt mẫu số bằng 0 do thiếu bằng chứng với lỗi hoặc thiếu trường bắt buộc.
+
+## WHY-76. Nền cuối T-051 và phạm vi T13 — Ghi theo Q-242/Q-248
+
+- **Chọn gì:** giữ E1-U, E2-C, E5, z+S1, E6a, cạnh quan sát; E3(a), E3b, E6b, E9 và hợp cạnh T12 tắt. E3 tắt vẫn giữ kênh log lỗi cơ bản. T13 chỉ mô tả, giữ cờ đánh đổi E2, giới hạn VC×E5, chiều đảo PageRank OPEN và hạn chế dev chọn lặp.
+- **Căn cứ sau T-051:** T11/E9 KHÔNG TÁC DỤNG theo luật khai trước ở ba worlds; ΔMRR tại P gộp 1/104, TT 1/60, OB 0; C-e ΔN1=7/30 trên 30 cặp. T12 KHÔNG TÁC DỤNG; ΔMRR=0 từng dataset nhưng F_I đổi ở 17 TT và 2 OB, nhóm hạng đổi 11 ca. C-e ΔN1=−7/10 chỉ xét tăng nên chưa phân xử loại quá tay. Nguồn T-051/t11-001 và t12-001/score/{law,metrics,mechanisms}.json, đính chính và manifest bổ sung cuối.
+- **Phương án:** giữ E9/hợp snapshot nếu đủ lợi theo luật đã duyệt, hoặc giữ nền quan sát. Q-242 nghiệm thu lựa chọn nền quan sát/E9 tắt. T13/P7 giữ kết quả âm và cặp T12 mô tả, không đổi nền theo điểm test.
+- **Bằng chứng đối lập:** M1 vs K-R0 TT giảm 1/18 (1 tăng/4 giảm/25 hòa), OB tăng khoảng 0,211 (9/2/11); C-d2 cao hơn M1 OB. Bỏ E1 hại TT/OB bằng; bỏ E2 và E5 có dấu khác giữa hai bộ. Mục tiêu bỏ mô-đun đồ thị làm chất lượng giảm chưa được hỗ trợ chung trên dev. Nguồn results/T-053/runs/k-cham-001/kq.json#/cau_hinh, results/T-051/kb-002/score/{metrics,scores}.json, results/T-051/t12-001/score/regions-controls.json.
+- **Điều kiện thất bại/phụ thuộc:** KB kiểm ba vế ở nền cuối, chưa đủ tương tác C/VC×E5 (WHY-72/73). E9 Nezha chưa tới phép xét thời gian theo đính chính; T12 có thay tập/kênh/vùng dù RR root giữ. Snapshot chưa xác minh revision benchmark. T13 phải báo hạn chế từng phép, P7 kiểm độc lập đúng phạm vi, P9/P10 nhận quan hệ thiếu đầu quan sát. Lựa chọn dev không chứng minh bất thường tự sinh là nguyên nhân vật lý.
+
+## WHY-77. Verdict, C-e, phạm vi P7(a) và chuyển mức A4 — Đã ghi theo Q-245–Q-248
+
+- **Chọn và vì sao:** giữ V0 truy vết, chấm P7(a) từ hạng/trạng thái hỗ trợ. WHY-68 cho thấy V0 bão hòa và ứng viên mới chưa hiệu chuẩn. Nền cuối C-e có CAUSE_FOUND 30/30, N1 14,7, nên chưa dùng V0 mở sự cố hoặc làm mức tin cậy root.
+- **C-e:** giữ phân bố hạng đầu để hỏi có ưu tiên lặp một thực thể. Dev có 16 thực thể từng đứng đầu, hai thực thể mỗi 5/30, top hai 10/30; MRR nhãn root thật sau mốc giả 0,0787266 so chance trên 68 thực thể 0,0706479; Hit@1=0/30. Nguồn T-051/kb-002/ce.json, nhan-dev ghép sau, T-053/chi-so-day-du.json#/K-E1+E2+E5/tong_hop/ce. RR của root tương lai không kiểm trực tiếp thiên lệch và mốc trước tiêm chưa chứng minh nền lành. P7 xin C-e mô tả trên tối đa 60 cửa sổ TT M1 cuối, không dùng chọn/hiệu chuẩn; khóa thiếu lịch sử/hỗ trợ/mẫu số và ngân sách trước mở. Mục đích là kiểm lại mẫu hình dev trên ca mới; phương án chỉ-dev sẽ thiếu phần kiểm lại đó.
+- **A4:** nhận chuyển mức một chiều của Claude với CI E-04 không suy biến tại P mới nâng OB từ 0,025 lên 0,05. Nó giữ cách đọc E-04, không cần p E-04 riêng, và cho phép câu phụ có ngưỡng rộng hơn khi câu chính qua. Phương án cố định 0,025 dễ hơn nhưng không nhận lợi ích đó. Holm đầy đủ cần quyết định E-04 ở thêm mức 0,05; Q-246 thay cả Holm lẫn phép chính TT. Hai world nhạy không cấp thêm mức.
+- **Giới hạn A4 đã xét:** CI percentile ít ô có thể hẹp hơn thực cả khi lo<hi. Bộ lọc suy biến chỉ hạn chế chuyển mức, không chữa sai số TT. Đạt theo công thức kèm cảnh báo ngay trong câu khi suy biến, luôn báo ô hữu hiệu/ô thua/ca cùng trượt. Đảo dấu OB chỉ có hiệu lực theo H0 hoán đổi dấu, không tự kiểm mọi phân bố có trung bình≤0. Giữ kết luận danh nghĩa/có điều kiện; synthetic không xác minh hiệu chuẩn cho benchmark.
+- **Nguồn thống kê:** src/p3/danh_gia.bootstrap và WHY-28 (seed 20261005); [Canay, Romano, Shaikh 2017](https://home.uchicago.edu/amshaikh/webfiles/weakrand.pdf) về điều kiện đối xứng của randomization, [Bretz et al. 2009](https://doi.org/10.1002/sim.3495) về chuyển mức và [Holm 1979](https://www.ime.usp.br/~abe/lista/pdf4R8xPVzCnX.pdf) là phương án đã xét. Các nguồn không chứng minh điều kiện thống kê được thỏa trên tập ca này.
+- **Phạm vi phụ thuộc:** hoãn (b) là lời Minh Q-245; hệ quả Q-66/P/R/F1 ghi riêng, D3/D16 vẫn trước kết luận (b)/khóa FT. RE3 cho bản cuối với hợp đồng nguồn khóa trước mở, không dùng bốn root metadata làm U. TX1/ca liền kề Nezha/RE3 cùng hệ-công cụ và mọi lần xem phải khai. P7 chạy locked trên local theo Q-42; quyền khác cần Minh cấp riêng.
+
+
+## WHY-78. Tổ chức hồ sơ T-054 và ranh giới đánh giá — ghi theo Q-250, chưa khóa G3
+
+- **Chọn gì trong kế hoạch:** một task hai pha theo yêu cầu Minh; bản SPEC hợp nhất giữ điều kiện chuyển pha và các quyền riêng. Không mở lại T-052 đã nghiệm thu phần dev/hồ sơ. Các chính sách còn OPEN không được gọi là đã quyết chỉ vì SPEC được ghi.
+- **Vì sao:** hồ sơ T-052 004 chỉ ra các liên kết nguồn→thực thi→seal→nhãn và toàn driver còn thiếu; lập luận khoa học không được thay bằng đủ file/hash hoặc chạy không lỗi. Cần hoàn thiện/kiểm trên dev trước khi Minh xét bản khóa và grant test.
+- **Nhãn và phép kiểm chính:** chặn mọi evaluator khi slot A4 còn BLOCKED/PENDING để không thấy gần đủ chênh lệch rồi sửa nhánh chính. Slot ngoài A4 chạy nguyên pin sau mốc xem phải khai; sửa code có dùng test theo C-15 B. Phương án công bố theo bậc chỉ dùng khi Minh quyết trước G3. Quy tắc này giữ phép so chính, không xóa lịch sử tiếp xúc metadata G1.
+- **Nguồn/máy:** OB ở laptop vì file metric ngày và một số file phút dùng chung dev/test; khai bản sao lịch sử EC2 theo preflight/Q-93, không kết luận đã đọc giá trị test hoặc vi phạm cũ. Native T-053 có cả hai máy; pilot mới đối chiếu đúng máy nguồn từng cửa sổ, có T-050 cho C-c/C-g. C-a0 cung cấp trường vị trí N trong miền đã kiểm; không dự toán thêm toàn bộ K-R0.
+- **Vận hành:** partition cố định, cùng controller đơn máy giúp tránh dựng hệ điều phối phân tán trên đường găng. Hai EC2 và laptop dùng cho lô độc lập, đủ quyền và có ích theo chỉ đạo Minh; EC2 2 phải có nhánh driver cụ thể còn thiếu, không chạy lại chỉ để dùng máy. Cache TORAI kiểm trên laptop nơi sẽ áp dụng. Nếu setup lớn hơn phần tiết kiệm hoặc không có lô cần thiết, báo Minh cho máy nghỉ.
+- **Bằng chứng và điều kiện thất bại:** phase/nguồn/config chưa rõ thì không chấm trượt; max monitor gap dưới ngưỡng đã khai là điều kiện cần, không đủ chứng minh không sleep. Gói đúng byte code thực chạy cùng hash/blob provenance khắc phục rủi ro checkout đổi line ending; tách code_root/data_root/output_root. Mất phiên agent/SSH có thể tự tiếp tục; reboot cần resume thủ công trừ quyền startup riêng. ETA chưa đo toàn bundle/local sau dọn nên các mốc sáng là có điều kiện.
+- **Phương án đã xét:** một máy local; cloud TT dev để phủ nhánh/cùng máy nguồn; cloud test cần ngoại lệ quyền dữ liệu; cache prep TORAI; công bố theo bậc. Chọn lô/worker/timeout cụ thể và ngoại lệ cạn ngân sách/TORAI A vẫn chờ bằng chứng hoặc Minh quyết, không tự chọn để vừa hạn.
+- **Nguồn:** SPEC T-054, hồ sơ T-052 004/giao thức 003, native/seal T-053, nguồn T-050, Q-42/Q-63/Q-74/Q-93/Q-243–Q-248, hai lượt phản biện chat và bản đáp tại results/T-054/runs/soan-spec-001/. Hash và lệnh kiểm ở manifest/LOG task, không rải trong văn bản.
+- **Kết luận phụ thuộc:** tính hợp lệ bản P7(a), mẫu số/diễn giải A4, cách báo kết quả đầu và sau khi đã xem test; không xác nhận hiệu quả độc lập, cơ chế vật lý, RQ3a hoặc độ đúng vùng. Phương án cạn ngân sách P7 khác câu P3 §8.3 phải được Minh quyết riêng trước G3; Q-250 không giải mâu thuẫn đó thay Minh.
+
+
+## T-054 — biểu diễn metric theo nguồn cho OB trước G3, 06/11/2026
+
+Minh duyệt có điều kiện theo mục mới DECISIONS; Codex tự soát và tiếp nhận đúng phạm vi báo cáo007. Chọn cài ứng viên source_native opt-in để giữ mẫu thật ở cửa sổ gốc khi số hàng khác nhau. Đây là nhu cầu adapter/hợp đồng, không là cơ chế sửa lỗi RCA đã xác nhận. Bằng chứng: reader yêu cầu5N5A rồi ghép bảng; lõiM1 yêu cầu mọi nguồn cùng số hàng; kiểm timestamp006 xác nhận4ca bị từ chối trước method. Phương án bỏ guard đơn lẻ không sửa phép ghép; cắt/bù/lưới/dịch mốc làm đổi input; bỏca/gán0 làm sai nghĩa lỗi. BARO per-column cho phép đề xuất chạy theo source rồi ghép khóa;8fixture feasibility007 chưa thay kiểm toàn tuyến. M1 dùng index nguồn tường minh, không giả timestamp hoặc observation. Điều kiện thất bại: mapping sai, điểm/hòa/preprocessing khác, unsupported/missing không đúng; phải dừng phần phụ thuộc. Mặc định legacy/TT giữ đường cũ; cần exactparity normalizedinput/trunggian/hạng/vùng ở dev và fixture. Phụ thuộc: toàn OB P7, code/binding/snapshot/lịch003máy; không chứng minh lợi ích, RQ3a, vùng ảnh hưởng hoặc cho phép mở test.
+
+
+## T-054 — H2: adapter RE3 với profile tường minh, 06/11/2026
+
+Minh duyệt cài theo báo cáo009. Nhu cầu kỹ thuật: RE3 có schema riêng; source time/r/U/alias chưa đủ nguồn, worker hiện chọn TT/Nezha và TORAI lọc ts-* làm rỗng metric OB trong kiểm tổng hợp. Chọn reader/profile riêng, kiểm hợp đồng trước I/O và dispatch/chấm held-out riêng; không sửa công thức M1/kernel baseline. Phương án tái dùng nguyên adapter TT làm mất metric; giả tên dataset hoặc tự đoán đơn vị/U từ nhãn làm sai đầu vào. Thêm tham số dataset tùy chọn giữ mặc định cũ cho BARO/CIRCA/TraceRCA; literal re2-tt không tự chứng minh sai số. Bằng chứng metadata/code và27kiểm ở009, chưa kiểm trên RE3 thật. Điều kiện thất bại: profile thiếu/sai, alias va chạm, clock không biểu diễn chính xác, owner ngoài U, source/grant khác binding; dừng trước method. Inventory/đơn vị/r/semantics status còn OPEN; duyệt cài không biến giả định thành FACT. Phụ thuộc: khả năng thực thi RE3 bản cuối và bảng riêng; không xác nhận hiệu quả RCA, RQ3/RQ5 hay mở dữ liệu. Các kiểm tổng hợp mới sẽ nằm ở checkpoint010.
+
+
+### H2 — giữ đủ hai bản ghi CIRCA trên RE3
+
+Bộ nhận và timeout đang chỉ khai hai vế CIRCA cho TT, trong khi adapter trả cả chính/phụ cho RE3. Minh duyệt bổ sung hai file theo010. Mở đúng điều kiện dataset sang TT hoặc RE3; không bỏ vế phụ hoặc đổi nghĩa timeout. Kiểm fixture đủ/thiếu variant và current; chưa kiểm RE3 thật.
+
+
+## T-054 — gRPC status và metadata inventory, 07/11/2026
+
+Nguồn tác giả mới `CONVERT.md`, ghim riêng trong checkpoint011, nói benchmark phát hành lưu mã gRPC, 0 là OK; `tracets_err` gốc cộng mã thay vì đếm span lỗi. Guard H2 chỉ nhận 0/1 là giả định. Minh duyệt profile gRPC khai rõ và giữ nguyên giá trị/kernel; không chuyển thành 0/1. Code benchmark đã chọn không nâng phiên bản; converter mới chỉ làm bằng chứng hợp đồng nguồn. Gọi tổng mã là số lỗi sai nghĩa; đổi sang đếm lỗi sẽ đổi baseline. Đã kiểm fixture về miền mã, tổng và tuyến worker; chưa đọc statusCode RE3 thật.
+
+Minh cấp quyền riêng đọc tên owner như metadata toàn cohort. Không dùng nhãn root hoặc phân bố theo fault để chọn U. Hợp tên quan sát không chứng minh deployment hay alias; nguồn thiếu giữ OPEN. Không áp đơn vị của converter mới cho release cũ khi schema khác. Lựa chọn này ảnh hưởng profile/khả năng hỗ trợ RE3 và hồ sơ G3, không chứng minh hiệu quả RCA hay cấp quyền main.
+
+## T-054 — sửa F9 bằng đường dẫn định vị mờ, 07/11/2026
+
+**Bằng chứng.** Hai gói ứng viên EC2 trong manifest 011 đều mang locator có tên gốc ở bản kê runtime và nguồn đối chiếu độc lập của đủ 60 ca TT. Biên nhận chuyển 006 xác nhận cả hai EC2 cũ đã nhận tệp qua tên thư mục có dịch vụ gốc và dạng lỗi. Các nguồn và cách đối chiếu nằm trong mục xử lý F9 của LOG T-054. Quan sát này chứng minh kênh lộ qua đường dẫn. Chưa có bằng chứng từ đó rằng phương pháp đã dùng nhãn.
+
+**Lựa chọn.** Dùng thư mục theo mã mờ và giữ đủ cohort. `p7_entry_v2.open_runtime` đối chiếu toàn bộ cohort và inventory (danh mục thực thể) với G1. `source_selection` kiểm gốc đường dẫn, tên parquet và SHA-256 cùng số byte của tệp. Tên thư mục gốc của ca không phải điều kiện đọc. `p7_guard_v3.attest_runtime` tính binding (dấu ràng buộc) cả trên locator. Vì vậy lập bản chiếu mờ từ nguồn đối chiếu đã ghim độc lập trên laptop, giữ nguyên dấu nội dung và số byte của parquet rồi ghim lại bản kê, nguồn đối chiếu, biên nhận và kế hoạch phụ thuộc. Tạo nguồn đối chiếu từ chính bản kê runtime sẽ làm mất phép kiểm độc lập. Chỉ chuyển bản chiếu mờ cần cho worker. Bản đồ mờ sang đường dẫn thật nằm ở vùng riêng trên laptop và dùng khi chuẩn bị tệp chuyển.
+
+**Phương án đã xét.** Cắt bản kê theo máy rồi sửa guard thành hai lớp sẽ phải đổi hợp đồng T-052. Cách đó không cần cho F9 vì kế hoạch ghim đã kiểm đủ tập job của từng máy và mỗi máy chỉ nhận parquet thuộc lô đó. Kiểm trong bộ nhớ xác nhận 60 mã mờ qua guard, bản kê bị cắt và locator sai lệch với nguồn đối chiếu bị chặn, ca chưa có tệp hoặc tệp sai SHA-256 cũng bị chặn.
+
+**Giới hạn và điều kiện sử dụng.** Mã theo `results/T-052/ke-hoach-tap-test.json#/opaque_rule` có thể dò từ tên công khai. Dấu nội dung cũng có thể dùng để đối chiếu với bản nguồn khi có tệp tương ứng. Mục tiêu là bỏ tên có nhãn khỏi đường dẫn mà phương pháp hay nhật ký có thể dùng vô tình. Khả năng tái nhận diện có chủ đích nằm ngoài bảo đảm của biện pháp này. Trước khi dùng gói thật, cần chạy lại phép B1 hiện có và kiểm mọi locator chuyển ra ngoài, gồm bản kê, nguồn đối chiếu, đường dẫn staging và nhật ký chuyển. Đây là điều kiện để coi F9 đã được xử lý cho gói mới. Kiểm trong bộ nhớ chưa xác nhận gói thật, parity (độ tương đương) baseline/OB hoặc câu hỏi RQ3b/RQ3d.
+
+## T-054 — quyền, hàng chờ A và giới hạn trước chạy 013, 07/11/2026
+
+Minh duyệt gói chuẩn bị013 và D1–D4/R3. Kiểm quyền phát main ở CLI cùng quyền G3/test để mọi đường run/resume dùng cùng điều kiện. Một supervisor laptop giữ tập slot bất biến. TORAI A chỉ được phát sau khi các slot khác A đã VERIFIED. Nguồn A thiếu quyền hoặc sai pin có biên nhận theo slot trước phát; lỗi chưa phân loại khi A chạy giữ attempt và dừng theo policy, ghi BLOCKED cho phần A chưa phát. Báo cáo giữ toàn ma trận và khai nhóm A chưa đủ seed/ca. Hai plan cùng host không phù hợp hợp đồng ghép hiện tại. Chỉ sắp A cuối danh sách chưa đủ khi hai worker hoạt động. Lý do là ngăn phần phụ làm mất bảng chính đã đủ điều kiện, giữ nguyên các ngưỡng và mẫu số thống kê.
+
+Tái dùng M1 TT012, fixture C-d3 DAG/cyclic/no-target012, parity OB008 và nguồn CSV A đã audit006 sau kiểm hash. Chỉ chạy các tuyến dev thực sự khác. R1 dùng bản chiếu mờ từ nguồn đối chiếu riêng, giữ đầy đủ cohort/byte/hash, không đổi guard T052. D1 khai tiếp xúc đã dùng sửa adapter; D2 để profile RE3 OPEN cho đợt cuối; D4 là bảng mô tả nhóm đã xác định trước điểm. Hạn chế logts A thiếu N và nhánh OB lệch số mẫu vẫn phải khai theo bằng chứng hiện có. Gói chuẩn bị và đồng thuận phản biện chưa trả lời RQ3b/RQ3d bằng test.
+
+## T-054 — sai khác C-e trên máy mới, 07/11/2026
+
+Phép đối chiếu M1 C-e dev-a5cabe5fa7 khác30trường float, mỗi trường1ULP. Normalized-input digest, cấu trúc/tầng/hạng/nhóm hòa/các trường rời rạc khớp, theo numeric-parity-Ce-audit.json của013. Minh duyệt đúng ngoại lệ đó. Giữ kết quả nguyên bản và công bố giới hạn, dùng tiếp cho bằng chứng tuyến đã đo. Chưa xác định cơ chế số học riêng, không gán nguyên nhân BLAS/CPU hoặc thêm dung sai toàn cục. Các sai khác mới vẫn cần phân xử.
+
+
+## T-054 — căn cứ phân lô và pin vận hành ứng viên013, 07/11/2026
+
+CANDIDATE để Minh xét cùng G3: hai EC2 mới cùng loại máy và đều đã có ổ30GiB; chia TT30/30 để dùng cả hai và giữ trọn nguồn từng ca, EC2_1 tối đa2worker, EC2_2 một worker như phép phủ môi trường đã kiểm. Không dùng lại lịch35/25+OB của011 khi máy cũ không truy cập được. Giữ OB, CIRCA, MicroRank và TORAI A trên tuyến Windows đã có bằng chứng và nguồn riêng; chuyển thêm sẽ cần dựng/parity/truyền mà chưa có bằng chứng giảm tổng thời gian. Laptop tối đa2worker theo pilot004, chỉ chạy đồng thời khi reservation và reserve cho phép. Đây là bố trí vận hành ứng viên, không là kết luận EC2 nào cũng nhanh hơn hoặc hai worker luôn tăng tốc. Kịch bản lặp thời gian DEV chỉ giúp trình chi phí dài hơn1giờ, không là ETA của cohort test.
+
+Để ghim đúng byte thực chạy, giữ106pin code repo/helper và pin106file upstream/bản vá local cùng hai runtime; cloud dùng bản source lowercase rcaeval đúng byte upstream và4file causal-learn đã vá như tuyến gốc. Không đổi công thức hoặc tham số khoa học. Đường nhận vẫn verify snapshot trước nhãn; source-map thật và nhãn ở laptop, chỉ runtime/bản chiếu TT mờ đủcohort vào packet. R1 không sửa guard T052. Bằng chứng, các lần hỏng và giới hạn ở runs/chuan-bi-main-013/bao-cao.md. G3/test/nguồn A/chuyển/main/chấm và commit vẫn theo quyền riêng.
+
+
+## T-054 — đáp F1/F2 của Claude, ứng viên vận hành013 sửa sau review, 07/11/2026
+
+Minh cho phép ghi phần Codex kiểm độc lập đồng ý với phản biện; nguồn nguyên văn được lưu cùng gói. Nhận F1 về thiếu bằng chứng thông lượng/ảnh hưởng tranh tài nguyên và F2 về dự toán thiếu phần local+chuyển/nhận/chấm. Chọn để TRÌNH KHÓA phương án F1(a): cả hai EC2 một worker, laptop tối đa hai theo scheduler/RAM và A cùng nhóm chạy sau non-A. Đây là sửa ứng viên trước G3, không ghi thành quyền chạy. Không khẳng định H1 tranhCPU hay H2 vế vốn nặng đã được phân xử; cũng không khẳng định đổi worker giữ nguyên TIMEOUT hoặc tổng thời gian. Giữ nguồn dữ liệu/config/case/seed/mẫu số và method600giây/C-d360giây; thay tranh chấp tài nguyên có thể đổi trạng thái TIMEOUT nên phải chốt trước test. Bằng chứng DEV hiện có và fixture cho phép kiểm tuyến với một worker; không chạy lại phương pháp chỉ vì metadata đổi.
+
+600giây là ngân sách wall-clock ứng viên thực dụng, không là cận trên chi phí mọi ca. Giữ vì giao thức/pilot đã dùng và phân loại có bằng chứng pha/monitor; DEV đã đo không chứng minh test đều hoàn tất trong hạn. Đặt cùng một worker trên hai EC2 để giảm bất đối xứng đồng thời; không tăng timeout hoặc chọn theo kết quả test. Phần chi phí theo từng vế phải tách số đo chạy đơn/chạy chồng và proxy; không lấy số chồng rồi mặc định chia2 như tốc độ đã đo. F2 bổ sung kịch bản laptop, truyền/hash/nhận và chấm bằng số đo cũ đã kiểm hash; thiếu số đo whole-cohort giữ giả định/điều kiện sai, không gán ETA đã xác minh. Đường găng chỉ là kết quả có điều kiện của kịch bản.
+
+
+## T-054 — khóa G3(a) theo ứng viên013 sau phản biện, 07/11/2026
+
+Khóa đúng ứng viên013 sau đáp F1/F2: hai EC2 một worker, laptop tối đa hai theo RAM/nhóm, A sau non-A; method 600 giây, C-d3 60 giây, poll 0,1 giây, maxgap dưới 5 giây; không trần cộng dồn. Lý do giữ nguyên các mục WHY 07/11 trước (phân lô, F1/F2, C-e). Lượt kiểm lại của Claude không thấy điểm CHẶN; metadata sau sửa chỉ đổi số worker EC2_1 và hash dẫn xuất. Đổi người thực hiện từ Codex sang Claude không đổi code, plan, cấu hình hay mẫu số; nó chỉ đổi ai vận hành và ai phản biện. Kết luận phụ thuộc: RQ3b/RQ3d chỉ được trả lời bằng kết quả đầu của bản khóa này; giới hạn OB/A/RE3 và dự toán chưa kiểm giữ như hồ sơ.
+
+
+## T-054 — v2 sau BLOCKED main013, 07/11/2026
+
+Chọn chạy lại toàn bộ dưới v2 vì vân tay job gồm mọi pin code và failure-policy: thêm quy tắc làm đổi vân tay của 1640 job, seal v1 không khớp plan mới. Phương án khác: cầu nối hai phiên bản (sửa phần chấm chưa chạy ở quy mô đủ, rủi ro cao hơn); giữ BLOCKED (vẫn phải sửa supervisor, bảng TraceRCA/MicroRank TT thiếu ca); dừng (A4 thiếu). Quy tắc mới cùng họ với operation mới không có nền đã khóa: giả định ≥2 mẫu nền của phương pháp không thỏa trên dữ liệu hợp lệ, nên tính trượt, không đổi mẫu số. Quét 60 ca TT (chỉ đọc đầu vào): 3 ca có operation 1 span bình thường (0e0bdcd10b, 5e8f996191, 541642b59e). Supervisor chạy tiếp sau lỗi phương pháp chưa phân loại vì lỗi đó không lan sang slot khác; lỗi nguồn/hạ tầng vẫn dừng vì có thể lan. Không tách bảng quy tắc ở lượt này để giảm phần sửa sau mở test. Bằng chứng tính đúng: so v1↔v2 trên slot trùng. Kết luận phụ thuộc: bảng TraceRCA/MicroRank TT và C-c; A4 không đổi định nghĩa.

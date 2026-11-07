@@ -1,0 +1,199 @@
+--- reviewed/results/T-054/runs/chuan-bi-main-013/bao-cao.md
++++ results/T-054/runs/chuan-bi-main-013/bao-cao.md
+@@ -1,12 +1,12 @@
+-# Chuẩn bị main 013 — chờ Claude kiểm và Minh duyệt chạy
++# Chuẩn bị main 013 — đã đáp review, chờ kiểm metadata sửa
+ 
+-Minh duyệt chuẩn bị013 và D1–D4/R3 ngày07/11/2026; sau đó duyệt ngoại lệ đúng một phép đối chiếu C-e. Codex là người làm, Claude là người phản biện. Đây là đầu ra chuẩn bị, chưa là nghiệm thu G3, lần chạy test hoặc kết quả nghiên cứu main. Quyền tại `preparation-permission.json` vẫn có g3/test_grant/main_dispatch=false.
++Minh duyệt chuẩn bị013 và D1–D4/R3 ngày07/11/2026; sau đó duyệt ngoại lệ đúng một phép đối chiếu C-e. Codex là người làm, Claude là người phản biện. Claude đã kiểm bản trước sửa, không có finding CHẶN; hai finding vận hành được đáp tại `review-response.md`. Đây là đầu ra chuẩn bị, chưa là nghiệm thu G3, lần chạy test hoặc kết quả nghiên cứu main. Quyền tại `preparation-permission.json` vẫn có g3/test_grant/main_dispatch=false.
+ 
+ ## Kế hoạch thực chạy ứng viên
+ 
+ | Máy | Phần việc | Job | C-e thiếu hỗ trợ | Worker tối đa |
+ |---|---|---:|---:|---:|
+-| EC2_1, 16.176.181.251 | 30 TT: họ M1, T12, baseline BARO/SimpleRCA/TraceRCA và TORAI B | 448 | 2 | 2 |
++| EC2_1, 16.176.181.251 | 30 TT: họ M1, T12, baseline BARO/SimpleRCA/TraceRCA và TORAI B | 448 | 2 | 1 |
+ | EC2_2, 13.236.44.106 | 30 TT còn lại, cùng các vế trên | 450 | 0 | 1 |
+ | Laptop | 34 OB và TT CIRCA/MicroRank/TORAI A | 742 | 0 | 2 |
+ 
+@@ -34,7 +34,9 @@
+ 
+ Timeout và monitor giữ hợp đồng: method600giây, C-d3=60giây, một luồng số học, poll0,1giây, gap<5giây, không trần cộng dồn, không tựretry. Lỗi vận hành/nguồn/clock/mất quan sát giữ attempt, dừng và báo; chưa chạy không thành TIMEOUT. TORAI A một plan laptop, chỉ phát sau mọi non-A trong plan đó VERIFIED. Thiếu quyền/sai pin A preflight ghi BLOCKED đúng slot, không chạy; lỗi A chưa rõ giữ quy tắc dừng, ghi BLOCKED cho A chưa phát. A thiếu đủba seed thì chỉ khai thiếu. Toàn snapshot và A4 hợp lệ mới ghép nhãn/chấm; thiếu A không làm mất bảng chính đã đủ điều kiện.
+ 
+-Chạy chính dài hơn1giờ và cần Minh duyệt riêng. `cost-scenario.json` lặp thời gian DEV cho TT cho khoảng6,9giờ tuần tự mỗi EC2; giả sử hai worker chồng hoàn hảo thì EC2_1 khoảng3,45giờ. Đây chưa là ETA, chưa tính local/chuyển/nhận/chấm và giả định sai nếu ca test nặng hơn hoặc RAM/CPU gây chờ. Không hứa xong trong một đêm. Agent theo dõi tới hoàn tất hoặc điểm chặn; không tạo lịch tự động hay tắt máy.
++Sau phản biện, ứng viên dùng một worker trên mỗi EC2. Không dùng số chồng rồi chia2 như thông lượng đã xác minh; H1 tranhCPU và H2 vế nặng còn chưa phân xử. `review-response.md` và WHY ghi lý do giữ method600giây/C-d360giây là ngân sách ứng viên, không bảo đảm mọi ca hoàn tất. Mã/slot/config/seed/source/window/env không đổi theo `metadata-revision-check.json`; job chỉ đổi pin protocol và phụ thuộc. Hai EC2 đã kiểm metadata/môi trường mới, xem `ec2_*-after-review-environment.json`.
++
++Chạy chính dài hơn1giờ, chờ Minh duyệt riêng. `cost-scenario.json` hiện gồm local, chuyển/nhận/hash/verify/chấm. Proxy tuần tự: EC2_1=6,90giờ, EC2_2=6,95giờ, local=6,08giờ. Hai kịch bản toàn chuỗi9,12/18,34giờ có giả định về cost/network/I/O/output, không là ETA hoặc cận trên đã kiểm. Chấm fullcohort chưa được đo; proxy dựa vào timeout120giây của report fixture thành công28slot, ngoại suy1640/28, nên giữ OPEN về tính tuyến tính/bootstrap/audit lỗi. Lượt chậm hoặc phải chờ RAM/người có thể vượt kịch bản. Không tự đặt trần tổng, retry hoặc tắt máy.
+ 
+ ## D1–D4/R3 và câu hỏi còn mở
+ 
+@@ -46,4 +48,7 @@
+ 
+ ## Bước tiếp
+ 
+-Claude cần kiểm trên code/diff và output đã ghim; bản cài013 này chưa được Claude kiểm. Phần kế hoạch hai bên đã thống nhất gồm một plan A, A cuối/preflight và một lượt C-d3 từ seal thật; ngoại lệ C-e được Minh duyệt sau khi chạy. Đọc `de-nghi-duyet-main.md`, `../../runbook.md`, `wrappers-013.patch`, manifest và bằng chứng gốc. Chưa commit/push. Danh sách commit sẽ được kê riêng, loại raw/archives/private mapping, và chỉ thực hiện nếu Minh duyệt.
++Claude cần kiểm trên code/diff và output đã ghim; metadata sửa sau phản biện chưa được Claude kiểm. Phần kế hoạch hai bên đã thống nhất gồm một plan A, A cuối/preflight và một lượt C-d3 từ seal thật; ngoại lệ C-e được Minh duyệt sau khi chạy. Đọc `de-nghi-duyet-main.md`, `../../runbook.md`, `wrappers-013.patch`, manifest và bằng chứng gốc. Chưa commit/push. Danh sách commit sẽ được kê riêng, loại raw/archives/private mapping, và chỉ thực hiện nếu Minh duyệt.
++
++
++Bản Claude đã kiểm được giữ ở pre-review-001; manifest mới ghim metadata sau sửa. Năm wrapper và ba helper thực thi không đổi, nên các phép kiểm trên code được dùng lại; không nhận Claude đã kiểm bản metadata mới.
+--- reviewed/results/T-054/runs/chuan-bi-main-013/de-nghi-duyet-main.md
++++ results/T-054/runs/chuan-bi-main-013/de-nghi-duyet-main.md
+@@ -1,10 +1,10 @@
+ # Gói Minh duyệt để phát main 013
+ 
+-Trạng thái: đề nghị sau Claude kiểm, chưa có quyền chạy. Một câu “Duyệt chạy main013 theo hồ sơ đã kiểm” sẽ được Codex ghi nguyên văn thành nguồn quyết định, với đúng protocol/source-bundle/manifest của gói này. Nếu code hoặc gói đổi, không dùng lại câu duyệt cho bản khác.
++Trạng thái: đã đáp phản biện bản gốc, metadata sửa đang chờ Claude kiểm; chưa có quyền chạy. Một câu “Duyệt chạy main013 theo hồ sơ đã kiểm” sẽ được Codex ghi nguyên văn thành nguồn quyết định, với đúng protocol/source-bundle/manifest của gói này. Nếu code hoặc gói đổi, không dùng lại câu duyệt cho bản khác.
+ 
+ Câu duyệt đó cấp cùng lần nhưng ghi riêng từng quyền sau:
+ 
+-1. Khóa G3(a) cho đúng ứng viên013, cấu hình, ma trận1.640job+2vị trí C-e thiếu hỗ trợ, môi trường, phân lô30/30 và policy trong hồ sơ.
++1. Khóa G3(a) cho đúng ứng viên013, cấu hình, ma trận1.640job+2vị trí C-e thiếu hỗ trợ, môi trường, phân lô30/30, một worker trên mỗi EC2 và policy trong hồ sơ. Laptop tối đa hai worker theo RAM/nhóm, TORAI A sau non-A của laptop.
+ 2. Mở đúng60TT+34Nezha-OB test, giữ cửa sổ, U/alias, seed/world/mẫu số; không gồm RE3.
+ 3. Codex làm người quản lý nguồn và evaluator: dùng các bản đồ nguồn/nhãn độc lập hiện có theo ref `source-bundle.json`; kiểm byte nguồn, tạo TT locator mờ bằng hardlink trong `data/locked/rcaeval-re2tt-60/<test-id>/`, ghép nhãn chỉ sau verify snapshot. Không sửa nguồn thô.
+ 4. Chuyển đúng nguồn TT vào `/home/ubuntu/rca-p7/T-054/checkpoint013/data-root/` của từng EC2 theo bảng90tệp/30ca mỗi máy; metadata đủ60ca vẫn giữ toàn cohort. Chỉ code/metadata, grant và đúng phân lô được chuyển, không bản đồ thật/nhãn.
+@@ -17,3 +17,6 @@
+ Codex sẽ tự ghi nguồn lời duyệt và grant thật, kiểm lại hash/tài nguyên/identity, kích hoạt metadata, kiểm nguồn/chuyển và phát CLI; Minh không phải tự sửa JSON hoặc gõ lệnh. `grant-template.json` hiện có tất cả cờ quyền=false. Một bước bị chặn thì dừng đúng phần phụ thuộc và báo, không tự đổi gói để ép chạy.
+ 
+ Commit/push cần Minh duyệt riêng theo danh sách file. Nó không là điều kiện tự tạo thêm trước main: provenance thực chạy được khóa bằng manifest và code/env pins theo SPEC. Có thể Minh duyệt commit kèm câu duyệt cuối nếu muốn; khi chưa có thì giữ working tree và không commit. Không dùng quyền main để hợp thức hóa quyền lịch sử006.
++
++
++Khi duyệt lượt dài: kịch bản toàn chuỗi trong cost-scenario.json khoảng9,1/18,3giờ dưới các giả định đã khai; không phải ETA/cận trên, chấm fullcohort chưa đo. Bản Minh xét phải là manifest sau đáp review, không pin gói trước sửa. Chỉ định quản lý nguồn/evaluator và các quyền ở trên chỉ có hiệu lực từ lời duyệt cuối đúng gói.
+--- reviewed/results/T-054/runs/chuan-bi-main-013/prepare_candidate.py
++++ results/T-054/runs/chuan-bi-main-013/prepare_candidate.py
+@@ -120,7 +120,7 @@
+     old_jobs = [job for host in parts for job in old('prepared/' + host + '-plan.json')['jobs']]
+     old_support = [row for host in parts for row in old('prepared/' + host + '-plan.json')['ce_support']]
+     tt_ids = sorted(runtimes['RE2-TT']['cases'])
+-    # Two identical EC2 types, one bounded single-worker and one two-worker cover.
++    # Two identical EC2 types; final candidate uses one worker on each after review.
+     owners = {oid: 'ec2_1' if i < 30 else 'ec2_2' for i, oid in enumerate(tt_ids)}
+     for job in old_jobs:
+         s = job['slot']
+@@ -150,7 +150,7 @@
+             hc['resources']['expected_peak_bytes'] = local_peaks
+         else:
+             hc.pop('auxiliary_A_policy', None)
+-            hc.update(code_root=remote + '/work', data_root=remote + '/data-root', workers=2 if host == 'ec2_1' else 1,
++            hc.update(code_root=remote + '/work', data_root=remote + '/data-root', workers=1,
+                       executable=remote + '/envs/main/bin/python', prep_executable=remote + '/envs/main/bin/python',
+                       method_executable=remote + '/envs/py38/bin/python', pythonpath=[remote + '/work/upstream/rcaeval'])
+             for group, peak in cloud['hosts'][mapping[host]].get('peaks', {}).items():
+--- reviewed/docs/DECISIONS.md
++++ docs/DECISIONS.md
+@@ -468,3 +468,8 @@
+ ## T-054 — ngoại lệ số học C-e đúng ca dev, 07/11/2026
+ 
+ Minh trả lời “Duyệt ngoại lệ cho đúng phép C-e này”. Phạm vi là M1 C-e RE2-TT dev-a5cabe5fa7 trên EC2 mới đối chiếu tham chiếu đã ghim. Đầu vào chuẩn hóa và mọi trường rời rạc khớp; 30 trường float khác tối đa1ULP, sai khác tuyệt đối tối đa2,7755575615628914e-17. Giữ nguyên byte kết quả. Duyệt ngoại lệ đúng phép đã đo để trình gói013 cho Claude kiểm. Không tạo dung sai chung hoặc suy sang sai khác mới. Nguồn audit và quyết định ở runs/chuan-bi-main-013/numeric-parity-Ce-{audit,decision}.json.
++
++
++## T-054 — quyền ghi có điều kiện khi đáp phản biện013, 07/11/2026
++
++Minh: “dưới đây là đánh giá và phản biện của claude, bạn hãy soát kĩ, nếu không có mâu thuẫn nào với claude hoặc phản đối nào thì cho phép ghi luôn rồi trình bước tiếp theo, nếu có mâu thuẫn thì soạn trình claude phản biện”. Codex tự soát trước, kiểm bằng chứng và nhận hai finding chính. Phạm vi ghi là đáp phản biện, bổ sung kịch bản chi phí và sửa ứng viên theo F1(a), ghim lại metadata/gói và hồ sơ phụ thuộc trong phạm vi chuẩn bị013; giữ bản cũ và kết quả thực nghiệm. Một worker trên mỗi EC2 là ứng viên trình duyệt cuối, chưa là Minh duyệt phát main. G3/test/nguồn/chuyển/main/chấm, chỉ định người quản lý nguồn/evaluator và commit/push vẫn theo lời duyệt cuối cụ thể.
+--- reviewed/docs/STATE.md
++++ docs/STATE.md
+@@ -18,7 +18,7 @@
+ 
+ ## Việc kế tiếp và chờ Minh
+ 
+-- **T-054 — chuẩn bị013 xong phía người làm, chờ Claude kiểm.** Codex làm, Claude phản biện. D1–D4/R3 và ngoại lệ đúng phép C-e đã duyệt; mỗi EC2101fixture, gói30TT/máy và laptopOB/CIRCA/MicroRank/A. Chưa G3/test/main/chấm/commit. [Hồ sơ](../results/T-054/runs/chuan-bi-main-013/bao-cao.md), [LOG](../tasks/T-054-khoa-g3-chay-p7-a/LOG.md).
++- **T-054 — đã đáp review013, chờ Claude kiểm metadata sửa.** Codex làm, Claude phản biện. Nhận F1(a)/F2: ứng viên một worker/EC2, bổ sung dự toán toàn chuỗi; code/ma trận giữ nguyên. Bản gốc và mọi lượt giữ lại; chưa G3/test/main/chấm/commit. [Phản hồi](../results/T-054/runs/chuan-bi-main-013/review-response.md), [LOG](../tasks/T-054-khoa-g3-chay-p7-a/LOG.md).
+ 
+ 
+ - **T-052 — T13 dev và hồ sơ G3(a): xong — Minh nghiệm thu 05/11/2026.** Phạm vi mô tả T13 dev, lát cắt F3 và đính chính 004. Minh duyệt trực tiếp, bỏ lượt kiểm lại bản 004. G3(a) còn bốn nhóm chặn và chờ SPEC P7. [Hồ sơ 004](../results/T-052/ho-so-g3-004.md), [LOG nghiệm thu và bàn giao](../tasks/T-052-t13-va-ho-so-g3/LOG.md#phiên-12--05112026--codex--windows--người-làm).
+--- reviewed/docs/WHY.md
++++ docs/WHY.md
+@@ -1211,3 +1211,10 @@
+ CANDIDATE để Minh xét cùng G3: hai EC2 mới cùng loại máy và đều đã có ổ30GiB; chia TT30/30 để dùng cả hai và giữ trọn nguồn từng ca, EC2_1 tối đa2worker, EC2_2 một worker như phép phủ môi trường đã kiểm. Không dùng lại lịch35/25+OB của011 khi máy cũ không truy cập được. Giữ OB, CIRCA, MicroRank và TORAI A trên tuyến Windows đã có bằng chứng và nguồn riêng; chuyển thêm sẽ cần dựng/parity/truyền mà chưa có bằng chứng giảm tổng thời gian. Laptop tối đa2worker theo pilot004, chỉ chạy đồng thời khi reservation và reserve cho phép. Đây là bố trí vận hành ứng viên, không là kết luận EC2 nào cũng nhanh hơn hoặc hai worker luôn tăng tốc. Kịch bản lặp thời gian DEV chỉ giúp trình chi phí dài hơn1giờ, không là ETA của cohort test.
+ 
+ Để ghim đúng byte thực chạy, giữ106pin code repo/helper và pin106file upstream/bản vá local cùng hai runtime; cloud dùng bản source lowercase rcaeval đúng byte upstream và4file causal-learn đã vá như tuyến gốc. Không đổi công thức hoặc tham số khoa học. Đường nhận vẫn verify snapshot trước nhãn; source-map thật và nhãn ở laptop, chỉ runtime/bản chiếu TT mờ đủcohort vào packet. R1 không sửa guard T052. Bằng chứng, các lần hỏng và giới hạn ở runs/chuan-bi-main-013/bao-cao.md. G3/test/nguồn A/chuyển/main/chấm và commit vẫn theo quyền riêng.
++
++
++## T-054 — đáp F1/F2 của Claude, ứng viên vận hành013 sửa sau review, 07/11/2026
++
++Minh cho phép ghi phần Codex kiểm độc lập đồng ý với phản biện; nguồn nguyên văn được lưu cùng gói. Nhận F1 về thiếu bằng chứng thông lượng/ảnh hưởng tranh tài nguyên và F2 về dự toán thiếu phần local+chuyển/nhận/chấm. Chọn để TRÌNH KHÓA phương án F1(a): cả hai EC2 một worker, laptop tối đa hai theo scheduler/RAM và A cùng nhóm chạy sau non-A. Đây là sửa ứng viên trước G3, không ghi thành quyền chạy. Không khẳng định H1 tranhCPU hay H2 vế vốn nặng đã được phân xử; cũng không khẳng định đổi worker giữ nguyên TIMEOUT hoặc tổng thời gian. Giữ nguồn dữ liệu/config/case/seed/mẫu số và method600giây/C-d360giây; thay tranh chấp tài nguyên có thể đổi trạng thái TIMEOUT nên phải chốt trước test. Bằng chứng DEV hiện có và fixture cho phép kiểm tuyến với một worker; không chạy lại phương pháp chỉ vì metadata đổi.
++
++600giây là ngân sách wall-clock ứng viên thực dụng, không là cận trên chi phí mọi ca. Giữ vì giao thức/pilot đã dùng và phân loại có bằng chứng pha/monitor; DEV đã đo không chứng minh test đều hoàn tất trong hạn. Đặt cùng một worker trên hai EC2 để giảm bất đối xứng đồng thời; không tăng timeout hoặc chọn theo kết quả test. Phần chi phí theo từng vế phải tách số đo chạy đơn/chạy chồng và proxy; không lấy số chồng rồi mặc định chia2 như tốc độ đã đo. F2 bổ sung kịch bản laptop, truyền/hash/nhận và chấm bằng số đo cũ đã kiểm hash; thiếu số đo whole-cohort giữ giả định/điều kiện sai, không gán ETA đã xác minh. Đường găng chỉ là kết quả có điều kiện của kịch bản.
+--- reviewed/results/T-054/ho-so-g3.md
++++ results/T-054/ho-so-g3.md
+@@ -1,6 +1,6 @@
+ # Hồ sơ G3(a) — ứng viên checkpoint013
+ 
+-Chuẩn bị013 đã làm theo Minh duyệt; chờ Claude kiểm bản cài và Minh duyệt chạy. Gói hiện hành là `runs/chuan-bi-main-013/`, thay các plan/helper ứng viên011 cho lần chạy sắp tới. Không dùng `protocol.json` ở gốc T054 hoặc helper006/011 để phát013. Các gói đó giữ làm lịch sử.
++Chuẩn bị013 đã làm theo Minh duyệt; đã đáp hai finding vận hành của Claude, chờ kiểm metadata sau sửa và Minh duyệt chạy. Gói hiện hành là `runs/chuan-bi-main-013/`, thay các plan/helper ứng viên011 cho lần chạy sắp tới. Không dùng `protocol.json` ở gốc T054 hoặc helper006/011 để phát013. Các gói đó giữ làm lịch sử.
+ 
+ [Báo cáo013](runs/chuan-bi-main-013/bao-cao.md) · [Nội dung duyệt cuối](runs/chuan-bi-main-013/de-nghi-duyet-main.md) · [Runbook](runbook.md) · [Manifest013](runs/chuan-bi-main-013/manifest.json).
+ 
+@@ -33,4 +33,7 @@
+ 5. Sau grant, báo theo dataset/ca/ô/world/support, giữ ERROR/TIMEOUT/UNSUPPORTED và lượt đầu đúng policy. Không có đối chứng đồ thị ngẫu nhiên thì không suy riêng lợi ích cấu trúc thật.
+ 6. B6 được khóa vào đúng byte code/gói/config/env/cohort và quyết định cuối. H1 RE3 chưa đóng, D2 cho trình main TT/Nezha riêng; RE3 cần nguồn/profile/quyền riêng cho bản cuối. RQ3c chỉ mô tả vùng vì thiếu nhãn; RQ3a/M1(b), LLM và áp dụng FlashTicket còn lại, không coi xong T054 là xong đề tài.
+ 
+-Claude đã góp ý và thống nhất phần kế hoạch trước triển khai, chưa kiểm các output013 mới. Đồng thuận không thay bằng chứng. Chưa commit/push, chưa mở test hoặc phát main.
++Claude đã kiểm bản013 trước sửa, không có finding CHẶN. Codex nhận F1(a)/F2; một worker mỗi EC2 và dự toán toàn chuỗi nằm trong metadata sau sửa, còn chờ Claude kiểm phần đổi này. Đồng thuận không thay bằng chứng. Chưa commit/push, chưa mở test hoặc phát main.
++
++
++[Phản hồi và kiểm sửa](runs/chuan-bi-main-013/review-response.md): bản trước sửa ở pre-review-001. Candidate hiện một worker/EC2, laptop tối đa hai. Không đổi code/slot/config/seed/source/window/env. Dự toán9,1/18,3giờ là kịch bản chưa kiểm; chấm toàn cohort chưa đo. Grant vẫnfalse, chưa mở test/main.
+--- reviewed/results/T-054/runbook.md
++++ results/T-054/runbook.md
+@@ -8,7 +8,7 @@
+ & D:/RCA-ext/envs/T-014-main/Scripts/python.exe -X utf8 -B results/T-054/runs/chuan-bi-main-013/verify_manifest.py
+ ```
+ 
+-Phân lô: EC2_1=16.176.181.251/key4,448job+2support,2worker; EC2_2=13.236.44.106/key3,450job,1worker; local742job,2worker tối đa. Mỗi EC230TT, toànOB/CIRCA/MicroRank/A ở laptop. Khóa SSH chỉ đọc từ `D:/RCA-ext/keys/`, không chép vào repo. Giữ strict host key/instance ID; không bật/tắt máy. Code=`checkpoint013/work`, data=`checkpoint013/data-root`, output=`work/results/T-054/runs/main-013/queue`. Python main trên EC2 phụ thuộc interpreter ở012: giữ012.
++Phân lô: EC2_1=16.176.181.251/key4,448job+2support,1worker; EC2_2=13.236.44.106/key3,450job,1worker; local742job,2worker tối đa. Mỗi EC230TT, toànOB/CIRCA/MicroRank/A ở laptop. Khóa SSH chỉ đọc từ `D:/RCA-ext/keys/`, không chép vào repo. Giữ strict host key/instance ID; không bật/tắt máy. Code=`checkpoint013/work`, data=`checkpoint013/data-root`, output=`work/results/T-054/runs/main-013/queue`. Python main trên EC2 phụ thuộc interpreter ở012: giữ012.
+ 
+ Sau Minh duyệt, Codex lưu nguyên văn lời duyệt ở `013/grants/minh-main.txt`, dựng grant thật `013/grants/main-grant.json` từ mẫu và ghi các quyền riêng theo đề nghị. Ghim protocol/source-bundle/manifest và nguồn quyết định; A giữ pin riêng. Nối DECISIONS/WHY/LOG và dòng STATE đúng quyền cuối; không sửa đầu ra chuẩn bị đã ghim. Minh không cần tự điền JSON. Dùng hash thật của file grant, không dùng chuỗi ví dụ dưới đây làm giá trị.
+ 
+@@ -33,3 +33,6 @@
+ Helper giữ archive và bản nhận, xác minh receipt/seal, union đủ từng slot rồi mới đọc nhãn evaluator. A4 còn thiếu/chặn thì chưa tạo bảng; thiếuA ngoài A4 được khai trong bảng thiếu, không bình quân seed sống. Báo cáo ở `results/T-054/reports/main-013/`, D4 trong a4.json#/OB_group_description. Nếu bước nhận/kiểm/chấm lỗi thì giữ output, chọn tên lượt mới khi được phép sửa; không ghi đè report.
+ 
+ D3: main giữ AC sleep0, DC giữ hiện hành; chỉ khôi phục AC2700giây sau nhận/kiểm/chấm thành công. receive_main làm và ghi receipt. Nếu bị chặn trước đó, giữ máy thức, báo Minh; không tự khôi phục giữa lượt cần laptop. Không tạo ScheduledTask hoặc tựresume sau reboot. RE3 không thuộc grant main TT/OB. Commit/push chỉ sau Minh duyệt riêng danh sách đã rà, không dùng packet cũ có mapping thật hoặc archive/raw data.
++
++
++Sau đáp review: xem review-response.md và manifest mới. Cả hai EC2 một worker, không dùng worker2 của bản trước sửa. WAIT_RESOURCE khi không có active có thể làm supervisor thoát; agent kiểm RAM/PID/token rồi resume cùng plan trong quyền main đã cấp, không tự đóng ứng dụng Minh hoặc retry slot hỏng. Dự toán toàn chuỗi có giả định; quyền cuối phải chỉ đúng bản metadata đã được kiểm lại.
+--- reviewed/tasks/T-054-khoa-g3-chay-p7-a/LOG.md
++++ tasks/T-054-khoa-g3-chay-p7-a/LOG.md
+@@ -2165,3 +2165,21 @@
+ Claude, phần chuẩn bị đã có đủ đầu ra để anh kiểm trực tiếp từ manifest, diff và các ref gốc. Xin giữ tách việc mã chạy đúng tuyến với việc test trả lời câu hỏi nghiên cứu; kết luận về bản cài013 phải dựa trên kiểm mới của anh. Minh chuyển thủ công khi muốn.
+ 
+ Lệnh cuối phần triển khai: python stage_helper_finish.py, cả hai EC2 báo final helper environment PASS. Lệnh kiểm đóng gói tiếp theo, chỉ đọc: D:/RCA-ext/envs/T-014-main/Scripts/python.exe -X utf8 -B results/T-054/runs/chuan-bi-main-013/verify_manifest.py --documents. Đầu ra lần kiểm được báo trong chat; nếu lệch thì dừng phần phụ thuộc, không phát main. Đề xuất commit: T054: prepare main013 and record approved D1-D4/R3 and C-e exception; danh sách/diff trong commit-proposal.md và commit-files.json, chưa có quyền commit/push.
++
++
++## 07/11/2026 — Codex, Windows, người làm T-054 — tự soát trước đáp phản biện013
++
++Minh chuyển bản phản biện và cho phép ghi đúng phần thống nhất nếu Codex kiểm độc lập không còn phản đối; có bất đồng thì trình Claude. Trước khi mở nội dung bản phản biện mới, đã đọc lại AGENTS/STATE/SPEC, mục LOG cuối, nguồn MRP/DT18/cô, LESSONS/WHY/DECISIONS liên quan; chạy verify_manifest.py --documents đạt3177mục, không lệch và không đọc payload test. Đã lần lại main/activate/receive và đề nghị duyệt: quyền ở entry trước source I/O; phân biệt runtime/code/data/output, nguồn quyền, source refs, union/seal trước nhãn và A ngoài A4. Chưa xác nhận lỗi mới từ các phần đã soát; không suy toàn bộ đường thực thi main đã được kiểm bằng việc manifest đạt. Các nhánh chỉ có fixture, dữ kiện chưa được cấp và tính đầy đủ của bằng chứng vẫn phải xét khi kiểm từng nhận định. Không SSH hoặc phát lệnh thực nghiệm. Đây là ghi nhật ký theo SPEC, chưa áp dụng sửa nào theo reviewer. Manifest013 giữ nguyên; pin reviewed_documents của LOG mô tả thời điểm đóng013, LOG được nối ở lượt đáp này. Bước tiếp là đọc bản Claude và kiểm từng finding trên bằng chứng gốc.
++
++
++### Kết quả đáp Claude và sửa metadata013, 07/11/2026
++
++Đồng ý F1 về căn cứ worker/thông lượng/biên wall-clock; nhận F1(a) và F2. Đã tự kiểm7job cộng475,39giây trong239,93giây; không xác nhận tranhCPU hay vế vốn nặng, không khẳng định đổi worker giữ nguyên TIMEOUT/tổngthời gian. Ghi WHY trước áp dụng. Một worker/EC2 là CANDIDATE trình khóa, không ghi rằng Minh đã duyệt chạy. Nguồn quyền có điều kiện và bản Claude nguyên văn đã lưu; bản013 gốc giữ ở pre-review-001 cùng ánh xạ preservation.
++
++Đổi metadata: EC2_1 từ2→1worker;1640job+2support, case/config/seed/source/window/env không đổi.106pin mã thực thi giữ nguyên. Validator/union/phụ thuộc đạt; chỉ job.protocol_ref và main_dependency rehash. Hai EC2 đã stage/kiểm metadata+môi trường mới trong vùng013, không chuyển test. Vì code và tuyến một worker đã có bằng chứng, dùng lại fixture/DEV hợp lệ; không chạy lại method.
++
++F2 dùng cost pilot007/004, timingOB T052, cloud013 và storage011 sau kiểm hash. Proxy tuần tự cloud6,90/6,95giờ, local6,08giờ; toàn chuỗi9,12/18,34giờ dưới giả định. Phần chấm fullcohort chưa đo: proxy scale timeout120s của fixture report28slot thành công, không phải số đo full1640slot. Hrank/bootstrap/audit lỗi/network/RAM/đợi người có thể làm sai kịch bản; giữ OPEN và owner trong cost-scenario. Phép đọc cost đầu có lỗi chuẩn hóa prefix manifest012, đã giữ biên nhận và sửa trước sinh số; không có lượt method nào.
++
++Đã đổi SPEC, ho-so-g3/runbook, bao-cao/de-nghi, WHY/DECISIONS và đúng dòngSTATE theo nguồn hợp lệ; không đổi mã phương pháp/wrapper/helper thực thi, AGENTS/MRP/LESSONS hoặc data/private. Phản hồi ở review-response.md; grant mẫu vẫnfalse. Không còn phản đối cách xử lý hai finding; chưa nhận Claude đã kiểm metadata mới hoặc G3 đã đạt. Câu hỏi nguồn RQ3b/RQ3d chưa có điểm test; giới hạn OB/A/RE3 giữ nguyên. Chủ nguồn/evaluator và quyền dài/chuyển/chấm vẫn nằm trong đề nghị duyệt cuối; commit không tự thêm thành điều kiện trước main, chưa commit/push.
++
++Bước tiếp: Claude kiểm ngắn phần metadata/dự toán/nguồn quyền sau sửa rồi đề nghị dừng hoặc nêu bất đồng; Minh quyết. Nếu dừng và Minh duyệt đúng manifest mới theo de-nghi-duyet-main.md, Codex mới ghi nguồn lời duyệt/grant thật và chạy theo runbook. Prompt bàn giao trung tính ở runs/chuan-bi-main-013/prompt-claude-after-review.txt để Minh chuyển thủ công, không tự gửi. Lệnh triển khai cuối: stage_review.py, cả hai host PASS; lệnh kiểm kết thúc dự kiến: verify_manifest.py --documents và kiểm bảo toàn bản trước sửa. Đề xuất commit khi Minh duyệt: T054: address preparation013 review and align EC2 worker policy; chưa commit/push.
+--- reviewed/tasks/T-054-khoa-g3-chay-p7-a/SPEC.md
++++ tasks/T-054-khoa-g3-chay-p7-a/SPEC.md
+@@ -2,7 +2,7 @@
+ 
+ > **Điều chỉnh theo Minh ngày 05/11/2026:** bỏ ràng buộc giữ test/dẫn xuất P7 ở local của Q-42 và phương án local trước đây. Được lập phương án phân chia P7 giữa EC2 và laptop để tối ưu tổng thời gian. Chưa mở test, chưa duyệt G3 hoặc tự phát lô; cần hoàn thiện bố trí nhiều máy, môi trường/đối chiếu đúng phần khác và nguồn/đích truyền cụ thể trước chạy. Các bảng lịch local cũ bên dưới là phương án lịch sử, phải thay bằng lịch nhiều máy trước khóa. Hồ sơ checkpoint004 và driver còn ghi local-only không còn là đề xuất vận hành hiện hành; không dùng nguyên gói ấy để phát main.
+ 
+-- **Trạng thái hiện hành 07/11/2026:** chuẩn bị013 theo Minh duyệt đã có output, chờ Claude kiểm bản cài và Minh duyệt G3/test/nguồn/chuyển/main/chấm. D1–D4/R3 đã chốt; H1 RE3 OPEN theo D2. Không commit/push. Các lịch local/005/011 bên dưới giữ lịch sử; nguồn vận hành sắp trình khóa là hồ sơ/runbook và protocol-candidate013.
++- **Trạng thái hiện hành 07/11/2026:** chuẩn bị013 đã đáp review; bản gốc được Claude kiểm, metadata sửa chờ kiểm lại và Minh duyệt G3/test/nguồn/chuyển/main/chấm. D1–D4/R3 đã chốt; H1 RE3 OPEN theo D2. Không commit/push. Các lịch local/005/011 bên dưới giữ lịch sử; nguồn vận hành sắp trình khóa là hồ sơ/runbook và protocol-candidate013.
+ - **Người làm:** Codex.
+ - **Người phản biện:** Claude.
+ - **Thuộc gói MRP:** chuẩn bị kết thúc P6/G3(a), thực thi P7(a), chuẩn bị trình G4.
+@@ -118,7 +118,10 @@
+ 
+ **Bổ sung Minh duyệt 07/11/2026 — chuẩn bị013.** Duyệt sửa `results/T-054/scripts/{p7,nguon,dieu_phoi,cham,fixtures}.py`, ghi `results/T-054/runs/chuan-bi-main-013/`, cập nhật SPEC/LOG và đúng dòng STATE, nối DECISIONS/WHY cùng hồ sơ G3/runbook. Duyệt SSH/dựng môi trường/fixture và đúng pilot dev cần bổ sung trên 16.176.181.251 và 13.236.44.106, vùng `/home/ubuntu/rca-p7/T-054/checkpoint013/`. Tải thêm ≤2 GiB/máy, fixture/dev ≤60 phút/máy. R1 chỉ đổi metadata và công thức chuẩn bị trước grant dữ liệu. D1–D4/R3 theo DECISIONS cùng ngày. TORAI A giữ một plan laptop, quyền theo slot, phát sau toàn phần khác A VERIFIED; thiếu quyền/sai pin A ghi chặn đúng slot, lỗi A chưa rõ giữ lượt và dừng A. Đủ A4 và snapshot mới được chấm, thiếu A không bình quân seed sống. Nguồn quyền chuẩn bị không mở test/main/RE3 hoặc commit/push.
+ 
+-**Đầu ra chuẩn bị013, chờ phản biện bản cài:** `runs/chuan-bi-main-013/candidate-validation.json` kê EC2_1=448job+2support/2worker, EC2_2=450job/1worker, laptop=742job/2worker tối đa. Hai EC2 mới30TT/máy; laptopOB/CIRCA/MicroRank/A. `protocol-candidate.json`, source-bundle, contract và placement013 thay ứng viên011 cho lần xin khóa tiếp theo, vẫn CANDIDATE. Mỗi EC2101fixture mã cuối;15đối chiếuDEV mới với14khớp nghiêm ngặt và một C-e sai khác số học Minh đã duyệt đúng phép. D1/D2/D4 theo DECISIONS ngày07/11 và báo cáo013; H1 chưa có nguồn, không mở RE3. Mọi điều kiện nguồn/quyền main vẫn chờ quyết định cuối, kể cả nguồnA và truyền test. Không lấy mã003/005/011 để phát013.
++**Đầu ra chuẩn bị013, chờ phản biện bản cài:** `runs/chuan-bi-main-013/candidate-validation.json` kê EC2_1=448job+2support/1worker, EC2_2=450job/1worker, laptop=742job/2worker tối đa. Hai EC2 mới30TT/máy; laptopOB/CIRCA/MicroRank/A. `protocol-candidate.json`, source-bundle, contract và placement013 thay ứng viên011 cho lần xin khóa tiếp theo, vẫn CANDIDATE. Mỗi EC2101fixture mã cuối;15đối chiếuDEV mới với14khớp nghiêm ngặt và một C-e sai khác số học Minh đã duyệt đúng phép. D1/D2/D4 theo DECISIONS ngày07/11 và báo cáo013; H1 chưa có nguồn, không mở RE3. Mọi điều kiện nguồn/quyền main vẫn chờ quyết định cuối, kể cả nguồnA và truyền test. Không lấy mã003/005/011 để phát013.
++
++**Đáp review013 theo quyền ghi có điều kiện 07/11/2026:** nhận F1(a)/F2; ứng viên hiện một worker mỗi EC2, laptop tối đa hai theo RAM/nhóm và A sau non-A. Giữ mã thực thi và toàn bộ slot/config/seed/source/window/env, tái ghim protocol/plan/contract/packet/manifest và hồ sơ; không chạy lại method. Bản gốc Claude đã kiểm giữ ở pre-review-001; metadata sau sửa chờ Claude kiểm. Dự toán toàn chuỗi nằm trong cost-scenario, là kịch bản chưa kiểm, không khẳng định tổng thời gian không đổi hoặc mọi test xong trong600giây. G3/test/nguồn/chuyển/main/chấm/chỉ định quản lý nguồn/evaluator và commit chưa được cấp.
++
+ 
+ 
+ 

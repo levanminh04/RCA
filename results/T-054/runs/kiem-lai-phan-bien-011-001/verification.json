@@ -1,0 +1,110 @@
+{
+  "schema": "T054-REVIEW-011-RECHECK-1",
+  "date_local": "2026-11-07",
+  "cwd": "D:/RCA-flashticket",
+  "source_checkpoint_manifest": "results/T-054/manifest-hoan-thien-local-g3-011.json",
+  "scope": "N1: rerun 29 read-only fixture checks and four 011 policy boundaries. No locked data, scientific methods, worker launch or cloud.",
+  "attempts": [
+    {
+      "name": "01-environment-probe-missing-shared-search-path",
+      "command": "$ErrorActionPreference='Stop'; $env:PYTHONHASHSEED='0'; $env:OPENBLAS_NUM_THREADS='1'; $env:OMP_NUM_THREADS='1'; $env:MKL_NUM_THREADS='1'; $t054Python='D:/RCA-ext/envs/T-014-main/Scripts/python.exe'; @'\nimport ast\nimport hashlib\nimport importlib.metadata\nimport json\nimport os\nimport platform\nimport sys\nfrom pathlib import Path\n\nroot = Path.cwd()\nbase = root / \"results/T-054\"\nrun = base / \"runs/hoan-thien-local-g3-011\"\nscript_dir = base / \"scripts\"\nmanifest_path = base / \"manifest-hoan-thien-local-g3-011.json\"\nmanifest = json.loads(manifest_path.read_bytes())\n\ndef check_pin(path, pin):\n    data = path.read_bytes()\n    assert len(data) == pin[\"bytes\"], path\n    assert hashlib.sha256(data).hexdigest() == pin[\"sha256\"], path\n\nruntime_path = run / \"local-runtime-environments.json\"\npin_path = run / \"current-code-pins.json\"\npolicy_path = run / \"failure-policy-candidate.json\"\nfor path in (runtime_path, pin_path, policy_path):\n    check_pin(path, manifest[\"outputs\"][path.relative_to(root).as_posix()])\n\nexpected = json.loads(runtime_path.read_bytes())[\"main\"][\"snapshot\"]\nexe = Path(sys.executable).resolve()\nassert exe == Path(expected[\"executable\"][\"path\"]).resolve()\ncheck_pin(exe, expected[\"executable\"])\npackages = {name: importlib.metadata.version(name) for name in expected[\"packages\"]}\nthreads = {name: os.environ.get(name) for name in expected[\"threads\"]}\nassert sys.version == expected[\"python\"], sys.version\nassert packages == expected[\"packages\"], packages\nassert threads == expected[\"threads\"], threads\n\npins = json.loads(pin_path.read_bytes())[\"code_pins\"]\nchecked_modules = [\"fixtures.py\", \"bien_nhan.py\", \"nguon.py\", \"cham.py\", \"dieu_phoi.py\"]\nfor name in checked_modules:\n    path = script_dir / name\n    assert hashlib.sha256(path.read_bytes()).hexdigest() == pins[path.relative_to(root).as_posix()], path\n\nsys.path.insert(0, str(script_dir))\nsource = script_dir / \"fixtures.py\"\ntree = ast.parse(source.read_text(encoding=\"utf-8\"))\nmain = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == \"main\")\n# Keep the exact original checks before test_grant_separate; omit mkdir and worker launches.\nselected = [node for node in main.body if 22 <= node.lineno <= 83]\nassert ast.unparse(selected[0]) == \"checks = []\"\nassert \"test_g3_before_IO\" in ast.unparse(selected[-1])\nmain.body = ast.parse(\"target = Path(directory).resolve()\").body + selected + ast.parse(\"return checks\").body\nast.fix_missing_locations(tree)\nscope = {\"__name__\": \"read_only_fixture_slice\", \"__file__\": str(source)}\nexec(compile(tree, str(source), \"exec\"), scope)\nexisting = scope[\"main\"](root)\nassert len(existing) == 29\n\nfrom bien_nhan import fingerprint, timeout_classification\npolicy = json.loads(policy_path.read_bytes())[\"monitor\"]\nlimit = policy[\"max_monitor_gap_s\"]\nassert limit == 5\nslot = {\"dataset\": \"RE2-TT\", \"arm\": \"torai_B\"}\nphase = {\"token\": \"fixture-token\", \"phase\": \"method\", \"state\": \"start\", \"invocation_sha256\": \"fixture\"}\nboundary = []\nfor gap, expected_status in [(4.999, \"COMPLETE_UNVERIFIED\"), (5, \"BLOCKED\"), (5.001, \"BLOCKED\"), (None, \"BLOCKED\")]:\n    monitor = {\"token\": \"fixture-token\", \"max_monitor_gap_s\": gap, \"last_phase_sha256\": fingerprint(phase)}\n    actual = timeout_classification(slot, [phase], monitor, policy)[0]\n    assert actual == expected_status, (gap, expected_status, actual)\n    boundary.append({\"gap_s\": gap, \"expected\": expected_status, \"actual\": actual})\nprint(json.dumps({\n    \"PASS\": True,\n    \"scope\": \"synthetic in-memory checks; no test/RE3 data, worker process, method execution or cloud\",\n    \"runtime\": {\"exe\": str(exe), \"python\": sys.version, \"platform\": platform.platform(), \"packages\": packages, \"threads\": threads, \"sha256\": expected[\"executable\"][\"sha256\"]},\n    \"checked_code_sha256\": {name: pins[(script_dir / name).relative_to(root).as_posix()] for name in checked_modules},\n    \"policy_sha256\": manifest[\"outputs\"][policy_path.relative_to(root).as_posix()][\"sha256\"],\n    \"existing_fixture_checks\": existing,\n    \"monitor_boundary_checks\": boundary,\n    \"checks_passed\": len(existing) + len(boundary),\n}))\n'@ | & $t054Python -X utf8 -B -",
+      "exit_code": 1,
+      "output": "Traceback (most recent call last):\r\n  File \"C:\\Users\\84583\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\importlib\\metadata\\__init__.py\", line 397, in from_name\r\n    return next(cls.discover(name=name))\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nStopIteration\r\n\r\nDuring handling of the above exception, another exception occurred:\r\n\r\nTraceback (most recent call last):\r\n  File \"<stdin>\", line 32, in <module>\r\n  File \"C:\\Users\\84583\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\importlib\\metadata\\__init__.py\", line 889, in version\r\n    return distribution(distribution_name).version\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"C:\\Users\\84583\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\importlib\\metadata\\__init__.py\", line 862, in distribution\r\n    return Distribution.from_name(distribution_name)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"C:\\Users\\84583\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\importlib\\metadata\\__init__.py\", line 399, in from_name\r\n    raise PackageNotFoundError(name)\r\nimportlib.metadata.PackageNotFoundError: No package metadata was found for drain3\r\n"
+    },
+    {
+      "name": "02-configured-T-014-main",
+      "command": "$ErrorActionPreference='Stop'; $env:PYTHONHASHSEED='0'; $env:OPENBLAS_NUM_THREADS='1'; $env:OMP_NUM_THREADS='1'; $env:MKL_NUM_THREADS='1'; $t054Python='D:/RCA-ext/envs/T-014-main/Scripts/python.exe'; @'\nimport ast\nimport hashlib\nimport importlib.metadata\nimport json\nimport os\nimport platform\nimport sys\nfrom pathlib import Path\n\nroot = Path.cwd()\nbase = root / \"results/T-054\"\nrun = base / \"runs/hoan-thien-local-g3-011\"\nscript_dir = base / \"scripts\"\nmanifest_path = base / \"manifest-hoan-thien-local-g3-011.json\"\nmanifest = json.loads(manifest_path.read_bytes())\n\ndef check_pin(path, pin):\n    data = path.read_bytes()\n    assert len(data) == pin[\"bytes\"], path\n    assert hashlib.sha256(data).hexdigest() == pin[\"sha256\"], path\n\nruntime_path = run / \"local-runtime-environments.json\"\npin_path = run / \"current-code-pins.json\"\npolicy_path = run / \"failure-policy-candidate.json\"\nfor path in (runtime_path, pin_path, policy_path):\n    check_pin(path, manifest[\"outputs\"][path.relative_to(root).as_posix()])\n\ncapture_path = run / \"capture_runtime_environment.py\"\ncheck_pin(capture_path, manifest[\"outputs\"][capture_path.relative_to(root).as_posix()])\nsys.path[:0] = [str(script_dir), str(root / \"src\")]\nsys.path.extend([\n    \"D:/RCA-ext/src/RCAEval\",\n    \"D:/RCA-ext/src/baro\",\n    \"D:/RCA-ext/work/T-014/CIRCA\",\n    \"D:/RCA-ext/envs/T-016-cong-cu/Lib/site-packages\",\n])\nexpected = json.loads(runtime_path.read_bytes())[\"main\"][\"snapshot\"]\nexe = Path(sys.executable).resolve()\nassert exe == Path(expected[\"executable\"][\"path\"]).resolve()\ncheck_pin(exe, expected[\"executable\"])\npackages = {name: importlib.metadata.version(name) for name in expected[\"packages\"]}\nthreads = {name: os.environ.get(name) for name in expected[\"threads\"]}\nassert sys.version == expected[\"python\"], sys.version\nassert packages == expected[\"packages\"], packages\nassert threads == expected[\"threads\"], threads\n\npins = json.loads(pin_path.read_bytes())[\"code_pins\"]\nchecked_modules = [\"fixtures.py\", \"bien_nhan.py\", \"nguon.py\", \"cham.py\", \"dieu_phoi.py\"]\nfor name in checked_modules:\n    path = script_dir / name\n    assert hashlib.sha256(path.read_bytes()).hexdigest() == pins[path.relative_to(root).as_posix()], path\n\nsource = script_dir / \"fixtures.py\"\ntree = ast.parse(source.read_text(encoding=\"utf-8\"))\nmain = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == \"main\")\n# Keep the exact original checks before test_grant_separate; omit mkdir and worker launches.\nselected = [node for node in main.body if 22 <= node.lineno <= 83]\nassert ast.unparse(selected[0]) == \"checks = []\"\nassert \"test_g3_before_IO\" in ast.unparse(selected[-1])\nmain.body = ast.parse(\"target = Path(directory).resolve()\").body + selected + ast.parse(\"return checks\").body\nast.fix_missing_locations(tree)\nscope = {\"__name__\": \"read_only_fixture_slice\", \"__file__\": str(source)}\nexec(compile(tree, str(source), \"exec\"), scope)\nexisting = scope[\"main\"](root)\nassert len(existing) == 29\n\nfrom bien_nhan import fingerprint, timeout_classification\npolicy = json.loads(policy_path.read_bytes())[\"monitor\"]\nlimit = policy[\"max_monitor_gap_s\"]\nassert limit == 5\nslot = {\"dataset\": \"RE2-TT\", \"arm\": \"torai_B\"}\nphase = {\"token\": \"fixture-token\", \"phase\": \"method\", \"state\": \"start\", \"invocation_sha256\": \"fixture\"}\nboundary = []\nfor gap, expected_status in [(4.999, \"COMPLETE_UNVERIFIED\"), (5, \"BLOCKED\"), (5.001, \"BLOCKED\"), (None, \"BLOCKED\")]:\n    monitor = {\"token\": \"fixture-token\", \"max_monitor_gap_s\": gap, \"last_phase_sha256\": fingerprint(phase)}\n    actual = timeout_classification(slot, [phase], monitor, policy)[0]\n    assert actual == expected_status, (gap, expected_status, actual)\n    boundary.append({\"gap_s\": gap, \"expected\": expected_status, \"actual\": actual})\nprint(json.dumps({\n    \"PASS\": True,\n    \"scope\": \"synthetic in-memory checks; no test/RE3 data, worker process, method execution or cloud\",\n    \"runtime\": {\"exe\": str(exe), \"python\": sys.version, \"platform\": platform.platform(), \"packages\": packages, \"threads\": threads, \"sha256\": expected[\"executable\"][\"sha256\"]},\n    \"checked_code_sha256\": {name: pins[(script_dir / name).relative_to(root).as_posix()] for name in checked_modules},\n    \"policy_sha256\": manifest[\"outputs\"][policy_path.relative_to(root).as_posix()][\"sha256\"],\n    \"existing_fixture_checks\": existing,\n    \"monitor_boundary_checks\": boundary,\n    \"checks_passed\": len(existing) + len(boundary),\n}))\n'@ | & $t054Python -X utf8 -B -",
+      "exit_code": 0,
+      "output": "{\"PASS\": true, \"scope\": \"synthetic in-memory checks; no test/RE3 data, worker process, method execution or cloud\", \"runtime\": {\"exe\": \"D:\\\\RCA-ext\\\\envs\\\\T-014-main\\\\Scripts\\\\python.exe\", \"python\": \"3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]\", \"platform\": \"Windows-11-10.0.22631-SP0\", \"packages\": {\"numpy\": \"1.26.4\", \"pandas\": \"2.2.3\", \"pyarrow\": \"18.1.0\", \"scipy\": \"1.14.1\", \"scikit-learn\": \"1.6.0\", \"networkx\": \"2.8.8\", \"psutil\": \"6.1.1\", \"drain3\": \"0.9.11\", \"causal-learn\": \"0.1.3.8\"}, \"threads\": {\"PYTHONHASHSEED\": \"0\", \"OPENBLAS_NUM_THREADS\": \"1\", \"OMP_NUM_THREADS\": \"1\", \"MKL_NUM_THREADS\": \"1\"}, \"sha256\": \"0b471133e110cfb53a061cad528ce8e517d7b9ac41a0a396c39ad795a487fc14\"}, \"checked_code_sha256\": {\"fixtures.py\": \"b606e04a3ea7e0d4f07667dbb27108f46d191ec83cd02fe65dc03fbd32c9b8fa\", \"bien_nhan.py\": \"a8df520b9291304c69284ecf37c4e325d8b849416d654019f8c1e9f46ff334f6\", \"nguon.py\": \"bb2e70a589dae39b49474ed4a2256f831c956a8eb009f0564925052e95e208d5\", \"cham.py\": \"f23075b38b167dd1005787c5dbc175fc52168a5821682bc5895dc265ea48d77d\", \"dieu_phoi.py\": \"f28d6534817b6af66e1f1d3c87f85d7b34901dd702a91b3fcdfe58cf461af234\"}, \"policy_sha256\": \"eefbc2e6fd52bff010adb911ee6889ad334d51c5969b4da79d2114e1e0b73172\", \"existing_fixture_checks\": [\"source_independent_positive\", \"source_rehashed_swap_t\", \"source_rehashed_swap_ce_history\", \"source_rehashed_swap_member_sha256\", \"traversal_before_payload\", \"label_independent_positive\", \"label_rehash_poison_root\", \"label_rehash_poison_fault\", \"label_rehash_poison_cell\", \"label_dataset\", \"label_g1_revision\", \"label_alias_sha256\", \"root_outside_U_blocks\", \"envelope_positive\", \"invocation_rehash_wrong_source_sha256\", \"invocation_rehash_wrong_window\", \"invocation_rehash_wrong_seed\", \"invocation_rehash_wrong_config_sha256\", \"invocation_rehash_wrong_environment_sha256\", \"output_swap_before_assignment\", \"monitor_gap_blocks_None\", \"monitor_gap_blocks_1\", \"monitor_gap_blocks_1.1\", \"method_timeout_phase_positive\", \"self_declared_method_without_start_blocks\", \"prepare_timeout_blocks\", \"missing_policy_blocks\", \"dev_grant_before_IO\", \"test_g3_before_IO\"], \"monitor_boundary_checks\": [{\"gap_s\": 4.999, \"expected\": \"COMPLETE_UNVERIFIED\", \"actual\": \"COMPLETE_UNVERIFIED\"}, {\"gap_s\": 5, \"expected\": \"BLOCKED\", \"actual\": \"BLOCKED\"}, {\"gap_s\": 5.001, \"expected\": \"BLOCKED\", \"actual\": \"BLOCKED\"}, {\"gap_s\": null, \"expected\": \"BLOCKED\", \"actual\": \"BLOCKED\"}], \"checks_passed\": 33}\r\n"
+    }
+  ],
+  "result": {
+    "PASS": true,
+    "scope": "synthetic in-memory checks; no test/RE3 data, worker process, method execution or cloud",
+    "runtime": {
+      "exe": "D:\\RCA-ext\\envs\\T-014-main\\Scripts\\python.exe",
+      "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+      "platform": "Windows-11-10.0.22631-SP0",
+      "packages": {
+        "numpy": "1.26.4",
+        "pandas": "2.2.3",
+        "pyarrow": "18.1.0",
+        "scipy": "1.14.1",
+        "scikit-learn": "1.6.0",
+        "networkx": "2.8.8",
+        "psutil": "6.1.1",
+        "drain3": "0.9.11",
+        "causal-learn": "0.1.3.8"
+      },
+      "threads": {
+        "PYTHONHASHSEED": "0",
+        "OPENBLAS_NUM_THREADS": "1",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1"
+      },
+      "sha256": "0b471133e110cfb53a061cad528ce8e517d7b9ac41a0a396c39ad795a487fc14"
+    },
+    "checked_code_sha256": {
+      "fixtures.py": "b606e04a3ea7e0d4f07667dbb27108f46d191ec83cd02fe65dc03fbd32c9b8fa",
+      "bien_nhan.py": "a8df520b9291304c69284ecf37c4e325d8b849416d654019f8c1e9f46ff334f6",
+      "nguon.py": "bb2e70a589dae39b49474ed4a2256f831c956a8eb009f0564925052e95e208d5",
+      "cham.py": "f23075b38b167dd1005787c5dbc175fc52168a5821682bc5895dc265ea48d77d",
+      "dieu_phoi.py": "f28d6534817b6af66e1f1d3c87f85d7b34901dd702a91b3fcdfe58cf461af234"
+    },
+    "policy_sha256": "eefbc2e6fd52bff010adb911ee6889ad334d51c5969b4da79d2114e1e0b73172",
+    "existing_fixture_checks": [
+      "source_independent_positive",
+      "source_rehashed_swap_t",
+      "source_rehashed_swap_ce_history",
+      "source_rehashed_swap_member_sha256",
+      "traversal_before_payload",
+      "label_independent_positive",
+      "label_rehash_poison_root",
+      "label_rehash_poison_fault",
+      "label_rehash_poison_cell",
+      "label_dataset",
+      "label_g1_revision",
+      "label_alias_sha256",
+      "root_outside_U_blocks",
+      "envelope_positive",
+      "invocation_rehash_wrong_source_sha256",
+      "invocation_rehash_wrong_window",
+      "invocation_rehash_wrong_seed",
+      "invocation_rehash_wrong_config_sha256",
+      "invocation_rehash_wrong_environment_sha256",
+      "output_swap_before_assignment",
+      "monitor_gap_blocks_None",
+      "monitor_gap_blocks_1",
+      "monitor_gap_blocks_1.1",
+      "method_timeout_phase_positive",
+      "self_declared_method_without_start_blocks",
+      "prepare_timeout_blocks",
+      "missing_policy_blocks",
+      "dev_grant_before_IO",
+      "test_g3_before_IO"
+    ],
+    "monitor_boundary_checks": [
+      {
+        "gap_s": 4.999,
+        "expected": "COMPLETE_UNVERIFIED",
+        "actual": "COMPLETE_UNVERIFIED"
+      },
+      {
+        "gap_s": 5,
+        "expected": "BLOCKED",
+        "actual": "BLOCKED"
+      },
+      {
+        "gap_s": 5.001,
+        "expected": "BLOCKED",
+        "actual": "BLOCKED"
+      },
+      {
+        "gap_s": null,
+        "expected": "BLOCKED",
+        "actual": "BLOCKED"
+      }
+    ],
+    "checks_passed": 33
+  }
+}

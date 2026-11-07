@@ -1,0 +1,22 @@
+--- D:\RCA-flashticket\results\T-054\runs\freeze-cong-cu-004\code\results\T-054\scripts\worker.py
++++ D:\RCA-flashticket\results\T-054\scripts\worker.py
+@@ -124,7 +124,9 @@
+                 if slot['source_sha256'] != fingerprint({'seal': job['main_seal']['sha256'], 'key': job['main_key']}):
+                     raise Blocked('C-d3 khác main seal/key đã khai')
+                 source_record = main_records_from_seal(job['main_seal'], job['main_key'])
+-            data = source_record['extra']['dau_vao_cd3']
++            data = dict(source_record['extra']['dau_vao_cd3'])
++            if 'canh' not in data:
++                data['canh'] = source_record['extra']['canh']
+             no_labels(data)
+             scores = {e: Fraction(*pair) for e, pair in data['diem'].items()}
+             invocation, raw = call(data, lambda: doi_chung.cd3(data['canh'], scores, data['dich']),
+@@ -249,6 +251,8 @@
+                         'tracerca': lambda: [tracerca.chay(win['traces'], job['t'])],
+                         'circa': lambda: circa.chay(win['metric'], win['traces'], job['t'], 'ols')}
+                     invocation, raws = call([win, job['t']], functions[arm])
++                    if arm == 'circa':
++                        window['circa_current'] = raws[0].get('diagnostics', {}).get('circa_current')
+                     records = package(job, raws, window)
+             else:
+                 raise Blocked('worker kind chưa hỗ trợ')

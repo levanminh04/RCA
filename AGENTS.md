@@ -65,6 +65,12 @@ Không có cơ chế nào trong công cụ cưỡng chế Luật 0. Minh đã qu
 17. **Phân biệt nguồn hạn chế.** Tách dữ liệu/thiếu đầu vào, giao thức, adapter/cài đặt và giả định/cách tính của phương pháp. Quy nguyên nhân phải có chuỗi bằng chứng và xét giải thích khác; không cộng cờ chồng lấn thành tỷ lệ nguyên nhân. Hạn chế dữ liệu đã xác nhận phải nêu hệ quả cho đánh giá và yêu cầu quan sát FlashTicket có thể rút ra; không mặc nhiên coi collector sửa được dữ liệu chưa từng được ghi.
 18. **Đồ thị phải có vai trò tính toán rõ.** Khi đề xuất và kiểm phương pháp, nêu nút, cạnh, nơi đặt log/trace/metric và phép tính dùng cạnh. Thành phần xử lý hạn chế phải có căn cứ, phương án khác và điều kiện thất bại; thành phần đáp ứng DT18 hoặc nhu cầu kỹ thuật phải ghi đúng lý do ấy, không dựng một hạn chế để hợp thức hóa. Tách bằng chứng đủ để đề xuất ứng viên, chọn thiết kế trên dev và khẳng định lợi ích sau đánh giá. Đối chứng bỏ quan hệ và quy tắc đơn giản trên cùng đồ thị dùng khi đánh giá tác dụng của việc dùng quan hệ, không là điều kiện trì hoãn mọi phân tích P4.
 
+19. **Ưu tiên EC2 và tối ưu tổng thời gian hoàn tất** (Minh xác nhận 05/11/2026, tiếp Q-243). Trong môi trường nghiên cứu hiện tại, Minh xác nhận EC2 nhanh hơn laptop và tiền máy không là ràng buộc. Khi lập kế hoạch hoặc triển khai tính toán nặng/chạy dài, mặc định ưu tiên EC2; tận dụng các EC2 sẵn có và laptop chạy song song các lô độc lập khi giảm tổng thời gian, gồm chuẩn bị, chuyển dữ liệu, tính toán, nhận/kiểm và chấm. Laptop ưu tiên điều khiển, nhận/kiểm/chấm và phần phù hợp. Không mặc định dồn toàn bộ thực nghiệm lên laptop, không tự hạn chế test/dẫn xuất chỉ được ở local. Nếu giữ một phần ở laptop hoặc không dùng EC2, phải nêu lý do cụ thể và ảnh hưởng thời gian; không viện quy định local cũ đã bị Minh thay thế. Dùng lại số đo/kết quả hợp lệ; chỉ kiểm thêm phần môi trường hoặc tuyến chạy thực sự khác, không chạy lại baseline/pilot diện rộng chỉ để xác nhận chọn máy. Không suy EC2 nào cũng nhanh hơn ở mọi tải, hoặc tự hứa hệ số tăng tốc/ETA khi chưa có căn cứ. Quyền mở test/G3/RE3, quyền bật/tắt máy, bảo vệ khóa truy cập và giữ kết quả vẫn theo quyết định tương ứng; ưu tiên EC2 không tự mở dữ liệu chưa được cấp quyền.
+
+20. **Rà và tận dụng kết quả đã có trước khi chạy thêm.** Trước khi lập lịch hoặc phát thực nghiệm mới, phải rà kết quả, code, trung gian và checkpoint liên quan; kiểm toàn vẹn và điều kiện tương đương cần thiết. Đầu ra còn hợp lệ và đủ trả lời câu hỏi hiện tại thì phải dùng lại, không chạy lại. Chỉ bổ sung phần thiếu hoặc phần chịu ảnh hưởng của thay đổi. Đề xuất chạy lại phải nêu bằng chứng nào chưa đủ, vì sao kết quả cũ không dùng được và lượt mới phân xử điều gì. Không chạy lại chỉ vì đổi phiên, agent, cách đóng gói hoặc muốn có kết quả mới.
+
+21. **Lượt chạy dài phải tính trước chi phí khi gặp lỗi giữa chừng** (Minh duyệt 07/11/2026, sau sự cố T-054 main013). Trước khi trình phát một lượt dự kiến dài hơn 1 giờ, hồ sơ phải có mục "gặp lỗi mới ở 10%, 50%, 99% thì xử lý thế nào, chạy lại gì, mất bao lâu". Thiết kế mặc định phải đạt ba điều: (a) một lỗi phương pháp chưa phân loại chỉ chặn slot đó và slot phụ thuộc; lỗi nguồn/hạ tầng có thể dừng cả máy; (b) thêm quy tắc phân loại hoặc quyết định của Minh không buộc chạy lại slot đã xong, trừ khi có lý do ghi rõ; (c) ở pilot dev, quét trước các điều kiện suy biến đã biết của từng phương pháp (ví dụ dưới 2 mẫu nền, operation mới) trên dữ liệu được phép. Vẫn được chạy lại toàn bộ khi lỗi ảnh hưởng tính đúng (sai code tính toán, sai nguồn) hoặc khi chạy lại rẻ hơn sửa; khi đó trình Minh lý do và chi phí trước. Người phản biện kiểm mục này trước khi đề nghị duyệt lượt chạy.
+
 ## 4. Nguồn sự thật và tổ chức dữ liệu
 
 **Repo git này là nguồn sự thật duy nhất.** Mọi điều cần nhớ qua phiên, qua agent, qua thiết bị phải nằm trong repo:
@@ -98,7 +104,7 @@ Mẫu cho ba file của task nằm ở `tasks/_MAU/`.
 
 ## 5. Vòng đời một task
 
-Một task là một phần việc có đầu ra rõ, làm xong trong **một phiên**. Một gói lớn trong MRP (ví dụ P1) được chia thành nhiều task.
+Một task có phạm vi và đầu ra rõ ràng, ưu tiên hoàn thành trong một phiên khi hợp lý. Task dài được thực hiện qua nhiều phiên với các mốc và checkpoint đủ để tiếp nhận; không bắt buộc tách task chỉ vì vượt một phiên. Một gói lớn có thể chia theo đầu ra và phụ thuộc nghiên cứu.
 
 1. **Tạo task.**
    - Người làm chép `tasks/_MAU/SPEC.md` thành `tasks/T-xxx-<tên>/SPEC.md` và điền đủ các mục, gồm "Phạm vi ghi", "Người làm", "Người phản biện", "Tiêu chí xong".
@@ -134,9 +140,9 @@ Một task là một phần việc có đầu ra rõ, làm xong trong **một ph
 ### 5a. Task khó, phiên dài
 
 1. Thử cùng một chỗ 3 lần không được: dừng, ghi cái đã thử và kết quả vào nơi được phép ghi, đề xuất tách task hoặc đổi cách làm. Một điểm bất đồng lặp ba lần không có tiến triển thì trình nguyên bất đồng và bằng chứng cho Minh; không tạo thêm lý lẽ để làm mất bất đồng. Không đặt giới hạn ba lượt cho mọi cuộc phản biện.
-2. Thấy ngữ cảnh đã bị nén, hoặc tự thấy mình lặp việc: ghi checkpoint ngay trong phạm vi được phép, rồi đề nghị Minh mở phiên mới. Người làm ghi LOG; người phản biện ghi bản phản biện của mình; phiên chỉ đọc báo trong chat.
+2. Khi ngữ cảnh bị nén, kiểm tra và bổ sung checkpoint nếu cần. Được tiếp tục khi vẫn xác định rõ mục tiêu, quyền, trạng thái và bước tiếp theo. Chỉ đề nghị chuyển phiên khi mất thông tin quan trọng, bắt đầu lặp việc, gần hết usage hoặc có nguy cơ giảm chất lượng; không dừng chỉ vì đã nén. Người làm ghi LOG, người phản biện ghi bản phản biện của mình; phiên chỉ đọc báo trong chat.
 3. Câu hỏi cho Minh gom vào một lượt ở đầu phiên. Người làm ghi câu trả lời vào mục "Quyết định của Minh trong phiên" của LOG khi có quyền; người phản biện ghi trong bản phản biện của mình; phiên chỉ đọc nêu trong chat. Quyết định cần lưu chính thức được trình ghi DECISIONS theo Luật 0.
-4. Task dự kiến không xong trong một phiên: đề xuất tách ngay khi viết SPEC.
+4. Task dự kiến kéo dài: khai các mốc, phụ thuộc, checkpoint và cách tiếp nhận khi viết SPEC. Chỉ đề xuất tách khi giúp quản lý đầu ra hoặc phụ thuộc, không tách máy móc theo số phiên.
 
 ## 6. Bắt đầu một phiên
 
@@ -228,7 +234,7 @@ Mục LOG phải đủ để **một agent khác, trên một máy khác, không
 - Kết luận về đồ thị dựa trên một cấu hình hoặc một con số trung bình.
 - Một giả thuyết khớp "đẹp" với tài liệu mà chưa xem số từng ô.
 - Đang cài một phương pháp mà không có câu hỏi nào cần nó trả lời.
-- Đang sửa thiết kế sau khi đã nhìn kết quả test.
+- Đang sửa thiết kế sau khi dùng test mà không ghi rõ, hoặc báo kết quả sau sửa như một phép kiểm độc lập. Theo C-15 B/Q-247: giữ kết quả đầu của bản khóa; bản sửa có dùng test báo riêng, kiểm độc lập bằng dữ liệu phù hợp chưa dùng sau khóa. RE3-OB chỉ mở một lần cho bản cuối. Quyền mở dữ liệu vẫn theo luật cứng 1 và Minh duyệt riêng.
 - Đang đoán ý Minh.
 - Dùng một kết quả làm căn cứ mà chưa nêu các nguyên nhân khả thi khác có thể giải thích nó.
 - Dùng "chưa kiểm" như sự thật, hoặc coi task xong là câu hỏi nghiên cứu đã được trả lời.

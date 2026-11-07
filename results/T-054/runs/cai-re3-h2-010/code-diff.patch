@@ -1,0 +1,931 @@
+--- before/src/p3/re3.py
++++ src/p3/re3.py
+@@ -0,0 +1,216 @@
++"""RE3-OB input contract. Units/ownership are declared, never inferred from labels.
++
++This module grants no data access. The task worker validates the independent grant
++before calling read_case. prepare_tables is also usable with generated fixtures.
++"""
++import copy
++import hashlib
++from numbers import Integral
++from pathlib import Path
++
++import numpy as np
++import pandas as pd
++
++NS = 10**9
++FACTORS = {'s': NS, 'ms': 10**6, 'us': 1000, 'ns': 1}
++CHANNELS = {'cpu', 'mem', 'diskio', 'socket', 'workload', 'error', 'latency-50', 'latency-90'}
++KINDS = {'tài nguyên', 'lưu lượng', 'lỗi', 'độ trễ'}
++TRACE = {'time', 'traceID', 'spanID', 'serviceName', 'methodName', 'operationName',
++         'parentSpanID', 'startTimeMillis', 'startTime', 'duration', 'statusCode'}
++LOG = {'timestamp', 'container_name', 'message'}
++
++
++class ContractError(ValueError):
++    """Input/profile defect, never a method failure."""
++
++
++def _integer(x):
++    if isinstance(x, (bool, np.bool_)) or not isinstance(x, Integral):
++        raise ContractError('RE3 requires integer timestamps/resolution')
++    return int(x)
++
++
++def validate_profile(profile):
++    if not isinstance(profile, dict):
++        raise ContractError('RE3 profile missing')
++    required = {'schema', 'dataset', 'status', 'time_units', 'observation_r_ns', 'inventory',
++                'aliases', 'metric_channels', 'log_rule', 'evidence'}
++    if not required <= set(profile) or set(profile) - required - {'trace_status_kind'}:
++        raise ContractError('RE3 profile missing/unknown fields')
++    if (profile['schema'] != 'RE3-OB-PROFILE-1' or profile['dataset'] != 'RE3-OB'
++            or profile['status'] != 'DECLARED'):
++        raise ContractError('RE3 profile not declared for this dataset')
++    units = profile['time_units']
++    if not isinstance(units, dict) or set(units) != {'metric', 'log', 'span_start', 'span_duration'} or any(
++            x not in FACTORS for x in units.values()):
++        raise ContractError('RE3 unit must be explicitly s/ms/us/ns')
++    resolution = profile['observation_r_ns']
++    if not isinstance(resolution, dict) or set(resolution) != {'trace', 'log', 'metric'} or any(
++            _integer(x) <= 0 for x in resolution.values()):
++        raise ContractError('RE3 observation resolution missing/invalid')
++    inventory = profile['inventory']
++    if (not isinstance(inventory, list) or not inventory or any(not isinstance(x, str) or not x for x in inventory)
++            or len(inventory) != len(set(inventory))):
++        raise ContractError('RE3 inventory must be a unique explicit list')
++    aliases = profile['aliases']
++    if not isinstance(aliases, dict) or any(not isinstance(k, str) or not k or v not in inventory
++                                          or (k in inventory and k != v) for k, v in aliases.items()):
++        raise ContractError('RE3 alias target/chain/canonical collision')
++    channels = profile['metric_channels']
++    if not isinstance(channels, dict) or set(channels) != CHANNELS or any(x not in KINDS for x in channels.values()):
++        raise ContractError('RE3 needs all eight declared metric channels')
++    rule = profile['log_rule']
++    if (not isinstance(rule, dict) or set(rule) != {'kieu', 'tu_khoa'} or rule['kieu'] != 'tu_khoa'
++            or not isinstance(rule['tu_khoa'], list) or not rule['tu_khoa']
++            or any(not isinstance(x, str) or not x for x in rule['tu_khoa'])):
++        raise ContractError('RE3 explicit keyword log rule required; no inferred severity')
++    evidence = profile['evidence']
++    fields = {'time_units', 'observation_r_ns', 'inventory', 'aliases', 'metric_channels', 'log_rule'}
++    if not isinstance(evidence, dict) or not fields <= set(evidence) or any(
++            not isinstance(evidence[k], str) or not evidence[k].strip() for k in fields):
++        raise ContractError('RE3 profile lacks source declarations')
++    if profile.get('trace_status_kind') not in (None, 'binary_error'):
++        raise ContractError('RE3 status interpretation not supported')
++    return copy.deepcopy(profile)
++
++
++def to_ns(values, unit):
++    if unit not in FACTORS:
++        raise ContractError('undeclared time unit')
++    out = [_integer(x)*FACTORS[unit] for x in values]
++    if any(x < 0 or x > np.iinfo(np.int64).max for x in out):
++        raise ContractError('RE3 time outside supported int64 ns range')
++    return out
++
++
++def _exact(values, divisor):
++    if any(x % divisor for x in values):
++        raise ContractError('RE3 clock cannot be represented exactly in canonical unit')
++    return [x//divisor for x in values]
++
++
++def _owner(x, profile):
++    if not isinstance(x, str) or not x:
++        raise ContractError('missing RE3 owner')
++    canonical = profile['aliases'].get(x, x)
++    if canonical not in profile['inventory']:
++        raise ContractError('RE3 owner outside declared inventory')
++    return canonical
++
++
++def _bounds(values):
++    return [[min(values), max(values)]] if values else []
++
++
++def _schema(df, columns):
++    if set(df.columns) != columns or len(df.columns) != len(columns):
++        raise ContractError('RE3 missing/unknown/duplicate schema columns')
++
++
++def prepare_tables(metrics, traces, logs, t, profile):
++    """Canonical metric seconds, span us, log seconds plus exact log ns for M1.
++
++    Null metrics are not filled. Full-file observation bounds are retained separately
++    from the selected window, without exporting paths or case labels to methods.
++    """
++    p = validate_profile(profile)
++    t = _integer(t)
++    lo, hi = (t-300)*NS, (t+300)*NS
++    if t < 300:
++        raise ContractError('RE3 boundary outside supported epoch')
++    m, tr, lg = metrics.copy(deep=True), traces.copy(deep=True), logs.copy(deep=True)
++    _schema(tr, TRACE)
++    _schema(lg, LOG)
++    if 'time' not in m or not m.columns.is_unique:
++        raise ContractError('RE3 metric time/schema missing')
++    names = {}
++    owners = {}
++    for c in m.columns:
++        if c == 'time':
++            continue
++        if not isinstance(c, str) or '_' not in c or c.rsplit('_', 1)[1] not in CHANNELS:
++            raise ContractError('RE3 unknown metric suffix')
++        owner, suffix = c.rsplit('_', 1)
++        canonical = _owner(owner, p)
++        if canonical in owners and owners[canonical] != owner:
++            raise ContractError('RE3 metric alias collision')
++        owners[canonical] = owner
++        names[c] = canonical+'_'+suffix
++        if not pd.api.types.is_numeric_dtype(m[c].dtype) or pd.api.types.is_bool_dtype(m[c].dtype):
++            raise ContractError('RE3 metric values must be numeric')
++    mn = to_ns(m['time'], p['time_units']['metric'])
++    if len(mn) != len(set(mn)) or mn != sorted(mn):
++        raise ContractError('RE3 metric timestamps duplicate/out of order')
++    m['time'] = _exact(mn, NS)
++    m = m.rename(columns=names)
++    starts = to_ns(tr['startTime'], p['time_units']['span_start'])
++    durations = to_ns(tr['duration'], p['time_units']['span_duration'])
++    ends = [a+b for a, b in zip(starts, durations)]
++    if any(x > np.iinfo(np.int64).max for x in ends):
++        raise ContractError('RE3 span end overflow')
++    tr['startTime'], tr['duration'] = _exact(starts, 1000), _exact(durations, 1000)
++    for c in ('traceID', 'spanID'):
++        if any(not isinstance(x, str) or not x for x in tr[c]):
++            raise ContractError('RE3 trace/span ID must be a nonempty string')
++    if tr.duplicated(['traceID', 'spanID']).any():
++        raise ContractError('RE3 ambiguous duplicate trace/span ID')
++    tr['parentSpanID'] = tr['parentSpanID'].fillna('')
++    if any(not isinstance(x, str) for x in tr['parentSpanID']):
++        raise ContractError('RE3 parent ID must be string')
++    if any(not isinstance(x, str) or not x for x in tr['operationName']):
++        raise ContractError('RE3 operation name missing')
++    if any(not pd.isna(x) and not isinstance(x, str) for x in tr['methodName']):
++        raise ContractError('RE3 method name must be string/null')
++    if any(not pd.isna(x) and (isinstance(x, (bool, np.bool_)) or not isinstance(x, (Integral, float, np.floating))
++                               or not np.isfinite(x) or not float(x).is_integer()) for x in tr['statusCode']):
++        raise ContractError('RE3 statusCode must be integer/null; semantics remain declared separately')
++    tr['serviceName'] = [_owner(x, p) for x in tr['serviceName']]
++    ln = to_ns(lg['timestamp'], p['time_units']['log'])
++    lg['container_name'] = [_owner(x, p) for x in lg['container_name']]
++    # Baselines consume seconds; M1 consumes the exact int64 clock, not this float.
++    lg['timestamp'] = [x//NS if x % NS == 0 else x/NS for x in ln]
++    lg['_timestamp_ns'] = ln
++    lg['message'] = lg['message'].fillna('')
++    if any(not isinstance(x, str) for x in lg['message']):
++        raise ContractError('RE3 log message must be string/null')
++    selected = {
++        'metric': m.loc[[lo <= x < hi for x in mn]].reset_index(drop=True),
++        'traces': tr.loc[[a >= lo and b < hi for a, b in zip(starts, ends)]].reset_index(drop=True),
++        'logs': lg.loc[[lo <= x < hi for x in ln]].reset_index(drop=True)}
++    coverage = {k: {'khoang': _bounds(x), 'r_ns': int(p['observation_r_ns'][k])}
++                for k, x in [('metric', mn), ('trace', ends), ('log', ln)]}
++    mt = selected['metric']['time']
++    window = {'t': t, 'N': [t-300, t], 'A': [t, t+300],
++              'rows_N': int((mt < t).sum()), 'rows_A': int((mt >= t).sum()),
++              'spans_N': int((selected['traces']['startTime'] < t*10**6).sum()),
++              'spans_A': int((selected['traces']['startTime'] >= t*10**6).sum()),
++              'log_rows_N': int((selected['logs']['_timestamp_ns'] < t*NS).sum()),
++              'log_rows_A': int((selected['logs']['_timestamp_ns'] >= t*NS).sum())}
++    selected.update(window=window, coverage=coverage,
++                    diagnostics={'full_rows': {'metric': len(m), 'trace': len(tr), 'log': len(lg)},
++                                 'selected_rows': {k: len(v) for k, v in selected.items()},
++                                 'clock': {'metric': 's', 'trace': 'us', 'log_exact': 'ns'}})
++    return selected
++
++
++def read_case(files, t, profile, expected=None):
++    validate_profile(profile)  # before ANY telemetry I/O
++    if set(files) != {'metrics.parquet', 'traces.parquet', 'logs.parquet'}:
++        raise ContractError('RE3 requires exactly three signal files')
++    if expected is not None and set(expected) != set(files):
++        raise ContractError('RE3 file pins missing/extra')
++    # The py38 TORAI method process validates profiles but only reads CSV.
++    import pyarrow.parquet as pq
++    tables, provenance = {}, {}
++    for name in ('metrics.parquet', 'traces.parquet', 'logs.parquet'):
++        path = Path(files[name])
++        b = path.read_bytes()
++        provenance[name] = {'bytes': len(b), 'sha256': hashlib.sha256(b).hexdigest()}
++        if expected is not None and any(provenance[name][k] != expected[name].get(k) for k in ('bytes', 'sha256')):
++            raise ContractError('RE3 bytes read differ from independently granted file pin')
++        # Parse the exact bytes hashed above, avoiding a path re-open race.
++        import pyarrow as pa
++        tables[name] = pq.read_table(pa.BufferReader(b)).to_pandas()
++    result = prepare_tables(tables['metrics.parquet'], tables['traces.parquet'], tables['logs.parquet'], t, profile)
++    result['provenance'] = provenance
++    return result
+--- before/src/m1/adapter.py
++++ src/m1/adapter.py
+@@ -31,8 +31,13 @@
+ TU_KHOA_RE2 = ['ERROR', 'FAIL', 'EXCEPTION']  # src/simplerca/core.py:22
+ 
+ 
+-def ho_so_nguon(hop_dong, dataset):
++def ho_so_nguon(hop_dong, dataset, profile=None):
+     """CĐ5: hồ sơ nguồn điền từ hop-dong.json."""
++    if dataset == 'RE3-OB':
++        from p3.re3 import validate_profile
++        p = validate_profile(profile)
++        return {'kenh_metric': {'kieu': 'hau_to', 'bang': dict(p['metric_channels'])},
++                'quy_tac_log': dict(p['log_rule']), 'nguon_khoi_phat': ['trace', 'metric']}
+     k = hop_dong['kenh'][dataset]
+     if dataset == 'RE2-TT':
+         return {'kenh_metric': {'kieu': 'hau_to', 'bang': dict(k['metric_theo_hau_to'])},
+@@ -44,6 +49,34 @@
+                 'quy_tac_log': {'kieu': 'severity', 'loi': list(sev['loi']), 'khong_loi': list(sev['khong_loi'])},
+                 'nguon_khoi_phat': ['trace']}
+     raise ValueError(dataset)
++
++
++def ca_re3(payload, profile, opaque_id=None, chuoi_cam=None):
++    """Canonical RE3 tables from p3.re3; profile must already be pinned by runner.
++
++    Exact log ns are preserved for M1. No paths, profile evidence or case metadata
++    enter params_ca. This does not grant access or validate a held-out cohort.
++    """
++    from p3.re3 import validate_profile, ContractError
++    p = validate_profile(profile)
++    tr, mt, lg = payload['traces'], payload['metric'], payload['logs']
++    if any(c != 'time' and c.split('_', 1)[0] != c.rsplit('_', 1)[0] for c in mt.columns):
++        raise ContractError('M1 metric ownership delimiter cannot represent this RE3 owner')
++    spans = [{'traceID': a, 'spanID': b, 'parentSpanID': c, 'owner': d,
++              'operation': e, 'start_us': int(f), 'duration_us': int(g)}
++             for a, b, c, d, e, f, g in tr[COT_SPAN_RE2].itertuples(index=False, name=None)]
++    metrics, cols = _dong_metric(mt)
++    logs = [{'timestamp': int(x), 'entity': e, 'message': m}
++            for x, e, m in lg[['_timestamp_ns', 'container_name', 'message']].itertuples(index=False, name=None)]
++    params = {'ho_so_nguon': ho_so_nguon({}, 'RE3-OB', p),
++              'don_vi_thoi_gian': {'spans.start_us': 'us', 'metrics.time': 's', 'logs.timestamp': 'ns'},
++              'coverage': {k: {'khoang': [list(x) for x in v['khoang']], 'r_ns': v['r_ns']}
++                           for k, v in payload['coverage'].items()},
++              'nguon_metric': {c: 'metric' for c in cols},
++              'thoi_gian_nguon': {'metric': 'metrics.time'}, 'phan_hoach_NA_da_kiem': {}}
++    return {'opaque_id': opaque_id, 'case_dir': None, 'chuoi_cam': list(chuoi_cam or []),
++            'spans': spans, 'metrics': metrics, 'logs': logs, 'inventory': list(p['inventory']),
++            'aliases': {}, 'params_ca': params, 'chan_doan_adapter': dict(payload['diagnostics'])}
+ 
+ 
+ def _r_ns(hop_dong, khoa):
+--- before/src/p3/adapters/baro.py
++++ src/p3/adapters/baro.py
+@@ -11,12 +11,12 @@
+     return doi_ten_latency(tien_xu_ly_main(metric_win))
+ 
+ 
+-def diem_lai(data, t):
++def diem_lai(data, t, dataset='re2-tt'):
+     """Tính lại max robust z bằng đúng các lời gọi của baro() (baro.py:22–50)."""
+     from RCAEval.io.time_series import preprocess
+     from sklearn.preprocessing import RobustScaler
+-    n = preprocess(data=data[data['time'] < t], dataset='re2-tt', dk_select_useful=False)
+-    a = preprocess(data=data[data['time'] >= t], dataset='re2-tt', dk_select_useful=False)
++    n = preprocess(data=data[data['time'] < t], dataset=dataset, dk_select_useful=False)
++    a = preprocess(data=data[data['time'] >= t], dataset=dataset, dk_select_useful=False)
+     cols = [x for x in n.columns if x in a.columns]
+     out = []
+     for c in cols:
+@@ -26,16 +26,16 @@
+     return out, cols
+ 
+ 
+-def chay(metric_win, t):
++def chay(metric_win, t, dataset='re2-tt'):
+     from RCAEval.e2e.baro import baro
+     data = chuan_bi(metric_win)
+     shape = {'metric_cols': int(metric_win.shape[1] - 1), 'metric_cols_after_preprocess': None}
+     try:
+-        out = baro(data, t, dataset='re2-tt', dk_select_useful=False)
++        out = baro(data, t, dataset=dataset, dk_select_useful=False)
+     except Exception as exc:  # noqa: BLE001 — lỗi của phương pháp
+         r = loi(exc); r['input_shape'] = shape
+         return r
+-    diem, cols = diem_lai(data, t)
++    diem, cols = diem_lai(data, t, dataset=dataset)
+     shape['metric_cols_after_preprocess'] = len(cols)
+     lai = [c for c, _ in sorted(diem, key=lambda x: x[1], reverse=True)]
+     if lai != out['ranks']:
+--- before/src/p3/adapters/circa.py
++++ src/p3/adapters/circa.py
+@@ -22,11 +22,11 @@
+ MO_HINH = ('svr', 'ols')
+ 
+ 
+-def chuan_bi(metric_win):
++def chuan_bi(metric_win, dataset='re2-tt'):
+     """Như T-014 run_examples.py:13–16, nhưng cắt trước (D1): tiền xử lý main.py, đổi tên, preprocess."""
+     from RCAEval.io.time_series import preprocess
+     raw = doi_ten_latency(tien_xu_ly_main(metric_win))
+-    clean = preprocess(raw.copy(), dataset='re2-tt')
++    clean = preprocess(raw.copy(), dataset=dataset)
+     clean['time'] = raw['time'].to_numpy()
+     return clean
+ 
+@@ -104,13 +104,13 @@
+     raise ValueError(mo_hinh)
+ 
+ 
+-def chay(metric_win, spans, t, mo_hinh):
++def chay(metric_win, spans, t, mo_hinh, dataset='re2-tt'):
+     """Trả danh sách hai kết quả: [RHT+DA, RHT-only] từ cùng một lượt."""
+     if mo_hinh not in MO_HINH:
+         raise LoiRunner(f'mô hình CIRCA lạ: {mo_hinh}')
+     shape = {'metric_cols': int(metric_win.shape[1] - 1), 'metric_cols_after_preprocess': None, 'spans': int(len(spans))}
+     try:
+-        clean = chuan_bi(metric_win)
++        clean = chuan_bi(metric_win, dataset=dataset)
+         shape['metric_cols_after_preprocess'] = int(clean.shape[1] - 1)
+         graph, grep = do_thi([c for c in clean.columns if c != 'time'], spans, t)
+         A = clean[clean['time'] >= t]
+--- before/src/p3/adapters/tracerca.py
++++ src/p3/adapters/tracerca.py
+@@ -13,7 +13,7 @@
+     return importlib.import_module('RCAEval.e2e.tracerca')  # RCAEval.e2e.__init__ che tên module bằng hàm
+ 
+ 
+-def _goi(mod, spans, t_us):
++def _goi(mod, spans, t_us, dataset='re2-tt'):
+     bat = {}
+     code = mod.tracerca.__code__
+ 
+@@ -23,18 +23,18 @@
+     old = sys.getprofile()
+     sys.setprofile(prof)
+     try:
+-        out = mod.tracerca(spans.copy(deep=True), t_us, dataset='re2-tt')
++        out = mod.tracerca(spans.copy(deep=True), t_us, dataset=dataset)
+     finally:
+         sys.setprofile(old)
+     return out, bat.get('ji')
+ 
+ 
+-def chay(spans, t):
++def chay(spans, t, dataset='re2-tt'):
+     shape = {'spans': int(len(spans)), 'operations': None}
+     obs = sorted(set(spans['serviceName'].dropna().astype(str)))
+     mod = _mod()
+     try:
+-        out, ji = _goi(mod, spans, int(t) * 1_000_000)
++        out, ji = _goi(mod, spans, int(t) * 1_000_000, dataset=dataset)
+     except Exception as exc:  # noqa: BLE001 — KeyError khi operation mới sau mốc
+         r = loi(exc); r['input_shape'] = shape; r['observed_entities'] = obs
+         return r
+--- before/src/p3/adapters/torai.py
++++ src/p3/adapters/torai.py
+@@ -15,9 +15,9 @@
+ N_DONG = 20  # main.py:381–393 với --length 10: 20 dòng mỗi phía
+ 
+ 
+-def chuan_bi_metric(metric_win):
++def chuan_bi_metric(metric_win, chi_ts=True):
+     from ..cua_so import doi_ten_latency, tien_xu_ly_main
+-    return doi_ten_latency(tien_xu_ly_main(metric_win, chi_ts=True))
++    return doi_ten_latency(tien_xu_ly_main(metric_win, chi_ts=chi_ts))
+ 
+ 
+ def cat_20(df, t):
+@@ -39,10 +39,10 @@
+     return chuan_bi_metric(metric_win), lt, te, tl, info
+ 
+ 
+-def chuan_bi_B(metric_win, spans, logs, t):
++def chuan_bi_B(metric_win, spans, logs, t, chi_ts=True):
+     from ..torai_b import nguon_b
+     lt, te, tl, info = nguon_b(spans, logs, t)
+-    return chuan_bi_metric(metric_win), lt.reset_index(), te.reset_index(), tl.reset_index(), info
++    return chuan_bi_metric(metric_win, chi_ts=chi_ts), lt.reset_index(), te.reset_index(), tl.reset_index(), info
+ 
+ 
+ def _khoi(loc, rcd_returns):
+--- before/results/T-054/scripts/nguon.py
++++ results/T-054/scripts/nguon.py
+@@ -140,6 +140,14 @@
+     no_labels(slot)
+     required = {'dataset', 'opaque_id', 'member_sha256', 'arm', 'view', 'seed', 'window',
+                 'source_sha256', 'config_sha256', 'environment_sha256'}
++    if slot.get('dataset') == 'RE3-OB':
++        if not required <= set(slot) or policy.get('mode') != 'heldout':
++            raise Blocked('RE3 requires a separate heldout plan')
++        protocol = read_pin(policy['protocol_ref'])
++        validate_re3_protocol(protocol)
++        if fingerprint(slot) not in {fingerprint(s) for s in protocol['slots']}:
++            raise Blocked('RE3 slot not registered in final protocol')
++        return
+     if not required <= set(slot) or slot['dataset'] not in ('RE2-TT', 'Nezha-OB', 'SYNTHETIC'):
+         raise Blocked('slot thiếu khóa hoặc dataset ngoài grant')
+     if slot['view'] == 'ce' and (slot['dataset'] != 'RE2-TT' or slot['arm'] != 'M1'):
+@@ -160,6 +168,8 @@
+ def authorize(plan, authority, action):
+     """Authority là hồ sơ của lời Minh, không phải cờ --granted từ worker."""
+     mode = plan['mode']
++    if mode == 'heldout':
++        return authorize_re3(plan, authority, action)
+     if mode == 'synthetic':
+         if action not in ('run', 'report'):
+             raise Blocked('hành động fixture lạ')
+@@ -205,6 +215,159 @@
+         raise Blocked('nguồn quyền khác pin')
+     if not plan.get('budget') or plan.get('open_before_run'):
+         raise Blocked('WAIT_POLICY_BUDGET')
++    from dieu_phoi import check_budget
++    check_budget(plan)
++
++
++def validate_re3_protocol(protocol):
++    """Metadata contract only; no implicit arms/seeds/U or reuse of A4."""
++    no_labels(protocol)
++    if (protocol.get('schema') != 'T054-RE3-PROTOCOL-1' or protocol.get('dataset') != 'RE3-OB'
++            or protocol.get('status') != 'LOCKED_FINAL_RE3' or protocol.get('final_version') is not True
++            or protocol.get('case_count') != 30 or protocol.get('cell_count') != 10):
++        raise Blocked('WAIT_RE3_FINAL_PROTOCOL')
++    members = protocol.get('members', [])
++    slots = protocol.get('slots', [])
++    arms = protocol.get('arms', {})
++    if (len(members) != 30 or len(set(members)) != 30 or not arms or not slots
++            or any(not isinstance(m, str) or len(m) != 64 for m in members)
++            or len({fingerprint(s) for s in slots}) != len(slots)):
++        raise Blocked('RE3 invalid registered members/arms/slots')
++    expected = set()
++    supported = {'M1', 'bo-E1', 'bo-E2', 'bo-E5', 'C-a0', 'C-a1', 'T12-on',
++                 'baro', 'simplerca', 'microrank', 'tracerca', 'circa', 'torai_B'}
++    for arm, seeds in arms.items():
++        if arm not in supported or not isinstance(seeds, list) or not seeds:
++            raise Blocked('RE3 source/arm not covered by this adapter contract')
++        if len({fingerprint(s) for s in seeds}) != len(seeds) or any(
++                s is not None and (type(s) is not int or s < 0) for s in seeds):
++            raise Blocked('RE3 duplicate/invalid registered seeds')
++        if arm == 'torai_B' and any(s is None for s in seeds):
++            raise Blocked('RE3 TORAI requires explicit seeds')
++        if arm != 'torai_B' and seeds != [None]:
++            raise Blocked('deterministic RE3 arm needs seed=None')
++        expected.update((m, arm, s) for m in members for s in seeds)
++    actual = set()
++    for s in slots:
++        required = {'dataset', 'opaque_id', 'member_sha256', 'arm', 'view', 'seed', 'window',
++                    'source_sha256', 'config_sha256', 'environment_sha256'}
++        if (not required <= set(s) or (s.get('seed') is not None and type(s.get('seed')) is not int)
++                or s.get('dataset') != 'RE3-OB' or s.get('view') != 'main' or s.get('arm') not in arms
++                or s.get('seed') not in arms[s['arm']] or s.get('member_sha256') not in members):
++            raise Blocked('RE3 slot outside registered matrix')
++        actual.add((s['member_sha256'], s['arm'], s['seed']))
++    if actual != expected or len(actual) != len(slots):
++        raise Blocked('RE3 matrix missing/duplicate member/arm/seed')
++    partitions = protocol.get('partitions', {})
++    if not isinstance(partitions, dict) or not partitions or 'aggregate' in partitions:
++        raise Blocked('RE3 execution partitions not declared')
++    assigned = []
++    for host, keys in partitions.items():
++        if not isinstance(host, str) or not host or not isinstance(keys, list) or not keys:
++            raise Blocked('RE3 invalid host partition')
++        assigned.extend(keys)
++    if len(assigned) != len(set(assigned)) or set(assigned) != {fingerprint(s) for s in slots}:
++        raise Blocked('RE3 partitions overlap or do not cover registered slots')
++    return protocol
++
++
++def validate_re3_job(job):
++    """Independent RE3 grant/profile/bindings, before source_row or reader I/O."""
++    if job.get('evaluation_mode') != 'heldout' or job['slot'].get('dataset') != 'RE3-OB':
++        raise Blocked('RE3 cannot borrow dev/test grant')
++    protocol = validate_re3_protocol(read_pin(job['protocol_ref']))
++    grant = read_pin(job['re3_grant_ref'])
++    if grant.get('re3_grant') is not True or grant.get('g3') is not True or not grant.get('source'):
++        raise Blocked('WAIT_RE3_GRANT')
++    read_pin(grant['source'])
++    refs = {'protocol': 'protocol_ref', 'profile': 're3_profile_ref', 'runtime': 'runtime_ref',
++            'independent_source': 'independent_source_ref', 'runtime_binding': 'runtime_binding_ref'}
++    for key, field in refs.items():
++        if grant.get(key+'_sha256') != job.get(field, {}).get('sha256'):
++            raise Blocked('RE3 grant not bound to '+key)
++    import sys
++    if str(ROOT/'src') not in sys.path:
++        sys.path.insert(0, str(ROOT/'src'))
++    from p3.re3 import validate_profile
++    profile = validate_profile(read_pin(job['re3_profile_ref']))
++    runtime = read_pin(job['runtime_ref'])
++    independent = read_pin(job['independent_source_ref'])
++    binding = read_pin(job['runtime_binding_ref'])
++    for key, field in refs.items():
++        if key == 'runtime_binding':
++            continue
++        if binding.get(key+'_sha256') != job[field]['sha256']:
++            raise Blocked('RE3 independent binding mismatch: '+key)
++    if (runtime.get('profile_sha256') != job['re3_profile_ref']['sha256']
++            or runtime.get('inventory') != profile['inventory'] or runtime.get('aliases') != profile['aliases']
++            or {r['member_sha256'] for r in runtime['cases'].values()} != set(protocol['members'])
++            or job.get('inventory') != profile['inventory']
++            or job.get('g1_revision') != protocol.get('g1_revision')):
++        raise Blocked('RE3 profile/cohort/G1 identity mismatch')
++    pins = compare_sources(runtime, independent, 'RE3-OB', job['g1_revision'])
++    slot = job['slot']
++    oid = slot['opaque_id']
++    if (fingerprint(slot) not in {fingerprint(s) for s in protocol['slots']}
++            or job['source'] != runtime['cases'][oid] or pins[oid] != slot['source_sha256']
++            or slot['member_sha256'] != job['source']['member_sha256']
++            or slot['window'] != {'t': job['source']['t'], 'half_width_s': 300}
++            or type(job.get('t')) is not int or job.get('t') != job['source']['t']):
++        raise Blocked('RE3 job/window/source differs from registered slot')
++    dispatch = protocol.get('dispatch', {})
++    host = next(h for h, keys in protocol['partitions'].items() if fingerprint(slot) in keys)
++    if dispatch.get('hosts'):
++        if job.get('re3_host') != host or host not in dispatch['hosts']:
++            raise Blocked('RE3 job host differs from registered partition')
++        dispatch = dispatch['hosts'][host]
++    elif len(protocol['partitions']) != 1:
++        raise Blocked('RE3 multiple hosts require per-host frozen dispatch')
++    family = slot['arm'] in {'M1', 'bo-E1', 'bo-E2', 'bo-E5', 'C-a0', 'C-a1', 'T12-on'}
++    expected_kinds = {'m1'} if family else {'torai_pipeline', 'torai_prep', 'torai_run'} if slot['arm'] == 'torai_B' else {'baseline'}
++    if job['kind'] not in expected_kinds:
++        raise Blocked('RE3 worker kind differs from registered arm')
++    if (not dispatch.get('code_pins') or job.get('code_pins') != dispatch['code_pins']
++            or fingerprint(job.get('config')) != slot['config_sha256']
++            or job['config'] != dispatch.get('configurations', {}).get(slot['arm'])):
++        raise Blocked('RE3 code/config differs from final protocol')
++    for field in ('data_root', 'pythonpath', 'executable', 'prep_executable', 'method_executable'):
++        if field in dispatch and job.get(field) != dispatch[field]:
++            raise Blocked('RE3 dispatch differs: '+field)
++    env = 'py38' if job['kind'] in ('torai_run', 'torai_pipeline') else 'main'
++    if slot['environment_sha256'] != dispatch.get('environments', {}).get(
++            'py38' if slot['arm'] == 'torai_B' else env):
++        raise Blocked('RE3 environment differs from final protocol')
++    if slot['arm'] == 'torai_B' and job.get('prep_environment_sha256') != dispatch.get('environments', {}).get('main'):
++        raise Blocked('RE3 TORAI prep environment differs')
++    if job['kind'] == 'm1' and job.get('m1_contract') != dispatch.get('m1_contract_ref'):
++        raise Blocked('RE3 M1 contract differs from final protocol')
++    if slot['arm'] == 'T12-on' and (not job.get('static_snapshot') or job['static_snapshot'] != dispatch.get('static_snapshot')):
++        raise Blocked('RE3 static snapshot not bound to final protocol')
++    if not dispatch.get('failure_policy_ref') or job.get('failure_policy_ref') != dispatch['failure_policy_ref']:
++        raise Blocked('RE3 failure policy not bound to final protocol')
++    failure = read_pin(job['failure_policy_ref'])
++    if failure.get('scope') != 'LOCKED_RE3' or failure.get('dataset') != 'RE3-OB':
++        raise Blocked('RE3 cannot reuse P7 failure policy implicitly')
++    return profile
++
++
++def authorize_re3(plan, authority, action):
++    if action not in ('run', 'report') or authority.get('re3_grant') is not True:
++        raise Blocked('WAIT_RE3_GRANT')
++    protocol = validate_re3_protocol(read_pin(plan['protocol_ref']))
++    grant = read_pin(plan['re3_grant_ref'])
++    if grant != authority or plan.get('open_before_run') or not plan.get('budget'):
++        raise Blocked('RE3 authority/policy/budget missing')
++    wanted = {fingerprint(s) for s in protocol['slots']}
++    if plan.get('host_role') != 'aggregate':
++        wanted = set(protocol.get('partitions', {}).get(plan.get('host_role'), []))
++        if not wanted or not wanted <= {fingerprint(s) for s in protocol['slots']}:
++            raise Blocked('RE3 host not registered')
++    if {fingerprint(j['slot']) for j in plan['jobs']} != wanted or len(plan['jobs']) != len(wanted):
++        raise Blocked('RE3 missing/extra/duplicate jobs')
++    for job in plan['jobs']:
++        if job.get('re3_grant_ref') != plan['re3_grant_ref'] or job.get('protocol_ref') != plan['protocol_ref']:
++            raise Blocked('RE3 job/plan authority differs')
++        validate_re3_job(job)
+     from dieu_phoi import check_budget
+     check_budget(plan)
+ 
+@@ -315,6 +478,9 @@
+ 
+ 
+ def validate_execution_links(job, invocation):
++    if job['slot']['dataset'] == 'RE3-OB':
++        if invocation.get('re3_profile_ref') != job.get('re3_profile_ref'):
++            raise Blocked('RE3 invocation profile differs from declared job')
+     if job.get('main_dependency'):
+         if invocation.get('dependency_sha256') != fingerprint(job['main_dependency']):
+             raise Blocked('invocation đổi dependency đã đăng ký')
+@@ -323,6 +489,8 @@
+             raise Blocked('C-d3 sai lookup trong invocation')
+     if job['kind'] == 'torai_pipeline' or job.get('pipeline_fixture'):
+         prep = read_pin(invocation['prepared_ref'])
++        if job['slot']['dataset'] == 'RE3-OB' and prep.get('re3_profile_ref') != job.get('re3_profile_ref'):
++            raise Blocked('RE3 TORAI prep profile differs from declared job')
+         if prep['token'] != invocation['token'] or prep['slot_sha256'] != fingerprint(job['slot']):
+             raise Blocked('TORAI method không cùng prep đã xử lý')
+         for pin in prep['tables'].values():
+--- before/results/T-054/scripts/worker.py
++++ results/T-054/scripts/worker.py
+@@ -20,8 +20,13 @@
+         if digest(ROOT / p) != sha:
+             raise Blocked('code khác pin thực chạy')
+     if job['kind'] != 'synthetic':
+-        if job.get('evaluation_mode') not in ('dev', 'test'):
++        if job.get('evaluation_mode') not in ('dev', 'test', 'heldout'):
+             raise Blocked('thiếu miền quyền dev/test trước I/O')
++        if job['slot']['dataset'] == 'RE3-OB':
++            from nguon import validate_re3_job
++            validate_re3_job(job)
++        elif job.get('evaluation_mode') == 'heldout':
++            raise Blocked('heldout domain requires RE3 dataset')
+         from lap_ho_so import stable_environment
+         actual = stable_environment()
+         expected_env = job.get('prep_environment_sha256') if job['kind'] == 'torai_prep' else job['slot']['environment_sha256']
+@@ -71,6 +76,9 @@
+         append(phase_file, dict(token=token, pid=os.getpid(), phase=name, state=state, **extra))
+ 
+     def call(args, fn, **bindings):
++        if slot['dataset'] == 'RE3-OB':
++            bindings['re3_profile_ref'] = job['re3_profile_ref']
++            re3_private_input_check(args, job)
+         invocation = dict(schema='T054-INVOKE-1', slot_sha256=fingerprint(slot), token=token,
+                           config_sha256=slot['config_sha256'], source_sha256=slot['source_sha256'],
+                           environment_sha256=slot['environment_sha256'], window=slot['window'],
+@@ -145,8 +153,9 @@
+             tables = {k: pd.read_csv(read_pin_path(v)) for k, v in prep['tables'].items()}
+             from p3.adapters import torai
+             args = [tables[k] for k in ('metric', 'logts', 'tracets_err', 'tracets_lat')]
+-            invocation, raw = call(args + [job['t'], slot['seed']],
+-                                   lambda: torai.chay(*args, job['t'], slot['seed']), prepared_ref=job['prepared'])
++            run_torai = (lambda: torai.chay(*args, job['t'], slot['seed'], dataset='torai-ob')) if slot['dataset'] == 'RE3-OB' else (
++                lambda: torai.chay(*args, job['t'], slot['seed']))
++            invocation, raw = call(args + [job['t'], slot['seed']], run_torai, prepared_ref=job['prepared'])
+             records = package(job, [raw], prep['window'])
+             for record in records:
+                 record['extra']['chuan_bi'] = prep.get('details')
+@@ -156,6 +165,10 @@
+             row = job['source']
+             if fingerprint(row) != slot['source_sha256']:
+                 raise Blocked('source row không cùng slot')
++            re3_profile = None
++            if slot['dataset'] == 'RE3-OB':
++                from p3 import re3
++                re3_profile = re3.validate_profile(read_pin(job['re3_profile_ref']))
+             files = source_row(row, job['data_root'])
+             if job.get('evaluation_mode') == 'test':
+                 import p7_entry_v2
+@@ -173,11 +186,17 @@
+                     with patch('m1.adapter.selector.chon_ca', return_value=files):
+                         data = adapter.ca_re2tt({slot['opaque_id']: row}, slot['opaque_id'], job['t'],
+                                                job['data_root'], contract, job['inventory'])
+-                else:
++                elif ds == 'RE3-OB':
++                    payload = re3.read_case(files, job['t'], re3_profile, expected=row['files'])
++                    data = adapter.ca_re3(payload, re3_profile, slot['opaque_id'],
++                                           [slot['opaque_id'], *files.values()])
++                elif ds == 'Nezha-OB':
+                     selection = ob_selection(job, files)
+                     with patch('m1.adapter.nezha.chon_ca', return_value=selection):
+                         data = adapter.ca_nezha({}, slot['opaque_id'], job['data_root'], contract,
+                                               inventory=job['inventory'], layout='source_native')
++                else:
++                    raise Blocked('M1 dataset has no declared adapter')
+                 config = job['config']
+                 if fingerprint(config) != slot['config_sha256']:
+                     raise Blocked('config không cùng slot')
+@@ -189,6 +208,8 @@
+                                           'canh': [[e['source'], e['target']] for e in graph['edges']]}
+                 chuoi._kiem_params(params)
+                 forbidden = [slot['opaque_id'], *files.values()]
++                if ds == 'RE3-OB':
++                    forbidden += [str(Path(f).parent) for f in files.values()]
+                 if hop_dong.vi_pham_gia_tri(params, data['aliases'], data['inventory'], forbidden):
+                     raise Blocked('chuỗi riêng lọt vào API')
+                 args = [data['spans'], data['metrics'], data['logs'], data['inventory'], data['aliases'], job['t'], params]
+@@ -213,12 +234,17 @@
+                     phase('read', 'end')
+                     invocation, raws = call([payload, 0], lambda: chay(arm, payload, trace_guard_s=0))
+                     records = package(job, raws, window)
+-                else:
+-                    metric = old_worker._doc_parquet(files, 'metrics.parquet')
+-                    traces = old_worker._doc_parquet(files, 'traces.parquet') if arm in ('simplerca', 'microrank', 'tracerca', 'circa', 'torai_B') else None
+-                    logs = old_worker._doc_parquet(files, 'logs.parquet') if arm in ('simplerca', 'torai_B') else None
+-                    phase('read', 'end'); phase('cut')
+-                    win, window = cua_so.cat_ca(metric, traces, logs, job['t'])
++                elif ds in ('RE2-TT', 'RE3-OB'):
++                    if ds == 'RE3-OB':
++                        win = re3.read_case(files, job['t'], re3_profile, expected=row['files'])
++                        window = win['window']
++                        phase('read', 'end'); phase('cut')
++                    else:
++                        metric = old_worker._doc_parquet(files, 'metrics.parquet')
++                        traces = old_worker._doc_parquet(files, 'traces.parquet') if arm in ('simplerca', 'microrank', 'tracerca', 'circa', 'torai_B') else None
++                        logs = old_worker._doc_parquet(files, 'logs.parquet') if arm in ('simplerca', 'torai_B') else None
++                        phase('read', 'end'); phase('cut')
++                        win, window = cua_so.cat_ca(metric, traces, logs, job['t'])
+                     phase('cut', 'end')
+                     if kind == 'torai_prep':
+                         from p3.adapters import torai
+@@ -235,7 +261,12 @@
+                             phase('read_author', 'end'); phase('prepare')
+                             tabs = torai.chuan_bi_A(win['metric'], *source_tables, job['t'])
+                         else:
+-                            tabs = torai.chuan_bi_B(win['metric'], win['traces'], win['logs'], job['t'])
++                            if ds == 'RE3-OB':
++                                if re3_profile.get('trace_status_kind') != 'binary_error' or not set(win['traces']['statusCode'].dropna()) <= {0, 1}:
++                                    raise Blocked('RE3 TORAI needs declared binary statusCode semantics')
++                                tabs = torai.chuan_bi_B(win['metric'], win['traces'], win['logs'], job['t'], chi_ts=False)
++                            else:
++                                tabs = torai.chuan_bi_B(win['metric'], win['traces'], win['logs'], job['t'])
+                         table_refs = {}
+                         for k, tab in zip(('metric', 'logts', 'tracets_err', 'tracets_lat'), tabs[:4]):
+                             p = attempt / (k + '.csv')
+@@ -244,7 +275,8 @@
+                         atomic(attempt / 'prepared.json', dict(schema='T054-PREP-1', token=token,
+                                slot_sha256=fingerprint(slot), tables=table_refs, window=window,
+                                normalized_input_sha256=normalized_digest(prep_inputs), details=tabs[4],
+-                               author_source_ref=job.get('author_source_ref')))
++                               author_source_ref=job.get('author_source_ref'),
++                               **({'re3_profile_ref': job['re3_profile_ref']} if ds == 'RE3-OB' else {})))
+                         phase('prepare', 'end')
+                         return
+                     from p3.adapters import baro, simplerca, microrank, tracerca, circa
+@@ -253,10 +285,16 @@
+                         'microrank': lambda: [microrank.chay(win['traces'], job['t'])],
+                         'tracerca': lambda: [tracerca.chay(win['traces'], job['t'])],
+                         'circa': lambda: circa.chay(win['metric'], win['traces'], job['t'], 'ols')}
++                    if ds == 'RE3-OB':
++                        functions.update(baro=lambda: [baro.chay(win['metric'], job['t'], dataset='re3-ob')],
++                            tracerca=lambda: [tracerca.chay(win['traces'], job['t'], dataset='re3-ob')],
++                            circa=lambda: circa.chay(win['metric'], win['traces'], job['t'], 'ols', dataset='re3-ob'))
+                     invocation, raws = call([win, job['t']], functions[arm])
+                     if arm == 'circa':
+                         window['circa_current'] = raws[0].get('diagnostics', {}).get('circa_current')
+                     records = package(job, raws, window)
++                else:
++                    raise Blocked('baseline dataset has no declared adapter')
+             else:
+                 raise Blocked('worker kind chưa hỗ trợ')
+         phase('write')
+@@ -281,6 +319,31 @@
+     return p
+ 
+ 
++def re3_private_input_check(value, job):
++    """Check values as well as keys, including object columns of signal tables."""
++    paths = [str(Path(job['data_root']) / v['path']) for v in job['source']['files'].values()]
++    forbidden = [job['slot']['opaque_id'], *paths]
++    forbidden += [str(Path(p).parent) for p in paths]
++    forbidden += [Path(p).parent.name for p in paths]
++
++    def walk(x):
++        if isinstance(x, str):
++            if any(s and s in x for s in forbidden):
++                raise Blocked('RE3 private locator/identifier in method input')
++        elif isinstance(x, dict):
++            for k, v in x.items():
++                walk(k); walk(v)
++        elif isinstance(x, (list, tuple)):
++            for v in x:
++                walk(v)
++        elif hasattr(x, 'columns'):
++            for c in x.columns:
++                walk(c)
++                for v in x[c]:
++                    walk(v)
++    walk(value)
++
++
+ def ob_selection(job, files):
+     from p3 import nezha
+     row = job['source']
+--- before/results/T-054/scripts/cham.py
++++ results/T-054/scripts/cham.py
+@@ -146,6 +146,8 @@
+ 
+ 
+ def evaluate(snapshot, plan, label_refs, canonical_refs, runtimes, aliases, inventories, output):
++    if plan.get('mode') == 'heldout':
++        return evaluate_re3(snapshot, plan, label_refs, canonical_refs, runtimes, aliases, inventories, output)
+     records = verify_snapshot(snapshot, plan['jobs'])  # trước mọi label reader
+     validate_a4_slots(plan, runtimes)
+     if snapshot['plan_sha256'] != fingerprint(plan):
+@@ -180,6 +182,109 @@
+     atomic(Path(output) / 'a4.json', result)
+     descriptive = describe(plan, records, labels)
+     atomic(Path(output) / 'tables.json', descriptive)
++    return result
++
++
++def validate_re3_slots(plan, runtime):
++    from nguon import validate_re3_protocol
++    protocol = validate_re3_protocol(read_pin(plan['protocol_ref']))
++    if (plan.get('mode') != 'heldout' or runtime.get('dataset') != 'RE3-OB'
++            or len(runtime.get('cases', {})) != protocol['case_count']
++            or {r['member_sha256'] for r in runtime['cases'].values()} != set(protocol['members'])):
++        raise Blocked('RE3 report needs complete separate held-out cohort')
++    wanted = {fingerprint(s) for s in protocol['slots']}
++    if len(plan['jobs']) != len(wanted) or {fingerprint(j['slot']) for j in plan['jobs']} != wanted:
++        raise Blocked('RE3 report missing/extra registered slots')
++    metrics = protocol.get('metrics', [])
++    if (not metrics or len(metrics) != len(set(metrics)) or not set(metrics) <= {
++            'rr', 'ndcg@5', 'avg@5', 'hit@1', 'hit@3', 'hit@5'}
++            or protocol.get('seed_aggregation') != 'mean_complete_case'
++            or set(protocol.get('support_policy', {})) != {'NO_EVIDENCE', 'ERROR', 'TIMEOUT', 'UNSUPPORTED'}
++            or any(v not in ('zero', 'separate') for v in protocol['support_policy'].values())
++            or not protocol.get('worlds') or not set(protocol['worlds']) <= {'P', 'S_lo', 'S_hi'}):
++        raise Blocked('WAIT_RE3_METRICS_SUPPORT_SEED_PROTOCOL')
++    return protocol
++
++
++def evaluate_re3(snapshot, plan, label_refs, canonical_refs, runtimes, aliases, inventories, output):
++    """Separate descriptive held-out table. No A4 threshold, test or denominator."""
++    if set(runtimes) != {'RE3-OB'} or set(label_refs) != {'RE3-OB'} or set(canonical_refs) != {'RE3-OB'}:
++        raise Blocked('RE3 cannot share a main A4 label join')
++    protocol = validate_re3_slots(plan, runtimes['RE3-OB'])
++    if snapshot.get('plan_sha256') != fingerprint(plan):
++        raise Blocked('RE3 snapshot not bound to complete plan')
++    if any(v.get('state') != 'VERIFIED' for v in snapshot.get('slots', {}).values()):
++        raise Blocked('RE3 unresolved slot: no labels joined')
++    records = verify_snapshot(snapshot, plan['jobs'])
++    from p3.re3 import validate_profile
++    profile = validate_profile(read_pin(plan['re3_profile_ref']))
++    if (aliases != {'RE3-OB': profile['aliases']} or inventories != {'RE3-OB': profile['inventory']}
++            or runtimes['RE3-OB'].get('profile_sha256') != plan['re3_profile_ref']['sha256']):
++        raise Blocked('RE3 report U/alias/profile differs from frozen inputs')
++    # Structural result/variant checks precede the very first label reader.
++    sys.path[:0] = [str(ROOT/'src')]
++    from m1_danh_gia.pha2 import giai_ma_json
++    from p3 import danh_gia
++    decoded = {}
++    for job in plan['jobs']:
++        key = fingerprint(job['slot'])
++        rows = giai_ma_json(records[key])
++        variants = protocol.get('variants', {}).get(job['slot']['arm'])
++        if not variants or [r.get('variant') for r in rows] != variants:
++            raise Blocked('RE3 variants differ from declared report contract')
++        for r in rows:
++            if r['status'] == 'OK':
++                for w in protocol['worlds']:
++                    danh_gia.khoi_tu_ban_ghi(r['worlds'][w] if 'worlds' in r else r)
++        decoded[key] = rows
++    labels = compare_labels(read_pin(label_refs['RE3-OB']), read_pin(canonical_refs['RE3-OB']),
++                            runtimes['RE3-OB'], profile['aliases'], profile['inventory'])
++    if len({v['cell'] for v in labels.values()}) != protocol['cell_count']:
++        raise Blocked('RE3 cell count differs from registered metadata')
++    append(Path(output)/'exposure.jsonl', {'event': 'RE3_LABEL_JOIN', 'snapshot_sha256': fingerprint(snapshot)})
++    rows, pooled = [], defaultdict(list)
++    for job in plan['jobs']:
++        s = job['slot']
++        for rec in decoded[fingerprint(s)]:
++            for world in protocol['worlds']:
++                v = rec['worlds'][world] if 'worlds' in rec else rec
++                status = rec['status']
++                scored = danh_gia.cham_ca(dict(v, status=status), labels[s['opaque_id']]['root'])
++                supported = status == 'OK' or protocol['support_policy'][status] == 'zero'
++                scores = {m: scored[m] if supported else None for m in protocol['metrics']}
++                row = dict(dataset='RE3-OB', opaque_id=s['opaque_id'], arm=s['arm'], seed=s['seed'],
++                           variant=rec['variant'], world=world, status=status, supported=supported,
++                           cell=labels[s['opaque_id']]['cell'], metrics=scores)
++                rows.append(row)
++                pooled[(s['opaque_id'], s['arm'], rec['variant'], world)].append(row)
++    cases = []
++    for (oid, arm, variant, world), seeds in pooled.items():
++        if {r['seed'] for r in seeds} != set(protocol['arms'][arm]) or len(seeds) != len(protocol['arms'][arm]):
++            raise Blocked('RE3 incomplete seed group; no surviving-seed average')
++        supported = all(r['supported'] for r in seeds)
++        cases.append(dict(dataset='RE3-OB', opaque_id=oid, arm=arm, variant=variant, world=world,
++                          cell=labels[oid]['cell'], supported=supported,
++                          seed_status=[r['status'] for r in seeds],
++                          metrics={m: sum(r['metrics'][m] for r in seeds)/len(seeds) if supported else None
++                                   for m in protocol['metrics']}))
++    def summarize(groups):
++        out = []
++        for key, values in sorted(groups.items()):
++            valid = [r for r in values if r['supported']]
++            out.append({'group': list(key), 'total_cases': len(values), 'supported_cases': len(valid),
++                        'separate_cases': len(values)-len(valid),
++                        'metrics': {m: sum(r['metrics'][m] for r in valid)/len(valid) if valid else None
++                                    for m in protocol['metrics']}})
++        return out
++    by_arm, by_cell = defaultdict(list), defaultdict(list)
++    for r in cases:
++        k = (r['arm'], r['variant'], r['world'])
++        by_arm[k].append(r); by_cell[k+(r['cell'],)].append(r)
++    result = dict(schema='T054-RE3-TABLES-1', dataset='RE3-OB', case_count=len(labels),
++                  cell_count=protocol['cell_count'], per_seed=rows, per_case=cases,
++                  by_arm=summarize(by_arm), by_cell=summarize(by_cell),
++                  support_policy=protocol['support_policy'], protocol_ref=plan['protocol_ref'])
++    atomic(Path(output)/'re3-tables.json', result)
+     return result
+ 
+ 
+--- before/results/T-054/scripts/dieu_phoi.py
++++ results/T-054/scripts/dieu_phoi.py
+@@ -338,13 +338,13 @@
+         family = s['arm'] in ('M1', 'bo-E1', 'bo-E2', 'bo-E5', 'C-a0', 'C-a1', 'T12-on')
+         expected_method = 'M1' if family else 'torai' if s['arm'] in ('torai_A', 'torai_B') else s['arm']
+         expected_variants = ([s['arm']] if family else ['ols+rht_da', 'ols+rht']
+-                              if s['arm'] == 'circa' and s['dataset'] == 'RE2-TT' else
++                              if s['arm'] == 'circa' and s['dataset'] in ('RE2-TT', 'RE3-OB') else
+                               [{'baro': 'native', 'simplerca': 'M4', 'microrank': 'full', 'C-d3': 'cd3',
+                                 'tracerca': 'finite', 'circa': 'ols+rht_da', 'torai_B': 'B', 'torai_A': 'A'}[s['arm']]])
+         if [r.get('variant') for r in records] != expected_variants:
+             raise Blocked('variant thiếu/sai/thừa so với slot')
+         for record in records:
+-            if s['arm'] == 'circa' and s['dataset'] == 'RE2-TT' and record.get('status') == 'OK':
++            if s['arm'] == 'circa' and s['dataset'] in ('RE2-TT', 'RE3-OB') and record.get('status') == 'OK':
+                 current = record.get('diagnostics', {}).get('circa_current')
+                 if type(current) is not int or record.get('window', {}).get('circa_current') != current:
+                     raise Blocked('CIRCA thiếu/sai mốc current thực dùng trong window')
+--- before/results/T-054/scripts/bien_nhan.py
++++ results/T-054/scripts/bien_nhan.py
+@@ -409,7 +409,7 @@
+     invocation = read_pin(ref(attempt / 'invocation.json'))
+     s = job['slot']; arm = s['arm']
+     family = arm in ('M1', 'bo-E1', 'bo-E2', 'bo-E5', 'C-a0', 'C-a1', 'T12-on')
+-    variants = ([arm] if family else ['ols+rht_da', 'ols+rht'] if arm == 'circa' and s['dataset'] == 'RE2-TT'
++    variants = ([arm] if family else ['ols+rht_da', 'ols+rht'] if arm == 'circa' and s['dataset'] in ('RE2-TT', 'RE3-OB')
+                 else [{'baro': 'native', 'simplerca': 'M4', 'microrank': 'full', 'tracerca': 'finite',
+                        'circa': 'ols+rht_da', 'torai_A': 'A', 'torai_B': 'B', 'C-d3': 'cd3'}[arm]])
+     method = 'M1' if family else 'torai' if arm.startswith('torai_') else arm

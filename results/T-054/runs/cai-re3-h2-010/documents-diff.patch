@@ -1,0 +1,45 @@
+--- before/tasks/T-054-khoa-g3-chay-p7-a/SPEC.md
++++ tasks/T-054-khoa-g3-chay-p7-a/SPEC.md
+@@ -116,6 +116,10 @@
+ 
+ ## Phạm vi ghi
+ 
++**Bổ sung CIRCA Minh duyệt06/11/2026:** “Duyệt bổ sung 2 file CIRCA”; thêm `results/T-054/scripts/dieu_phoi.py` và `bien_nhan.py` đúng ba điều kiện theo010/bo-sung-circa-xin-duyet.md, nhận/kiểm hai variant/current và tạo hai bản ghi TIMEOUT cho RE3 như TT. Không nới quyền dữ liệu/chính sách lỗi/deadline.
++
++**Bổ sung Minh duyệt H2 ngày06/11/2026:** “Duyệt cài H2 theo báo cáo009”. Cài đúng9file: `src/p3/re3.py` (mới), `src/m1/adapter.py`, `src/p3/adapters/baro.py`, `circa.py`, `tracerca.py`, `torai.py`, `results/T-054/scripts/nguon.py`, `worker.py`, `cham.py`; cập nhật đúng lý do/quyền vào WHY/DECISIONS. Reader và M1 RE3 nhận profile thời gian/U/alias/r tường minh đã ghim, thiếu thì chặn trước method; default TT/Nezha giữ nguyên. Worker/grant/bảng RE3 riêng, kiểm bằng synthetic; chưa mở telemetry/đánh giá RE3 hoặc G3/main. Không sửa lõi M1/cấu hình đã chọn, không quyết các trường H1 còn OPEN. Snapshot trước sửa và kiểm ở checkpoint010.
++
+ **Bổ sung Minh duyệt có điều kiện ngày06/11/2026:** cài đúng bản vá source_native trong báo cáo007: `src/p3/nezha.py`, `src/m1/adapter.py`, `src/m1/chuoi.py`, `src/p3/adapters/nezha.py`, `results/T-054/scripts/worker.py`; thêm lý do/quyền vào WHY/DECISIONS và lưu bản SPEC trước sửa ở checkpoint008. Reader/adapter mặc định legacy; workerT054 bật layout rõ choOB, không thay TT/nền/ca/seed/statistics. Giữ mẫu và timestamp từng nguồn; mapping phải kiểm đủ; BARO per-source giữ preprocessing/kernel và quy tắc hòa. Chỉ nhận tuyến mới hợp lệ sau kiểm synthetic/dev đủ trường. Đây là ngoại lệ có phạm vi cho câu không sửa src bên dưới; không sửa task lịch sử. Lưu mọi lượt, đổi pin/binding/plan sau code; chưa mở G3/main/telemetryRE3 hoặc commit/push.
+ 
+ - Hiện tại theo Q-250: `tasks/T-054-khoa-g3-chay-p7-a/SPEC.md`, LOG; `results/T-054/runs/soan-spec-001/` và `manifest-soan-spec-001.json`; nối Q-250/WHY-78, thêm đúng dòng T-054 STATE.
+--- before/docs/WHY.md
++++ docs/WHY.md
+@@ -1167,3 +1167,13 @@
+ ## T-054 — biểu diễn metric theo nguồn cho OB trước G3, 06/11/2026
+ 
+ Minh duyệt có điều kiện theo mục mới DECISIONS; Codex tự soát và tiếp nhận đúng phạm vi báo cáo007. Chọn cài ứng viên source_native opt-in để giữ mẫu thật ở cửa sổ gốc khi số hàng khác nhau. Đây là nhu cầu adapter/hợp đồng, không là cơ chế sửa lỗi RCA đã xác nhận. Bằng chứng: reader yêu cầu5N5A rồi ghép bảng; lõiM1 yêu cầu mọi nguồn cùng số hàng; kiểm timestamp006 xác nhận4ca bị từ chối trước method. Phương án bỏ guard đơn lẻ không sửa phép ghép; cắt/bù/lưới/dịch mốc làm đổi input; bỏca/gán0 làm sai nghĩa lỗi. BARO per-column cho phép đề xuất chạy theo source rồi ghép khóa;8fixture feasibility007 chưa thay kiểm toàn tuyến. M1 dùng index nguồn tường minh, không giả timestamp hoặc observation. Điều kiện thất bại: mapping sai, điểm/hòa/preprocessing khác, unsupported/missing không đúng; phải dừng phần phụ thuộc. Mặc định legacy/TT giữ đường cũ; cần exactparity normalizedinput/trunggian/hạng/vùng ở dev và fixture. Phụ thuộc: toàn OB P7, code/binding/snapshot/lịch003máy; không chứng minh lợi ích, RQ3a, vùng ảnh hưởng hoặc cho phép mở test.
++
++
++## T-054 — H2: adapter RE3 với profile tường minh, 06/11/2026
++
++Minh duyệt cài theo báo cáo009. Nhu cầu kỹ thuật: RE3 có schema riêng; source time/r/U/alias chưa đủ nguồn, worker hiện chọn TT/Nezha và TORAI lọc ts-* làm rỗng metric OB trong kiểm tổng hợp. Chọn reader/profile riêng, kiểm hợp đồng trước I/O và dispatch/chấm held-out riêng; không sửa công thức M1/kernel baseline. Phương án tái dùng nguyên adapter TT làm mất metric; giả tên dataset hoặc tự đoán đơn vị/U từ nhãn làm sai đầu vào. Thêm tham số dataset tùy chọn giữ mặc định cũ cho BARO/CIRCA/TraceRCA; literal re2-tt không tự chứng minh sai số. Bằng chứng metadata/code và27kiểm ở009, chưa kiểm trên RE3 thật. Điều kiện thất bại: profile thiếu/sai, alias va chạm, clock không biểu diễn chính xác, owner ngoài U, source/grant khác binding; dừng trước method. Inventory/đơn vị/r/semantics status còn OPEN; duyệt cài không biến giả định thành FACT. Phụ thuộc: khả năng thực thi RE3 bản cuối và bảng riêng; không xác nhận hiệu quả RCA, RQ3/RQ5 hay mở dữ liệu. Các kiểm tổng hợp mới sẽ nằm ở checkpoint010.
++
++
++### H2 — giữ đủ hai bản ghi CIRCA trên RE3
++
++Bộ nhận và timeout đang chỉ khai hai vế CIRCA cho TT, trong khi adapter trả cả chính/phụ cho RE3. Minh duyệt bổ sung hai file theo010. Mở đúng điều kiện dataset sang TT hoặc RE3; không bỏ vế phụ hoặc đổi nghĩa timeout. Kiểm fixture đủ/thiếu variant và current; chưa kiểm RE3 thật.
+--- before/docs/DECISIONS.md
++++ docs/DECISIONS.md
+@@ -426,3 +426,13 @@
+ ## T-054 — quyền phiên dài và bản vá OB, 06/11/2026
+ 
+ Minh: “DUYỆT TRIỂN KHAI PHIÊN DÀI CÁC BƯỚC 1 2 3 4 NHƯ ĐỀ XUẤT, VÌ PHIÊN DÀI NÊN CẦN CHECKPOINT, BÁO CÁO CẨN THẬN, TRÁNH VIỆC BỊ MẤT THÔNG TIN DO CONTEXT BỊ NÉN”. Sau báo cáo007 và đề xuất đúng8mục, Minh: “NẾU BẠN THẤY ỔN THÌ DUYỆT”. Codex tự soát không còn phản đối chặn việc cài ứng viên và tiếp nhận quyền có điều kiện cho5filecode, SPEC/WHY/sổ theo báo cáo007. Per-source giữ mẫu/timestamp thật; mặc định cũ giữ nguyên; kiểm trước coi tuyến mới hợp lệ. Không suy G3/main hoặc mở telemetryRE3/commit/push từ quyền này.
++
++
++## T-054 — duyệt cài H2 RE3, 06/11/2026 — USER_CONFIRMED
++
++Minh: “Duyệt cài H2 theo báo cáo009”. Phạm vi là 9 file code cùng SPEC/WHY/DECISIONS trong mục Bản vá H2 cụ thể trình duyệt tại results/T-054/runs/chuan-bi-re3-009/bao-cao.md. Cài tuyến RE3 riêng và kiểm bằng dữ liệu tổng hợp; giữ mặc định TT/Nezha, bắt buộc profile thời gian/U/alias/r đã ghim. Duyệt cài không xác nhận các đơn vị/inventory còn thiếu, không mở telemetry hoặc đánh giá RE3, G3/main, cloud, commit/push.
++
++
++### T-054 H2 — bổ sung CIRCA, 06/11/2026
++
++Minh: “Duyệt bổ sung 2 file CIRCA”. Duyệt đúng đề xuất010/bo-sung-circa-xin-duyet.md: dieu_phoi.py kiểm hai variant/current cho RE3 như TT; bien_nhan.py tạo đủ hai variant CIRCA khi TIMEOUT đã đủ điều kiện. Không nới chính sách lỗi, deadline hoặc quyền dữ liệu.

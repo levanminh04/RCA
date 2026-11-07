@@ -1,0 +1,560 @@
+"""Nguồn phi nhãn và nhãn evaluator là hai đầu vào độc lập."""
+from pathlib import Path
+from bien_nhan import ROOT, Blocked, fingerprint, digest, read_pin, no_labels, resolve_path
+
+
+def source_row(row, data_root):
+    no_labels(row)
+    paths = {}
+    base = resolve_path(data_root).resolve()
+    for name, meta in row['files'].items():
+        rel = meta['path']
+        if '\\' in rel or ':' in rel or any(p in ('', '.', '..') for p in rel.split('/')):
+            raise Blocked('locator không hợp lệ')
+        p = (base / rel).resolve()
+        if not p.is_relative_to(base) or not p.is_file():
+            raise Blocked('nguồn ngoài gốc/không tồn tại')
+        if p.stat().st_size != meta['bytes'] or digest(p) != meta['sha256']:
+            raise Blocked('byte/hash nguồn khác bản đã cấp')
+        paths[name] = str(p)
+    return paths
+
+
+def compare_sources(runtime, independent, dataset, revision):
+    """Ref independent do người cấp chỉ định ngoài runtime, không lấy từ runtime."""
+    if independent.get('schema') == 'T054-DEV-ORIGINALS-1':
+        independent = original_dev_sources(independent)
+    no_labels(runtime); no_labels(independent)
+    if (runtime['dataset'] != dataset or independent['dataset'] != dataset or
+            independent['g1_revision'] != revision or runtime['g1_revision'] != revision):
+        raise Blocked('dataset/revision nguồn khác G1')
+    by_member = independent['cases_by_member']
+    rows = runtime['cases']
+    if len({r['member_sha256'] for r in rows.values()}) != len(rows):
+        raise Blocked('trùng thành viên')
+    if set(by_member) != {r['member_sha256'] for r in rows.values()}:
+        raise Blocked('cohort khác nguồn độc lập')
+    for oid, row in rows.items():
+        if fingerprint(row) != fingerprint(by_member[row['member_sha256']]):
+            raise Blocked('file/mốc/support khác nguồn độc lập')
+    return {oid: fingerprint(r) for oid, r in rows.items()}
+
+
+def original_dev_sources(descriptor):
+    """Dựng lại nguồn chuẩn từ G1/allowlist/command gốc, không tin bản runtime mới."""
+    import csv
+    import io
+    allow = read_pin(descriptor['allowlist_ref'])
+    g1_pin = descriptor['g1_ref']
+    path = Path(g1_pin['path'])
+    if not path.is_absolute():
+        path = ROOT / path
+    if digest(path) != g1_pin['sha256'] or descriptor['g1_revision'] != g1_pin['sha256']:
+        raise Blocked('G1 gốc khác pin')
+    ds = descriptor['dataset']
+    members = [r for r in csv.DictReader(io.StringIO(path.read_text(encoding='utf-8-sig')))
+               if r['dataset'] == ds and r['vai_tro'] == 'dev']
+    original = {r['opaque_id']: r for r in allow['cases']}
+    chosen = descriptor['selected_ids']
+    if len(chosen) != len(set(chosen)) or not set(chosen) <= set(original):
+        raise Blocked('dev selection không thuộc allowlist gốc')
+    out = {}
+    for oid in chosen:
+        row = original[oid]
+        if ds == 'RE2-TT':
+            case = Path(row['case_dir']).name
+            found = [m for m in members if m['case'] == case]
+            if oid != 'dev-' + row['files']['metrics.parquet']['sha256'][:10]:
+                raise Blocked('mã TT không cùng file gốc')
+            command = read_pin(descriptor['command_refs'][oid])
+            job = command['job']
+            if job['opaque_id'] != oid or job['dataset'] != ds or job['window'] != 'that':
+                raise Blocked('mốc TT không từ command main đúng ca')
+            normalized = {'t': job['t'], 'ce_history': 'unknown'}
+            if oid in descriptor.get('ce_evidence', {}):
+                evidence = descriptor['ce_evidence'][oid]
+                ce_job = read_pin(evidence['command'])['job']
+                from pilot import reference
+                record = reference(evidence['record'], evidence['config_id'])
+                t_ns = (job['t'] - 300) * 10**9
+                if (ce_job['opaque_id'] != oid or ce_job['dataset'] != ds or ce_job['window'] != 'ce'
+                        or ce_job['t'] != job['t'] - 300 or record.get('opaque_id') != oid
+                        or record.get('status') != 'OK'
+                        or record['window']['N'] != [t_ns-300*10**9, t_ns]
+                        or record['window']['A'] != [t_ns, t_ns+300*10**9]
+                        or ce_job['source_bytes'] != sum(v['bytes'] for v in row['files'].values())):
+                    raise Blocked('C-e evidence không cùng source/case/window đã ghim')
+                coverage = record.get('coverage', {})
+                if set(coverage) != {'trace', 'metric', 'log'} or any(
+                    c.get('trang_thai') != 'OK' or not c.get('F')
+                    or c['F'][0] > t_ns-300*10**9 or c['F'][1] < t_ns+300*10**9
+                    or any(c['o'][w].get('OPEN', 0) for w in ('N', 'A')) for c in coverage.values()):
+                    raise Blocked('C-e lịch sử/A0 chưa đủ căn cứ; không tự gán verified')
+                normalized['ce_history'] = 'verified'
+
+        elif ds == 'Nezha-OB':
+            import hashlib
+            found = [m for m in members if 'dev-' + hashlib.sha256(m['case'].encode()).hexdigest()[:10] == oid]
+            case = found[0]['case'] if len(found) == 1 else None
+            normalized = {k: row[k] for k in ('t_ns', 'trace_guard_s')}
+        else:
+            raise Blocked('originals chỉ dev TT/Nezha')
+        if len(found) != 1:
+            raise Blocked('thành viên không khớp duy nhất G1 dev')
+        member = fingerprint([ds, case])
+        normalized.update(member_sha256=member, files=row['files'])
+        out[member] = normalized
+    return {'dataset': ds, 'g1_revision': descriptor['g1_revision'], 'cases_by_member': out}
+
+
+def compare_labels(labels, independent, runtime, aliases, universe):
+    if independent.get('schema') == 'T054-DEV-LABEL-ORIGINALS-1':
+        independent = original_dev_labels(independent, aliases)
+    if (labels['dataset'] != runtime['dataset'] or independent['dataset'] != runtime['dataset']
+            or labels['g1_revision'] != runtime['g1_revision']
+            or independent['g1_revision'] != runtime['g1_revision']
+            or labels.get('alias_sha256') != fingerprint(aliases)
+            or independent.get('alias_sha256') != fingerprint(aliases)):
+        raise Blocked('nhãn sai dataset/G1 revision/alias')
+    if set(labels['cases']) != set(runtime['cases']):
+        raise Blocked('nhãn thiếu/thừa ca')
+    if set(independent['by_member']) != {r['member_sha256'] for r in runtime['cases'].values()}:
+        raise Blocked('nguồn nhãn thiếu/thừa thành viên')
+    result = {}
+    for oid, binding in runtime['cases'].items():
+        row = labels['cases'][oid]
+        trusted = independent['by_member'][binding['member_sha256']]
+        if row != trusted or row['member_sha256'] != binding['member_sha256']:
+            raise Blocked('root/fault/cell không khớp nguồn nhãn độc lập')
+        canonical_root = aliases.get(row['root'], row['root'])
+        if canonical_root != row['root'] or canonical_root not in universe:
+            raise Blocked('root ngoài U hoặc chưa canonicalize: đối chiếu nguồn')
+        expected_cell = [runtime['dataset'], canonical_root, row['fault']]
+        if row['cell'] != expected_cell:
+            raise Blocked('ô không theo dataset/root/fault G1')
+        result[oid] = dict(row, cell='|'.join(expected_cell))
+    return result
+
+
+def validate_slot(slot, policy):
+    no_labels(slot)
+    required = {'dataset', 'opaque_id', 'member_sha256', 'arm', 'view', 'seed', 'window',
+                'source_sha256', 'config_sha256', 'environment_sha256'}
+    if slot.get('dataset') == 'RE3-OB':
+        if not required <= set(slot) or policy.get('mode') != 'heldout':
+            raise Blocked('RE3 requires a separate heldout plan')
+        protocol = read_pin(policy['protocol_ref'])
+        validate_re3_protocol(protocol)
+        if fingerprint(slot) not in {fingerprint(s) for s in protocol['slots']}:
+            raise Blocked('RE3 slot not registered in final protocol')
+        return
+    if not required <= set(slot) or slot['dataset'] not in ('RE2-TT', 'Nezha-OB', 'SYNTHETIC'):
+        raise Blocked('slot thiếu khóa hoặc dataset ngoài grant')
+    if slot['view'] == 'ce' and (slot['dataset'] != 'RE2-TT' or slot['arm'] != 'M1'):
+        raise Blocked('C-e chỉ TT/M1')
+    if slot['arm'] == 'torai_A' and slot['dataset'] != 'RE2-TT':
+        raise Blocked('TORAI A chỉ là bảng phụ TT đã khai')
+    if slot['arm'] in ('torai_A', 'torai_B') and slot['dataset'] == 'RE2-TT':
+        if type(slot['seed']) is not int or slot['seed'] not in (0, 1, 2):
+            raise Blocked('TORAI B cần seed 0/1/2')
+    elif slot['seed'] is not None:
+        raise Blocked('seed ngoài ma trận')
+    if policy.get('mode') != 'synthetic' and any(slot[k] is None for k in required):
+        # None là seed hợp lệ cho vế tất định, không là bằng chứng env/window.
+        if any(slot[k] is None for k in required - {'seed'}):
+            raise Blocked('slot thực chưa ghim đủ')
+
+
+def authorize(plan, authority, action):
+    """Authority là hồ sơ của lời Minh, không phải cờ --granted từ worker."""
+    mode = plan['mode']
+    if mode == 'heldout':
+        return authorize_re3(plan, authority, action)
+    if mode == 'synthetic':
+        if action not in ('run', 'report'):
+            raise Blocked('hành động fixture lạ')
+        if any(j.get('kind') != 'synthetic' for j in plan['jobs']):
+            raise Blocked('fixture không được gọi tuyến dữ liệu thật')
+        return
+    if authority.get('pilot_grant') is not True and mode == 'dev':
+        raise Blocked('WAIT_PILOT_GRANT')
+    if mode == 'test':
+        if authority.get('g3') is not True:
+            raise Blocked('WAIT_G3')
+        if authority.get('test_grant') is not True:
+            raise Blocked('WAIT_TEST_GRANT')
+        if action == 'run' and authority.get('main_dispatch') is not True:
+            raise Blocked('WAIT_MAIN_DISPATCH')
+        if action == 'report' and authority.get('score_grant') is not True:
+            raise Blocked('WAIT_SCORE_GRANT')
+        if not plan.get('protocol_ref') or read_pin(plan['protocol_ref']).get('status') != 'LOCKED_G3':
+            raise Blocked('WAIT_LOCKED_PROTOCOL')
+        locked = read_pin(plan['protocol_ref'])
+        aggregate = action == 'report' and plan.get('host_role') == 'aggregate'
+        if plan.get('host_role') not in locked.get('allowed_hosts', ['local']) and not aggregate:
+            raise Blocked('máy chưa nằm trong phạm vi G3 được cấp')
+        if aggregate:
+            validate_aggregate_plan(plan, locked)
+        else:
+            validate_locked_plan(plan, locked)
+    if mode not in ('dev', 'test'):
+        raise Blocked('mode chưa được cấp')
+    if any(j.get('evaluation_mode') != mode or j.get('kind') == 'synthetic' for j in plan['jobs']):
+        raise Blocked('miền quyền của job khác plan')
+    separate_A = plan.get('auxiliary_A_policy') == 'AFTER_NON_A_VERIFIED_PREFLIGHT_AND_PRESERVE_BLOCKED'
+    if (any(j['slot']['arm'] == 'torai_A' for j in plan['jobs'])
+            and authority.get('torai_A_source_grant') is not True and not separate_A):
+        raise Blocked('WAIT_TORAI_A_SOURCE_GRANT')
+    for job in plan['jobs']:
+        if job['slot']['arm'] == 'torai_A' and authority.get('torai_A_source_grant') is True:
+            declared = authority.get('torai_A_source_sha256')
+            if declared != job.get('author_source_ref', {}).get('sha256') or declared != job['slot'].get('author_source_sha256'):
+                raise Blocked('grant TORAI A không trỏ đúng nguồn đã pin')
+    if not authority.get('source') or not authority.get('plan_sha256') == fingerprint(plan):
+        raise Blocked('quyền không trỏ đúng plan')
+    authority_pin = authority['source']
+    authority_path = Path(authority_pin['path'])
+    if not authority_path.is_absolute():
+        authority_path = ROOT / authority_path
+    if (digest(authority_path) != authority_pin['sha256'] or
+            authority_path.stat().st_size != authority_pin.get('bytes', authority_path.stat().st_size)):
+        raise Blocked('nguồn quyền khác pin')
+    if not plan.get('budget') or plan.get('open_before_run'):
+        raise Blocked('WAIT_POLICY_BUDGET')
+    from dieu_phoi import check_budget
+    check_budget(plan)
+
+
+def validate_re3_protocol(protocol):
+    """Metadata contract only; no implicit arms/seeds/U or reuse of A4."""
+    no_labels(protocol)
+    if (protocol.get('schema') != 'T054-RE3-PROTOCOL-1' or protocol.get('dataset') != 'RE3-OB'
+            or protocol.get('status') != 'LOCKED_FINAL_RE3' or protocol.get('final_version') is not True
+            or protocol.get('case_count') != 30 or protocol.get('cell_count') != 10):
+        raise Blocked('WAIT_RE3_FINAL_PROTOCOL')
+    members = protocol.get('members', [])
+    slots = protocol.get('slots', [])
+    arms = protocol.get('arms', {})
+    if (len(members) != 30 or len(set(members)) != 30 or not arms or not slots
+            or any(not isinstance(m, str) or len(m) != 64 for m in members)
+            or len({fingerprint(s) for s in slots}) != len(slots)):
+        raise Blocked('RE3 invalid registered members/arms/slots')
+    expected = set()
+    supported = {'M1', 'bo-E1', 'bo-E2', 'bo-E5', 'C-a0', 'C-a1', 'T12-on',
+                 'baro', 'simplerca', 'microrank', 'tracerca', 'circa', 'torai_B'}
+    for arm, seeds in arms.items():
+        if arm not in supported or not isinstance(seeds, list) or not seeds:
+            raise Blocked('RE3 source/arm not covered by this adapter contract')
+        if len({fingerprint(s) for s in seeds}) != len(seeds) or any(
+                s is not None and (type(s) is not int or s < 0) for s in seeds):
+            raise Blocked('RE3 duplicate/invalid registered seeds')
+        if arm == 'torai_B' and any(s is None for s in seeds):
+            raise Blocked('RE3 TORAI requires explicit seeds')
+        if arm != 'torai_B' and seeds != [None]:
+            raise Blocked('deterministic RE3 arm needs seed=None')
+        expected.update((m, arm, s) for m in members for s in seeds)
+    actual = set()
+    for s in slots:
+        required = {'dataset', 'opaque_id', 'member_sha256', 'arm', 'view', 'seed', 'window',
+                    'source_sha256', 'config_sha256', 'environment_sha256'}
+        if (not required <= set(s) or (s.get('seed') is not None and type(s.get('seed')) is not int)
+                or s.get('dataset') != 'RE3-OB' or s.get('view') != 'main' or s.get('arm') not in arms
+                or s.get('seed') not in arms[s['arm']] or s.get('member_sha256') not in members):
+            raise Blocked('RE3 slot outside registered matrix')
+        actual.add((s['member_sha256'], s['arm'], s['seed']))
+    if actual != expected or len(actual) != len(slots):
+        raise Blocked('RE3 matrix missing/duplicate member/arm/seed')
+    partitions = protocol.get('partitions', {})
+    if not isinstance(partitions, dict) or not partitions or 'aggregate' in partitions:
+        raise Blocked('RE3 execution partitions not declared')
+    assigned = []
+    for host, keys in partitions.items():
+        if not isinstance(host, str) or not host or not isinstance(keys, list) or not keys:
+            raise Blocked('RE3 invalid host partition')
+        assigned.extend(keys)
+    if len(assigned) != len(set(assigned)) or set(assigned) != {fingerprint(s) for s in slots}:
+        raise Blocked('RE3 partitions overlap or do not cover registered slots')
+    return protocol
+
+
+def validate_re3_job(job):
+    """Independent RE3 grant/profile/bindings, before source_row or reader I/O."""
+    if job.get('evaluation_mode') != 'heldout' or job['slot'].get('dataset') != 'RE3-OB':
+        raise Blocked('RE3 cannot borrow dev/test grant')
+    protocol = validate_re3_protocol(read_pin(job['protocol_ref']))
+    grant = read_pin(job['re3_grant_ref'])
+    if grant.get('re3_grant') is not True or grant.get('g3') is not True or not grant.get('source'):
+        raise Blocked('WAIT_RE3_GRANT')
+    read_pin(grant['source'])
+    refs = {'protocol': 'protocol_ref', 'profile': 're3_profile_ref', 'runtime': 'runtime_ref',
+            'independent_source': 'independent_source_ref', 'runtime_binding': 'runtime_binding_ref'}
+    for key, field in refs.items():
+        if grant.get(key+'_sha256') != job.get(field, {}).get('sha256'):
+            raise Blocked('RE3 grant not bound to '+key)
+    import sys
+    if str(ROOT/'src') not in sys.path:
+        sys.path.insert(0, str(ROOT/'src'))
+    from p3.re3 import validate_profile
+    profile = validate_profile(read_pin(job['re3_profile_ref']))
+    runtime = read_pin(job['runtime_ref'])
+    independent = read_pin(job['independent_source_ref'])
+    binding = read_pin(job['runtime_binding_ref'])
+    for key, field in refs.items():
+        if key == 'runtime_binding':
+            continue
+        if binding.get(key+'_sha256') != job[field]['sha256']:
+            raise Blocked('RE3 independent binding mismatch: '+key)
+    if (runtime.get('profile_sha256') != job['re3_profile_ref']['sha256']
+            or runtime.get('inventory') != profile['inventory'] or runtime.get('aliases') != profile['aliases']
+            or {r['member_sha256'] for r in runtime['cases'].values()} != set(protocol['members'])
+            or job.get('inventory') != profile['inventory']
+            or job.get('g1_revision') != protocol.get('g1_revision')):
+        raise Blocked('RE3 profile/cohort/G1 identity mismatch')
+    pins = compare_sources(runtime, independent, 'RE3-OB', job['g1_revision'])
+    slot = job['slot']
+    oid = slot['opaque_id']
+    if (fingerprint(slot) not in {fingerprint(s) for s in protocol['slots']}
+            or job['source'] != runtime['cases'][oid] or pins[oid] != slot['source_sha256']
+            or slot['member_sha256'] != job['source']['member_sha256']
+            or slot['window'] != {'t': job['source']['t'], 'half_width_s': 300}
+            or type(job.get('t')) is not int or job.get('t') != job['source']['t']):
+        raise Blocked('RE3 job/window/source differs from registered slot')
+    dispatch = protocol.get('dispatch', {})
+    host = next(h for h, keys in protocol['partitions'].items() if fingerprint(slot) in keys)
+    if dispatch.get('hosts'):
+        if job.get('re3_host') != host or host not in dispatch['hosts']:
+            raise Blocked('RE3 job host differs from registered partition')
+        dispatch = dispatch['hosts'][host]
+    elif len(protocol['partitions']) != 1:
+        raise Blocked('RE3 multiple hosts require per-host frozen dispatch')
+    family = slot['arm'] in {'M1', 'bo-E1', 'bo-E2', 'bo-E5', 'C-a0', 'C-a1', 'T12-on'}
+    expected_kinds = {'m1'} if family else {'torai_pipeline', 'torai_prep', 'torai_run'} if slot['arm'] == 'torai_B' else {'baseline'}
+    if job['kind'] not in expected_kinds:
+        raise Blocked('RE3 worker kind differs from registered arm')
+    if (not dispatch.get('code_pins') or job.get('code_pins') != dispatch['code_pins']
+            or fingerprint(job.get('config')) != slot['config_sha256']
+            or job['config'] != dispatch.get('configurations', {}).get(slot['arm'])):
+        raise Blocked('RE3 code/config differs from final protocol')
+    for field in ('data_root', 'pythonpath', 'executable', 'prep_executable', 'method_executable'):
+        if field in dispatch and job.get(field) != dispatch[field]:
+            raise Blocked('RE3 dispatch differs: '+field)
+    env = 'py38' if job['kind'] in ('torai_run', 'torai_pipeline') else 'main'
+    if slot['environment_sha256'] != dispatch.get('environments', {}).get(
+            'py38' if slot['arm'] == 'torai_B' else env):
+        raise Blocked('RE3 environment differs from final protocol')
+    if slot['arm'] == 'torai_B' and job.get('prep_environment_sha256') != dispatch.get('environments', {}).get('main'):
+        raise Blocked('RE3 TORAI prep environment differs')
+    if job['kind'] == 'm1' and job.get('m1_contract') != dispatch.get('m1_contract_ref'):
+        raise Blocked('RE3 M1 contract differs from final protocol')
+    if slot['arm'] == 'T12-on' and (not job.get('static_snapshot') or job['static_snapshot'] != dispatch.get('static_snapshot')):
+        raise Blocked('RE3 static snapshot not bound to final protocol')
+    if not dispatch.get('failure_policy_ref') or job.get('failure_policy_ref') != dispatch['failure_policy_ref']:
+        raise Blocked('RE3 failure policy not bound to final protocol')
+    failure = read_pin(job['failure_policy_ref'])
+    if failure.get('scope') != 'LOCKED_RE3' or failure.get('dataset') != 'RE3-OB':
+        raise Blocked('RE3 cannot reuse P7 failure policy implicitly')
+    return profile
+
+
+def authorize_re3(plan, authority, action):
+    if action not in ('run', 'report') or authority.get('re3_grant') is not True:
+        raise Blocked('WAIT_RE3_GRANT')
+    protocol = validate_re3_protocol(read_pin(plan['protocol_ref']))
+    grant = read_pin(plan['re3_grant_ref'])
+    if grant != authority or plan.get('open_before_run') or not plan.get('budget'):
+        raise Blocked('RE3 authority/policy/budget missing')
+    wanted = {fingerprint(s) for s in protocol['slots']}
+    if plan.get('host_role') != 'aggregate':
+        wanted = set(protocol.get('partitions', {}).get(plan.get('host_role'), []))
+        if not wanted or not wanted <= {fingerprint(s) for s in protocol['slots']}:
+            raise Blocked('RE3 host not registered')
+    if {fingerprint(j['slot']) for j in plan['jobs']} != wanted or len(plan['jobs']) != len(wanted):
+        raise Blocked('RE3 missing/extra/duplicate jobs')
+    for job in plan['jobs']:
+        if job.get('re3_grant_ref') != plan['re3_grant_ref'] or job.get('protocol_ref') != plan['protocol_ref']:
+            raise Blocked('RE3 job/plan authority differs')
+        validate_re3_job(job)
+    from dieu_phoi import check_budget
+    check_budget(plan)
+
+
+def validate_locked_plan(plan, protocol, verify_host=True):
+    """Plan được grant vẫn phải khớp code/config/env/policy khóa, trước I/O dữ liệu."""
+    c = read_pin(protocol['dispatch_contract_ref'])
+    host = plan.get('host_role', 'local')
+    if c.get('hosts'):
+        if host not in c['hosts']:
+            raise Blocked('thiếu hợp đồng môi trường của máy thực chạy')
+        c = dict(c, **c['hosts'][host])
+    if verify_host and c.get('code_root') and Path(c['code_root']).resolve() != ROOT.resolve():
+        raise Blocked('code_root không phải phân vùng đã khóa của máy')
+    if c.get('partition_ref'):
+        placement = read_pin(c['partition_ref'])
+        expected = placement['hosts'][host]
+        got = [placement_key(j['slot']) for j in plan['jobs']]
+        got += [placement_key(dict(row,arm='M1',view='ce',seed=None)) for row in plan.get('ce_support',[])]
+        if len(got) != len(set(got)) or set(got) != set(expected):
+            raise Blocked('partition thiếu/thừa/trùng slot; không phát lô khác phạm vi')
+    if (c.get('schema') != 'T054-DISPATCH-CONTRACT-1'
+            or plan.get('auxiliary_A_policy') != c.get('auxiliary_A_policy')
+            or plan.get('ob_sensitivity_ref') != c.get('ob_sensitivity_ref')
+            or plan.get('workers', 1) != c['workers'] or plan.get('monitor') != c['monitor']
+            or plan.get('budget') != c['budget']
+            or plan.get('resources') != c.get('resources')
+            or plan.get('sensitivity_decision_ref') != c['sensitivity_decision_ref']):
+        raise Blocked('plan vận hành/độ nhạy khác bản khóa')
+    from bien_nhan import failure_policy
+    for job in plan['jobs']:
+        if c.get('data_root') and job.get('data_root') != c['data_root']:
+            raise Blocked('data_root khác vùng nguồn đã khóa')
+        s = job['slot']; arm = s['arm']
+        family = arm in protocol['configurations']
+        expected = (protocol['configurations'][arm]['sha256'] if family else
+                    fingerprint({'cd3': 'same sealed M1'}) if arm == 'C-d3' else c['baseline_config_sha256'].get(arm))
+        if (not expected or s['config_sha256'] != expected
+                or (arm != 'C-d3' and fingerprint(job['config']) != expected)
+                or job.get('code_pins') != c['code_pins'] or job.get('protocol_ref') != plan['protocol_ref']):
+            raise Blocked('job code/config/protocol khác bản khóa')
+        if family and job.get('m1_contract') != protocol.get('m1_contract_ref'):
+            raise Blocked('hợp đồng dữ liệu/tham số M1 khác bản khóa')
+        for field in ('pythonpath','executable','prep_executable','method_executable'):
+            if field in c and job.get(field) != c[field]:
+                raise Blocked('đường thực thi/thư viện khác bản khóa: '+field)
+        torai = arm in ('torai_A','torai_B') and s['dataset'] == 'RE2-TT'
+        kind = 'm1' if family else 'cd3' if arm == 'C-d3' else 'torai_pipeline' if torai else 'baseline'
+        if job['kind'] != kind or job['timeout_s'] != c['timeout_s']['C-d3' if arm=='C-d3' else 'main_slot']:
+            raise Blocked('kind/timeout khác vế khóa')
+        if s['environment_sha256'] != c['environment_sha256']['py38' if torai else 'main']:
+            raise Blocked('environment slot khác bản khóa')
+        if torai and job.get('prep_environment_sha256') != c['environment_sha256']['main']:
+            raise Blocked('TORAI prep environment khác bản khóa')
+        if arm == 'T12-on' and job.get('static_snapshot') != protocol['snapshots'][s['dataset']]:
+            raise Blocked('T12 dùng snapshot khác bản khóa')
+        policy = failure_policy(job)
+        candidate = read_pin(c['failure_policy_candidate_ref'])
+        if ({k:v for k,v in policy.items() if k not in ('scope','main_allowed')}
+                != {k:v for k,v in candidate.items() if k not in ('scope','main_allowed')}):
+            raise Blocked('chính sách phân loại lỗi khác bản khóa')
+
+
+def placement_key(slot):
+    return fingerprint({k:slot[k] for k in ('dataset','opaque_id','arm','view','seed')})
+
+
+def validate_aggregate_plan(plan, protocol):
+    jobs = {}; hosts = set(); support = []
+    for pin in plan.get('execution_plan_refs', []):
+        part = read_pin(pin); host = part['host_role']
+        if part.get('protocol_ref',{}).get('sha256') != plan.get('protocol_ref',{}).get('sha256'):
+            raise Blocked('phân lô không cùng giao thức G3 toàn đợt')
+        if host in hosts or host not in protocol['allowed_hosts']:
+            raise Blocked('máy ghép trùng hoặc chưa được cấp')
+        hosts.add(host); validate_locked_plan(part, protocol, verify_host=False)
+        support.extend(part.get('ce_support',[]))
+        for job in part['jobs']:
+            key = fingerprint(job['slot'])
+            if key in jobs:
+                raise Blocked('slot bị phát hai máy')
+            jobs[key] = fingerprint(job)
+    expected = {fingerprint(j['slot']):fingerprint(j) for j in plan['jobs']}
+    if not jobs or len(expected)!=len(plan['jobs']) or jobs != expected:
+        raise Blocked('tập job ghép không bằng toàn bộ plan đã khóa')
+    if sorted(map(fingerprint,support)) != sorted(map(fingerprint,plan.get('ce_support',[]))):
+        raise Blocked('dòng hỗ trợ C-e thiếu/thừa giữa các phân lô')
+
+
+def main_dependency_record(job, seal_ref):
+    """Dependency được khai trước; hash output main chỉ được nối sau khi seal."""
+    from bien_nhan import verify_envelope
+    dep = job['main_dependency']; seal = read_pin(seal_ref)
+    parent = dep['slot']; own = job['slot']
+    if (parent.get('arm') != 'M1' or parent.get('view') != 'main' or parent.get('seed') is not None
+            or any(parent.get(k) != own.get(k) for k in ('dataset', 'opaque_id', 'member_sha256', 'window', 'source_sha256'))):
+        raise Blocked('C-d3 dependency khác ca/cửa sổ/nguồn main')
+    key = '|'.join(str(parent[k]) for k in ('dataset', 'opaque_id', 'arm', 'view', 'seed'))
+    if (seal.get('schema') != 'T054-MAIN-SEAL-2' or seal.get('parent_slot_sha256') != fingerprint(parent)
+            or seal.get('parent_job_sha256') != dep['job_sha256'] or set(seal.get('records', {})) != {key}):
+        raise Blocked('seal không cùng dependency đã đăng ký')
+    receipt = read_pin(seal['producer_receipt'])
+    if receipt['job_sha256'] != dep['job_sha256']:
+        raise Blocked('producer của main không khớp plan')
+    envelope = read_pin(receipt['result']); invocation = read_pin(receipt['invocation'])
+    records = verify_envelope(envelope, invocation, parent, envelope['token'])
+    if len(records) != 1 or records[0] != seal['records'][key]:
+        raise Blocked('main seal khác output đã verify của producer')
+    return records[0], key
+
+
+def validate_execution_links(job, invocation):
+    if job['slot']['dataset'] == 'RE3-OB':
+        if invocation.get('re3_profile_ref') != job.get('re3_profile_ref'):
+            raise Blocked('RE3 invocation profile differs from declared job')
+    if job.get('main_dependency'):
+        if invocation.get('dependency_sha256') != fingerprint(job['main_dependency']):
+            raise Blocked('invocation đổi dependency đã đăng ký')
+        _, key = main_dependency_record(job, invocation['main_seal_ref'])
+        if invocation.get('main_key') != key:
+            raise Blocked('C-d3 sai lookup trong invocation')
+    if job['kind'] == 'torai_pipeline' or job.get('pipeline_fixture'):
+        prep = read_pin(invocation['prepared_ref'])
+        if job['slot']['dataset'] == 'RE3-OB' and prep.get('re3_profile_ref') != job.get('re3_profile_ref'):
+            raise Blocked('RE3 TORAI prep profile differs from declared job')
+        if prep['token'] != invocation['token'] or prep['slot_sha256'] != fingerprint(job['slot']):
+            raise Blocked('TORAI method không cùng prep đã xử lý')
+        for pin in prep['tables'].values():
+            path = resolve_path(pin['path'])
+            if path.stat().st_size != pin['bytes'] or digest(path) != pin['sha256']:
+                raise Blocked('CSV khác prep đã thực chạy')
+        if job['slot']['arm'] == 'torai_A':
+            source = prep.get('author_source_ref')
+            if not source or source != job.get('author_source_ref') or source['sha256'] != job['slot'].get('author_source_sha256'):
+                raise Blocked('prep TORAI A khác nguồn đã khai/grant')
+            read_pin(source)
+
+
+def author_source(job):
+    """Chỉ gọi sau grant ở CLI; không suy đường dẫn A từ tên ca/nhãn."""
+    pin = job['author_source_ref']
+    if pin['sha256'] != job['slot'].get('author_source_sha256'):
+        raise Blocked('TORAI A source ref khác slot')
+    source = read_pin(pin); no_labels(source)
+    if job['kind'] == 'synthetic':
+        from bien_nhan import OUT
+        fixture_root = Path(source['data_root']).resolve()
+        if not fixture_root.is_relative_to(OUT / 'runs') or fixture_root.name != 'synthetic-data':
+            raise Blocked('nguồn A giả ngoài vùng dữ liệu tự sinh')
+    if (source.get('schema') != 'T054-TORAI-A-SOURCE-1' or source.get('dataset') != 'RE2-TT'
+            or source.get('g1_revision') != job['g1_revision']):
+        raise Blocked('sai dataset/revision nguồn TORAI A')
+    row = source['cases_by_member'][job['slot']['member_sha256']]
+    if set(row['files']) != {'logts', 'tracets_err', 'tracets_lat'}:
+        raise Blocked('TORAI A cần đúng ba CSV đã cấp')
+    return source_row(row, source['data_root'])
+
+
+def original_dev_labels(descriptor, aliases):
+    """Chỉ evaluator sau seal gọi. G1 gốc là nguồn nhãn, tách khỏi runtime mới."""
+    import csv
+    import io
+    source = original_dev_sources(descriptor['source_descriptor'])
+    pin = descriptor['source_descriptor']['g1_ref']
+    path = Path(pin['path'])
+    if not path.is_absolute():
+        path = ROOT / path
+    if digest(path) != pin['sha256']:
+        raise Blocked('nguồn G1 nhãn đổi hash')
+    ds = descriptor['source_descriptor']['dataset']
+    by_member = {}
+    for row in csv.DictReader(io.StringIO(path.read_text(encoding='utf-8-sig'))):
+        if row['dataset'] != ds or row['vai_tro'] != 'dev':
+            continue
+        member = fingerprint([ds, row['case']])
+        if member not in source['cases_by_member']:
+            continue
+        canonical = aliases.get(row['root'], row['root'])
+        by_member[member] = {'member_sha256': member, 'root': canonical,
+                             'fault': row['fault'], 'cell': [ds, canonical, row['fault']]}
+    if set(by_member) != set(source['cases_by_member']):
+        raise Blocked('G1 dev label thiếu/thừa thành viên')
+    return {'dataset': ds, 'g1_revision': pin['sha256'],
+            'alias_sha256': fingerprint(aliases), 'by_member': by_member}

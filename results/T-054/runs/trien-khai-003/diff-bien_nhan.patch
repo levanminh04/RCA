@@ -1,0 +1,47 @@
+--- D:\RCA-flashticket\results\T-054\runs\freeze-cong-cu-004\code\results\T-054\scripts\bien_nhan.py
++++ D:\RCA-flashticket\results\T-054\scripts\bien_nhan.py
+@@ -230,3 +230,44 @@
+     if 'method' not in policy.get('score_phases', []):
+         return 'BLOCKED', 'METHOD_TIMEOUT_POLICY_OPEN'
+     return 'COMPLETE_UNVERIFIED', 'DECLARED_METHOD_TIMEOUT'
++
++
++def verify_dev_error_reproduction(pin, job, envelope, invocation):
++    """Chỉ ERROR dev đã tái hiện đúng baseline gốc và có audit code/đầu vào.
++
++    Không cấp chính sách lỗi test/TIMEOUT; các trường hợp đó vẫn BLOCKED.
++    """
++    c = read_pin(pin)
++    if (job.get('evaluation_mode') != 'dev' or c.get('scope') != 'DEV_BASELINE_REPRODUCTION_ONLY'
++            or c.get('job_sha256') != fingerprint(job)
++            or c.get('result_sha256') != fingerprint(envelope)
++            or c.get('invocation_sha256') != fingerprint(invocation)):
++        raise Blocked('phân loại lỗi dev không cùng job/output/phạm vi')
++    old = read_pin(c['baseline_reference'])
++    record, = envelope['records']
++    if (record.get('status') != 'ERROR' or old.get('status') != 'ERROR'
++            or old.get('opaque_id') != job['slot']['opaque_id']):
++        raise Blocked('không suy giấy tái hiện ERROR sang TIMEOUT/lỗi khác')
++    for key in ('method', 'mode', 'seed', 'status', 'error', 'window', 'blocks', 'entity_ranking', 'ranking_native', 'observed_entities'):
++        if old.get(key) != record.get(key):
++            raise Blocked('ERROR dev khác bản gốc: ' + key)
++    if c.get('origin') != 'method_implementation_assumption':
++        raise Blocked('chưa phân xử nguồn lỗi')
++    from nguon import compare_sources
++    compare_sources(read_pin(job['runtime_ref']), read_pin(job['independent_source_ref']),
++                    job['slot']['dataset'], job['g1_revision'])
++    audit = read_pin(c['input_audit'])
++    arm = job['slot']['arm']
++    if (arm not in ('microrank', 'tracerca') or audit['t'] != job['t']
++            or audit['trace_sha256'] != job['source']['files']['traces.parquet']['sha256']
++            or audit['normal_count'][arm] != 0 or audit['anomalous_count'][arm] <= 0):
++        raise Blocked('thiếu bằng chứng operation mới tại đầu vào hợp lệ')
++    if len(c.get('code_evidence', [])) < 2:
++        raise Blocked('thiếu code method và adapter ánh xạ lỗi')
++    for item in c['code_evidence']:
++        path = Path(item['path'])
++        if not path.is_absolute():
++            path = ROOT / path
++        if digest(path) != item['sha256']:
++            raise Blocked('code phân loại lỗi thay đổi')
++    return c

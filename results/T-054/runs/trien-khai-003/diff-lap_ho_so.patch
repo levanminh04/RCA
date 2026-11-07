@@ -1,0 +1,117 @@
+--- D:\RCA-flashticket\results\T-054\runs\freeze-cong-cu-004\code\results\T-054\scripts\lap_ho_so.py
++++ D:\RCA-flashticket\results\T-054\scripts\lap_ho_so.py
+@@ -55,77 +55,46 @@
+     return {'schema': 'T054-MATRIX-1', 'status': 'CANDIDATE_NOT_EXECUTABLE', 'main': jobs, 'derived': derived,
+             'ce': ce, 'counts': {'main_slots': len(jobs), 'core_calls_excluding_unsupported': sum(j['supported_core'] for j in jobs),
+             'separate_cd3_workers': sum(j['separate_worker'] for j in derived), 'ce_max': len(ce)},
+-            'torai_A': 'OPEN: chưa tự loại hoặc thêm trước Minh quyết', 'test_sources_materialized': False}
++            'torai_A': {'scope': 'A phụ ngoài A4, B chính theo P3 và Minh xác nhận lại',
++                         'source_grant': False},
++            'auxiliary': [{'dataset': 'RE2-TT', 'opaque_id': 'test-' + m[:10],
++                           'member_sha256': m, 'arm': 'torai_A', 'view': 'main', 'seed': seed,
++                           'worlds': ['P'], 'a4': False, 'source_access': 'WAIT_A_SOURCE_GRANT'}
++                          for m in cohort['cohorts']['RE2-TT']['members_locked_sha256'] for seed in (0, 1, 2)],
++            'test_sources_materialized': False}
+ 
+ 
+-def build_documents():
+-    """Chỉ tạo hồ sơ CANDIDATE; không điền quyền/policy OPEN để phát lô."""
+-    import json
+-    import collections
+-    from pilot import plan_candidate
+-    sys.path.append(str(ROOT / 'results/T-052/scripts'))
+-    import common
+-    old_ref = ref(ROOT / 'results/T-052/giao-thuc-p7-a-003.json')
+-    old = read_pin(old_ref)
+-    cohort = read_pin(old['cohorts_source'])
+-    own = {p.relative_to(ROOT).as_posix(): ref(p) for p in (OUT / 'scripts').glob('*.py')}
+-    protocol = dict(old)
+-    protocol.pop('fingerprint', None)
+-    protocol.update(schema='T054-PROTOCOL-1', status='CANDIDATE_NOT_LOCKED',
+-                    entrypoint='results/T-054/scripts/p7.py', previous_protocol=old_ref,
+-                    implementation='checkpoint synthetic verified; real pilot still WAIT',
+-                    real_execution_ready=False,
+-                    required_permissions=['pilot grant and budget', 'G3 and finalized policy', 'test grant',
+-                                          'independent source/label provider and materialize permission'],
+-                    decision_changes=[], open_choices=['budget exception', 'TORAI A', 'source/labels provider',
+-                        'error-excluded and case-permutation formulas', 'timeouts/monitor-gap/resources', 'machine plan/deadline'])
+-    protocol['fingerprint'] = fingerprint(protocol)
+-    atomic(OUT / 'protocol.json', protocol)
+-    m = matrix(old, cohort)
+-    assert m['counts'] == {'main_slots': 1342, 'core_calls_excluding_unsupported': 1274,
+-                           'separate_cd3_workers': 60, 'ce_max': 60}
+-    atomic(OUT / 'matrix.json', m)
+-    atomic(OUT / 'authorization.json', {'schema': 'T054-AUTHORITY-1',
+-           'source': ref(OUT / 'runs/trien-khai-001/quyen-minh.txt'), 'implementation': True,
+-           'synthetic_fixtures': True, 'pilot_grant': False, 'ssh_grant': False, 'sync_grant': False,
+-           'g3': False, 'test_grant': False, 'materialize_private': False, 'commit_push': False,
+-           'note': 'False nghĩa là chưa có quyền riêng được ghi, không là Minh từ chối.'})
+-    atomic(OUT / 'environment.json', dict(preflight(), status='LOCAL_CODE_INSPECTION_ONLY',
+-                                         stable=stable_environment(), cloud='NOT_INSPECTED_NO_SSH'))
+-    atomic(OUT / 'source-manifest.json', {'schema': 'T054-SOURCE-1', 'own_scripts': own,
+-           'legacy_code': old['source_code'], 'upstream_manifests': [ref(ROOT / p) for p in (
+-               'results/T-052/manifest-dinh-chinh-g3-004.json', 'results/T-050/manifest-chay-lai-002.json',
+-               'results/T-053/manifest.json', 'results/T-054/manifest-soan-spec-001.json')],
+-           'snapshots': old['snapshots'], 'cohorts_source': old['cohorts_source'],
+-           'private_sources_materialized': False})
+-    atomic(OUT / 'reuse.json', {'status': 'CONDITIONAL_REUSE', 'stable_outputs_verified':
+-          {'T052': 576, 'T050': 297, 'T053': 2654, 'protocol_code': 93},
+-          'historical_pins_excluded': ['T052 LOG', 'docs/STATE.md'],
+-          'requirements': ['same member/window/config/seed/variant', 'input/intermediate/rank/region parity',
+-                           'source machine per window; exact decisions even cross-machine',
+-                           'new full driver must pass dev; hash alone insufficient'],
+-          'no_bulk_rerun': True, 'real_driver_parity': 'NOT_YET_RUN'})
+-    manifest, native = common.native_index()
+-    pilot = plan_candidate()
+-    selected = {'dev-a915aa2424', 'dev-a5cabe5fa7', 'dev-bcbd4f46ae', 'dev-03d4910932',
+-                'dev-607751ac0a', 'dev-2bfc97b01e', 'dev-63c30faf34', 'dev-5467884de4'}
+-    pilot['candidates'] = [{'opaque_id': oid, 'window': w, 'dataset': command['job']['dataset'],
+-           'native_machine': 'EC2' if command['platform'].startswith('Linux') else 'laptop',
+-           'native_command_pin': ref(ROOT / (item['path'].rsplit('/', 1)[0] + '/command.json')),
+-           'native_record': item} for (oid, w), (item, command) in native.items() if oid in selected]
+-    pilot['source_machine_counts'] = [{'dataset': ds, 'window': w, 'machine': host, 'n': n}
+-        for (ds, w, host), n in collections.Counter((c['job']['dataset'], w,
+-            'EC2' if c['platform'].startswith('Linux') else 'laptop') for (_, w), (_, c) in native.items()).items()]
+-    pilot['execution_plan_ready'] = False
+-    pilot['remaining_before_pilot'] = ['materialize selected DEV runtime/source binding in T054',
+-        'pin effective Python paths and per-stage TORAI environments', 'freeze final driver bytes',
+-        'choose exact minimal branch cover from candidates; budget and SSH grant',
+-        'C-d3 subprocess fixture passed; integrate sealed main -> worker job in registered real plan',
+-        'method-failure finalization requires decided policy and pinned classification evidence']
+-    atomic(OUT / 'pilot-plan.json', pilot)
+-    return {'matrix': m['counts'], 'own_scripts': len(own), 'test_opened': False}
++def build_documents(destination=None):
++    """Kiểm và xuất bản sao hồ sơ hiện hành, không reset quyền bằng mặc định cũ.
++
++    Cập nhật hồ sơ phải có nguồn quyết định mới và manifest riêng. Lệnh này không
++    còn tái sinh ứng viên cũ trước câu trả lời Minh về A/B hay tự hạ/nâng quyền.
++    """
++    current = {name: read_pin(ref(OUT / name)) for name in
++               ('protocol.json', 'matrix.json', 'authorization.json', 'source-manifest.json')}
++    source = current['source-manifest.json']
++    for path, expected in source['own_scripts'].items():
++        actual = ref(ROOT / path)
++        if actual['sha256'] != expected['sha256']:
++            raise ValueError('source-manifest chưa cập nhật code: ' + path)
++    summary = {'status': current['protocol.json']['status'],
++               'matrix': current['matrix.json']['counts'],
++               'own_scripts': len(source['own_scripts']),
++               'authorization': ref(OUT / 'authorization.json'),
++               'documents_overwritten': False, 'test_opened': False}
++    if destination is not None:
++        target = Path(destination).resolve()
++        if not (target.is_relative_to(OUT / 'runs') or target.is_relative_to(OUT / 'reports')):
++            raise ValueError('đích hồ sơ ngoài phạm vi T054 runs/reports')
++        target.mkdir(parents=True, exist_ok=False)
++        copies = {}
++        for name, value in current.items():
++            copies[name] = atomic(target / name, value)
++        summary['exported_documents'] = copies
++        atomic(target / 'summary.json', summary)
++    return summary
+ 
+ 
+ if __name__ == '__main__':
+     import json
+-    print(json.dumps(build_documents(), ensure_ascii=False))
++    print(json.dumps(build_documents(sys.argv[1] if len(sys.argv) > 1 else None), ensure_ascii=False))

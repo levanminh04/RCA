@@ -11,12 +11,12 @@ def chuan_bi(metric_win):
     return doi_ten_latency(tien_xu_ly_main(metric_win))
 
 
-def diem_lai(data, t):
+def diem_lai(data, t, dataset='re2-tt'):
     """Tính lại max robust z bằng đúng các lời gọi của baro() (baro.py:22–50)."""
     from RCAEval.io.time_series import preprocess
     from sklearn.preprocessing import RobustScaler
-    n = preprocess(data=data[data['time'] < t], dataset='re2-tt', dk_select_useful=False)
-    a = preprocess(data=data[data['time'] >= t], dataset='re2-tt', dk_select_useful=False)
+    n = preprocess(data=data[data['time'] < t], dataset=dataset, dk_select_useful=False)
+    a = preprocess(data=data[data['time'] >= t], dataset=dataset, dk_select_useful=False)
     cols = [x for x in n.columns if x in a.columns]
     out = []
     for c in cols:
@@ -26,16 +26,16 @@ def diem_lai(data, t):
     return out, cols
 
 
-def chay(metric_win, t):
+def chay(metric_win, t, dataset='re2-tt'):
     from RCAEval.e2e.baro import baro
     data = chuan_bi(metric_win)
     shape = {'metric_cols': int(metric_win.shape[1] - 1), 'metric_cols_after_preprocess': None}
     try:
-        out = baro(data, t, dataset='re2-tt', dk_select_useful=False)
+        out = baro(data, t, dataset=dataset, dk_select_useful=False)
     except Exception as exc:  # noqa: BLE001 — lỗi của phương pháp
         r = loi(exc); r['input_shape'] = shape
         return r
-    diem, cols = diem_lai(data, t)
+    diem, cols = diem_lai(data, t, dataset=dataset)
     shape['metric_cols_after_preprocess'] = len(cols)
     lai = [c for c, _ in sorted(diem, key=lambda x: x[1], reverse=True)]
     if lai != out['ranks']:

@@ -167,6 +167,8 @@ Mỗi mục cần Minh duyệt riêng (Luật 0). Ghi "duyệt C-xx" là đủ �
 
 ### D.1 Đích đến và mức thành công
 
+**Cập nhật 04/11/2026.** E-04 giữ biên và đối chứng TORAI B. Cách tính và diễn giải hiện hành theo Q-246 và [WHY-06](WHY.md). Khi E-04 không đạt, dùng phương án (c) với câu báo thất bại bắt buộc. Các ghi chú chờ chọn A4 phía dưới là lịch sử.
+
 - **Tầng 1, tối thiểu. Phải đạt dù phương pháp không thắng.**
   - (a) Phương pháp hợp nhất được cài, kiểm giá trị trung gian, chạy hết dev và chạy test một lần.
   - (b) So với 6 baseline và các đối chứng.
@@ -350,6 +352,8 @@ Dữ liệu (trace, log, metric; FlashTicket có thêm kind, DB, hàng đợi, m
 - Nếu dùng E6(c) hoặc dùng điểm baseline làm đầu vào thì C-c là bắt buộc. Nếu không, C-c là tùy chọn.
 
 ### D.6 Độ đo và thống kê
+
+**Cập nhật 04/11/2026.** A4 dùng chuyển mức một chiều TT→OB theo Q-246. Đảo dấu TT quanh 0 là phép nhạy. Chi tiết cận CI, ngưỡng OB, trường hợp suy biến và quy tắc McNemar theo [SPEC T-052](../tasks/T-052-t13-va-ho-so-g3/SPEC.md). Nội dung A4 cũ dưới đây giữ làm lịch sử.
 
 - **Mọi độ đo đều được tính và báo** (M-07). "Độ đo chính" dùng ở ba chỗ:
   - chọn giữa các biến thể trên dev;
@@ -622,6 +626,8 @@ Giả định: mỗi request 10 span; mỗi span 450 B (suy từ tài liệu Tem
 - **Không đưa vào bảng so sánh chính** (C-07).
 
 ### D.11 P7, P8, demo, quyển, bảo vệ
+
+**Cập nhật 04/11/2026.** P7 chính chuẩn bị chế độ (a), chế độ (b) hoãn theo Q-245. C-15 B giữ kết quả đầu của bản khóa và báo riêng bản sửa có dùng test. RE3-OB dành cho bản cuối theo Q-247/Q-248. Duyệt G3 và quyền mở dữ liệu theo phạm vi Minh cấp.
 
 - **P7:**
   - Chạy test một lần sau G3: 60 ca RE2-TT, phần test của Nezha-OB, RE3-OB.

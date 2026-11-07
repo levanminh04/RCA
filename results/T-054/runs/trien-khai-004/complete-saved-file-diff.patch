@@ -1,0 +1,1066 @@
+--- before/results/T-054/scripts/bien_nhan.py
++++ results/T-054/scripts/bien_nhan.py
+@@ -271,3 +271,135 @@
+         if digest(path) != item['sha256']:
+             raise Blocked('code phân loại lỗi thay đổi')
+     return c
++
++
++def failure_policy(job):
++    policy = read_pin(job['failure_policy_ref'])
++    if policy.get('schema') != 'T054-FAILURE-POLICY-1':
++        raise Blocked('chính sách lỗi sai schema')
++    if job.get('evaluation_mode') == 'test' and policy.get('scope') != 'LOCKED_P7':
++        raise Blocked('chính sách lỗi chưa khóa trước test')
++    for pin in policy.get('code_evidence', []):
++        path = Path(pin['path'])
++        if not path.is_absolute():
++            path = ROOT / path
++        if digest(path) != pin['sha256']:
++            raise Blocked('code phân loại khác bản khóa')
++    return policy
++
++
++def known_operation_error(job, envelope, invocation):
++    """Xác minh cơ chế operation mới trên đầu vào thật, không chỉ đọc chuỗi lỗi."""
++    policy = failure_policy(job)
++    arm = job['slot']['arm']
++    if (job['slot']['dataset'] != 'RE2-TT' or arm not in ('microrank', 'tracerca')
++            or 'NEW_OPERATION_WITHOUT_NORMAL_BASELINE' not in policy.get('error_rules', [])
++            or len(policy.get('code_evidence', [])) < 4):
++        raise Blocked('ERROR chưa có quy tắc phù hợp; giữ BLOCKED để điều tra')
++    record, = envelope['records']
++    if record.get('status') != 'ERROR':
++        raise Blocked('quy tắc operation chỉ nhận ERROR')
++    import sys
++    sys.path.insert(0, str(ROOT / 'src'))
++    from nguon import source_row, compare_sources
++    from p3 import worker, cua_so
++    compare_sources(read_pin(job['runtime_ref']), read_pin(job['independent_source_ref']),
++                    job['slot']['dataset'], job['g1_revision'])
++    paths = source_row(job['source'], job['data_root'])
++    raw = {key: worker._doc_parquet(paths, name) for key, name in
++           [('metric', 'metrics.parquet'), ('traces', 'traces.parquet')]}
++    raw['logs'] = None  # Hai adapter này không đọc log ở worker thật.
++    win, _ = cua_so.cat_ca(raw['metric'], raw['traces'], raw['logs'], job['t'])
++    if normalized_digest([win, job['t']]) != invocation['normalized_input_sha256']:
++        raise Blocked('audit lỗi khác normalized input thực chạy')
++    df = win['traces'].copy()
++    df['methodName'] = df['methodName'].fillna(df['operationName'])
++    ops = df['serviceName'] + '_' + df['methodName']
++    before = df['startTime'] + df['duration'] < job['t'] * 1_000_000
++    new = sorted(set(ops[~before]) - set(ops[before]))
++    error = record.get('error')
++    valid = (error == 'ValueError: No normal baseline for: ' + ','.join(new) if arm == 'microrank'
++             else any(error == 'KeyError: ' + repr(op) for op in new))
++    if not new or not valid:
++        raise Blocked('ERROR không khớp cơ chế đã khóa và operation thực')
++    return {'rule': 'NEW_OPERATION_WITHOUT_NORMAL_BASELINE', 'new_operations': new,
++            'normal_spans': {op: int(((ops == op) & before).sum()) for op in new},
++            'anomalous_spans': {op: int(((ops == op) & ~before).sum()) for op in new}}
++
++
++def verify_method_failure(pin, job, envelope, invocation):
++    c = read_pin(pin)
++    policy = failure_policy(job)
++    if (c.get('schema') != 'T054-METHOD-FAILURE-1' or c.get('job_sha256') != fingerprint(job)
++            or c.get('result_sha256') != fingerprint(envelope)
++            or c.get('invocation_sha256') != fingerprint(invocation)
++            or c.get('policy') != job['failure_policy_ref']):
++        raise Blocked('phân loại lỗi không cùng job/output/policy')
++    if c.get('kind') == 'ERROR':
++        if c['audit'] != known_operation_error(job, envelope, invocation):
++            raise Blocked('audit lỗi khác bằng chứng nguồn')
++    elif c.get('kind') == 'TIMEOUT':
++        phases = read_pin(c['phases'])
++        monitor = read_pin(c['monitor'])
++        launch = read_pin(c['launch'])
++        state, reason = timeout_classification(job['slot'], phases, monitor, policy['monitor'])
++        if (state != 'COMPLETE_UNVERIFIED' or reason != 'DECLARED_METHOD_TIMEOUT'
++                or launch['token'] != envelope['token'] or monitor['token'] != envelope['token']
++                or monitor.get('budget_exhausted') or monitor.get('clock_anomaly')
++                or monitor.get('poll_s') != policy['monitor']['poll_s']
++                or monitor.get('deadline_observed_epoch', monitor['wall_clock']) < launch['deadline_epoch']
++                or phases[-1]['invocation_sha256'] != fingerprint(invocation)
++                or any(r.get('status') != 'TIMEOUT' for r in envelope['records'])):
++            raise Blocked('TIMEOUT thiếu bằng chứng method/clock/đầu vào')
++    else:
++        raise Blocked('loại lỗi chưa khai')
++    return c
++
++
++def finalize_error(attempt, job):
++    """Controller phân loại trước verify; các lệnh kiểm/đọc không tạo receipt."""
++    attempt = Path(attempt)
++    if (attempt / 'method-failure.json').exists() or not job.get('failure_policy_ref'):
++        return
++    envelope = read_pin(ref(attempt / 'result.json'))
++    if not any(r.get('status') == 'ERROR' for r in envelope['records']):
++        return
++    invocation = read_pin(ref(attempt / 'invocation.json'))
++    audit = known_operation_error(job, envelope, invocation)
++    c = dict(schema='T054-METHOD-FAILURE-1', kind='ERROR', job_sha256=fingerprint(job),
++             result_sha256=fingerprint(envelope), invocation_sha256=fingerprint(invocation),
++             policy=job['failure_policy_ref'], audit=audit)
++    atomic(attempt / 'method-failure.json', c)
++
++
++def finalize_timeout(attempt, job, token):
++    """Chỉ đóng TIMEOUT sau giám sát/kill; prep và mất quan sát vẫn BLOCKED."""
++    attempt = Path(attempt)
++    policy = failure_policy(job)
++    phases = events(attempt / 'phases.jsonl')
++    monitor = read_pin(ref(attempt / 'timeout.json'))
++    state, _ = timeout_classification(job['slot'], phases, monitor, policy['monitor'])
++    if state != 'COMPLETE_UNVERIFIED' or monitor.get('clock_anomaly'):
++        raise Blocked('timeout ngoài pha method hoặc mất quan sát')
++    invocation = read_pin(ref(attempt / 'invocation.json'))
++    s = job['slot']; arm = s['arm']
++    family = arm in ('M1', 'bo-E1', 'bo-E2', 'bo-E5', 'C-a0', 'C-a1', 'T12-on')
++    variants = ([arm] if family else ['ols+rht_da', 'ols+rht'] if arm == 'circa' and s['dataset'] == 'RE2-TT'
++                else [{'baro': 'native', 'simplerca': 'M4', 'microrank': 'full', 'tracerca': 'finite',
++                       'circa': 'ols+rht_da', 'torai_A': 'A', 'torai_B': 'B', 'C-d3': 'cd3'}[arm]])
++    method = 'M1' if family else 'torai' if arm.startswith('torai_') else arm
++    records = [dict(method=method, variant=v, mode='a', seed=s['seed'], status='TIMEOUT',
++                    config_id=arm, blocks=[], error='DECLARED_METHOD_TIMEOUT') for v in variants]
++    envelope = dict(schema='T054-RESULT-1', token=token, slot_sha256=fingerprint(s),
++                    invocation_sha256=fingerprint(invocation), records=records, record_sha256=fingerprint(records))
++    # Giữ mọi output hoàn tất nếu có cuộc đua tại deadline; không ghi đè rồi tự chấm.
++    if (attempt / 'result.json').exists():
++        raise Blocked('output đã đóng tại deadline; cần phân xử, không ghi đè')
++    c = dict(schema='T054-METHOD-FAILURE-1', kind='TIMEOUT', job_sha256=fingerprint(job),
++             result_sha256=fingerprint(envelope), invocation_sha256=fingerprint(invocation),
++             policy=job['failure_policy_ref'], phases=atomic(attempt / 'timeout-phases.json', phases),
++             monitor=ref(attempt / 'timeout.json'), launch=ref(attempt / 'launch.json'))
++    pin = atomic(attempt / 'method-failure.json', c)
++    verify_method_failure(pin, job, envelope, invocation)
++    atomic(attempt / 'result.json', envelope)
++    return pin
+--- before/results/T-054/scripts/cham.py
++++ results/T-054/scripts/cham.py
+@@ -29,6 +29,11 @@
+                 raise Blocked('receipt không cùng job')
+             results[key] = verify_envelope(envelope, invocation, job['slot'], slot['token'])
+             if any(r.get('status') in ('ERROR', 'TIMEOUT') for r in results[key]):
++                if receipt.get('method_failure'):
++                    from bien_nhan import verify_method_failure
++                    verify_method_failure(receipt['method_failure'], job, envelope, invocation)
++                    validate_execution_links(job, invocation)
++                    continue
+                 from bien_nhan import verify_dev_error_reproduction
+                 if not receipt.get('dev_error_reproduction'):
+                     raise Blocked('snapshot lỗi chưa có finalization/phân loại được duyệt')
+@@ -87,6 +92,33 @@
+         selected[key] = s['member_sha256']
+     if selected != wanted:
+         raise Blocked('A4 chưa đủ mọi ca/seed trước ghép nhãn')
++    if plan['mode'] == 'test':
++        validate_ce_plan(plan, runtimes['RE2-TT'])
++
++
++def validate_ce_plan(plan, runtime):
++    """Mỗi ca TT có một lượt C-e hỗ trợ hoặc dòng insufficient đã ràng buộc nguồn."""
++    covered = set()
++    for job in plan['jobs']:
++        s = job['slot']
++        if s['view'] != 'ce':
++            continue
++        oid = s['opaque_id']; row = runtime['cases'].get(oid)
++        if (s['dataset'] != 'RE2-TT' or s['arm'] != 'M1' or s['seed'] is not None or oid in covered
++                or row is None or row.get('ce_history') != 'verified'
++                or s['source_sha256'] != fingerprint(row)
++                or s['window'] != {'t': row['t']-300, 'half_width_s': 300}):
++            raise Blocked('C-e job khác nguồn/hỗ trợ hoặc bị trùng')
++        covered.add(oid)
++    for support in plan.get('ce_support', []):
++        oid = support['opaque_id']; row = runtime['cases'].get(oid)
++        if (support.get('dataset') != 'RE2-TT' or support.get('status') != 'INSUFFICIENT_EVIDENCE'
++                or oid in covered or row is None or row.get('ce_history') != 'insufficient'
++                or support.get('source_sha256') != fingerprint(row)):
++            raise Blocked('C-e insufficient không có hỗ trợ nguồn riêng hoặc trùng lượt')
++        covered.add(oid)
++    if covered != set(runtime['cases']):
++        raise Blocked('C-e thiếu ca/dòng hỗ trợ trước ghép nhãn')
+ 
+ 
+ def evaluate(snapshot, plan, label_refs, canonical_refs, runtimes, aliases, inventories, output):
+@@ -119,10 +151,51 @@
+         tables[ds] = left, right, labels[ds]
+     expected = (60, 34) if plan['mode'] == 'test' else tuple(len(labels[ds]) for ds in ('RE2-TT', 'Nezha-OB'))
+     result = a4_v2.evaluate(tables['RE2-TT'], tables['Nezha-OB'], torai_seeds=(0, 1, 2), expected_counts=expected)
++    if plan.get('sensitivity_decision_ref'):
++        approved_sensitivities(result, tables, plan['sensitivity_decision_ref'])
+     atomic(Path(output) / 'a4.json', result)
+     descriptive = describe(plan, records, labels)
+     atomic(Path(output) / 'tables.json', descriptive)
+     return result
++
++
++def approved_sensitivities(result, tables, decision_ref):
++    """Hai độ nhạy Minh duyệt; không đổi E04 hoặc mức OB từ phép chính."""
++    from math import lcm
++    import numpy as np
++    import a4_v2
++    from p3 import danh_gia
++    decision = read_pin(decision_ref)
++    if decision.get('status') != 'USER_CONFIRMED' or not decision.get('sensitivity'):
++        raise Blocked('thiếu quyết định công thức độ nhạy')
++    for ds, key in [('RE2-TT', 'TT'), ('Nezha-OB', 'OB')]:
++        left, right, labels = tables[ds]
++        cells = {oid: labels[oid]['cell'] for oid in left}
++        kept = [oid for oid in left if left[oid]['status'] not in ('ERROR', 'TIMEOUT')
++                and not any(r['status'] in ('ERROR', 'TIMEOUT') for r in right[oid])]
++        for world, row in result[key].items():
++            a = {oid: a4_v2._score(left[oid], labels[oid]['root'], world) for oid in left}
++            b = {oid: a4_v2._mean_scores([a4_v2._score(r, labels[oid]['root']) for r in right[oid]]) for oid in left}
++            metric = 'RR' if ds == 'RE2-TT' else 'Hit5_Q'
++            delta = {oid: a[oid][metric] - b[oid][metric] for oid in left}
++            if ds == 'RE2-TT':
++                # Số nguyên chính xác: không dùng epsilon của helper ứng viên cũ.
++                scale = lcm(*(v.denominator for v in delta.values()))
++                values = [int(scale * delta[o]) for o in sorted(delta)]
++                observed = abs(sum(values))
++                rng = np.random.default_rng(20261005)
++                signs = 2 * rng.integers(0, 2, size=(10000, len(values))) - 1
++                exceed = sum(abs(sum(int(s) * v for s, v in zip(sample, values))) >= observed for sample in signs)
++                row.pop('case_permutation_candidate', None)
++                row['case_permutation'] = dict(p=Fraction(exceed + 1, 10001), draws=10000, seed=20261005,
++                    status='USER_CONFIRMED_SENSITIVITY_ONLY', decision=decision_ref,
++                    limit='Ca cùng ô có thể phụ thuộc; không điều khiển A4/chuyển mức.')
++            excluded = row.pop('error_excluded_candidate')
++            excluded.update(status='USER_CONFIRMED_SENSITIVITY_ONLY', decision=decision_ref,
++                n=len(kept), cells=len({cells[o] for o in kept}),
++                bootstrap=danh_gia.bootstrap({'M1': {o:a[o] for o in kept}, 'baseline': {o:b[o] for o in kept}},
++                                             {o:cells[o] for o in kept}) if kept else None)
++            row['error_excluded'] = excluded
+ 
+ 
+ def main_records_from_seal(seal_ref, key):
+@@ -176,6 +249,8 @@
+         votes = {r['entity']: r['key'][0] for r in simple.get('entity_ranking', [])}
+     graph = m1.get('extra', {}).get('canh')
+     if graph is None:
++        if m1.get('status') in ('ERROR', 'TIMEOUT'):
++            return {'C-c': cc}  # C-c độc lập; C-g thiếu graph, không dựng/rút từ nhãn.
+         raise Blocked('M1 thiếu graph cho C-g; không dựng từ nhãn')
+     return {'C-c': cc, 'C-g': doi_chung.cg(votes, ranks['simplerca'], [tuple(e) for e in graph])}
+ 
+@@ -204,14 +279,26 @@
+             pool[(s['dataset'], s['view'], s['opaque_id'])]['circa_rht_aux'].extend(auxiliary)
+         else:
+             pool[(s['dataset'], s['view'], s['opaque_id'])][s['arm']].extend(actual)
+-    rows, region_rows, ce_rows, positions, missing = [], [], [], [], []
++    rows, region_rows, ce_rows, positions = [], [], [], []
++    missing = [[j['slot']['dataset'], j['slot']['opaque_id'], j['slot']['view'], j['slot']['arm'],
++                'BLOCKED_NO_VERIFIED_RESULT'] for j in plan['jobs'] if fingerprint(j['slot']) not in sealed_records]
+     by_world = defaultdict(dict)
++    for support in plan.get('ce_support', []):
++        ce_rows.append(dict(support, U=len(plan['inventories']['RE2-TT']), top_mass=None,
++                           O=None, returned=None, V0=None, N1=None,
++                           future_root_score=None, limit='Không đủ lịch sử; ngoài mẫu số miền C-e hỗ trợ.'))
+     for (ds, view, oid), arms in sorted(pool.items()):
+         root = labels[ds][oid]['root']
+         if view == 'ce':
+             if 'M1' not in arms:
+                 missing.append([ds, oid, 'ce', 'M1']); continue
+             rec, = arms['M1']
++            if rec['status'] in ('ERROR', 'TIMEOUT'):
++                ce_rows.append({'dataset': ds, 'opaque_id': oid, 'status': rec['status'],
++                    'U': len(plan['inventories'][ds]), 'top_mass': None, 'O': None, 'returned': None,
++                    'V0': None, 'N1': None, 'future_root_score': exact_score(rec, root),
++                    'limit': 'Lỗi phương pháp trên cửa sổ hỗ trợ; chưa có hạng/trung gian, không gán N1/O/V0=0.'})
++                continue
+             ranked = danh_gia.khoi_tu_ban_ghi(rec) if rec['status'] == 'OK' else []
+             returned = [e for block in ranked for group in block['groups'] for e in group]
+             mass = {e: danh_gia.phan_bo_hang(ranked, e).get(1, Fraction(0)) for e in returned}
+@@ -227,6 +314,8 @@
+             m1, = arms['M1']
+             if all(k in arms for k in ('baro', 'simplerca', 'tracerca')):
+                 derived = controls(m1, {k: arms[k][0] for k in ('baro', 'simplerca', 'tracerca')})
++                if 'C-g' not in derived:
++                    missing.append([ds, oid, 'main', 'C-g', 'MAIN_METHOD_DID_NOT_RETURN_GRAPH'])
+                 for name, item in derived.items():
+                     arms[name] = [dict(item, status=item['trang_thai'])]
+             for name, item in m1.get('extra', {}).get('doi_chung', {}).items():
+--- before/results/T-054/scripts/dieu_phoi.py
++++ results/T-054/scripts/dieu_phoi.py
+@@ -54,7 +54,10 @@
+             jobs[row['job_id']] = row
+     for sample in iter_events(directory / 'resources.jsonl'):
+         pass
+-    return {'jobs': jobs, 'last_event': last, 'last_monitor': sample, 'wait': wait, 'controller': controller,
++    counts = {}
++    for row in jobs.values():
++        counts[row['state']] = counts.get(row['state'], 0) + 1
++    return {'jobs': jobs, 'counts': counts, 'last_event': last, 'last_monitor': sample, 'wait': wait, 'controller': controller,
+             'warning': 'Heartbeat cũ không xác minh process đã dừng; dùng resume để đối chiếu PID/token.'}
+ 
+ 
+@@ -73,6 +76,12 @@
+ def check_budget(plan):
+     budget = plan.get('budget')
+     if budget is None and plan['mode'] == 'synthetic':
++        return
++    if isinstance(budget, dict) and budget.get('mode') == 'UNTIL_COHORT_COMPLETE':
++        decision = read_pin(budget['decision_ref'])
++        if (decision.get('status') != 'USER_CONFIRMED' or budget.get('wall_s') is not None
++                or budget.get('method_dataset_s') != {} or not decision.get('budget', {}).get('rule', '').startswith('no fixed cumulative cap')):
++            raise Blocked('chính sách không trần thiếu nguồn Minh hoặc có trần ẩn')
+         return
+     if (not isinstance(budget, dict) or not _positive(budget.get('wall_s'))
+             or not isinstance(budget.get('method_dataset_s'), dict)):
+@@ -112,6 +121,8 @@
+     import psutil
+     start = budget['start']; limits = {}
+     same_boot = start['boot_time'] == psutil.boot_time()
++    if budget['policy'].get('mode') == 'UNTIL_COHORT_COMPLETE':
++        return {}
+     limits['whole_run'] = {'epoch': start['started_epoch'] + budget['policy']['wall_s']}
+     if same_boot:
+         limits['whole_run']['monotonic'] = start['started_monotonic'] + budget['policy']['wall_s']
+@@ -230,14 +241,17 @@
+     samples = events(attempt / 'monitor.jsonl')
+     gap = max((r['max_monitor_gap_s'] for r in samples), default=0)
+     peak = max((r.get('peak_tree_rss', 0) for r in samples), default=0)
+-    previous = time.monotonic(); sample = None
++    previous = time.monotonic(); previous_wall = time.time(); sample = None
++    clock_anomaly = any(r.get('clock_anomaly') for r in samples)
+     # Khoảng mất quan sát khi controller restart tính từ clock wall đã lưu; không lấp bằng heartbeat mới.
+     if samples:
+         gap = max(gap, max(0, time.time() - samples[-1]['wall_clock']))
+     while alive(ident):
+         now = time.monotonic()
++        wall = time.time()
++        clock_anomaly = clock_anomaly or abs((wall - previous_wall) - (now - previous)) > policy['max_monitor_gap_s']
+         gap = max(gap, now - previous)
+-        previous = now
++        previous = now; previous_wall = wall
+         rss = read_bytes = write_bytes = 0
+         cpu = 0.0
+         try:
+@@ -252,14 +266,19 @@
+         except psutil.NoSuchProcess:
+             pass
+         peak = max(peak, rss)
++        memory = psutil.virtual_memory()
++        swap = psutil.swap_memory()
+         phases = events(attempt / 'phases.jsonl')
+         ident = bind_actual_process(attempt, token, ident, phases)
+         sample = {'token': token, 'wall_clock': time.time(), 'max_monitor_gap_s': gap,
+                   'peak_tree_rss': peak, 'tree_rss': rss, 'tree_cpu_s': cpu,
+                   'tree_read_bytes': read_bytes, 'tree_write_bytes': write_bytes,
+                   'free_disk': psutil.disk_usage(str(attempt)).free,
++                  'host_available_ram': memory.available, 'host_swap_used': swap.used,
++                  'host_swap_in': swap.sin, 'host_swap_out': swap.sout,
+                   'last_phase_sha256': fingerprint(phases[-1]) if phases else None,
+-                  'phase': phases[-1].get('phase') if phases else None, 'pid': ident['pid']}
++                  'phase': phases[-1].get('phase') if phases else None, 'pid': ident['pid'],
++                  'clock_anomaly': clock_anomaly, 'poll_s': policy['poll_s']}
+         append(attempt / 'monitor.jsonl', sample)
+         append(resources or attempt.parent.parent / 'resources.jsonl', sample)
+         budget_reason = exhausted(limits or {})
+@@ -270,6 +289,8 @@
+             return True, sample
+         if time.time() >= deadline:
+             # Ghi bằng chứng trước khi kill, không suy pha từ chuỗi lỗi.
++            sample['deadline_observed_epoch'] = time.time()
++            sample['max_monitor_gap_s'] = max(gap, time.monotonic() - previous)
+             atomic(attempt / 'timeout.json', sample)
+             terminate_tree(ident['pid'])
+             return True, sample
+@@ -310,6 +331,11 @@
+                 if any(not danh_gia.khoi_tu_ban_ghi(v) for v in views):
+                     raise Blocked('record OK không có thứ hạng hợp lệ')
+     if any(r.get('status') in ('ERROR', 'TIMEOUT') for r in records):
++        failure = attempt / 'method-failure.json'
++        if failure.is_file():
++            from bien_nhan import verify_method_failure
++            verify_method_failure(ref(failure), job, envelope, invocation)
++            return records
+         from bien_nhan import verify_dev_error_reproduction
+         path = attempt / 'dev-error-reproduction.json'
+         if not path.is_file():
+@@ -365,6 +391,8 @@
+                 from worker import read_pin_path
+                 for pin in prep['tables'].values(): read_pin_path(pin)
+             else:
++                from bien_nhan import finalize_error
++                finalize_error(stage, job)
+                 verify_attempt(stage, job, token)
+             continue
+         if name == 'method':
+@@ -379,6 +407,7 @@
+         else:
+             stage.mkdir()
+             atomic(stage / 'job.json', item)
++            os.link(attempt / 'launch.json', stage / 'launch.json')
+             p = launch(executable, [str(OUT / 'scripts/worker.py'), str(stage / 'job.json'), str(stage), token],
+                        stage / 'stdout.txt', stage / 'stderr.txt')
+             ident = identity(p.pid, token)
+@@ -387,19 +416,167 @@
+         if timed_out:
+             if sample.get('budget_exhausted'):
+                 raise BudgetStop(sample['budget_exhausted'])
++            if name == 'method' and job.get('failure_policy_ref'):
++                from bien_nhan import finalize_timeout
++                finalize_timeout(stage, job, token)
++                continue
+             classified = timeout_classification(job['slot'], events(stage / 'phases.jsonl'), sample, policy)
+             raise Blocked('TORAI ' + name + ' timeout: ' + classified[1])
+         if not expected_output.exists():
+             raise Blocked('TORAI ' + name + ' worker chưa đóng output')
+-    for name in ('result.json', 'invocation.json'):
++        if name == 'method':
++            from bien_nhan import finalize_error
++            finalize_error(stage, job)
++    for name in ('result.json', 'invocation.json', 'method-failure.json'):
+         dest = attempt / name
+-        if not dest.exists():
++        if not dest.exists() and (attempt / 'method' / name).exists():
+             os.link(attempt / 'method' / name, dest)
+     verify_attempt(attempt, job, token)
+ 
+ 
++def _run_one(job, plan, directory, budget, old_jobs, jobs_by_slot, emit):
++    """Một slot, không retry; scheduler giữ độc quyền nhóm method×dataset."""
++    job_id = fingerprint(job['slot'])
++    old = old_jobs.get(job_id)
++    if old is None:
++        candidate = directory / job_id / 'attempt-001'
++        if candidate.exists():
++            try:
++                saved_job = read_pin(ref(candidate / 'job.json'))
++                saved_launch = read_pin(ref(candidate / 'launch.json'))
++                if fingerprint(saved_job) != fingerprint(job):
++                    raise Blocked('attempt cũ không cùng job')
++                old = {'state': 'RUNNING', 'attempt': str(candidate), 'token': saved_launch['token']}
++                emit(dict(old, job_id=job_id, action='RECOVER_ATTEMPT_METADATA'))
++            except (Blocked, OSError, ValueError, KeyError) as exc:
++                emit({'job_id': job_id, 'state': 'BLOCKED', 'reason': 'ATTEMPT_OWNER_UNKNOWN:' + str(exc)})
++                return False
++    if old and old['state'] == 'VERIFIED':
++        attempt = Path(old['attempt'])
++        records = verify_attempt(attempt, job, old['token'])
++        sealed = read_pin(old['receipt'])
++        if sealed['result'] != ref(attempt / 'result.json') or sealed['invocation'] != ref(attempt / 'invocation.json'):
++            raise Blocked('VERIFIED file bị đổi sau receipt')
++        return False
++    if old and old['state'] in ('BLOCKED', 'FAILED_OPERATIONAL'):
++        return False  # không tự thử lại bằng chứng lỗi chưa phân xử
++    if not old:
++        controls = events(directory / 'control.jsonl')
++        if controls and controls[-1]['action'] == 'DRAIN':
++            return True
++        limits = budget_limits(budget, job, launch_record('preflight', job['timeout_s']))
++        reason = exhausted(limits)
++        if reason:
++            emit({'state': 'WAIT_BUDGET', 'reason': reason, 'next_job_id': job_id})
++            return True
++    try:
++        execution = resolve_dependency(job, jobs_by_slot, old_jobs, directory)
++    except (Blocked, OSError, KeyError, ValueError) as exc:
++        emit({'job_id': job_id, 'state': 'BLOCKED', 'reason': str(exc)})
++        return False
++    if job['kind'] == 'torai_pipeline' or (job['kind'] == 'synthetic' and job.get('pipeline_fixture')):
++        if old:
++            attempt, token = Path(old['attempt']), old['token']
++            deadline = read_pin(ref(attempt / 'launch.json'))['deadline_epoch']
++        else:
++            token = uuid.uuid4().hex
++            attempt = directory / job_id / 'attempt-001'
++            attempt.mkdir(parents=True, exist_ok=False)
++            deadline = time.time() + job['timeout_s']
++            atomic(attempt / 'job.json', job)
++            started = launch_record(token, job['timeout_s']); deadline = started['deadline_epoch']
++            atomic(attempt / 'launch.json', started)
++        emit(dict(job_id=job_id, state='RUNNING', attempt=str(attempt), token=token))
++        limits = budget_limits(budget, job, read_pin(ref(attempt / 'launch.json')))
++        try:
++            pipeline(job, attempt, token, deadline, plan['monitor'], limits=limits, resources=directory / 'resources.jsonl')
++            receipt = ref(attempt / 'verified.json') if (attempt / 'verified.json').exists() else atomic(attempt / 'verified.json', {'job_sha256': fingerprint(job),
++                             'result': ref(attempt / 'result.json'), 'invocation': ref(attempt / 'invocation.json'),
++                             **({'method_failure': ref(attempt / 'method-failure.json')}
++                                if (attempt / 'method-failure.json').exists() else {})})
++            close_cost(attempt, job, budget)
++            emit(dict(job_id=job_id, state='VERIFIED', attempt=str(attempt), token=token, receipt=receipt))
++        except BudgetStop as exc:
++            close_cost(attempt, job, budget)
++            emit(dict(job_id=job_id, state='BLOCKED', attempt=str(attempt), token=token, reason='BUDGET:' + str(exc)))
++            emit({'state': 'WAIT_BUDGET', 'reason': str(exc)})
++            return True
++        except (Blocked, OSError, ValueError) as exc:
++            close_cost(attempt, job, budget)
++            emit(dict(job_id=job_id, state='BLOCKED', attempt=str(attempt), token=token, reason=str(exc)))
++        return False
++    if old:
++        attempt = Path(old['attempt']); token = old['token']
++        if not (attempt / 'identity.json').is_file():
++            emit(dict(job_id=job_id, state='BLOCKED', reason='PROCESS_OWNER_UNKNOWN', attempt=str(attempt), token=token)); return False
++        ident = saved_identity(attempt)
++        if not alive(ident) and not (attempt / 'result.json').exists():
++            emit(dict(job_id=job_id, state='BLOCKED', reason='DEAD_PARTIAL_RETAINED', attempt=str(attempt), token=token)); return False
++        emit(dict(job_id=job_id, state='RUNNING', action='ADOPT', attempt=str(attempt), token=token))
++        deadline = read_pin(ref(attempt / 'launch.json'))['deadline_epoch']
++    else:
++        token = uuid.uuid4().hex
++        attempt = directory / job_id / 'attempt-001'
++        attempt.mkdir(parents=True, exist_ok=False)
++        atomic(attempt / 'job.json', job)
++        started = launch_record(token, job['timeout_s']); deadline = started['deadline_epoch']
++        atomic(attempt / 'launch.json', started)
++        emit(dict(job_id=job_id, state='RUNNING', attempt=str(attempt), token=token))
++        execution_path = attempt / 'job.json'
++        if execution != job:
++            execution_path = attempt / 'execution-job.json'
++            atomic(execution_path, execution)
++        p = launch(job['executable'], [str(OUT / 'scripts/worker.py'), str(execution_path), str(attempt), token],
++                   attempt / 'stdout.txt', attempt / 'stderr.txt')
++        try:
++            ident = identity(p.pid, token)
++            atomic(attempt / 'identity.json', ident)
++        except Exception:
++            terminate_tree(p.pid)
++            raise
++    limits = budget_limits(budget, job, read_pin(ref(attempt / 'launch.json')))
++    timed_out, monitor = _monitor(attempt, token, ident, deadline, plan['monitor'], limits=limits)
++    close_cost(attempt, job, budget)
++    if timed_out:
++        if monitor.get('budget_exhausted'):
++            emit(dict(job_id=job_id, state='BLOCKED', reason='BUDGET:' + monitor['budget_exhausted'], attempt=str(attempt), token=token))
++            emit({'state': 'WAIT_BUDGET', 'reason': monitor['budget_exhausted']})
++            return True
++        state, reason = timeout_classification(job['slot'], events(attempt / 'phases.jsonl'), monitor, plan['monitor'])
++        try:
++            from bien_nhan import finalize_timeout
++            if not job.get('failure_policy_ref'):
++                raise Blocked(reason)
++            finalize_timeout(attempt, job, token)
++        except (Blocked, OSError, ValueError, KeyError) as exc:
++            emit(dict(job_id=job_id, state='BLOCKED', reason=str(exc), phase_state=state, attempt=str(attempt), token=token))
++            return False
++    try:
++        emit(dict(job_id=job_id, state='COMPLETE_UNVERIFIED', attempt=str(attempt), token=token))
++        from bien_nhan import finalize_error
++        finalize_error(attempt, job)
++        verify_attempt(attempt, job, token)
++        receipt_path = attempt / 'verified.json'
++        if receipt_path.exists():
++            receipt = ref(receipt_path)
++        else:
++            receipt = atomic(receipt_path, {'result': ref(attempt / 'result.json'),
++                             'invocation': ref(attempt / 'invocation.json'), 'job_sha256': fingerprint(job),
++                             **({'method_failure': ref(attempt / 'method-failure.json')}
++                                if (attempt / 'method-failure.json').exists() else {})})
++        emit(dict(job_id=job_id, state='VERIFIED', attempt=str(attempt), token=token, receipt=receipt))
++    except (Blocked, OSError, ValueError, KeyError) as exc:
++        emit(dict(job_id=job_id, state='BLOCKED', reason=str(exc), attempt=str(attempt), token=token))
++    return False
++
++
+ def supervise(plan, directory):
+-    """Plan đã kiểm pin/quyền trước hàm này. Không auto retry khi chính sách chưa duyệt."""
++    """Một supervisor; tối đa hai worker. Plan bất biến quyết số worker."""
++    import threading
++    from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
++    count = plan.get('workers', 1)
++    if type(count) is not int or count not in (1, 2):
++        raise Blocked('workers phải là 1 hoặc 2, khai trong plan')
+     directory = Path(directory)
+     directory.mkdir(parents=True, exist_ok=True)
+     with exclusive(directory / 'supervisor.lock'):
+@@ -407,132 +584,55 @@
+         journal = directory / 'events.jsonl'
+         append(directory / 'control.jsonl', {'action': 'RESUME'})
+         append(journal, {'state': 'SUPERVISOR', 'pid': os.getpid(), 'plan_sha256': fingerprint(plan),
+-                         'identity': identity(os.getpid(), 'supervisor')})
+-        old_jobs = status(directory)['jobs']
++                         'workers': count, 'identity': identity(os.getpid(), 'supervisor')})
++        current = status(directory)['jobs']
+         jobs_by_slot = {fingerprint(j['slot']): j for j in plan['jobs']}
++        lock = threading.Lock()
+         def emit(row):
+-            append(journal, row)
+-            if 'job_id' in row and 'state' in row:
+-                old_jobs[row['job_id']] = row
+-        for job in plan['jobs']:
+-            job_id = fingerprint(job['slot'])
+-            old = old_jobs.get(job_id)
+-            if old is None:
+-                candidate = directory / job_id / 'attempt-001'
+-                if candidate.exists():
+-                    try:
+-                        saved_job = read_pin(ref(candidate / 'job.json'))
+-                        saved_launch = read_pin(ref(candidate / 'launch.json'))
+-                        if fingerprint(saved_job) != fingerprint(job):
+-                            raise Blocked('attempt cũ không cùng job')
+-                        old = {'state': 'RUNNING', 'attempt': str(candidate), 'token': saved_launch['token']}
+-                        emit(dict(old, job_id=job_id, action='RECOVER_ATTEMPT_METADATA'))
+-                    except (Blocked, OSError, ValueError, KeyError) as exc:
+-                        emit({'job_id': job_id, 'state': 'BLOCKED', 'reason': 'ATTEMPT_OWNER_UNKNOWN:' + str(exc)})
+-                        continue
+-            if old and old['state'] == 'VERIFIED':
+-                attempt = Path(old['attempt'])
+-                records = verify_attempt(attempt, job, old['token'])
+-                sealed = read_pin(old['receipt'])
+-                if sealed['result'] != ref(attempt / 'result.json') or sealed['invocation'] != ref(attempt / 'invocation.json'):
+-                    raise Blocked('VERIFIED file bị đổi sau receipt')
+-                continue
+-            if old and old['state'] in ('BLOCKED', 'FAILED_OPERATIONAL'):
+-                continue  # không tự thử lại bằng chứng lỗi chưa phân xử
+-            if not old:
+-                controls = events(directory / 'control.jsonl')
+-                if controls and controls[-1]['action'] == 'DRAIN':
+-                    break
+-                limits = budget_limits(budget, job, launch_record('preflight', job['timeout_s']))
+-                reason = exhausted(limits)
+-                if reason:
+-                    emit({'state': 'WAIT_BUDGET', 'reason': reason, 'next_job_id': job_id})
+-                    break
+-            try:
+-                execution = resolve_dependency(job, jobs_by_slot, old_jobs, directory)
+-            except (Blocked, OSError, KeyError, ValueError) as exc:
+-                emit({'job_id': job_id, 'state': 'BLOCKED', 'reason': str(exc)})
+-                continue
+-            if job['kind'] == 'torai_pipeline' or (job['kind'] == 'synthetic' and job.get('pipeline_fixture')):
+-                if old:
+-                    attempt, token = Path(old['attempt']), old['token']
+-                    deadline = read_pin(ref(attempt / 'launch.json'))['deadline_epoch']
+-                else:
+-                    token = uuid.uuid4().hex
+-                    attempt = directory / job_id / 'attempt-001'
+-                    attempt.mkdir(parents=True, exist_ok=False)
+-                    deadline = time.time() + job['timeout_s']
+-                    atomic(attempt / 'job.json', job)
+-                    started = launch_record(token, job['timeout_s']); deadline = started['deadline_epoch']
+-                    atomic(attempt / 'launch.json', started)
+-                emit(dict(job_id=job_id, state='RUNNING', attempt=str(attempt), token=token))
+-                limits = budget_limits(budget, job, read_pin(ref(attempt / 'launch.json')))
+-                try:
+-                    pipeline(job, attempt, token, deadline, plan['monitor'], limits=limits, resources=directory / 'resources.jsonl')
+-                    receipt = ref(attempt / 'verified.json') if (attempt / 'verified.json').exists() else atomic(attempt / 'verified.json', {'job_sha256': fingerprint(job),
+-                                     'result': ref(attempt / 'result.json'), 'invocation': ref(attempt / 'invocation.json')})
+-                    close_cost(attempt, job, budget)
+-                    emit(dict(job_id=job_id, state='VERIFIED', attempt=str(attempt), token=token, receipt=receipt))
+-                except BudgetStop as exc:
+-                    close_cost(attempt, job, budget)
+-                    emit(dict(job_id=job_id, state='BLOCKED', attempt=str(attempt), token=token, reason='BUDGET:' + str(exc)))
+-                    emit({'state': 'WAIT_BUDGET', 'reason': str(exc)})
+-                    break
+-                except (Blocked, OSError, ValueError) as exc:
+-                    close_cost(attempt, job, budget)
+-                    emit(dict(job_id=job_id, state='BLOCKED', attempt=str(attempt), token=token, reason=str(exc)))
+-                continue
+-            if old:
+-                attempt = Path(old['attempt']); token = old['token']
+-                if not (attempt / 'identity.json').is_file():
+-                    emit(dict(job_id=job_id, state='BLOCKED', reason='PROCESS_OWNER_UNKNOWN', attempt=str(attempt), token=token)); continue
+-                ident = saved_identity(attempt)
+-                if not alive(ident) and not (attempt / 'result.json').exists():
+-                    emit(dict(job_id=job_id, state='BLOCKED', reason='DEAD_PARTIAL_RETAINED', attempt=str(attempt), token=token)); continue
+-                emit(dict(job_id=job_id, state='RUNNING', action='ADOPT', attempt=str(attempt), token=token))
+-                deadline = read_pin(ref(attempt / 'launch.json'))['deadline_epoch']
+-            else:
+-                token = uuid.uuid4().hex
+-                attempt = directory / job_id / 'attempt-001'
+-                attempt.mkdir(parents=True, exist_ok=False)
+-                atomic(attempt / 'job.json', job)
+-                started = launch_record(token, job['timeout_s']); deadline = started['deadline_epoch']
+-                atomic(attempt / 'launch.json', started)
+-                emit(dict(job_id=job_id, state='RUNNING', attempt=str(attempt), token=token))
+-                execution_path = attempt / 'job.json'
+-                if execution != job:
+-                    execution_path = attempt / 'execution-job.json'
+-                    atomic(execution_path, execution)
+-                p = launch(job['executable'], [str(OUT / 'scripts/worker.py'), str(execution_path), str(attempt), token],
+-                           attempt / 'stdout.txt', attempt / 'stderr.txt')
+-                try:
+-                    ident = identity(p.pid, token)
+-                    atomic(attempt / 'identity.json', ident)
+-                except Exception:
+-                    terminate_tree(p.pid)
+-                    raise
+-            limits = budget_limits(budget, job, read_pin(ref(attempt / 'launch.json')))
+-            timed_out, monitor = _monitor(attempt, token, ident, deadline, plan['monitor'], limits=limits)
+-            close_cost(attempt, job, budget)
+-            if timed_out:
+-                if monitor.get('budget_exhausted'):
+-                    emit(dict(job_id=job_id, state='BLOCKED', reason='BUDGET:' + monitor['budget_exhausted'], attempt=str(attempt), token=token))
+-                    emit({'state': 'WAIT_BUDGET', 'reason': monitor['budget_exhausted']})
+-                    break
+-                state, reason = timeout_classification(job['slot'], events(attempt / 'phases.jsonl'), monitor, plan['monitor'])
+-                # COMPLETE_UNVERIFIED chỉ đủ bằng chứng pha; đóng TIMEOUT khoa học còn cần policy/grant.
+-                emit(dict(job_id=job_id, state='BLOCKED', reason=reason, phase_state=state, attempt=str(attempt), token=token))
+-                continue
+-            try:
+-                emit(dict(job_id=job_id, state='COMPLETE_UNVERIFIED', attempt=str(attempt), token=token))
+-                verify_attempt(attempt, job, token)
+-                receipt_path = attempt / 'verified.json'
+-                if receipt_path.exists():
+-                    receipt = ref(receipt_path)
+-                else:
+-                    receipt = atomic(receipt_path, {'result': ref(attempt / 'result.json'),
+-                                     'invocation': ref(attempt / 'invocation.json'), 'job_sha256': fingerprint(job)})
+-                emit(dict(job_id=job_id, state='VERIFIED', attempt=str(attempt), token=token, receipt=receipt))
+-            except (Blocked, OSError, ValueError, KeyError) as exc:
+-                emit(dict(job_id=job_id, state='BLOCKED', reason=str(exc), attempt=str(attempt), token=token))
+-        append(journal, {'state': 'SUPERVISOR_STOPPED', 'pid': os.getpid()})
++            with lock:
++                append(journal, dict(row, wall_clock=time.time()))
++                if 'job_id' in row and 'state' in row:
++                    current[row['job_id']] = row
++        # Lượt đang sống được nhận trước lượt mới; không tăng số worker khi resume.
++        pending = sorted(plan['jobs'], key=lambda j: 0 if current.get(fingerprint(j['slot']), {}).get('state')
++                         in ('RUNNING', 'COMPLETE_UNVERIFIED') else 1)
++        active = {}; groups = set(); stop = False
++        try:
++            with ThreadPoolExecutor(max_workers=count) as pool:
++                while pending or active:
++                    controls = events(directory / 'control.jsonl')
++                    if controls and controls[-1]['action'] == 'DRAIN':
++                        stop = True
++                    if not stop:
++                        for job in list(pending):
++                            if len(active) >= count:
++                                break
++                            group = budget_group(job)
++                            if group in groups:
++                                continue
++                            dep = job.get('main_dependency')
++                            if dep:
++                                parent = fingerprint(dep['slot'])
++                                parent_state = current.get(parent, {}).get('state')
++                                if parent_state not in ('VERIFIED', 'BLOCKED', 'FAILED_OPERATIONAL'):
++                                    continue
++                            pending.remove(job); groups.add(group)
++                            future = pool.submit(_run_one, job, plan, directory, budget, current, jobs_by_slot, emit)
++                            active[future] = (group, fingerprint(job['slot']))
++                    if not active:
++                        if stop or not pending:
++                            break
++                        raise Blocked('dependency không có producer có thể thực hiện')
++                    done, _ = wait(active, timeout=0.2, return_when=FIRST_COMPLETED)
++                    for future in done:
++                        group, job_id = active.pop(future)
++                        groups.remove(group)
++                        requested_stop = future.result()
++                        if current.get(job_id, {}).get('state') in ('BLOCKED', 'FAILED_OPERATIONAL'):
++                            emit({'state': 'WAIT_ERROR', 'blocked_job_id': job_id,
++                                  'reason': current[job_id].get('reason')})
++                            requested_stop = True
++                        if requested_stop:
++                            stop = True
++        finally:
++            append(journal, {'state': 'SUPERVISOR_STOPPED', 'pid': os.getpid(), 'wall_clock': time.time()})
+--- before/results/T-054/scripts/nguon.py
++++ results/T-054/scripts/nguon.py
+@@ -71,6 +71,27 @@
+             if job['opaque_id'] != oid or job['dataset'] != ds or job['window'] != 'that':
+                 raise Blocked('mốc TT không từ command main đúng ca')
+             normalized = {'t': job['t'], 'ce_history': 'unknown'}
++            if oid in descriptor.get('ce_evidence', {}):
++                evidence = descriptor['ce_evidence'][oid]
++                ce_job = read_pin(evidence['command'])['job']
++                from pilot import reference
++                record = reference(evidence['record'], evidence['config_id'])
++                t_ns = (job['t'] - 300) * 10**9
++                if (ce_job['opaque_id'] != oid or ce_job['dataset'] != ds or ce_job['window'] != 'ce'
++                        or ce_job['t'] != job['t'] - 300 or record.get('opaque_id') != oid
++                        or record.get('status') != 'OK'
++                        or record['window']['N'] != [t_ns-300*10**9, t_ns]
++                        or record['window']['A'] != [t_ns, t_ns+300*10**9]
++                        or ce_job['source_bytes'] != sum(v['bytes'] for v in row['files'].values())):
++                    raise Blocked('C-e evidence không cùng source/case/window đã ghim')
++                coverage = record.get('coverage', {})
++                if set(coverage) != {'trace', 'metric', 'log'} or any(
++                    c.get('trang_thai') != 'OK' or not c.get('F')
++                    or c['F'][0] > t_ns-300*10**9 or c['F'][1] < t_ns+300*10**9
++                    or any(c['o'][w].get('OPEN', 0) for w in ('N', 'A')) for c in coverage.values()):
++                    raise Blocked('C-e lịch sử/A0 chưa đủ căn cứ; không tự gán verified')
++                normalized['ce_history'] = 'verified'
++
+         elif ds == 'Nezha-OB':
+             import hashlib
+             found = [m for m in members if 'dev-' + hashlib.sha256(m['case'].encode()).hexdigest()[:10] == oid]
+@@ -156,6 +177,7 @@
+             raise Blocked('test chỉ local, chưa có ngoại lệ cloud')
+         if not plan.get('protocol_ref') or read_pin(plan['protocol_ref']).get('status') != 'LOCKED_G3':
+             raise Blocked('WAIT_LOCKED_PROTOCOL')
++        validate_locked_plan(plan, read_pin(plan['protocol_ref']))
+     if mode not in ('dev', 'test'):
+         raise Blocked('mode chưa được cấp')
+     if any(j.get('evaluation_mode') != mode or j.get('kind') == 'synthetic' for j in plan['jobs']):
+@@ -180,6 +202,41 @@
+         raise Blocked('WAIT_POLICY_BUDGET')
+     from dieu_phoi import check_budget
+     check_budget(plan)
++
++
++def validate_locked_plan(plan, protocol):
++    """Plan được grant vẫn phải khớp code/config/env/policy khóa, trước I/O dữ liệu."""
++    c = read_pin(protocol['dispatch_contract_ref'])
++    if (c.get('schema') != 'T054-DISPATCH-CONTRACT-1'
++            or plan.get('workers', 1) != c['workers'] or plan.get('monitor') != c['monitor']
++            or plan.get('budget') != c['budget']
++            or plan.get('sensitivity_decision_ref') != c['sensitivity_decision_ref']):
++        raise Blocked('plan vận hành/độ nhạy khác bản khóa')
++    from bien_nhan import failure_policy
++    for job in plan['jobs']:
++        s = job['slot']; arm = s['arm']
++        family = arm in protocol['configurations']
++        expected = (protocol['configurations'][arm]['sha256'] if family else
++                    fingerprint({'cd3': 'same sealed M1'}) if arm == 'C-d3' else c['baseline_config_sha256'].get(arm))
++        if (not expected or s['config_sha256'] != expected
++                or (arm != 'C-d3' and fingerprint(job['config']) != expected)
++                or job.get('code_pins') != c['code_pins'] or job.get('protocol_ref') != plan['protocol_ref']):
++            raise Blocked('job code/config/protocol khác bản khóa')
++        torai = arm in ('torai_A','torai_B') and s['dataset'] == 'RE2-TT'
++        kind = 'm1' if family else 'cd3' if arm == 'C-d3' else 'torai_pipeline' if torai else 'baseline'
++        if job['kind'] != kind or job['timeout_s'] != c['timeout_s']['C-d3' if arm=='C-d3' else 'main_slot']:
++            raise Blocked('kind/timeout khác vế khóa')
++        if s['environment_sha256'] != c['environment_sha256']['py38' if torai else 'main']:
++            raise Blocked('environment slot khác bản khóa')
++        if torai and job.get('prep_environment_sha256') != c['environment_sha256']['main']:
++            raise Blocked('TORAI prep environment khác bản khóa')
++        if arm == 'T12-on' and job.get('static_snapshot') != protocol['snapshots'][s['dataset']]:
++            raise Blocked('T12 dùng snapshot khác bản khóa')
++        policy = failure_policy(job)
++        candidate = read_pin(c['failure_policy_candidate_ref'])
++        if ({k:v for k,v in policy.items() if k not in ('scope','main_allowed')}
++                != {k:v for k,v in candidate.items() if k not in ('scope','main_allowed')}):
++            raise Blocked('chính sách phân loại lỗi khác bản khóa')
+ 
+ 
+ def main_dependency_record(job, seal_ref):
+--- before/results/T-054/scripts/p7.py
++++ results/T-054/scripts/p7.py
+@@ -13,6 +13,8 @@
+     p = read_pin({'path': path, 'sha256': sha})
+     if p['schema'] != 'T054-PLAN-1' or len({fingerprint(j['slot']) for j in p['jobs']}) != len(p['jobs']):
+         raise Blocked('plan schema lạ hoặc slot trùng')
++    if type(p.get('workers', 1)) is not int or p.get('workers', 1) not in (1, 2):
++        raise Blocked('workers phải là 1 hoặc 2 trong plan bất biến')
+     for job in p['jobs']:
+         validate_slot(job['slot'], p)
+         if not isinstance(job['timeout_s'], (int, float)) or not 0 < job['timeout_s'] <= 3600:
+--- before/results/T-054/scripts/pilot.py
++++ results/T-054/scripts/pilot.py
+@@ -49,7 +49,7 @@
+ def plan_candidate():
+     return {'status': 'METADATA_COVER_CANDIDATE_NOT_CURRENT_AUTHORITY', 'measured_runtime': None,
+             'local': ['TT nhẹ/nặng + C-e', 'OB E2/C-d2 giúp và đối chiếu', 'T12 vùng đổi/không đổi',
+-                      'TORAI 3 seed + prep cache byte parity', 'đo throughput 1 rồi 2/3 worker'],
++                      'TORAI prep byte/seed parity đã có ở checkpoint003', 'chỉ đo thêm 2 worker; không benchmark 3/4'],
+             'ec2_1': ['TT có native cùng máy và nhánh driver còn thiếu, sau identity/env/sync grant'],
+             'ec2_2': 'Chỉ phát khi có nhánh driver cần thiết và giảm đường găng; chưa tự dựng thêm lô.',
+             'reference_sources': ['T-024', 'T-026', 'T-050', 'T-053', 'T-051'],
+@@ -116,7 +116,7 @@
+             'ec2_conditions': ['SSH identity/env inventory and exact TT dev sync must be granted',
+                 'EC2 2 only if setup/sync/parity is cheaper than local branch it frees; otherwise retain branch locally with recorded plan before run',
+                 'OB remains local; no test or test-derived data on cloud'],
+-            'local_concurrency': 'Stage 1 is one worker. 2/3 need resource/throughput measurement and scheduler support before use.',
++            'local_concurrency': 'Latest approved plan: retain existing one-worker references; one bounded two-worker check only. No 3/4 search.',
+             'remaining_before_dispatch': ['pilot/source-map/label grant for exact selected DEV set',
+                 'resolve runtime/source/env references from approved originals; do not synthesize source authority',
+                 'pin each host and final plan; time caps above are proposals only'],
+--- before/results/T-054/scripts/worker.py
++++ results/T-054/scripts/worker.py
+@@ -51,6 +51,8 @@
+             expected_t = job['source'].get('t', job['source'].get('t_ns', 0) // 10**9)
+             if job['slot']['view'] == 'ce':
+                 expected_t -= 300
++                if job['source'].get('ce_history') != 'verified':
++                    raise Blocked('C-e chưa có chứng cứ lịch sử/A0 trước method')
+             if job['t'] != expected_t or job['slot']['window'] != {'t': expected_t, 'half_width_s': 300}:
+                 raise Blocked('cửa sổ thực dùng khác nguồn và slot')
+         if job['kind'] == 'm1' and fingerprint(job['config']) != job['slot']['config_sha256']:
+--- before/tasks/T-054-khoa-g3-chay-p7-a/SPEC.md
++++ tasks/T-054-khoa-g3-chay-p7-a/SPEC.md
+@@ -154,7 +154,7 @@
+ 
+ 6. **Thống kê và diễn giải.** Giữ Q-246: TT 60 ca, MRR M1−TORAI B, seed 0/1/2 bình quân trong ca; bootstrap cặp theo ô 10000 mẫu, seed 20261005. Lưu CI thô và cận 12 chữ số ROUND_HALF_EVEN, strict lo>−0,05; bằng biên không đạt. OB 34 ca, Hit@5 kỳ vọng M1−M4, đảo dấu nguyên ô một phía tại 0; mức 0,025 nâng lên 0,05 chỉ khi E-04 tại P qua và CI làm tròn lo<hi. Chỉ P điều khiển; S_lo/S_hi dùng mẫu chung là độ nhạy. McNemar phụ dùng tiêu chí chắc hạng 1, TORAI≥2/3 seed; all3 là độ nhạy. Báo ô hữu hiệu/khác 0/thua/lẫn chiều/ca cả hai trượt, ít ô, bootstrap undercoverage và giả định hoán đổi. Mức chỉ là danh nghĩa.
+ 
+-   Hai ứng viên cần Minh chốt: (i) bản loại lỗi loại nguyên cặp nếu M1 hoặc bất kỳ seed baseline có ERROR/TIMEOUT phương pháp đủ điều kiện; giữ NO_EVIDENCE/UNSUPPORTED, không bình quân seed sống; tính lại mô tả/CI, báo n/ô, rỗng thì N/A, không điều khiển chuyển mức; (ii) hoán vị ca TT hai phía, 10000 lần đổi dấu, seed 20261005, cộng 1 vào tử/mẫu, chỉ là độ nhạy, không thêm mức bác bỏ. Nghĩa vụ bản loại lỗi Q-211(6) đã có; công thức vẫn chưa khóa. Fixture gồm đúng biên, p tại ngưỡng, CI suy biến, ít ô, ô khác cỡ, seed lỗi, cả hai trượt và world cho cách đọc trái nhau.
++   Minh đã chốt cả hai công thức ngày 05/11/2026 (runs/trien-khai-004/quyet-dinh-minh.json): (i) bản loại lỗi loại nguyên cặp nếu M1 hoặc bất kỳ seed baseline có ERROR/TIMEOUT phương pháp đủ điều kiện; giữ NO_EVIDENCE/UNSUPPORTED, không bình quân seed sống; tính lại mô tả/CI, báo n/ô, rỗng thì N/A, không điều khiển chuyển mức; (ii) hoán vị ca TT hai phía, 10000 lần đổi dấu, seed 20261005, cộng 1 vào tử/mẫu, chỉ là độ nhạy, không thêm mức bác bỏ. Nghĩa vụ bản loại lỗi Q-211(6) đã có; hai công thức đã được Minh chốt, gói G3 chưa khóa. Fixture gồm đúng biên, p tại ngưỡng, CI suy biến, ít ô, ô khác cỡ, seed lỗi, cả hai trượt và world cho cách đọc trái nhau.
+ 
+    Bảng diễn giải giữ tiêu chí Q-246:
+ 
+@@ -169,7 +169,7 @@
+ 
+ 7. **Fixture và pilot đại diện.** Tái dùng bảng/dev/native/fixture phù hợp từ T-052. F3 chỉ gồm hai ca/seed 0 sau selector, không thay driver/guard mới. Pilot-plan chọn theo nguồn dev trước khi chạy: TT nhẹ/nặng thật/C-e, nhánh E1/E2/E5 đổi và ca đối chiếu không đổi; OB E2 giúp/C-d2 đổi và ca đối chiếu; T12 đổi/không đổi vùng; đủ 3 seed TORAI trên ca đại diện; kiểm A ở bảng phụ sau grant nguồn riêng; không chọn lại baseline. C-d3 gồm hỗ trợ/chu trình/thiếu đích. Dùng dữ liệu giả cho lỗi nguồn/timeout, C-e thiếu lịch sử/O=0/world nếu dev không chạm nhánh. Chạy bundle từ chọn nguồn→prep→method→seal→nhãn dev→bảng; mỗi tuyến khác có kiểm nguồn. Nhánh kiểm bằng mẫu giả không được gọi là đã kiểm thật. Dùng chính lượt pilot mới so với các tham chiếu ở bước 4; không nhất thiết thêm lượt.
+ 
+-   Local đo 1 worker rồi 2/3 trên lô tương đương. Chỉ dùng 4 khi RAM/đĩa/throughput cả lô tốt hơn và không paging. Cold/warm/tải cạnh tranh lưu riêng. Cache prep TORAI phải kiểm **trên laptop**, gồm byte CSV %.17g và tính độc lập seed; Linux không thay kiểm nơi áp dụng. Mốc đề nghị ban đầu là tối đa 60 phút trôi/180 phút-máy trên ba máy, không phải ETA. Quyền hiện hành theo LOG phiên 4 là pilot dev local trước chạy chính với cap local tối đa một giờ; SSH/sync và lô cloud vẫn riêng. Không đủ phủ nhánh thì giữ outputs và trình đúng phần thiếu.
++   Theo gói thu gọn Minh duyệt ngày 05/11/2026: giữ các pilot một worker và baseline G2 đã hợp lệ làm tham chiếu; chỉ đo thêm 2 worker để chọn cách ổn định. Không yêu cầu thử 3/4 worker hoặc săn cấu hình nhanh nhất. Không chạy lại baseline dev diện rộng; lượt bổ sung phải gắn với lỗi/phép đối chiếu cụ thể chưa giải quyết. Driver dùng slot độc lập; cache liên vế là tối ưu hiệu năng, không là điều kiện khoa học để mở test. Chưa có lợi ích đủ căn cứ thì không dựng cache phức tạp. Byte prep TORAI/seed đã được kiểm trên laptop ở checkpoint003, không lặp chỉ để đo thời gian. Chỉ kiểm phần vận hành mới thay và tuyến C-e còn thiếu. Mọi lượt lỗi giữ nguyên; lượt hơn một giờ vẫn cần quyền theo AGENTS.
+ 
+ 8. **Hồ sơ khóa.** Gồm B6/sáu câu G3, code/env/revision/gói đúng byte/config/cohort/U/alias/seed/world/errors/fallback/timeout/mẫu số/statistics/diễn giải/tiếp xúc/lịch/budget. A/B1/B2/C có bằng chứng hoặc điểm chặn rõ. Khóa gói byte thực chạy, hash gói/từng file và blob Git/provenance; không lấy checkout mới khác EOL làm nguồn. Tách `code_root`, `data_root`, `output_root`; gói code không kéo theo data/nhãn. Reviewer kiểm hồ sơ bằng prompt chuẩn, Minh chuyển thủ công. Script dừng WAIT_G3 rồi WAIT_TEST_GRANT nếu thiếu quyết định. Chưa có quyền commit thì chưa commit.
+ 
+@@ -242,9 +242,9 @@
+ 
+ Minh muốn tận dụng cả hai EC2 + laptop để giảm tổng thời gian, ưu tiên EC2 cho việc độc lập/nặng/đủ quyền. Không dựng queue phân tán chỉ để dùng máy. Đầu tiên lập job cần thiết và so setup/sync/hash/parity/receive với phần đường găng tiết kiệm. Không còn việc cloud có ích thì báo Minh có thể Stop, không tự bật/tắt hoặc Terminate. Lịch laptop đơn máy là phương án thay thế nếu không có lô cloud hữu ích; không tự bỏ chỉ đạo Minh.
+ 
+-Nguồn kết nối theo Minh: EC2 1 `13.211.127.97`, PEM `D:/RCA-ext/keys/keys.pem`; EC2 2 `3.107.156.186`, PEM `D:/RCA-ext/keys/key2.pem`. Chỉ lập kế hoạch; không in/nạp nội dung khóa vào log/prompt/manifest/repo. Nếu SSH từ chối do ACL, thực hiện đúng quyền Minh cấp cho bước kết nối; không sửa ACL trong lượt ghi hồ sơ. Ghim executable/Python/gói/RNG/PYTHONHASHSEED/BLAS-OMP threads 1/code upstream/số học Q-237; tách code root và data root. Runner hiện dùng ENVS Windows; Linux wrapper chỉ override đúng env được duyệt, không sửa src để chạy. Chưa đủ parity giữa máy thì cặp so dùng cùng môi trường. Ngoại lệ chỉ để chẩn đoán: Minh đã cấp một lượt MicroRank dev-607751ac0a với thiết lập luồng khác để kiểm sai khác số cuối; chưa duyệt thay cấu hình chính 1 luồng. Kết quả và giới hạn suy luận về thread lịch sử ở runs/trien-khai-003/diagnostic-thread-001/summary.json.
+-
+-Số worker theo CPU/throughput và `floor((RAM_available − dự_phòng_host/controller)/(1,25 × peak_tree_RSS_bundle))`. Hệ số 1,25 là đề nghị, chưa bảo đảm. Đo sau khi Minh dọn; chỉ giữ 4 worker khi nhanh hơn cả lô và không paging. Đĩa tính output nén + temp + retry + gói nhận + dự phòng, không chỉ kích thước tệp cuối.
++Nguồn kết nối theo Minh: EC2 1 `13.211.127.97`, PEM `D:/RCA-ext/keys/keys.pem`; EC2 2 `3.107.156.186`, PEM `D:/RCA-ext/keys/key2.pem`. Chỉ lập kế hoạch; không in/nạp nội dung khóa vào log/prompt/manifest/repo. Nếu SSH từ chối do ACL, thực hiện đúng quyền Minh cấp cho bước kết nối; không sửa ACL trong lượt ghi hồ sơ. Ghim executable/Python/gói/RNG/PYTHONHASHSEED/BLAS-OMP threads 1/code upstream/số học Q-237; tách code root và data root. Runner hiện dùng ENVS Windows; Linux wrapper chỉ override đúng env được duyệt, không sửa src để chạy. Chưa đủ parity giữa máy thì cặp so dùng cùng môi trường. Minh chấp nhận riêng ba sai khác đã ghi ở numeric-parity-analysis.json: MicroRank OB một ca 1 ULP và M1/T12 một ca OB tối đa 2 ULP, các trường rời rạc đã đối chiếu không đổi. Giữ 1 luồng; không dung sai chung, không sửa/làm tròn kết quả. Sai khác mới vẫn dừng phần phụ thuộc. Ngoại lệ chỉ để chẩn đoán: Minh đã cấp một lượt MicroRank dev-607751ac0a với thiết lập luồng khác để kiểm sai khác số cuối; chưa duyệt thay cấu hình chính 1 luồng. Kết quả và giới hạn suy luận về thread lịch sử ở runs/trien-khai-003/diagnostic-thread-001/summary.json.
++
++Số worker thực thi chỉ 1 hoặc 2 theo plan bất biến. Chọn 2 khi lô đại diện có overlap thật, output/input khớp tham chiếu và đủ RAM/đĩa; giữ một slot mỗi nhóm method×dataset để không cộng nhầm cost. DRAIN ngừng phát mới, nhận lại giữ token/PID và không chạy đôi. Không có yêu cầu đo 3/4 worker theo gói Minh vừa duyệt. Đĩa tính output nén + temp + lượt hỏng + gói nhận + dự phòng, không chỉ kích thước cuối.
+ 
+ Ngoại lệ cloud test là phương án riêng xin Minh: chính xác ca/raw parquet/file CSV ngày-phút/CSV TORAI/feature/intermediate/ranking nào, byte, máy/thư mục/retention/quyền đọc và labels có đi hay không. “Dẫn xuất không nhãn” không tự được phép. TT parquet tách ca thuận lợi hơn OB file chung nhưng không tự có quyền. Máy local mạnh hơn là phương án khác. Chỉ chọn khi tổng chi phí thấp hơn phần local tiết kiệm và parity đạt.
+ 
+@@ -293,7 +293,7 @@
+ | T-052 pilot-f3-summary-001.json | 12 PASS, 404,16 s là upper bound gồm lượt lỗi | Không là runtime sạch/full guard |
+ | T-051/dinh-chinh-luot-1.md | ~821 MB nén→11,55 GB logic; inflate/nạp đáng kể | Cần stream/output/temp/reserve, không chỉ chừa đĩa nén |
+ 
+-Dự toán công pha 1 **chưa kiểm** là 6–10 giờ cho driver/fixture/pilot/hồ sơ/tự kiểm, nếu không sửa lõi/hợp đồng. Chờ Claude/Minh và công sửa tính riêng. Pilot ban đầu đề nghị tối đa 60 phút trôi/180 phút-máy; đây là cap, không phải ETA. Đề xuất tăng lên 3 giờ ở checkpoint002 chưa được chốt và không dùng làm dự báo. Lệnh Minh mới cho tiếp tục chuẩn bị/pilot local trước chạy chính được lưu ở LOG; lô local vẫn giữ cap tối đa một giờ, chưa tự nâng cap bằng số. Pha 2 chưa có ETA toàn tuyến. Kịch bản ~8 giờ tuần tự trước đây chưa được xác minh và không dùng xếp lịch; số đo driver lạnh mới nằm trong reports/tu-soat-003/bao-cao.md và tách rõ kịch bản ngoại suy khỏi ETA. 3 worker không có nghĩa nhanh gấp 3.
++Dự toán công pha 1 **chưa kiểm** là 6–10 giờ cho driver/fixture/pilot/hồ sơ/tự kiểm, nếu không sửa lõi/hợp đồng. Chờ Claude/Minh và công sửa tính riêng. Pilot ban đầu đề nghị tối đa 60 phút trôi/180 phút-máy; đây là cap, không phải ETA. Đề xuất tăng lên 3 giờ ở checkpoint002 chưa được chốt và không dùng làm dự báo. Lệnh Minh mới cho tiếp tục chuẩn bị/pilot local trước chạy chính được lưu ở LOG; cap local một giờ là quyền pilot cũ; quyết định phiên 5 bỏ trần cộng dồn cho P7, không bỏ yêu cầu xin quyền cho một lượt hơn một giờ. Pha 2 chưa có ETA toàn tuyến. Kịch bản ~8 giờ tuần tự trước đây chưa được xác minh và không dùng xếp lịch; số đo driver lạnh mới nằm trong reports/tu-soat-003/bao-cao.md và tách rõ kịch bản ngoại suy khỏi ETA. Chỉ kiểm thêm 2 worker theo gói Minh duyệt, không ngoại suy tốc độ theo số worker.
+ 
+ Tách cấp máy, sync code/chuyển dev, hash, env, prep, run, receive, seal/verify, score/CI và đọc ca/report. Mạng/env EC2/throughput local chưa đo. Lập lịch:
+ 
+@@ -303,7 +303,7 @@
+ 
+ Mốc đề nghị **08:00 06/11/2026 Asia/Saigon**, cần Minh xác nhận. Giờ sớm nhất là E; chưa có giờ xác nhận trước pilot/duyệt. Ví dụ chưa kiểm: test 6 h + score/report 2 h + buffer 2 h→bắt đầu trước 22:00 05/11; test 12 h→16:00. Kịch bản 8 h→20:00; mốc 00:30 06/11 cần test xong trong 3,5 h, chưa có số đo. Không giảm ca/seed/vế để vừa giờ. Nếu E>L hoặc thiếu quyền, sáng có thể chỉ có hồ sơ/queue/dev hợp lệ, không hứa P7 đủ.
+ 
+-Q-40 là tối đa 3 h chờ thực tế/phương pháp/toàn dataset chạy tuần tự. Báo riêng lượt/method×dataset/makespan song song/trần toàn đợt. Không lách bằng chia lệnh/tăng worker. Dự toán vượt phải xin ngoại lệ đúng vế, không tự giảm seed. Lượt hơn 1 h, tải hơn 5 GB hoặc vượt trần phải báo trước và chờ quyền.
++Ngoại lệ Minh xác nhận ngày 05/11/2026 cho riêng P7: không đặt trần thời gian cộng dồn toàn đợt hoặc method×dataset; chạy đủ cohort. Giữ timeout từng lượt để xử lý treo và số đo tiến độ/tài nguyên. Nếu lỗi, không tiến triển, lặp vô tận hoặc hàng chục giờ chưa xong thì dừng/báo Minh; không tự tạo một trần cố định thay lời Minh. Lượt chưa chạy giữ PENDING/BLOCKED và bảng cần đủ cohort bị chặn, không gán method TIMEOUT. Quy tắc Q-40/P3 cũ giữ lịch sử, không áp trần cộng dồn vào P7. Lượt hơn một giờ, tải hơn 5 GB vẫn theo quyền thao tác AGENTS.
+ 
+ ## Rủi ro và điều chưa chắc
+ 
+@@ -311,11 +311,11 @@
+ 
+ | Mục | Nguồn và phương án | Quyết định/điểm dừng |
+ |---|---|---|
+-| Cạn ngân sách | P3 §8.3: “nếu đã cam kết chạy đủ cohort mà hết ngân sách giữa chừng thì ca chưa chạy là `TIMEOUT` (Q-74 Q9).” Đề nghị riêng P7: cạn trần điều phối/toàn đợt thì dừng phát việc; unrun giữ PENDING/BLOCKED, không gán method TIMEOUT; giữ cohort, bảng cần đủ cohort bị chặn. Chỉ method timeout đã chạy/đủ pha mới tính trượt. Phương án khác: giữ P3 và báo riêng phần budget | Minh duyệt ngoại lệ hoặc giữ P3 trước G3; ghi hồ sơ không tự chọn. Chưa quyết thì chặn phần khóa lỗi/budget, không sửa lịch sử P3 |
++| Thời gian P7 — USER_CONFIRMED | Minh bỏ trần cộng dồn cố định, chạy đủ cohort; lỗi/hàng chục giờ chưa xong/không tiến triển thì dừng và báo. Timeout từng lượt vẫn có bằng chứng pha/monitor. | Không còn OPEN về trần cộng dồn. Unrun không thành TIMEOUT; A4 chưa đủ thì chưa ghép nhãn/chấm. Nguồn ở quyết định phiên 5, sổ chính thức chờ Minh duyệt dòng ghi. |
+ | Nguồn TORAI A | Q-74 Q3/P3 §6.6 đã yêu cầu cả A/B; baseline đã chạy B chính/A phụ. Minh xác nhận giữ A phụ ngoài A4, không mở lại lựa chọn baseline. Driver mới đã kiểm A tự sinh và A thật trên đúng ca dev-a5cabe5fa7 đủ ba seed; chưa kiểm toàn cohort | Đã có grant đúng ca dev-a5cabe5fa7 cho pilot, không phải toàn cohort. Trước phần A chính còn cần grant cụ thể 3 CSV tác giả logts/tracets_err/tracets_lat của đúng thành viên TT tại D:/RCA-ext/work/T-016/data/torai-TT + metric. Chưa xác minh đủ ca/hash/schema; nằm ngoài thư mục locked vẫn không được đọc. Locator có service/fault ở map riêng; method không nhận. Giữ nhãn hồi cứu P3 §4/lưới-ngưỡng toàn file. A ngoài A4 có thể chạy sau seal chính nhưng không tự miễn snapshot/công bố |
+ | Nguồn/nhãn | Ai cấp map/label ref độc lập từ G1/metadata được phép; schema đã thiết kế | Minh chỉ định/quyền materialize trước test; hash không thay provenance |
+-| Chính sách chưa có số | Timeout từng pha/vế, trần method×dataset, monitor-gap threshold/nhịp, worker/đĩa/retry, config/env/revision | Đo/fixture dev và Minh duyệt trước LOCKED; không điền unknown để đóng bảng |
+-| Độ nhạy | Bản loại nguyên cặp và case-permutation ở bước 6 | Minh chốt công thức trước G3; không bỏ nghĩa vụ loại lỗi Q-211 |
++| Vận hành trình G3 | 1/2 worker; 1 luồng BLAS/OMP; ứng viên timeout 600 s/slot chính, C-d3 60 s; poll 0,1 s/maxgap strict <5 s; ERROR chưa phân xử giữ BLOCKED, không retry. | Kiểm đúng đường sửa trên dev/fixture; trình Minh khóa các số này với code/env/matrix. Không còn trần cộng dồn. |
++| Độ nhạy — USER_CONFIRMED | Minh duyệt bản loại nguyên cặp và TT case-permutation ở bước 6 ngày 05/11/2026. | Chỉ độ nhạy, không điều khiển E-04/chuyển mức. Cài kiểm trong wrapper T054; không sửa lịch sử T052. |
+ | Công bố | Cơ sở ở bước 11 chặn mọi bảng khi A4 BLOCKED/PENDING; ngoài A4 chạy sau khi xem được đánh dấu riêng | Muốn theo bậc khác cần Minh chốt trước G3; BLOCKED không đổi thành 0 |
+ | Máy/quyền/hạn | Cả hai EC2 + laptop được ưu tiên khi có ích; EC2 2 chỉ có lô cụ thể; OB local/cache local | SSH/chạy/sync/pilot/budget/grant/quyền cloud test/giờ sáng xét riêng. Không tự suy từ ghi hồ sơ |
+ 
+--- before/tasks/T-054-khoa-g3-chay-p7-a/LOG.md
++++ tasks/T-054-khoa-g3-chay-p7-a/LOG.md
+@@ -491,3 +491,111 @@
+ Code/revision, cấu hình, giả thuyết, độ đo, tập ca/tập ứng viên, cách xử lý ca lỗi/UNSUPPORTED/nhánh dự phòng và bảng diễn giải đã khóa trước test chưa? Có bỏ nhóm khó sau khi nhìn điểm hoặc dùng test để chọn thiết kế không?
+ Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.
+ ```
++
++
++## Phiên 5 — 05/11/2026 — Codex — Windows — người làm
++
++Tiếp nhận checkpoint003, giữ vai trò người làm; Claude phản biện. Minh duyệt gói thu gọn ở runs/trien-khai-004/quyen-minh.txt. Đã đọc AGENTS/STATE/SPEC/LOG; validator003 --manifest PASS toàn bộ 3.558 pin, 40 slot dev giữ nguyên, không có worker sống. Chưa chạy phương pháp mới, chưa sửa code. Bản trước thay đổi tại before.json/before-files.
++
++Checkpoint khi ngữ cảnh được nén: các đầu ra hiện hành hợp lệ, không lặp baseline. Thứ tự tiếp: hoàn thiện scheduler đúng 1/2 worker; kiểm resume/DRAIN/budget/phân loại; chỉ chạy lô dev ngắn giải quyết concurrency/C-e hoặc sai khác cụ thể; cập nhật hồ sơ để Minh xét G3. Kế hoạch cũ đo 3/4 và cache diện rộng được thay bởi chỉ đạo mới, không tự buộc làm thêm. Những OPEN số học/chính sách/nguồn vẫn OPEN tới khi có bằng chứng và quyết định tương ứng. Không test/RE3/SSH/commit. AGENTS §5a.2 yêu cầu đề nghị phiên mới khi nén; checkpoint này cho phép chuyển phiên nếu Minh cần, công việc tiếp tục trong phạm vi vừa duyệt.
++Lệnh kiểm cuối: Python main -X utf8 -B results/T-054/runs/trien-khai-003/kiem_checkpoint.py --manifest results/T-054/manifest-trien-khai-003.json.
++
++### Quyết định Minh phiên 5
++
++Nguồn USER_CONFIRMED: runs/trien-khai-004/quyet-dinh-minh.json. Minh chấp nhận đúng ba sai khác số học đã lưu, giữ 1 luồng, không dung sai chung/không làm tròn. Minh duyệt cả hai công thức độ nhạy trong SPEC. Về thời gian: “trừ khi chạy hàng chục tiếng chưa xong hoặc chạy lỗi. vòng lặp vô tận thì dừng, không thì cứ cho chạy, không tạo trần cố định”. Áp riêng P7: bỏ trần cộng dồn toàn đợt/method×dataset; giữ timeout từng lượt để xử lý treo, theo dõi không tiến triển, lỗi hoặc hàng chục giờ chưa xong phải dừng/báo. Lượt chưa chạy không thành method TIMEOUT, bảng cần đủ cohort vẫn chặn. Đây chưa là G3/test/main. Sổ DECISIONS/WHY sẽ trình đúng dòng để Minh duyệt ghi, không tự ghi.
++
++
++### Kết thúc phiên5 — checkpoint004, dừng trước G3/main
++
++**Đã làm:** hoàn tất gói thu gọn được Minh duyệt. Giữ G2 và40slot/bốnca cũ; chỉ thêm2slot M1 (TT C-e a5cabe5fa7 và OB607751ac0a) giải tuyến C-e và đo2worker. Lô thật250,171s, overlap55,229s; cảhaiOK/paritytoàntrườngkhớp, OBnormalizedinputkhớp1worker. ĐỉnhRSSđồngthờilấymẫu1.426.219.008byte. Khôngthử3/4, khôngcacheliênvế, khôngđobiênrộng.
++
++**Thay đổi:** bảy script task (bien_nhan,nguon,worker,dieu_phoi,cham,p7,pilot); hai script fixtures/lap_ho_so giữ byte. SPEC cập nhật đúng gói/ba quyết định Minh; LOG chỉ nối, STATE chỉ dòng T054. Đồng bộ bảy hồ sơ root (protocol,source-manifest,authorization,pilot-plan,reuse,environment,ho-so-g3) và runbook; matrix giữ byte. Thêm runs/trien-khai-004, reports/tu-soat-004, freeze006 và manifest004. Tập chính xác/byte trước ở before.json; tập sau trong manifest. Không sửa src/AGENTS/MRP/DECISIONS/WHY/task cũ. Sổ chính thức đề nghị ở de-xuat-ghi-so.md, chưa tự ghi.
++
++**Kiểm:** 60 transport sau driver;9 operational checks có controller restart haiworker thực, DRAIN, method/source timeout, hai ERROR cũ audit không rerun;4 nhánh cuối có same-group serial/WAIT_ERROR/pipeline method timeout; độnhạy seedlỗi/cặprỗng/giữ UNSUPPORTED/NO_EVIDENCE và primary/alpha khôngđổi;6 C-e support metadata; nhánh báoTIMEOUTgiữ N1/O/V0=N/A, C-c độc lập vàC-g thiếugraph khai riêng. Finalvalidation/manifest là phép kiểm chỉ đọc sau đóng hồ sơ, không là nghiệm thu khoa học. Giữ mọi lượt lỗi: helper chấm celllist chưa canonicalize và fixture timestamp trướcdeadline. Sửa đúng lỗi, giữ script/lượt đầu, không lặp method thật. Code thực lô2worker được chụp trong pilot-2-worker-001/code; bản cuối thêm metadata quan sát/sửa timeout/mô tả, không tự nhận code cuối tạo mọi lượt cũ.
++
++**Điểm dừng/còn mở:** sẵn sàng trình xét G3 theo phạm vi gói, không phải đãđạtG3 hoặc đủ quyền phátmain. Còn phảnbiện/duyệt khóa đúng byte/params, ghi sổ chính thức/commit khiMinhduyệt, nguồn/test94 và map nhãn độc lập saugrant, A3CSV đúngcohort. RE3 có hợpđồngmetadata, H1schema/H2adapter/src/quyềnriêng chưa làm; không thuộcgrant94, không bỏ nghĩa vụ. Chưa có ETAtoànmatrix, lônhỏkhông chứng minh speedup hoặczeroOSpaging. Đãbổsung monitor RAM/pagefile, sốhosthiệnở preflight-final; cần theo dõi sức ép RAM/đĩa khi chạyđúnggrant. Khôngtạo trần cộngdồn; lỗi/khôngtiếntriển/hàngchụcgiờchưaxongthìdừng/báo theoMinh. RQ3/test/nhânquả/vùngđúng/P/R/F1pháthiệnchưacóbằngchứngmới.
++
++**Bước tiếp:** KHÔNG chạy thêm pilot mặc định; báo Minh xem reports/tu-soat-004/bao-cao.md, de-xuat-khoa-g3.json, de-xuat-ghi-so.md và chọn chuyển prompt Claude bên dưới. Chờ G3/quyền nguồn trước materialize test/plan; không tự đổi cờ LOCKED/test. Lệnh tiếp nhận: Python main -X utf8 -B results/T-054/runs/trien-khai-004/kiem_checkpoint.py --manifest results/T-054/manifest-trien-khai-004.json. Lệnh kiểm cuối dự kiến và được ghi kết quả trong validation/manifest: chính lệnh này sau dựng gói. Đề nghị nội dung commit (chưa thực hiện): `feat(t054): prepare P7 driver and G3 review package`; trước commit phải trình đúng filelist, không gom thay đổi có sẵn của Minh.
++
++AGENTS §5a.2: đã có checkpoint đầy đủ khi nén; có thể mở phiên mới từ lệnh tiếp nhận trên, không cần khởi động lại pilot.
++
++### Prompt Minh chuyển Claude — chỉ đọc trong chat
++
++```text
++Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
++Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
++
++Thông tin lượt này:
++- Task hoặc đề xuất: T-054; tasks/T-054-khoa-g3-chay-p7-a/SPEC.md.
++- Công đoạn: soát kết quả.
++- Gói/cổng: P7(a), chuẩn bị G3.
++- Người làm và người phản biện chính thức: Codex người làm; Claude người phản biện.
++- Tài liệu gốc: AGENTS.md; docs/MRP.md; docs/reference/sources/DT18-de-tai-va-nhiem-vu.md; docs/reference/sources/advisor-2026-09-23.md; SPEC/LOG T-054.
++- Phản biện và phản hồi trước: tasks/T-054-khoa-g3-chay-p7-a/LOG.md; results/T-054/runs/soan-spec-001/.
++- Code và kết quả liên quan: results/T-054/manifest-trien-khai-004.json; results/T-054/reports/tu-soat-004/bao-cao.md; results/T-054/scripts/; results/T-054/runs/trien-khai-004/buoc-tiep-theo.md; results/T-054/runbook.md.
++- Phạm vi ghi được Minh cho phép trong lượt này: Chỉ đọc và trả lời trong chat; chưa có quyền ghi bản phản biện mới..
++
++Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
++
++Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
++Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
++Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
++
++Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
++hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
++Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
++số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
++có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
++
++Bổ sung yêu cầu phản biện:
++1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
++2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
++3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
++4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
++5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
++6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
++7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
++8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
++9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
++10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
++
++Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
++Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
++
++Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
++bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
++Tiếng Việt, câu ngắn.
++
++Cuối lượt báo:
++1. Đã làm gì.
++2. File đã thay đổi, hoặc không sửa file nào.
++3. Kiểm đã chạy và kết quả.
++4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
++
++Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
++
++Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
++
++Công đoạn: soát kết quả.
++Kiểm trên đầu ra thật, code và dữ liệu được phép; không tin tóm tắt LOG. Đối chiếu tiêu chí xong với phần mục tiêu nguồn và mức căn cứ cho bước tiếp theo; chạy lại phần rẻ khi trong quyền được duyệt.
++Phân biệt hoàn thành task mô tả, xác nhận cơ chế và đủ căn cứ chọn/đánh giá thiết kế. Giới hạn đã khai không tự miễn phép kiểm cần thiết còn làm được.
++Chỉ ghi bản phản biện lượt được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ bản cũ; không sửa kết quả thay người làm.
++
++Với từng thành phần, kiểm mục đích và căn cứ: sửa hạn chế P4, đáp ứng DT18 hay nhu cầu kỹ thuật. Có lý do kỹ thuật, phương án khác, bằng chứng dev và điều kiện thất bại không; có dùng mã hạn chế mô tả như bằng chứng cơ chế hoặc chọn theo mức chênh đồ thị trừ không đồ thị không?
++Nêu rõ nút/cạnh, ánh xạ log/trace/metric và phép tính thực sự sử dụng cạnh. Lần theo thông tin quan hệ và nhãn trong phương pháp lẫn đối chứng; gọi “không đồ thị” có đúng với thông tin còn giữ không?
++Kiểm baseline và đối chứng đủ mạnh, tương đương về tín hiệu/cửa sổ/tập ứng viên/coverage/tiền xử lý/quy tắc chấm/ngân sách chọn cấu hình ở phần không chủ ý thay; yếu tố thay cùng phải giới hạn kết luận.
++Phương pháp và đối chứng đã được cài và kiểm đầu vào, trung gian, hành vi trên dev chưa, hay chỉ chạy không lỗi? Không đòi đồ thị phải thắng để khóa.
++Code/revision, cấu hình, giả thuyết, độ đo, tập ca/tập ứng viên, cách xử lý ca lỗi/UNSUPPORTED/nhánh dự phòng và bảng diễn giải đã khóa trước test chưa? Có bỏ nhóm khó sau khi nhìn điểm hoặc dùng test để chọn thiết kế không?
++Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.
++```
++
++
++### Checkpoint cuối phiên 5 — ghi rõ để tiếp nhận
++
++Đã hoàn tất gói thu gọn; chỉ thêm hai lượt M1 dev cần thiết, không lặp baseline diện rộng. Driver kiểm 1/2 worker, nhận lại tiến trình/DRAIN, dừng phát khi lỗi, lỗi phương pháp đã phân loại và timeout đủ bằng chứng; C-e có cả tuyến thật và kiểm thiếu lịch sử. Đã chốt ba quyết định theo lời Minh trong quyet-dinh-minh.json; sổ DECISIONS/WHY chưa sửa, có đề xuất dòng ghi riêng.
++
++Soát cuối bổ sung đối chiếu plan với code/config/env/policy khóa trước I/O dữ liệu, tránh plan tự đổi cấu hình rồi tự băm lại. Chín kiểm metadata giả đạt; không phát test. Đường độ nhạy và bảng TIMEOUT đã kiểm riêng; không đổi E-04/mức OB. Giữ code của lô thật và các lượt hỏng, kèm giải thích lineage.
++
++Lô hai slot có producer receipt đủ VERIFIED trước đọc nhãn dev. Helper ghi tệp tên snapshot-before-labels sau lookup nhãn; đã khai điều này trong label-exposure-note.json và báo cáo, không lấy tên tệp làm chứng cứ mù hoặc thời điểm. Đường chấm chính vẫn kiểm snapshot trước nhãn.
++
++Hiện dừng chờ Minh xét hồ sơ G3 và quyền nguồn; không còn lô pilot mặc định. Chưa G3, chưa main/test, chưa adapter/telemetry RE3, chưa SSH/commit. Đọc báo cáo004, de-xuat-khoa-g3.json và de-xuat-ghi-so.md. Prompt Claude ở ngay mục trước, chỉ chuyển khi Minh chọn. Lệnh kiểm tiếp nhận: Python main -X utf8 -B results/T-054/runs/trien-khai-004/kiem_checkpoint.py --manifest results/T-054/manifest-trien-khai-004.json.
+--- before/docs/STATE.md
++++ docs/STATE.md
+@@ -18,7 +18,7 @@
+ 
+ ## Việc kế tiếp và chờ Minh
+ 
+-- **T-054 — Khóa G3(a), chạy/báo cáo P7(a): đã pilot local thật, chưa đủ G3/chưa chạy chính.** Codex làm, Claude phản biện. Hai gói bốn ca/40 slot đã seal/chấm; khoảng 40 phút máy/56 phút trôi, giữ mọi lượt lỗi. B chính/A phụ; A đúng một ca dev được grant. Còn bundle/cache, scheduler nhiều worker, C-e/phủ nhánh và chính sách số học/lỗi/nguồn trước khóa. RE3 có hợp đồng metadata, chưa adapter/telemetry. [LOG phiên 4](../tasks/T-054-khoa-g3-chay-p7-a/LOG.md), [báo cáo 003](../results/T-054/reports/tu-soat-003/bao-cao.md).
++- **T-054 — chuẩn bị P7(a): đã hoàn tất gói thu gọn, DỪNG chờ Minh xét G3/quyền nguồn; chưa main/test.** Codex làm, Claude phản biện. Giữ G2/40 slot dev cũ; chỉ thêm C-e TT + M1 OB cho lô2 worker (~250 s), parity khớp. Đã kiểm resume/DRAIN/lỗi/timeout/C-e; Minh chốt ba sai khác số học, hai độ nhạy và bỏ trần cộng dồn. A phụ còn grant cohort, RE3 còn schema/adapter riêng; sổ quyết định/khóa/nguồn test chờ duyệt. [LOG phiên5](../tasks/T-054-khoa-g3-chay-p7-a/LOG.md), [hồ sơ004](../results/T-054/reports/tu-soat-004/bao-cao.md).
+ 
+ 
+ - **T-052 — T13 dev và hồ sơ G3(a): xong — Minh nghiệm thu 05/11/2026.** Phạm vi mô tả T13 dev, lát cắt F3 và đính chính 004. Minh duyệt trực tiếp, bỏ lượt kiểm lại bản 004. G3(a) còn bốn nhóm chặn và chờ SPEC P7. [Hồ sơ 004](../results/T-052/ho-so-g3-004.md), [LOG nghiệm thu và bàn giao](../tasks/T-052-t13-va-ho-so-g3/LOG.md#phiên-12--05112026--codex--windows--người-làm).

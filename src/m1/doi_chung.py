@@ -97,23 +97,24 @@ def cd3(canh_goi, diem, dich):
     if not dich:
         return {'trang_thai': 'NO_TARGET', 'diem_ung_vien': {}, 'blocks': []}
     bt = set(diem)
-    G = nx.DiGraph()
-    G.add_nodes_from(sorted(bt | set(dich) | {x for c in canh_goi for x in c}))
-    G.add_edges_from(sorted({(b, a) for a, b in canh_goi if a != b}))  # chiều nhân quả: bên được gọi → bên gọi
-    H = G.subgraph(sorted(bt))
+    H = nx.DiGraph()
+    H.add_nodes_from(sorted(bt))
+    H.add_edges_from(sorted({(b, a) for a, b in canh_goi if a != b and a in bt and b in bt}))
     if not nx.is_directed_acyclic_graph(H):
         return {'trang_thai': 'UNSUPPORTED_CYCLIC', 'diem_ung_vien': {}, 'blocks': []}
-    ung = sorted(v for v in bt if not any(p in bt for p in G.predecessors(v)))
-    diem_ung = {}
-    for d in sorted(dich):
-        for c in ung:
-            best = None
-            for path in nx.all_simple_paths(G, c, d):
-                if all(x in bt for x in path):
-                    s = sum((_q(diem[x]) for x in path), Fraction(0))  # cộng chính xác (S20)
-                    best = s if best is None or s > best else best
-            if best is not None:
-                diem_ung[c] = max(diem_ung.get(c, best), best)
+    ung = sorted(v for v in H if H.in_degree(v) == 0)
+    dich = set(dich)
+    diem_nut = {v: _q(diem[v]) for v in H}
+    den_dich, qua_canh = {}, {}
+    for v in reversed(list(nx.topological_sort(H))):
+        tiep = max((den_dich[w] for w in H.successors(v) if w in den_dich), default=None)
+        if tiep is not None:
+            qua_canh[v] = diem_nut[v] + tiep
+            den_dich[v] = qua_canh[v]
+        if v in dich:
+            den_dich[v] = max(diem_nut[v], den_dich.get(v, diem_nut[v]))
+    # Một ứng viên trùng đích vẫn cần đi qua ít nhất một cạnh tới đích khác.
+    diem_ung = {v: qua_canh[v] for v in ung if v in qua_canh}
     if not diem_ung:
         return {'trang_thai': 'NO_EVIDENCE', 'diem_ung_vien': {}, 'blocks': [], 'ung_vien': ung}
     blocks = _khoi([(e, (s,)) for e, s in diem_ung.items()])

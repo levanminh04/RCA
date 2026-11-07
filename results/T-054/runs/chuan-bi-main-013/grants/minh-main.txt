@@ -1,0 +1,27 @@
+Nguồn quyết định cuối của Minh cho main013. Ghi ngày 07/11/2026 bởi Claude (người làm phần chạy sau đổi vai).
+Chép nguyên văn đoạn mở đầu và toàn bộ PHA 2 của tin nhắn Minh. Phần PHA 1 của cùng tin nhắn là prompt phản biện chuẩn
+(Prompt chung + Kiểm lại phản hồi và sửa + G3 trong docs/review-prompt.md) với thông tin lượt: T-054, checkpoint013 sau đáp
+phản biện; manifest đích SHA-256 752da8e5870ad27b92ed82e846d54d9570b7f58664661259f1a33ecb718d40dd; lệnh kiểm
+verify_manifest.py --documents; pha 1 chỉ đọc và trả lời trong chat.
+
+----- BẮT ĐẦU NGUYÊN VĂN -----
+Claude, tôi là Minh. Hãy kiểm độc lập checkpoint013 của T-054 trong D:/RCA-flashticket, sau đó chạy main ngay trong phiên này nếu kết luận không có điểm CHẶN. Tôi cấp quyền có điều kiện theo hai pha bên dưới. Nếu có điểm CHẶN, nêu bằng chứng, hậu quả và cách sửa tối thiểu, rồi dừng trước khi mở test.
+
+PHA 2 — QUYỀN MINH CẤP CÓ ĐIỀU KIỆN
+
+Nếu kết luận pha 1 không có điểm CHẶN, báo kết luận ngắn trong chat rồi chuyển sang thực hiện ngay. Tôi duyệt kết thúc lượt phản biện này và chuyển Claude thành người làm phần chạy T-054, quản lý nguồn và chấm điểm. Codex là người phản biện cho phần Claude thực hiện sau khi đổi vai. Tôi duyệt sửa hai dòng vai trò trong SPEC và nối LOG để ghi thời điểm bàn giao. Giữ nguyên tác giả và vai trò của các lượt trước.
+
+Tôi duyệt sửa lỗi nhỏ trong bao-cao.md và de-nghi-duyet-main.md của 013, cùng results/T-054/ho-so-g3.md và runbook.md. Phạm vi là chính tả, diễn đạt và tham chiếu tài liệu có đích xác minh được. Sửa mô tả người vận hành cho khớp quyết định đổi vai. Nếu cần sửa code, đường cấp quyền, phương pháp, plan, cấu hình, timeout, mẫu số hoặc kết luận, báo tôi trước. Giữ bản trước sửa và diff trong thư mục 013. Ghim lại các file được phép đổi, giữ manifest cũ và kiểm manifest cuối trước khi tạo grant. Quyền trong tin nhắn này áp dụng cho manifest đã nêu hoặc bản chỉ có đúng các thay đổi tài liệu và ghi nhận bàn giao được phép ở trên.
+
+Tôi duyệt khóa G3(a) và chạy main013 theo de-nghi-duyet-main.md với Claude là người thực hiện. Quyền này bao gồm mở đúng 60 RE2-TT và 34 Nezha-OB test, chuẩn bị nguồn theo locator mờ, chuyển đúng phân lô 30 TT sang mỗi EC2 hiện hành, dùng nguồn TORAI A đã ghim trong phạm vi đề nghị, phát và theo dõi main, rồi nhận, kiểm và chấm khi đủ điều kiện snapshot/A4. Tôi duyệt lượt dài hơn một giờ theo các giả định thời gian đã khai trong hồ sơ. RE3 và commit/push cần quyền riêng.
+
+Ghi nguyên văn quyền này và kết luận pha 1 vào hồ sơ. Nối DECISIONS/WHY/LOG và cập nhật đúng dòng T-054 trong STATE. Tạo grant thật với pin manifest, protocol, source bundle và nguồn quyết định theo runbook. Kiểm tài nguyên, danh tính máy, môi trường, phân lô và byte nguồn ở các bước tương ứng. Dùng entry chính thức để phát queue và dùng đường nhận/chấm đã chuẩn bị. Giữ mọi attempt, kể cả lỗi, và kết quả đầu của bản khóa. Nếu một bước kiểm thất bại, giữ bằng chứng và báo đúng phần đang chặn. Không gọi lại lệnh phát một cách mù quáng khi đã có queue hoặc biên nhận dở.
+
+VẬN HÀNH RAM LAPTOP VÀ BÁO TIẾN ĐỘ
+
+- Đo RAM vật lý laptop trước khi phát và theo dõi khi chạy. Nếu chạm hoặc vượt 95%, báo tôi ngay trong chat, kèm % RAM, RAM khả dụng và tình trạng queue laptop. Tôi sẽ tự đóng bớt Chrome. Để tôi xử lý ứng dụng trên máy.
+- Dùng WAIT_RESOURCE hoặc DRAIN theo runbook nếu cần ngừng phát thêm việc ở laptop. Giữ attempt đang chạy nếu an toàn và giữ các lô độc lập đang ổn định. Sau khi tôi giải phóng RAM, đo lại rồi tiếp tục bằng cùng plan và kiểm PID/token trước khi resume.
+- Giữ đủ ca, vế, seed và số lượt theo ma trận đã khóa. Nếu RAM đã giải phóng mà vẫn không đủ, hoặc tiếp tục có thể ảnh hưởng tính đúng đắn, dừng phần chịu ảnh hưởng và báo tôi số liệu, phương án tối thiểu cùng hậu quả. Ưu tiên chờ RAM hoặc chạy tuần tự trong giới hạn của plan hiện hành. Nếu cần đổi plan, số worker đã khóa hoặc số lượt, trình tôi quyết trước khi áp dụng.
+- Khi cả hai EC2 và laptop thực sự vào guồng, báo tôi ngay trong chat. Xác nhận từ trạng thái supervisor, tiến độ job qua các lần kiểm và seal đầu tiên của từng máy khi đã có. Ghi rõ máy nào đang chạy ổn, máy nào còn chờ và RAM laptop hiện tại. Biên nhận launcher riêng chưa đủ để báo đã ổn định.
+- Tôi sẽ giữ laptop cắm điện và không tắt máy. Áp dụng D3 theo runbook, giữ AC sleep bằng 0 đến khi xong nhận, kiểm và chấm, rồi khôi phục AC về 45 phút. Tiếp tục theo dõi sau thông báo ổn định. Nếu phải bàn giao phiên, ghi checkpoint đủ để người tiếp theo xác minh và tiếp tục mà không phát trùng.
+----- HẾT NGUYÊN VĂN -----

@@ -31,8 +31,13 @@ COT_SPAN_RE2 = ['traceID', 'spanID', 'parentSpanID', 'serviceName', 'operationNa
 TU_KHOA_RE2 = ['ERROR', 'FAIL', 'EXCEPTION']  # src/simplerca/core.py:22
 
 
-def ho_so_nguon(hop_dong, dataset):
+def ho_so_nguon(hop_dong, dataset, profile=None):
     """CĐ5: hồ sơ nguồn điền từ hop-dong.json."""
+    if dataset == 'RE3-OB':
+        from p3.re3 import validate_profile
+        p = validate_profile(profile)
+        return {'kenh_metric': {'kieu': 'hau_to', 'bang': dict(p['metric_channels'])},
+                'quy_tac_log': dict(p['log_rule']), 'nguon_khoi_phat': ['trace', 'metric']}
     k = hop_dong['kenh'][dataset]
     if dataset == 'RE2-TT':
         return {'kenh_metric': {'kieu': 'hau_to', 'bang': dict(k['metric_theo_hau_to'])},
@@ -44,6 +49,34 @@ def ho_so_nguon(hop_dong, dataset):
                 'quy_tac_log': {'kieu': 'severity', 'loi': list(sev['loi']), 'khong_loi': list(sev['khong_loi'])},
                 'nguon_khoi_phat': ['trace']}
     raise ValueError(dataset)
+
+
+def ca_re3(payload, profile, opaque_id=None, chuoi_cam=None):
+    """Canonical RE3 tables from p3.re3; profile must already be pinned by runner.
+
+    Exact log ns are preserved for M1. No paths, profile evidence or case metadata
+    enter params_ca. This does not grant access or validate a held-out cohort.
+    """
+    from p3.re3 import validate_profile, ContractError
+    p = validate_profile(profile)
+    tr, mt, lg = payload['traces'], payload['metric'], payload['logs']
+    if any(c != 'time' and c.split('_', 1)[0] != c.rsplit('_', 1)[0] for c in mt.columns):
+        raise ContractError('M1 metric ownership delimiter cannot represent this RE3 owner')
+    spans = [{'traceID': a, 'spanID': b, 'parentSpanID': c, 'owner': d,
+              'operation': e, 'start_us': int(f), 'duration_us': int(g)}
+             for a, b, c, d, e, f, g in tr[COT_SPAN_RE2].itertuples(index=False, name=None)]
+    metrics, cols = _dong_metric(mt)
+    logs = [{'timestamp': int(x), 'entity': e, 'message': m}
+            for x, e, m in lg[['_timestamp_ns', 'container_name', 'message']].itertuples(index=False, name=None)]
+    params = {'ho_so_nguon': ho_so_nguon({}, 'RE3-OB', p),
+              'don_vi_thoi_gian': {'spans.start_us': 'us', 'metrics.time': 's', 'logs.timestamp': 'ns'},
+              'coverage': {k: {'khoang': [list(x) for x in v['khoang']], 'r_ns': v['r_ns']}
+                           for k, v in payload['coverage'].items()},
+              'nguon_metric': {c: 'metric' for c in cols},
+              'thoi_gian_nguon': {'metric': 'metrics.time'}, 'phan_hoach_NA_da_kiem': {}}
+    return {'opaque_id': opaque_id, 'case_dir': None, 'chuoi_cam': list(chuoi_cam or []),
+            'spans': spans, 'metrics': metrics, 'logs': logs, 'inventory': list(p['inventory']),
+            'aliases': {}, 'params_ca': params, 'chan_doan_adapter': dict(payload['diagnostics'])}
 
 
 def _r_ns(hop_dong, khoa):
@@ -167,16 +200,24 @@ def _khoang_file_nezha(sel):
     return out
 
 
-def ca_nezha(allowlist, opaque_id, repo_root, hop_dong, inventory=None, canh_tinh=None):
+def ca_nezha(allowlist, opaque_id, repo_root, hop_dong, inventory=None, canh_tinh=None, layout='legacy'):
     """Một ca Nezha-OB cho runner.pha1. Mốc của lượt là t_ns của allowlist (trả kèm để runner dựng bảng mốc)."""
     sel = nezha.chon_ca(allowlist, opaque_id, repo_root)
-    win = nezha.doc_cua_so(sel)
+    win = nezha.doc_cua_so(sel, layout=layout)
     sp = win['spans']
     spans = [{'traceID': str(a), 'spanID': str(b), 'parentSpanID': '' if _rong(c) else str(c), 'owner': str(d),
               'operation': str(e), 'start_us': int(f), 'duration_us': int(g)}
              for a, b, c, d, e, f, g in sp[['traceID', 'spanID', 'parentSpanID', 'serviceName', 'operationName',
                                             'startTime', 'duration']].itertuples(index=False, name=None)]
-    metrics, cols = _dong_metric(win['metric'])
+    indices = {}
+    if win.get('metric_layout') == 'source_native':
+        metrics, cols = [], list(win['metric_arrays'])
+        for rel, frame in win['metric_sources'].items():
+            records, _ = _dong_metric(frame)
+            indices[rel] = list(range(len(metrics), len(metrics) + len(records)))
+            metrics.extend(records)
+    else:
+        metrics, cols = _dong_metric(win['metric'])
     prov = win['provenance']
     ma_nguon = {}
     for c in cols:
@@ -205,6 +246,8 @@ def ca_nezha(allowlist, opaque_id, repo_root, hop_dong, inventory=None, canh_tin
         'phan_hoach_NA_da_kiem': {ma: True for ma in nguon_ts}}
     if canh_tinh is not None:
         params_ca['canh_tinh'] = canh_tinh
+    if indices:
+        params_ca['chi_so_hang_metric'] = {ma_nguon[rel]: ix for rel, ix in indices.items()}
     t_ns = sel['t_ns']
     return {'opaque_id': opaque_id, 'spans': spans, 'metrics': metrics, 'logs': logs,
             'inventory': list(inventory if inventory is not None else nezha.UNIVERSE), 'aliases': {},

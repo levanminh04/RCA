@@ -1,0 +1,360 @@
+--- before/results/T-054/scripts/p7.py
++++ results/T-054/scripts/p7.py
+@@ -59,7 +59,7 @@
+     authority = read_pin({'path': args.authority, 'sha256': args.authority_sha256}) if args.authority else {}
+     authorize(plan, authority, 'report' if args.command in ('report', 'verify') else 'run')
+     if args.command == '_supervise':
+-        supervise(plan, directory); return
++        supervise(plan, directory, authority=authority); return
+     if args.command in ('run', 'resume'):
+         directory.mkdir(parents=True, exist_ok=True)
+         cmd = [str(OUT / 'scripts/p7.py'), '_supervise', '--plan', str(Path(args.plan).resolve()),
+@@ -76,6 +76,10 @@
+     if snapshot.get('plan_sha256') != fingerprint(plan):
+         raise Blocked('snapshot ghép khác plan toàn đợt')
+     verified = verify_snapshot(snapshot, plan['jobs'])
++    if (plan['mode'] == 'test' and authority.get('torai_A_source_grant') is not True
++            and any(j['slot']['arm'] == 'torai_A'
++                    and fingerprint(j['slot']) in verified for j in plan['jobs'])):
++        raise Blocked('WAIT_TORAI_A_SOURCE_GRANT: chỉ nhận BLOCKED cho A chưa được cấp quyền')
+     if args.command == 'report' and plan['mode'] != 'synthetic':
+         from cham import evaluate
+         required = plan.get('evaluation')
+--- before/results/T-054/scripts/nguon.py
++++ results/T-054/scripts/nguon.py
+@@ -183,6 +183,10 @@
+             raise Blocked('WAIT_G3')
+         if authority.get('test_grant') is not True:
+             raise Blocked('WAIT_TEST_GRANT')
++        if action == 'run' and authority.get('main_dispatch') is not True:
++            raise Blocked('WAIT_MAIN_DISPATCH')
++        if action == 'report' and authority.get('score_grant') is not True:
++            raise Blocked('WAIT_SCORE_GRANT')
+         if not plan.get('protocol_ref') or read_pin(plan['protocol_ref']).get('status') != 'LOCKED_G3':
+             raise Blocked('WAIT_LOCKED_PROTOCOL')
+         locked = read_pin(plan['protocol_ref'])
+@@ -197,10 +201,12 @@
+         raise Blocked('mode chưa được cấp')
+     if any(j.get('evaluation_mode') != mode or j.get('kind') == 'synthetic' for j in plan['jobs']):
+         raise Blocked('miền quyền của job khác plan')
+-    if any(j['slot']['arm'] == 'torai_A' for j in plan['jobs']) and authority.get('torai_A_source_grant') is not True:
++    separate_A = plan.get('auxiliary_A_policy') == 'AFTER_NON_A_VERIFIED_PREFLIGHT_AND_PRESERVE_BLOCKED'
++    if (any(j['slot']['arm'] == 'torai_A' for j in plan['jobs'])
++            and authority.get('torai_A_source_grant') is not True and not separate_A):
+         raise Blocked('WAIT_TORAI_A_SOURCE_GRANT')
+     for job in plan['jobs']:
+-        if job['slot']['arm'] == 'torai_A':
++        if job['slot']['arm'] == 'torai_A' and authority.get('torai_A_source_grant') is True:
+             declared = authority.get('torai_A_source_sha256')
+             if declared != job.get('author_source_ref', {}).get('sha256') or declared != job['slot'].get('author_source_sha256'):
+                 raise Blocked('grant TORAI A không trỏ đúng nguồn đã pin')
+@@ -390,6 +396,8 @@
+         if len(got) != len(set(got)) or set(got) != set(expected):
+             raise Blocked('partition thiếu/thừa/trùng slot; không phát lô khác phạm vi')
+     if (c.get('schema') != 'T054-DISPATCH-CONTRACT-1'
++            or plan.get('auxiliary_A_policy') != c.get('auxiliary_A_policy')
++            or plan.get('ob_sensitivity_ref') != c.get('ob_sensitivity_ref')
+             or plan.get('workers', 1) != c['workers'] or plan.get('monitor') != c['monitor']
+             or plan.get('budget') != c['budget']
+             or plan.get('resources') != c.get('resources')
+--- before/results/T-054/scripts/dieu_phoi.py
++++ results/T-054/scripts/dieu_phoi.py
+@@ -596,13 +596,17 @@
+     return False
+ 
+ 
+-def supervise(plan, directory):
++def supervise(plan, directory, authority=None):
+     """Một supervisor; tối đa hai worker. Plan bất biến quyết số worker."""
+     import threading
+     from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
+     count = plan.get('workers', 1)
+     if type(count) is not int or count not in (1, 2):
+         raise Blocked('workers phải là 1 hoặc 2, khai trong plan')
++    separate_A = plan.get('auxiliary_A_policy') == 'AFTER_NON_A_VERIFIED_PREFLIGHT_AND_PRESERVE_BLOCKED'
++    if separate_A and plan['mode'] == 'test':
++        from nguon import authorize
++        authorize(plan, authority or {}, 'run')
+     directory = Path(directory)
+     directory.mkdir(parents=True, exist_ok=True)
+     with exclusive(directory / 'supervisor.lock'):
+@@ -619,10 +623,44 @@
+                 append(journal, dict(row, wall_clock=time.time()))
+                 if 'job_id' in row and 'state' in row:
+                     current[row['job_id']] = row
++        def block_A(job, reason):
++            row = {'state': 'BLOCKED', 'job_id': fingerprint(job['slot']), 'reason': reason,
++                   'attempt_started': False}
++            emit(row)
++        if separate_A:
++            from nguon import author_source
++            for job in plan['jobs']:
++                job_id = fingerprint(job['slot'])
++                if job['slot']['arm'] != 'torai_A':
++                    continue
++                if job_id in current:
++                    if (current[job_id]['state'] in ('RUNNING', 'COMPLETE_UNVERIFIED')
++                            and (not authority or authority.get('torai_A_source_grant') is not True)):
++                        raise Blocked('A đang chạy nhưng quyền nguồn chưa xác minh')
++                    continue
++                if not authority or authority.get('torai_A_source_grant') is not True:
++                    block_A(job, 'A_SOURCE_NOT_GRANTED')
++                    continue
++                try:
++                    files = author_source(job)
++                    path = directory / 'A-source-checks' / (job_id + '.json')
++                    evidence = {'job_sha256': fingerprint(job), 'source': job['author_source_ref'],
++                                'files': {name: ref(path) for name, path in files.items()}, 'PASS': True}
++                    if path.exists():
++                        if read_pin(ref(path)) != evidence:
++                            raise Blocked('biên nhận nguồn A cũ khác slot')
++                    else:
++                        atomic(path, evidence)
++                except (Blocked, OSError, KeyError, ValueError) as exc:
++                    block_A(job, 'A_SOURCE_VERIFICATION_FAILED: ' + str(exc))
+         # Lượt đang sống được nhận trước lượt mới; không tăng số worker khi resume.
+         pending = sorted(plan['jobs'], key=lambda j: 0 if current.get(fingerprint(j['slot']), {}).get('state')
+                          in ('RUNNING', 'COMPLETE_UNVERIFIED') else 1)
++        if separate_A:
++            pending = [j for j in pending if not (j['slot']['arm'] == 'torai_A'
++                       and current.get(fingerprint(j['slot']), {}).get('state') == 'BLOCKED')]
+         active = {}; groups = set(); stop = False
++        A_halted = False
+         import psutil
+         memory_capacity = psutil.virtual_memory().available - plan.get('resources', {}).get('reserve_bytes', 0)
+         try:
+@@ -635,6 +673,10 @@
+                         for job in list(pending):
+                             if len(active) >= count:
+                                 break
++                            if (separate_A and job['slot']['arm'] == 'torai_A'
++                                    and any(current.get(fingerprint(other['slot']), {}).get('state') != 'VERIFIED'
++                                            for other in plan['jobs'] if other['slot']['arm'] != 'torai_A')):
++                                continue
+                             group = budget_group(job)
+                             if group in groups:
+                                 continue
+@@ -668,5 +710,10 @@
+                             requested_stop = True
+                         if requested_stop:
+                             stop = True
++                            A_halted = separate_A and jobs_by_slot[job_id]['slot']['arm'] == 'torai_A'
++                if A_halted:
++                    for job in pending:
++                        if job['slot']['arm'] == 'torai_A' and fingerprint(job['slot']) not in current:
++                            block_A(job, 'A_QUEUE_HALTED_BEFORE_DISPATCH')
+         finally:
+             append(journal, {'state': 'SUPERVISOR_STOPPED', 'pid': os.getpid(), 'wall_clock': time.time()})
+--- before/results/T-054/scripts/cham.py
++++ results/T-054/scripts/cham.py
+@@ -179,6 +179,8 @@
+     result = a4_v2.evaluate(tables['RE2-TT'], tables['Nezha-OB'], torai_seeds=(0, 1, 2), expected_counts=expected)
+     if plan.get('sensitivity_decision_ref'):
+         approved_sensitivities(result, tables, plan['sensitivity_decision_ref'])
++    if plan.get('ob_sensitivity_ref'):
++        result['OB_group_description'] = ob_group_description(tables['Nezha-OB'], plan['ob_sensitivity_ref'])
+     atomic(Path(output) / 'a4.json', result)
+     descriptive = describe(plan, records, labels)
+     atomic(Path(output) / 'tables.json', descriptive)
+@@ -286,6 +288,27 @@
+                   support_policy=protocol['support_policy'], protocol_ref=plan['protocol_ref'])
+     atomic(Path(output)/'re3-tables.json', result)
+     return result
++
++
++def ob_group_description(table, decision_ref):
++    """Bảng nhóm đã khai trước điểm; không điều khiển A4 hoặc mức kiểm định."""
++    import a4_v2
++    decision = read_pin(decision_ref)
++    left, right, labels = table
++    group = set(decision['affected_opaque_ids'])
++    if (decision.get('status') != 'USER_CONFIRMED' or len(group) != 4
++            or len(left) != 34 or not group <= set(left) or set(left) != set(right)):
++        raise Blocked('nhóm độ nhạy OB khác cohort/nhóm bốn ca đã khai')
++    rows = []
++    for world in ('P', 'S_lo', 'S_hi'):
++        delta = {oid: a4_v2._score(left[oid], labels[oid]['root'], world)['Hit5_Q']
++                 - a4_v2._mean_scores([a4_v2._score(r, labels[oid]['root']) for r in right[oid]])['Hit5_Q']
++                 for oid in left}
++        for name, members in [('all34', set(left)), ('remaining30', set(left) - group), ('affected4', group)]:
++            rows.append({'group': name, 'world': world, 'n': len(members),
++                         'paired_mean_delta_Hit5': sum(delta[o] for o in members) / len(members)})
++    return {'decision': decision_ref, 'rows': rows, 'role': 'DESCRIPTIVE_ONLY',
++            'limit': 'Đổi tập đích theo nhóm; chưa tách tác động adapter khỏi độ khó ca.'}
+ 
+ 
+ def approved_sensitivities(result, tables, decision_ref):
+@@ -470,6 +493,9 @@
+         for arm, records in sorted(arms.items()):
+             worlds = ('P', 'S_lo', 'S_hi') if arm not in ('C-c', 'C-g', 'C-d1', 'C-d2', 'C-d3', 'torai_A') else ('P',)
+             if arm in ('torai_A', 'torai_B') and ds == 'RE2-TT' and (len(records) != 3 or {r.get('seed') for r in records} != {0, 1, 2}):
++                if arm == 'torai_A':
++                    missing.append([ds, oid, view, arm, 'INCOMPLETE_THREE_SEEDS'])
++                    continue
+                 raise Blocked('bảng mô tả không bình quân seed sống')
+             for world in worlds:
+                 scored = []
+--- before/results/T-054/scripts/fixtures.py
++++ results/T-054/scripts/fixtures.py
+@@ -213,6 +213,7 @@
+             else:
+                 check('separate_cd3_' + ds + '_' + arm, lambda r=recs: assert_equal('C-d3' in r[0]['extra']['doi_chung'], False))
+ 
++    checks.extend(auxiliary_policy_checks(target / 'policy013'))
+     atomic(target / 'summary.json', {'checks': checks, 'count': len(checks), 'PASS': True,
+            'scope': 'synthetic transport/source/labels/phase/queue/A4 boundary; no scientific pilot',
+            'test_opened': False, 'real_methods_on_dev': False})
+@@ -223,7 +224,7 @@
+     assert a == b, (a, b)
+ 
+ 
+-def report_checks(target, reader_source):
++def report_checks(target, reader_source, partial_A=False):
+     """Record transport tổng hợp quanh output lõi trên dữ liệu giả; không phải baseline pilot."""
+     from cham import evaluate
+     target = Path(target).resolve(); target.mkdir(parents=True, exist_ok=False)
+@@ -277,6 +278,24 @@
+                 receipt = atomic(target / key / 'receipt.json', {'job_sha256': fingerprint(j), 'invocation': ip, 'result': rp})
+                 slots[key] = {'state': 'VERIFIED', 'receipt': receipt, 'token': token}
+                 jobs.append(j)
++    template = next(j for j in jobs if j['slot']['dataset'] == 'RE2-TT' and j['slot']['arm'] == 'torai_B' and j['slot']['seed'] == 0)
++    for seed in (0, 1, 2):
++        s = dict(template['slot'], arm='torai_A', seed=seed)
++        job = dict(template, slot=s, a4=False)
++        key = fingerprint(s)
++        jobs.append(job)
++        slots[key] = {'state': 'BLOCKED', 'reason': 'A_SOURCE_NOT_GRANTED_FIXTURE'}
++        if partial_A and seed == 0:
++            original = read_pin(slots[fingerprint(template['slot'])]['receipt'])
++            records = copy.deepcopy(read_pin(original['result'])['records'])
++            records[0].update(variant='A', seed=0)
++            invocation = dict(read_pin(original['invocation']), slot_sha256=key)
++            envelope = dict(read_pin(original['result']), slot_sha256=key, records=records,
++                            invocation_sha256=fingerprint(invocation), record_sha256=fingerprint(records))
++            ip = atomic(target / key / 'invocation.json', invocation)
++            rp = atomic(target / key / 'result.json', envelope)
++            receipt = atomic(target / key / 'receipt.json', dict(job_sha256=fingerprint(job), invocation=ip, result=rp))
++            slots[key] = dict(state='VERIFIED', receipt=receipt, token=envelope['token'])
+     plan = {'mode': 'synthetic', 'jobs': jobs, 'inventories': inventories}
+     snapshot = {'schema': 'T054-SNAPSHOT-1', 'plan_sha256': fingerprint(plan), 'slots': slots}
+     result = evaluate(snapshot, plan, labels, canonicals, runtimes, {k: {} for k in runtimes}, inventories, target / 'report')
+@@ -284,10 +303,109 @@
+     assert len(table['regions']) == 4 and len(table['position_N']) == 2
+     assert {r['arm'] for r in table['rows']} >= {'M1', 'C-a0', 'C-a1', 'C-c', 'C-g', 'C-d1', 'C-d2', 'circa_rht_aux'}
+     assert all(r['seed_count'] == 3 for r in table['rows'] if r['dataset'] == 'RE2-TT' and r['arm'] == 'torai_B')
++    assert not any(r['arm'] == 'torai_A' for r in table['rows'])
++    assert any('torai_A' in row for row in table['missing'])
+     atomic(target / 'summary.json', {'PASS': True, 'slots': len(slots), 'rows': len(table['rows']),
+           'regions': len(table['regions']), 'positions': len(table['position_N']),
+-          'scope': 'synthetic labels + synthetic baseline records + real M1 on generated data; not scientific pilot'})
++          'scope': 'synthetic labels + synthetic baseline records + real M1 on generated data; not scientific pilot',
++          'A4_with_missing_A': True, 'A_partial_seed_fixture': partial_A})
+     print(json.dumps({'PASS': True, 'report_rows': len(table['rows']), 'output': str(target)}))
++
++
++def auxiliary_policy_checks(target):
++    """Các hồi quy quyền, hàng chờ hai worker và bảng A thiếu seed."""
++    from fractions import Fraction
++    import nguon
++    import cham
++    from dieu_phoi import supervise
++    target.mkdir(parents=True, exist_ok=False)
++    checks = []
++    policy = 'AFTER_NON_A_VERIFIED_PREFLIGHT_AND_PRESERVE_BLOCKED'
++    slot = {'dataset': 'RE2-TT', 'opaque_id': 'fixture-A', 'arm': 'M1', 'view': 'main', 'seed': None}
++    job = {'slot': slot, 'kind': 'synthetic', 'evaluation_mode': 'test'}
++    source = atomic(target / 'permission.json', {'scope': 'fixture only'})
++    plan = {'mode': 'test', 'host_role': 'local', 'jobs': [dict(job, kind='m1')],
++            'protocol_ref': source, 'budget': {'wall_s': 30}, 'open_before_run': []}
++    authority = {'g3': True, 'test_grant': True, 'source': source, 'plan_sha256': fingerprint(plan)}
++    with patch('nguon.read_pin', return_value={'status': 'LOCKED_G3', 'allowed_hosts': ['local']}), \
++            patch('nguon.validate_locked_plan'), patch('dieu_phoi.check_budget'):
++        for flag in (None, False):
++            try:
++                nguon.authorize(plan, dict(authority, main_dispatch=flag), 'run')
++            except Blocked as exc:
++                assert str(exc) == 'WAIT_MAIN_DISPATCH'
++            else:
++                raise AssertionError('main phát khi thiếu quyền')
++        nguon.authorize(plan, dict(authority, main_dispatch=True), 'run')
++        try:
++            nguon.authorize(plan, authority, 'report')
++        except Blocked as exc:
++            assert str(exc) == 'WAIT_SCORE_GRANT'
++        else:
++            raise AssertionError('chấm khi thiếu quyền')
++        nguon.authorize(plan, dict(authority, score_grant=True), 'report')
++        blocked_A_plan = dict(plan, host_role='aggregate', jobs=[dict(plan['jobs'][0], slot=dict(slot, arm='torai_A'))],
++                              auxiliary_A_policy=policy)
++        with patch('nguon.validate_aggregate_plan'):
++            nguon.authorize(blocked_A_plan, dict(authority, score_grant=True,
++                            plan_sha256=fingerprint(blocked_A_plan)), 'report')
++    checks.append('main_dispatch_checked_before_run_and_resume')
++    checks.append('report_permission_distinct_from_dispatch')
++    checks.append('aggregate_report_can_include_ungranted_blocked_A')
++    afile = target / 'author-fixture.csv'
++    afile.write_text('time,x\n0,1\n', encoding='utf-8')
++    jobs = [dict(job, slot=dict(slot, arm=arm, seed=seed), author_source_ref=source)
++            for arm, seed in [('circa', None), ('microrank', None), ('torai_A', 0), ('torai_A', 1)]]
++    for scenario in ('barrier', 'missing_grant', 'bad_pin', 'unknown_failure'):
++        queue = target / scenario
++        sequence = []
++        def fake_run(item, plan, directory, budget, current, registered, emit):
++            arm = item['slot']['arm']
++            if arm == 'torai_A':
++                assert all(current.get(fingerprint(j['slot']), {}).get('state') == 'VERIFIED'
++                           for j in jobs if j['slot']['arm'] != 'torai_A')
++            sequence.append(('start', arm))
++            if arm != 'torai_A':
++                time.sleep(.04)
++            failed = scenario == 'unknown_failure' and arm == 'torai_A'
++            emit({'job_id': fingerprint(item['slot']), 'state': 'BLOCKED' if failed else 'VERIFIED',
++                  'reason': 'UNKNOWN_METHOD_FAILURE' if failed else None})
++            sequence.append(('finish', arm))
++            return failed
++        mock_source = (Blocked('fixture CSV mismatch') if scenario == 'bad_pin' else None)
++        with patch('nguon.author_source', side_effect=mock_source,
++                   return_value={'logts': str(afile)}) as author, patch('dieu_phoi._run_one', side_effect=fake_run):
++            supervise({'mode': 'synthetic', 'workers': 2, 'jobs': jobs, 'auxiliary_A_policy': policy}, queue,
++                      authority={'torai_A_source_grant': scenario != 'missing_grant'})
++            if scenario == 'missing_grant':
++                author.assert_not_called()
++        state = status(queue)
++        assert all(state['jobs'][fingerprint(j['slot'])]['state'] == 'VERIFIED' for j in jobs[:2])
++        if scenario in ('bad_pin', 'missing_grant'):
++            assert not any(arm == 'torai_A' for event, arm in sequence)
++        if scenario == 'unknown_failure':
++            assert state['jobs'][fingerprint(jobs[-1]['slot'])]['reason'] == 'A_QUEUE_HALTED_BEFORE_DISPATCH'
++            cham.snapshot_from_status({'jobs': jobs}, state)
++        checks.append('A_' + scenario)
++    partial = {fingerprint(jobs[2]['slot']): [{'seed': 0, 'status': 'ERROR'}]}
++    description = cham.describe({'jobs': jobs[2:]}, partial,
++                                {'RE2-TT': {'fixture-A': {'root': 'fixture', 'fault': 'fixture', 'cell': 'fixture'}}})
++    assert not description['rows'] and any('INCOMPLETE_THREE_SEEDS' in row for row in description['missing'])
++    checks.append('A_partial_seeds_preserved_without_partial_mean')
++    decision = atomic(target / 'OB-group-decision.json',
++                      {'status': 'USER_CONFIRMED', 'affected_opaque_ids': [str(i) for i in range(4)]})
++    left = {str(i): {'hit': Fraction(i % 2)} for i in range(34)}
++    right = {oid: [{'hit': Fraction(0)}] for oid in left}
++    labels = {oid: {'root': 'fixture'} for oid in left}
++    sys.path.insert(0, str(ROOT / 'results/T-052/scripts'))
++    with patch('a4_v2._score', side_effect=lambda rec, root, world='P': {'Hit5_Q': rec['hit']}), \
++            patch('a4_v2._mean_scores', side_effect=lambda rows: rows[0]):
++        rows = cham.ob_group_description((left, right, labels), decision)['rows']
++    assert [r['n'] for r in rows] == [34, 30, 4] * 3
++    assert all(r['paired_mean_delta_Hit5'] == Fraction(1, 2) for r in rows)
++    checks.append('OB_group_description_denominators_and_pairs')
++    atomic(target / 'summary.json', {'PASS': True, 'checks': checks})
++    return checks
+ 
+ 
+ def exclusive_probe(path):
+@@ -298,7 +416,7 @@
+ if __name__ == '__main__':
+     try:
+         if '--reports-from' in sys.argv:
+-            report_checks(sys.argv[1], sys.argv[sys.argv.index('--reports-from') + 1])
++            report_checks(sys.argv[1], sys.argv[sys.argv.index('--reports-from') + 1], partial_A='--partial-A-fixture' in sys.argv)
+         else:
+             main(sys.argv[1], readers='--transport-only' not in sys.argv)
+     except BaseException as exc:

@@ -242,12 +242,14 @@ def _numeric(value):
         raise LoiRunner('Nezha: giá trị metric sai schema số') from exc
 
 
-def _doc_cua_so(selection, trace_guard_s=0):
+def _doc_cua_so(selection, trace_guard_s=0, layout='legacy'):
     """Trả frame/arrays trong RAM; guard N được wrapper method áp riêng.
 
     metric.time là marker ns của front_service theo thứ tự; mỗi kênh vẫn giữ
     timestamp nguồn trong provenance. Không lưới/union/interpolate/dedup.
     """
+    if layout not in ('legacy', 'source_native'):
+        raise LoiRunner('Nezha: layout không hợp lệ')
     t = _integer(selection.get('t_ns'), 't_ns')
     guard = _integer(trace_guard_s, 'trace_guard_s')
     if guard not in (0, selection.get('trace_guard_s')):
@@ -256,6 +258,7 @@ def _doc_cua_so(selection, trace_guard_s=0):
     csv.field_size_limit(10_000_000)
     sources, channel_values, arrays, channel_info = {}, {}, {}, {}
     marker = None
+    metric_sources = {}
     for rel, meta in sorted(selection['files'].items()):
         p = _relative_path(rel)
         if p.parts[-2] != 'metric':
@@ -278,33 +281,42 @@ def _doc_cua_so(selection, trace_guard_s=0):
                 rows.append((timestamp, aliases[ident], row))
         rows.sort(key=lambda item: item[0])
         times = [r[0] for r in rows]
-        if len(rows) != 10 or sum(x < t for x in times) != 5:
+        if layout == 'legacy' and (len(rows) != 10 or sum(x < t for x in times) != 5):
             raise LoiRunner('Nezha: metric không giữ hợp đồng 5N+5A ordinal')
-        if len({r[1] for r in rows}) != 1:
+        if len({r[1] for r in rows}) > 1:
             raise LoiRunner('Nezha: một nguồn metric có nhiều service')
         if front:
             marker = times
         sources[rel] = dict(_stats(times, t), timestamps_ns=times,
                             sha256=meta['sha256'], bytes=meta['bytes'], kind='metric')
+        owner = SERVICE_ALIASES['Frontend'] if front else POD_ALIASES[p.name[:-len('_metric.csv')]]
+        source_columns = {}
         for original, suffix in channels.items():
-            name = rows[0][1] + '_' + suffix
+            name = owner + '_' + suffix
             if name in channel_values:
                 raise LoiRunner('Nezha: kênh metric sau alias bị trùng')
             values = np.asarray([_numeric(r[2][original]) for r in rows], dtype=float)
             n = np.asarray([v for x, v in zip(times, values) if x < t], dtype=float)
             a = np.asarray([v for x, v in zip(times, values) if x >= t], dtype=float)
             channel_values[name] = values
+            source_columns[name] = values
             arrays[name] = {'normal': n, 'anomalous': a}
             channel_info[name] = {'source': rel, 'source_column': original, 'timestamps_ns': times,
                                   'finite_N': int(np.isfinite(n).sum()), 'finite_A': int(np.isfinite(a).sum()),
                                   'nonfinite_N': int((~np.isfinite(n)).sum()),
                                   'nonfinite_A': int((~np.isfinite(a)).sum())}
+        metric_sources[rel] = pd.DataFrame({'time': np.asarray(times, dtype=np.int64), **source_columns})
     if marker is None or len(channel_values) != 165 or len(sources) != 11:
         raise LoiRunner('Nezha: không đủ 11 nguồn/165 kênh đã duyệt')
-    for source in sources.values():
-        if [x < t for x in source['timestamps_ns']] != [x < t for x in marker]:
-            raise LoiRunner('Nezha: ordinal nguồn không cùng N/A với marker')
-    metric = pd.DataFrame({'time': np.asarray(marker, dtype=np.int64), **channel_values})
+    rectangular = all(len(s['timestamps_ns']) == 10 and sum(x < t for x in s['timestamps_ns']) == 5
+                      for s in sources.values())
+    if layout == 'legacy' or rectangular:
+        for source in sources.values():
+            if [x < t for x in source['timestamps_ns']] != [x < t for x in marker]:
+                raise LoiRunner('Nezha: ordinal nguồn không cùng N/A với marker')
+        metric = pd.DataFrame({'time': np.asarray(marker, dtype=np.int64), **channel_values})
+    else:
+        metric = None  # No invented common rows, timestamps, interpolation, or padding.
 
     span_rows, seen, duplicate_spans = [], {}, 0
     for rel, meta in sorted(selection['files'].items()):
@@ -389,14 +401,22 @@ def _doc_cua_so(selection, trace_guard_s=0):
                   'duplicates_retained': True, 'span_duplicate_rows': duplicate_spans,
                   'span_unique_keys': len(seen), 'log_identical_duplicate_rows': duplicate_logs,
                   'clock_shift_ns': 0, 'derived_payload_files': []}
-    return {'metric': metric, 'metric_arrays': arrays, 'spans': spans, 'logs': logs,
-            't_ns': t, 'window': window, 'provenance': provenance}
+    result = {'metric': metric, 'metric_arrays': arrays, 'spans': spans, 'logs': logs,
+              't_ns': t, 'window': window, 'provenance': provenance}
+    if metric is None:
+        window.update(metric_rows_N=None, metric_rows_A=None,
+                      metric_rows_per_source={k: {'N': int((f['time'] < t).sum()),
+                                                   'A': int((f['time'] >= t).sum())}
+                                              for k, f in metric_sources.items()})
+        provenance['ordinal_marker_source'] = None
+        result.update(metric_layout='source_native', metric_sources=metric_sources)
+    return result
 
 
-def doc_cua_so(selection, trace_guard_s=0):
+def doc_cua_so(selection, trace_guard_s=0, layout='legacy'):
     """Lỗi nguồn/schema là LoiRunner; không biến thành ERROR của phương pháp."""
     try:
-        return _doc_cua_so(selection, trace_guard_s)
+        return _doc_cua_so(selection, trace_guard_s, layout=layout)
     except LoiRunner:
         raise
     except (ValueError, TypeError, KeyError, OverflowError, OSError, csv.Error) as exc:

@@ -1,0 +1,85 @@
+{
+ "schema": "T043-hop-dong-M1-v1",
+ "task": "T-043",
+ "trang_thai": "Đặc tả hợp đồng cho task cài đặt; chưa cài. Phần đã quyết dẫn SPEC; phần [T-043] chờ phản biện.",
+ "vao": {
+  "tham_so_duy_nhat": ["spans", "metrics", "logs", "inventory", "aliases", "t", "params"],
+  "spans": {"cot": {"traceID": "str", "spanID": "str", "parentSpanID": "str|rỗng", "owner": "str (sau alias)", "operation": "str", "start_us": "int", "duration_us": "int >= 0"}, "mien": "start >= t-300 s và end < t+300 s (chế độ a)"},
+  "metrics": {"cot": {"time": "giây (RE2-TT) hoặc ns (Nezha-OB, theo adapter)", "<thực thể>_<kênh>": "float"}, "ghi_chu": "giữ mọi cột có trong file của ca (WHY-27)"},
+  "logs": {"cot": {"timestamp": "giây hoặc ns", "entity": "str (sau alias)", "message": "str", "severity_raw": "tùy nguồn; có thể vắng"}},
+  "inventory": "U của dataset: RE2-TT 68 thực thể (results/T-022/mappings/universe-re2tt-dev.json#/U); Nezha-OB 10 dịch vụ (src/p3/nezha.py UNIVERSE)",
+  "aliases": "alias tường minh của adapter; không suy bằng regex (LESSONS SL34)",
+  "t": "giây nguyên; chế độ (a) là mốc tiêm do runner truyền (Q-66); chế độ (b) là t̂ của báo động",
+  "params": {"config_id": "str", "bat_tat": {"E1": "U|CP|tat", "E2": "C|VC|tat", "E3": "bool", "E3b": "bool", "E5": "bool", "E6": "a|b", "E9": "bool", "T12": "bool"}, "the_gioi": ["P", "S_lo", "S_hi"], "nhanh_z": "bool (chỉ T4b)", "tham_so_E4": {"m_span": 20, "m_metric": 5, "alpha": 0.01, "epsilon": 0.05, "q_hi": 0.95, "q_lo": 0.05, "n_exact_max": 100, "count_min": 10}}
+ },
+ "cam": {
+  "ten_cam": ["root", "fault", "fault_type", "cell", "case", "label", "labels", "nhan", "answer", "inject_time", "opaque_id_path", "nhom_loi", "nhom_vi_tri_p75", "ground_truth"],
+  "nguon_ten": "src/p3/ban_ghi.py CAM cộng src/p3/nezha.py FORBIDDEN_LABEL_KEYS",
+  "quy_tac": "Bộ kiểm M1 duyệt đệ quy qua dict, list và tuple; gặp khóa thuộc ten_cam ở bất kỳ mức nào thì từ chối bản ghi. opaque_id chỉ ở mức runner, không truyền vào phương pháp.",
+  "phan_vi_du": "fixture 74: worlds = [{\"root\": \"A\"}]; worlds = {\"P\": [{\"root\": \"A\"}]}; evidence_refs = ({\"label\": 1},) đều bị từ chối",
+  "gioi_han": "Lọc tên không chứng minh đặc trưng không suy từ nhãn; mỗi thành phần khai đầu vào ở đặc tả v1 mục 7–8."
+ },
+ "ra": {
+  "ban_ghi_goc": "ban_ghi.tao (method = M1, variant = config_id, mode, window, config_id, why_ids, status, entity_ranking hoặc blocks, sets, diagnostics)",
+  "truong_them": {
+   "classes": "theo thực thể: tự sinh | kế thừa | bình thường | thiếu dữ liệu",
+   "inherited_by": "theo kênh: thực thể, kênh, hướng, điểm trước E5, đơn vị giải thích (thực thể, kênh), cạnh hoặc đường, quy tắc (lan ngược | lan xuôi | nhóm vòng), trạng thái (đề xuất | áp dụng | bị E9 phủ quyết)",
+   "region": "R_r cho từng ứng viên trong nhóm hòa đầu ở thế giới P; vùng hợp là đầu ra phụ",
+   "evidence_refs": "khóa span, cột metric, ID mẫu log",
+   "coverage": "trạng thái quan sát theo nguồn: F, H, T của ba thế giới; số ô theo trạng thái; ô biên",
+   "worlds": "nhãn và điểm từng đơn vị ở P, S_lo, S_hi; thứ hạng ở ba thế giới; cờ OBS_DEPENDENT, RANK_CHANGED",
+   "verdict": "CAUSE_FOUND | NO_INTRINSIC_ANOMALY | INSUFFICIENT_EVIDENCE (thế giới P)",
+   "do_phu_cham": "tỷ lệ thực thể quan sát được có ít nhất một phép chấm hợp lệ",
+   "chan_doan": "số lần E2-VC rơi về E2-C; số con vượt biên cha > 1 ms; số span mồ côi; số bản lặp bỏ; NO_POSITIVE_MASS; UNSUPPORTED theo thành phần"
+  },
+  "cam_trong_ra": "WORLD_DEPENDENT, M5, RR, hạng của root chỉ do bộ đánh giá tính sau ghép nhãn"
+ },
+ "trang_thai": {
+  "don_vi": ["OK", "LOW_SUPPORT", "NO_BASELINE", "NO_A"],
+  "thuc_the": ["xếp hạng (tầng 1, 2, 3)", "NO_VALID_CHANNEL (thuộc O, không trả về)", "UNOBSERVED (ngoài O)"],
+  "ban_ghi": ["OK", "NO_EVIDENCE", "ERROR", "TIMEOUT", "UNSUPPORTED"],
+  "thanh_phan": ["UNSUPPORTED", "NO_POSITIVE_MASS (E6b)", "UNSUPPORTED_CYCLIC (C-d3)", "NO_TARGET (C-d3)", "NO_EVIDENCE (C-g)"],
+  "chan_doan_phuong_phap": ["OBS_DEPENDENT", "RANK_CHANGED"],
+  "chan_doan_bo_danh_gia": ["WORLD_DEPENDENT"],
+  "mau_so": "mọi ca ở mẫu số MRR; trạng thái khác OK tính trượt (WHY-28)"
+ },
+ "kenh": {
+  "chung": {
+   "trace_thao_tac": {"don_vi": "(thực thể, tên thao tác)", "loai": "phân vị", "E1_tat": "thời lượng cả span, giữ span bọc, lớp lan ngược, lên (E3 thêm xuống)", "E1_bat": "thời gian độc quyền, bỏ span bọc chặt, lớp không lan, lên (E3 thêm xuống)"},
+   "trace_canh": {"don_vi": "cạnh a->b qua span bọc chặt", "loai": "phân vị", "huong": "lên", "lop": "không lan", "khi": "E2 bật"},
+   "trace_tan_suat": {"don_vi": "(thực thể, tên thao tác)", "loai": "đếm", "huong": "lên (lan ngược), xuống (lan xuôi); NEW_OP, STOPPED", "khi": "E3b bật"},
+   "log_loi_co_ban": {"don_vi": "thực thể", "loai": "đếm", "huong": "lên", "lop": "lan ngược", "khi": "E3 tắt"},
+   "log_mau": {"don_vi": "(thực thể, mẫu Drain) và ô mẫu mới", "loai": "đếm", "huong": "mẫu lỗi và mẫu mới: lên, lan ngược; mẫu thường: xuống, lan xuôi", "khi": "E3 bật"}
+  },
+  "RE2-TT": {
+   "metric_theo_hau_to": {"cpu": "tài nguyên", "mem": "tài nguyên", "diskio": "tài nguyên", "socket": "tài nguyên", "workload": "lưu lượng", "error": "lỗi", "latency-50": "độ trễ", "latency-90": "độ trễ"},
+   "thuc_the_metric": "tiền tố trước '_' đầu tiên (ban_ghi.thuc_the_metric)",
+   "log": "container_name là thực thể; dòng lỗi theo từ khóa SimpleRCA ERROR|FAIL|EXCEPTION, không phân biệt hoa thường (src/simplerca/core.py:22)",
+   "cot_ID_log": false
+  },
+  "Nezha-OB": {
+   "metric_theo_kenh": {"CpuUsage-m": "tài nguyên", "CpuUsageRate-pct": "tài nguyên", "MemoryUsage-Mi": "tài nguyên", "MemoryUsageRate-pct": "tài nguyên", "SyscallRead": "tài nguyên", "SyscallWrite": "tài nguyên", "NetworkReceiveBytes": "tài nguyên", "NetworkTransmitBytes": "tài nguyên", "PodClientLatencyP90-s": "độ trễ", "PodServerLatencyP90-s": "độ trễ", "PodClientLatencyP95-s": "độ trễ", "PodServerLatencyP95-s": "độ trễ", "PodClientLatencyP99-s": "độ trễ", "PodServerLatencyP99-s": "độ trễ", "PodWorkload-Ops": "lưu lượng", "PodSuccessRate-pct": "tỷ lệ thành công", "FrontSuccessRate-pct": "tỷ lệ thành công (frontend)", "FrontLatencyP50-s": "độ trễ (frontend)", "FrontLatencyP90-s": "độ trễ (frontend)", "FrontLatencyP95-s": "độ trễ (frontend)", "FrontLatencyP99-s": "độ trễ (frontend)"},
+   "thuc_the_metric": "tiền tố trước '_' đầu tiên của tên kênh adapter",
+   "log": "PodName qua alias; severity theo `severity` dưới đây",
+   "cot_ID_log": true
+  },
+  "lop_huong": {"tài nguyên": {"lên": "không lan", "xuống": "lan xuôi"}, "độ trễ": {"lên": "lan ngược"}, "lỗi": {"lên": "lan ngược"}, "lưu lượng": {"lên": "lan ngược", "xuống": "lan xuôi"}, "tỷ lệ thành công": {"xuống": "lan ngược, chỉ khi E3 bật"}}
+ },
+ "severity": {
+  "Nezha-OB": {"duong_doc": "JSON ngoài của cột Log, khóa `log` là chuỗi JSON; giải mã lần hai, khóa `severity` (hợp đồng T-042 continuation-001: #/paths = [log, $decoded, severity])", "chuan_hoa": "chỉ giá trị chuỗi: bỏ khoảng trắng hai đầu, đổi chữ hoa", "loi": ["ERROR", "FATAL", "CRITICAL"], "khong_loi": ["TRACE", "DEBUG", "INFO", "WARN", "WARNING"], "con_lai": "UNKNOWN: rỗng, sai kiểu, không giải mã được, ngoài ánh xạ. Không tính là lỗi, không tính là không lỗi, không đổi thành INFO", "do_phu": "chỉ giá trị thuộc ánh xạ tính vào độ phủ severity xác định; báo theo thực thể và cửa sổ"},
+  "RE2-TT": {"quy_tac": "không có severity; từ khóa SimpleRCA"}
+ },
+ "nhanh_z": {"bien_doi_dau_vao": "không đổi đơn vị", "don_vi": {"thời lượng span": "µs ở cả hai dataset", "metric": "đơn vị của cột nguồn"}, "ly_do": "z bất biến khi nhân cả mẫu với hệ số dương nếu IQR_N trước và sau phép đổi đều >= 10·ε_mach; chỉ phụ thuộc đơn vị khi c = 1 (fixture 76). Đổi đơn vị là một lựa chọn riêng chưa có căn cứ.", "gioi_han": "Khi c = 1, điểm z phụ thuộc đơn vị biểu diễn và có thể chi phối khóa max."},
+ "quan_sat": {"luat": "đặc tả v1 mục 2.2", "do_phan_giai_r": {"RE2-TT log": 1.0, "RE2-TT metric": 1.0, "RE2-TT span": 1e-06, "Nezha-OB": 1e-09}, "khe_file_toi_da_s": 10, "o_s": 10, "metric_tham_gia_T": false},
+ "goi_bang_chung": {
+  "cho_P8": ["thứ hạng kèm khóa và tầng", "đồ thị con bất thường (nút F_raw, cạnh)", "vùng R_r và vùng hợp", "inherited_by", "kênh lệch nhất theo thực thể (top 3)", "dòng log tiêu biểu theo mẫu (tối đa 3 mỗi thực thể)", "coverage", "worlds", "verdict"],
+  "nguyen_tac": "LLM không đổi thứ hạng; được trả lời 'không đủ bằng chứng' (MRP P8)"
+ },
+ "flashticket_B1_9": {
+  "don_vi_dau_ra": "xếp hạng thực thể; định vị cạnh là đầu ra tùy chọn khi có bằng chứng ở cạnh (E2, E8)",
+  "tap_ung_vien": "nút của mô hình T-037 (WHY-52): dịch vụ, gateway, DB logic, cache, broker, đối tác ngoài, máy; khai trước theo loại nút",
+  "luat_quan_sat_duoc": "nút quan sát được khi có ít nhất một tín hiệu đã xác minh: span của chính nó; span CLIENT phía gọi có đích đã xác minh; metric hoặc log của nó. Nút chỉ thấy qua bên gọi được chấm theo bằng chứng cạnh và gắn cờ riêng.",
+  "nhan_va_cham": "giao SPEC P10, khai trước chiến dịch (SPEC B1.9)",
+  "chung_cu_A0": "siêu dữ liệu thu (B16 mục 8), chỉ số collector (B16 dòng 83, 108), request kiểm tra có trace biết trước"
+ }
+}

@@ -1,0 +1,249 @@
+Đang đọc SPEC, LOG và báo cáo chuẩn bị013; tiếp theo kiểm code, JSON và chạy lệnh kiểm manifest chỉ đọc.
+
+Manifest kiểm PASS (3177 file). Đang đọc patch năm wrapper và bằng chứng tuyến laptop.
+
+Đang đọc các helper kích hoạt/phát/nhận (activate.py, main.py, receive_main.py) để kiểm đường quyền và chuyển nguồn.
+
+Đang kiểm nguồn chiếu R1 (không thấy nhãn root/fault trong gói gửi EC2); tiếp theo đối chiếu DECISIONS/WHY, hồ sơ G3 và phạm vi file đổi.
+
+Cổng ghép nhãn trong `cham.evaluate` chặn đúng khi còn PENDING/RUNNING hoặc A4 BLOCKED. Đang kiểm căn cứ chọn 2 worker cho EC2_1 nhưng 1 worker cho EC2_2.
+
+EC2_1 pilot r2 đang chạy 2 worker chồng thời gian (tổng 475 s trong 240 s). Tôi đang so thời gian từng job khi chạy chồng với khi chạy đơn để xem thông lượng có thật sự tăng không.
+
+Đang kiểm hạn 600 s là theo thời gian đồng hồ hay CPU, vì EC2_1 chạy 2 worker làm mỗi job chậm gần gấp đôi.
+
+Đang đọc phần WHY/DECISIONS thêm trong lượt 013 và runbook, rồi đối chiếu hai bản đánh giá kế hoạch trước của Claude.
+
+Số fixture khớp báo cáo (101/101, 11, 89 hàng). Đang kiểm tuyến CIRCA/MicroRank TT trên laptop có lượt dev thật với `worker.py` hiện hành không.
+
+Lượt dev thật CIRCA/MicroRank trên laptop chưa thấy với `worker.py` hiện hành; đang xem bản vá 010 có chạm nhánh TT không.
+
+Đang kiểm điều kiện RAM laptop cho slot TORAI A/CIRCA (laptop còn ~2,23 GiB khả dụng).
+
+Thông tin này đã được xem qua để đưa về tóm tắt. Bản "current_rewritten_source" trên là một câu tiếng Việt đã viết lại, không phải lời tường thuật gốc, nên không có nội dung để nén thêm mà không làm mất ý; tôi giữ nguyên ý của nó: cấu hình 7 vế khớp sha với giao thức 003, và đang kiểm tra đường xác minh lại lỗi TraceRCA trên laptop khi nhận kết quả từ EC2.
+
+Đang kiểm 4 mã ca OB của D4 có nằm trong cohort OB của plan không — kiểm này trong code chỉ chạy sau khi đã ghép nhãn.
+
+Kiểm căn cứ của hạn 600 s/slot: có tính tới chạy 2 worker trên máy 2 vCPU không.
+
+Đang kiểm R1: bản chiếu "độc lập" có thật được dựng từ nguồn đối chiếu riêng, không từ bản kê runtime.
+
+Đang tìm số đo C-a0/bo-E1 chạy đơn trên cùng ca để phân xử: job chậm do tranh chấp CPU hay do vế vốn nặng hơn.
+
+Tự soát xong; còn hai điểm về số worker/hạn 600 s và ước lượng thời gian. Đang đọc `docs/review-prompt.md` để soạn prompt bàn giao đúng mẫu.
+
+Trước khi kết luận, tôi đọc nhanh hai nguồn đề tài (DT18 và hướng dẫn cô) để đối chiếu phần mục tiêu.
+
+# Soát kết quả chuẩn bị013 (Claude, chỉ đọc)
+
+## Kết luận
+
+- **Không có điểm CHẶN.** Không thấy lỗi ở code, nguồn, ma trận, cổng ghép nhãn hay đường quyền. Gói 013 đạt mức Pha 1 cần: đủ căn cứ để trình Minh khóa, trong phạm vi đã khai.
+- **Có hai điểm KHÔNG CHẶN.** Cả hai về chính sách vận hành và ước lượng thời gian. Nên chốt trước câu duyệt cuối, vì sau khi khóa thì plan không đổi được nữa.
+- RQ3b và RQ3d chưa có câu trả lời. Đây đúng là trạng thái trước main.
+
+## Phần tự soát đã đạt
+
+- **Manifest:** lệnh `verify_manifest.py --documents` trả `PASS`, kiểm 3177 file, không file nào lệch.
+- **Pin code:** 106/106 file khớp với file hiện tại. `protocol-candidate.json#/source_code` cùng tập file. 106 file upstream và bản vá local cũng khớp.
+- **So với 011:** chỉ năm wrapper đổi. Thêm ba helper (`activate`, `main`, `receive_main`), bỏ hai helper cũ. 98 file còn lại giữ nguyên.
+- **Cấu hình:** bảy vế M1-family khớp sha với `giao-thuc-p7-a-003.json#/configurations`.
+- **Ma trận:** 1.640 job cộng 2 dòng C-e thiếu hỗ trợ. Số này bằng 1.402+H (H=58) cộng 180 job TORAI A. EC2_1/EC2_2/laptop có 448/450/742 job, nhóm từng máy khớp (`candidate-validation.json#/hosts`).
+- **Cổng nhãn:** `cham.evaluate` gọi `verify_snapshot` và `validate_a4_slots` trước khi đọc nhãn. Còn slot PENDING/RUNNING hoặc slot A4 bị BLOCKED thì dừng.
+- **Nhãn ra cloud:** gói code gửi EC2 có 188 file, không chứa bản đồ thật hay nhãn.
+  - `sources/TT-*.json` chỉ có locator mờ, byte/hash, mốc t và U.
+  - Runtime binding chỉ chứa hash.
+  - Mỗi EC2 chỉ nhận 90 tệp của 30 ca của mình, kiểm hash ở cả hai đầu.
+- **Phân loại lỗi trên Linux:** hàm `_qua_ma_phuong_phap` dựa vào chuỗi đường dẫn qua `normcase`. Trên Linux hàm này không đổi chữ hoa thành chữ thường, nên đường dẫn `RCAEval` không khớp với `rcaeval`. Đổi tên gốc đóng gói đưa lại đúng ngữ nghĩa như trên Windows. Lỗi ERROR còn phải qua `known_operation_error`, hàm này đọc lại operation thật. Vậy phân loại không chỉ dựa vào chuỗi lỗi, đạt SPEC bước 5.
+- **D4:** bốn mã ca nằm trong 34 ca OB M1 của plan. Hàm dùng `_score`/`_mean_scores` giống A4.
+- **Laptop CIRCA/MicroRank/OB:** chưa có lượt dev thật chạy với `worker.py` hiện hành. Đọc diff 010/011 thì nhánh TT/Nezha chỉ đổi `else` thành `elif`. CIRCA chỉ thêm tham số mặc định `'re2-tt'`. Tôi chấp nhận dùng lại bằng chứng cũ cho các tuyến này. Căn cứ là đọc code, không phải một lượt chạy mới.
+- **Phạm vi ghi:** 12 file có snapshot trước khi sửa, cộng thư mục run. Các file khác đang đổi (AGENTS, MRP, LESSONS, src) đều có giờ sửa trước 16:12 ngày 07/11, tức trước lời duyệt 013.
+- **Thời gian fixture/dev trên EC2:** khoảng 384 s và 423 s mỗi máy, dưới giới hạn 60 phút.
+- **Các số trong báo cáo khớp file:** 101 fixture mỗi EC2, 11 kiểm kích hoạt, 89 hàng ở hai báo cáo A. Tài nguyên: RAM 7,01/7,04 GiB, đĩa 23,71/24,11 GiB; laptop 2,23 GiB RAM, 15,17 GiB đĩa.
+
+## Finding
+
+### F1 — KHÔNG CHẶN. Hai EC2 chạy số worker khác nhau; số đo khi chạy chồng chưa được phân tích
+
+- **Ảnh hưởng quyết định nào:** không ảnh hưởng tính đúng của code. Ảnh hưởng mục 1 và 5 của `de-nghi-duyet-main.md`: khóa "phân lô 30/30 và policy", và phát main với giới hạn method hiện hành.
+- **Ở đâu:**
+  - `prepare_candidate.py:153` đặt `workers=2 if host == 'ec2_1' else 1`.
+  - `docs/WHY.md:1209` ghi lý do: EC2_2 một worker "như phép phủ môi trường đã kiểm".
+  - `cost-scenario.json` và `bao-cao.md:37`.
+- **Sai gì:** hai máy cùng loại, mỗi máy 30 ca, nhưng EC2_1 chạy 2 worker còn EC2_2 chạy 1. Con số 3,45 giờ cho EC2_1 giả định hai worker chồng hoàn hảo. Số đo của chính 013 không ủng hộ rõ giả định này.
+- **Bằng chứng (cùng ca dev-a915aa2424):**
+  - **Chạy đơn:**
+    - M1 mất 69,3 s trên EC2_1 và 68,3 s trên EC2_2 (`danh-gia-ec2-moi-012/comparison.json#/hosts/*/attempt/wall_s`).
+    - Trên EC2_2, C-a1 mất 65,2 s, bo-E5 68,4 s, T12-on 68,6 s (`cloud-verification.json#/hosts/ec2-small-disk/rows`).
+  - **Chạy chồng trên EC2_1:** C-a0 mất 121,8 s, bo-E1 126,6 s, bo-E2 114,0 s.
+    - Tôi đọc `received/ec2-large-disk-r2/.../checkpoint013-results-002/queue/events.jsonl`: `workers=2`, bảy job tổng 475,4 s nằm gọn trong 239,9 s.
+    - C-a0 chạy từ giây 0 tới 121,8; bo-E1 chạy cùng lúc, từ giây 1,6 tới 128,2.
+  - **Hai giải thích, chưa phân xử được:**
+    - (H1) Hai job tranh CPU trên máy 2 vCPU. Mỗi job chậm khoảng 1,8 lần, thông lượng gần như không tăng.
+    - (H2) Ba vế đó vốn nặng hơn khoảng 1,8 lần.
+    - Không có số đo chạy đơn của C-a0/bo-E1/bo-E2 trên EC2, nên chưa chọn được giải thích nào.
+  - **Lặp LESSONS SL30:** `cost-scenario.json#/observed_per_arm_seconds` lấy chính các số chạy chồng làm chi phí từng vế, rồi chia đôi để ra con số cho EC2_1. Đây là đo trong lúc có việc nặng khác chạy cùng.
+  - **Đường găng:** cũng theo cost-scenario, EC2_2 một worker mất khoảng 25.009 s, tức 6,95 giờ (`#/scenario/ec2_2`). Đó đã là đường găng giữa hai EC2. Với chia 30/30, hai worker chỉ rút ngắn EC2_1, không giảm tổng thời gian, dù H1 hay H2 đúng.
+  - **Hạn 600 s tính theo đồng hồ:**
+    - Code đặt `deadline_epoch = time.time() + timeout_s` (`dieu_phoi.py:175`); `timeout_s` bằng 600.
+    - TIMEOUT ở pha method được đóng thành bản ghi, không chạy lại, và tính trượt trong A4 (`bien_nhan.finalize_timeout`; `a4_v2._score` nhận TIMEOUT).
+    - Nếu H1 đúng, vế M1 của 30 ca trên EC2_1 có biên thời gian thực thấp hơn 30 ca trên EC2_2.
+    - Biên hiện vẫn rộng: job dev nặng nhất khi chạy chồng khoảng 127 s. File traces test lớn nhất 30,6 MB, gần cỡ dev lớn nhất 28,6 MB (chỉ đọc metadata bytes). Đây là nguy cơ thấp và chưa kiểm, chưa phải lỗi đã xảy ra.
+  - **WHY thiếu căn cứ cho con số 600 s.** `WHY.md:1162` để "lô/worker/timeout cụ thể" chờ bằng chứng hoặc Minh quyết.
+- **Đoạn có thể phản bác:** SPEC đòi "overlap thật" và output khớp tham chiếu. Lượt r2 có chồng thật và các job khớp nghiêm ngặt, trừ C-e đã được duyệt riêng. Báo cáo cũng ghi rõ "chưa là ETA". Vậy theo đúng chữ của SPEC thì không vi phạm. Nhưng mục đích chọn 2 worker là giảm thời gian, và với lịch 30/30 mục đích đó không đạt.
+- **Hậu quả:** Minh sẽ khóa một sự bất đối xứng không đem lại lợi ích thời gian. Kèm theo là chênh lệch biên thời gian giữa hai nửa cohort mà hồ sơ chưa khai. Con số 3,45 giờ có thể sai.
+- **Sửa tối thiểu, Minh chọn một:**
+  - (a) Đặt EC2_1 `workers=1`. Chỉ cần dựng lại plan, contract và manifest. Không phải chạy lại phương pháp, vì số worker không đổi đầu ra. Đường một worker đã chạy trên EC2_2 và trong fixture. Tổng thời gian dự kiến không đổi.
+  - (b) Giữ 2 worker. Ghi WHY cho con số 600 s và cho sự bất đối xứng; sửa cost-scenario theo số đo chạy chồng.
+  - Nếu muốn rút ngắn đường găng bằng cách cho cả hai máy chạy 2 worker hoặc chia lại ca, phải phân xử H1/H2 trước. Đó là quyết định riêng.
+
+### F2 — KHÔNG CHẶN. Ước lượng chi phí thiếu phần laptop, chuyển, nhận và chấm
+
+- **Ảnh hưởng quyết định nào:** việc duyệt một lượt chạy dài hơn 1 giờ (AGENTS luật 8 và 19), tức mục 5 của đề nghị duyệt.
+- **Ở đâu:** `cost-scenario.json#/assumptions` ghi "local OB/CIRCA/MicroRank/A and staging/receive/score not estimated here"; `bao-cao.md:37`.
+- **Sai gì:** chỉ ước lượng phần TT chạy trên EC2. Laptop gánh 742 job (`candidate-validation.json#/hosts/local`):
+  - 238 job họ M1 trên OB;
+  - 136 lời gọi baseline OB có hỗ trợ;
+  - 120 job CIRCA/MicroRank trên TT;
+  - 180 job TORAI A, xếp sau mọi job khác.
+  - Chấm chỉ bắt đầu khi cả ba máy đã có snapshot đủ.
+- **Bằng chứng:**
+  - M1 trên OB tại laptop mất 55,2 s (`trien-khai-004/pilot-2-worker-001/queue/013d169b…/attempt-001/cost.json`). Nhân thô 238×55,2 s ra khoảng 3,6 giờ một worker, riêng cho họ M1 trên OB. Đây là phép nhân chưa kiểm.
+  - RAM laptop còn 2,23 GiB. Nhu cầu CIRCA TT (0,98 GiB) cộng MicroRank TT (1,0 GiB) cộng phần dự phòng đã vượt mức này. Vậy phần TT nặng trên laptop gần như chạy một worker.
+  - Nếu RAM tụt dưới mức một slot khi không có job nào đang chạy, supervisor ghi WAIT rồi thoát, phải resume bằng tay.
+  - Lượt đánh giá kế hoạch đầu của tôi đã nêu "tính theo lô lâu nhất, cộng chuyển, nhận và chấm". 013 chưa làm phần này.
+- **Hậu quả:** chưa biết queue nào là đường găng; laptop có thể dài ngang hoặc hơn EC2_2. Minh duyệt lượt chạy dài với ước lượng còn thiếu.
+- **Sửa tối thiểu:** thêm kịch bản cho laptop và cho chuyển/nhận/chấm, dùng số đo đã có (pilot004, T-052 ob-local-002, chi phí CIRCA/MicroRank TT ở T-024, lượt A trên dev-a5cabe5fa7). Ghi rõ là kịch bản chưa kiểm. Không cần chạy thêm.
+
+## Phần giữ OPEN, không phải lỗi mới
+
+- **Nhánh OB lệch số mẫu:** chỉ có fixture. Bốn ca test đã biết từ audit006 sẽ đi nhánh này. D1 và D4 đã khai giới hạn.
+- **TORAI A:** ca có logts với N=0 vẫn chưa rõ hành vi.
+- **RE3:** H1 còn OPEN, theo D2.
+- **Đối chứng đồ thị:** không có đối chứng đồ thị ngẫu nhiên. C-a1 vẫn còn E1.
+- **C-e:** lệch 1 ULP giữa hai hệ điều hành, Minh đã duyệt riêng. M1 giữa hai máy Linux khớp tuyệt đối.
+- **DT18 và hướng dẫn cô:** P7(a) phủ bước 3–4 với MRR/NDCG. P/R/F1 phát hiện, LLM và FlashTicket đã khai là phần sau.
+
+## Phản hồi các lượt trước
+
+| Điểm | Kết luận | Bằng chứng |
+|---|---|---|
+| L1: kiểm `main_dispatch` cho run/resume | Đúng, đã sửa | `nguon.authorize` có `WAIT_MAIN_DISPATCH`/`WAIT_SCORE_GRANT`; `policy-fixture-002` kiểm cả hai |
+| L1: tách plan A | Đã rút ở L2 | Một plan có hàng rào; `merge_partitions` đòi một plan mỗi máy |
+| L1: bảng tuyến cloud | Đúng, đã làm đủ | 15 hàng; 14 khớp nghiêm ngặt |
+| L1: dự toán theo lô lâu nhất, cộng chuyển/nhận/chấm | Chưa làm | Xem F2 |
+| L1/L2: D3 | Đúng, đã làm | `main.py` đặt AC sleep 0; `receive_main.py` chỉ khôi phục 45 phút sau khi chấm thành công |
+| L2: A chạy cuối, kiểm pin trước khi phát | Đúng, đã làm | `supervise` gọi `author_source` trước khi phát; rào chờ mọi job khác VERIFIED; `A_QUEUE_HALTED`; bốn fixture |
+| L2: báo cáo khi thiếu quyền A | Đúng, đã sửa | `report-A-blocked/partial` ra 89 hàng |
+| L2: một C-d3 từ seal M1 thật | Đúng | Ca a915 trả UNSUPPORTED_CYCLIC, khớp tham chiếu T-051 |
+| Codex: "98 file không đổi so với 011" | Đúng | Tôi so `current-code-pins` của 011 với `code-pins` của 013 |
+| Codex: "M1 chính dùng lại 012" | Đúng | Vân tay môi trường main trùng giữa 012 và 013 |
+| Codex: "Linux đổi gốc thành lowercase, không sửa code khoa học" | Đúng | Như mục phân loại lỗi trên Linux ở trên |
+
+## Báo cáo cuối lượt
+
+1. **Đã làm gì:**
+   - Đọc AGENTS, STATE, SPEC, các mục LOG của 013, DT18, hướng dẫn của cô, và các mục DECISIONS/WHY/LESSONS liên quan.
+   - Đọc code thật: diff wrapper, `activate`, `main`, `receive_main`, `cham`, `dieu_phoi`, `bien_nhan`, `adapters/__init__`.
+   - Đọc các JSON đầu ra, rồi mới đọc hai bản đánh giá kế hoạch trước.
+2. **File đã thay đổi:** không sửa file nào.
+3. **Kiểm đã chạy, tất cả chỉ đọc:**
+   - `verify_manifest.py --documents` PASS với 3177 file.
+   - So hash 106 pin code và 106 pin external: đều khớp.
+   - So cấu hình với giao thức 003: khớp.
+   - So pin 011 với 013 như bảng trên.
+   - Tính chồng thời gian từ events r2.
+   - Kiểm bốn mã D4 nằm trong cohort.
+   - Đối chiếu các số tài nguyên và fixture.
+   - Không SSH, không mở dữ liệu test, chỉ đọc metadata bytes.
+4. **Bất đồng và điều cần Minh quyết:**
+   - **F1:** chọn (a) cho EC2_1 chạy 1 worker, hay (b) giữ 2 worker và khai trong WHY.
+   - **F2:** có cần kịch bản thời gian cho laptop và cho chuyển/nhận/chấm trước câu duyệt cuối không.
+   - **Mục 3 của đề nghị duyệt:** có chỉ định Codex làm người quản lý nguồn kiêm evaluator không. SPEC bước 2 để Minh chỉ định.
+   - **Commit trước main hay không:** code sẽ chạy hiện chỉ có ở working tree (9 file src đã sửa chưa commit, nhiều file T-054 chưa được git theo dõi), một archive local và bản sao trên EC2.
+   - **Câu duyệt cuối** phải trỏ đúng manifest đã kiểm. Bản tôi kiểm có `manifest.json` sha256 `3dac84b5346e05ad6a2ad3d1a647313afa0bf4a9f0fa27baa1538dbfd2008b0b`. Nếu sửa theo F1(a), pin này đổi và phần metadata cần được kiểm lại.
+
+## Đề xuất
+
+Tiếp tục thêm một lượt ngắn để Codex đáp F1 và F2.
+- Nếu Minh chọn F1(a), tôi chỉ kiểm diff metadata (plan, contract, manifest) rồi đề xuất dừng.
+- Nếu Minh chấp nhận giữ nguyên và coi F1/F2 là giới hạn đã khai, có thể dừng phản biện bản cài 013 ngay.
+
+Không còn phản đối nào chặn tính đúng. Dừng phản biện không có nghĩa là đã duyệt G3, mở test hay cho commit.
+
+## Prompt bàn giao cho Codex
+
+```text
+Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
+Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
+
+Thông tin lượt này:
+- Task hoặc đề xuất: T-054, D:/RCA-flashticket/tasks/T-054-khoa-g3-chay-p7-a/SPEC.md; đầu ra chuẩn bị checkpoint013 và đề nghị duyệt chạy main trong D:/RCA-flashticket/results/T-054/runs/chuan-bi-main-013/; bản soát kết quả chuẩn bị013 của Claude (chat, Minh dán kèm).
+- Công đoạn: người làm đáp phản biện.
+- Gói/cổng: P7, chuẩn bị G3(a).
+- Người làm và người phản biện chính thức: Codex làm; Claude phản biện theo SPEC.
+- Tài liệu gốc: D:/RCA-flashticket/AGENTS.md; D:/RCA-flashticket/docs/{STATE,MRP,WHY,DECISIONS,LESSONS}.md; D:/RCA-flashticket/docs/reference/sources/DT18-de-tai-va-nhiem-vu.md; D:/RCA-flashticket/docs/reference/sources/advisor-2026-09-23.md; SPEC và LOG T-054. Diff của lượt chuẩn bị: D:/RCA-flashticket/results/T-054/runs/chuan-bi-main-013/complete-preparation-diff.patch; bản trước sửa và danh sách file tại before/, before-pins.json và final-root-change-list.json trong cùng thư mục.
+- Phản biện và phản hồi trước: các mục trao đổi theo thời gian trong LOG T-054; hai bản đánh giá kế hoạch của Claude tại C:/Users/84583/.codex/attachments/632e2c5b-4630-4814-a84e-a499dcc84f47/Pasted text.txt và C:/Users/84583/.codex/attachments/71865966-511b-44d5-af62-650eda0629cd/Pasted text.txt; bản soát kết quả chuẩn bị013 của Claude (chat, Minh dán kèm).
+- Code và kết quả liên quan:
+  + D:/RCA-flashticket/results/T-054/scripts/{p7,nguon,dieu_phoi,cham,fixtures,worker,bien_nhan,lap_ho_so}.py.
+  + D:/RCA-flashticket/results/T-054/{ho-so-g3,runbook}.md.
+  + Thư mục D:/RCA-flashticket/results/T-054/runs/chuan-bi-main-013/: manifest.json, bao-cao.md, de-nghi-duyet-main.md, readiness.json, protocol-candidate.json, source-bundle.json, dispatch-contract.json, placement.json, candidate-validation.json, cost-scenario.json, cloud-verification.json, prepare_candidate.py, prepared/, sources/, received/, main-packet.json, launch-conditions.json, grant-template.json, code-pins.json, environments.json, local-external-code-pins.json, environment-patches.json, upstream-pins.json; helper activate.py, main.py, receive_main.py.
+  + D:/RCA-flashticket/results/T-054/runs/danh-gia-ec2-moi-012/ và D:/RCA-flashticket/results/T-054/runs/trien-khai-004/pilot-2-worker-001/.
+  + Môi trường kiểm: D:/RCA-ext/envs/T-014-main/Scripts/python.exe -X utf8 -B.
+  + Lệnh kiểm chỉ đọc, chạy từ D:/RCA-flashticket: & D:/RCA-ext/envs/T-014-main/Scripts/python.exe -X utf8 -B results/T-054/runs/chuan-bi-main-013/verify_manifest.py --documents.
+- Phạm vi ghi được Minh cho phép trong lượt này: theo quyền Minh ghi kèm khi chuyển; nếu không có, chỉ đọc và trả lời trong chat.
+
+Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
+
+Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
+Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
+Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
+
+Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
+hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
+Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
+số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
+có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
+
+Bổ sung yêu cầu phản biện:
+1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
+2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
+3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
+4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
+5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
+6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
+7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
+8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
+9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
+10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
+
+Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
+Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
+
+Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
+bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
+Tiếng Việt, câu ngắn.
+
+Cuối lượt báo:
+1. Đã làm gì.
+2. File đã thay đổi, hoặc không sửa file nào.
+3. Kiểm đã chạy và kết quả.
+4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
+
+Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
+
+Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
+
+Công đoạn: người làm đáp phản biện. Giữ vai trò người làm, không là người phản biện chính thức của chính task.
+Tự soát yêu cầu và mọi file đầu ra gốc cần để trả lời các câu hỏi như một người chưa từng làm task, TRƯỚC khi mở kết luận các bản phản biện. Ghi danh sách điểm tự tìm được vào LOG trước khi mở các kết luận ấy nếu được phép ghi; phiên chỉ đọc ghi nhận xét trong chat.
+Sau đó kiểm từng điểm phản biện trên file/code/dữ liệu thật; chạy lại khi rẻ và được phép. Kết luận đúng / đúng một phần / sai / chưa kiểm được với bằng chứng riêng. Reviewer có thể sai, nói quá hoặc đề xuất sửa có mặt trái.
+Nếu được Minh cho phép: điền bảng Phản hồi của người làm ở cuối đúng bản phản biện; thêm N1, N2… cho điểm tự tìm được với CHẶN/KHÔNG CHẶN; để trống cột Minh quyết; nối LOG đủ mục 7 của AGENTS, gồm đề xuất sửa gom theo file; chỉ cập nhật dòng task trong STATE khi được phép. Không sửa nội dung hay prompt của reviewer hoặc tự sửa báo cáo/code.
+Nếu chưa có quyền ghi các phần này, trình phản hồi và đề xuất trong chat. Soạn prompt bàn giao cho người phản biện kiểm độc lập.
+
+Với từng thành phần, kiểm mục đích và căn cứ: sửa hạn chế P4, đáp ứng DT18 hay nhu cầu kỹ thuật. Có lý do kỹ thuật, phương án khác, bằng chứng dev và điều kiện thất bại không; có dùng mã hạn chế mô tả như bằng chứng cơ chế hoặc chọn theo mức chênh đồ thị trừ không đồ thị không?
+Nêu rõ nút/cạnh, ánh xạ log/trace/metric và phép tính thực sự sử dụng cạnh. Lần theo thông tin quan hệ và nhãn trong phương pháp lẫn đối chứng; gọi “không đồ thị” có đúng với thông tin còn giữ không?
+Kiểm baseline và đối chứng đủ mạnh, tương đương về tín hiệu/cửa sổ/tập ứng viên/coverage/tiền xử lý/quy tắc chấm/ngân sách chọn cấu hình ở phần không chủ ý thay; yếu tố thay cùng phải giới hạn kết luận.
+Phương pháp và đối chứng đã được cài và kiểm đầu vào, trung gian, hành vi trên dev chưa, hay chỉ chạy không lỗi? Không đòi đồ thị phải thắng để khóa.
+Code/revision, cấu hình, giả thuyết, độ đo, tập ca/tập ứng viên, cách xử lý ca lỗi/UNSUPPORTED/nhánh dự phòng và bảng diễn giải đã khóa trước test chưa? Có bỏ nhóm khó sau khi nhìn điểm hoặc dùng test để chọn thiết kế không?
+Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.
+```

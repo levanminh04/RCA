@@ -13,7 +13,7 @@ def _mod():
     return importlib.import_module('RCAEval.e2e.tracerca')  # RCAEval.e2e.__init__ che tên module bằng hàm
 
 
-def _goi(mod, spans, t_us):
+def _goi(mod, spans, t_us, dataset='re2-tt'):
     bat = {}
     code = mod.tracerca.__code__
 
@@ -23,18 +23,18 @@ def _goi(mod, spans, t_us):
     old = sys.getprofile()
     sys.setprofile(prof)
     try:
-        out = mod.tracerca(spans.copy(deep=True), t_us, dataset='re2-tt')
+        out = mod.tracerca(spans.copy(deep=True), t_us, dataset=dataset)
     finally:
         sys.setprofile(old)
     return out, bat.get('ji')
 
 
-def chay(spans, t):
+def chay(spans, t, dataset='re2-tt'):
     shape = {'spans': int(len(spans)), 'operations': None}
     obs = sorted(set(spans['serviceName'].dropna().astype(str)))
     mod = _mod()
     try:
-        out, ji = _goi(mod, spans, int(t) * 1_000_000)
+        out, ji = _goi(mod, spans, int(t) * 1_000_000, dataset=dataset)
     except Exception as exc:  # noqa: BLE001 — KeyError khi operation mới sau mốc
         r = loi(exc); r['input_shape'] = shape; r['observed_entities'] = obs
         return r

@@ -1,0 +1,111 @@
+--- results\T-054\runs\freeze-cong-cu-003\code\results\T-054\scripts\worker.py
++++ results\T-054\scripts\worker.py
+@@ -85,12 +85,16 @@
+         if job.get('fixture_route'):
+             from bien_nhan import OUT
+             base = Path(job['data_root']).resolve()
+-            if (kind != 'synthetic' or not base.is_relative_to(OUT / 'runs') or base.name != 'synthetic-data'
++            try:
++                base.relative_to(OUT / 'runs'); inside = True
++            except ValueError:
++                inside = False
++            if (kind != 'synthetic' or not inside or base.name != 'synthetic-data'
+                     or read_pin(job['fixture_origin']).get('schema') != 'T054-GENERATED-FIXTURE'):
+                 raise Blocked('fixture route ngoài dữ liệu giả được sinh riêng')
+             kind = job['fixture_route']
+         if kind == 'synthetic':
+-            # Aucune lecture de dataset; protocole de panne et transport seulement.
++            # Chỉ dữ liệu tổng hợp để kiểm vận hành, không đọc dataset.
+             phase('source_validation', 'end')
+             scenario = job.get('scenario', 'ok')
+             if scenario == 'source_error':
+@@ -111,13 +115,21 @@
+             from cham import main_records_from_seal
+             if slot['dataset'] != 'RE2-TT' or slot['arm'] != 'C-d3':
+                 raise Blocked('C-d3 worker chỉ TT, OB giữ support riêng')
+-            if slot['source_sha256'] != fingerprint({'seal': job['main_seal']['sha256'], 'key': job['main_key']}):
+-                raise Blocked('C-d3 khác main seal/key đã khai')
+-            source_record = main_records_from_seal(job['main_seal'], job['main_key'])
++            if job.get('main_dependency'):
++                from nguon import main_dependency_record
++                source_record, actual_key = main_dependency_record(job, job['main_seal'])
++                if actual_key != job['main_key']:
++                    raise Blocked('C-d3 lookup không cùng khóa dependency')
++            else:
++                if slot['source_sha256'] != fingerprint({'seal': job['main_seal']['sha256'], 'key': job['main_key']}):
++                    raise Blocked('C-d3 khác main seal/key đã khai')
++                source_record = main_records_from_seal(job['main_seal'], job['main_key'])
+             data = source_record['extra']['dau_vao_cd3']
+             no_labels(data)
+             scores = {e: Fraction(*pair) for e, pair in data['diem'].items()}
+-            invocation, raw = call(data, lambda: doi_chung.cd3(data['canh'], scores, data['dich']))
++            invocation, raw = call(data, lambda: doi_chung.cd3(data['canh'], scores, data['dich']),
++                                   main_seal_ref=job['main_seal'], main_key=job['main_key'],
++                                   dependency_sha256=fingerprint(job.get('main_dependency')))
+             records = [dict(raw, method='C-d3', variant='cd3', mode='a', seed=None, status=raw['trang_thai'])]
+         elif kind == 'torai_run':
+             # Chạy bằng py38. Prep do process khác đóng trước; không dựng lại seed.
+@@ -132,6 +144,10 @@
+             invocation, raw = call(args + [job['t'], slot['seed']],
+                                    lambda: torai.chay(*args, job['t'], slot['seed']), prepared_ref=job['prepared'])
+             records = package(job, [raw], prep['window'])
++            for record in records:
++                record['extra']['chuan_bi'] = prep.get('details')
++                record['extra']['information_boundary'] = ('author_full_file_retrospective'
++                    if slot['arm'] == 'torai_A' else 't_plus_300')
+         else:
+             row = job['source']
+             if fingerprint(row) != slot['source_sha256']:
+@@ -194,7 +210,7 @@
+                     records = package(job, raws, window)
+                 else:
+                     metric = old_worker._doc_parquet(files, 'metrics.parquet')
+-                    traces = old_worker._doc_parquet(files, 'traces.parquet') if arm != 'baro' else None
++                    traces = old_worker._doc_parquet(files, 'traces.parquet') if arm in ('simplerca', 'microrank', 'tracerca', 'circa', 'torai_B') else None
+                     logs = old_worker._doc_parquet(files, 'logs.parquet') if arm in ('simplerca', 'torai_B') else None
+                     phase('read', 'end'); phase('cut')
+                     win, window = cua_so.cat_ca(metric, traces, logs, job['t'])
+@@ -202,7 +218,19 @@
+                     if kind == 'torai_prep':
+                         from p3.adapters import torai
+                         phase('prepare')
+-                        tabs = torai.chuan_bi_B(win['metric'], win['traces'], win['logs'], job['t'])
++                        prep_inputs = [win, job['t']]
++                        if arm == 'torai_A':
++                            from nguon import author_source
++                            import pandas as pd
++                            phase('author_source_validation')
++                            csvs = author_source(job)
++                            phase('author_source_validation', 'end'); phase('read_author')
++                            source_tables = [pd.read_csv(csvs[k]) for k in ('logts', 'tracets_err', 'tracets_lat')]
++                            prep_inputs.extend(source_tables)
++                            phase('read_author', 'end'); phase('prepare')
++                            tabs = torai.chuan_bi_A(win['metric'], *source_tables, job['t'])
++                        else:
++                            tabs = torai.chuan_bi_B(win['metric'], win['traces'], win['logs'], job['t'])
+                         table_refs = {}
+                         for k, tab in zip(('metric', 'logts', 'tracets_err', 'tracets_lat'), tabs[:4]):
+                             p = attempt / (k + '.csv')
+@@ -210,7 +238,8 @@
+                             table_refs[k] = ref(p)
+                         atomic(attempt / 'prepared.json', dict(schema='T054-PREP-1', token=token,
+                                slot_sha256=fingerprint(slot), tables=table_refs, window=window,
+-                               normalized_input_sha256=normalized_digest([win, job['t']]), details=tabs[4]))
++                               normalized_input_sha256=normalized_digest(prep_inputs), details=tabs[4],
++                               author_source_ref=job.get('author_source_ref')))
+                         phase('prepare', 'end')
+                         return
+                     from p3.adapters import baro, simplerca, microrank, tracerca, circa
+@@ -258,10 +287,10 @@
+     from p3 import ban_ghi, runner
+     from p3.adapters.nezha import VARIANTS, VERSIONS
+     arm = job['slot']['arm']
+-    method = 'torai' if arm == 'torai_B' else arm
++    method = 'torai' if arm in ('torai_A', 'torai_B') else arm
+     records = []
+     for raw in raws:
+-        variant = raw.get('variant') or VARIANTS[arm]
++        variant = raw.get('variant') or ('A' if arm == 'torai_A' else VARIANTS[arm])
+         # M4 được ghim rõ cả đường thành công và timeout; không dùng default native.
+         records.append(ban_ghi.tao(method, VERSIONS[arm] if job['slot']['dataset'] == 'Nezha-OB'
+                        else job['method_version'], variant, 'a', raw, window, 'T054-P7-a', runner.WHY[method],

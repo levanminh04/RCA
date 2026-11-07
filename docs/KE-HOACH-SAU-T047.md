@@ -126,3 +126,7 @@ Q-236 nghiệm thu T-048/T-053; Q-237 chốt D24=z+S1 và nền E1-U+E2-C+E5. C�
 - Bảng hành động E5 cũ không đảo lại quyết định Q-237. KB tiếp tục đảo E5 trong bối cảnh cuối theo giao thức; nếu kết cục khác thì trình Minh như bước 11. Đổi E5 sau K-b đòi đánh giá lại các phép phụ thuộc; chưa kiểm đủ tương tác VC × E5, nên không tự tuyên bố K-b còn dùng được.
 - Chuỗi tiếp theo: số học/công cụ → K-b → T6 → T9/T10 → T11/T12 → KB → T13/hồ sơ G3. Phần độc lập có thể chuẩn bị song song; không chạy phép chọn tiếp trên nền còn chờ quyết. Lượt dài và chi phí EC2 của T-049 cần dự toán riêng trước chạy, không lấy trần task cũ.
 - C-e/verdict, chế độ (b), RE3-OB, thử FlashTicket và hiệu quả trên dữ liệu độc lập còn OPEN. Việc nghiệm thu và duyệt SPEC không mở G3/test.
+
+## Cập nhật hiện hành 04/11/2026 — T-052
+
+Phân công và trạng thái chờ quyết của mục T-052 phía trên là lịch sử. Codex làm, Claude phản biện. V0 dùng để truy vết, chế độ (b) hoãn ở đợt P7 chính và RE3 giữ nguyên bộ cho bản cuối. A4 theo Q-246/WHY-06. Phạm vi T13 và phân việc theo [SPEC T-052](../tasks/T-052-t13-va-ho-so-g3/SPEC.md) và Q-245–Q-249. Quyền triển khai và mở dữ liệu trình riêng.

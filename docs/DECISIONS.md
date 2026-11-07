@@ -382,3 +382,106 @@ Sau phản biện lượt 1 và bản đáp của Codex, Minh trả lời nguyê
 | Q-243 | 04/11/2026 | “sau đó push lên giúp tôi các phần chưa push, soạn prompt yêu cầu phiên codex mới, nghiên cứu kĩ các kết quả làm được hiện tại, phải đọc hiểu hết các kết quả đã đạt được, có được cái nhìn bao trùm toàn bộ, từ đó đề xuất ra spec cho task t052”; “ec2 nhanh hơn laptop, không quan tâm tiền máy” | Duyệt commit và push các phần chưa push trong phạm vi lưu ở Q-244, trên nhánh hiện hành, không yêu cầu merge. Giao phiên Codex mới nghiên cứu toàn cảnh kết quả và bài học các task trước, rồi trình SPEC T-052. Khi lập phương án, ưu tiên EC2 và giảm tổng thời gian hoàn tất; nhắc rõ bài học môi trường, phân phối tải, số tiến trình, tính tương đương giữa máy, cache/phát lại, tiếp nhận lại, chuyển dữ liệu, RAM/đĩa và hậu xử lý. Tiền máy không là tiêu chí hạn chế lựa chọn của phương án. Đây là quyền soạn đề xuất, chưa duyệt SPEC hoặc thực nghiệm T-052, thay thiết kế, mở G3/test hay khởi động máy mới. Vai trò triển khai T-052 trình trong SPEC. |
 
 | Q-244 | 04/11/2026 | “Đẩy hồ sơ và kết quả tổng hợp; giữ trung gian nặng local” | Minh chọn phạm vi push sau khi được báo khối file chưa theo dõi chứa nhiều GiB dữ liệu trung gian. Commit mã, công cụ, SPEC/LOG, báo cáo/đính chính, cấu hình, manifest/seal, biên nhận và kết quả tổng hợp. Giữ bản ghi, capture, dữ liệu đầu vào/trung gian theo ca và khối thực nghiệm nặng ở local; không xóa, đóng gói hay chuyển chúng sang kho lưu khác. Giữ các quyết định lưu trữ riêng trước đây của T-032/T-041/T-042/T-045/T-046. Nguồn: câu trả lời trực tiếp của Minh trong chat ngày 04/11/2026. |
+
+## T-052 — ghi hồ sơ theo duyệt có điều kiện, 04/11/2026
+
+Nguồn quyền ghi cho Q-245–Q-248 là lời Minh: “nếu không có bất đồng quan điểm nào với claude thì duyệt ghi luôn ,nếu có thì trình phần bất đồng yêu cầu claude xem xét lại”. Sau đối chiếu phản hồi Claude mới nhất, Codex nhận các sửa ở SPEC hợp nhất và không còn giữ phản đối với phương án được ghi dưới đây. Đây là ghi nhận quyền có điều kiện của Minh, không phải agent tự duyệt. Lịch sử phản biện và kiểm riêng nằm trong LOG T-052. Việc ghi hồ sơ không là quyền chạy thực nghiệm hay mở dữ liệu.
+
+| Mã | Ngày | Lời Minh/nguồn | Nội dung được ghi |
+|---|---|---|---|
+| Q-245 | 04/11/2026 | “quyết định hoãn b) soạn lại toàn bộ đề xuất và yêu cầu claude phản biện”; quyền ghi có điều kiện nêu trên | Minh hoãn triển khai và đánh giá RCA chế độ (b) trong T-052 và đợt P7 chính đang chuẩn bị. Hệ quả giao thức được ghi theo gói đã trình: yêu cầu Q-66 báo (a) cạnh (b) dời tới đợt có (b); G4 khai rõ đợt này chưa có Precision/Recall/F1 của M1 trên dữ liệu công khai. Giữ D3/D16 trước mọi kết luận M1(b) và trước khóa bản FlashTicket. G/H tiếp tục theo điều kiện kích hoạt cũ. T-025 chỉ là kết quả lịch sử của giao thức P3. “Đã xem” và “đã dùng để thiết kế” khai riêng; (b) thiết kế sau khi đã xem cùng tập chỉ báo thăm dò trên tập đó, phép kiểm độc lập dùng dữ liệu phù hợp chưa dùng sau khi khóa. |
+| Q-246 | 04/11/2026 | Quyền ghi có điều kiện; phương án chuyển mức của Claude, điều kiện và bản đáp Codex được hợp nhất | Sửa A4 Q-211 ở hai điểm: thay Holm bằng chuyển mức một chiều TT→OB; chuyển đảo dấu TT tại 0 thành phép nhạy, không dùng đảo dấu dịch biên để kiểm E-04. Giữ MRR trên 60 ca TT, TORAI B, biên 0,05 và cách đọc cận dưới CI bootstrap 95% hai phía lớn hơn −0,05. OB so Hit@5 kỳ vọng với SimpleRCA M4, đảo dấu nguyên ô một phía tại 0 theo giả thuyết hoán đổi dấu; ngưỡng ban đầu 0,025, nâng 0,05 chỉ nếu E-04 ở P qua biên và CI không suy biến (lo < hi). Chỉ P điều khiển chuyển mức; S_lo/S_hi là độ nhạy. Giữ bootstrap cặp theo ô 10.000 mẫu, seed 20261005 theo WHY-28, bình quân seed trong từng ca trước chấm. Lưu CI thô và cận làm tròn 12 chữ số thập phân, ROUND_HALF_EVEN; so strict trên cận làm tròn, bằng biên không đạt; CI suy biến theo cùng độ chính xác. Khi CI suy biến mà qua biên phải ghi cùng câu “đạt E-04 theo công thức; CI suy biến”, kèm số ô khác 0, số ô M1 thua và số ca cả hai trượt. Báo cảnh báo ít ô và giới hạn bootstrap cho mọi kết luận, không thêm ngưỡng số ô để đổi tiêu chí sau test. lo < hi không khôi phục hiệu chuẩn sai số; mức một phía 0,025 và sai số gia đình 0,05 chỉ là mức danh nghĩa, phụ thuộc hiệu lực từng phép. McNemar phụ dùng một cặp nhị phân mỗi ca: mỗi seed đạt khi root chắc hạng 1; TORAI B đạt theo đa số ≥2/3 seed, bản cả ba seed là độ nhạy; M1 dùng tiêu chí chắc hạng 1. Bảng chính giữ kỳ vọng hòa và trung bình seed; báo hạn chế phụ thuộc theo ô. Các so sánh khác mô tả riêng từng dataset. Khi không đạt E-04 chọn phương án (c) cỡ chênh/CI, câu đầu ghi “Không đạt E-04. Chưa chứng minh được không thua quá 0,05”; giữ đối chiếu chênh TORAI B−SimpleRCA dev như mốc tham khảo, không suy thành biên mới. |
+| Q-247 | 04/11/2026 | Quyền ghi có điều kiện; cụ thể hóa C-03 đã duyệt hướng M-30 và C-15 B đã duyệt hướng M-43 | C-03: giữ danh sách Q-62, đổi nghĩa “phải vượt” thành mốc so sánh. TT theo E-04 với TORAI B; OB mục tiêu cải thiện; vượt baseline ở FlashTicket là mục tiêu thiết kế theo D.9. C-15 B: test khóa tới G3 và quyền mở riêng. Kết quả đầu của bản khóa là kết quả chính, giữ và báo nguyên. Sửa sau khi dùng test để thiết kế phải ghi rõ và báo riêng, không gọi là kiểm độc lập; sửa lỗi cài đặt tách khỏi sửa thiết kế, chạy lại các phương pháp chịu ảnh hưởng theo phạm vi Minh duyệt và giữ lịch sử. Kiểm độc lập bản sửa dùng dữ liệu phù hợp chưa dùng, gồm lượt FlashTicket mới sau khóa; RE3-OB chỉ mở một lần cho bản cuối sau các lần sửa. Đồng bộ đúng các đoạn AGENTS §11, MRP P7/§6.1/§7/§9, LESSONS QT6 và WHY-04 đã trình. Luật cứng 1 về quyền dữ liệu giữ nguyên. |
+| Q-248 | 04/11/2026 | Quyền ghi có điều kiện nêu trên, sau phản biện và tiếp nhận các sửa của Claude | Duyệt ghi SPEC hợp nhất T-052, LOG và đúng dòng T-052 STATE, cùng sổ/WHY và đồng bộ Q-247 trong phạm vi đã trình. Codex làm, Claude phản biện. T-052 gồm T13 dev, đủ baseline/đối chứng, vùng và hồ sơ G3(a), tận dụng KB/native có kiểm tương đương. Giữ nền Q-242, cờ E2 và giới hạn VC×E5; V0 chỉ truy vết, chưa hiệu chuẩn báo động. C-d3 TT giữ dòng mô tả đủ trạng thái/mẫu số; OB suy biến theo Đ12. Hồ sơ xin P7 có C-e mô tả cho M1 cuối trên TT và cặp cạnh quan sát↔hợp snapshot tĩnh theo D8; kiểm điều kiện hỗ trợ trước chấm, không đổi nền từ test. RE3 giữ nguyên bộ cho bản cuối, khóa hồ sơ nguồn/U/alias và giao thức trước mở bằng metadata/schema được phép. Khóa tập ca theo phép chia G1 đã duyệt, cơ chế mã mờ, tách nhãn, báo vị trí root và mức tiếp xúc trước G3. Quyền lượt này là ghi hồ sơ và kiểm rẻ trong bộ nhớ. Chưa cấp quyền chạy pilot/thực nghiệm T-052/P7, mở G3/test/RE3, cấp máy mới, sửa src, commit hoặc push. Quyền chạy dev và ngân sách dự kiến trong SPEC là phạm vi trình cho bước tiếp theo. |
+| Q-249 | 04/11/2026 | “duyệt sửa” cho gói ghi bảy file T-052 | Duyệt chỉnh SPEC về nguồn và trường tái dùng, phạm vi world, ứng viên dựng vị trí N, kiểm tương đương, lịch và dự toán. Duyệt nối LOG, thêm ghi chú hiện hành vào hai kế hoạch, lưu bản SPEC trước sửa và tạo manifest lượt sửa. Nền, A4 và phạm vi theo Q-245–Q-248. Quyền triển khai code, chạy dev/pilot, SSH/EC2, cấp máy, mở G3/test/RE3, commit và push trình riêng. |
+
+
+## T-054 — duyệt ghi SPEC hợp nhất có điều kiện, 05/11/2026
+
+| Mã | Ngày | Lời Minh/nguồn | Nội dung được ghi |
+|---|---|---|---|
+| Q-250 | 05/11/2026 | “nếu không có mâu thuẫn nào với claude hoặc phản đối nào thì cho phép ghi luôn , nếu có mâu thuẫn thì soạn trình claude phản biện” | Codex đã kiểm nguồn và nhận N1–N5 của lượt Claude cuối, không còn phản đối chưa xử lý với phương án ghi. Ghi SPEC một task T-054 gồm chuẩn bị khóa G3(a) rồi thực thi/báo cáo P7(a); Codex làm, Claude phản biện. Hợp nhất các sửa đã trình: OB local/file chung và tiếp xúc lưu trữ lịch sử; chặn mọi ghép nhãn khi slot A4 BLOCKED/PENDING, khai slot ngoài A4 chạy sau khi xem; parity có T-050/máy nguồn từng cửa sổ; max monitor gap là điều kiện cần trước xét TIMEOUT; gói đúng byte/tách code và data; reboot nhận lại thủ công; cache TORAI local, EC2 2 chỉ lô driver cụ thể còn thiếu/có ích. Ghi SPEC/LOG, hồ sơ nguồn/đáp/manifest T-054, WHY-78 và đúng dòng T-054 STATE. Quyền này là ghi hồ sơ, không cấp cài công cụ, SSH/EC2, pilot/thực nghiệm, mở G3/test/RE3, truyền dữ liệu, Scheduled Task, commit/push. Ngoại lệ cạn ngân sách P7, TORAI A và grant nguồn, nguồn cấp/nhạy/timeout/ngưỡng giám sát/ngân sách thực thi/lịch công bố khác và hạn sáng vẫn OPEN trước khóa/phát lô. Nguồn nguyên văn và kiểm điều kiện tại results/T-054/runs/soan-spec-001/{quyen-ghi.txt,phan-hoi-002.md,nguon-phan-bien-002.txt}; không ghi Claude đã kiểm file hợp nhất sau ghi. |
+
+
+## T-054 — bỏ ràng buộc test local, 05/11/2026 — USER_CONFIRMED
+
+Lời Minh: “bỏ ngay cái luật giữ test ở local cho tôi”, cùng yêu cầu tối ưu thời gian và hỏi chạy song song. Riêng P7, bỏ phần hạn chế không chép dữ liệu khóa lên EC2 của Q-42 và phương án chỉ chạy test trên laptop. Lập lại phương án dùng EC2 cùng laptop theo tổng thời gian; không coi local-only là điều kiện khoa học. Chưa chốt số EC2/số worker hoặc phạm vi nguồn truyền cụ thể bằng quyết định này. Quyền mở test/G3 và RE3 vẫn riêng; không tự chạy main. Giữ lịch sử Q-42, không sửa ngược quyết định cũ.
+
+
+## Luật ưu tiên EC2 — 05/11/2026 — USER_CONFIRMED
+
+Minh: “tôi nhấn mạnh là ec2 nhanh hơn laptop, ghi lại thành luật cho tôi luôn”. Đưa nguyên tắc ưu tiên EC2 và tối ưu tổng thời gian vào AGENTS §3.19, tiếp Q-243; không dùng tiền máy làm lý do dồn việc về laptop. Chủ động tận dụng EC2 và laptop cho lô độc lập; giữ local phải có lý do cụ thể, không viện ràng buộc test-local đã bỏ. Không tự thay quyền mở test/G3/RE3, bật/tắt máy hoặc bảo vệ khóa. Đây là chỉ đạo vận hành trong môi trường hiện tại, không là kết quả đo mọi loại EC2/tải. Những luật khác được rà và liệt kê trong chat, chưa được Minh yêu cầu bỏ.
+
+
+## 05/11/2026 — nới phiên dài và bắt buộc tận dụng kết quả cũ
+
+Minh “duyệt 1 3”: duyệt nới task nhiều phiên/checkpoint sau nén và thêm luật rà kết quả cũ, dùng lại khi hợp lệ; không duyệt thay cơ chế phản biện thủ công ở mục2 của đề xuất. Minh đồng thời giao SSH kiểm hai EC2, kiểm kê dữ liệu/dọn được gì, lập kế hoạch chuyển dữ liệu/phân tải tối đa tài nguyên hai EC2+laptop theo phụ thuộc, sửa tuyến cloud và kiểm một lượt dev ngắn; dừng trước main. Nếu60ca TT thiếu thì tải, báo dung lượng. Không bắt buộc mọi tính toán ở EC2, ưu tiên EC2 nhanh hơn; độc lập thì song song, phụ thuộc thì tuần tự. Không tự xóa dữ liệu/kết quả cũ từ câu hỏi dọn dẹp; lập danh sách và trình trước. Quyền mở telemetry test/G3/RE3 vẫn riêng.
+
+
+## T-054 — duyệt ghi bảng phân bổ và lưu ý dung lượng EC2, 06/11/2026 — USER_CONFIRMED
+
+Lời Minh nguyên văn: “duyệt ghi, lưu ý, trong số 2 ec2, có 1 ec2 có disk lớn hơn, phân bổ hợp lý nếu cần nhiều disk”. Duyệt ghi bảng kế hoạch vừa trình: EC2_1 TT35; EC2_2 TT25 cùng Nezha34; laptop CIRCA TT, MicroRank TT và TORAI A; RE3 dự kiến15ca mỗi EC2, ma trận phương pháp/số lượt còn OPEN. Lưu ý ưu tiên máy đĩa lớn cho phần cần nhiều dung lượng. Số đo checkpoint cho thấy EC2_2 có đĩa tổng và khoảng trống lớn hơn; bảng/căn cứ/nguồn và thứ tự ở LOG T-054 Phiên8. Đây là duyệt ghi hồ sơ, không tự cấp quyền sửa code/triển khai lịch mới, SSH/truyền thêm dữ liệu, mở G3/main/chấm/telemetry RE3, thay đổi máy, commit hoặc push. Các plan thực thi006 giữ lịch sử; phải hoàn thiện và duyệt đúng phần trước dùng.
+
+
+## T-054 — quyền phiên dài và bản vá OB, 06/11/2026
+
+Minh: “DUYỆT TRIỂN KHAI PHIÊN DÀI CÁC BƯỚC 1 2 3 4 NHƯ ĐỀ XUẤT, VÌ PHIÊN DÀI NÊN CẦN CHECKPOINT, BÁO CÁO CẨN THẬN, TRÁNH VIỆC BỊ MẤT THÔNG TIN DO CONTEXT BỊ NÉN”. Sau báo cáo007 và đề xuất đúng8mục, Minh: “NẾU BẠN THẤY ỔN THÌ DUYỆT”. Codex tự soát không còn phản đối chặn việc cài ứng viên và tiếp nhận quyền có điều kiện cho5filecode, SPEC/WHY/sổ theo báo cáo007. Per-source giữ mẫu/timestamp thật; mặc định cũ giữ nguyên; kiểm trước coi tuyến mới hợp lệ. Không suy G3/main hoặc mở telemetryRE3/commit/push từ quyền này.
+
+
+## T-054 — duyệt cài H2 RE3, 06/11/2026 — USER_CONFIRMED
+
+Minh: “Duyệt cài H2 theo báo cáo009”. Phạm vi là 9 file code cùng SPEC/WHY/DECISIONS trong mục Bản vá H2 cụ thể trình duyệt tại results/T-054/runs/chuan-bi-re3-009/bao-cao.md. Cài tuyến RE3 riêng và kiểm bằng dữ liệu tổng hợp; giữ mặc định TT/Nezha, bắt buộc profile thời gian/U/alias/r đã ghim. Duyệt cài không xác nhận các đơn vị/inventory còn thiếu, không mở telemetry hoặc đánh giá RE3, G3/main, cloud, commit/push.
+
+
+### T-054 H2 — bổ sung CIRCA, 06/11/2026
+
+Minh: “Duyệt bổ sung 2 file CIRCA”. Duyệt đúng đề xuất010/bo-sung-circa-xin-duyet.md: dieu_phoi.py kiểm hai variant/current cho RE3 như TT; bien_nhan.py tạo đủ hai variant CIRCA khi TIMEOUT đã đủ điều kiện. Không nới chính sách lỗi, deadline hoặc quyền dữ liệu.
+
+
+## T-054 — hoàn thiện local, guard gRPC và metadata owner, 07/11/2026
+
+Minh: “làm toàn bộ các phần còn lại, trừ phần kiểm ec2 ra vì hiện chưa vào được”. Tiếp tục chuẩn bị local; không kiểm/SSH/sync EC2, không phát main hoặc mở đánh giá RE3.
+
+Sau đề xuất `results/T-054/runs/hoan-thien-local-g3-011/h1-bo-sung-xin-duyet.md`, Minh: “Duyệt sửa guard theo phần A” và “Duyệt đọc hai cột như metadata inventory”. A: sửa đúng `src/p3/re3.py` và `results/T-054/scripts/worker.py` cùng SPEC/WHY/sổ để hỗ trợ profile gRPC khai rõ, giữ mã/kernel cộng mã native. B: chỉ chunk `serviceName` của 30 trace và `container_name` của 30 log ở revision đã ghim, tổng metadata và chunk tối đa 16 MiB; chỉ xuất hợp tên toàn cục, không phân bố theo ca. Không đọc thời gian/metric/duration/message/ID/operation/statusCode hoặc chạy phương pháp trên RE3. Alias thiếu nguồn vẫn OPEN; không suy thành quyền đánh giá RE3/G3/main hoặc commit/push.
+
+## T-054 — ghi phương án xử lý locator RE2-TT trước G3, 07/11/2026
+
+Minh cho phép ghi có điều kiện bằng lời “nếu không có mâu thuẫn nào với claude hoặc phản đối nào về các đề xuất giữa 2 bên thì cho phép ghi luôn , nếu có mâu thuẫn thì soạn trình claude phản biện”. Codex kiểm độc lập và đồng ý R1–R3 của Claude. Minh duyệt ghi các điểm thống nhất trong DECISIONS, WHY và LOG. Đây là quyền ghi hồ sơ. Quyền triển khai và cấp nguồn theo mốc riêng của SPEC.
+
+- **F9.** Giữ bản kê RE2-TT đủ 60 ca theo G1. Trên EC2 dùng locator (đường dẫn định vị) theo mã mờ `data/locked/rcaeval-re2tt-60/<test-id>/<file>`. Bản đồ đến đường dẫn thật ở vùng riêng trên laptop. Bản kê runtime và bản chiếu từ nguồn đối chiếu độc lập đều dùng locator mờ. Giữ phép kiểm cohort của T-052. Kế hoạch ghim quy định các job của từng máy và máy chỉ nhận tệp thuộc phần được giao.
+- **Giới hạn của F9.** Mã xác định có thể dò từ danh sách ca công khai. Biện pháp giảm nguy cơ vô tình dùng nhãn từ đường dẫn. Quyền truy cập và phép kiểm đầu vào vẫn theo SPEC.
+- **Tiếp xúc 006.** Biên nhận cũ ghi `labels_transferred: false` cho việc tách tệp nhãn chấm. Đường dẫn tệp chuyển lên cả hai EC2 cũ vẫn mang tên ca chứa dịch vụ gốc và dạng lỗi. Đính chính ở LOG, giữ biên nhận gốc làm bằng chứng. Việc giữ hay xóa các bản sao cũ chờ Minh.
+- **Chuẩn bị khóa.** Giữ đối chiếu và ghim môi trường của các tuyến được chọn trong hồ sơ khóa (D5). Laptop là ứng viên đầu tiên cho OB, chốt sau khi có căn cứ về RAM và tổng thời gian. Số 5 ca TT từng nêu thuộc kịch bản EC2 cũ. Loại tar chứa parquet dev khỏi phạm vi đề xuất commit (F10). Phạm vi commit, D1–D4, phân máy, mở rộng hệ thống tệp EC2, cấp nguồn, G3 và main vẫn chờ quyết định hoặc bằng chứng tương ứng.
+
+## T-054 — duyệt chuẩn bị 013 và D1–D4/R3, 07/11/2026
+
+Minh xác nhận “Duyệt chuẩn bị 013 và chốt D1–D4/R3 theo đề xuất trên”. Phạm vi và giới hạn thao tác ở `results/T-054/runs/chuan-bi-main-013/preparation-permission.json`. Codex làm, Claude phản biện. Duyệt sửa năm wrapper p7/nguon/dieu_phoi/cham/fixtures, dựng R1 và bộ 013, kiểm fixture/dev trên hai EC2 mới, cập nhật SPEC/LOG/STATE/WHY và hồ sơ G3/runbook. Mỗi máy tải thêm tối đa 2 GiB và chạy fixture/dev tối đa 60 phút. Lần này là chuẩn bị trước quyền test/main.
+
+- D1. Khai đúng lần đọc 006 và việc cấu trúc thời gian cohort OB đã được dùng sửa adapter. Phạm vi quyền lịch sử chưa rõ được giữ nguyên như lịch sử. Khi báo OB phải nêu giới hạn tính độc lập của việc sửa adapter đó.
+- D2. Cho phép trình khóa TT/Nezha khi H1 RE3 còn OPEN. RE3 cần nguồn, profile và quyền đánh giá riêng cho bản cuối. Điều kiện main TT/Nezha theo gói được khóa.
+- D3. Giữ AC sleep bằng 0 trong đợt main được duyệt tới khi xong nhận/kiểm/chấm trên laptop, rồi khôi phục 2700 giây. DC theo thiết lập hiện hành.
+- D4. Khóa bảng mô tả chênh Hit@5 cặp M1–M4 trên 34 OB, 30 ca còn lại và nhóm bốn ca từ audit006. A4 giữ đủ 34 ca và mức đã chốt. Bảng nhóm không phân xử riêng tác động adapter với độ khó ca.
+- R3. Giữ bản sao trên hai EC2 cũ, loại hai máy đó khỏi lịch013.
+
+G3, mở/đọc/chuyển test, nguồn A cho main, phát main và chấm cần quyết định cuối có nguồn đúng gói. Commit được chuẩn bị danh sách/diff cho Minh duyệt riêng.
+
+## T-054 — ngoại lệ số học C-e đúng ca dev, 07/11/2026
+
+Minh trả lời “Duyệt ngoại lệ cho đúng phép C-e này”. Phạm vi là M1 C-e RE2-TT dev-a5cabe5fa7 trên EC2 mới đối chiếu tham chiếu đã ghim. Đầu vào chuẩn hóa và mọi trường rời rạc khớp; 30 trường float khác tối đa1ULP, sai khác tuyệt đối tối đa2,7755575615628914e-17. Giữ nguyên byte kết quả. Duyệt ngoại lệ đúng phép đã đo để trình gói013 cho Claude kiểm. Không tạo dung sai chung hoặc suy sang sai khác mới. Nguồn audit và quyết định ở runs/chuan-bi-main-013/numeric-parity-Ce-{audit,decision}.json.
+
+
+## T-054 — quyền ghi có điều kiện khi đáp phản biện013, 07/11/2026
+
+Minh: “dưới đây là đánh giá và phản biện của claude, bạn hãy soát kĩ, nếu không có mâu thuẫn nào với claude hoặc phản đối nào thì cho phép ghi luôn rồi trình bước tiếp theo, nếu có mâu thuẫn thì soạn trình claude phản biện”. Codex tự soát trước, kiểm bằng chứng và nhận hai finding chính. Phạm vi ghi là đáp phản biện, bổ sung kịch bản chi phí và sửa ứng viên theo F1(a), ghim lại metadata/gói và hồ sơ phụ thuộc trong phạm vi chuẩn bị013; giữ bản cũ và kết quả thực nghiệm. Một worker trên mỗi EC2 là ứng viên trình duyệt cuối, chưa là Minh duyệt phát main. G3/test/nguồn/chuyển/main/chấm, chỉ định người quản lý nguồn/evaluator và commit/push vẫn theo lời duyệt cuối cụ thể.
+
+
+## T-054 — duyệt G3(a), chạy main013 và đổi vai, 07/11/2026
+
+Minh (nguyên văn ở `results/T-054/runs/chuan-bi-main-013/grants/minh-main.txt`): “Tôi duyệt khóa G3(a) và chạy main013 theo de-nghi-duyet-main.md với Claude là người thực hiện. Quyền này bao gồm mở đúng 60 RE2-TT và 34 Nezha-OB test, chuẩn bị nguồn theo locator mờ, chuyển đúng phân lô 30 TT sang mỗi EC2 hiện hành, dùng nguồn TORAI A đã ghim trong phạm vi đề nghị, phát và theo dõi main, rồi nhận, kiểm và chấm khi đủ điều kiện snapshot/A4. Tôi duyệt lượt dài hơn một giờ theo các giả định thời gian đã khai trong hồ sơ. RE3 và commit/push cần quyền riêng.” Điều kiện: pha 1 không có điểm CHẶN; Claude đã kết luận không có (`grants/claude-review-013-002.txt`).
+
+Đổi vai: Claude là người làm phần chạy T-054, quản lý nguồn và chấm; Codex phản biện phần đó. Duyệt sửa hai dòng vai trò SPEC, nối LOG ghi bàn giao, và sửa lỗi nhỏ/mô tả người vận hành trong `bao-cao.md`, `de-nghi-duyet-main.md`, `ho-so-g3.md`, `runbook.md`. Quyền áp dụng cho manifest 752da8e5…40dd hoặc bản chỉ có đúng các thay đổi tài liệu và ghi nhận bàn giao đó. Vận hành RAM: chạm/vượt 95% thì báo Minh; D3 giữ AC sleep 0 tới khi xong nhận/kiểm/chấm rồi khôi phục 45 phút.
+
+
+## T-054 — xử lý BLOCKED main013 bằng bản v2 và luật 21, 07/11/2026
+
+Minh: “duyệt, khi nào 3 luồng chạy ổn định thì báo tôi” cho đề xuất gồm: (1) v2 thêm quy tắc lỗi “dưới 2 span bình thường” cho TraceRCA/MicroRank TT, nhận chỉ khi kiểm lại từ đầu vào thật, tính là phương pháp trượt như quy tắc operation mới; (2) supervisor chạy tiếp slot độc lập khi một slot BLOCKED vì lỗi phương pháp chưa phân loại, lỗi nguồn/hạ tầng vẫn dừng máy; (3) không tách bảng quy tắc lỗi ở lượt này; (4) chạy lại cả 1640 job dưới v2 trong queue mới, giữ v1 làm lịch sử, so v1↔v2 trên slot trùng, lệch thì dừng; (5) EC2_2 chạy v1 tới khi v2 sẵn sàng rồi DRAIN; (6) khai C-15 B là sửa sau mở test, chưa xem điểm/nhãn. Duyệt tính các slot này là trượt. Duyệt ghi AGENTS luật 21 và LESSONS SL38. Lời trước đó: “duyệt theo đề xuất , xử lý luôn tránh sau này không còn chứng minh được là chạy đúng bản khóa hoặc tránh không qua được bước kiểm...”.

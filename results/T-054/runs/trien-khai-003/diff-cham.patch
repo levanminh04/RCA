@@ -1,0 +1,14 @@
+--- D:\RCA-flashticket\results\T-054\runs\freeze-cong-cu-004\code\results\T-054\scripts\cham.py
++++ D:\RCA-flashticket\results\T-054\scripts\cham.py
+@@ -28,6 +28,11 @@
+             if receipt['job_sha256'] != fingerprint(job):
+                 raise Blocked('receipt không cùng job')
+             results[key] = verify_envelope(envelope, invocation, job['slot'], slot['token'])
++            if any(r.get('status') in ('ERROR', 'TIMEOUT') for r in results[key]):
++                from bien_nhan import verify_dev_error_reproduction
++                if not receipt.get('dev_error_reproduction'):
++                    raise Blocked('snapshot lỗi chưa có finalization/phân loại được duyệt')
++                verify_dev_error_reproduction(receipt['dev_error_reproduction'], job, envelope, invocation)
+             validate_execution_links(job, invocation)
+     return results
+ 

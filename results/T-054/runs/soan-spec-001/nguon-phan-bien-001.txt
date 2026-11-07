@@ -1,0 +1,238 @@
+Tôi sẽ đọc nguồn và code gốc trước, kiểm lại các số đếm bằng lệnh chỉ đọc, rồi trả lời phản biện trong chat. Tôi không sửa file nào.
+
+Tôi đang đọc tiếp mã điều phối và kiểm tra hai rủi ro về quyền dữ liệu: tệp phút Nezha dùng chung giữa dev và test, cùng nơi lưu dữ liệu trên EC2. Chưa mở dữ liệu thô nào.
+
+Phần kiểm số đã xong. Tôi kiểm nốt hai điểm là nguồn TORAI A và bộ điều phối T-053, rồi viết nhận xét.
+
+# Phản biện SPEC T-054: công đoạn soát SPEC, cổng G3
+
+**Kết luận:** chưa nên duyệt nguyên văn. Có **4 điểm CHẶN**, đều sửa được bằng vài dòng. Sau khi sửa, một SPEC hai pha là đủ để trình Minh; không cần tách task hay thiết kế lại. Phép đếm khối lượng đúng.
+
+## Các điểm chặn
+
+### F1. CHẶN lô B và C2, phần OB: "OB dev" trên EC2 mang theo dữ liệu của ca test
+*Loại: mâu thuẫn thiết kế, kèm một việc đã xảy ra chưa được khai.*
+
+- **Ở đâu:** bảng phân máy (lô B, C2) và câu "không chuyển raw hoặc dẫn xuất test lên EC2".
+- **Sai gì:** file metric của Nezha là file theo ngày và theo pod, không tách theo ca. Mỗi ca test đọc đúng các file mà ca dev đọc.
+- **Bằng chứng:**
+  - [allowlist dev](results/T-026/allowlist-dev.json) có 154 file, gồm 66 log, 66 trace và 22 metric, tức 11 nguồn × 2 ngày.
+  - [nezha.py:102](src/p3/nezha.py:102) chỉ nhận tên metric không có phút. `_doc_cua_so` lọc theo cột `Time`.
+  - G1 có 34 ca test OB nằm đúng hai ngày đó (15 và 19 ca).
+  - Thêm 1/34 ca test có phút trace trong khoảng ±5 phút nằm trong file dev.
+- **Đã xảy ra:** [preflight T-053](results/T-053/runs/preflight-001.json) `/ec2/dev/Nezha-OB` ghi đủ 154 file trên EC2. `/exposure/limits` của giao thức 003 nói file dùng chung nhưng không nói bản sao trên EC2.
+- **Mức chắc chắn:** suy ra từ schema và code. Tôi không mở file để xem cột `Time`.
+- **Có thể phản bác:** Q-63 cho phép adapter cắt đúng ca, và Q-90/Q-93 cho dùng EC2 với dev. Vì vậy tôi không gọi đây là vi phạm cũ và không mở lại task đã đóng. Tuy vậy, nó vẫn trái câu cam kết của T-054.
+- **Sửa tối thiểu:**
+  - Pilot OB chỉ chạy trên laptop. OB rất nhẹ nên không mất gì đáng kể.
+  - Khai bản sao cũ trong mục tiếp xúc của hồ sơ G3.
+  - Nếu vẫn muốn chạy OB trên EC2, Minh phải duyệt ngoại lệ ghi rõ 22 file.
+
+### F2. CHẶN khóa G3: chưa khóa thời điểm mở nhãn
+*Loại: mâu thuẫn thiết kế.*
+
+- **Ở đâu:** bước 10, gồm "Bảng mô tả từng dataset có thể hoàn tất độc lập" và "các lô độc lập đủ quyền vẫn tiếp tục".
+- **Sai gì:** chỉ bảng A4 mới có chốt chặn đủ hai bộ ([p7_a4_v3.py:207](results/T-052/scripts/p7_a4_v3.py:207)). Các bảng khác có thể ghép nhãn sớm.
+- **Hậu quả:** người làm có thể thấy điểm TT, rồi sửa một nhánh OB, C-d3 hay T12 còn bị chặn. Khi đó "kết quả đầu của bản khóa" theo Q-247 không còn sạch, mà không có dòng nào ghi lại việc đó.
+- **Sửa tối thiểu:** thêm một luật. Chỉ ghép nhãn một lần, sau khi mọi slot đã có trạng thái cuối hoặc được ghi BLOCKED. Sửa nào làm sau mốc đó phải ghi "sau khi đã xem".
+- **Mặt trái:** không thấy kết quả sớm. Nếu cần báo sáng, xem phương án theo bậc ở mục lịch.
+
+### F3. CHẶN khóa G3: pilot chưa có tiêu chí khớp với bản ghi dev đã dùng để chọn
+*Loại: mâu thuẫn thiết kế.*
+
+- **Ở đâu:** bước 6 chỉ nói phủ nhánh và chạy toàn tuyến. SPEC có nói parity giữa các máy, nhưng không nêu mốc đối chiếu.
+- **Sai gì:** T-054 thay tuyến worker bằng driver mới. Biên nhận F3 không phủ tuyến này. Lựa chọn M1 trên TT đến từ native chạy trên EC2 ([stage_ec2.py:42](results/T-052/scripts/stage_ec2.py:42)), còn test chạy trên laptop.
+- **Hậu quả:** driver có thể chạy không lỗi nhưng đổi hạng mà không ai biết. Đây đúng là sai lầm SL24 và SL36.
+- **Sửa tối thiểu:** thêm một dòng tiêu chí. Mỗi vế pilot phải so với bản ghi nguồn đã ghim (T-024, T-026, native T-053, T-051), giống `comparable` trong [pilot_ec2.py:36](results/T-052/scripts/pilot_ec2.py:36). Lệch hòa, hạng hoặc tầng thì dừng.
+- **Chi phí:** không cần chạy thêm, vì dùng chính lượt pilot.
+
+### F4. CHẶN khóa G3: quy tắc hết ngân sách trái giao thức P3 nhưng không nằm trong danh sách xin quyết
+*Loại: mâu thuẫn thiết kế.*
+
+- **Sai gì:** [giao thức P3 §8.3](results/T-022/giao-thuc-v2.md) ghi rằng nếu đã cam kết chạy đủ cohort mà hết ngân sách giữa chừng thì ca chưa chạy là `TIMEOUT`, dẫn Q-74 Q9. T-054 ghi ngược lại: không dùng cạn ngân sách làm timeout khoa học, không đổi lượt chưa chạy thành trượt.
+- **Đánh giá:** bản T-054 thận trọng hơn và tôi đồng ý với hướng đó. Nhưng nó đổi mẫu số so với quy tắc cũ.
+- **Mặt trái:** nếu hết giờ thì nhánh bị chặn và có thể chưa có A4.
+- **Sửa tối thiểu:** thêm vào mục OPEN để Minh quyết rõ cho P7.
+
+## Các điểm không chặn
+
+**F5. Vị trí N không cần thêm 94 lời gọi K-R0.**
+- C-a0 đã mang đúng hai trường cần dùng. `comparable` chỉ bỏ `region`, `dau_vao_cd3` và C-d3; `G_N` và `don_vi_phan_vi` vẫn được so.
+- [Pilot EC2](results/T-052/runs/trien-khai-001/ec2-pilot-002/received/output/summary.json) `/comparisons` có 15/15 không lệch, gồm cặp C-a0↔K-R0 trên 3 cửa sổ TT và 2 OB.
+- Sửa: đọc từ C-a0, kiểm thêm khi pilot, và ghi trạng thái khi C-a0 lỗi. Bỏ hàng "cộng tối đa 94 lời gọi". Giới hạn: mới có bằng chứng trên 5 cửa sổ.
+
+**F6. Timeout có thể bị tính trượt do máy tạm dừng.** *(nguy cơ chưa kiểm)*
+- [runner.py:75](src/p3/runner.py:75) đo bằng đồng hồ thực. Nếu máy sleep giữa pha `method`, ca có thể bị tính `TIMEOUT` khoa học.
+- Hạn theo vế cũng phụ thuộc cache: cùng một ca TT, vế chạy đầu mất 50 s, M1 chạy sau mất 22 s.
+- Sửa: phát hiện khoảng trống heartbeat thì xếp vào lỗi vận hành. Ghim thứ tự vế và đặt hạn theo lượt lạnh.
+
+**F7. Tiếp nhận sau lỗi: bảng trạng thái ổn, còn thiếu trường hợp khởi động lại máy.**
+- Bảng tiếp nhận, claim, atomic rename và seal không ghi đè đều hợp lý.
+- Chỉ có `resume` thủ công. Nếu laptop khởi động lại lúc đêm thì mất phần còn lại của đêm, nên câu "script tự chạy" chưa đúng ở trường hợp này.
+- Sửa: ghi rõ giới hạn đó trong runbook, hoặc Minh duyệt một tác vụ tự khởi động.
+
+**F8. Pin theo byte có thể không tái dựng được sau commit.**
+- `core.autocrlf=true`. `git ls-files --eol` cho thấy `chuoi.py` là w/crlf, `doi_chung.py` là w/lf, và cả hai đều i/lf.
+- Sau khi commit, checkout mới trên Windows sẽ lệch `doi_chung.py`. Checkout trên Linux sẽ lệch `chuoi.py`.
+- Sửa: chốt ngay trong bước đóng băng, ghim thêm blob git hoặc chuyển bằng archive.
+
+**F9. TORAI A: Codex đúng là chưa phân xử, nhưng còn thiếu căn cứ và quyền dữ liệu.**
+- Căn cứ mạnh nhất là Q-74 Q3, lời Minh, chứ không chỉ giao thức. Mặt khác, [bảng T-034](results/T-034/bang-baseline.json) không có dòng A.
+- Nguồn A nằm ở `D:/RCA-ext/work/T-016/data/torai-TT` ([runner.py:28](src/p3/runner.py:28)), ngoài `data/locked`. [p7_entry_v2.py:79](results/T-052/scripts/p7_entry_v2.py:79) đang từ chối nguồn này, và câu grant "đúng 60 TT + 34 Nezha" chưa bao phủ nó. Tôi chưa mở thư mục đó, nên chưa biết có chứa ca test không.
+- Sửa: Minh quyết giữ hay bỏ. Nếu giữ, ghi nguồn đó vào grant. A nằm ngoài A4, nên chạy sau seal chính và không chặn phần còn lại.
+
+**F10. Có thể giảm một câu hỏi cho Minh về root ngoài U.**
+- Đếm trên CSV G1: 0/60 TT và 0/34 OB nằm ngoài U.
+- Vì vậy, bất kỳ root ngoài U nào xuất hiện lúc chạy đều nghĩa là nguồn lệch G1. Dừng là đủ, có thể bỏ nhánh "điểm 0".
+
+**F11. Tài liệu trình soát có chỗ nghiêng về kết luận trước.**
+- Câu "nhất là quyền dữ liệu…" và bảng tự soát trái tinh thần Q-44.
+- Ảnh hưởng thấp, vì tôi đọc nguồn trước và F2, F3, F8 đều nằm ngoài các chỗ được gợi ý.
+
+## Lịch máy và mốc sáng
+
+**Nhận định về hai EC2.** Hai EC2 không giải được nút thắt nào trong phương án cơ sở:
+- Bốn nút thắt là viết driver, pilot trên laptop, phản biện và duyệt G3, rồi hàng đợi test trên laptop.
+- Parity TT không cần EC2 chạy lại, vì mốc so đã được lưu.
+- Queue nhiều máy, SSH và runbook lại nằm đúng trên đường găng.
+
+Đây là đề xuất của tôi, Minh quyết:
+
+| Bước | Laptop | EC2 | Nút thắt được giải |
+|---|---|---|---|
+| 1 | Driver một máy, fixture | Không dùng | Bớt phần phải viết trước G3 |
+| 2 | Pilot 1 rồi 2–3 worker, so bản ghi nguồn | Tùy chọn: một máy chạy nhánh TT tốn giờ bằng lệnh tách phiên như T-052 | Phủ nhánh nhanh hơn, không cần queue nhiều máy |
+| 3 | Hồ sơ G3, phản biện | Stop nếu rảnh | — |
+| 4 | Test theo bậc: M1 + TORAI B + SimpleRCA M4 trước, các vế còn lại sau | Không dùng | Có A4 kể cả khi hết giờ |
+
+- **Mặt trái của chạy theo bậc:** mất một phần cache chung, ước lượng thêm khoảng 1 giờ (chưa kiểm).
+- **Điều mất khi bỏ EC2 ở pha chuẩn bị:** không kiểm được tuyến Linux, nhưng phương án cơ sở chạy test trên laptop nên không cần tuyến đó.
+- **Nếu laptop vẫn không kịp:** ngoại lệ Q-42 chỉ nên xét cho TT, vì TT có parquet riêng từng ca. OB phải ở lại laptop theo F1.
+
+**Ước lượng chạy tuần tự trên laptop (chưa kiểm).** Số lấy từ một vài ca mẫu trong các biên nhận T-048 và T-052, không phải ETA:
+
+| Khối | Giờ |
+|---|---:|
+| TT M1-family | ~3,75 |
+| TT C-e | ~1,1 |
+| TT baseline, TORAI 3 seed | ~2,4 |
+| OB toàn bộ | ~0,7 |
+| **Tổng** | **~8** |
+
+Chưa tính C-d3 và cạnh tranh I/O.
+
+**Giờ bắt đầu test muộn nhất cho hạn 08:00 ngày 06/11** (cộng 2 giờ chấm và báo cáo, 2 giờ dự phòng):
+- 1 worker: khoảng 20:00 ngày 05/11.
+- 3 worker: khoảng 00:30 ngày 06/11, nếu RAM cho phép.
+
+**Tài nguyên đo lúc này:** RAM trống 2,0/15,7 GB, D trống 16 GB, C trống 39,5 GB. Với mức trống này, công thức trong SPEC cho 0 worker. Muốn có 3 worker cần trống khoảng 8 GB (giả định chừa 2 GB).
+
+**Về mốc sáng:**
+- Sáng 05/11 không khả thi, vì riêng pha 1 đã cần 6–10 giờ.
+- Sáng 06/11 chỉ khả thi nếu Minh duyệt G3 và cấp quyền trước khi ngủ tối 05/11.
+- Mốc này không có nguồn trong repo, nên cần Minh xác nhận.
+
+## Phản hồi bảng tự soát của Codex
+
+| Nhận xét | Kết luận | Bằng chứng riêng |
+|---|---|---|
+| Hồ sơ chưa khóa | Đúng | `/status` của giao thức 003 |
+| A4 chỉ có hai cặp | Đúng | `p7_a4_v3.py:12,129` |
+| Liên kết bản ghi và nhãn thiếu | Đúng ở phần đã đọc | `_check_record` không kiểm mã ca của M1 (dòng 48); `label_reader` do bên gọi cấp (dòng 214); `a4_v2` chưa đọc |
+| Timeout thiếu bằng chứng pha | Đúng | `p7_a4_v3.py:66,157` |
+| Đóng gói sai variant khi hết giờ | Đúng | `runner.py:166–173` |
+| Helper C-d3 sai cấu trúc | Đúng | `p7_entry.py:183` |
+| Vị trí N dựa K-R0 | Đúng một phần | Xem F5 |
+| Recovery cũ chưa đủ | Đúng | `T-053/scripts/dieu_phoi.py:42–44` |
+| Phép đếm | Đúng | Tính lại khớp mọi tổng; ca và ô đếm từ CSV |
+| ETA chưa đo | Đúng, có thể thu hẹp | Xem mục lịch |
+| Cache giảm đáng kể | Đúng một phần | Cache M1 lớn. Cache prep TORAI chỉ tiết kiệm khoảng 20 phút (Drain ~9,7 s × 120 lần); job prep không nhận seed |
+| Không cần tính lại T-052 | Đúng với điều kiện | Cần F3 cho M1 TT trên laptop |
+
+## Báo cáo cuối lượt
+
+1. **Đã làm:** đọc nguồn đề tài, MRP, quyết định, WHY, LESSONS, giao thức 003, hồ sơ 004 và code P7. Tính lại phép đếm và kiểm các pin.
+2. **File đã thay đổi:** không sửa file nào, không commit. Chưa SSH, chưa chạy thực nghiệm.
+3. **Kiểm đã chạy:**
+   - Manifest 004: 576 đầu ra khớp. Hai mục lệch là LOG và STATE, đúng như LOG T-052 đã khai.
+   - Giao thức 003: 93/93 pin khớp.
+   - F3: 12 đối chiếu, PASS.
+   - **Khai tiếp xúc:** tôi đọc các dòng test trong CSV G1 (`case`, `root`) để đếm ngày, đếm chồng phút và đếm root ngoài U, và chỉ xem kết quả đếm. Không mở `data/locked`, file Nezha thô hay nguồn TORAI A; chỉ liệt kê tên thư mục cấp đầu trong `data/ngoai-rcaeval/nezha`. Không dùng các số này để thiết kế phương pháp.
+4. **Cần Minh quyết và còn mở:**
+   - **Quyết:** F1 (OB chỉ chạy laptop hay duyệt ngoại lệ), F2 (mở nhãn một lần hay theo bậc), F4 (quy tắc hết ngân sách), TORAI A, lịch máy, mốc sáng.
+   - **Câu hỏi nguồn:** T-054 chỉ bao phủ RQ3b và phần can thiệp của RQ3d, cùng mô tả vùng nghi ngờ. RQ3a, độ đúng vùng và cơ chế vật lý vẫn OPEN.
+   - **Thiếu bằng chứng:** ETA đo thật, chế độ sleep của máy (`powercfg` không đọc được), hiện trạng EC2 13.211.127.97.
+   - **Bất đồng còn lại:** vai trò của hai EC2 và cách đọc vị trí N (F5).
+
+**Đề xuất:** tiếp tục một lượt để Codex đáp F1–F4 và phần lịch. Nếu Codex nhận bốn điểm CHẶN và không còn phản đối, tôi đề xuất dừng phản biện SPEC. Dừng không tự duyệt SPEC hay mở test.
+
+## Prompt bàn giao cho Codex
+
+```text
+Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
+Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
+
+Thông tin lượt này:
+- Task hoặc đề xuất: Đề xuất SPEC T-054 do Codex soạn trong chat; chưa tạo file. Minh dán nguyên văn đề xuất kèm prompt này.
+- Công đoạn: người làm đáp phản biện.
+- Gói/cổng: chuẩn bị G3(a), thực thi và báo cáo P7(a).
+- Người làm và người phản biện chính thức: dự kiến Codex làm, Claude phản biện; chờ Minh duyệt SPEC.
+- Tài liệu gốc: AGENTS.md, docs/STATE.md, tasks/_MAU/SPEC.md, docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md, docs/reference/sources/DT18-de-tai-va-nhiem-vu.md, docs/reference/sources/advisor-2026-09-23.md, tasks/T-043-thiet-ke-rca-m1/SPEC.md, tasks/T-052-t13-va-ho-so-g3/SPEC.md.
+- Phản biện và phản hồi trước: bản nhận xét của Claude cho đề xuất T-054 trong chat, Minh dán kèm sau prompt này.
+- Code và kết quả liên quan: src/m1/, src/m1_danh_gia/, src/p3/; results/T-052/manifest-dinh-chinh-g3-004.json, results/T-052/giao-thuc-p7-a-003.json, results/T-052/scripts/, results/T-026/allowlist-dev.json, results/T-053/runs/preflight-001.json, results/T-022/giao-thuc-v2.md, results/T-021/chia-theo-o/A-phan-tang.csv; môi trường và lệnh tại LOG T-052.
+- Phạm vi ghi được Minh cho phép trong lượt này: chỉ đọc và trả lời trong chat.
+
+Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
+
+Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
+Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
+Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
+
+Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
+hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
+Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
+số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
+có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
+
+Bổ sung yêu cầu phản biện:
+1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
+2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
+3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
+4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
+5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
+6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
+7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
+8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
+9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
+10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
+
+Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
+Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
+
+Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
+bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
+Tiếng Việt, câu ngắn.
+
+Cuối lượt báo:
+1. Đã làm gì.
+2. File đã thay đổi, hoặc không sửa file nào.
+3. Kiểm đã chạy và kết quả.
+4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
+
+Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
+
+Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
+
+Công đoạn: người làm đáp phản biện. Giữ vai trò người làm, không là người phản biện chính thức của chính task.
+Tự soát yêu cầu và mọi file đầu ra gốc cần để trả lời các câu hỏi như một người chưa từng làm task, TRƯỚC khi mở kết luận các bản phản biện. Ghi danh sách điểm tự tìm được vào LOG trước khi mở các kết luận ấy nếu được phép ghi; phiên chỉ đọc ghi nhận xét trong chat.
+Sau đó kiểm từng điểm phản biện trên file/code/dữ liệu thật; chạy lại khi rẻ và được phép. Kết luận đúng / đúng một phần / sai / chưa kiểm được với bằng chứng riêng. Reviewer có thể sai, nói quá hoặc đề xuất sửa có mặt trái.
+Nếu được Minh cho phép: điền bảng Phản hồi của người làm ở cuối đúng bản phản biện; thêm N1, N2… cho điểm tự tìm được với CHẶN/KHÔNG CHẶN; để trống cột Minh quyết; nối LOG đủ mục 7 của AGENTS, gồm đề xuất sửa gom theo file; chỉ cập nhật dòng task trong STATE khi được phép. Không sửa nội dung hay prompt của reviewer hoặc tự sửa báo cáo/code.
+Nếu chưa có quyền ghi các phần này, trình phản hồi và đề xuất trong chat. Soạn prompt bàn giao cho người phản biện kiểm độc lập.
+
+Với từng thành phần, kiểm mục đích và căn cứ: sửa hạn chế P4, đáp ứng DT18 hay nhu cầu kỹ thuật. Có lý do kỹ thuật, phương án khác, bằng chứng dev và điều kiện thất bại không; có dùng mã hạn chế mô tả như bằng chứng cơ chế hoặc chọn theo mức chênh đồ thị trừ không đồ thị không?
+Nêu rõ nút/cạnh, ánh xạ log/trace/metric và phép tính thực sự sử dụng cạnh. Lần theo thông tin quan hệ và nhãn trong phương pháp lẫn đối chứng; gọi “không đồ thị” có đúng với thông tin còn giữ không?
+Kiểm baseline và đối chứng đủ mạnh, tương đương về tín hiệu/cửa sổ/tập ứng viên/coverage/tiền xử lý/quy tắc chấm/ngân sách chọn cấu hình ở phần không chủ ý thay; yếu tố thay cùng phải giới hạn kết luận.
+Phương pháp và đối chứng đã được cài và kiểm đầu vào, trung gian, hành vi trên dev chưa, hay chỉ chạy không lỗi? Không đòi đồ thị phải thắng để khóa.
+Code/revision, cấu hình, giả thuyết, độ đo, tập ca/tập ứng viên, cách xử lý ca lỗi/UNSUPPORTED/nhánh dự phòng và bảng diễn giải đã khóa trước test chưa? Có bỏ nhóm khó sau khi nhìn điểm hoặc dùng test để chọn thiết kế không?
+Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.
+```

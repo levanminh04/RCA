@@ -1,0 +1,75 @@
+--- before/results/T-054/ho-so-g3.md
++++ results/T-054/ho-so-g3.md
+@@ -33,7 +33,7 @@
+ 5. Sau grant, báo theo dataset/ca/ô/world/support, giữ ERROR/TIMEOUT/UNSUPPORTED và lượt đầu đúng policy. Không có đối chứng đồ thị ngẫu nhiên thì không suy riêng lợi ích cấu trúc thật.
+ 6. B6 được khóa vào đúng byte code/gói/config/env/cohort và quyết định cuối. H1 RE3 chưa đóng, D2 cho trình main TT/Nezha riêng; RE3 cần nguồn/profile/quyền riêng cho bản cuối. RQ3c chỉ mô tả vùng vì thiếu nhãn; RQ3a/M1(b), LLM và áp dụng FlashTicket còn lại, không coi xong T054 là xong đề tài.
+ 
+-Claude đã kiểm bản013 trước sửa, không có finding CHẶN. Codex nhận F1(a)/F2; một worker mỗi EC2 và dự toán toàn chuỗi nằm trong metadata sau sửa, còn chờ Claude kiểm phần đổi này. Đồng thuận không thay bằng chứng. Chưa commit/push, chưa mở test hoặc phát main.
++Claude đã kiểm bản013 trước sửa, không có finding CHẶN. Codex nhận F1(a)/F2; một worker mỗi EC2 và dự toán toàn chuỗi nằm trong metadata sau sửa, còn chờ Claude kiểm phần đổi này. Cập nhật 07/11/2026: Claude đã kiểm, không có điểm CHẶN; Minh duyệt G3(a)/main và đổi vai (Claude chạy, quản lý nguồn, chấm; Codex phản biện) tại `runs/chuan-bi-main-013/grants/minh-main.txt`. Đồng thuận không thay bằng chứng. Chưa commit/push, chưa mở test hoặc phát main.
+ 
+ 
+ [Phản hồi và kiểm sửa](runs/chuan-bi-main-013/review-response.md): bản trước sửa ở pre-review-001. Candidate hiện một worker/EC2, laptop tối đa hai. Không đổi code/slot/config/seed/source/window/env. Dự toán9,1/18,3giờ là kịch bản chưa kiểm; chấm toàn cohort chưa đo. Grant vẫnfalse, chưa mở test/main.
+--- before/results/T-054/runbook.md
++++ results/T-054/runbook.md
+@@ -10,7 +10,7 @@
+ 
+ Phân lô: EC2_1=16.176.181.251/key4,448job+2support,1worker; EC2_2=13.236.44.106/key3,450job,1worker; local742job,2worker tối đa. Mỗi EC230TT, toànOB/CIRCA/MicroRank/A ở laptop. Khóa SSH chỉ đọc từ `D:/RCA-ext/keys/`, không chép vào repo. Giữ strict host key/instance ID; không bật/tắt máy. Code=`checkpoint013/work`, data=`checkpoint013/data-root`, output=`work/results/T-054/runs/main-013/queue`. Python main trên EC2 phụ thuộc interpreter ở012: giữ012.
+ 
+-Sau Minh duyệt, Codex lưu nguyên văn lời duyệt ở `013/grants/minh-main.txt`, dựng grant thật `013/grants/main-grant.json` từ mẫu và ghi các quyền riêng theo đề nghị. Ghim protocol/source-bundle/manifest và nguồn quyết định; A giữ pin riêng. Nối DECISIONS/WHY/LOG và dòng STATE đúng quyền cuối; không sửa đầu ra chuẩn bị đã ghim. Minh không cần tự điền JSON. Dùng hash thật của file grant, không dùng chuỗi ví dụ dưới đây làm giá trị.
++Sau Minh duyệt, người thực hiện (Claude từ 07/11/2026, theo `grants/minh-main.txt`) lưu nguyên văn lời duyệt ở `013/grants/minh-main.txt`, dựng grant thật `013/grants/main-grant.json` từ mẫu và ghi các quyền riêng theo đề nghị. Ghim protocol/source-bundle/manifest và nguồn quyết định; A giữ pin riêng. Nối DECISIONS/WHY/LOG và dòng STATE đúng quyền cuối; không sửa đầu ra chuẩn bị đã ghim. Minh không cần tự điền JSON. Dùng hash thật của file grant, không dùng chuỗi ví dụ dưới đây làm giá trị.
+ 
+ ```powershell
+ $grant013 = 'results/T-054/runs/chuan-bi-main-013/grants/main-grant.json'
+--- before/results/T-054/runs/chuan-bi-main-013/bao-cao.md
++++ results/T-054/runs/chuan-bi-main-013/bao-cao.md
+@@ -1,6 +1,8 @@
+ # Chuẩn bị main 013 — đã đáp review, chờ kiểm metadata sửa
+ 
+-Minh duyệt chuẩn bị013 và D1–D4/R3 ngày07/11/2026; sau đó duyệt ngoại lệ đúng một phép đối chiếu C-e. Codex là người làm, Claude là người phản biện. Claude đã kiểm bản trước sửa, không có finding CHẶN; hai finding vận hành được đáp tại `review-response.md`. Đây là đầu ra chuẩn bị, chưa là nghiệm thu G3, lần chạy test hoặc kết quả nghiên cứu main. Quyền tại `preparation-permission.json` vẫn có g3/test_grant/main_dispatch=false.
++Cập nhật 07/11/2026 sau đổi vai: Claude đã kiểm metadata sửa, không có điểm CHẶN (`grants/claude-review-013-002.txt`). Minh duyệt main theo `grants/minh-main.txt`; Claude là người thực hiện phần chạy, quản lý nguồn và chấm; Codex phản biện phần đó.
++
++Minh duyệt chuẩn bị013 và D1–D4/R3 ngày07/11/2026; sau đó duyệt ngoại lệ đúng một phép đối chiếu C-e. Codex là người làm chuẩn bị013, Claude là người phản biện. Claude đã kiểm bản trước sửa, không có finding CHẶN; hai finding vận hành được đáp tại `review-response.md`. Đây là đầu ra chuẩn bị, chưa là nghiệm thu G3, lần chạy test hoặc kết quả nghiên cứu main. Quyền tại `preparation-permission.json` vẫn có g3/test_grant/main_dispatch=false.
+ 
+ ## Kế hoạch thực chạy ứng viên
+ 
+--- before/results/T-054/runs/chuan-bi-main-013/de-nghi-duyet-main.md
++++ results/T-054/runs/chuan-bi-main-013/de-nghi-duyet-main.md
+@@ -1,12 +1,14 @@
+ # Gói Minh duyệt để phát main 013
+ 
+-Trạng thái: đã đáp phản biện bản gốc, metadata sửa đang chờ Claude kiểm; chưa có quyền chạy. Một câu “Duyệt chạy main013 theo hồ sơ đã kiểm” sẽ được Codex ghi nguyên văn thành nguồn quyết định, với đúng protocol/source-bundle/manifest của gói này. Nếu code hoặc gói đổi, không dùng lại câu duyệt cho bản khác.
++Cập nhật 07/11/2026 sau đổi vai: Claude đã kiểm metadata sửa, không có điểm CHẶN (`grants/claude-review-013-002.txt`). Minh duyệt main theo `grants/minh-main.txt`; Claude là người thực hiện phần chạy, quản lý nguồn và chấm; Codex phản biện phần đó.
++
++Trạng thái: đã đáp phản biện bản gốc, metadata sửa đang chờ Claude kiểm; chưa có quyền chạy. Một câu “Duyệt chạy main013 theo hồ sơ đã kiểm” sẽ được người thực hiện ghi nguyên văn thành nguồn quyết định, với đúng protocol/source-bundle/manifest của gói này. Nếu code hoặc gói đổi, không dùng lại câu duyệt cho bản khác.
+ 
+ Câu duyệt đó cấp cùng lần nhưng ghi riêng từng quyền sau:
+ 
+ 1. Khóa G3(a) cho đúng ứng viên013, cấu hình, ma trận1.640job+2vị trí C-e thiếu hỗ trợ, môi trường, phân lô30/30, một worker trên mỗi EC2 và policy trong hồ sơ. Laptop tối đa hai worker theo RAM/nhóm, TORAI A sau non-A của laptop.
+ 2. Mở đúng60TT+34Nezha-OB test, giữ cửa sổ, U/alias, seed/world/mẫu số; không gồm RE3.
+-3. Codex làm người quản lý nguồn và evaluator: dùng các bản đồ nguồn/nhãn độc lập hiện có theo ref `source-bundle.json`; kiểm byte nguồn, tạo TT locator mờ bằng hardlink trong `data/locked/rcaeval-re2tt-60/<test-id>/`, ghép nhãn chỉ sau verify snapshot. Không sửa nguồn thô.
++3. Người thực hiện làm người quản lý nguồn và evaluator (sau đổi vai 07/11/2026: Claude): dùng các bản đồ nguồn/nhãn độc lập hiện có theo ref `source-bundle.json`; kiểm byte nguồn, tạo TT locator mờ bằng hardlink trong `data/locked/rcaeval-re2tt-60/<test-id>/`, ghép nhãn chỉ sau verify snapshot. Không sửa nguồn thô.
+ 4. Chuyển đúng nguồn TT vào `/home/ubuntu/rca-p7/T-054/checkpoint013/data-root/` của từng EC2 theo bảng90tệp/30ca mỗi máy; metadata đủ60ca vẫn giữ toàn cohort. Chỉ code/metadata, grant và đúng phân lô được chuyển, không bản đồ thật/nhãn.
+ 5. Phát và theo dõi main tới hết cohort, có thể dài hơn1giờ, không trần cộng dồn; giữ giới hạn method/monitor hiện hành. DRAIN/resume cùng plan/token/root theo runbook; không retry slot đã hỏng, không sửa thiết kế sau điểm hoặc tắt máy.
+ 6. Cấp nguồn TORAI A đúng cohort60TT và180CSV tác giả cùng metric đã ghim, chạy seed0/1/2 sau phần chính của laptop. Thiếu/sai pin giữ BLOCKED; ca logts thiếu N giữ nguyên; lỗi chưa phân loại giữ attempt và dừng A. A là bảng phụ, không điều khiển A4.
+@@ -14,7 +16,7 @@
+ 
+ Phạm vi ghi của lượt chạy sau duyệt: `results/T-054/runs/chuan-bi-main-013/{grants,activated-001,execution-receipts,received-main-*}/`, `results/T-054/runs/main-013/`, `results/T-054/reports/main-013/`; nối LOG và DECISIONS/WHY để lưu quyết định đúng lời Minh, cập nhật đúng dòng T-054 trong STATE. Trên EC2 chỉ vùng checkpoint013. Tạo hardlink TT theo công thức trên, không xóa dữ liệu hoặc đổi file thô. Lưu mọi attempt và archive nhận, kể cả hỏng.
+ 
+-Codex sẽ tự ghi nguồn lời duyệt và grant thật, kiểm lại hash/tài nguyên/identity, kích hoạt metadata, kiểm nguồn/chuyển và phát CLI; Minh không phải tự sửa JSON hoặc gõ lệnh. `grant-template.json` hiện có tất cả cờ quyền=false. Một bước bị chặn thì dừng đúng phần phụ thuộc và báo, không tự đổi gói để ép chạy.
++Người thực hiện (Claude, sau đổi vai) sẽ tự ghi nguồn lời duyệt và grant thật, kiểm lại hash/tài nguyên/identity, kích hoạt metadata, kiểm nguồn/chuyển và phát CLI; Minh không phải tự sửa JSON hoặc gõ lệnh. `grant-template.json` hiện có tất cả cờ quyền=false. Một bước bị chặn thì dừng đúng phần phụ thuộc và báo, không tự đổi gói để ép chạy.
+ 
+ Commit/push cần Minh duyệt riêng theo danh sách file. Nó không là điều kiện tự tạo thêm trước main: provenance thực chạy được khóa bằng manifest và code/env pins theo SPEC. Có thể Minh duyệt commit kèm câu duyệt cuối nếu muốn; khi chưa có thì giữ working tree và không commit. Không dùng quyền main để hợp thức hóa quyền lịch sử006.
+ 
+--- before/tasks/T-054-khoa-g3-chay-p7-a/SPEC.md
++++ tasks/T-054-khoa-g3-chay-p7-a/SPEC.md
+@@ -3,8 +3,8 @@
+ > **Điều chỉnh theo Minh ngày 05/11/2026:** bỏ ràng buộc giữ test/dẫn xuất P7 ở local của Q-42 và phương án local trước đây. Được lập phương án phân chia P7 giữa EC2 và laptop để tối ưu tổng thời gian. Chưa mở test, chưa duyệt G3 hoặc tự phát lô; cần hoàn thiện bố trí nhiều máy, môi trường/đối chiếu đúng phần khác và nguồn/đích truyền cụ thể trước chạy. Các bảng lịch local cũ bên dưới là phương án lịch sử, phải thay bằng lịch nhiều máy trước khóa. Hồ sơ checkpoint004 và driver còn ghi local-only không còn là đề xuất vận hành hiện hành; không dùng nguyên gói ấy để phát main.
+ 
+ - **Trạng thái hiện hành 07/11/2026:** chuẩn bị013 đã đáp review; bản gốc được Claude kiểm, metadata sửa chờ kiểm lại và Minh duyệt G3/test/nguồn/chuyển/main/chấm. D1–D4/R3 đã chốt; H1 RE3 OPEN theo D2. Không commit/push. Các lịch local/005/011 bên dưới giữ lịch sử; nguồn vận hành sắp trình khóa là hồ sơ/runbook và protocol-candidate013.
+-- **Người làm:** Codex.
+-- **Người phản biện:** Claude.
++- **Người làm:** Codex tới hết chuẩn bị013; từ 07/11/2026 Claude làm phần chạy main013, quản lý nguồn và chấm (Minh duyệt đổi vai, `results/T-054/runs/chuan-bi-main-013/grants/minh-main.txt`).
++- **Người phản biện:** Claude tới hết chuẩn bị013; từ 07/11/2026 Codex phản biện phần Claude thực hiện.
+ - **Thuộc gói MRP:** chuẩn bị kết thúc P6/G3(a), thực thi P7(a), chuẩn bị trình G4.
+ - **Tổ chức:** một task, hai pha theo yêu cầu trực tiếp của Minh; có các mốc dừng quyền trong cùng task. SPEC không tự mở các quyền thực thi.
+ - **Nguồn duyệt:** lời Minh và hai lượt phản biện đã lưu tại `results/T-054/runs/soan-spec-001/`. Codex nhận N1–N5 của lượt cuối, không còn phản đối chưa xử lý đối với phương án ghi. Việc dừng phản biện SPEC không xác nhận G3 đã đạt.

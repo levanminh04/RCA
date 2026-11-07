@@ -1,0 +1,114 @@
+--- D:\RCA-flashticket\results\T-054\runs\freeze-cong-cu-004\code\results\T-054\scripts\nguon.py
++++ D:\RCA-flashticket\results\T-054\scripts\nguon.py
+@@ -22,6 +22,8 @@
+ 
+ def compare_sources(runtime, independent, dataset, revision):
+     """Ref independent do người cấp chỉ định ngoài runtime, không lấy từ runtime."""
++    if independent.get('schema') == 'T054-DEV-ORIGINALS-1':
++        independent = original_dev_sources(independent)
+     no_labels(runtime); no_labels(independent)
+     if (runtime['dataset'] != dataset or independent['dataset'] != dataset or
+             independent['g1_revision'] != revision or runtime['g1_revision'] != revision):
+@@ -38,7 +40,55 @@
+     return {oid: fingerprint(r) for oid, r in rows.items()}
+ 
+ 
++def original_dev_sources(descriptor):
++    """Dựng lại nguồn chuẩn từ G1/allowlist/command gốc, không tin bản runtime mới."""
++    import csv
++    import io
++    allow = read_pin(descriptor['allowlist_ref'])
++    g1_pin = descriptor['g1_ref']
++    path = Path(g1_pin['path'])
++    if not path.is_absolute():
++        path = ROOT / path
++    if digest(path) != g1_pin['sha256'] or descriptor['g1_revision'] != g1_pin['sha256']:
++        raise Blocked('G1 gốc khác pin')
++    ds = descriptor['dataset']
++    members = [r for r in csv.DictReader(io.StringIO(path.read_text(encoding='utf-8-sig')))
++               if r['dataset'] == ds and r['vai_tro'] == 'dev']
++    original = {r['opaque_id']: r for r in allow['cases']}
++    chosen = descriptor['selected_ids']
++    if len(chosen) != len(set(chosen)) or not set(chosen) <= set(original):
++        raise Blocked('dev selection không thuộc allowlist gốc')
++    out = {}
++    for oid in chosen:
++        row = original[oid]
++        if ds == 'RE2-TT':
++            case = Path(row['case_dir']).name
++            found = [m for m in members if m['case'] == case]
++            if oid != 'dev-' + row['files']['metrics.parquet']['sha256'][:10]:
++                raise Blocked('mã TT không cùng file gốc')
++            command = read_pin(descriptor['command_refs'][oid])
++            job = command['job']
++            if job['opaque_id'] != oid or job['dataset'] != ds or job['window'] != 'that':
++                raise Blocked('mốc TT không từ command main đúng ca')
++            normalized = {'t': job['t'], 'ce_history': 'unknown'}
++        elif ds == 'Nezha-OB':
++            import hashlib
++            found = [m for m in members if 'dev-' + hashlib.sha256(m['case'].encode()).hexdigest()[:10] == oid]
++            case = found[0]['case'] if len(found) == 1 else None
++            normalized = {k: row[k] for k in ('t_ns', 'trace_guard_s')}
++        else:
++            raise Blocked('originals chỉ dev TT/Nezha')
++        if len(found) != 1:
++            raise Blocked('thành viên không khớp duy nhất G1 dev')
++        member = fingerprint([ds, case])
++        normalized.update(member_sha256=member, files=row['files'])
++        out[member] = normalized
++    return {'dataset': ds, 'g1_revision': descriptor['g1_revision'], 'cases_by_member': out}
++
++
+ def compare_labels(labels, independent, runtime, aliases, universe):
++    if independent.get('schema') == 'T054-DEV-LABEL-ORIGINALS-1':
++        independent = original_dev_labels(independent, aliases)
+     if (labels['dataset'] != runtime['dataset'] or independent['dataset'] != runtime['dataset']
+             or labels['g1_revision'] != runtime['g1_revision']
+             or independent['g1_revision'] != runtime['g1_revision']
+@@ -119,7 +169,13 @@
+                 raise Blocked('grant TORAI A không trỏ đúng nguồn đã pin')
+     if not authority.get('source') or not authority.get('plan_sha256') == fingerprint(plan):
+         raise Blocked('quyền không trỏ đúng plan')
+-    read_pin(authority['source'])
++    authority_pin = authority['source']
++    authority_path = Path(authority_pin['path'])
++    if not authority_path.is_absolute():
++        authority_path = ROOT / authority_path
++    if (digest(authority_path) != authority_pin['sha256'] or
++            authority_path.stat().st_size != authority_pin.get('bytes', authority_path.stat().st_size)):
++        raise Blocked('nguồn quyền khác pin')
+     if not plan.get('budget') or plan.get('open_before_run'):
+         raise Blocked('WAIT_POLICY_BUDGET')
+     from dieu_phoi import check_budget
+@@ -188,3 +244,31 @@
+     if set(row['files']) != {'logts', 'tracets_err', 'tracets_lat'}:
+         raise Blocked('TORAI A cần đúng ba CSV đã cấp')
+     return source_row(row, source['data_root'])
++
++
++def original_dev_labels(descriptor, aliases):
++    """Chỉ evaluator sau seal gọi. G1 gốc là nguồn nhãn, tách khỏi runtime mới."""
++    import csv
++    import io
++    source = original_dev_sources(descriptor['source_descriptor'])
++    pin = descriptor['source_descriptor']['g1_ref']
++    path = Path(pin['path'])
++    if not path.is_absolute():
++        path = ROOT / path
++    if digest(path) != pin['sha256']:
++        raise Blocked('nguồn G1 nhãn đổi hash')
++    ds = descriptor['source_descriptor']['dataset']
++    by_member = {}
++    for row in csv.DictReader(io.StringIO(path.read_text(encoding='utf-8-sig'))):
++        if row['dataset'] != ds or row['vai_tro'] != 'dev':
++            continue
++        member = fingerprint([ds, row['case']])
++        if member not in source['cases_by_member']:
++            continue
++        canonical = aliases.get(row['root'], row['root'])
++        by_member[member] = {'member_sha256': member, 'root': canonical,
++                             'fault': row['fault'], 'cell': [ds, canonical, row['fault']]}
++    if set(by_member) != set(source['cases_by_member']):
++        raise Blocked('G1 dev label thiếu/thừa thành viên')
++    return {'dataset': ds, 'g1_revision': pin['sha256'],
++            'alias_sha256': fingerprint(aliases), 'by_member': by_member}

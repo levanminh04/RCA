@@ -258,7 +258,7 @@ Trước G3, phương pháp và các đối chứng đã khai báo phải đư�
 
 ### P7 — Bước 3 và 4: Thực nghiệm và so sánh
 
-- **Khóa trước** (cổng G3): code/revision, cấu hình phương pháp và đối chứng, giả thuyết, bảng diễn giải kết quả, cách tính độ đo, danh sách so sánh, tập ca/tập ứng viên và cách xử lý lỗi/nhánh dự phòng. Khóa bằng commit khi Minh duyệt commit. Sau đó mới chạy một lần trên phần test và dataset giữ ngoài khi Minh cho phép; duyệt thiết kế không mặc nhiên là quyền mở dữ liệu.
+- **Khóa trước** (cổng G3): code/revision, cấu hình phương pháp và đối chứng, giả thuyết, bảng diễn giải kết quả, cách tính độ đo, danh sách so sánh, tập ca/tập ứng viên và cách xử lý lỗi/nhánh dự phòng. Khóa bằng commit khi Minh duyệt commit. Theo C-15 B/Q-247, lần chạy đầu sau khóa trên test khi Minh cho phép là kết quả chính, giữ và báo nguyên. Bản sửa có dùng test báo riêng là đã dùng dữ liệu để thiết kế, kiểm độc lập bằng dữ liệu phù hợp chưa dùng sau khóa; RE3-OB chỉ mở một lần cho bản cuối. Duyệt thiết kế không mặc nhiên là quyền mở dữ liệu. Đợt P7 chính chế độ (a), chế độ (b) hoãn theo Q-245; giao thức A4 hiện hành ở Q-246/WHY-06, mốc so sánh theo Q-247.
 - **So với:**
   - các baseline của P3;
   - nhánh **cùng bằng chứng nhưng không dùng đồ thị**. Spec P7 ghi rõ cấu trúc nào được coi là đồ thị (quan hệ cha–con trong trace, đồ thị service), thông tin nào giữ chung, bước nào bị loại. Ví dụ self-time và hồi quy theo nút cha đã dùng quan hệ; nếu nhánh này giữ chúng mà chỉ bỏ bước xếp hạng trên đồ thị thì kết quả chỉ nói về bước xếp hạng (WHY-07);
@@ -318,7 +318,7 @@ Trước G3, phương pháp và các đối chứng đã khai báo phải đư�
 
 ## 6. Nguyên tắc thực nghiệm
 
-1. **Dev để thiết kế, test để kiểm.** Test và dataset giữ ngoài chỉ mở một lần, sau G3, khi Minh cho phép.
+1. **Dev để thiết kế, test để kiểm.** Test và dataset giữ ngoài khóa tới G3 và chỉ mở đúng phạm vi Minh cho phép. Theo C-15 B/Q-247, giữ và báo nguyên kết quả đầu của bản khóa. Bản sửa có dùng test phải khai rõ, báo riêng, không gọi là kiểm độc lập. Tách sửa lỗi cài đặt khỏi sửa thiết kế, giữ lịch sử và chạy lại các phương pháp chịu ảnh hưởng theo phạm vi Minh duyệt. Kiểm độc lập bản sửa dùng dữ liệu phù hợp chưa dùng sau khóa, gồm lượt FlashTicket mới; RE3-OB chỉ mở một lần cho bản cuối.
 2. **Baseline phải mạnh** trước khi nói đồ thị giúp, gồm cả baseline đơn giản đã công bố (QT7).
 3. **Khẳng định lợi ích đến từ việc dùng quan hệ cần đủ ba thứ** (QT8):
    - hơn nhánh cùng bằng chứng mà không dùng quan hệ;
@@ -357,7 +357,7 @@ Trước G3, phương pháp và các đối chứng đã khai báo phải đư�
 
 **Cách dùng G2:** bản đồ phải trả lời năm mục đầu ra P4 và chỉ rõ căn cứ nào đủ để đề xuất/chọn thành phần, căn cứ nào chưa đủ. Câu còn OPEN không tự biến thành đã xác nhận khi Minh đóng một task. Nếu thiếu bằng chứng ảnh hưởng lựa chọn thiết kế, trình phần cần bổ sung hoặc giới hạn đề xuất để Minh quyết; không báo đủ căn cứ chỉ vì các task và bảng đã xong.
 
-**Cách dùng G3:** đây là khóa thiết kế sau P5–P6, không phải điểm bắt đầu dựng phương pháp. Kiểm căn cứ từng thành phần, cách dùng cạnh thực tế, đối chứng và giá trị trung gian trên dev; khóa cách đánh giá và diễn giải trước test. Không dùng test để chọn cơ chế hoặc làm rõ một lựa chọn thiết kế chưa đủ căn cứ.
+**Cách dùng G3:** đây là khóa thiết kế sau P5–P6, không phải điểm bắt đầu dựng phương pháp. Kiểm căn cứ từng thành phần, cách dùng cạnh thực tế, đối chứng và giá trị trung gian trên dev; khóa cách đánh giá và diễn giải trước test. Kết quả chính đầu tiên áp cho bản đã khóa, không dùng test để hoàn thiện một lựa chọn còn thiếu rồi gọi kết quả đó là kiểm độc lập. Bản sửa sau khi dùng test theo C-15 B/Q-247 được báo riêng và cần dữ liệu phù hợp chưa dùng sau khóa để kiểm độc lập. Minh cấp quyền khóa/mở dữ liệu riêng.
 
 Mọi lượt trình SPEC, báo cáo, phản biện, đáp và kiểm sửa đều phải kèm prompt bàn giao theo AGENTS §9 (Q-88), kể cả đề xuất dừng. Cột phản biện bắt buộc ở trên nói cổng nào cần có phản biện trước duyệt; không miễn nghĩa vụ soạn prompt ở cổng khác. Minh quyết chuyển prompt hoặc dừng. Dừng phản biện không tự duyệt cổng hay mở test.
 
@@ -382,7 +382,7 @@ Báo cáo đi theo đúng chuỗi của cô, mỗi phần mở bằng câu "ph�
 | Dataset không phân xử nổi | Ít service gốc, đồ thị không đổi, triệu chứng chỉ ở service gốc | Đếm ở P2, trước khi đặt giả thuyết; thêm bộ độc lập |
 | Code baseline sai lặng lẽ | Thứ hạng bằng thứ tự cột; số lệch xa số công bố | Adapter ghi ca lỗi là lỗi (P3); kiểm tái lập ở P3 |
 | Rò nhãn | Kết quả quá đẹp; tên ca lọt vào phương pháp | §6 mục 7, 8 |
-| Thiết kế theo test | Nhìn kết quả test rồi sửa | Khóa ở G3; test mở một lần |
+| Thiết kế theo test | Dùng test để sửa nhưng báo như kiểm độc lập | C-15 B/Q-247: giữ kết quả đầu của bản khóa; khai bản sửa dùng test, báo riêng; kiểm độc lập bằng dữ liệu phù hợp chưa dùng sau khóa; RE3 chỉ mở một lần bản cuối |
 | FlashTicket chưa chạy được khi tới P10 | Kho quan sát chưa triển khai | Giao P9a sớm; P1–P8 không phụ thuộc FlashTicket |
 | Phiên agent bị ngắt | Hết usage giữa chừng | LOG của task và quy trình đổi agent (`AGENTS.md` mục 7, 8) |
 | Quy trình phình to | Viết thêm luật thay vì trả lời câu hỏi khoa học | LESSONS CB1, CB2 |

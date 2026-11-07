@@ -1,0 +1,109 @@
+{
+  "schema": "T052-plan-revision-v1",
+  "date_local": "2026-11-04",
+  "authority": "Minh: “duyệt sửa” cho đúng gói năm file sau báo cáo tự soát T-052.",
+  "status": "CD3_FIX_VERIFIED_NO_EXPERIMENT",
+  "base_revision": "dc01bc0d3cc4e945f78be7e7b6607581946213a8",
+  "prior_manifest": {
+    "path": "results/T-052/manifest-ra-soat-ke-hoach-002.json",
+    "bytes": 4726,
+    "sha256": "74760858f96b9ad21eb3ddd6035ced3dcf9a9754ff2dc4fa1c2dbafc14568850"
+  },
+  "write_scope": [
+    "tasks/T-052-t13-va-ho-so-g3/SPEC.md",
+    "src/m1/chuoi.py",
+    "src/m1/doi_chung.py",
+    "tasks/T-052-t13-va-ho-so-g3/LOG.md",
+    "results/T-052/manifest-ra-soat-ke-hoach-003.json"
+  ],
+  "before": {
+    "tasks/T-052-t13-va-ho-so-g3/SPEC.md": {
+      "bytes": 49270,
+      "sha256": "0a2fd14eb0845df7e2ea5206a7f815baf5f410bd6fd9a6085f41e09ca7110357"
+    },
+    "tasks/T-052-t13-va-ho-so-g3/LOG.md": {
+      "bytes": 73301,
+      "sha256": "8f597bb1ef2cba27af1f082644fe17c47785d6990d80c48654bb7493cd92ae6a"
+    },
+    "src/m1/chuoi.py": {
+      "bytes": 40533,
+      "sha256": "2bcf3a6f2cbba33551d5ff595de140a4bdd44f915f531ef6e58b0e2f98c164eb"
+    },
+    "src/m1/doi_chung.py": {
+      "bytes": 8068,
+      "sha256": "c08d76abf016389de046fbd199da9ff9d3151d76c8862f4f75c6f2593d3b2a1b",
+      "representation": "HEAD Git blob"
+    },
+    "results/T-052/manifest-ra-soat-ke-hoach-003.json": null
+  },
+  "outputs": {
+    "tasks/T-052-t13-va-ho-so-g3/SPEC.md": {
+      "bytes": 50772,
+      "sha256": "bbde2c24bd34946a04eda5b148c238f1ce836ef273ad1e66bf35f343ef950d50"
+    },
+    "src/m1/chuoi.py": {
+      "bytes": 40949,
+      "sha256": "5d0aefd84021d84cdbda40835fdb8f7f7abc9e40585fd720942c8144b1137e71"
+    },
+    "src/m1/doi_chung.py": {
+      "bytes": 8087,
+      "sha256": "45121bb859ed44ecb690dffc2fbe4fd40927f20d52d465cdb829f4552ead87f1"
+    },
+    "tasks/T-052-t13-va-ho-so-g3/LOG.md": {
+      "bytes": 85768,
+      "sha256": "c573d06f9ec3ac16784d2b8ec18d7ae06c113bf5365773b172ceae9a1373f68f"
+    }
+  },
+  "checks": {
+    "synthetic_cases": 5000,
+    "seed": 5203,
+    "synthetic_mismatches": 0,
+    "synthetic_status_counts": {
+      "NO_EVIDENCE": 2708,
+      "NO_TARGET": 883,
+      "OK": 990,
+      "UNSUPPORTED_CYCLIC": 419
+    },
+    "layered_graph": {
+      "layers": 30,
+      "unflagged_intermediates": "NO_EVIDENCE",
+      "flagged_intermediates_score": 32.0
+    },
+    "failure_isolation_and_roundtrip": [
+      "M1",
+      "C-a0",
+      "C-a1"
+    ],
+    "pinned_dev": {
+      "windows": 82,
+      "records": 246,
+      "old_new_equal": true,
+      "historical_status_and_ties_equal": true,
+      "seal": "results/T-053/runs/k-dong-pha1-001/seal.json",
+      "scope": "Stored channel scores and edges, no native run"
+    },
+    "spec_before_reconstructed_exactly": true,
+    "log_prefix_bytes": 73301,
+    "handoff_blocks": [
+      "Prompt chung",
+      "Kiểm lại phản hồi và sửa",
+      "G3"
+    ],
+    "audit_attempts": [
+      {
+        "check": "reconstruct original SPEC",
+        "first_attempt": "read-only script stopped on tuple.copy",
+        "resolution": "matched original bytes/hash after correction"
+      }
+    ],
+    "verification_command_powershell": "@'\nimport collections, gzip, hashlib, json, pathlib, random, subprocess, sys\nfrom fractions import Fraction\nfrom unittest.mock import patch\nsys.path.extend(('src','results/T-044/tests','D:/RCA-ext/envs/py312-pin/Lib/site-packages','D:/RCA-ext/envs/T-016-cong-cu/Lib/site-packages'))\nfrom m1 import chuoi, doi_chung, hop_dong\nfrom sinh_trace_S import params\ndef original(path):\n ns={}\n exec(compile(subprocess.check_output(['git','show','HEAD:'+path]),path,'exec'),ns)\n return ns\nold=original('src/m1/doi_chung.py')['cd3']\nold_chain=original('src/m1/chuoi.py')['chay']\nrng=random.Random(5203)\nstatuses=collections.Counter()\nfor i in range(5000):\n n=list('abcdefg')[:rng.randrange(1,8)]\n g=[(a,b) for a in n for b in n if (i%2 or a<b) and rng.randrange(5)==0]\n d={v:Fraction(rng.randrange(-4,9),rng.choice((1,2,3,5))) for v in n if rng.randrange(4)}\n t=[v for v in n+['outside'] if rng.randrange(3)==0]\n left,right=old(g,d,t),doi_chung.cd3(g,d,t)\n assert left==right,(i,left,right)\n statuses[right['trang_thai']]+=1\nprint('SYNTHETIC_EQUIVALENCE',dict(statuses),flush=True)\nfor n, label in (((), 'invalid_intermediates'), (('c','d'),'long_flagged_dag')):\n groups=[['c']]+[[f'x{i}_{j}' for j in range(2)] for i in range(30)]+[['d']]\n edges=[(b,a) for left,right in zip(groups,groups[1:]) for a in left for b in right]\n d={v:1 for g in groups for v in g} if n else {'c':1,'d':1}\n r=doi_chung.cd3(edges,d,['d'])\n assert r['diem_ung_vien']==({'c':32.0} if n else {})\n print('LAYERED_DAG',label,r['trang_thai'],r['diem_ung_vien'],flush=True)\nspans=[dict(traceID=str(i),spanID='s',parentSpanID='',owner='svc',operation='op',\n            start_us=(950+i*2 if i<20 else 1010+(i-20)*2)*10**6,\n            duration_us=1000 if i<20 else 2000) for i in range(40)]\nfor name,change in (('M1',{'E1':'U','E2':'C','E5':True}),('C-a0',{}),('C-a1',{'E1':'U'})):\n p=params(change)\n p.update(config_id=name,nhanh_z=True,che_do={'cong_phan_vi':'G3','cong_dem':'D1','thang':'E4+T4c'})\n if name!='M1':p['doi_chung']=name\n args=(spans,[],[],['svc'],{},1000)\n legacy=chuoi.chay(*args,p)\n assert legacy==old_chain(*args,p)\n split=hop_dong.kiem_ban_ghi(chuoi.chay(*args,dict(p,tach_cd3=True)))\n assert split['status']=='OK'\n with patch.object(doi_chung,'cd3',side_effect=RuntimeError('only C-d3')) as f:\n  assert chuoi.chay(*args,dict(p,tach_cd3=True))==split\n  f.assert_not_called()\n  assert chuoi.chay(*args,p)['status']=='ERROR'\n broken=chuoi.chay(*args,dict(p,tach_cd3=1))\n assert broken['status']=='ERROR' and 'tach_cd3' in broken['error']\n split=json.loads(json.dumps(split,allow_nan=False))\n payload=split['extra'].pop('dau_vao_cd3')\n score={e:Fraction(*q) for e,q in payload.pop('diem').items()}\n split['extra']['doi_chung']['C-d3']=dict(doi_chung.cd3(split['extra']['canh'],score,payload['dich']),**payload)\n assert split==json.loads(json.dumps(legacy))\n print('ISOLATION_AND_ROUNDTRIP',name,flush=True)\ndef rd(path): return json.loads(pathlib.Path(path).read_bytes())\ndef check(path,index):\n b=pathlib.Path(path).read_bytes()\n assert len(b)==index[path]['bytes'] and hashlib.sha256(b).hexdigest()==index[path]['sha256'],path\n return b\nm=rd('results/T-053/manifest.json')['outputs']\np='results/T-053/runs/k-dong-pha1-001/seal.json'\nseal=json.loads(check(p,m))\ncount=collections.Counter()\nfor window,entries in seal.items():\n for entry in entries:\n  p=entry['path']\n  assert entry['sha256']==m[p]['sha256']\n  for rec in map(json.loads,gzip.decompress(check(p,m)).splitlines()):\n   if rec['config_id'] not in ('K-E1+E2+E5','K-R0','K-E1'): continue\n   ex=rec['extra']\n   sc={r['thuc_the']:max(q['s'] for q in ex['kenh_co'] if q['thuc_the']==r['thuc_the']) for r in ex['kenh_co']}\n   ref=ex['doi_chung']['C-d3']\n   g,t=ex['canh'],ref['dich']\n   left,right=old(g,sc,t),doi_chung.cd3(g,sc,t)\n   assert left==right,(p,rec['config_id'])\n   assert ref['trang_thai']==right['trang_thai']\n   assert [b['groups'] for b in ref['blocks']]==[b['groups'] for b in right['blocks']]\n   count[(window,rec['config_id'])]+=1\nprint('PINNED_DEV_REPLAY',dict(count),flush=True)\n'@ | & 'C:/Users/84583/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' -B -S -"
+  },
+  "boundaries": {
+    "experiment_run": false,
+    "ec2_used": false,
+    "locked_data_opened": false,
+    "committed": false,
+    "pushed": false
+  },
+  "self_hash_policy": "Manifest does not hash itself."
+}

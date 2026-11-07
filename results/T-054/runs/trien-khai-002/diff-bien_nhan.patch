@@ -1,0 +1,108 @@
+--- results\T-054\runs\freeze-cong-cu-003\code\results\T-054\scripts\bien_nhan.py
++++ results\T-054\scripts\bien_nhan.py
+@@ -3,6 +3,8 @@
+ import json
+ import math
+ import os
++import time
++from contextlib import contextmanager
+ from pathlib import Path
+ from fractions import Fraction
+ from datetime import datetime, timezone
+@@ -78,30 +80,79 @@
+     return ref(p)
+ 
+ 
++@contextmanager
++def journal_lock(path):
++    """Khóa OS cho một lần nối, kể cả khi CLI và supervisor cùng ghi control."""
++    stream = Path(path).open('a+b')
++    if os.fstat(stream.fileno()).st_size == 0:
++        stream.write(b'0'); stream.flush()
++    started = time.monotonic()
++    try:
++        while True:
++            stream.seek(0)
++            try:
++                if os.name == 'nt':
++                    import msvcrt
++                    msvcrt.locking(stream.fileno(), msvcrt.LK_NBLCK, 1)
++                else:
++                    import fcntl
++                    fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
++                break
++            except OSError:
++                if time.monotonic() - started > 2:
++                    raise Blocked('journal đang được ghi, chưa xác minh chủ')
++                time.sleep(.01)
++        yield
++    finally:
++        stream.close()
++
++
+ def append(path, value):
+     p = Path(path)
+     p.parent.mkdir(parents=True, exist_ok=True)
+-    with p.open('ab', buffering=0) as f:
+-        f.write(canonical(dict(utc=utc(), **value)) + b'\n')
+-        os.fsync(f.fileno())
+-
+-
+-def events(path):
++    with journal_lock(p.with_name(p.name + '.lock')):
++        # Giữ byte dở trước khi cắt phần chưa commit. Không nối JSON mới vào đuôi JSON dở.
++        with p.open('a+b', buffering=0) as f:
++            end = f.seek(0, os.SEEK_END)
++            if end:
++                f.seek(-1, os.SEEK_END)
++                if f.read(1) != b'\n':
++                    f.seek(0); raw = f.read()
++                    prefix = raw.rfind(b'\n') + 1
++                    tail = raw[prefix:]
++                    sha = hashlib.sha256(tail).hexdigest()
++                    saved = p.with_name(p.name + '.torn-' + sha + '.bin')
++                    if saved.exists():
++                        if saved.read_bytes() != tail:
++                            raise Blocked('bản byte dở không khớp')
++                    else:
++                        with saved.open('xb') as archive:
++                            archive.write(tail); archive.flush(); os.fsync(archive.fileno())
++                    f.seek(prefix); f.truncate(); os.fsync(f.fileno())
++                    recovery = {'utc': utc(), 'event': 'JOURNAL_TAIL_PRESERVED',
++                                'valid_prefix_bytes': prefix, 'tail_sha256': sha, 'tail_bytes': len(tail),
++                                'archive': saved.name}
++                    f.write(canonical(recovery) + b'\n'); os.fsync(f.fileno())
++            f.write(canonical(dict(utc=utc(), **value)) + b'\n')
++            os.fsync(f.fileno())
++
++
++def iter_events(path):
+     p = Path(path)
+     if not p.exists():
+-        return []
+-    result = []
+-    lines = p.read_bytes().splitlines(keepends=True)
+-    for i, line in enumerate(lines):
+-        try:
++        return
++    with p.open('rb') as f:
++        for line in f:
+             if not line.endswith(b'\n'):
+-                raise ValueError('event dở')
+-            result.append(json.loads(line))
+-        except ValueError:
+-            if i != len(lines) - 1:
++                return  # Chỉ đọc: không sửa đuôi chưa commit.
++            try:
++                yield json.loads(line)
++            except ValueError as exc:
+                 raise Blocked('event hỏng giữa lịch sử')
+-            break
+-    return result
++
++
++def events(path):
++    return list(iter_events(path))
+ 
+ 
+ def no_labels(value):

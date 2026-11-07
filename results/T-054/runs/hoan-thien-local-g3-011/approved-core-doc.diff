@@ -1,0 +1,91 @@
+--- before/src/p3/re3.py
++++ src/p3/re3.py
+@@ -35,7 +35,7 @@
+         raise ContractError('RE3 profile missing')
+     required = {'schema', 'dataset', 'status', 'time_units', 'observation_r_ns', 'inventory',
+                 'aliases', 'metric_channels', 'log_rule', 'evidence'}
+-    if not required <= set(profile) or set(profile) - required - {'trace_status_kind'}:
++    if not required <= set(profile) or set(profile) - required - {'trace_status_kind', 'trace_status_values'}:
+         raise ContractError('RE3 profile missing/unknown fields')
+     if (profile['schema'] != 'RE3-OB-PROFILE-1' or profile['dataset'] != 'RE3-OB'
+             or profile['status'] != 'DECLARED'):
+@@ -69,9 +69,31 @@
+     if not isinstance(evidence, dict) or not fields <= set(evidence) or any(
+             not isinstance(evidence[k], str) or not evidence[k].strip() for k in fields):
+         raise ContractError('RE3 profile lacks source declarations')
+-    if profile.get('trace_status_kind') not in (None, 'binary_error'):
++    if profile.get('trace_status_kind') not in (None, 'binary_error', 'grpc_status_code'):
+         raise ContractError('RE3 status interpretation not supported')
++    if profile.get('trace_status_kind') == 'grpc_status_code':
++        domain = profile.get('trace_status_values')
++        if (not isinstance(domain, list) or not domain or any(_integer(x) < 0 for x in domain)
++                or len(domain) != len(set(domain)) or 0 not in domain
++                or not isinstance(evidence.get('trace_status_kind'), str) or not evidence['trace_status_kind'].strip()):
++            raise ContractError('RE3 gRPC status domain and source declaration required')
+     return copy.deepcopy(profile)
++
++
++def validate_torai_status(codes, profile):
++    """Keep released TORAI's native sum of status codes, not an invented count."""
++    p = validate_profile(profile)
++    kind = p.get('trace_status_kind')
++    if kind not in ('binary_error', 'grpc_status_code'):
++        raise ContractError('RE3 TORAI status semantics not declared')
++    domain = {0, 1} if kind == 'binary_error' else set(p['trace_status_values'])
++    for code in codes:
++        if pd.isna(code):
++            continue  # preserve the existing kernel's handling of missing values
++        if (isinstance(code, (bool, np.bool_)) or not isinstance(code, (Integral, float, np.floating))
++                or not np.isfinite(code) or not float(code).is_integer() or int(code) not in domain):
++            raise ContractError('RE3 status code outside declared domain/type')
++    return 'native_sum_of_status_codes_not_error_span_count' if kind == 'grpc_status_code' else 'native_binary_sum'
+ 
+ 
+ def to_ns(values, unit):
+--- before/results/T-054/scripts/worker.py
++++ results/T-054/scripts/worker.py
+@@ -262,9 +262,9 @@
+                             tabs = torai.chuan_bi_A(win['metric'], *source_tables, job['t'])
+                         else:
+                             if ds == 'RE3-OB':
+-                                if re3_profile.get('trace_status_kind') != 'binary_error' or not set(win['traces']['statusCode'].dropna()) <= {0, 1}:
+-                                    raise Blocked('RE3 TORAI needs declared binary statusCode semantics')
++                                status_meaning = re3.validate_torai_status(win['traces']['statusCode'], re3_profile)
+                                 tabs = torai.chuan_bi_B(win['metric'], win['traces'], win['logs'], job['t'], chi_ts=False)
++                                tabs[4]['trace_error_series_semantics'] = status_meaning
+                             else:
+                                 tabs = torai.chuan_bi_B(win['metric'], win['traces'], win['logs'], job['t'])
+                         table_refs = {}
+--- before/tasks/T-054-khoa-g3-chay-p7-a/SPEC.md
++++ tasks/T-054-khoa-g3-chay-p7-a/SPEC.md
+@@ -116,6 +116,8 @@
+ 
+ ## Phạm vi ghi
+ 
++**Bổ sung Minh duyệt07/11/2026:** phầnA011/h1-bo-sung-xin-duyet.md cho sửa `src/p3/re3.py` và `results/T-054/scripts/worker.py` để nhận semanticsgRPCtườngminh, giữkernel/tổngmã native vàdefaultTT/Nezha; nối WHY/DECISIONS. PhầnB được đọcduynhất columnchunkserviceNamecủa30trace vàcontainer_namecủa30logRE3HFđúngrevision, tổngmetadata+chunk<=16MiB, chỉhợptên toàncohort, không phân bố theo ca hoặc tínhiệu/thờigian/message/ID/operation/statusCode. Đây là quyềnmetadata inventory riêng, không mở đánhgiáRE3/G3/main. Snapshotvàreceiptở011.
++
+ **Bổ sung CIRCA Minh duyệt06/11/2026:** “Duyệt bổ sung 2 file CIRCA”; thêm `results/T-054/scripts/dieu_phoi.py` và `bien_nhan.py` đúng ba điều kiện theo010/bo-sung-circa-xin-duyet.md, nhận/kiểm hai variant/current và tạo hai bản ghi TIMEOUT cho RE3 như TT. Không nới quyền dữ liệu/chính sách lỗi/deadline.
+ 
+ **Bổ sung Minh duyệt H2 ngày06/11/2026:** “Duyệt cài H2 theo báo cáo009”. Cài đúng9file: `src/p3/re3.py` (mới), `src/m1/adapter.py`, `src/p3/adapters/baro.py`, `circa.py`, `tracerca.py`, `torai.py`, `results/T-054/scripts/nguon.py`, `worker.py`, `cham.py`; cập nhật đúng lý do/quyền vào WHY/DECISIONS. Reader và M1 RE3 nhận profile thời gian/U/alias/r tường minh đã ghim, thiếu thì chặn trước method; default TT/Nezha giữ nguyên. Worker/grant/bảng RE3 riêng, kiểm bằng synthetic; chưa mở telemetry/đánh giá RE3 hoặc G3/main. Không sửa lõi M1/cấu hình đã chọn, không quyết các trường H1 còn OPEN. Snapshot trước sửa và kiểm ở checkpoint010.
+--- before/docs/WHY.md
++++ docs/WHY.md
+@@ -1177,3 +1177,8 @@
+ ### H2 — giữ đủ hai bản ghi CIRCA trên RE3
+ 
+ Bộ nhận và timeout đang chỉ khai hai vế CIRCA cho TT, trong khi adapter trả cả chính/phụ cho RE3. Minh duyệt bổ sung hai file theo010. Mở đúng điều kiện dataset sang TT hoặc RE3; không bỏ vế phụ hoặc đổi nghĩa timeout. Kiểm fixture đủ/thiếu variant và current; chưa kiểm RE3 thật.
++
++
++## T-054 — gRPC status và metadata inventory, 07/11/2026
++
++Nguồn tác giả mới CONVERT.md được ghim riêng011 nói benchmark phát hành lưu mã gRPC,0OK và tracets_err gốc cộng mã thay vì đếm span. Guard H2binary-only là giả định, không phải sự thật nguồn. Minh duyệt thêm profile gRPCtườngminh vàgiữgiátrị/kernel, không chuyển thành0/1. Sourcecodebenchmark đã chọn không nângversion; codeconverter mới chỉ dùng làm tài liệu hợp đồng, không thay preprocessing/kernel. Phương án coi tổng mã là số lỗi sai nghĩa; đổi sang đếm sẽ đổi baseline. Kiểmfixture cácmã/tổng vànhánh mặcđịnh, chưa kiểmstatusCodeRE3thật. Tên owner của nguồn được Minh cấp đọc riêng nhưmetadata toàncohort, không lấy rootlabels hoặc nhìn phân bố theo fault đểchọn U. Hợp tên quan sát không chứng minh deployment/alias; nguồn thiếu vẫn OPEN. Hợpđồng thời gian mới không tự chuyển sangreleasecũ khi outputconverterkhácschema/đơnvị. Phụthuộc: profile/support RE3vàhồsơG3; không là hiệuquả RCA hoặc quyềnmain.
+--- before/docs/DECISIONS.md
++++ docs/DECISIONS.md
+@@ -436,3 +436,8 @@
+ ### T-054 H2 — bổ sung CIRCA, 06/11/2026
+ 
+ Minh: “Duyệt bổ sung 2 file CIRCA”. Duyệt đúng đề xuất010/bo-sung-circa-xin-duyet.md: dieu_phoi.py kiểm hai variant/current cho RE3 như TT; bien_nhan.py tạo đủ hai variant CIRCA khi TIMEOUT đã đủ điều kiện. Không nới chính sách lỗi, deadline hoặc quyền dữ liệu.
++
++
++## T-054 — hoàn thiện local, guard gRPC và metadata owner, 07/11/2026
++
++Minh: “làm toàn bộ các phần còn lại, trừ phần kiểm ec2 ra vì hiện chưa vào được”. Tiếp tục chuẩn bị local; không kiểm/SSH/sync EC2, không phát main hoặc mở đánh giá RE3. Sau đề xuất011/h1-bo-sung-xin-duyet.md, Minh: “Duyệt sửa guard theo phần A” và “Duyệt đọc hai cột như metadata inventory”. A: sửa đúng src/p3/re3.py và results/T-054/scripts/worker.py cùng SPEC/WHY/sổ để hỗ trợ profile gRPC khai rõ, giữ mã/kernel cộng mã native. B: chỉ chunk serviceName của30trace và container_name của30log ở revision đã ghim, tổngmetadata+chunk tối đa16MiB; chỉ xuất hợp tên toàncục, không phân bố theo ca. Không đọc thời gian/metric/duration/message/ID/operation/statusCode hoặc chạy phương pháp trên RE3. Alias thiếu nguồn vẫn OPEN; không suy thành quyền đánh giá RE3/G3/main hoặc commit/push.

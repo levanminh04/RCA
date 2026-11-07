@@ -1,0 +1,85 @@
+Làm việc tại `D:\RCA-flashticket`. Minh giao phiên Codex mới **rà soát độc lập về lập luận và bằng chứng, rồi triển khai T-054 nếu không còn lỗi nghiêm trọng hoặc CHẶN**.
+
+Đây là lệnh giao việc cụ thể. Không chỉ xác nhận đã đọc tài liệu, đối chiếu checklist hoặc viết thêm prompt rồi dừng. Việc chép đúng prompt mẫu không thay cho đánh giá thực chất.
+
+## 1. Vai trò và quyền Minh cấp
+
+- Bạn tiếp nhận vai trò **người làm T-054**. Claude vẫn là người phản biện chính thức. Đánh giá của bạn là lượt tự soát từ đầu trong phiên mới, không được ghi thành một lượt phản biện chính thức thay Claude.
+- Trước hết chỉ đọc để rà soát.
+- Nếu không còn lỗi nghiêm trọng hoặc CHẶN đối với bước tiếp theo, **Minh cho phép triển khai task trong phạm vi SPEC**, không cần hỏi lại quyền bắt đầu.
+- Lỗi nhỏ về câu từ hoặc diễn đạt được sửa trực tiếp trong SPEC, giữ nghĩa và ghi rõ thay đổi.
+- Quyền này không cho tự giải quyết một lựa chọn khoa học còn OPEN, thay thiết kế, thay mẫu số, mở test/RE3 hoặc vượt các mốc quyền riêng.
+- Không commit/push nếu Minh chưa duyệt riêng.
+
+Nếu một nhánh bị chặn, dừng đúng nhánh và tiếp tục phần độc lập đã đủ quyền. Không dùng một mục OPEN ở pha sau làm lý do ngừng toàn bộ công việc có thể làm trước.
+
+## 2. Đánh giá từ nguồn trước, đối chiếu SPEC sau
+
+Đọc `AGENTS.md`, `docs/STATE.md` và phần cuối LOG để biết trạng thái, vai trò và quyền. Ở lượt đầu, chỉ đọc phần hành chính cần thiết của SPEC để xác định phạm vi; **chưa dùng mục tiêu, phép kiểm hoặc tiêu chí xong của SPEC làm khung kết luận**.
+
+Sau đó tự dựng lại yêu cầu và bằng chứng từ:
+
+- `docs/reference/sources/DT18-de-tai-va-nhiem-vu.md`
+- `docs/reference/sources/advisor-2026-09-23.md`
+- Các phần chi phối trong `docs/MRP.md`, `docs/DECISIONS.md`, `docs/WHY.md`, `docs/LESSONS.md`.
+- G1, giao thức baseline, kết quả và hạn chế P4, đồ thị P5, thiết kế M1, chuỗi lựa chọn trên dev P6 và hồ sơ T-052.
+- Code, bản ghi đầu vào, trung gian, đầu ra và manifest tương ứng.
+
+Điểm vào quan trọng:
+
+- `results/T-052/manifest-dinh-chinh-g3-004.json`
+- `results/T-052/giao-thuc-p7-a-003.json`
+- `results/T-052/ke-hoach-tap-test.json`
+- `results/T-050/manifest-chay-lai-002.json`
+- `results/T-053/manifest.json`
+- `src/m1/`, `src/m1_danh_gia/`, `src/p3/` và code baseline được dẫn.
+
+Kiểm hash trước khi tái dùng. Phân biệt pin lịch sử của LOG/STATE với đầu ra ổn định; không yêu cầu khôi phục trạng thái cũ. Không mở telemetry test, raw Nezha ngoài miền được phép hoặc nguồn TORAI A chỉ để rà hồ sơ.
+
+**Trước khi đọc kết luận phản biện cũ và trước khi đối chiếu toàn SPEC, ghi nhận xét riêng**, gồm:
+
+1. Câu hỏi nghiên cứu thực sự cần trả lời.
+2. Bằng chứng hiện có trả lời tới đâu.
+3. Phần nào có thể tái dùng và điều kiện tương đương.
+4. Phần thiếu có thể đổi quyết định hoặc làm sai đánh giá.
+5. Công việc tối thiểu cần làm trước khóa và sau quyền mở test.
+
+Không coi “task đã nghiệm thu”, “hash khớp”, “hai agent đồng ý” hoặc “đủ file” là bằng chứng phương pháp đúng.
+
+## 3. Sau đó mới đối chiếu SPEC và phản biện
+
+Đọc đầy đủ:
+
+- `tasks/T-054-khoa-g3-chay-p7-a/SPEC.md`
+- `tasks/T-054-khoa-g3-chay-p7-a/LOG.md`
+- `results/T-054/manifest-soan-spec-001.json`
+- Các nguồn phản biện và bản đáp trong `results/T-054/runs/soan-spec-001/`.
+
+Hỏi hai chiều: SPEC có bỏ sót nghĩa vụ từ nguồn không; và SPEC có bắt làm việc không cần thiết hoặc vượt bằng chứng không.
+
+Kiểm từng nhận xét cũ bằng chứng riêng, kể cả phần có thể bác bỏ nó. Không mặc nhiên nhận kết luận của Codex hoặc Claude.
+
+Mỗi lỗi đáng kể phải nêu: nguồn, bước bị ảnh hưởng, hậu quả, sửa tối thiểu và phép kiểm phân xử. Phân biệt lỗi đã xác nhận, nguy cơ chưa kiểm và quyết định còn OPEN. Không tìm lỗi cho đủ số lượng hoặc thêm phép kiểm chỉ để “cho chắc”.
+
+## 4. Quyết định triển khai ngay trong phiên
+
+- **Có lỗi nghiêm trọng/CHẶN:** báo rõ chặn bước nào. Không tự sửa thiết kế hoặc quyết thay Minh. Trình phương án và bằng chứng cần thêm; tiếp tục phần độc lập đủ quyền.
+- **Chỉ có lỗi câu chữ:** sửa trực tiếp, ghi diff và lý do.
+- **Không còn lỗi nghiêm trọng/CHẶN đối với phần triển khai:** bắt đầu cài đặt công cụ và các bước được phép của T-054 ngay. Không kết thúc bằng “có thể triển khai”, một kế hoạch hoặc câu hỏi xin lại quyền đã cấp.
+
+Giữ các mốc dừng G3, quyền dữ liệu, ngân sách và các lựa chọn OPEN theo SPEC. Phân biệt việc chuẩn bị công cụ có thể làm ngay với quyết định phải chốt trước chạy hoặc trước test.
+
+Tận dụng kết quả hợp lệ đã có. Dùng hai EC2 và laptop cho lô độc lập, đủ quyền và thực sự giảm tổng thời gian; không tạo lượt chạy chỉ để dùng máy. Chất lượng phép so ưu tiên hơn hạn sáng.
+
+## 5. Ghi nhận và báo cáo
+
+Ghi nguồn quyền Minh của prompt này vào hồ sơ phù hợp; không ghi rằng Minh đã quyết các mục OPEN.
+
+Báo ngắn theo bốn mục:
+
+1. Nhận xét tự tìm được từ nguồn trước khi xem SPEC/phản biện.
+2. Kết luận đối chiếu: lỗi chặn, lỗi nhỏ hoặc không có lỗi đáng kể.
+3. File đã sửa, phần đã triển khai và kiểm thực tế đã đạt.
+4. Phần còn thiếu, bước bị chặn và quyết định cần Minh.
+
+LOG phải đủ để tiếp nhận trên máy khác không cần lịch sử chat. Giữ mọi lượt hỏng. Không tự gửi prompt hoặc mở vòng phản biện mới. Nếu cần prompt bàn giao theo luật repo, lưu trong LOG; **đầu ra chính của phiên phải là đánh giá có bằng chứng và công việc triển khai thực tế khi điều kiện đã đạt**.

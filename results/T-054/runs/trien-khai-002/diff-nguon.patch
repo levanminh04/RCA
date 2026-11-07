@@ -1,0 +1,97 @@
+--- results\T-054\runs\freeze-cong-cu-003\code\results\T-054\scripts\nguon.py
++++ results\T-054\scripts\nguon.py
+@@ -73,7 +73,9 @@
+         raise Blocked('slot thiếu khóa hoặc dataset ngoài grant')
+     if slot['view'] == 'ce' and (slot['dataset'] != 'RE2-TT' or slot['arm'] != 'M1'):
+         raise Blocked('C-e chỉ TT/M1')
+-    if slot['arm'] == 'torai_B' and slot['dataset'] == 'RE2-TT':
++    if slot['arm'] == 'torai_A' and slot['dataset'] != 'RE2-TT':
++        raise Blocked('TORAI A chỉ là bảng phụ TT đã khai')
++    if slot['arm'] in ('torai_A', 'torai_B') and slot['dataset'] == 'RE2-TT':
+         if type(slot['seed']) is not int or slot['seed'] not in (0, 1, 2):
+             raise Blocked('TORAI B cần seed 0/1/2')
+     elif slot['seed'] is not None:
+@@ -106,8 +108,83 @@
+             raise Blocked('WAIT_LOCKED_PROTOCOL')
+     if mode not in ('dev', 'test'):
+         raise Blocked('mode chưa được cấp')
++    if any(j.get('evaluation_mode') != mode or j.get('kind') == 'synthetic' for j in plan['jobs']):
++        raise Blocked('miền quyền của job khác plan')
++    if any(j['slot']['arm'] == 'torai_A' for j in plan['jobs']) and authority.get('torai_A_source_grant') is not True:
++        raise Blocked('WAIT_TORAI_A_SOURCE_GRANT')
++    for job in plan['jobs']:
++        if job['slot']['arm'] == 'torai_A':
++            declared = authority.get('torai_A_source_sha256')
++            if declared != job.get('author_source_ref', {}).get('sha256') or declared != job['slot'].get('author_source_sha256'):
++                raise Blocked('grant TORAI A không trỏ đúng nguồn đã pin')
+     if not authority.get('source') or not authority.get('plan_sha256') == fingerprint(plan):
+         raise Blocked('quyền không trỏ đúng plan')
+     read_pin(authority['source'])
+     if not plan.get('budget') or plan.get('open_before_run'):
+         raise Blocked('WAIT_POLICY_BUDGET')
++    from dieu_phoi import check_budget
++    check_budget(plan)
++
++
++def main_dependency_record(job, seal_ref):
++    """Dependency được khai trước; hash output main chỉ được nối sau khi seal."""
++    from bien_nhan import verify_envelope
++    dep = job['main_dependency']; seal = read_pin(seal_ref)
++    parent = dep['slot']; own = job['slot']
++    if (parent.get('arm') != 'M1' or parent.get('view') != 'main' or parent.get('seed') is not None
++            or any(parent.get(k) != own.get(k) for k in ('dataset', 'opaque_id', 'member_sha256', 'window', 'source_sha256'))):
++        raise Blocked('C-d3 dependency khác ca/cửa sổ/nguồn main')
++    key = '|'.join(str(parent[k]) for k in ('dataset', 'opaque_id', 'arm', 'view', 'seed'))
++    if (seal.get('schema') != 'T054-MAIN-SEAL-2' or seal.get('parent_slot_sha256') != fingerprint(parent)
++            or seal.get('parent_job_sha256') != dep['job_sha256'] or set(seal.get('records', {})) != {key}):
++        raise Blocked('seal không cùng dependency đã đăng ký')
++    receipt = read_pin(seal['producer_receipt'])
++    if receipt['job_sha256'] != dep['job_sha256']:
++        raise Blocked('producer của main không khớp plan')
++    envelope = read_pin(receipt['result']); invocation = read_pin(receipt['invocation'])
++    records = verify_envelope(envelope, invocation, parent, envelope['token'])
++    if len(records) != 1 or records[0] != seal['records'][key]:
++        raise Blocked('main seal khác output đã verify của producer')
++    return records[0], key
++
++
++def validate_execution_links(job, invocation):
++    if job.get('main_dependency'):
++        if invocation.get('dependency_sha256') != fingerprint(job['main_dependency']):
++            raise Blocked('invocation đổi dependency đã đăng ký')
++        _, key = main_dependency_record(job, invocation['main_seal_ref'])
++        if invocation.get('main_key') != key:
++            raise Blocked('C-d3 sai lookup trong invocation')
++    if job['kind'] == 'torai_pipeline' or job.get('pipeline_fixture'):
++        prep = read_pin(invocation['prepared_ref'])
++        if prep['token'] != invocation['token'] or prep['slot_sha256'] != fingerprint(job['slot']):
++            raise Blocked('TORAI method không cùng prep đã xử lý')
++        for pin in prep['tables'].values():
++            path = Path(pin['path'])
++            if path.stat().st_size != pin['bytes'] or digest(path) != pin['sha256']:
++                raise Blocked('CSV khác prep đã thực chạy')
++        if job['slot']['arm'] == 'torai_A':
++            source = prep.get('author_source_ref')
++            if not source or source != job.get('author_source_ref') or source['sha256'] != job['slot'].get('author_source_sha256'):
++                raise Blocked('prep TORAI A khác nguồn đã khai/grant')
++            read_pin(source)
++
++
++def author_source(job):
++    """Chỉ gọi sau grant ở CLI; không suy đường dẫn A từ tên ca/nhãn."""
++    pin = job['author_source_ref']
++    if pin['sha256'] != job['slot'].get('author_source_sha256'):
++        raise Blocked('TORAI A source ref khác slot')
++    source = read_pin(pin); no_labels(source)
++    if job['kind'] == 'synthetic':
++        from bien_nhan import OUT
++        fixture_root = Path(source['data_root']).resolve()
++        if not fixture_root.is_relative_to(OUT / 'runs') or fixture_root.name != 'synthetic-data':
++            raise Blocked('nguồn A giả ngoài vùng dữ liệu tự sinh')
++    if (source.get('schema') != 'T054-TORAI-A-SOURCE-1' or source.get('dataset') != 'RE2-TT'
++            or source.get('g1_revision') != job['g1_revision']):
++        raise Blocked('sai dataset/revision nguồn TORAI A')
++    row = source['cases_by_member'][job['slot']['member_sha256']]
++    if set(row['files']) != {'logts', 'tracets_err', 'tracets_lat'}:
++        raise Blocked('TORAI A cần đúng ba CSV đã cấp')
++    return source_row(row, source['data_root'])

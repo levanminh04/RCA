@@ -15,9 +15,9 @@ VERSION = 'src/torai/torai_sua.py (RCAEval 259ea41 sửa A, B)'
 N_DONG = 20  # main.py:381–393 với --length 10: 20 dòng mỗi phía
 
 
-def chuan_bi_metric(metric_win):
+def chuan_bi_metric(metric_win, chi_ts=True):
     from ..cua_so import doi_ten_latency, tien_xu_ly_main
-    return doi_ten_latency(tien_xu_ly_main(metric_win, chi_ts=True))
+    return doi_ten_latency(tien_xu_ly_main(metric_win, chi_ts=chi_ts))
 
 
 def cat_20(df, t):
@@ -39,10 +39,10 @@ def chuan_bi_A(metric_win, logts, tracets_err, tracets_lat, t):
     return chuan_bi_metric(metric_win), lt, te, tl, info
 
 
-def chuan_bi_B(metric_win, spans, logs, t):
+def chuan_bi_B(metric_win, spans, logs, t, chi_ts=True):
     from ..torai_b import nguon_b
     lt, te, tl, info = nguon_b(spans, logs, t)
-    return chuan_bi_metric(metric_win), lt.reset_index(), te.reset_index(), tl.reset_index(), info
+    return chuan_bi_metric(metric_win, chi_ts=chi_ts), lt.reset_index(), te.reset_index(), tl.reset_index(), info
 
 
 def _khoi(loc, rcd_returns):
