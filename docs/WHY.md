@@ -1228,3 +1228,16 @@ Khóa đúng ứng viên013 sau đáp F1/F2: hai EC2 một worker, laptop tối 
 ## T-054 — v2 sau BLOCKED main013, 07/11/2026
 
 Chọn chạy lại toàn bộ dưới v2 vì vân tay job gồm mọi pin code và failure-policy: thêm quy tắc làm đổi vân tay của 1640 job, seal v1 không khớp plan mới. Phương án khác: cầu nối hai phiên bản (sửa phần chấm chưa chạy ở quy mô đủ, rủi ro cao hơn); giữ BLOCKED (vẫn phải sửa supervisor, bảng TraceRCA/MicroRank TT thiếu ca); dừng (A4 thiếu). Quy tắc mới cùng họ với operation mới không có nền đã khóa: giả định ≥2 mẫu nền của phương pháp không thỏa trên dữ liệu hợp lệ, nên tính trượt, không đổi mẫu số. Quét 60 ca TT (chỉ đọc đầu vào): 3 ca có operation 1 span bình thường (0e0bdcd10b, 5e8f996191, 541642b59e). Supervisor chạy tiếp sau lỗi phương pháp chưa phân loại vì lỗi đó không lan sang slot khác; lỗi nguồn/hạ tầng vẫn dừng vì có thể lan. Không tách bảng quy tắc ở lượt này để giảm phần sửa sau mở test. Bằng chứng tính đúng: so v1↔v2 trên slot trùng. Kết luận phụ thuộc: bảng TraceRCA/MicroRank TT và C-c; A4 không đổi định nghĩa.
+
+
+## WHY-79. Sửa dấu span gốc Nezha bằng wrapper và C-d3 OB bổ sung — T-054, 08/11/2026
+
+**Chọn gì.** Chuẩn hóa `ParentID = "root"` của trace Nezha thành parent rỗng bằng một wrapper trong `results/T-054/runs/sua-cd3-ob-001/lane.py`, chạy ngay sau `src/m1/adapter.py::ca_nezha` đã ghim; không sửa `src` ở lượt này. Tính C-d3 cho 34 ca OB test từ trung gian M1 đã lưu (`canh`, `dau_vao_cd3.diem`, `kenh_co`) cộng tập span gốc trong A dựng lại qua đúng bộ đọc/adapter đã ghim + wrapper; không chạy lại M1 trên test.
+
+**Vì sao.** Adapter M1 chỉ coi `None`/`''` là parent rỗng, nên span gốc Nezha bị đếm là mồ côi và `dich_cd3` rỗng ở 34/34 ca test và 22/22 ca dev (K3:87 và `src/do_thi/builder.py:79` đã biết dấu này). Theo code, `cha=None` ở cả hai cách, nên span bọc, E1, E2, `G_N` không đổi; chỉ đích C-d3 và số đếm chẩn đoán đổi — kiểm bằng dev. Sửa `src/m1/adapter.py` tại chỗ sẽ đổi hash đang ghim trong plan/protocol main013-v2 (gồm 180 job TORAI A chờ chạy), plan RE3 và plan chấm T-055.
+
+**Phương án đã xét.** (1) Sửa `src` ngay: chặn TORAI A, phá pin của phần không liên quan. (2) Sửa chung `_rong` trong lõi: chạm cả TT/RE3. (3) Không chạy C-d3 OB, ghi "chưa đánh giá do lỗi adapter": còn C-d1/C-d2, thiếu đối chứng đường tới đích. (4) Chạy lại M1 OB trên test với wrapper: thêm tiếp xúc test, không cần vì C-d3 chỉ phụ thuộc trung gian đã lưu + span gốc.
+
+**Bằng chứng.** `kiem-wrapper.json` (3 trường hợp span; driver chế độ cũ tái lập bản ghi `dev-ob-001` 25/25 khóa); `dev-so-sanh.json` (22 ca dev, hai EC2); `cd3-test-phi-nhan.json` (34/34 ca chế độ cũ tái lập đúng `dau_vao_cd3` đã lưu); kiểm đường chấm trên 60 ca C-d3 TT khớp `tables.json`.
+
+**Kết luận phụ thuộc.** Bảng C-d3 OB bổ sung là **sửa sau khi đã xem test** (C-15 B), không là phép kiểm độc lập; không đổi A4 hay bảng chính. `src/m1/adapter.py` còn lỗi cho các lượt OB sau: sửa chính thức sau khi TORAI A nhận/chấm xong, đề xuất riêng kèm ghim mới.

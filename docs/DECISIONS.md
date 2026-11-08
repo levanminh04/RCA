@@ -485,3 +485,13 @@ Minh (nguyên văn ở `results/T-054/runs/chuan-bi-main-013/grants/minh-main.tx
 ## T-054 — xử lý BLOCKED main013 bằng bản v2 và luật 21, 07/11/2026
 
 Minh: “duyệt, khi nào 3 luồng chạy ổn định thì báo tôi” cho đề xuất gồm: (1) v2 thêm quy tắc lỗi “dưới 2 span bình thường” cho TraceRCA/MicroRank TT, nhận chỉ khi kiểm lại từ đầu vào thật, tính là phương pháp trượt như quy tắc operation mới; (2) supervisor chạy tiếp slot độc lập khi một slot BLOCKED vì lỗi phương pháp chưa phân loại, lỗi nguồn/hạ tầng vẫn dừng máy; (3) không tách bảng quy tắc lỗi ở lượt này; (4) chạy lại cả 1640 job dưới v2 trong queue mới, giữ v1 làm lịch sử, so v1↔v2 trên slot trùng, lệch thì dừng; (5) EC2_2 chạy v1 tới khi v2 sẵn sàng rồi DRAIN; (6) khai C-15 B là sửa sau mở test, chưa xem điểm/nhãn. Duyệt tính các slot này là trượt. Duyệt ghi AGENTS luật 21 và LESSONS SL38. Lời trước đó: “duyệt theo đề xuất , xử lý luôn tránh sau này không còn chứng minh được là chạy đúng bản khóa hoặc tránh không qua được bước kiểm...”.
+
+
+## T-054 — gói sửa R7–R9: dấu span gốc Nezha, C-d3 OB, đính chính 003, 08/11/2026
+
+Minh: “nếu không còn bất đồng quản điểm nào thì duyệt gói đầy đủ và triển khai luôn, tuyệt đối không ảnh hưởng đến các phần không liên quan, ... nếu chạy lại thì tôi muốn chạy lên trên ec2.” Gói: sửa dấu "root" của adapter OB, kiểm tương đương trên dev, C-d3 bổ sung cho 34 ca OB test từ trung gian đã lưu, đính chính 003 (R7, R8, nguyên nhân C-d3), WHY/DECISIONS/LESSONS, LOG, STATE. Sau khi Claude phát hiện sửa `src` sẽ chặn TORAI A: Minh duyệt “chạy ở laptop cho phần tính C-d3 cho test”, rồi “TÔI QUYẾT ĐỊNH ĐỂ CLAUDE LÀM TRƯỚC, TORAI A chạy sau” — tức bản sửa đặt ở wrapper trong thư mục lượt, không sửa file đã ghim; kiểm dev chạy trên hai EC2; TORAI A chạy sau, tuần tự. Sửa `src/m1/adapter.py` chính thức chờ đề xuất riêng sau TORAI A.
+
+
+## T-054 — TORAI A tạm hoãn vô thời hạn, 08/11/2026
+
+Minh: “bỏ torai A, ghi trong tài liệu là tạm hoãn vô thời hạn trừ khi sau này cần đến, ghi đầy đủ lỗi tìm được để sau này còn xem lại nếu cần, trình kế hoạch tiếp theo”. Bảng phụ TORAI A giữ 6/180 slot VERIFIED, 174 BLOCKED; không dựng bộ khóa v3. Hồ sơ lỗi và đường chạy lại: `results/T-054/runs/torai-a-v3-001/HOAN-TORAI-A.md`.
