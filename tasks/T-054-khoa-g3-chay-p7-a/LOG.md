@@ -2611,3 +2611,194 @@ Dùng nguyên prompt "kiểm lại phản hồi và sửa" đã trình trong cha
 
 - Minh: "bỏ torai A, ghi trong tài liệu là tạm hoãn vô thời hạn trừ khi sau này cần đến, ghi đầy đủ lỗi tìm được...". Ghi `results/T-054/runs/torai-a-v3-001/HOAN-TORAI-A.md` (hiện tượng, cơ chế, bằng chứng tái hiện, bản sửa đề xuất chưa cài, đường phát v3, dự toán) và mục DECISIONS. Không dựng v3, không sửa file ghim. Tiêu chí xong 1–2 của SPEC (bảng phụ A) nay là giới hạn được Minh chấp nhận, khai ở G4.
 - Lệnh cuối: `py -3 -B results/T-054/runs/chuan-bi-main-013-v2/verify_manifest.py --documents`.
+
+## 08/11/2026 — Claude, Windows, người làm (đáp phản biện Codex về đính chính 003, R10)
+
+### Quyết định của Minh trong phiên
+
+- Minh chuyển phản biện Codex (chat, không có REVIEW-3.md): R10 KHÔNG CHẶN, đề xuất dừng phản biện gói R7–R9. Minh: “nếu không có mâu thuẫn nào với codex hoặc phản đối nào thì cho phép ghi luôn, nếu có mâu thuẫn thì soạn trình claude phản biện, rà soát các phần khác xem còn lỗ hổng nào không, tuyệt đối không coi là đã đúng mà cần kiểm chính xác”.
+
+### Tự soát và kiểm từng điểm
+
+- R10 — **đúng**. Kiểm độc lập trên 10 ca OK (`doi_chung.py:105–120`; `cd3-test-phi-nhan.json#/cases/<ca>/moi/cd3`; `extra.canh`, `extra.dau_vao_cd3.diem` M1): 4 ca kém M1 đều có root có điểm, không là ứng viên, root gọi bên có điểm; 6 ca còn lại root là ứng viên, không bên được gọi có điểm. Quy tắc khớp PetShop revision `2e96f937` (đọc `baseline_anomaly_traversal.py`).
+- N7 (tự tìm, KHÔNG CHẶN, mở rộng R10): hai ca root `frontend` có thêm lý do đủ độc lập — root trùng đích. PetShop chỉ cho điểm ứng viên có `all_simple_paths(ứng viên, đích)` khác rỗng; trùng đích thì rỗng, ứng viên bị bỏ. `frontend` có 0 bên gọi trong `canh` hai ca này. Hệ quả: với đích `frontend`, C-d3 không thể xếp đúng root `frontend`; 6/34 ca OB test có root `frontend`.
+- Số Codex nêu, tái kiểm: `verify_manifest.py --documents` PASS 515/515; `manifest-005.json` 61/61 hash khớp; MRR C-d3 OB = 5,25/34 = 21/136 ≈ 0,1544; trên 10 ca OK C-d3 0,525, M1 0,800 (khớp Đ12). Không chạy lại so sánh dev 22/22, không chấm lại 60 ca TT (đã có trong lượt trước; không kiểm lại trong lượt này).
+- R1–R9 trong bảng của Codex: không mở lại; không kiểm lại trong lượt này.
+- N8 (tự tìm, KHÔNG CHẶN, sai số LOG): mục LOG lượt C-d3 ghi `manifest-005.json` “60 file”; thực tế 61 mục (đếm `outputs`). Hash cả 61 khớp. Ghi đính chính tại đây, không sửa mục cũ.
+- N9 (tự tìm, KHÔNG CHẶN, tài liệu cũ chưa cập nhật): `dinh-chinh-003.md` mục Trạng thái, WHY-79 “Kết luận phụ thuộc” và DECISIONS mục “gói sửa R7–R9” còn ghi sửa `src/m1/adapter.py` sau khi TORAI A nhận/chấm xong và “TORAI A chạy sau, do Codex làm”. Đã bị thay bởi: TORAI A tạm hoãn vô thời hạn (DECISIONS) và ghi chú STATE “chỉ sửa khi có lượt chạy Nezha-OB mới” (Minh 08/11; chưa có dòng DECISIONS). Không đổi số; chỉ lệch trạng thái. Chưa sửa — trình Minh.
+
+### Đã ghi
+
+- `results/T-054/reports/p7a-013-v2/dinh-chinh-004.md` (Đ13: thay câu “chưa lần” ở Đ12 bằng phân tích R10 + N7).
+- LOG này; dòng T-054 `docs/STATE.md`.
+
+### Kết thúc lượt
+
+1. Đã làm: kiểm R10 và số Codex nêu trên file thật; tìm N7–N9; ghi đính chính 004.
+2. File: mới `dinh-chinh-004.md`; nối LOG; sửa dòng T-054 STATE. Không sửa src/scripts/plan/manifest ghim.
+3. Kiểm: như trên. Lệnh cuối: `D:/RCA-ext/envs/T-014-main/Scripts/python.exe -B results/T-054/runs/chuan-bi-main-013-v2/verify_manifest.py --documents`.
+4. Còn mở: nguồn cờ bất thường ở bên được gọi (không phân xử được bằng dữ liệu đã lưu); đóng góp riêng E1/E2/E5; định vị trễ E2-C. N9 chờ Minh: ghi dòng DECISIONS cho quyết định “chỉ sửa adapter khi có lượt Nezha-OB mới” (cần lời Minh nguyên văn) và một đính chính trạng thái. Chưa thêm manifest cho đính chính 004. Commit chờ duyệt. Đề xuất dừng phản biện tính đúng gói R7–R10; dừng không đóng câu hỏi khoa học hay nghiệm thu T-054.
+
+### Prompt bàn giao cho Codex — Minh chọn gửi hay dừng
+
+```text
+Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
+Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
+
+Thông tin lượt này:
+- Task hoặc đề xuất: T-054, tasks/T-054-khoa-g3-chay-p7-a/ — luồng sửa dấu span gốc Nezha-OB và C-d3 OB bổ sung; phản hồi R10..
+- Công đoạn: kiểm lại phản hồi và sửa..
+- Gói/cổng: P7(a), chuẩn bị G4..
+- Người làm và người phản biện chính thức: Claude làm luồng này; Codex phản biện..
+- Tài liệu gốc: tasks/T-054-khoa-g3-chay-p7-a/{SPEC.md,LOG.md}; results/T-054/reports/p7a-013-v2/{bao-cao.md,dinh-chinh-001.md,dinh-chinh-002.md,dinh-chinh-003.md,dinh-chinh-004.md,manifest-005.json}; docs/STATE.md; docs/WHY.md; docs/DECISIONS.md. Gốc: commit 293a94c1 trên branch claude/sweet-hawking-dy078d; thay đổi chưa commit: `git diff 293a94c1 -- docs/STATE.md tasks/T-054-khoa-g3-chay-p7-a/LOG.md` và file mới dinh-chinh-004.md..
+- Phản biện và phản hồi trước: tasks/T-054-khoa-g3-chay-p7-a/{REVIEW.md,REVIEW-2.md} và bảng phản hồi cuối từng file; phản biện Codex R10 trong chat do Minh chuyển; mục LOG cuối "đáp phản biện Codex về đính chính 003, R10"..
+- Code và kết quả liên quan: results/T-054/runs/sua-cd3-ob-001/{lane.py,cd3_test.py,cd3-test-phi-nhan.json,cd3-test-cham.json,exposure.jsonl,dev-so-sanh.json}; src/m1/doi_chung.py; results/T-054/reports/p7a-013-v2/phan-tich-nhom.json; results/T-054/reports/main-013-v2/tables.json; code PetShop amazon-science/petshop-root-cause-analysis revision 2e96f937c4c044b8b4aad03217592cd52e66db5d, code/baseline_anomaly_traversal.py. Python: D:/RCA-ext/envs/T-014-main/Scripts/python.exe. Lệnh chỉ đọc: <python> -B results/T-054/runs/chuan-bi-main-013-v2/verify_manifest.py --documents..
+- Phạm vi ghi được Minh cho phép trong lượt này: chỉ trả lời trong chat..
+
+Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
+
+Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
+Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
+Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
+
+Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
+hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
+Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
+số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
+có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
+
+Bổ sung yêu cầu phản biện:
+1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
+2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
+3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
+4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
+5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
+6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
+7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
+8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
+9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
+10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
+11. Rà cả phần không được nêu trong LOG, báo cáo hay phản biện trước. Với mỗi bước dữ liệu đi qua (đọc → chuyển đổi → tính → chấm), hỏi quy ước của dữ liệu nguồn (giá trị đặc biệt, đơn vị, gốc, alias, rỗng) có được xử lý đúng không. Không coi phần không ai nêu là đã đúng.
+12. Một trạng thái xảy ra đồng loạt (100% lỗi, 100% không hỗ trợ, toàn hòa, toàn rỗng) là dấu hiệu cần lần tới đầu vào, không phải kết quả để diễn giải. Không dùng nó làm căn cứ thiết kế trước khi lần.
+13. Điểm cuối khớp số công bố, hay "chạy không lỗi", chưa chứng minh thành phần chạy đúng. Kiểm trung gian và phép kiểm không cần nhãn.
+14. Câu có "mọi", "đều", "không đổi", "trùng" phải nói rõ đại lượng và có lệnh đếm trên đủ đối tượng.
+15. Trước khi đề xuất sửa hoặc ghi vào một file dùng chung (code, script, tài liệu), kiểm file đó có bị ghim trong manifest, plan hoặc vân tay job nào không. Nêu rõ thao tác nào làm đổi hash và ảnh hưởng tới đâu.
+16. Kiểm tiêu chí so sánh hoặc chấp nhận được khai trước khi xem kết quả. Đổi tiêu chí sau khi xem phải khai là sửa sau.
+17. Với lượt chạy, tách lỗi hạ tầng và điều phối (tiến trình, nguồn điện, kết nối, giới hạn thời gian) khỏi lỗi phương pháp; lỗi hạ tầng không được ghi thành kết quả khoa học.
+18. Phản biện một kế hoạch thì kiểm cả đường thực thi thật: code có cho phép làm đúng như kế hoạch nói không (guard, thư mục, trạng thái đã khóa). Không chỉ kiểm lập luận trên giấy.
+
+Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
+Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
+
+Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
+bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
+Tiếng Việt, câu ngắn.
+
+Cuối lượt báo:
+1. Đã làm gì.
+2. File đã thay đổi, hoặc không sửa file nào.
+3. Kiểm đã chạy và kết quả.
+4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
+
+Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
+
+Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
+
+Công đoạn: người phản biện kiểm lại phản hồi và sửa.
+Tự soát yêu cầu và đầu ra gốc trước; sau đó đọc phản biện, phản hồi và các thay đổi được duyệt. Kiểm cả ý kiến phản bác reviewer; không mặc định phản hồi hoặc bản sửa đúng.
+Đối chiếu từng điểm với bằng chứng hiện tại, quyền sửa và hậu quả. Có điểm đúng nhưng chưa được Minh duyệt sửa thì ghi đúng trạng thái; không tự coi đã xử lý hoặc ép người làm sửa.
+Chỉ ghi bản phản biện lượt mới được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ lịch sử, không ghi LOG/STATE hay sửa thay người làm. Nêu bất đồng còn lại và soạn prompt để người làm đáp.
+
+Kết luận có vượt quá bằng chứng không; có nêu mẫu hình từ một ô hoặc từ trung bình không;
+số trong văn bản có khớp file kết quả không; có thay đổi thiết kế sau khi nhìn test không.
+```
+
+## 08/11/2026 — Claude, Windows, người làm (sửa N9; thêm mục 19–20 prompt mẫu)
+
+- Minh: “thêm 1 chỗ vào prompt mẫu ... phải có lời giải thích ... mọi phiên trả lời nêu có phần chờ Minh quyết thì phải nêu kèm đề xuất của agent trong lượt đó và yêu cầu agent khác phải phản biện. duyệt sửa N9”.
+- Đã ghi: `docs/review-prompt.md` mục 19–20 (khối Bổ sung yêu cầu phản biện); `docs/DECISIONS.md` mục “mốc sửa adapter Nezha”; `docs/WHY.md` WHY-79 dòng cập nhật; `dinh-chinh-004.md` Đ14.
+- Prompt bàn giao ở mục trước được soạn trước mục 19–20; khi gửi Codex, Minh dùng bản đã thêm hai mục này (chép lại từ `docs/review-prompt.md`).
+- Kiểm: `verify_manifest.py --documents` (kết quả ở báo cáo lượt).
+
+### Prompt bàn giao cho Codex (bản thay bản trước, có mục 19–20)
+
+```text
+Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
+Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
+
+Thông tin lượt này:
+- Task hoặc đề xuất: T-054, tasks/T-054-khoa-g3-chay-p7-a/ — luồng sửa dấu span gốc Nezha-OB và C-d3 OB bổ sung; phản hồi R10, sửa N9 (dinh-chinh-004.md Đ13–Đ14, WHY-79 cập nhật, DECISIONS mục "mốc sửa adapter Nezha"); các đề xuất chờ Minh quyết của người làm nằm trong chat do Minh chuyển..
+- Công đoạn: kiểm lại phản hồi và sửa..
+- Gói/cổng: P7(a), chuẩn bị G4..
+- Người làm và người phản biện chính thức: Claude làm luồng này; Codex phản biện..
+- Tài liệu gốc: tasks/T-054-khoa-g3-chay-p7-a/{SPEC.md,LOG.md}; results/T-054/reports/p7a-013-v2/{bao-cao.md,dinh-chinh-001.md,dinh-chinh-002.md,dinh-chinh-003.md,dinh-chinh-004.md,manifest-005.json}; docs/STATE.md; docs/WHY.md; docs/DECISIONS.md. Gốc: commit 293a94c1 trên branch claude/sweet-hawking-dy078d; thay đổi chưa commit: `git diff 293a94c1 -- docs/STATE.md tasks/T-054-khoa-g3-chay-p7-a/LOG.md` và file mới dinh-chinh-004.md..
+- Phản biện và phản hồi trước: tasks/T-054-khoa-g3-chay-p7-a/{REVIEW.md,REVIEW-2.md} và bảng phản hồi cuối từng file; phản biện Codex R10 trong chat do Minh chuyển; mục LOG cuối "đáp phản biện Codex về đính chính 003, R10"..
+- Code và kết quả liên quan: results/T-054/runs/sua-cd3-ob-001/{lane.py,cd3_test.py,cd3-test-phi-nhan.json,cd3-test-cham.json,exposure.jsonl,dev-so-sanh.json}; src/m1/doi_chung.py; results/T-054/reports/p7a-013-v2/phan-tich-nhom.json; results/T-054/reports/main-013-v2/tables.json; code PetShop amazon-science/petshop-root-cause-analysis revision 2e96f937c4c044b8b4aad03217592cd52e66db5d, code/baseline_anomaly_traversal.py. Python: D:/RCA-ext/envs/T-014-main/Scripts/python.exe. Lệnh chỉ đọc: <python> -B results/T-054/runs/chuan-bi-main-013-v2/verify_manifest.py --documents..
+- Phạm vi ghi được Minh cho phép trong lượt này: chỉ trả lời trong chat..
+
+Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
+
+Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
+Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
+Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
+
+Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
+hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
+Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
+số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
+có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
+
+Bổ sung yêu cầu phản biện:
+1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
+2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
+3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
+4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
+5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
+6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
+7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
+8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
+9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
+10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
+11. Rà cả phần không được nêu trong LOG, báo cáo hay phản biện trước. Với mỗi bước dữ liệu đi qua (đọc → chuyển đổi → tính → chấm), hỏi quy ước của dữ liệu nguồn (giá trị đặc biệt, đơn vị, gốc, alias, rỗng) có được xử lý đúng không. Không coi phần không ai nêu là đã đúng.
+12. Một trạng thái xảy ra đồng loạt (100% lỗi, 100% không hỗ trợ, toàn hòa, toàn rỗng) là dấu hiệu cần lần tới đầu vào, không phải kết quả để diễn giải. Không dùng nó làm căn cứ thiết kế trước khi lần.
+13. Điểm cuối khớp số công bố, hay "chạy không lỗi", chưa chứng minh thành phần chạy đúng. Kiểm trung gian và phép kiểm không cần nhãn.
+14. Câu có "mọi", "đều", "không đổi", "trùng" phải nói rõ đại lượng và có lệnh đếm trên đủ đối tượng.
+15. Trước khi đề xuất sửa hoặc ghi vào một file dùng chung (code, script, tài liệu), kiểm file đó có bị ghim trong manifest, plan hoặc vân tay job nào không. Nêu rõ thao tác nào làm đổi hash và ảnh hưởng tới đâu.
+16. Kiểm tiêu chí so sánh hoặc chấp nhận được khai trước khi xem kết quả. Đổi tiêu chí sau khi xem phải khai là sửa sau.
+17. Với lượt chạy, tách lỗi hạ tầng và điều phối (tiến trình, nguồn điện, kết nối, giới hạn thời gian) khỏi lỗi phương pháp; lỗi hạ tầng không được ghi thành kết quả khoa học.
+18. Phản biện một kế hoạch thì kiểm cả đường thực thi thật: code có cho phép làm đúng như kế hoạch nói không (guard, thư mục, trạng thái đã khóa). Không chỉ kiểm lập luận trên giấy.
+19. Mỗi phần ghi "chưa xác định", "chưa phân xử", "chưa biết" hoặc OPEN phải kèm giải thích: vì sao chưa xác định được (thiếu dữ kiện gì, hay dữ liệu đã lưu không tách được các giải thích); các giải thích khả thi còn lại; bằng chứng hoặc phép phân tích nào phân xử được, trên dữ liệu nào, chi phí; kết luận nào phụ thuộc. Không dừng ở một câu "chưa xác định".
+20. Mỗi phần chờ Minh quyết phải kèm đề xuất của agent trong chính lượt đó: chọn gì, vì sao, mặt trái, phương án khác đã xét. Prompt bàn giao yêu cầu agent đối phương phản biện các đề xuất ấy. Đề xuất không thay quyết định của Minh.
+
+Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
+Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
+
+Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
+bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
+Tiếng Việt, câu ngắn.
+
+Cuối lượt báo:
+1. Đã làm gì.
+2. File đã thay đổi, hoặc không sửa file nào.
+3. Kiểm đã chạy và kết quả.
+4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
+
+Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
+
+Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
+
+Công đoạn: người phản biện kiểm lại phản hồi và sửa.
+Tự soát yêu cầu và đầu ra gốc trước; sau đó đọc phản biện, phản hồi và các thay đổi được duyệt. Kiểm cả ý kiến phản bác reviewer; không mặc định phản hồi hoặc bản sửa đúng.
+Đối chiếu từng điểm với bằng chứng hiện tại, quyền sửa và hậu quả. Có điểm đúng nhưng chưa được Minh duyệt sửa thì ghi đúng trạng thái; không tự coi đã xử lý hoặc ép người làm sửa.
+Chỉ ghi bản phản biện lượt mới được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ lịch sử, không ghi LOG/STATE hay sửa thay người làm. Nêu bất đồng còn lại và soạn prompt để người làm đáp.
+
+Kết luận có vượt quá bằng chứng không; có nêu mẫu hình từ một ô hoặc từ trung bình không;
+số trong văn bản có khớp file kết quả không; có thay đổi thiết kế sau khi nhìn test không.
+```
+
+## 08/11/2026 — Claude, Windows, người làm (thực hiện 8 đề xuất Minh duyệt)
+
+- Minh: “DUYỆT CẢ 8, NHƯNG SAO PHẢI SỬA ADAPTER ? LESSONS LÀ PHẢI CHUNG, SAO LẠI GHIM ? CÂU Vì sao các bên được gọi bị gắn cờ bất thường LÀ TRẢ LỜI CHO PHƯƠNG PHÁP NÀO ?”
+- Làm: Đ15 trong `dinh-chinh-004.md` (script `runs/sua-cd3-ob-001/r10_kenh.py`, đầu ra `r10-kenh.txt`): 3/4 ca có cờ bên được gọi nằm trên cạnh do root gọi (E2-C gán cho bên nhận); cờ operation ở 2 ca còn chưa phân xử. `manifest-006.json` (3 file, không ghim docs). DECISIONS: dòng prompt mẫu 11–20 và dòng tám đề xuất. Xóa `goi/data-ec2_1.tar`, `goi/data-ec2_2.tar` (không ghim trong manifest-005; hash ở `goi/goi.json`).
+- Chờ Minh: SL39 / cách ghim LESSONS trong `chuan-bi-main-013-v2/manifest.json` (đề xuất trong chat).
+- Lệnh cuối: `D:/RCA-ext/envs/T-014-main/Scripts/python.exe -B results/T-054/runs/chuan-bi-main-013-v2/verify_manifest.py --documents`.

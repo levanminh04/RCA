@@ -495,3 +495,15 @@ Minh: “nếu không còn bất đồng quản điểm nào thì duyệt gói �
 ## T-054 — TORAI A tạm hoãn vô thời hạn, 08/11/2026
 
 Minh: “bỏ torai A, ghi trong tài liệu là tạm hoãn vô thời hạn trừ khi sau này cần đến, ghi đầy đủ lỗi tìm được để sau này còn xem lại nếu cần, trình kế hoạch tiếp theo”. Bảng phụ TORAI A giữ 6/180 slot VERIFIED, 174 BLOCKED; không dựng bộ khóa v3. Hồ sơ lỗi và đường chạy lại: `results/T-054/runs/torai-a-v3-001/HOAN-TORAI-A.md`.
+
+## T-054 — mốc sửa adapter Nezha, 08/11/2026
+
+Minh quyết 08/11/2026 (ghi ở STATE, mục lưu ý cho mọi agent; lời nguyên văn lúc quyết không còn trong repo): `src/m1/adapter.py::ca_nezha` chỉ sửa khi có lượt chạy Nezha-OB mới, kèm ghim lại pin; không sửa tại chỗ khi chưa có lượt mới vì file đang ghim trong plan main013-v2, RE3, T-055. Thay câu “sửa chính thức chờ đề xuất riêng sau TORAI A” ở mục “gói sửa R7–R9”. Minh duyệt ghi dòng này: “duyệt sửa N9” (chat 08/11/2026, sau phản hồi R10).
+
+## Prompt mẫu mục 11–20 và khối "Phân tích sâu", 08/11/2026
+
+Minh duyệt (chat 08/11/2026, “DUYỆT CẢ 8”, đề xuất 5): giữ `docs/review-prompt.md` mục 11–18 và khối “Phân tích sâu” (đã có trong file trước đó, chưa có dòng duyệt), cùng mục 19–20 do Minh yêu cầu: “mọi phần nêu là chưa xác định được vì sao, chưa phân xử ... thì phải có lời giải thích”; “mọi phiên trả lời nêu có phần chờ Minh quyết thì phải nêu kèm đề xuất của agent trong lượt đó và yêu cầu agent khác phải phản biện”.
+
+## T-054 — tám đề xuất sau R10, 08/11/2026
+
+Minh: “DUYỆT CẢ 8”. (1) gửi Codex một lượt kiểm đính chính 004 rồi dừng; (2) phân tích cờ bên được gọi trên trung gian đã lưu, mô tả (Đ15); (3) đóng góp riêng E1/E2/E5 để OPEN, khai giới hạn ở G4; (4) manifest-006; (5) dòng trên; (6) SL39 chưa ghi LESSONS — Minh hỏi lại lý do, chờ quyết; (7) xóa hai `goi/data-ec2_*.tar` trên laptop, hash giữ ở `goi/goi.json`; (8) commit.

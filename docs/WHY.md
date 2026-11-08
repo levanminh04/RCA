@@ -1241,3 +1241,5 @@ Chọn chạy lại toàn bộ dưới v2 vì vân tay job gồm mọi pin code 
 **Bằng chứng.** `kiem-wrapper.json` (3 trường hợp span; driver chế độ cũ tái lập bản ghi `dev-ob-001` 25/25 khóa); `dev-so-sanh.json` (22 ca dev, hai EC2); `cd3-test-phi-nhan.json` (34/34 ca chế độ cũ tái lập đúng `dau_vao_cd3` đã lưu); kiểm đường chấm trên 60 ca C-d3 TT khớp `tables.json`.
 
 **Kết luận phụ thuộc.** Bảng C-d3 OB bổ sung là **sửa sau khi đã xem test** (C-15 B), không là phép kiểm độc lập; không đổi A4 hay bảng chính. `src/m1/adapter.py` còn lỗi cho các lượt OB sau: sửa chính thức sau khi TORAI A nhận/chấm xong, đề xuất riêng kèm ghim mới.
+
+**Cập nhật 08/11/2026.** TORAI A đã tạm hoãn vô thời hạn (DECISIONS, mục “TORAI A tạm hoãn vô thời hạn”). Mốc sửa `src/m1/adapter.py` đổi thành: chỉ sửa khi có lượt chạy Nezha-OB mới, kèm ghim lại pin (DECISIONS, mục “mốc sửa adapter Nezha”). Câu “sau khi TORAI A nhận/chấm xong” ở trên không còn hiệu lực.
