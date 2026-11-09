@@ -1,0 +1,286 @@
+{
+ "author": "Claude (người làm T-055)",
+ "authority": {
+  "bytes": 3658,
+  "path": "results/T-055/grants/minh-re3.txt",
+  "sha256": "8456dc46fcb16935c84fea72fda469ca99780b9c1ee4e254d5a0cb509c90e5c7"
+ },
+ "created": "2026-11-08",
+ "failure": {
+  "cost_10_50_99": "10%: sửa nguồn/adapter rồi chạy lại toàn bộ (chưa ghép nhãn); 50%/99%: chỉ slot lỗi",
+  "error_rules": [
+   "RE3_METHOD_ERROR_IS_MISS"
+  ],
+  "monitor": {
+   "max_monitor_gap_s": 5,
+   "poll_s": 0.1,
+   "score_phases": [
+    "method"
+   ]
+  },
+  "stop": "lỗi nguồn/adapter/hạ tầng/preflight: dừng trước method và ghép nhãn",
+  "timeout_s": 600
+ },
+ "h1_assumptions_unverified": {
+  "aliases": {
+   "value": {},
+   "why": "frontend-external giữ riêng, không gộp frontend (do_not_infer ở inventory-schema)."
+  },
+  "inventory": {
+   "source": "results/T-054/runs/chuan-bi-re3-009/inventory-schema.json#/all_owner_tokens; results/T-054/runs/hoan-thien-local-g3-011/inventory-owner-global.json#/union",
+   "value": [
+    "adservice",
+    "carts",
+    "carts-db",
+    "cartservice",
+    "catalogue",
+    "catalogue-db",
+    "checkoutservice",
+    "currencyservice",
+    "emailservice",
+    "front-end",
+    "frontend",
+    "frontend-check",
+    "frontend-external",
+    "orders",
+    "orders-db",
+    "payment",
+    "paymentservice",
+    "productcatalogservice",
+    "queue-master",
+    "rabbitmq",
+    "rabbitmq-exporter",
+    "recommendationservice",
+    "redis",
+    "session-db",
+    "shipping",
+    "shippingservice",
+    "user",
+    "user-db"
+   ],
+   "why": "Hợp mọi tiền tố owner trong schema metric 30 ca (28 tên) — chứa cả 11 owner quan sát ở trace/log. Không bỏ cột hay gộp tên vì không có nguồn deployment; tên lạ (namespace Sock Shop ở 2 ca) giữ là thực thể ứng viên. Root G1 đều thuộc tập này."
+  },
+  "log_rule": {
+   "kieu": "tu_khoa",
+   "source": "src/m1/adapter.py TU_KHOA_RE2 (src/simplerca/core.py:22)",
+   "tu_khoa": [
+    "ERROR",
+    "FAIL",
+    "EXCEPTION"
+   ]
+  },
+  "metric_channels": {
+   "cpu": "tài nguyên",
+   "diskio": "tài nguyên",
+   "error": "lỗi",
+   "latency-50": "độ trễ",
+   "latency-90": "độ trễ",
+   "mem": "tài nguyên",
+   "socket": "tài nguyên",
+   "workload": "lưu lượng"
+  },
+  "observation_r_ns": "R8: metric = bước trung vị chung; trace 1000 ns; log 1e9 ns như TT/Nezha",
+  "time_units": {
+   "log": "quyết bởi R3",
+   "metric": "s (FACT: dataset card)",
+   "span_start/span_duration": "quyết bởi R3/R4/R5 (ứng viên chính us theo Jaeger)"
+  },
+  "trace_status": {
+   "kind": "grpc_status_code",
+   "source": "phản hồi tác giả RCAEval issue #64 (re3-h1-status.md: released datasets dùng gRPC, 0 OK)",
+   "values": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ]
+  }
+ },
+ "matrix": {
+  "arms": {
+   "C-a0": [
+    null
+   ],
+   "C-a1": [
+    null
+   ],
+   "M1": [
+    null
+   ],
+   "baro": [
+    null
+   ],
+   "bo-E1": [
+    null
+   ],
+   "bo-E2": [
+    null
+   ],
+   "bo-E5": [
+    null
+   ],
+   "circa": [
+    null
+   ],
+   "microrank": [
+    null
+   ],
+   "simplerca": [
+    null
+   ],
+   "torai_B": [
+    0,
+    1,
+    2
+   ],
+   "tracerca": [
+    null
+   ]
+  },
+  "configurations": "đúng results/T-054/runs/chuan-bi-main-013-v2/activated-001/protocol.json#/configurations (M1-family) và config baseline P3-v2/Q85 như main",
+  "derived_after_seal": [
+   "C-d1",
+   "C-d2",
+   "C-c",
+   "C-g"
+  ],
+  "metrics": [
+   "rr",
+   "hit@1",
+   "hit@3",
+   "hit@5",
+   "ndcg@5",
+   "avg@5"
+  ],
+  "not_run": {
+   "C-d3": "OB không có",
+   "C-e": "chỉ TT",
+   "T12-on": "không có snapshot RE3",
+   "torai_A": "không có nguồn tác giả"
+  },
+  "primary_reading": "M1 so SimpleRCA M4 (mốc OB) và TORAI B; Hit@5 và MRR; theo ô và theo loại lỗi f1–f5",
+  "primary_world": "P",
+  "seed_aggregation": "mean_complete_case",
+  "slots": 420,
+  "statistics": "mô tả; CI bootstrap cặp theo ô src/p3/danh_gia.bootstrap 10000 mẫu seed 20261005; không kiểm định (WHY-06/Q-246)",
+  "support_policy": {
+   "ERROR": "zero",
+   "NO_EVIDENCE": "zero",
+   "TIMEOUT": "zero",
+   "UNSUPPORTED": "separate"
+  },
+  "variants": {
+   "C-a0": [
+    "C-a0"
+   ],
+   "C-a1": [
+    "C-a1"
+   ],
+   "M1": [
+    "M1"
+   ],
+   "baro": [
+    "native"
+   ],
+   "bo-E1": [
+    "bo-E1"
+   ],
+   "bo-E2": [
+    "bo-E2"
+   ],
+   "bo-E5": [
+    "bo-E5"
+   ],
+   "circa": [
+    "ols+rht_da",
+    "ols+rht"
+   ],
+   "microrank": [
+    "full"
+   ],
+   "simplerca": [
+    "M4"
+   ],
+   "torai_B": [
+    "B"
+   ],
+   "tracerca": [
+    "finite"
+   ]
+  },
+  "worlds": [
+   "P",
+   "S_lo",
+   "S_hi"
+  ]
+ },
+ "note": "Khóa trước khi tải hay đọc bất kỳ byte telemetry RE3 nào. Giả định H1 ghi \"chưa kiểm\"; preflight không nhãn quyết định đơn vị theo quy tắc R3–R8 trong preflight_ec2.py; lệch thì dừng trước phương pháp và trước ghép nhãn.",
+ "overlay": {
+  "base_pinned": {
+   "bytes": 21223,
+   "path": "results/T-054/scripts/bien_nhan.py",
+   "sha256": "a7365897195e833fdc79211bfd806360cfff23f75546a0730bb0c45513403eb4"
+  },
+  "change": "thêm nhánh RE3_METHOD_ERROR_IS_MISS trong known_operation_error; còn lại trùng byte",
+  "results/T-054/scripts/bien_nhan.py": {
+   "bytes": 22079,
+   "path": "results/T-055/overlay/results/T-054/scripts/bien_nhan.py",
+   "sha256": "87b4a8e1142ee4b483551a6346a497333058109463b8fbbdaab7066ef9a3c28a"
+  }
+ },
+ "placement": {
+  "ec2_1": 15,
+  "ec2_2": 15,
+  "laptop": "chỉ điều khiển, nhận compact, chấm",
+  "workers_per_host": 1
+ },
+ "schema": "T055-PREREGISTRATION-1",
+ "scripts": {
+  "preflight_ec2.py": {
+   "bytes": 10151,
+   "path": "results/T-055/scripts/preflight_ec2.py",
+   "sha256": "22a8fb18bc5c267f6dea463babc1e3bb92a2d63b42f99f73b8f5f0cd3dc6512c"
+  },
+  "re3_build.py": {
+   "bytes": 7277,
+   "path": "results/T-055/scripts/re3_build.py",
+   "sha256": "b1f40159a71e74a69d8ebb0a46e1c34d8baa4301a823e82d816bb3a786f6e6c6"
+  },
+  "stage_ec2.py": {
+   "bytes": 2666,
+   "path": "results/T-055/scripts/stage_ec2.py",
+   "sha256": "c8cfdacc14ff01709ac07133a4a9b5a478e8a9d28c84df6d51d62284f40c8d29"
+  }
+ },
+ "sources": {
+  "build_receipt": {
+   "bytes": 997,
+   "path": "results/T-055/runs/nguon-001/build-receipt.json",
+   "sha256": "26ab9e47b9c951aac2fe7f76ebcc5124189707b0010f9aeafcb003c2d7e7f391"
+  },
+  "independent": {
+   "bytes": 25357,
+   "path": "results/T-055/runs/nguon-001/independent-source.json",
+   "sha256": "3856dde202ed1bc2fa6f3410a7aec911d23242110947bb50ce7dae0910bde508"
+  },
+  "partition": {
+   "bytes": 1065,
+   "path": "results/T-055/runs/nguon-001/partition.json",
+   "sha256": "b25d5242c0ddcec02a182d79a34d5b0c3a03a43a03f56914b90f01d85185d7bc"
+  }
+ },
+ "status": "LOCKED_BEFORE_RE3_DATA_READ"
+}

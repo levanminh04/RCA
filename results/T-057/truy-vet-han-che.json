@@ -1,0 +1,1580 @@
+{
+ "lenh": "py -3 -B results/T-057/scripts/h2_truy_vet.py results/T-057/truy-vet-han-che.json",
+ "ma_tran": [
+  {
+   "g2": "G2-H03",
+   "han_che": "TraceRCA bản thư viện chấm thời gian chờ root thành bất thường của dịch vụ gọi",
+   "M1": "E1 (UV-2), E2 (UV-1)",
+   "nguon_anh_xa": "results/T-043/bao-cao.md §7; results/T-034/goi-g2.md UV-1, UV-2",
+   "do": "dem/<bộ>|M1 so với dem/<bộ>|C-a0 (đối thủ phía trên root ở ca sai)"
+  },
+  {
+   "g2": "G2-H06",
+   "han_che": "Trễ mạng: dấu hiệu ở span phía gọi",
+   "M1": "E2 (UV-1)",
+   "nguon_anh_xa": "results/T-043/bao-cao.md §7; UV-1",
+   "do": "loi/Nezha-OB/network_delay; loi/RE2-TT/delay, loss"
+  },
+  {
+   "g2": "G2-H17",
+   "han_che": "Dịch vụ phía trên đứng trước root (M5)",
+   "M1": "E5 (tách tự sinh/kế thừa), E1, E2",
+   "nguon_anh_xa": "results/T-043/bao-cao.md §7; MRP P6 tầng 2",
+   "do": "dem (phía trên root ở ca sai); results/T-057/e5-thanh-phan.json"
+  },
+  {
+   "g2": "G2-H07",
+   "han_che": "Lỗi return Nezha-OB: root không hạng 1",
+   "M1": "Không có thành phần riêng trong bản P7 (E3 tắt; UV-6 chưa vào M1)",
+   "nguon_anh_xa": "results/T-056/dinh-chinh-001.md D1a (M1, C-a0 đều tắt E3/E3b); results/T-034/goi-g2.md UV-6",
+   "do": "loi/Nezha-OB/return (mô tả)"
+  },
+  {
+   "g2": "G2-H09",
+   "han_che": "BARO chia cho IQR của nền gần phẳng",
+   "M1": "Không sửa; E4 có cùng suy biến (c = 1 khi IQR = 0)",
+   "nguon_anh_xa": "src/m1/e4.py:279; results/T-055/reports/re3/dinh-chinh-001.md Đ1a; results/T-056/bao-cao.md §2.3",
+   "do": "T-056 K#/2_3_iqr0"
+  },
+  {
+   "g2": "G2-H12",
+   "han_che": "CIRCA: giá trị không hợp lệ lan qua cấu trúc",
+   "M1": "Yêu cầu kỹ thuật UV-7 (chặn giá trị không hợp lệ trước khi lan)",
+   "nguon_anh_xa": "results/T-034/goi-g2.md UV-7",
+   "do": "không đo riêng trên test"
+  },
+  {
+   "g2": "G2-H16",
+   "han_che": "Rào cản tập ứng viên, hòa cắt biên",
+   "M1": "Tầng 3 giữ thực thể không cờ trong tập trả về (MRP P6 tầng 4)",
+   "nguon_anh_xa": "MRP P6 tầng 4; src/m1/xep_hang.py",
+   "do": "root_trong_tap_tra_ve"
+  }
+ ],
+ "khong_thuoc_M1": [
+  {
+   "g2": [
+    "G2-H01",
+    "G2-H02",
+    "G2-H04",
+    "G2-H05"
+   ],
+   "ly_do": "Hạn chế của bản cài MicroRank/TraceRCA; M1 không dùng bước chia trace hay gộp điểm theo tập (UV-3, UV-4 không vào M1)."
+  },
+  {
+   "g2": [
+    "G2-H08"
+   ],
+   "ly_do": "Hạn chế của SimpleRCA (phiếu đếm theo mẫu). T-056 cho thấy chính đặc tính này là sức mạnh của M4 trên TT/RE3 (results/T-056/dinh-chinh-001.md D3)."
+  },
+  {
+   "g2": [
+    "G2-H13",
+    "G2-H14",
+    "G2-H15"
+   ],
+   "ly_do": "Hạn chế riêng của CIRCA/TORAI; M1 không dùng hồi quy theo nút cha hay bước nhân quả (results/T-043/bao-cao.md §7)."
+  },
+  {
+   "g2": [
+    "G2-H10",
+    "G2-H19",
+    "G2-H24",
+    "G2-H25"
+   ],
+   "ly_do": "Hạn chế dữ liệu; phương pháp không sửa được dữ liệu chưa ghi (AGENTS luật 17). Chuyển thành yêu cầu quan sát P9."
+  },
+  {
+   "g2": [
+    "G2-H11",
+    "G2-H18"
+   ],
+   "ly_do": "Chưa phân xử ở G2; M1 không có thành phần nhắm riêng. G2-H11 (thực thể ngoài chuỗi gọi) liên quan cơ chế max-z kênh hẹp ở T-054 §7.5, chưa nối thành bằng chứng."
+  },
+  {
+   "g2": [
+    "G2-H20",
+    "G2-H21",
+    "G2-H22",
+    "G2-H23",
+    "G2-H26"
+   ],
+   "ly_do": "Chế độ (b), hoãn theo Q-245."
+  }
+ ],
+ "dem": {
+  "Nezha-OB|C-a0": {
+   "so_ca": 34,
+   "sai": 15,
+   "doi_thu_truc_tiep_goi_root": 8,
+   "doi_thu_gian_tiep_goi_root": 0,
+   "doi_thu_khong_phia_tren": 7
+  },
+  "Nezha-OB|M1": {
+   "so_ca": 34,
+   "sai": 7,
+   "doi_thu_truc_tiep_goi_root": 0,
+   "doi_thu_gian_tiep_goi_root": 0,
+   "doi_thu_khong_phia_tren": 7
+  },
+  "RE2-TT|C-a0": {
+   "so_ca": 60,
+   "sai": 3,
+   "doi_thu_truc_tiep_goi_root": 1,
+   "doi_thu_gian_tiep_goi_root": 0,
+   "doi_thu_khong_phia_tren": 2
+  },
+  "RE2-TT|M1": {
+   "so_ca": 60,
+   "sai": 3,
+   "doi_thu_truc_tiep_goi_root": 0,
+   "doi_thu_gian_tiep_goi_root": 0,
+   "doi_thu_khong_phia_tren": 3
+  },
+  "RE3-OB|C-a0": {
+   "so_ca": 30,
+   "sai": 4,
+   "doi_thu_truc_tiep_goi_root": 1,
+   "doi_thu_gian_tiep_goi_root": 1,
+   "doi_thu_khong_phia_tren": 2
+  },
+  "RE3-OB|M1": {
+   "so_ca": 30,
+   "sai": 4,
+   "doi_thu_truc_tiep_goi_root": 1,
+   "doi_thu_gian_tiep_goi_root": 0,
+   "doi_thu_khong_phia_tren": 3
+  }
+ },
+ "loi": {
+  "Nezha-OB": {
+   "network_delay": {
+    "C-a0": 0.407934,
+    "C-d2": 0.95,
+    "M1": 0.9,
+    "M1_thang_thua_simplerca": [
+     8,
+     2
+    ],
+    "n": 10,
+    "simplerca": 0.380056
+   },
+   "return": {
+    "C-a0": 0.777778,
+    "C-d2": 0.75,
+    "M1": 0.75,
+    "M1_thang_thua_simplerca": [
+     1,
+     0
+    ],
+    "n": 3,
+    "simplerca": 0.712136
+   },
+   "exception": {
+    "C-a0": 0.75,
+    "C-d2": 0.6875,
+    "M1": 0.6875,
+    "M1_thang_thua_simplerca": [
+     0,
+     2
+    ],
+    "n": 4,
+    "simplerca": 0.9375
+   }
+  },
+  "RE2-TT": {
+   "delay": {
+    "C-a0": 1.0,
+    "C-d2": 0.87037,
+    "M1": 0.944444,
+    "M1_thang_thua_torai_B": [
+     1,
+     1
+    ],
+    "n": 9,
+    "simplerca": 0.694444,
+    "torai_B": 0.944444
+   },
+   "loss": {
+    "C-a0": 1.0,
+    "C-d2": 1.0,
+    "M1": 1.0,
+    "M1_thang_thua_torai_B": [
+     3,
+     0
+    ],
+    "n": 9,
+    "simplerca": 0.476667,
+    "torai_B": 0.725
+   }
+  },
+  "RE3-OB": {
+   "f1": {
+    "M1": 0.8888888888888888,
+    "C-a0": 0.8611111111111112,
+    "simplerca": 0.9444444444444444
+   },
+   "f2": {
+    "M1": 0.8333333333333334,
+    "C-a0": 0.8333333333333334,
+    "simplerca": 1.0
+   },
+   "f3": {
+    "M1": 1.0,
+    "C-a0": 1.0,
+    "simplerca": 1.0
+   },
+   "f4": {
+    "M1": 1.0,
+    "C-a0": 1.0,
+    "simplerca": 1.0
+   },
+   "f5": {
+    "M1": 0.875,
+    "C-a0": 0.9166666666666666,
+    "simplerca": 0.9583333333333334
+   }
+  }
+ },
+ "root_trong_tap_tra_ve": {
+  "RE2-TT": {
+   "root_trong_tap_tra_ve": 60,
+   "n": 60
+  },
+  "Nezha-OB": {
+   "root_trong_tap_tra_ve": 34,
+   "n": 34
+  },
+  "RE3-OB": {
+   "root_trong_tap_tra_ve": 30,
+   "n": 30
+  }
+ },
+ "theo_ca": {
+  "Nezha-OB|C-a0": [
+   {
+    "ca": "test-07fef64ba3",
+    "root": "paymentservice",
+    "nhom": "sai",
+    "doi_thu": "checkoutservice",
+    "phia_tren": "truc_tiep"
+   },
+   {
+    "ca": "test-122816e8ab",
+    "root": "shippingservice",
+    "nhom": "sai",
+    "doi_thu": "frontend",
+    "phia_tren": "truc_tiep"
+   },
+   {
+    "ca": "test-2a10521c83",
+    "root": "frontend",
+    "nhom": "sai",
+    "doi_thu": "productcatalogservice",
+    "phia_tren": "khong"
+   },
+   {
+    "ca": "test-3218391218",
+    "root": "frontend",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-35c1f287ba",
+    "root": "paymentservice",
+    "nhom": "sai",
+    "doi_thu": "checkoutservice",
+    "phia_tren": "truc_tiep"
+   },
+   {
+    "ca": "test-3a1afd6d4f",
+    "root": "frontend",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-3eca4ed46f",
+    "root": "checkoutservice",
+    "nhom": "sai",
+    "doi_thu": "currencyservice",
+    "phia_tren": "khong"
+   },
+   {
+    "ca": "test-46c58be0b9",
+    "root": "productcatalogservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-4928b11a75",
+    "root": "productcatalogservice",
+    "nhom": "sai",
+    "doi_thu": "recommendationservice",
+    "phia_tren": "truc_tiep"
+   },
+   {
+    "ca": "test-4dbcb97712",
+    "root": "frontend",
+    "nhom": "sai",
+    "doi_thu": "productcatalogservice",
+    "phia_tren": "khong"
+   },
+   {
+    "ca": "test-5bd31dee64",
+    "root": "currencyservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-6955461c81",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-6ae17814a4",
+    "root": "currencyservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-6ea21f2759",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-739318ce25",
+    "root": "recommendationservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-7bb21d627d",
+    "root": "shippingservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-87c4f27c66",
+    "root": "checkoutservice",
+    "nhom": "sai",
+    "doi_thu": "currencyservice",
+    "phia_tren": "khong"
+   },
+   {
+    "ca": "test-88dc4b2c47",
+    "root": "frontend",
+    "nhom": "sai",
+    "doi_thu": "checkoutservice",
+    "phia_tren": "khong"
+   },
+   {
+    "ca": "test-95702cf1a6",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-9712e01207",
+    "root": "frontend",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-a14af88774",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-a76c6e5147",
+    "root": "cartservice",
+    "nhom": "sai",
+    "doi_thu": "frontend",
+    "phia_tren": "truc_tiep"
+   },
+   {
+    "ca": "test-a8cc0373da",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-a8e49c60a8",
+    "root": "cartservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-b21b046f9e",
+    "root": "adservice",
+    "nhom": "sai",
+    "doi_thu": "frontend",
+    "phia_tren": "truc_tiep"
+   },
+   {
+    "ca": "test-b26b36e721",
+    "root": "cartservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-d46d61c932",
+    "root": "cartservice",
+    "nhom": "sai",
+    "doi_thu": "productcatalogservice",
+    "phia_tren": "khong"
+   },
+   {
+    "ca": "test-e0653eb872",
+    "root": "currencyservice",
+    "nhom": "sai",
+    "doi_thu": "frontend",
+    "phia_tren": "truc_tiep"
+   },
+   {
+    "ca": "test-e37c6ad037",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-e6aad4f10b",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-e941cc1059",
+    "root": "productcatalogservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-f92f6a18c4",
+    "root": "recommendationservice",
+    "nhom": "sai",
+    "doi_thu": "frontend",
+    "phia_tren": "truc_tiep"
+   },
+   {
+    "ca": "test-fb1f5d0a4a",
+    "root": "currencyservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-fd2c49f3cc",
+    "root": "productcatalogservice",
+    "nhom": "sai",
+    "doi_thu": "paymentservice",
+    "phia_tren": "khong"
+   }
+  ],
+  "Nezha-OB|M1": [
+   {
+    "ca": "test-07fef64ba3",
+    "root": "paymentservice",
+    "nhom": "sai",
+    "doi_thu": "adservice",
+    "phia_tren": "khong"
+   },
+   {
+    "ca": "test-122816e8ab",
+    "root": "shippingservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-2a10521c83",
+    "root": "frontend",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-3218391218",
+    "root": "frontend",
+    "nhom": "sai",
+    "doi_thu": "adservice",
+    "phia_tren": "khong"
+   },
+   {
+    "ca": "test-35c1f287ba",
+    "root": "paymentservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-3a1afd6d4f",
+    "root": "frontend",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-3eca4ed46f",
+    "root": "checkoutservice",
+    "nhom": "sai",
+    "doi_thu": "currencyservice",
+    "phia_tren": "khong"
+   },
+   {
+    "ca": "test-46c58be0b9",
+    "root": "productcatalogservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-4928b11a75",
+    "root": "productcatalogservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-4dbcb97712",
+    "root": "frontend",
+    "nhom": "sai",
+    "doi_thu": "productcatalogservice",
+    "phia_tren": "khong"
+   },
+   {
+    "ca": "test-5bd31dee64",
+    "root": "currencyservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-6955461c81",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-6ae17814a4",
+    "root": "currencyservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-6ea21f2759",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-739318ce25",
+    "root": "recommendationservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-7bb21d627d",
+    "root": "shippingservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-87c4f27c66",
+    "root": "checkoutservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-88dc4b2c47",
+    "root": "frontend",
+    "nhom": "sai",
+    "doi_thu": "recommendationservice",
+    "phia_tren": "khong"
+   },
+   {
+    "ca": "test-95702cf1a6",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-9712e01207",
+    "root": "frontend",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-a14af88774",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-a76c6e5147",
+    "root": "cartservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-a8cc0373da",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-a8e49c60a8",
+    "root": "cartservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-b21b046f9e",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-b26b36e721",
+    "root": "cartservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-d46d61c932",
+    "root": "cartservice",
+    "nhom": "sai",
+    "doi_thu": "productcatalogservice",
+    "phia_tren": "khong"
+   },
+   {
+    "ca": "test-e0653eb872",
+    "root": "currencyservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-e37c6ad037",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-e6aad4f10b",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-e941cc1059",
+    "root": "productcatalogservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-f92f6a18c4",
+    "root": "recommendationservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-fb1f5d0a4a",
+    "root": "currencyservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-fd2c49f3cc",
+    "root": "productcatalogservice",
+    "nhom": "sai",
+    "doi_thu": "adservice",
+    "phia_tren": "khong"
+   }
+  ],
+  "RE2-TT|C-a0": [
+   {
+    "ca": "test-03e6bb5dd7",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-053c028c65",
+    "root": "ts-order-service",
+    "nhom": "sai",
+    "doi_thu": "ts-auth-service",
+    "phia_tren": "khong"
+   },
+   {
+    "ca": "test-06f59cdbc7",
+    "root": "ts-route-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-071883754c",
+    "root": "ts-route-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-0c80e10889",
+    "root": "ts-route-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-0e0bdcd10b",
+    "root": "ts-order-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-0f1fe61e38",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-1401955138",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-17f8f776e5",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-2a0c838e6b",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-2a6db7647b",
+    "root": "ts-route-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-327ac2a20e",
+    "root": "ts-route-service",
+    "nhom": "sai",
+    "doi_thu": "ts-train-service",
+    "phia_tren": "khong"
+   },
+   {
+    "ca": "test-3286736cd4",
+    "root": "ts-route-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-3a4c777083",
+    "root": "ts-route-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-3ece35b6e7",
+    "root": "ts-travel-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-42e06f6bc2",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-4b609aee97",
+    "root": "ts-travel-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-4bc5b37428",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-4d466e7090",
+    "root": "ts-travel-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-511dfe222c",
+    "root": "ts-travel-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-541642b59e",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-547d46b5ce",
+    "root": "ts-travel-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-573c04dc92",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-5e8f996191",
+    "root": "ts-order-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-60f9be319f",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-676faad97a",
+    "root": "ts-travel-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-7a22c1c7ba",
+    "root": "ts-travel-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-839238c42a",
+    "root": "ts-order-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-8cd0c3c1f1",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-8d002cfd92",
+    "root": "ts-order-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-8d2e418c32",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-8d319f6c9e",
+    "root": "ts-travel-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-93ab3ce88c",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-95e732f0f5",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-96d9068f82",
+    "root": "ts-order-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-9b1a709254",
+    "root": "ts-order-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-a758fc8b69",
+    "root": "ts-route-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-a798329f17",
+    "root": "ts-order-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-a80801e5d0",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-a8ffb84490",
+    "root": "ts-travel-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-c39cc282a4",
+    "root": "ts-order-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-c5520b6a87",
+    "root": "ts-travel-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-c969fedf9b",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-cca3e8d0f9",
+    "root": "ts-route-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-cda8dfc162",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-d1548df55d",
+    "root": "ts-travel-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-d1a4bf90fb",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-d4eb10a4ba",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-d62934a19f",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-d78b70af26",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-d819fba4a5",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-dd30a767a9",
+    "root": "ts-order-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-e654f8c5ab",
+    "root": "ts-route-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-e86db87152",
+    "root": "ts-order-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-e9dc7064cc",
+    "root": "ts-route-service",
+    "nhom": "sai",
+    "doi_thu": "ts-travel-service",
+    "phia_tren": "truc_tiep"
+   },
+   {
+    "ca": "test-ea77b053b8",
+    "root": "ts-travel-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-edaa68b4cf",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-f9d046a28e",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-fcfc3ab240",
+    "root": "ts-route-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-fdcc43a676",
+    "root": "ts-order-service",
+    "nhom": "dung"
+   }
+  ],
+  "RE2-TT|M1": [
+   {
+    "ca": "test-03e6bb5dd7",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-053c028c65",
+    "root": "ts-order-service",
+    "nhom": "sai",
+    "doi_thu": "ts-auth-service",
+    "phia_tren": "khong"
+   },
+   {
+    "ca": "test-06f59cdbc7",
+    "root": "ts-route-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-071883754c",
+    "root": "ts-route-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-0c80e10889",
+    "root": "ts-route-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-0e0bdcd10b",
+    "root": "ts-order-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-0f1fe61e38",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-1401955138",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-17f8f776e5",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-2a0c838e6b",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-2a6db7647b",
+    "root": "ts-route-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-327ac2a20e",
+    "root": "ts-route-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-3286736cd4",
+    "root": "ts-route-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-3a4c777083",
+    "root": "ts-route-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-3ece35b6e7",
+    "root": "ts-travel-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-42e06f6bc2",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-4b609aee97",
+    "root": "ts-travel-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-4bc5b37428",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-4d466e7090",
+    "root": "ts-travel-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-511dfe222c",
+    "root": "ts-travel-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-541642b59e",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-547d46b5ce",
+    "root": "ts-travel-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-573c04dc92",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-5e8f996191",
+    "root": "ts-order-service",
+    "nhom": "sai",
+    "doi_thu": "ts-auth-service",
+    "phia_tren": "khong"
+   },
+   {
+    "ca": "test-60f9be319f",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-676faad97a",
+    "root": "ts-travel-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-7a22c1c7ba",
+    "root": "ts-travel-service",
+    "nhom": "sai",
+    "doi_thu": "ts-train-service",
+    "phia_tren": "khong"
+   },
+   {
+    "ca": "test-839238c42a",
+    "root": "ts-order-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-8cd0c3c1f1",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-8d002cfd92",
+    "root": "ts-order-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-8d2e418c32",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-8d319f6c9e",
+    "root": "ts-travel-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-93ab3ce88c",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-95e732f0f5",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-96d9068f82",
+    "root": "ts-order-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-9b1a709254",
+    "root": "ts-order-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-a758fc8b69",
+    "root": "ts-route-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-a798329f17",
+    "root": "ts-order-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-a80801e5d0",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-a8ffb84490",
+    "root": "ts-travel-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-c39cc282a4",
+    "root": "ts-order-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-c5520b6a87",
+    "root": "ts-travel-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-c969fedf9b",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-cca3e8d0f9",
+    "root": "ts-route-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-cda8dfc162",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-d1548df55d",
+    "root": "ts-travel-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-d1a4bf90fb",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-d4eb10a4ba",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-d62934a19f",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-d78b70af26",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-d819fba4a5",
+    "root": "ts-auth-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-dd30a767a9",
+    "root": "ts-order-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-e654f8c5ab",
+    "root": "ts-route-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-e86db87152",
+    "root": "ts-order-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-e9dc7064cc",
+    "root": "ts-route-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-ea77b053b8",
+    "root": "ts-travel-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-edaa68b4cf",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-f9d046a28e",
+    "root": "ts-train-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-fcfc3ab240",
+    "root": "ts-route-service",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-fdcc43a676",
+    "root": "ts-order-service",
+    "nhom": "dung"
+   }
+  ],
+  "RE3-OB|C-a0": [
+   {
+    "ca": "test-042156d716",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-0d4b3947ca",
+    "root": "currencyservice",
+    "nhom": "sai",
+    "doi_thu": "shippingservice",
+    "phia_tren": "khong"
+   },
+   {
+    "ca": "test-1d99effe3f",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-299b7a94b2",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-2b123fa80d",
+    "root": "cartservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-2d6f135519",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-36c78c2a82",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-386b4c8d07",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-3af6a9645f",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-3cfd7d149c",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-428cf2c868",
+    "root": "emailservice",
+    "nhom": "sai",
+    "doi_thu": "paymentservice",
+    "phia_tren": "khong"
+   },
+   {
+    "ca": "test-49773083f4",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-5096b119e7",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-5cf7f603ac",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-6197959d99",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-6f08f4fa1e",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-75b5125c92",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-83ddf66107",
+    "root": "cartservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-a7510d430e",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-a83887a3e0",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-b826c34da1",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-c6907e939b",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-c7485e7c0f",
+    "root": "cartservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-cde8f873f5",
+    "root": "currencyservice",
+    "nhom": "sai",
+    "doi_thu": "checkoutservice",
+    "phia_tren": "truc_tiep"
+   },
+   {
+    "ca": "test-d07d23cade",
+    "root": "emailservice",
+    "nhom": "sai",
+    "doi_thu": "frontend",
+    "phia_tren": "gian_tiep"
+   },
+   {
+    "ca": "test-d19a7fccfa",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-dab581296e",
+    "root": "currencyservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-e961c64194",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-f894cc03a6",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-faa199f14e",
+    "root": "adservice",
+    "nhom": "dung"
+   }
+  ],
+  "RE3-OB|M1": [
+   {
+    "ca": "test-042156d716",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-0d4b3947ca",
+    "root": "currencyservice",
+    "nhom": "sai",
+    "doi_thu": "shippingservice",
+    "phia_tren": "khong"
+   },
+   {
+    "ca": "test-1d99effe3f",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-299b7a94b2",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-2b123fa80d",
+    "root": "cartservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-2d6f135519",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-36c78c2a82",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-386b4c8d07",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-3af6a9645f",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-3cfd7d149c",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-428cf2c868",
+    "root": "emailservice",
+    "nhom": "sai",
+    "doi_thu": "paymentservice",
+    "phia_tren": "khong"
+   },
+   {
+    "ca": "test-49773083f4",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-5096b119e7",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-5cf7f603ac",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-6197959d99",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-6f08f4fa1e",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-75b5125c92",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-83ddf66107",
+    "root": "cartservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-a7510d430e",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-a83887a3e0",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-b826c34da1",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-c6907e939b",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-c7485e7c0f",
+    "root": "cartservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-cde8f873f5",
+    "root": "currencyservice",
+    "nhom": "sai",
+    "doi_thu": "checkoutservice",
+    "phia_tren": "truc_tiep"
+   },
+   {
+    "ca": "test-d07d23cade",
+    "root": "emailservice",
+    "nhom": "sai",
+    "doi_thu": "currencyservice",
+    "phia_tren": "khong"
+   },
+   {
+    "ca": "test-d19a7fccfa",
+    "root": "emailservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-dab581296e",
+    "root": "currencyservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-e961c64194",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-f894cc03a6",
+    "root": "adservice",
+    "nhom": "dung"
+   },
+   {
+    "ca": "test-faa199f14e",
+    "root": "adservice",
+    "nhom": "dung"
+   }
+  ]
+ },
+ "gioi_han": "Mô tả sau khi xem test (C-15 B). 'Phía trên' tính trên extra/canh của chính vế (cạnh quan sát N ∪ A). Không cộng các dòng thành tỷ lệ nguyên nhân."
+}

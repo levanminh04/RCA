@@ -1,0 +1,23 @@
+Nguồn quyết định của Minh cho luồng A, B, C sau báo cáo P7(a). Ghi ngày 08/11/2026 bởi Claude. Chép nguyên văn theo thứ tự trong chat.
+
+1. Lời Minh sau kế hoạch bốn luồng:
+"duyệt triển khai luồng A B C ,các câu hỏi duyệt theo đề xuất, riêng luồng D sẽ để codex làm, claude cần tập trung để re3 xong. tôi sẽ treo máy, nếu không có lỗi nào nghiêm trọng cần tôi duyệt thì hi vọng sau khi tôi ngủ dậy re3 đã có kết quả,  tôi sẽ giao cho bạn quyết , tuy nhiên cần tuân theo dự án, tránh viêc chọn dễ bỏ khó, chỉ bỏ khi nó đem lại ít giá trị, làm khi nó đem lại nhiều giá trị, nếu tận dụng được kết quả thì không chạy lại , nếu có câu hỏi nào thì hãy hỏi tôi sớm, nếu chưa thấy câu trả lời của tôi thì có thể tự đưa ra quyết định phù hợp nhất và sát nhất với các mong muốn của tôi, các quyết định lớn đều phải ghi chép lại để tôi kiểm. re3 có loại lỗi mới là lỗi code so với các dataset khác nên tôi rất muốn thấy kết quả ra sao, nếu kết quả thấp hay cao thì cũng cần biết nguyên nhân lí do, điều này ảnh hưởng đến triển khai flash ticket, đọc flash ticket trên remote, hiện các branch trên repo flash ticket platform đã triển khai code luồng chính rồi. nếu 2 ec2 là đủ thì không cần chạy trên  laptop nếu không cần thiết , nếu chỉ vì lí do di chuyển dữ liệu thì không chọn laptop, laptop chỉ chạy khi thực sự cần thiết như liên quan đến tính đúng đắn, số liệu , tôi muốn dùng ec2 vì ec2 nhanh hơn. bắt đầu giúp tôi, nêu có câu hỏi nào thì hỏi tôi sớm trước khi tôi treo máy ngay sau đây"
+
+"Các câu hỏi duyệt theo đề xuất" áp vào Q1–Q8 của kế hoạch (trong chat):
+Q1 duyệt luồng A (ghi results/T-054/reports/p7a-013-v2/kiem-toan-ven/);
+Q2 giữ M1 cho RE3, kèm bước đọc dev rẻ T-051 kb-002;
+Q3 (a) giữ M1 nguyên trước rủi ro lỗi mã nguồn;
+Q4 tạo T-055 (Claude làm, Codex phản biện sau);
+Q5 soạn câu hỏi tác giả để Minh duyệt nội dung trước khi gửi (chưa gửi);
+Q6 mỗi EC2 tự tải phần RE3 của mình từ HF, telemetry giữ trên EC2, chỉ bảng tên→mã và nhãn về vùng private laptop;
+Q7 luồng D giao Codex;
+Q8 Codex phản biện gộp sau.
+
+2. Trả lời bốn câu hỏi trước khi treo máy (nguyên văn lựa chọn):
+- Mở RE3: "Đồng ý mở có preflight (Recommended)".
+- Phản biện: "Mở trước, Codex sau (Recommended)".
+- Máy/tải: "Đồng ý, EC2 đang bật, nếu không ssh được thì cho phép chạy các lệnh mở quyền ssh đến các ec2 này".
+- FlashTicket: "Cho git fetch, không checkout (Recommended)".
+
+Nội dung câu hỏi tương ứng: mở RE3 một lần với bộ giả định H1 tường minh ghi "chưa kiểm" và preflight không nhãn khóa trước, lệch thì dừng trước method và trước ghép nhãn; khóa bằng manifest/hash như main013, commit chờ Minh duyệt riêng; SSH 13.236.44.106 và 16.176.181.251, mỗi EC2 tự tải phần RE3-OB của mình từ HF, nếu HF thiếu thời điểm tiêm thì tải bản RCAEval công khai khác chỉ đúng 30 ca re3ob lên EC2; giữ laptop AC sleep 0, khôi phục 2700 s sau khi chấm; FlashTicket git fetch không checkout.
+Không gồm: commit/push, gửi câu hỏi ra ngoài, bật/tắt/terminate máy, luồng D.

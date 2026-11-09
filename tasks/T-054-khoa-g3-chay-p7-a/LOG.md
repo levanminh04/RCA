@@ -2802,3 +2802,13 @@ số trong văn bản có khớp file kết quả không; có thay đổi thiế
 - Làm: Đ15 trong `dinh-chinh-004.md` (script `runs/sua-cd3-ob-001/r10_kenh.py`, đầu ra `r10-kenh.txt`): 3/4 ca có cờ bên được gọi nằm trên cạnh do root gọi (E2-C gán cho bên nhận); cờ operation ở 2 ca còn chưa phân xử. `manifest-006.json` (3 file, không ghim docs). DECISIONS: dòng prompt mẫu 11–20 và dòng tám đề xuất. Xóa `goi/data-ec2_1.tar`, `goi/data-ec2_2.tar` (không ghim trong manifest-005; hash ở `goi/goi.json`).
 - Chờ Minh: SL39 / cách ghim LESSONS trong `chuan-bi-main-013-v2/manifest.json` (đề xuất trong chat).
 - Lệnh cuối: `D:/RCA-ext/envs/T-014-main/Scripts/python.exe -B results/T-054/runs/chuan-bi-main-013-v2/verify_manifest.py --documents`.
+
+## 08/11/2026 — Claude, Windows, người làm (ghi SL39, bỏ ghim LESSONS)
+
+- Minh: “GHI SL39, BỎ GHIM”. Đã chèn SL39 vào `docs/LESSONS.md` sau SL38 (nguyên văn `runs/sua-cd3-ob-001/lessons-SL39-cho-duyet.md`).
+- Bỏ ghim theo đề xuất đã trình: không sửa manifest đã khóa. Mục `docs/LESSONS.md` trong `results/T-054/runs/chuan-bi-main-013-v2/manifest.json#/outputs` từ nay là ảnh chụp lịch sử; bản gốc ở commit `293a94c1`. `verify_manifest.py --documents` báo đúng 1 lệch đã biết: `{"PASS": false, "checked": 515, "mismatches": ["docs/LESSONS.md"]}`. Lệch khác ngoài file này mới là lỗi.
+
+
+## 09/11/2026 — Claude, Windows, người làm (khép task)
+
+- Minh: “T56 chạy xong chưa ? rồi thì khép 3 task lại, trình kế hoạch tiếp theo”. T-056 đã chạy và đáp phản biện xong; Codex chưa kiểm lại lượt cuối. Minh nghiệm thu T-054, T-055, T-056 ngày 09/11/2026. Các câu hỏi khoa học OPEN giữ nguyên; nghiệm thu không xác nhận cơ chế hay hiệu quả.

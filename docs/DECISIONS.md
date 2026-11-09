@@ -507,3 +507,11 @@ Minh duyệt (chat 08/11/2026, “DUYỆT CẢ 8”, đề xuất 5): giữ `doc
 ## T-054 — tám đề xuất sau R10, 08/11/2026
 
 Minh: “DUYỆT CẢ 8”. (1) gửi Codex một lượt kiểm đính chính 004 rồi dừng; (2) phân tích cờ bên được gọi trên trung gian đã lưu, mô tả (Đ15); (3) đóng góp riêng E1/E2/E5 để OPEN, khai giới hạn ở G4; (4) manifest-006; (5) dòng trên; (6) SL39 chưa ghi LESSONS — Minh hỏi lại lý do, chờ quyết; (7) xóa hai `goi/data-ec2_*.tar` trên laptop, hash giữ ở `goi/goi.json`; (8) commit.
+
+## LESSONS không ghim trong manifest, 08/11/2026
+
+Minh: “LESSONS LÀ PHẢI CHUNG, SAO LẠI GHIM ?”; “GHI SL39, BỎ GHIM”. Ghi SL39. Mục `docs/LESSONS.md` trong manifest main013-v2 là ảnh chụp lịch sử (bản gốc ở commit `293a94c1`); kiểm `--documents` coi lệch ở file này là đã biết. Manifest mới không ghim tài liệu sống trong `docs/`.
+
+## Khép T-054, T-055, T-056; hoãn P8; mục tiêu FlashTicket 7 ngày, 09/11/2026
+
+Minh: “58 LÀ TRIỂN KHAI LLM CHO DEV ... TÔI MUỐN HOÃN PHẦN NÀY SANG PHẦN TIẾP THEO. T56 chạy xong chưa ? rồi thì khéo 3 task lại, trình kế hoạch tiếp theo, tôi muốn 7 ngày tới cần chạy được rca cho flash ticket bản đầu tiên”. Nghiệm thu ba task khi lượt kiểm lại cuối của Codex (T-054 đính chính 004, T-056 D6–D10) chưa làm; OPEN giữ nguyên. P8/LLM hoãn. Mục tiêu: RCA bản đầu chạy trên FlashTicket trong 7 ngày (tới 16/11/2026).
