@@ -1,0 +1,552 @@
+--- replay_circa_v3.py
++++ replay_circa_v4.py
+@@ -1,8 +1,10 @@
+-"""T-032 CIRCA OLS/a/h0 v3: exact native/observed and frozen-pair replay.
++"""T-032 CIRCA OLS/a/h0 v4: exact native/observed and frozen-pair replay.
+ 
+ Run only on the approved EC2, with the original environment and PYTHONPATH.
+ CLI: fixture NEW_DIR --source-closure FILE --source-closure-sha256 SHA
+      one RE2-TT|Nezha-OB OPAQUE_ID NEW_DIR --source-closure FILE ...
++     audit-fixture NEW_DIR --old-run CLOSED_FAILED_RUN --transport-inventory FILE
++         --transport-inventory-sha256 SHA --source-closure FILE ...
+ 
+ The coordinator supplies an independently anchored, byte-hashed source closure
+ for the frozen revisions. No T-014 manifest is copied or assumed to exist on
+@@ -24,6 +26,7 @@
+ import os
+ from pathlib import Path
+ import re
++import shutil
+ import subprocess
+ import sys
+ import time
+@@ -274,6 +277,132 @@
+             array[state == 1], array[state == 2], array[state == 3] = np.nan, np.inf, -np.inf
+         result[decode(column["name"])] = array
+     return result
++
++
++def final_manifest(directory, excluded):
++    """Seal all run files after the terminal log/source writes, including logs."""
++    directory = Path(directory).resolve()
++    excluded = set(excluded)
++    result = []
++    for path in sorted(directory.rglob("*")):
++        if path.is_symlink():
++            raise ReplayError("run artifact symlink cannot be sealed")
++        if path.is_file():
++            relative = path.relative_to(directory).as_posix()
++            if relative not in excluded:
++                result.append({"path": relative, "bytes": path.stat().st_size, "sha256": sha(path)})
++    return result
++
++
++def verify_final_manifest(directory, check_name="check.json"):
++    directory = Path(directory).resolve()
++    check = read(directory / check_name)
++    if check.get("manifest_excludes") != [check_name]:
++        raise ReplayError("final check does not declare its precise self exclusion")
++    expected = check.get("artifact_manifest")
++    if not isinstance(expected, list) or exact_differences(expected, final_manifest(directory, [check_name])):
++        raise ReplayError("closed final run artifact set/byte hash mismatch")
++    return {"pass": True, "check": check_name, "files_checked": len(expected),
++        "progress_in_manifest": any(row["path"] == "progress.jsonl" for row in expected),
++        "source_checks_in_manifest": any(row["path"] == "source-checks.json" for row in expected)}
++
++
++def finalize_check(directory, payload, terminal, terminal_fields=None, check_name="check.json"):
++    """This is the last wrapper write; the current check cannot hash itself."""
++    if (directory / check_name).exists():
++        raise ReplayError("refusing to overwrite a closed check")
++    if not (directory / "source-checks.json").is_file():
++        raise ReplayError("source checks must be written before the final manifest")
++    progress(directory, terminal, **(terminal_fields or {}))
++    value = {**payload, "artifact_manifest": final_manifest(directory, [check_name]),
++        "manifest_excludes": [check_name], "terminal_event_before_manifest": terminal}
++    dump(directory / check_name, value)
++    return verify_final_manifest(directory, check_name)
++
++
++def da_journal_check(call):
++    """Join every DA line event in native order; never discard repeat headers."""
++    def require(condition, message):
++        if not condition:
++            raise ReplayError(message)
++    def same(left, right, message):
++        require(not exact_differences(left, right), message)
++    journals = call["journal"]
++    if call["outcome"] == "exception":
++        # The explicitly declared pre-loop fixture is scores=None on a nonempty
++        # graph: the native list comprehension raises before sorted_nodes exists.
++        # Other incomplete DA calls remain failures, never completed traversals.
++        require(call["entry"]["scores"] == {"__missing__": "None"}
++            and not journals and "sorted_nodes" not in call["exit"]
++            and call["exit"]["return"] == {"__missing__": "None"}
++            and bool(call["exceptions"])
++            and all(item["type"] == "TypeError" and item["line"] in (254, 255, 256)
++                for item in call["exceptions"]),
++            "DA exception is not the declared pre-loop scores=None path; incomplete journal")
++        return {"pass": True, "completed": False, "native_outcome": "pre_loop_exception",
++            "groups": None, "header_count": 0, "mechanism_evidence": False}
++    require(call["outcome"] == "return" and not call["exceptions"],
++        "completed DA must return without an original exception")
++    headers = [item for item in journals if item["step"] == "topological_groups_after_native_cache"]
++    require(bool(headers), "actual DA groups not observed")
++    groups = headers[0]["groups"]
++    require(isinstance(groups, list) and all(isinstance(group, list) for group in groups),
++        "DA group snapshot schema is not ordered groups")
++    require(len(headers) == len(groups) + 1, "DA header count must be exact G+1 for a completed loop")
++    for item in headers:
++        same(groups, item["groups"], "DA group snapshot changed while assigning native indexes")
++    stored_groups = call["exit"]["sorted_nodes"]
++    require(isinstance(stored_groups, list)
++        and all(isinstance(group, dict) and set(group) == {"__set_iteration__"} for group in stored_groups),
++        "native exit DA groups do not preserve set iteration")
++    same(groups, [group["__set_iteration__"] for group in stored_groups],
++        "DA header and native exit groups differ in node/group order")
++    scores = call["entry"]["scores"]
++    if scores == {}:
++        score_items = []
++    else:
++        require(isinstance(scores, dict) and set(scores) == {"__mapping_items__"},
++            "DA entry score mapping lacks native item order")
++        score_items = scores["__mapping_items__"]
++        require(all(isinstance(item, list) and len(item) == 2 for item in score_items),
++            "DA entry score item schema differs")
++    score_nodes = [item[0] for item in score_items]
++    grouped_nodes = [node for group in groups for node in group]
++    require(len(grouped_nodes) == len(score_nodes)
++        and len({json.dumps(node, sort_keys=True) for node in grouped_nodes}) == len(grouped_nodes),
++        "DA groups duplicate or omit scored nodes")
++    require({json.dumps(node, sort_keys=True) for node in grouped_nodes}
++        == {json.dumps(node, sort_keys=True) for node in score_nodes},
++        "DA group and input score candidate sets differ")
++    position = 0
++    def take(step, node=None, index=None):
++        nonlocal position
++        require(position < len(journals), "DA chronology is missing a native step: " + step)
++        item = journals[position]
++        position += 1
++        require(item["step"] == step, "DA chronology has an extra/reordered step: " + step)
++        if node is not None:
++            same(node, item["node"], "DA chronology node differs: " + step)
++        if index is not None:
++            same(index, item["index"], "DA native index differs from its group position")
++        return item
++    for index, group in enumerate(groups):
++        same(groups, take("topological_groups_after_native_cache")["groups"],
++            "DA chronology header changed")
++        for node in group:
++            take("index_visit", node, index)
++    same(groups, take("topological_groups_after_native_cache")["groups"],
++        "DA terminal loop header changed")
++    for group in reversed(groups):
++        for node in group:
++            take("descendant_visit", node)
++            take("child_map_before_assignment", node)
++    for node in score_nodes:
++        take("adjustment_before_mutation", node)
++    require(position == len(journals), "DA chronology has trailing/duplicate native steps")
++    return {"pass": True, "completed": True, "native_outcome": "return", "groups": groups,
++        "header_count": len(headers), "group_count": len(groups), "chronology_steps": position,
++        "entry_score_order": score_nodes, "empty_scored_candidates": not score_nodes}
+ 
+ 
+ def capture_checks(directory, summary):
+@@ -440,9 +569,13 @@
+         require(len(da_calls) == 1, "expected exactly one DA call")
+         call = da_calls[0]
+         journals = call["journal"]
+-        group_entries = [j for j in journals if j["step"] == "topological_groups_after_native_cache"]
+-        require(len(group_entries) == 1, "actual DA groups not observed")
+-        groups = group_entries[0]["groups"]
++        journal_check = da_journal_check(call)
++        if not journal_check["completed"]:
++            require(summary["entry"] == "da" and not score_graph_calls,
++                "pre-loop DA exception cannot stand in for a successful adapter/score graph")
++            return {**critical, "native_da_outcome": journal_check["native_outcome"],
++                "completed_da_journal": False, "da_journal": journal_check, "mechanism_evidence": False}
++        groups = journal_check["groups"]
+         for step, expected in (("index_visit", [n for g in groups for n in g]),
+                 ("descendant_visit", [n for g in reversed(groups) for n in g])):
+             same([j["node"] for j in journals if j["step"] == step], expected, "actual DA traversal differs from native groups")
+@@ -455,6 +588,10 @@
+             node = name(item["node"])
+             same(item["child_map"], maps[node], "DA child map changed before adjustment")
+             score = final_scores[node]["__score__"]
++            native_group_index = next(index for index, group in enumerate(groups)
++                if any(name(member) == node for member in group))
++            same(score["info"]["index"], native_group_index,
++                "DA final score index differs from the recorded native group/index visit")
+             require(isinstance(score["explicit_key"], list) and len(score["explicit_key"]) == 3, "DA key incomplete")
+             same(score["explicit_key"], [score["score"], -score["info"]["index"], score["info"].get("z-score", 0)], "native DA key chain differs")
+         if score_graph_calls:
+@@ -463,7 +600,8 @@
+                 state = score["__score__"]
+                 same(state["score"], full["da"][node]["score"], "DA final score differs from native full return")
+                 same(state["explicit_key"], full["da"][node]["key"], "DA final key differs from native full return")
+-        critical.update(da_traversal_observed=True, da_propagation_before_mutation=True, da_native_keys_joined=True)
++        critical.update(da_traversal_observed=True, da_propagation_before_mutation=True,
++            da_native_keys_joined=True, completed_da_journal=True, da_journal=journal_check)
+     if summary["entry"] == "adapter" and summary["adapter_statuses"] and all(s in ("OK", "NO_EVIDENCE") for s in summary["adapter_statuses"]):
+         require(len(score_graph_calls) == 1 and len(by_function.get("build_graph", [])) == 1, "successful adapter lacks graph/native full return")
+         adapter = by_function["adapter"][0]["exit"]["return"]
+@@ -626,7 +764,7 @@
+         check_imports(closure, audit, p3_hashes)
+         passed = not differences and capture_check["pass"] is True
+         dump(directory / "source-checks.json", {"checks": audit})
+-        dump(directory / "check.json", {"status": "PASS" if passed else "FAIL", "method": "circa",
++        finalize_check(directory, {"status": "PASS" if passed else "FAIL", "method": "circa",
+             "dataset": dataset, "opaque_id": opaque_id, "source_verified": True,
+             "source_closure_sha256": closure_sha256, "compare": comparisons,
+             "native_observed_exact": all(c["native_observed_exact"] for c in comparisons),
+@@ -635,9 +773,8 @@
+             "capture_status": summary["status"], "capture_check": capture_check, "actual_imports_after": imports_after,
+             "intermediates_eligible": passed and dataset == "RE2-TT",
+             "unsupported_status_preserved": passed and dataset == "Nezha-OB",
+-            "artifact_manifest": artifact_manifest(directory), "manifest_excludes": ["check.json"],
+-            "interpretation": "exact source/capture/replay checks only; no causal claim; OLS numeric drift is FAIL; Nezha native is never called"})
+-        progress(directory, "FINISHED", status="PASS" if passed else "FAIL")
++            "interpretation": "exact source/capture/replay checks only; no causal claim; OLS numeric drift is FAIL; Nezha native is never called"},
++            "FINISHED", {"status": "PASS" if passed else "FAIL"})
+         return 0 if passed else 1
+     finally:
+         if not (directory / "source-checks.json").exists():
+@@ -891,6 +1028,220 @@
+         sys.setprofile(old_profile)
+ 
+ 
++def audit_stored_fixture(directory, old_run, transport_inventory, transport_sha256,
++        closure_path, closure_sha256):
++    """Read authenticated closed FAILED artifacts; no method or old file write."""
++    old_run = Path(old_run).expanduser().resolve()
++    task_root = Path("/home/ubuntu/rca/T-032").resolve()
++    if old_run != task_root / "runs" / "circa-nodeview-fixture-001":
++        raise ReplayError("stored audit must use the approved closed CIRCA NodeView fixture")
++    inventory_path = Path(transport_inventory).expanduser().resolve()
++    if task_root not in inventory_path.parents or sha(inventory_path) != transport_sha256:
++        raise ReplayError("stored audit transport inventory path/hash mismatch")
++    inventory = read(inventory_path)
++    if inventory.get("eligibility") is not False or not isinstance(inventory.get("files"), list):
++        raise ReplayError("stored audit lacks an explicitly ineligible closed transport inventory")
++    prefixes = ("runs/circa-nodeview-fixture-001/", "runs/circa-nodeview-fixture-001-monitor/")
++    rows = inventory["files"]
++    if len({row["path"] for row in rows}) != len(rows) or not rows:
++        raise ReplayError("stored audit transport has duplicate/missing files")
++    def verify_closed_transport():
++        for row in rows:
++            relative = row["path"]
++            if not isinstance(relative, str) or not relative.startswith(prefixes):
++                raise ReplayError("stored audit transport file outside the closed fixture/monitor")
++            path = (task_root / relative).resolve()
++            if task_root not in path.parents or path.is_symlink() or not path.is_file():
++                raise ReplayError("closed audit artifact path escaped/missing/symlink")
++            if path.stat().st_size != row["bytes"] or sha(path) != row["sha256"]:
++                raise ReplayError("closed audit artifact current hash mismatch: " + relative)
++        actual_paths = set()
++        for prefix in prefixes:
++            base = task_root / prefix.rstrip("/")
++            for path in base.rglob("*"):
++                if path.is_symlink():
++                    raise ReplayError("closed transport contains a symlink")
++                if path.is_file():
++                    actual_paths.add(path.relative_to(task_root).as_posix())
++        if actual_paths != {row["path"] for row in rows}:
++            raise ReplayError("closed transport inventory is not the complete current artifact set")
++    verify_closed_transport()
++    progress(directory, "CLOSED_FAILED_TRANSPORT_VERIFIED", files=len(rows), eligible=False)
++    original = read(old_run / "check.json")
++    if original.get("status") != "FAIL" or original.get("intermediates_eligible") is not False:
++        raise ReplayError("old fixture was not the declared ineligible FAILED run")
++    if original.get("source_closure_sha256") != closure_sha256:
++        raise ReplayError("old fixture source closure binding differs")
++    # Preserve the exact old manifest failure. Authenticate all ordinary old
++    # artifacts and the pinned prefix plus terminal append of progress.jsonl.
++    mismatches = []
++    for row in original["artifact_manifest"]:
++        path = (old_run / row["path"]).resolve()
++        if old_run not in path.parents or not path.is_file():
++            raise ReplayError("original failed manifest path escaped or disappeared")
++        if path.stat().st_size != row["bytes"] or sha(path) != row["sha256"]:
++            mismatches.append(row)
++    if len(mismatches) != 1 or mismatches[0]["path"] != "progress.jsonl":
++        raise ReplayError("closed failed manifest mismatch is not the declared terminal progress append")
++    row = mismatches[0]
++    data = (old_run / "progress.jsonl").read_bytes()
++    if hashlib.sha256(data[:row["bytes"]]).hexdigest() != row["sha256"]:
++        raise ReplayError("old failed progress prefix differs from the original manifest")
++    suffix = data[row["bytes"]:].decode("utf-8")
++    lines = suffix.splitlines()
++    if len(lines) != 1:
++        raise ReplayError("old failed progress has more than the declared terminal append")
++    terminal = json.loads(lines[0])
++    if terminal.get("stage") != "FAILED" or terminal.get("error") != original.get("error"):
++        raise ReplayError("old failed progress suffix does not preserve the original failure")
++    audit = []
++    closure = load_closure(closure_path, closure_sha256, audit)
++    imports = prepare_imports(closure, audit)
++    capture_dir = old_run / "adapter_extension_tables" / "capture"
++    captured_sources = read(capture_dir / "capture-start.json")["sources"]
++    expected_by_path = {str(Path(meta["path"]).resolve()): meta["sha256"]
++        for meta in closure["files"].values()}
++    for name, meta in captured_sources.items():
++        path = Path(meta["path"]).resolve()
++        expected = expected_by_path.get(str(path))
++        if expected != meta["sha256"] or sha(path) != expected:
++            raise ReplayError("old captured native source differs from the pinned closure: " + name)
++    summary = read(capture_dir / "capture.json")
++    result = capture_checks(capture_dir, summary)
++    if not result.get("pass") or not result.get("completed_da_journal") or not result.get("adapter_pair_joined"):
++        raise ReplayError("posthoc stored adapter capture did not pass every declared stage/journal join")
++    load_closure(closure_path, closure_sha256, audit)
++    check_imports(closure, audit)
++    verify_closed_transport()
++    dump(directory / "source-checks.json", {"checks": audit})
++    finalize_check(directory, {"status": "PASS_STORED_CAPTURE_AUDIT", "method": "circa",
++        "source_verified": True, "source_closure_sha256": closure_sha256,
++        "transport_inventory_path": str(inventory_path), "transport_inventory_sha256": transport_sha256,
++        "closed_transport_files_verified_before_after": len(rows), "old_run": str(old_run),
++        "actual_imports": imports, "capture_check": result,
++        "original_full_manifest_pass": False, "original_failed_progress_prefix_verified": True,
++        "original_failure_preserved": original["error"], "methods_executed": False,
++        "old_files_written": False, "intermediates_eligible": False,
++        "native_observed_original_comparison_recovered": False,
++        "meaning": "posthoc integrity/stage/journal audit only; no new native call and no eligibility for the failed old fixture"},
++        "AUDIT_FINISHED", {"status": "PASS_STORED_CAPTURE_AUDIT"})
++    return 0
++
++
++def focused_da_fixtures(directory):
++    """Declared empty/SCC/pre-loop paths, original versus observed exactly."""
++    import copy
++    from datetime import timedelta
++    import networkx as nx
++    import numpy as np
++    import pandas as pd
++    from RCAEval.classes.data import CaseData, MemoryDataLoader
++    from RCAEval.classes.graph import Node, MemoryGraph
++    from RCAEval.graph_heads.rht import DAScorer
++    from RCAEval.graph_heads.random_walk import Score
++    checks = []
++    for kind in ("da_empty_groups", "da_scc_with_tail", "da_preloop_exception"):
++        run = directory / kind
++        run.mkdir()
++        progress(directory, "FIXTURE_START", name=kind)
++        nodes = [Node("a", "cpu"), Node("b", "cpu"), Node("c", "cpu")]
++        graph = nx.DiGraph()
++        if kind != "da_empty_groups":
++            graph.add_nodes_from(nodes)
++            graph.add_edges_from([(nodes[0], nodes[1]), (nodes[1], nodes[0]), (nodes[1], nodes[2])])
++        base_scores = ({node: Score(value, info={"z-score": value, "Confidence": 0.5})
++            for node, value in zip(nodes, (4., 2., 5.))} if kind == "da_scc_with_tail" else
++            None if kind == "da_preloop_exception" else {})
++        old_profile = sys.getprofile()
++        def profile(frame, event, arg):
++            return None
++        def invoke():
++            candidate_graph = graph.copy()
++            before_graph = (list(candidate_graph.nodes), list(candidate_graph.edges), copy.deepcopy(vars(candidate_graph)))
++            scores = copy.deepcopy(base_scores)
++            memory = MemoryGraph(candidate_graph)
++            case = CaseData(MemoryDataLoader({}), nodes[0], 1000, interval=timedelta(seconds=1))
++            try:
++                value = DAScorer(threshold=3).score(memory, case, 1001, scores)
++                if value is not scores:
++                    raise ReplayError("declared DA return identity changed")
++                error = None
++            except Exception as failure:
++                value = None
++                error = {"type": type(failure).__name__, "message": str(failure)}
++            if (before_graph[0:2] != (list(candidate_graph.nodes), list(candidate_graph.edges))
++                    or before_graph[2] != vars(candidate_graph)):
++                raise ReplayError("declared focused DA fixture mutated its original graph")
++            return value, error
++        def pure(value):
++            serializer = CircaCapture.__new__(CircaCapture)
++            serializer.np, serializer.pd = np, pd
++            return serializer._value(value)
++        sys.setprofile(profile)
++        try:
++            original, original_error = invoke()
++            with CircaCapture(run / "capture", entry="da") as capture:
++                observed, observed_error = invoke()
++            summary = capture.require_complete()
++            check = capture_checks(run / "capture", summary)
++            differences = exact_differences(pure(original), pure(observed)) + exact_differences(original_error, observed_error)
++            if differences or sys.getprofile() is not profile or sys.gettrace() is not None:
++                raise ReplayError("focused DA fixture changed result/exception/hook: " + kind)
++            journal = check["da_journal"]
++            if kind == "da_empty_groups":
++                if original_error is not None or journal["group_count"] != 0 or journal["header_count"] != 1:
++                    raise ReplayError("focused DA empty fixture did not exercise exact G=0/header=1")
++            elif kind == "da_scc_with_tail":
++                if original_error is not None or journal["group_count"] < 2 or not any(len(group) == 2 for group in journal["groups"]):
++                    raise ReplayError("focused DA cycle fixture did not exercise SCC plus tail groups")
++            elif (original_error is None or original_error["type"] != "TypeError"
++                    or journal["completed"] is not False or journal["header_count"] != 0):
++                raise ReplayError("focused DA exception fixture was mistaken for completed traversal")
++            item = {"name": kind, "entry": "da", "passed": True, "differences": differences,
++                "original_exception": original_error, "observed_exception": observed_error,
++                "capture": check, "profile_restored": True, "graph_state_unchanged": True,
++                "meaning": "declared observer/journal fixture only; no research mechanism evidence"}
++            dump(run / "check.json", item)
++            checks.append(item)
++        finally:
++            sys.setprofile(old_profile)
++    return checks
++
++
++def terminal_manifest_fixture(directory):
++    """Both terminal statuses are sealed with their final source/log bytes."""
++    run = directory / "terminal_manifest"
++    run.mkdir()
++    progress(directory, "FIXTURE_START", name="terminal_manifest")
++    branches = []
++    for label in ("PASS", "FAIL"):
++        branch = run / label.lower()
++        branch.mkdir()
++        dump(branch / "source-checks.json", {"checks": [], "fixture_only": True})
++        progress(branch, "FIXTURE_INPUT", branch=label)
++        verified = finalize_check(branch, {"status": label, "fixture_only": True,
++            "intermediates_eligible": False}, "FINISHED" if label == "PASS" else "FAILED", {"status": label})
++        if not verified["progress_in_manifest"] or not verified["source_checks_in_manifest"]:
++            raise ReplayError("terminal manifest fixture omitted progress/source checks")
++        copied = run / (label.lower() + "-tamper-copy")
++        shutil.copytree(branch, copied)
++        with (copied / "progress.jsonl").open("a", encoding="utf-8") as output:
++            output.write('{"stage":"UNEXPECTED_POST_SEAL_APPEND"}\n')
++        try:
++            verify_final_manifest(copied)
++        except ReplayError:
++            rejected = True
++        else:
++            raise ReplayError("terminal manifest fixture accepted modified sealed progress")
++        verify_final_manifest(branch)
++        branches.append({"status": label, "final_manifest": verified, "post_seal_append_rejected": rejected})
++    item = {"name": "terminal_manifest", "entry": "tool_integrity_only", "passed": True,
++        "branches": branches, "methods_executed": False,
++        "meaning": "terminal/source/log integrity fixture only; no mechanism evidence"}
++    dump(run / "check.json", item)
++    return item
++
++
+ def fixtures(directory, closure_path, closure_sha256):
+     import copy
+     import numpy as np
+@@ -898,6 +1249,7 @@
+     audit = []
+     closure = load_closure(closure_path, closure_sha256, audit)
+     prepare_imports(closure, audit)
++    dump(directory / "source-checks.json", {"checks": audit})
+     from circa_kien_truc.scoring import score_graph
+     from RCAEval.classes.graph import Node, MemoryGraph
+     from RCAEval.graph_heads.rht import ANMRegressor, DAScorer
+@@ -983,6 +1335,8 @@
+             if kind == "da_order":
+                 if observed[nodes[0]].score != 9. or observed[nodes[1]].score != 2.:
+                     raise ReplayError("native DA fixture failed to exercise below-threshold descendant propagation")
++                if check["da_journal"]["group_count"] < 2:
++                    raise ReplayError("native DA order fixture did not exercise multiple topological groups")
+             item = {"name": kind, "entry": entry, "passed": not differences, "differences": differences,
+                 "original_exception": original_exception, "observed_exception": observed_exception,
+                 "capture": check, "profile_restored": True, "meaning": "observation fixture only; no mechanism evidence"}
+@@ -990,20 +1344,25 @@
+             checks.append(item)
+         finally:
+             sys.setprofile(old_profile)
++    checks.extend(focused_da_fixtures(directory))
++    checks.append(terminal_manifest_fixture(directory))
++    if len(checks) != 23:
++        raise ReplayError("all 19 preserved and four declared new CIRCA fixtures are required")
+     load_closure(closure_path, closure_sha256, audit)
+     check_imports(closure, audit)
+     dump(directory / "source-checks.json", {"checks": audit})
+     passed = all(c["passed"] for c in checks)
+-    dump(directory / "check.json", {"status": "PASS" if passed else "FAIL", "fixtures": checks,
++    finalize_check(directory, {"status": "PASS" if passed else "FAIL", "fixtures": checks,
+         "source_verified": True, "source_closure_sha256": closure_sha256, "mechanism_evidence": False,
+-        "artifact_manifest": artifact_manifest(directory), "manifest_excludes": ["check.json"]})
++        "preserved_fixture_count": 19, "new_fixture_count": 4},
++        "FIXTURES_FINISHED", {"status": "PASS" if passed else "FAIL"})
+     return 0 if passed else 1
+ 
+ 
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+     sub = parser.add_subparsers(dest="command", required=True)
+-    for command in ("one", "fixture", "native"):
++    for command in ("one", "fixture", "native", "audit-fixture"):
+         p = sub.add_parser(command)
+         if command in ("one", "native"):
+             p.add_argument("dataset", choices=("RE2-TT", "Nezha-OB"))
+@@ -1012,6 +1371,10 @@
+         p.add_argument("--source-closure", required=True)
+         p.add_argument("--source-closure-sha256", required=True)
+         p.add_argument("--repo-root", default=str(shared.REPO))
++        if command == "audit-fixture":
++            p.add_argument("--old-run", required=True)
++            p.add_argument("--transport-inventory", required=True)
++            p.add_argument("--transport-inventory-sha256", required=True)
+     args = parser.parse_args()
+     shared.REPO = Path(args.repo_root).expanduser().resolve()
+     if os.environ.get("PYTHONHASHSEED") != "0":
+@@ -1020,6 +1383,33 @@
+         return native_child(args)
+     directory = new_directory(args.directory)
+     try:
++        if args.command == "audit-fixture":
++            audit_dir = new_directory(directory / "audit")
++            progress(directory, "STORED_CAPTURE_AUDIT_START")
++            code = audit_stored_fixture(audit_dir, args.old_run, args.transport_inventory,
++                args.transport_inventory_sha256, args.source_closure, args.source_closure_sha256)
++            audit_check = read(audit_dir / "check.json")
++            verify_final_manifest(audit_dir)
++            if code != 0 or audit_check.get("status") != "PASS_STORED_CAPTURE_AUDIT" or audit_check.get("intermediates_eligible") is not False:
++                raise ReplayError("stored capture audit did not pass; no fresh fixture/native may start")
++            progress(directory, "STORED_CAPTURE_AUDIT_PASS", eligible_old_capture=False)
++            fixture_dir = new_directory(directory / "fixtures")
++            progress(directory, "FULL_FRESH_FIXTURES_START")
++            code = fixtures(fixture_dir, args.source_closure, args.source_closure_sha256)
++            fixture_check = read(fixture_dir / "check.json")
++            verify_final_manifest(fixture_dir)
++            if code != 0 or fixture_check.get("status") != "PASS" or len(fixture_check.get("fixtures", [])) != 23:
++                raise ReplayError("full fresh CIRCA fixture did not pass all 23 declared fixtures")
++            combined_sources = read(audit_dir / "source-checks.json")["checks"] + read(fixture_dir / "source-checks.json")["checks"]
++            dump(directory / "source-checks.json", {"checks": combined_sources})
++            finalize_check(directory, {"status": "PASS_AUDIT_AND_FIXTURES", "method": "circa",
++                "source_verified": True, "source_closure_sha256": args.source_closure_sha256,
++                "audit_check_path": "audit/check.json", "audit_check_sha256": sha(audit_dir / "check.json"),
++                "fixture_check_path": "fixtures/check.json", "fixture_check_sha256": sha(fixture_dir / "check.json"),
++                "fixtures_passed": 23, "old_capture_intermediates_eligible": False,
++                "pilot_started": False, "mechanism_evidence": False},
++                "AUDIT_AND_FIXTURES_FINISHED", {"status": "PASS_AUDIT_AND_FIXTURES"})
++            return 0
+         if args.command == "fixture":
+             # Authenticate source bytes before importing any native module.
+             closure = load_closure(args.source_closure, args.source_closure_sha256, [])
+@@ -1027,12 +1417,21 @@
+             return fixtures(directory, args.source_closure, args.source_closure_sha256)
+         return one(directory, args.dataset, args.opaque_id, args.source_closure, args.source_closure_sha256)
+     except BaseException as error:
++        if not (directory / "source-checks.json").exists():
++            available = [path for path in (directory / "audit" / "source-checks.json",
++                directory / "fixtures" / "source-checks.json") if path.is_file()]
++            dump(directory / "source-checks.json", {"checks": [item for path in available
++                for item in read(path).get("checks", [])],
++                "status": "partial failure audit; not a source verification PASS",
++                "available_child_source_checks": [path.relative_to(directory).as_posix() for path in available]})
++        check_name = "failure-after-check.json" if (directory / "check.json").exists() else "check.json"
+         failure = {"status": "FAIL", "method": "circa", "error_type": type(error).__name__, "error": str(error),
+             "traceback": traceback.format_exc(), "intermediates_eligible": False,
+-            "source_closure_sha256": args.source_closure_sha256,
+-            "artifact_manifest": artifact_manifest(directory), "manifest_excludes": ["check.json"]}
+-        dump(directory / ("failure-after-check.json" if (directory / "check.json").exists() else "check.json"), failure)
+-        progress(directory, "FAILED", error=str(error))
++            "source_closure_sha256": args.source_closure_sha256}
++        if check_name != "check.json":
++            failure["superseded_check"] = {"path": "check.json", "sha256": sha(directory / "check.json"),
++                "earlier_result_usable": False}
++        finalize_check(directory, failure, "FAILED", {"error": str(error)}, check_name)
+         return 1
+ 
+ 

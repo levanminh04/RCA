@@ -1,0 +1,138 @@
+{
+  "services": {
+    "prometheus": {
+      "image": "prom/prometheus@sha256:e04987641b57704f408e31f6373ba4138ecf27cb4a165d24aabb6c38fddd0f06",
+      "mem_limit": "3072m",
+      "command": [
+        "--config.file=/etc/prometheus/config.json",
+        "--web.enable-otlp-receiver",
+        "--storage.tsdb.path=/prometheus",
+        "--storage.tsdb.retention.time=30d",
+        "--storage.tsdb.retention.size=40GB"
+      ],
+      "ports": [
+        "127.0.0.1:9090:9090"
+      ],
+      "volumes": [
+        "/opt/flash-ticket-obs/pinned/prometheus.json:/etc/prometheus/config.json:ro",
+        "prometheus-data:/prometheus"
+      ],
+      "container_name": "flash-ticket-obs-prometheus",
+      "restart": "unless-stopped",
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      }
+    },
+    "loki": {
+      "image": "grafana/loki@sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+      "mem_limit": "1g",
+      "user": "0:0",
+      "command": [
+        "-config.file=/etc/loki/config.json"
+      ],
+      "ports": [
+        "127.0.0.1:3100:3100"
+      ],
+      "volumes": [
+        "/opt/flash-ticket-obs/pinned/loki.json:/etc/loki/config.json:ro",
+        "loki-data:/loki"
+      ],
+      "container_name": "flash-ticket-obs-loki",
+      "restart": "unless-stopped",
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      }
+    },
+    "tempo": {
+      "image": "grafana/tempo@sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+      "mem_limit": "2g",
+      "user": "0:0",
+      "command": [
+        "--config.file=/etc/tempo/config.json"
+      ],
+      "environment": {
+        "GOMEMLIMIT": "1536MiB"
+      },
+      "ports": [
+        "127.0.0.1:3200:3200",
+        "127.0.0.1:14317:4317"
+      ],
+      "volumes": [
+        "/opt/flash-ticket-obs/pinned/tempo.json:/etc/tempo/config.json:ro",
+        "tempo-data:/var/tempo"
+      ],
+      "container_name": "flash-ticket-obs-tempo",
+      "restart": "unless-stopped",
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      }
+    },
+    "grafana": {
+      "image": "grafana/grafana@sha256:488984b716c0862639f91a698adbe2862677a5a07bad42da5f03f3030883b205",
+      "mem_limit": "768m",
+      "env_file": [
+        "/opt/flash-ticket-obs/grafana.env"
+      ],
+      "ports": [
+        "10.0.0.215:3000:3000"
+      ],
+      "volumes": [
+        "grafana-data:/var/lib/grafana",
+        "/opt/flash-ticket-obs/pinned/provisioning:/etc/grafana/provisioning:ro",
+        "/opt/flash-ticket-obs/rca-ket-qua:/usr/share/grafana/public/rca:ro"
+      ],
+      "container_name": "flash-ticket-obs-grafana",
+      "restart": "unless-stopped",
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "environment": {
+        "GF_PLUGINS_PREINSTALL_SYNC": "yesoreyeram-infinity-datasource@4.1.6"
+      }
+    },
+    "collector": {
+      "image": "otel/opentelemetry-collector-contrib@sha256:e40d61f10c9a617cca1ffd1be4d7e2b3a4b0f0001798ff07e58cabe82e618cea",
+      "mem_limit": "768m",
+      "user": "0:0",
+      "network_mode": "host",
+      "command": [
+        "--config=/etc/otel/config.json"
+      ],
+      "volumes": [
+        "/opt/flash-ticket-obs/pinned/collector.json:/etc/otel/config.json:ro",
+        "/opt/flash-ticket-obs/pinned/data:/data"
+      ],
+      "container_name": "flash-ticket-obs-collector",
+      "restart": "unless-stopped",
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      }
+    }
+  },
+  "volumes": {
+    "prometheus-data": {},
+    "loki-data": {},
+    "tempo-data": {},
+    "grafana-data": {}
+  }
+}

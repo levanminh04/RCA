@@ -1,0 +1,147 @@
+{
+  "utc": "2026-11-10T20:36:58.056231+00:00",
+  "traceql": {
+    "redis": {
+      "query": "{ span.db.system = \"redis\" || span.db.system.name = \"redis\" }",
+      "returned_traces": 0,
+      "limit": 1000,
+      "trace_ids": []
+    },
+    "rabbitmq": {
+      "query": "{ span.messaging.system = \"rabbitmq\" }",
+      "returned_traces": 44,
+      "limit": 1000,
+      "trace_ids": [
+        "a882a5912605d41243e2d5be9f3622e",
+        "6bbb8c613e7b98c72732bf9233884fe3",
+        "951160daeb67d1e02c922722e214c1aa",
+        "3b884e0546525062e77d25c92b74f401",
+        "e779455cab9cda6653f476743489f1eb",
+        "e0792722aed35068e4e3bcd3b932ffa6",
+        "8aabca58a744a320e12612d8a745fefc",
+        "46049297d9d174e0bc6d2c0f67009153"
+      ]
+    },
+    "producer_consumer": {
+      "query": "{ kind = producer || kind = consumer }",
+      "returned_traces": 1,
+      "limit": 1000,
+      "trace_ids": [
+        "6bbb8c613e7b98c72732bf9233884fe3"
+      ]
+    },
+    "postgresql": {
+      "query": "{ span.db.system = \"postgresql\" || span.db.system.name = \"postgresql\" }",
+      "returned_traces": 1000,
+      "limit": 1000,
+      "trace_ids": [
+        "319fe46062f46d383dcbffa1f506e6b",
+        "d4cf981b2b43cf047068a1edd6cd341",
+        "153697b6090a3907bfb74e49623492e1",
+        "d10b8d8fcf5229d53d18cb1f90a479e",
+        "259fd47776c54f18767db353a7ab5b86",
+        "bb5fb21420aa6ea636523b12af08c03",
+        "1f1cc8a9ec63015e67894cb098bd33b1",
+        "a9596a8ae3f6e507b5edc5e6e5e5cb5"
+      ]
+    }
+  },
+  "grafana_proxies": {
+    "metrics": {
+      "query": "count by(service_name) (http_server_request_duration_seconds_count)",
+      "status": "success",
+      "series": [
+        {
+          "metric": {
+            "service_name": "discovery-server"
+          },
+          "value": [
+            1794343018.453,
+            "8"
+          ]
+        },
+        {
+          "metric": {
+            "service_name": "event-service"
+          },
+          "value": [
+            1794343018.453,
+            "5"
+          ]
+        },
+        {
+          "metric": {
+            "service_name": "api-gateway"
+          },
+          "value": [
+            1794343018.453,
+            "9"
+          ]
+        },
+        {
+          "metric": {
+            "service_name": "keycloak"
+          },
+          "value": [
+            1794343018.453,
+            "5"
+          ]
+        },
+        {
+          "metric": {
+            "service_name": "payment-service"
+          },
+          "value": [
+            1794343018.453,
+            "2"
+          ]
+        },
+        {
+          "metric": {
+            "service_name": "user-service"
+          },
+          "value": [
+            1794343018.453,
+            "1"
+          ]
+        },
+        {
+          "metric": {
+            "service_name": "ticket-service"
+          },
+          "value": [
+            1794343018.453,
+            "1"
+          ]
+        },
+        {
+          "metric": {
+            "service_name": "booking-service"
+          },
+          "value": [
+            1794343018.453,
+            "5"
+          ]
+        }
+      ]
+    },
+    "logs": {
+      "status": "success",
+      "streams": 10,
+      "rows": 10
+    },
+    "traces": {
+      "trace_id": "4e4e55834ff4af204cb5ed0bdcce45c3",
+      "span_count": 18,
+      "top_level_keys": [
+        "batches"
+      ]
+    }
+  },
+  "dashboard": {
+    "uid": "t058-flashticket",
+    "url": "/d/t058-flashticket/flashticket-t-058",
+    "status": "success",
+    "version": 1
+  }
+}

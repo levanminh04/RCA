@@ -1,0 +1,9 @@
+# Lời nhắn tiếp theo cho L1 (Claude điều phối, sau khi L1 báo xong lượt đầu)
+
+Cảm ơn bàn giao 1–2 và việc tự phát hiện lỗi `traceparent` của k6 v1. Claude (người phản biện + điều phối) cần thêm ba việc, vẫn trong SPEC phụ lục 2 và phạm vi ghi cũ. Đọc lại `results/T-062/tai-2/CHECKPOINT.md` của bạn trước.
+
+1. **Đổi bậc tải trong cùng lượt** (cho ô FLASH-HEALTHY và HTTP5-EVENT-FLASH của đợt thu): thêm vào `Start-Tai` tham số `-BuocTai <giây>` dùng cùng `-Multiplier <k>`: nhịp hành trình = chuẩn từ 0 tới `BuocTai`, = chuẩn × k từ `BuocTai` tới hết lượt, trong **một** lượt k6 (hai scenario `constant-arrival-rate` có `startTime`, cùng hỗn hợp, token, dữ liệu). Không có `-BuocTai` thì hành vi `-Multiplier` giữ như hiện tại. Kiểm bằng một lượt ngắn (vd. `-Seconds 240 -BuocTai 120 -Multiplier 3`): bảng request/giây theo khúc 30 s phía k6 và phía gateway; báo maxVUs có đủ ở ×3 không (đang 20), lượt rơi, lỗi.
+2. **Độ bền cho đợt thu nhiều giờ:** hàm `Test-L1Duong` (hoặc tương đương) để bộ chạy gọi trước mỗi chu kỳ: kiểm tunnel máy tải → mock (health 200), PID mock còn sống, token pool còn hạn; tự dựng lại tunnel/mock nếu chết (giữ log, ghi sự kiện). Đây là thay đổi trong phạm vi L1 (mock, tunnel, kịch bản). Không mở firewall.
+3. **Chờ bảo trì `exp-app` của Claude:** Claude sẽ tạo lại container (cùng image) để đổi nhãn log và cấu hình agent Keycloak; khi xong Claude ghi `results/T-062/tai-2/EXP-APP-BAO-TRI-1-XONG`. Sau marker đó: kiểm lại **một giao dịch mua trọn** và **một lượt 5 phút** trên cấu hình mới (kiểm tích hợp lại, phụ lục 2 phần bổ sung), ghi `BAN-GIAO-3-sau-bao-tri.md`. Chưa có marker thì làm việc 1–2 trên máy tải (không tải lên `exp-app` trong lúc bảo trì — kiểm marker `EXP-APP-BAO-TRI-1-BAT-DAU`).
+
+Báo xong như cũ (dòng đầu `L1 XONG` / `L1 XONG MỘT PHẦN` / `L1 CHẶN`).

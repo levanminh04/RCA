@@ -1,0 +1,18 @@
+# T-065 L8 — G-c bị chặn tại hợp đồng hash cấu hình
+
+2026-11-14T16:52:24.329Z — Codex người làm; Claude phản biện.
+
+1. Đã kiểm chỉ mục bản 2, 83 đầu ra có file và một slot P7 lỗi chạy. SHA byte của mọi đầu ra có file khớp; manifest cũ 6.311 mục và LOG khớp khi tiếp nhận. Dữ kiện máy đọc ở `tiep-nhan.json#/source_outputs` và `chan-hash-cau-hinh.json`.
+2. Mâu thuẫn có bằng chứng: `results/T-064/ban-xuat/chi-muc-ban.json#/ban/1/cau_hinh_sha256` và `results/T-064/cau-hinh-de-xuat.json#/cau_hinh_sha256` ghi hash byte của file cấu hình. Cả 28 đầu ra V082 tại `/extra/m1_ft/cau_hinh_sha256` ghi hash JSON chuẩn hóa. `src/m1_ft/chay.py:54–59,165` định nghĩa loại thứ hai. Tính lại trên chính file cấu hình khớp hai giá trị tương ứng. Không phải lệch SHA byte của method-output; chưa có bằng chứng sai cấu hình chạy hoặc sai hạng. V071 không có mâu thuẫn hai trường metadata với chỉ mục. Hash đầy đủ và con trỏ từng ca nằm trong `chan-hash-cau-hinh.json`, không rải vào văn bản.
+3. Theo AGENTS phần Resolve conflicts và Luật 0, đã dừng phần xuất phụ thuộc trước khi ghi dữ liệu/dashboard. Chưa chạy API của dashboard L8. Mới tạo thư mục `t065-l8-001` trên exp-obs, chứa nguồn chụp/payload/script và inventory; chưa tạo file provisioning mới, chưa restart. `may-sau-chan.json` xác nhận 3.019 file máy có trước giữ hash, thời điểm khởi động Grafana không đổi. Bản thử G-c và toàn bộ dữ liệu/dashboard cũ giữ nguyên.
+4. Đã xác nhận nguồn trace/log/metric tồn tại cho cả sáu ca dev3. Chưa đọc/xử lý raw sau khi guard metadata dừng; chưa dựng liên kết dev3. Việc tồn tại raw không chứng minh kho sống còn dữ liệu. `codex/l8-xuat.py` là bản nháp chưa kiểm quá guard metadata; không dùng làm bộ xuất đã đạt, không deploy nhánh dashboards/deploy. Giữ lượt hỏng tại `codex/l8-xuat-luot-001.txt`.
+
+FACT: hai cách băm có giá trị khác nhau trên cùng cấu hình JSON, đủ giải thích sự khác metadata. DECIDED: Minh đã chọn V082 theo nguồn DECISIONS/WHY-98; L8 không thay quyết định đó. OPEN: trường hash ở hợp đồng/chỉ mục sẽ dùng quy ước nào. Chủ phần nguồn: Claude người làm T-064 trong quyền điều phối; Minh phân xử khi cần.
+
+Đề xuất: T-064 thống nhất `cau_hinh_sha256` của chỉ mục và hồ sơ đề xuất theo `sha_cau_hinh` đã dùng trong đầu ra; nếu cần giữ hash byte file thì ghi thành trường riêng có tên rõ. Giữ nguyên method-output và file cấu hình, không chạy lại M1 vì khác biệt hiện có được giải thích bằng serialization. Đề xuất này chưa là quyết định. Phương án khác: giữ cả hai quy ước và Minh cho phép T-065 hiển thị hai nhãn riêng; mặt trái là hợp đồng vẫn cần nói rõ ý nghĩa từng trường. Không tự chọn một nguồn hoặc sửa T-064 trong L8.
+
+Bằng chứng cần để tiếp: chỉ mục/hồ sơ T-064 đã thống nhất ý nghĩa hash, hash chỉ mục bàn giao lại; sau đó kiểm lại nguồn và tiếp bộ xuất/dashboard/API. Thiếu nguồn đã thống nhất chặn G-c, không thể thay bằng ảnh Chrome. Khi triển khai được mới kiểm hạng/cờ/hash ít nhất ba ca mỗi bản, gồm ebd5ef38, ca V071 có cạnh và ca T-062; kiểm URL/cửa sổ, nhánh lỗi chạy và nguồn dev3, rồi báo phần Chrome chưa làm.
+
+Phạm vi nghiên cứu: L8 chưa chứng minh hoàn thành G-c, không nghiệm thu T-065 và không trả lời xong RQ5. L6/L7 còn chờ Claude kiểm lại; prompt hiện hành gộp ba lượt, không tự đóng các ý kiến cũ. Chưa thay quyết định nghiên cứu, chưa ghi STATE/docs/SPEC/REVIEW/src/T-064, không commit/push.
+
+Lỗi công cụ giữ trong hồ sơ: Python/Node executable của user bị sandbox từ chối; dùng PowerShell/Node REPL. Node REPL hash toàn bộ timeout, không tính là đạt; PowerShell sau đó kiểm đủ. PowerShell 5.1 đọc script UTF-8 không BOM lỗi parse trước ghi; đã thêm BOM để chạy init. Lệnh inventory đầu chưa sudo bị PermissionError; lệnh đọc lại bằng sudo đạt. Lỗi guard metadata không là kết quả khoa học.

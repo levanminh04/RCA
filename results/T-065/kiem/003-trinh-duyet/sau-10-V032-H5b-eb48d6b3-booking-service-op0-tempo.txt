@@ -1,0 +1,352 @@
+- link "Skip to main content":
+  - /url: "#pageContent"
+  - generic: Skip to main content
+- link "Grafana":
+  - /url: /
+  - img "Grafana"
+- link "Grafana":
+  - /url: /
+- button "Close menu":
+- navigation "Navigation":
+  - list "Navigation":
+    - link "Bookmarks":
+      - /url: /bookmarks
+      - paragraph: Bookmarks
+    - 'button "Expand section: Bookmarks"':
+    - link "Starred":
+      - /url: /dashboards?starred
+      - paragraph: Starred
+    - 'button "Expand section: Starred"':
+    - link "Dashboards":
+      - /url: /dashboards
+      - paragraph: Dashboards
+    - 'button "Collapse section: Dashboards" [expanded]':
+    - list:
+      - link "Playlists":
+        - /url: /playlists
+        - paragraph: Playlists
+      - link "Snapshots":
+        - /url: /dashboard/snapshots
+        - paragraph: Snapshots
+      - link "Library panels":
+        - /url: /library-panels
+        - paragraph: Library panels
+      - link "Shared dashboards":
+        - /url: /dashboard/public
+        - paragraph: Shared dashboards
+      - link "Recently deleted":
+        - /url: /dashboard/recently-deleted
+        - paragraph: Recently deleted
+    - link "Explore":
+      - /url: /explore
+      - paragraph: Explore
+    - link "Drilldown":
+      - /url: /drilldown
+      - paragraph: Drilldown
+    - 'button "Expand section: Drilldown"':
+    - link "Alerting":
+      - /url: /alerting
+      - paragraph: Alerting
+    - 'button "Expand section: Alerting"':
+    - link "Connections":
+      - /url: /connections
+      - paragraph: Connections
+    - 'button "Collapse section: Connections" [expanded]':
+    - list:
+      - link "Add new connection":
+        - /url: /connections/add-new-connection
+        - paragraph: Add new connection
+      - link "Data sources":
+        - /url: /connections/datasources
+        - paragraph: Data sources
+    - link "Administration":
+      - /url: /admin
+      - paragraph: Administration
+    - 'button "Expand section: Administration"':
+  - separator
+  - button "Undock menu":
+- banner:
+  - navigation "Breadcrumbs":
+    - list:
+      - link "Explore":
+        - /url: /explore
+      - generic: Tempo
+  - button "Search..."
+  - generic: ctrl+k
+  - button "New":
+  - button "Help":
+  - button "Profile":
+    - img "User avatar"
+- main:
+  - heading "Explore" [level=1]
+  - navigation "Explore toolbar":
+    - navigation "Search links":
+      - button "Content outline" [expanded]:
+        - generic: Outline
+      - img "Tempo logo"
+      - combobox "Select a data source"
+      - button "Go queryless":
+        - generic: Go queryless
+    - button "Split the pane":
+      - generic: Split
+    - button "Add":
+      - generic: Add
+    - button "Move time range backwards":
+    - 'button "Time range selected: 2026-11-13 14:19:20 to 2026-11-13 14:29:19"':
+    - button "Move time range forwards":
+    - button "Zoom out time range":
+    - button "Run query":
+    - button "Auto refresh turned off. Choose refresh time interval":
+    - button "Copy shortened URL":
+    - button "Open copy link options":
+  - button "Collapse outline" [expanded]:
+    - img "arrow-from-right"
+  - button "Queries":
+    - img "arrow"
+    - generic: Queries
+  - button "Table":
+    - generic: Table
+  - button "Collapse query row" [expanded]:
+  - button "A":
+    - generic: A
+  - emphasis: (Tempo)
+  - button "Show data source help":
+  - button "Duplicate query":
+  - button "Hide response":
+  - button "Remove query":
+  - button "Drag and drop to reorder":
+    - img "Drag and drop to reorder"
+  - generic: Query type
+  - radiogroup:
+    - radio "Search"
+    - generic "Search":
+      - generic: Search
+    - radio "TraceQL" [checked]
+    - generic "TraceQL":
+      - generic: TraceQL
+    - radio "Trace ID"
+    - generic "Trace ID":
+      - generic: Trace ID
+    - radio "Service Graph"
+    - generic "Service Graph":
+      - generic: Service Graph
+  - button "Import trace":
+    - generic: Import trace
+  - text: Build complex queries using TraceQL to select a list of traces.
+  - link "Documentation":
+    - /url: https://grafana.com/docs/tempo/latest/traceql/
+    - text: Documentation
+  - code:
+    - generic: "{ resource.service.name = \"booking-service\" && name = \"SELECT booking_schema.tbl_outbox_messages\" }"
+    - textbox "Editor content;Press Alt+F1 for Accessibility Options.": "{ resource.service.name = \"booking-service\" && name = \"SELECT booking_schema.tbl_outbox_messages\" }"
+  - 'button "Search Options Limit: 50 Spans Limit: 3 Table Format: Traces | Streaming: Disabled"':
+  - heading "Search Options" [level=6]
+  - generic: "Limit: 50"
+  - generic: "Spans Limit: 3"
+  - generic: "Table Format: Traces"
+  - generic: "|"
+  - generic: "Streaming: Disabled"
+  - 'button "Metrics Options Step: auto Type: Range | Streaming: Disabled"':
+  - heading "Metrics Options" [level=6]
+  - generic: "Step: auto"
+  - generic: "Type: Range"
+  - generic: "|"
+  - generic: "Streaming: Disabled"
+  - button "Add query":
+    - generic: Add query
+  - button "Query history":
+    - generic: Query history
+  - button "Query inspector":
+    - generic: Query inspector
+  - main:
+    - region "Table - Traces":
+      - heading "Table - Traces" [level=2]
+      - treegrid:
+        - row "Expand nested rows Trace ID Start time Service Name Duration":
+          - columnheader "Expand nested rows":
+            - generic: Expand nested rows
+          - columnheader "Trace ID":
+            - button "Trace ID"
+          - columnheader "Start time":
+            - button "Start time"
+          - columnheader "Service":
+            - button "Service"
+          - columnheader "Name":
+            - button "Name"
+          - columnheader "Duration":
+            - button "Duration"
+        - row "Expand row 106ffc29899cf606e410d5c000eb645f 2026-11-13 14:29:11 booking-service BookingOutboxWorker.publishDueBookingMessages 16 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "106ffc29899cf606e410d5c000eb645f":
+            - link "106ffc29899cf606e410d5c000eb645f":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22106ffc29899cf606e410d5c000eb645f%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:29:11"
+          - gridcell "booking-service"
+          - gridcell "BookingOutboxWorker.publishDueBookingMessages"
+          - gridcell "16 ms"
+        - row "Expand row bd9aa824ea2191b0592c9409e036a8b 2026-11-13 14:29:10 payment-service PaymentWorker.publishOutbox 26 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "bd9aa824ea2191b0592c9409e036a8b":
+            - link "bd9aa824ea2191b0592c9409e036a8b":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22bd9aa824ea2191b0592c9409e036a8b%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:29:10"
+          - gridcell "payment-service"
+          - gridcell "PaymentWorker.publishOutbox"
+          - gridcell "26 ms"
+        - row "Expand row 127f69cb29b5196fb6bd93ddf61b59e0 2026-11-13 14:28:57 booking-service BookingOutboxWorker.publishDueBookingMessages 15 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "127f69cb29b5196fb6bd93ddf61b59e0":
+            - link "127f69cb29b5196fb6bd93ddf61b59e0":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22127f69cb29b5196fb6bd93ddf61b59e0%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:28:57"
+          - gridcell "booking-service"
+          - gridcell "BookingOutboxWorker.publishDueBookingMessages"
+          - gridcell "15 ms"
+        - row "Expand row 30e0a387ade076a706eb454d81a351e 2026-11-13 14:28:55 booking-service BookingOutboxWorker.publishDueBookingMessages 21 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "30e0a387ade076a706eb454d81a351e":
+            - link "30e0a387ade076a706eb454d81a351e":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%2230e0a387ade076a706eb454d81a351e%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:28:55"
+          - gridcell "booking-service"
+          - gridcell "BookingOutboxWorker.publishDueBookingMessages"
+          - gridcell "21 ms"
+        - row "Expand row 1276390310846c7b7ac30a2fa3a0177e 2026-11-13 14:28:37 booking-service BookingOutboxWorker.publishDueBookingMessages 54 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "1276390310846c7b7ac30a2fa3a0177e":
+            - link "1276390310846c7b7ac30a2fa3a0177e":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%221276390310846c7b7ac30a2fa3a0177e%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:28:37"
+          - gridcell "booking-service"
+          - gridcell "BookingOutboxWorker.publishDueBookingMessages"
+          - gridcell "54 ms"
+        - row "Expand row 1307b237d2241a684e529172430e524c 2026-11-13 14:28:17 booking-service BookingOutboxWorker.publishDueBookingMessages 1 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "1307b237d2241a684e529172430e524c":
+            - link "1307b237d2241a684e529172430e524c":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%221307b237d2241a684e529172430e524c%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:28:17"
+          - gridcell "booking-service"
+          - gridcell "BookingOutboxWorker.publishDueBookingMessages"
+          - gridcell "1 ms"
+        - row "Expand row 6163adb17c62885adcaa548fa38b903 2026-11-13 14:28:15 booking-service BookingOutboxWorker.publishDueBookingMessages 1 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "6163adb17c62885adcaa548fa38b903":
+            - link "6163adb17c62885adcaa548fa38b903":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%226163adb17c62885adcaa548fa38b903%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:28:15"
+          - gridcell "booking-service"
+          - gridcell "BookingOutboxWorker.publishDueBookingMessages"
+          - gridcell "1 ms"
+        - row "Expand row 11ae0f754e3c2afc70373da8658b6794 2026-11-13 14:28:02 payment-service PaymentWorker.publishOutbox 30 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "11ae0f754e3c2afc70373da8658b6794":
+            - link "11ae0f754e3c2afc70373da8658b6794":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%2211ae0f754e3c2afc70373da8658b6794%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:28:02"
+          - gridcell "payment-service"
+          - gridcell "PaymentWorker.publishOutbox"
+          - gridcell "30 ms"
+        - row "Expand row 945f8794da26f06b151c211cb0f5c4c 2026-11-13 14:28:00 payment-service PaymentWorker.publishOutbox 20 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "945f8794da26f06b151c211cb0f5c4c":
+            - link "945f8794da26f06b151c211cb0f5c4c":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22945f8794da26f06b151c211cb0f5c4c%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:28:00"
+          - gridcell "payment-service"
+          - gridcell "PaymentWorker.publishOutbox"
+          - gridcell "20 ms"
+        - row "Expand row d566702e5f28344eaf1b39fe94fa59b 2026-11-13 14:27:59 booking-service BookingOutboxWorker.publishDueBookingMessages 1 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "d566702e5f28344eaf1b39fe94fa59b":
+            - link "d566702e5f28344eaf1b39fe94fa59b":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22d566702e5f28344eaf1b39fe94fa59b%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:27:59"
+          - gridcell "booking-service"
+          - gridcell "BookingOutboxWorker.publishDueBookingMessages"
+          - gridcell "1 ms"
+        - row "Expand row 4e36c7e2004b67b0a02cb090d45a424 2026-11-13 14:27:52 payment-service PaymentWorker.publishOutbox 17 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "4e36c7e2004b67b0a02cb090d45a424":
+            - link "4e36c7e2004b67b0a02cb090d45a424":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%224e36c7e2004b67b0a02cb090d45a424%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:27:52"
+          - gridcell "payment-service"
+          - gridcell "PaymentWorker.publishOutbox"
+          - gridcell "17 ms"
+        - row "Expand row c8a564ddc30c14659e36bd92381eaca 2026-11-13 14:27:41 booking-service BookingOutboxWorker.publishDueBookingMessages 2 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "c8a564ddc30c14659e36bd92381eaca":
+            - link "c8a564ddc30c14659e36bd92381eaca":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22c8a564ddc30c14659e36bd92381eaca%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:27:41"
+          - gridcell "booking-service"
+          - gridcell "BookingOutboxWorker.publishDueBookingMessages"
+          - gridcell "2 ms"
+        - row "Expand row caaa4fa240009b0ad1e9441219a9046 2026-11-13 14:27:24 booking-service BookingOutboxWorker.publishDueBookingMessages 1 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "caaa4fa240009b0ad1e9441219a9046":
+            - link "caaa4fa240009b0ad1e9441219a9046":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22caaa4fa240009b0ad1e9441219a9046%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:27:24"
+          - gridcell "booking-service"
+          - gridcell "BookingOutboxWorker.publishDueBookingMessages"
+          - gridcell "1 ms"
+        - row "Expand row 8d17f5ccced5a199c3c87f29311a9b0 2026-11-13 14:26:54 booking-service BookingOutboxWorker.publishDueBookingMessages 16 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "8d17f5ccced5a199c3c87f29311a9b0":
+            - link "8d17f5ccced5a199c3c87f29311a9b0":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%228d17f5ccced5a199c3c87f29311a9b0%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:26:54"
+          - gridcell "booking-service"
+          - gridcell "BookingOutboxWorker.publishDueBookingMessages"
+          - gridcell "16 ms"
+        - row "Expand row 5bdca3622896333766bdc9df5218dcb 2026-11-13 14:26:40 booking-service BookingOutboxWorker.publishDueBookingMessages 36 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "5bdca3622896333766bdc9df5218dcb":
+            - link "5bdca3622896333766bdc9df5218dcb":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%225bdca3622896333766bdc9df5218dcb%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:26:40"
+          - gridcell "booking-service"
+          - gridcell "BookingOutboxWorker.publishDueBookingMessages"
+          - gridcell "36 ms"
+        - row "Expand row 2ad113509f687083dc0d48a7f395d9c 2026-11-13 14:26:30 payment-service PaymentWorker.publishOutbox 22 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "2ad113509f687083dc0d48a7f395d9c":
+            - link "2ad113509f687083dc0d48a7f395d9c":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%222ad113509f687083dc0d48a7f395d9c%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:26:30"
+          - gridcell "payment-service"
+          - gridcell "PaymentWorker.publishOutbox"
+          - gridcell "22 ms"
+        - row "Expand row 12154d35c0f96a6f90988ae38897cf41 2026-11-13 14:26:02 booking-service BookingOutboxWorker.publishDueBookingMessages 1 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "12154d35c0f96a6f90988ae38897cf41":
+            - link "12154d35c0f96a6f90988ae38897cf41":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%2212154d35c0f96a6f90988ae38897cf41%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:26:02"
+          - gridcell "booking-service"
+          - gridcell "BookingOutboxWorker.publishDueBookingMessages"
+          - gridcell "1 ms"
+- log
+- alert
+- alert
+- complementary
+- complementary

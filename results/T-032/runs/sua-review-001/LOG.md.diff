@@ -1,0 +1,113 @@
+--- before/tasks/T-032-g2-nguyen-nhan-xep-hang/LOG.md
++++ after/tasks/T-032-g2-nguyen-nhan-xep-hang/LOG.md
+@@ -2792,3 +2792,110 @@
+ Đầu ra có nêu: hạn chế đã xác nhận và điều kiện; lỗi cài đặt/thiếu đầu vào; hạn chế giả định/phép tính; quan hệ có thể bổ sung thông tin gì; câu chưa trả lời và bằng chứng còn thiếu? Căn cứ nào đủ đề xuất ứng viên, căn cứ nào đủ lựa chọn thiết kế?
+ Không bắt mọi task P4 làm xong đối chứng của phương pháp mới. Đối chứng bỏ quan hệ và đồ thị ngẫu nhiên dùng khi đánh giá tác dụng cấu trúc; không là điều kiện trì hoãn mọi phân tích hạn chế baseline.
+ ```
++
++
++## Sửa sau REVIEW — 11/10/2026, Codex, laptop Windows
++
++### Mở lượt và quyền sửa
++
++Minh duyệt toàn bộ đề xuất và yêu cầu Codex sửa, rồi soạn prompt cho phiên Codex mới kiểm lại. Lời duyệt và phạm vi ở Q-142. Codex thực hiện riêng bản sửa được duyệt; không đổi vai trò lịch sử Claude/Codex trong SPEC. Phiên Codex mới do Minh mở, không do phiên này tự mở hay gửi. Yêu cầu mới của Minh là ngoại lệ riêng về tên agent kiểm bản sửa; không coi bản sửa hay việc hai phiên đồng ý là bằng chứng khoa học.
++
++Bản tự soát chỉ đọc trước lời duyệt đã đối chiếu đầu ra gốc trước REVIEW: N1 đếm MicroRank cần tách OK sai/ERROR/ca đúng; N2 self-check E chỉ bao phủ KQ13 mục1–6, không kiểm mục7 hoặc doc-tay mục8; N3 mốc giả so nhóm khác loại nên không tách được cơ chế; N4 nội dung lời duyệt “1 2 3”/Q-142 cũ không có trong nguồn đọc được, không tự tái dựng. Phản hồi chỉ đọc của Claude được Minh dán; lượt này kiểm và thực hiện bản sửa theo quyền mới, không ghi thay một phiên Claude đã chạy.
++
++Ảnh hưởng: bốn báo cáo sửa phạm vi kết luận và tổng đếm; REVIEW chỉ bảng phản hồi; LOG nối thêm; STATE chỉ dòng T-032; DECISIONS ghi đúng lời duyệt hiện tại. Phần bổ sung lưu trong results/T-032/runs/sua-review-001/: bản trước và hash, bảng M-D theo trace, kiểm số, kiểm diff, manifest, prompt. Dùng lại trung gian để giảm chi phí; không đổi phương pháp, cửa sổ, điểm đóng băng hoặc dữ liệu. Bản manifest phiên13 trước sửa khớp 28/28 file; giữ nguyên manifest cũ cùng bản trước để đọc đúng lịch sử.
++
++### Duyệt bổ sung ngày12/10/2026
++
++Trong kiểm số đọc tay phát hiện nhãn tác dụng S-1 dùng hạng tốt nhất, trong khi báo cáo dùng hạng bi quan. Minh duyệt riêng một câu (Q-143). Sửa đúng câu đã trình; nguồn không đổi.
++
++
++### Tiếp tục và kết thúc lượt sửa — 12/10/2026, Codex, laptop Windows
++
++**Quyền và phục hồi.** Minh yêu cầu tiếp tục phần dở sau usage limit, chỉ làm phần có căn cứ và đã được cho phép. Quyền sửa Q-142/Q-143 giữ nguyên. Đã đọc lại AGENTS, SPEC, STATE, mục LOG cuối, file hiện có; so nguồn với snapshot/manifest, không suy tiến độ từ tin nhắn trợ lý. Phần trích M-D và kiểm số đã lưu hợp lệ, không chạy lại phương pháp. Hai trợ lý nội bộ trước đó chỉ hỗ trợ thu/kiểm bằng chứng, không mở vòng phản biện chính thức; không còn trợ lý chạy.
++
++**1. Đã làm.** Sửa R1–R5 trong bốn báo cáo; tách thứ hạng khỏi đáp ứng do lỗi, bỏ bác bỏ chờ tuyệt đối ở MicroRank, giữ ca chưa rõ và ca không gắn nhưng có root, giới hạn kết luận CIRCA theo cửa sổ và kết luận đồ thị theo cạnh đi vào. Sửa N1 về48 đơn vị đọc; kiểm N2 độc lập từ JSON/phiếu; giữ mốc N3 không đạt, không tái dựng lời duyệt cũ N4. N5 phát hiện thêm về hòa S-1, đã được Minh duyệt riêng. Thu bảng cờ/nhóm M-D từ capture cũ; có bằng chứng caller mất cờ nhưng trace vẫn A trong 20/20ca caller trên root native,19 ca còn caller trên root M-D. Đây là bước OR/đếm, không quy toàn bộ hạng giữ cho cùng nguyên nhân.
++
++**2. File đổi.** Bốn báo cáo results/T-032/nguyen-nhan-xep-hang.md,ket-qua-phien-13.md,doc-tay.md,kiem-tiep.md; REVIEW.md chỉ bảng Phản hồi của người làm; LOG.md chỉ nối; docs/STATE.md chỉ dòng T-032; docs/DECISIONS.md nối làm rõ quyền Q-142 và Q-143. Gói mới results/T-032/runs/sua-review-001/ có snapshot, script và mọi kết quả thu/kiểm, diff,manifest,bo-sung-sau-review.md,prompt. Không sửa SPEC,src,data,code/môi trường/cửa sổ/điểm đóng băng hay task khác. Không mở test,không commit/push.
++
++**3. Kiểm và kết quả.** Manifest phiên13 trước sửa28/28 khớp. M-D: 48 ca PASS, 4 ERROR ghi N/A;7 kiểm/ca khớp native/M-D,8 fixtures đạt; kiểm độc lập bảng trace vàhash nguồn đạt (kiem-md-doc-lap.json). Native đúng2 ca RE2-TT|delay không có caller trực tiếp trong tập; không có native đúng cùng dataset/fault cho 20ca caller trên root, nên không tự gán nguyên nhân riêng. Runtime ba lượt 287,300giây, giữ hai failure(thiếu liên kết capture), lượt003 truy đúng binding có hash. Kiểm số results/T-032/runs/sua-review-001/kiem-so/result-after-008.json:412/412; thêm 17đối chiếu slow-call/CIRCA ở kiểm bổ sung đạt. A46/D15/E61 đạt; các lần E bị lệch chuỗi do định dạng đều giữ, câu không thuộc sửa đã trả đúng bản trước. B/C là rà chuỗi, còn mục chưa ánh xạ; không lấy tổngcheck để xác nhận mọi lời giải thích. Diff toàn bộ so với snapshot, prefixLOG/DECISIONS, phần REVIEW ngoài bảng, dòng STATE ngoài T-032vàhash đầu vào được kiểm cuối. Manifest/diff cuối trong gói.
++
++**4. Phần đạt và phần còn mở.** Gói sửa được duyệt đã hoàn tất; bốn báo cáo ghi mức kết luận đúng hơn và có trung gian M-D mới. Câu hỏi nguồn RQ2 trả lời thêm được đường cờ giữ trace trongA; chưa phân xử vật lý chờ, tác dụng trọng số khi nhóm đổi hay cơ chế mọi ca sai. Return chưa tách đáp ứng do lỗi khỏi nền; dev-14701a3bbb còn chưa rõ cả hai luật,dev-607751ac0a luật code có root trong trace nhưng không gắn; cầntrọng số/điểm theo thao tác và đối chứng phù hợp. CIRCA chưa cô lập độ dài học,phân phối/giai đoạn lỗi,tập nút; cần phép đổi riêng trước khẳng định nguyên nhân. Lời duyệt cũ “1 2 3”/Q142cũ chưa truy được nguyên văn, không ảnh hưởng quyền sửa hiện tại nhưng không tái dựng. Cách ghi 4 ERROR,dòng độ nhạy,lan đáng kể và chọn ứng viên P5–P6 vẫn thuộc Minh/tổng hợp G2. Không nghiệm thu task hay đóng G2 trong lượt này. Các câu phù hợp báo cáo đồ án hiện ở báo cáo chính/bo-sung; không lấy câu cũ về không có tín hiệu làm kết luận cuối.
++
++**Bước tiếp theo chính xác.** Minh mở phiên Codex mới và copy prompt đầy đủ dướiđây. Phiên mới đọc AGENTS,STATE,SPEC,LOG và đầu ra gốc; kiểm manifest mới và snapshot trước khi đọc REVIEW/phản hồi. Chỉ đọc và trả lời chat theo quyền hiện có; quyền tạo REVIEW-2 cần Minh duyệt riêng. Không tự chạy baseline/PageRank/EC2 hay test. Kiểm hash/parse JSON/tính trongbộ nhớ từ kết quả đãlưu được phép. Đề xuất tiếp tục lượt kiểm theo yêu cầu Minh; sau kiểm Minh quyết nghiệm thu/chấp nhận giới hạn hay bổ sung.
++
++**Lệnh kiểm đã chạy cuối.** py -3 -B -X utf8 results/T-032/runs/sua-review-001/kiem-so/validate_handwritten.py after; py -3 -B -X utf8 results/T-032/runs/sua-review-001/verify_extra_numbers.py; py -3 -B -X utf8 results/T-032/scripts/self_check_phien13_v1.py results/T-032 results/T-032/runs/sua-review-001/self-check-phien13-005.json. Kiểm cuối bảo toàn/phạm vi/manifest: script trong gói được ghi rõ trong kiem-cuoi.json.
++
++**Đề xuất commit, chưa làm.** docs(T-032): sửa kết luận sau phản biện và bổ sung bằng chứng M-D. Chỉ commit/push nếu Minh duyệt riêng.
++
++### Prompt mới để Minh chuyển sang phiên Codex mới — kiểm lại bản sửa
++
++Bản thuần: results/T-032/runs/sua-review-001/prompt-codex-kiem-lai.txt. Dựng từ đúng Prompt chung, Khối Kiểm lại phản hồi và sửa, Khối G2; không gợi finding. Phiên này không tự gửi.
++
++```text
++Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
++Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
++
++Thông tin lượt này:
++- Task hoặc đề xuất: T-032; tasks/T-032-g2-nguyen-nhan-xep-hang/SPEC.md và LOG.md.
++- Công đoạn: kiểm lại phản hồi và sửa.
++- Gói/cổng: P4; cổng G2.
++- Người làm và người phản biện chính thức: theo SPEC, Claude làm và Codex phản biện. Minh trực tiếp yêu cầu Codex thực hiện lượt sửa sau REVIEW, rồi mở phiên Codex mới này để kiểm lại; ngoại lệ chỉ áp dụng lượt sửa và lượt kiểm này, không đổi SPEC hay luật chung. Phiên này giữ vai trò người kiểm, không sửa thay người làm.
++- Tài liệu gốc: tasks/T-032-g2-nguyen-nhan-xep-hang/SPEC.md; phần đầu ra gốc tại results/T-032/: nguyen-nhan-xep-hang.md, ket-qua-phien-13.md, doc-tay.md, kiem-tiep.md, doi-chieu-dung-sai.json, chuoi-bang-chung.json, bao-phu-nhom.json, phan-xu-caller-root.json, kha-nang-do-trace.json, coverage-trace.json, can-thiep-tinh-toan.json, các ket-qua-phien-*.md, doi-chieu-tai-lieu-goc-phien-10.md, goi-bo-sung-007.md và thiet-ke-*.md. Bản trước sửa và diff ở results/T-032/runs/sua-review-001/ban-truoc/ và cac-thay-doi.diff; các bản trước theo phiên tại runs/tong-hop-phien-12-001/ban-truoc/ và runs/tong-hop-phien-13-001/ban-truoc/. T-032 chưa nằm trong commit, nên đối chiếu bằng các snapshot này.
++- Phản biện và phản hồi trước: tasks/T-032-g2-nguyen-nhan-xep-hang/REVIEW.md (gồm bảng phản hồi cuối file); sau đó mục Sửa sau REVIEW trong LOG.md và results/T-032/runs/sua-review-001/bo-sung-sau-review.md. Chỉ đọc các kết luận này sau khi tự soát nguồn và đầu ra gốc.
++- Code và kết quả liên quan: results/T-032/scripts/ và runs/; gói sửa results/T-032/runs/sua-review-001/ (manifest.json, truoc-sua.json, kiem-so/, md-partition/ với thiết kế, script và các lượt chạy được giữ); nguồn đóng băng results/T-024/, results/T-026/, results/T-028/runs/phan-hoi-review-001/manifest.json, results/T-031/moi-truong.json; mã và adapter src/ chỉ đọc. Manifest phiên13 ở results/T-032/runs/tong-hop-phien-13-001/sha256-dau-ra-phien-13.txt; đối chiếu file đã sửa bằng snapshot ban-truoc trong gói sửa, không dùng manifest cũ cho bản mới. Môi trường Windows; kiểm rẻ được phép: kiểm hash, parse JSON, đối chiếu số bằng tính trong bộ nhớ từ kết quả đã lưu; không chạy lại baseline, PageRank, lượt EC2 hay thực nghiệm mới. Chạy script có ghi file chỉ khi được Minh cho phép đầu ra riêng.
++- Phạm vi ghi được Minh cho phép trong lượt này: chỉ đọc và trả lời trong chat. Không tạo REVIEW-2.md hay sửa file nào khi Minh chưa duyệt riêng quyền ghi; liệt kê thư mục task để xác nhận các bản đã có. Không ghi LOG hoặc STATE.
++
++Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
++
++Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
++Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
++Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
++
++Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
++hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
++Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
++số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
++có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
++
++Bổ sung yêu cầu phản biện:
++1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
++2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
++3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
++4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
++5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
++6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
++7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
++8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
++9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
++10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
++
++Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
++Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
++
++Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
++bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
++Tiếng Việt, câu ngắn.
++
++Cuối lượt báo:
++1. Đã làm gì.
++2. File đã thay đổi, hoặc không sửa file nào.
++3. Kiểm đã chạy và kết quả.
++4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
++
++Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
++
++Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
++
++Công đoạn: người phản biện kiểm lại phản hồi và sửa.
++Tự soát yêu cầu và đầu ra gốc trước; sau đó đọc phản biện, phản hồi và các thay đổi được duyệt. Kiểm cả ý kiến phản bác reviewer; không mặc định phản hồi hoặc bản sửa đúng.
++Đối chiếu từng điểm với bằng chứng hiện tại, quyền sửa và hậu quả. Có điểm đúng nhưng chưa được Minh duyệt sửa thì ghi đúng trạng thái; không tự coi đã xử lý hoặc ép người làm sửa.
++Chỉ ghi bản phản biện lượt mới được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ lịch sử, không ghi LOG/STATE hay sửa thay người làm. Nêu bất đồng còn lại và soạn prompt để người làm đáp.
++
++Kiểm chuỗi đầu vào → xử lý → trung gian → đầu ra ở các nhóm quan trọng. Đọc code và trung gian đã lưu trước, đối chiếu ca sai với ca đúng có điều kiện tương ứng. Thiếu trung gian thì nêu đúng phần cần chạy/thu thêm, chi phí và quyết định phụ thuộc; không tự chạy ngoài quyền hoặc bỏ câu hỏi bằng “ngoài SPEC”.
++Kết luận cơ chế phải chỉ được: trong điều kiện X, bước Y làm mất hoặc đánh giá sai thông tin Z. Nếu chưa xác định Y, giữ đúng quan sát, giải thích khác và bằng chứng thiếu.
++Phân biệt dữ liệu/thiếu đầu vào, giao thức, adapter/cài đặt và giả định/cách tính; không cộng cờ chồng lấn thành tỷ lệ nguyên nhân. Hạn chế dữ liệu xác nhận có hệ quả đánh giá và yêu cầu quan sát FlashTicket có thể rút ra không?
++Đầu ra có nêu: hạn chế đã xác nhận và điều kiện; lỗi cài đặt/thiếu đầu vào; hạn chế giả định/phép tính; quan hệ có thể bổ sung thông tin gì; câu chưa trả lời và bằng chứng còn thiếu? Căn cứ nào đủ đề xuất ứng viên, căn cứ nào đủ lựa chọn thiết kế?
++Không bắt mọi task P4 làm xong đối chứng của phương pháp mới. Đối chứng bỏ quan hệ và đồ thị ngẫu nhiên dùng khi đánh giá tác dụng cấu trúc; không là điều kiện trì hoãn mọi phân tích hạn chế baseline.
++```
++
++Kiểm cuối lần đầu được giữ ở kiem-cuoi-001.json: các kiểm nguồn/phạm vi đều đạt, kiểm whitespace bị gắn FAIL vì Git cảnh báo LF→CRLF. Đã giữ scriptv1, điều chỉnh riêng lệnh kiểm dùng core.autocrlf=false cho lần gọi (không đổi cấu hình repo), không bỏ kiểm whitespace. Lệnh chốt sau đó: py -3 -B -X utf8 results/T-032/runs/sua-review-001/verify_and_manifest.py.

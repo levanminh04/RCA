@@ -1,0 +1,209 @@
+--- replay_tracerca_v2.py
++++ replay_tracerca_v3.py
+@@ -25,8 +25,46 @@
+     REPO, RE2_RAW_REPO, M24, I24, M26, I26, EXACT_FIELDS, EXCLUDED_FIELDS,
+     ReplayError, now, sha, read, dump, safe_source, new_directory, progress,
+     verify, verified_index26, loaded_sources, literal_constants, exact_differences,
+-    compare_records, decode, table_columns, verify_capture, measured_cost, artifact_manifest,
++    compare_records, decode, verify_capture, measured_cost, artifact_manifest,
+ )
++
++
++TABLE_COLUMNS_PROVENANCE = {'source': 'replay_circa_v2.py', 'source_sha256': '78e330875910b9054e80d8ba3e0b0594d38f8ba4f7e26a68088e7321772eb557', 'function': 'table_columns', 'function_ast_sha256': '33c2263e48b06fe5279d027abc6859bb6d9d56273b01eb9e37c53a83ec35f3fe', 'logical_dtype_only': True, 'string_storage_backend_identity': 'not historically recorded; OPEN'}
++
++def table_columns(directory, meta):
++    """Restore recorded logical dtype without treating it as a NumPy dtype.
++
++    StringDtype/Int64/boolean/Float64 belong to pandas. Tagged scalar decoding
++    preserves the recorded missing/nonfinite values; the caller still checks
++    the complete ordered table signature against the original native snapshot.
++    String storage backend identity was not recorded by capture v1 and remains
++    unverified. This helper reads capture artifacts and never touches a method.
++    """
++    import numpy as np
++    import pandas as pd
++    path = (directory / meta["path"]).resolve()
++    if directory.resolve() not in path.parents:
++        raise ReplayError("capture table reference escaped its directory")
++    stored = pd.read_parquet(path, use_threads=False)
++    if len(stored) != meta["rows"]:
++        raise ReplayError("capture table row count mismatch")
++    result = {}
++    for column in meta["columns"]:
++        values = stored[column["storage"]]
++        dtype = pd.api.types.pandas_dtype(column["dtype"])
++        extension = pd.api.types.is_extension_array_dtype(dtype)
++        if column["encoding"] == "tagged_json_scalar":
++            decoded = [decode(json.loads(value)) for value in values]
++            array = pd.array(decoded, dtype=dtype) if extension else np.asarray(decoded, dtype=dtype)
++        else:
++            array = pd.array(values.tolist(), dtype=dtype) if extension else values.to_numpy(dtype=dtype, copy=True)
++        if "special_state_column" in column:
++            state = stored[column["special_state_column"]].to_numpy()
++            if not np.isin(state, [0, 1, 2, 3]).all():
++                raise ReplayError("unknown nonfinite state")
++            array[state == 1], array[state == 2], array[state == 3] = np.nan, np.inf, -np.inf
++        result[decode(column["name"])] = array
++    return result
+ 
+ 
+ def source_for(dataset, opaque_id, audit):
+@@ -203,7 +241,7 @@
+     restored, checked_tables = {}, []
+     for relative, meta in tables.items():
+         values = table_columns(directory, meta)
+-        storage = pd.read_parquet(directory / relative)
++        storage = pd.read_parquet(directory / relative, use_threads=False)
+         columns = [decode(column["name"]) for column in meta["columns"]]
+         if meta["index_levels"] != 1 or len(columns) != len(set(columns)):
+             raise ReplayError("TraceRCA table requires one index and unique columns")
+@@ -430,6 +468,14 @@
+     frame["traceID"] = "one-shared-trace"
+     frame["spanID"] = [str(i) for i in range(len(frame))]
+     frame["parentSpanID"] = ""
++    if name == "adapter_extension_tables":
++        for column in ("serviceName", "methodName", "operationName", "traceID", "spanID", "parentSpanID"):
++            frame[column] = frame[column].astype("string")
++        for column in ("startTime", "duration"):
++            frame[column] = frame[column].astype("Int64")
++        frame["unused_boolean"] = pd.array([True, False, pd.NA, None] * (len(frame) // 4 + 1), dtype="boolean")[:len(frame)]
++        frame["unused_float"] = pd.array([1.25, -0.0, pd.NA, None] * (len(frame) // 4 + 1), dtype="Float64")[:len(frame)]
++        frame["unused_object"] = pd.Series([None, pd.NA, float("nan"), "kept"] * (len(frame) // 4 + 1), dtype="object").iloc[:len(frame)].to_numpy()
+     return frame, 100
+ 
+ 
+@@ -440,8 +486,9 @@
+     audit = []
+     external_sources(audit)
+     dump(directory / "source-checks.json", {"checks": audit})
++    serializer_checks = serializer_table_fixtures(directory)
+     checks = []
+-    for name in ("scalar", "zero_support", "zero_abnormal", "single_baseline_std_nan", "new_operation_error", "mapping_collision_error"):
++    for name in ("scalar", "zero_support", "zero_abnormal", "single_baseline_std_nan", "new_operation_error", "mapping_collision_error", "adapter_extension_tables"):
+         case_dir = directory / name
+         case_dir.mkdir()
+         frame, boundary = fixture_data(name)
+@@ -496,7 +543,7 @@
+                       "existing_profile_preserved": existing_profile_preserved}
+         calls = [read(case_dir / "capture" / call["path"]) for call in summary["calls"]]
+         native = next(call for call in calls if call["function"] == "native")
+-        if name == "scalar":
++        if name in ("scalar", "adapter_extension_tables"):
+             counts = native["count_operands_from_observed_flags"]
+             invariants.update(span_count_total=counts["total_abnormal_spans_A"] == 2,
+                 equal_support=native["support_dict"] == {"alpha_work": 0.5, "beta_work": 0.5},
+@@ -530,13 +577,101 @@
+         checks.append(check)
+         progress(directory, "FIXTURE_DONE", name=name, status="PASS" if check["pass"] else "FAIL")
+         if not check["pass"]:
+-            dump(directory / "check.json", {"status": "FAIL", "fixtures": checks,
++            dump(directory / "check.json", {"status": "FAIL", "fixtures": checks, "serializer_fixtures": serializer_checks,
+                  "artifact_manifest": artifact_manifest(directory), "manifest_excludes": ["check.json"]})
+             return 1
+-    dump(directory / "check.json", {"status": "PASS", "fixtures": checks,
++    dump(directory / "check.json", {"status": "PASS", "fixtures": checks, "serializer_fixtures": serializer_checks,
+         "artifact_manifest": artifact_manifest(directory), "manifest_excludes": ["check.json"],
+         "limits": "synthetic observer/count/filter/mutation/error checks; no real frozen replay or mechanism claim"})
+     return 0
++
++def serializer_table_fixtures(directory):
++    """Exercise unchanged TraceRCA serialization, not a method backend change."""
++    import copy
++    import numpy as np
++    import pandas as pd
++    run = directory / "serializer_tables"
++    run.mkdir()
++    serializer = TraceRcaCapture(run / "capture")
++    serializer.np, serializer.pd = np, pd
++    serializer.directory.mkdir()
++    serializer._table_content = {}
++    checks = []
++    cases = (
++        ("string", "string", ["plain", "", "tiếng Việt"]),
++        ("string_NA", "string", ["x", pd.NA, None]),
++        ("Int64", "Int64", [1, 0, -2]),
++        ("Int64_NA", "Int64", [1, pd.NA, None]),
++        ("boolean", "boolean", [True, False, True]),
++        ("boolean_NA", "boolean", [True, pd.NA, None]),
++        ("Float64", "Float64", [1.0, -0.0, 2.5]),
++        ("Float64_NA", "Float64", [1.0, pd.NA, None]),
++        ("native_float_special", "float64", [np.nan, np.inf, -np.inf, -0.0, 1.25]),
++        ("object_missing_special", "object", [None, pd.NA, np.nan, np.inf, -np.inf, -0.0, "", "tiếng Việt"]),
++    )
++    for name, dtype, values in cases:
++        progress(directory, "FIXTURE_START", name="serializer_" + name)
++        frame = pd.DataFrame({"value": pd.Series(values, dtype=dtype)})
++        frame.index = pd.Index(list(range(100 + len(frame), 100, -1)), name="position")
++        frame.columns.name = "channel"
++        before = frame.copy(deep=True)
++        original = serializer._table_signature(frame)
++        meta = serializer._save_table(name + ".parquet", frame)
++        stored = pd.read_parquet(serializer.directory / meta["path"], use_threads=False)
++        columns = [decode(m["name"]) for m in meta["columns"]]
++        arrays = table_columns(serializer.directory, meta)
++        restored = pd.DataFrame({c: pd.Series(arrays[c], dtype=m["dtype"]) for c, m in zip(columns, meta["columns"])})
++        restored.index = pd.Index([decode(json.loads(v)) for v in stored["index_0"]], name=decode(meta["index_names"])[0])
++        restored.columns.name = decode(meta["columns_name"])
++        differences = exact_differences(original, serializer._table_signature(restored))
++        pd.testing.assert_frame_equal(frame, before, check_exact=True)
++        pd.testing.assert_frame_equal(frame, restored, check_exact=True)
++        mutations = {
++            "order_rejected": bool(exact_differences(original, serializer._table_signature(restored.iloc[::-1]))),
++            "index_rejected": bool(exact_differences(original, serializer._table_signature(restored.set_axis([int(v)+1 for v in restored.index])))),
++            "logical_dtype_rejected": True if dtype == "object" else bool(exact_differences(original, serializer._table_signature(restored.astype("object")))),
++        }
++        for key, bad_dtype in (("missing_dtype_rejected", None), ("unknown_dtype_rejected", "not_a_logical_dtype")):
++            bad = copy.deepcopy(meta)
++            if bad_dtype is None:
++                del bad["columns"][0]["dtype"]
++            else:
++                bad["columns"][0]["dtype"] = bad_dtype
++            try:
++                table_columns(serializer.directory, bad)
++                mutations[key] = False
++            except (KeyError, TypeError, ValueError):
++                mutations[key] = True
++        item = {"name": "serializer_" + name, "pass": not differences and all(mutations.values()),
++            "input_unchanged": True, "differences": differences, "invariants": mutations,
++            "capture_table": meta, "methods_executed": False,
++            "logical_dtype": dtype, "string_storage_backend_identity": "not historically recorded; OPEN"}
++        dump(run / (name + "-check.json"), item)
++        checks.append(item)
++        progress(directory, "FIXTURE_DONE", name=item["name"], status="PASS" if item["pass"] else "FAIL")
++        if not item["pass"]:
++            raise ReplayError("TraceRCA serializer fixture failed: " + name)
++    # Unknown tagged scalar and special-state bytes must not become evidence.
++    for name, dtype, values in (("unknown_missing", "object", [None]), ("unknown_nonfinite", "float64", [np.nan])):
++        frame = pd.DataFrame({"value": pd.Series(values, dtype=dtype)})
++        meta = serializer._save_table(name + "-original.parquet", frame)
++        mutated = pd.read_parquet(serializer.directory / meta["path"], use_threads=False)
++        if name == "unknown_missing":
++            mutated.loc[0, meta["columns"][0]["storage"]] = json.dumps({"__missing__": "unknown"})
++        else:
++            mutated.loc[0, meta["columns"][0]["special_state_column"]] = 9
++        bad = copy.deepcopy(meta)
++        bad["path"] = name + "-mutated.parquet"
++        mutated.to_parquet(serializer.directory / bad["path"], engine="pyarrow", index=False, compression="zstd")
++        try:
++            table_columns(serializer.directory, bad)
++        except (KeyError, ReplayError):
++            continue
++        raise ReplayError("unknown tagged scalar/state not rejected: " + name)
++    dump(run / "check.json", {"status": "PASS", "fixtures": checks, "unknown_values_rejected": True,
++        "methods_executed": False, "artifact_manifest": artifact_manifest(run), "manifest_excludes": ["check.json"]})
++    return checks
++
+ 
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+@@ -551,8 +686,8 @@
+     directory = new_directory(args.new_run_dir)
+     dump(directory / "invocation.json", {"at_utc": now(), "argv": sys.argv, "command": args.command,
+         "scripts": {name: sha(Path(__file__).with_name(name)) for name in
+-            ("capture_tracerca.py", "replay_tracerca_v2.py", "capture_microrank.py", "replay_microrank.py")},
+-        "python": sys.version, "hashseed": os.environ.get("PYTHONHASHSEED"), "source_repo": str(REPO)})
++            ("capture_tracerca.py", "replay_tracerca_v3.py", "capture_microrank.py", "replay_microrank.py")},
++        "python": sys.version, "hashseed": os.environ.get("PYTHONHASHSEED"), "source_repo": str(REPO), "table_columns_provenance": TABLE_COLUMNS_PROVENANCE})
+     try:
+         return fixtures(directory) if args.command == "fixture" else one(directory, args.dataset, args.opaque_id)
+     except Exception as error:

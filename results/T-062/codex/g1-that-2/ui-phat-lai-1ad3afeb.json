@@ -1,0 +1,81 @@
+{
+  "id": "1ad3afeb",
+  "url": "http://127.0.0.1:13000/d/rca-g2-phat-lai/rca-e28094-phat-lai-co-dap-an-g2?var-thu_muc=rca%2Fphat-lai&var-ca=1ad3afeb&var-dv=event-service&from=2026-11-11T21:06:16.000Z&to=2026-11-11T21:36:16.000Z&timezone=browser&var-dv_svc=event-service&var-t_tu=1794431776000&var-t_den=1794432376000",
+  "panels": {
+    "3": "Sự cố đang xem: 1ad3afeb\nMã sự cố\n1ad3afeb\nKết luận của M1\nM1 thấy thành phần có bất thường tự sinh\nTrạng thái lượt M1\nchạy xong (OK)\nMốc sự cố\n2026-11-11 21:21:16 UTC (do bộ điều phối cấp)\nCửa sổ nền / sự cố\n21:16:16 → 21:21:16 UTC | 21:21:16 → 21:26:16 UTC\nM1 nghi là nguồn\n#1 event-service, #2 keycloak\nBị kéo theo\n#3 api-gateway\nThiếu dữ liệu\nkhông có\nVùng nghi ngờ\ngốc: event-service · cách 1: api-gateway, event-service · cách 2: api-gateway, event-service, keycloak\nĐộ phủ\nM1 trả hạng cho 17/17 thành phần (kể cả nhóm bình thường xếp chung hạng); 14 cạnh gọi quan sát; 9 thành phần không có cạnh (DB, broker… M1 không thấy cạnh)\n◆ ĐÁP ÁN: root khai trước\nevent-service → event_db (data)\nHọ lỗi\nD9-01 — event-service → event_db (data)\nTập chấp nhận mức nút (◆ trên đồ thị)\nevent-service, event_db\nHạng tốt nhất trong tập (theo e2, mức nút; không phải kết luận M1 định vị đúng cạnh)\n#1\nNhận xét phát lại\nĐáp án: event-service → event_db (data) (ô EVENT-DB-LAT, họ D9-01). Hạng tốt nhất trong tập chấp nhận ['event-service', 'event_db']: #1. Hạng 1 của M1: event-service.\nCảnh báo\nBản phát lại: đáp án ghép SAU khi kết quả cả đợt đã băm; không dùng để chẩn đoán trực tuyến.",
+    "4": "Đồ thị dịch vụ — sự cố 1ad3afeb (phát lại)\n#3\nbị kéo theo\napi-gateway\n\n\nbình thường\nbooking-service\n\n\nbình thường\nbooking_db\n\n\nbình thường\nbroker\n\n\nbình thường\ncache\n\n\nbình thường\nconfig-discovery\n\n#1\nnghi là nguồn\n◆ event-service\n\n\nbình thường\n◆ event_db\n\n#2\nnghi là nguồn\nkeycloak\n\n\nbình thường\nkeycloak_db\n\n\nbình thường\nmongodb-instance\n\n\nbình thường\npayment-service\n\n\nbình thường\npayment_db\n\n\nbình thường\npostgresql-shared-instance\n\n\nbình thường\nticket-service\n\n\nbình thường\nticket_db\n\n\nbình thường\nuser-service\n\nHạng (chữ trên nút)\nVai trò (chữ dưới nút)\nMàu theo vai trò",
+    "5": "Bảng hạng thành phần — sự cố 1ad3afeb\nHạng\nThành phần (bấm để xem bằng chứng)\nVai trò\nĐồng hạng\nSố kênh có cờ\nVùng nghi ngờ\n#1\nevent-service\nnghi là nguồn\n13\ngốc vùng nghi ngờ\n#2\nkeycloak\nnghi là nguồn\n1\ntrong vùng (cách 2)\n#3\napi-gateway\nbị kéo theo\n2\ntrong vùng (cách 1)\nbooking-service\nbình thường\n0\nbooking_db\nbình thường\n0\nbroker\nbình thường\n0\ncache\nbình thường\n0\nconfig-discovery\nbình thường\n0\nevent_db\nbình thường\n0\nkeycloak_db\nbình thường\n0\nmongodb-instance\nbình thường\n0\npayment-service\nbình thường\n0\npayment_db\nbình thường\n0\npostgresql-shared-instance\nbình thường\n0\nticket-service\nbình thường\n0\nticket_db\nbình thường\n0",
+    "6": "Bằng chứng của event-service — các kênh M1 gắn cờ\nKênh có cờ\nLoại\nHướng\nKiểu lan (E5)\nKhởi phát\nĐiểm s\nMở dữ liệu gốc\nĐơn vị M1\nOutboxWorker.relay\nthao tác (span)\ntăng ↑\nkhông lan\n21:21:16 UTC\n1328.828\nTempo ↗\nop|event-service|OutboxWorker.relay\nSELECT event_db\nthao tác (span)\ntăng ↑\nkhông lan\n21:21:16 UTC\n615.143\nTempo ↗\nop|event-service|SELECT event_db\nSELECT event_schema.tbl_event_images\nthao tác (span)\ntăng ↑\nkhông lan\n21:21:16 UTC\n644.153\nTempo ↗\nop|event-service|SELECT event_schema.tbl_event_images\nSELECT event_schema.tbl_event_layouts\nthao tác (span)\ntăng ↑\nkhông lan\n21:21:16 UTC\n620.177\nTempo ↗\nop|event-service|SELECT event_schema.tbl_event_layouts\nSELECT event_schema.tbl_event_seats\nthao tác (span)\ntăng ↑\nkhông lan\n21:21:16 UTC\n523.788\nTempo ↗\nop|event-service|SELECT event_schema.tbl_event_seats\nSELECT event_schema.tbl_event_sectors\nthao tác (span)\ntăng ↑\nkhông lan\n21:21:16 UTC\n570.618\nTempo ↗\nop|event-service|SELECT event_schema.tbl_event_sectors\nSELECT event_schema.tbl_outbox_messages\nthao tác (span)\ntăng ↑\nkhông lan\n21:21:16 UTC\n183.910\nTempo ↗\nop|event-service|SELECT event_schema.tbl_outbox_messages\nSELECT event_schema.tbl_promotions\nthao tác (span)\ntăng ↑\nkhông lan\n21:21:16 UTC\n522.885\nTempo ↗\nop|event-service|SELECT event_schema.tbl_promotions\nSELECT event_schema.tbl_ticket_types\nthao tác (span)\ntăng ↑\nkhông lan\n21:21:16 UTC\n552.397\nTempo ↗\nop|event-service|SELECT event_schema.tbl_ticket_types\nTransaction.commit\nthao tác (span)\ntăng ↑\nkhông lan\n21:21:16 UTC\n687.951\nTempo ↗\nop|event-service|Transaction.commit",
+    "7": "Vì sao event-service bị coi là kéo theo (giải thích E5 của M1)\nKênh của event-service\nĐược giải thích bởi\nĐường lan\nQuy tắc E5\nTrạng thái\nlatency-50 ↑\nkeycloak: SELECT keycloak_db.OFFLINE_USER_SESSION ↑\nevent-service → keycloak\nlan ngược\náp dụng\nlatency-90 ↑\nkeycloak: SELECT keycloak_db.OFFLINE_USER_SESSION ↑\nevent-service → keycloak\nlan ngược\náp dụng"
+  },
+  "markers": [
+    {
+      "label": "Node: api-gateway",
+      "text": "#3bị kéo theoapi-gateway"
+    },
+    {
+      "label": "Node: booking-service",
+      "text": "bình thườngbooking-service"
+    },
+    {
+      "label": "Node: booking_db",
+      "text": "bình thườngbooking_db"
+    },
+    {
+      "label": "Node: broker",
+      "text": "bình thườngbroker"
+    },
+    {
+      "label": "Node: cache",
+      "text": "bình thườngcache"
+    },
+    {
+      "label": "Node: config-discovery",
+      "text": "bình thườngconfig-discovery"
+    },
+    {
+      "label": "Node: ◆ event-service",
+      "text": "#1nghi là nguồn◆ event-service"
+    },
+    {
+      "label": "Node: ◆ event_db",
+      "text": "bình thường◆ event_db"
+    },
+    {
+      "label": "Node: keycloak",
+      "text": "#2nghi là nguồnkeycloak"
+    },
+    {
+      "label": "Node: keycloak_db",
+      "text": "bình thườngkeycloak_db"
+    },
+    {
+      "label": "Node: mongodb-instance",
+      "text": "bình thườngmongodb-instance"
+    },
+    {
+      "label": "Node: payment-service",
+      "text": "bình thườngpayment-service"
+    },
+    {
+      "label": "Node: payment_db",
+      "text": "bình thườngpayment_db"
+    },
+    {
+      "label": "Node: postgresql-shared-instance",
+      "text": "bình thườngpostgresql-shared-instance"
+    },
+    {
+      "label": "Node: ticket-service",
+      "text": "bình thườngticket-service"
+    },
+    {
+      "label": "Node: ticket_db",
+      "text": "bình thườngticket_db"
+    },
+    {
+      "label": "Node: user-service",
+      "text": "bình thườnguser-service"
+    }
+  ]
+}

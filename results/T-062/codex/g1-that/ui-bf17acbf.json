@@ -1,0 +1,173 @@
+{
+  "url": "http://127.0.0.2:13000/d/rca-g2/rca-xem-su-co?orgId=1&var-thu_muc=rca&var-ca=bf17acbf&from=2026-11-11T23:42:05.000Z&to=2026-11-12T00:12:05.000Z&timezone=browser&var-dv=event-service&var-t_tu=1794442999000&var-t_den=1794443599000&var-dv_svc=event-service",
+  "record": "Sự cố đang xem: bf17acbf\nMã sự cố\n00eaea92\nKết luận của M1\nM1 thấy thành phần có bất thường tự sinh\nTrạng thái lượt M1\nchạy xong (OK)\nMốc sự cố\n2026-11-12 00:28:19 UTC (do bộ điều phối cấp)\nCửa sổ nền / sự cố\n00:23:19 → 00:28:19 UTC | 00:28:19 → 00:33:19 UTC\nM1 nghi là nguồn\n#1 payment-service, #2 booking-service, #3 event-service, #4 ticket-service\nBị kéo theo\n#5 api-gateway\nThiếu dữ liệu\nkhông có\nVùng nghi ngờ\ngốc: payment-service · cách 1: api-gateway, payment-service · cách 2: api-gateway, booking-service, event-service, payment-service, ticket-service\nĐộ phủ\n17/17 thành phần có hạng; 14 cạnh gọi quan sát; 9 thành phần không có cạnh (DB, broker… M1 không thấy cạnh)",
+  "ranks": "Bảng hạng thành phần — sự cố bf17acbf\nHạng\nThành phần (bấm để xem bằng chứng)\nVai trò\nĐồng hạng\nSố kênh có cờ\nVùng nghi ngờ\n#1\npayment-service\nnghi là nguồn\n4\ngốc vùng nghi ngờ\n#2\nbooking-service\nnghi là nguồn\n1\ntrong vùng (cách 2)\n#3\nevent-service\nnghi là nguồn\n1\ntrong vùng (cách 2)\n#4\nticket-service\nnghi là nguồn\n3\ntrong vùng (cách 2)\n#5\napi-gateway\nbị kéo theo\n3\ntrong vùng (cách 1)\nbooking_db\nbình thường\n0\nbroker\nbình thường\n0\ncache\nbình thường\n0\nconfig-discovery\nbình thường\n0\nevent_db\nbình thường\n0\nkeycloak\nbình thường\n0\nkeycloak_db\nbình thường\n0\nmongodb-instance\nbình thường\n0\npayment_db\nbình thường\n0\npostgresql-shared-instance\nbình thường\n0\nticket_db\nbình thường\n0",
+  "evidence": "Bằng chứng của event-service — các kênh M1 gắn cờ\nKênh có cờ\nLoại\nHướng\nKiểu lan (E5)\nKhởi phát\nĐiểm s\nMở dữ liệu gốc\nĐơn vị M1\nworkload\nchỉ số (metric)\ntăng ↑\nlan ngược\n00:28:29 UTC\n6.264\nPrometheus ↗\nmetric|event-service_workload",
+  "evidenceRenderedLinks": [
+    {
+      "text": "Prometheus ↗",
+      "url": "/explore?schemaVersion=1&orgId=1&panes=%257B%2522a%2522%253A%257B%2522datasource%2522%253A%2522prometheus%2522%252C%2522queries%2522%253A%255B%257B%2522datasource%2522%253A%257B%2522type%2522%253A%2522prometheus%2522%252C%2522uid%2522%253A%2522prometheus%2522%257D%252C%2522expr%2522%253A%2522%2528sum+by%2528service_name%2529+%2528rate%2528http_server_request_duration_seconds_count%255B1m%255D%2529%2529%2529+and+on%2528service_name%2529+label_replace%2528vector%25281%2529%252C+%255C%2522service_name%255C%2522%252C+%255C%2522event-service%255C%2522%252C+%255C%2522%255C%2522%252C+%255C%2522%255C%2522%2529%2522%252C%2522range%2522%253Atrue%252C%2522refId%2522%253A%2522A%2522%257D%255D%252C%2522range%2522%253A%257B%2522from%2522%253A%25221794442999000%2522%252C%2522to%2522%253A%25221794443599000%2522%257D%257D%257D"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "api-gateway",
+      "text": "#5bị kéo theoapi-gateway",
+      "color": "#FF9830"
+    },
+    {
+      "id": "booking-service",
+      "text": "#2nghi là nguồnbooking-service",
+      "color": "#E02F44"
+    },
+    {
+      "id": "booking_db",
+      "text": "bình thườngbooking_db",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "broker",
+      "text": "bình thườngbroker",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "cache",
+      "text": "bình thườngcache",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "config-discovery",
+      "text": "bình thườngconfig-discovery",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "event-service",
+      "text": "#3nghi là nguồnevent-service",
+      "color": "#E02F44"
+    },
+    {
+      "id": "event_db",
+      "text": "bình thườngevent_db",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "keycloak",
+      "text": "bình thườngkeycloak",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "keycloak_db",
+      "text": "bình thườngkeycloak_db",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "mongodb-instance",
+      "text": "bình thườngmongodb-instance",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "payment-service",
+      "text": "#1nghi là nguồnpayment-service",
+      "color": "#E02F44"
+    },
+    {
+      "id": "payment_db",
+      "text": "bình thườngpayment_db",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "postgresql-shared-instance",
+      "text": "bình thườngpostgresql-shared-instance",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "ticket-service",
+      "text": "#4nghi là nguồnticket-service",
+      "color": "#E02F44"
+    },
+    {
+      "id": "ticket_db",
+      "text": "bình thườngticket_db",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "user-service",
+      "text": "bình thườnguser-service",
+      "color": "#8E8E8E"
+    }
+  ],
+  "edgeCount": 14,
+  "nodeLinks": [
+    {
+      "text": "Tempo: trace của service ↗",
+      "url": "/explore?schemaVersion=1&orgId=1&panes=%7B%22a%22%3A%7B%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22queryType%22%3A%22traceql%22%2C%22query%22%3A%22%7Bresource.service.name%3D%5C%22booking-service%5C%22%7D%22%2C%22limit%22%3A50%2C%22tableType%22%3A%22traces%22%2C%22refId%22%3A%22A%22%2C%22datasource%22%3A%7B%22type%22%3A%22tempo%22%2C%22uid%22%3A%22tempo%22%7D%7D%5D%2C%22range%22%3A%7B%22from%22%3A%221794441125000%22%2C%22to%22%3A%221794441725000%22%7D%7D%7D",
+      "ds": "tempo",
+      "range": {
+        "from": "1794441125000",
+        "to": "1794441725000"
+      },
+      "query": {
+        "queryType": "traceql",
+        "query": "{resource.service.name=\"booking-service\"}",
+        "limit": 50,
+        "tableType": "traces",
+        "refId": "A",
+        "datasource": {
+          "type": "tempo",
+          "uid": "tempo"
+        }
+      },
+      "windowMatches": true
+    },
+    {
+      "text": "Loki: log của service ↗",
+      "url": "/explore?schemaVersion=1&orgId=1&panes=%7B%22a%22%3A%7B%22datasource%22%3A%22loki%22%2C%22queries%22%3A%5B%7B%22expr%22%3A%22%7Bservice_name%3D%5C%22booking-service%5C%22%7D%22%2C%22queryType%22%3A%22range%22%2C%22refId%22%3A%22A%22%2C%22datasource%22%3A%7B%22type%22%3A%22loki%22%2C%22uid%22%3A%22loki%22%7D%7D%5D%2C%22range%22%3A%7B%22from%22%3A%221794441125000%22%2C%22to%22%3A%221794441725000%22%7D%7D%7D",
+      "ds": "loki",
+      "range": {
+        "from": "1794441125000",
+        "to": "1794441725000"
+      },
+      "query": {
+        "expr": "{service_name=\"booking-service\"}",
+        "queryType": "range",
+        "refId": "A",
+        "datasource": {
+          "type": "loki",
+          "uid": "loki"
+        }
+      },
+      "windowMatches": true
+    },
+    {
+      "text": "Prometheus: số request mỗi giây theo route ↗",
+      "url": "/explore?schemaVersion=1&orgId=1&panes=%7B%22a%22%3A%7B%22datasource%22%3A%22prometheus%22%2C%22queries%22%3A%5B%7B%22expr%22%3A%22sum%20by%20%28http_request_method%2C%20http_route%29%20%28rate%28http_server_request_duration_seconds_count%7Bservice_name%3D%5C%22booking-service%5C%22%7D%5B1m%5D%29%29%22%2C%22range%22%3Atrue%2C%22refId%22%3A%22A%22%2C%22datasource%22%3A%7B%22type%22%3A%22prometheus%22%2C%22uid%22%3A%22prometheus%22%7D%7D%5D%2C%22range%22%3A%7B%22from%22%3A%221794441125000%22%2C%22to%22%3A%221794441725000%22%7D%7D%7D",
+      "ds": "prometheus",
+      "range": {
+        "from": "1794441125000",
+        "to": "1794441725000"
+      },
+      "query": {
+        "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"booking-service\"}[1m]))",
+        "range": true,
+        "refId": "A",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        }
+      },
+      "windowMatches": true
+    }
+  ],
+  "livePanels": {
+    "7": "Vì sao event-service bị coi là kéo theo (giải thích E5 của M1)\nKênh của event-service\nĐược giải thích bởi\nĐường lan\nQuy tắc E5\nTrạng thái\nlatency-50 ↑\nconfig-discovery: POST ↑\nevent-service → config-discovery\nlan ngược\náp dụng\nlatency-50 ↑\nkeycloak: SELECT keycloak_db.OFFLINE_USER_SESSION ↑\nevent-service → keycloak\nlan ngược\náp dụng\nlatency-50 ↑\nkeycloak: SELECT keycloak_db.OUTBOX_ENTRY ↑\nevent-service → keycloak\nlan ngược\náp dụng\nlatency-90 ↑\nconfig-discovery: POST ↑\nevent-service → config-discovery\nlan ngược\náp dụng\nlatency-90 ↑\nkeycloak: SELECT keycloak_db.OFFLINE_USER_SESSION ↑\nevent-service → keycloak\nlan ngược\náp dụng\nlatency-90 ↑\nkeycloak: SELECT keycloak_db.OUTBOX_ENTRY ↑\nevent-service → keycloak\nlan ngược\náp dụng",
+    "9": "Request/giây theo thao tác — event-service\nSeries color\nName\nMax\nGET /actuator/health\n0 req/s\nGET /api/v1/events\n0 req/s\nGET /api/v1/events/{id}\n2.86 req/s",
+    "10": "Độ trễ p90 theo thao tác — event-service\nSeries color\nName\nMax\nGET /actuator/health\nGET /api/v1/events\nGET /api/v1/events/{id}\n35.2 ms",
+    "11": "Lỗi 5xx/giây theo thao tác — event-service\nSeries color\nName\nMax\nGET /api/v1/events/{id}\n0 req/s",
+    "12": "Trace của event-service trong khung giờ (bấm Trace ID để xem cây span cha → con)\nExpand nested rows\nTrace ID\nStart time\nService\nName\nDuration\n36b4a6f0ebb54bb0d6755a5f10ba34b\n2026-11-12 00:12:04\napi-gateway\nGET event\n8 ms\n7266c2b274711c729739590a059261\n2026-11-12 00:12:02\napi-gateway\nGET event\n9 ms\n33ab937433362a36f747701d2ab2af5\n2026-11-12 00:11:49\napi-gateway\nGET event\n8 ms\n2584a1c68840e6b36986ac0a70b7fcf\n2026-11-12 00:11:29\napi-gateway\nGET event\n9 ms\n1171c6664774258e104527e865b0515\n2026-11-12 00:11:26\napi-gateway\nGET event\n8 ms\n26fa1e0d681c2b361760a1b00c20d76\n2026-11-12 00:11:21\napi-gateway\nGET event\n9 ms\n73bcc3cb30c8869aba5815ee0bec09\n2026-11-12 00:11:10\napi-gateway\nGET event\n8 ms\n25739c1c4b87a5dd0d8f48186f7ff47\n2026-11-12 00:11:05\napi-gateway\nGET event\n13 ms\n1eae99270f6b972539f15b1abe607fb\n2026-11-12 00:10:15\nevent-service\nOutboxWorker.relay\n1 ms\n4005de6e6b646efaf3e9070d69ad5b6\n2026-11-12 00:10:13\nevent-service\nOutboxWorker.relay\n1 ms",
+    "13": "Log của event-service có chữ error/exception/warn\nNo data"
+  },
+  "nodeMatches": false,
+  "answerTextOccurrences": [
+    "Trang phát lại (có đáp án — chỉ mở khi chấm xong)"
+  ]
+}

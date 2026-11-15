@@ -1,0 +1,2033 @@
+{
+  "scope": "C3 shortened by STEER #3: 30 min idle + 30 min fixed 1 request/s, not SPEC 1h + 1h",
+  "limitations": [
+    "Oracle ARM with actual RAM below; not a test of the SPEC 8 GiB machines",
+    "Host CPU uses all machine CPUs; Docker 100% uses one logical CPU",
+    "Storage growth includes OTLP capture/queues and backend data, not steady-state retention capacity",
+    "Exporter send_failed counts failed attempts and retries; it is not a count of permanently lost items",
+    "Collector counters do not measure SDK sampling or items dropped before the Collector",
+    "Shared boundary sample at 21:15Z is included in both windows for endpoint deltas; CPU uses only intervals ending after each start",
+    "Docker stats is a short asynchronous sweep after the recorded host timestamp, not an atomic sample of all containers",
+    "State.OOMKilled may become false after automatic restart; authoritative kernel OOM events are included separately"
+  ],
+  "hosts": {
+    "app": {
+      "memory_total_bytes": 12504469504,
+      "sample_count": 241,
+      "storage_paths": [
+        "/opt/flash-ticket-app/collector/data"
+      ],
+      "windows": {
+        "idle": {
+          "samples": 121,
+          "first_utc": "2026-11-10T20:45:00.000089+00:00",
+          "last_utc": "2026-11-10T21:15:00.000081+00:00",
+          "actual_seconds": 1799.999992609024,
+          "cpu_mean_percent_machine": 20.43843954683746,
+          "cpu_max_percent_machine": 93.5095349615256,
+          "minimum_memory_available_bytes": 7378436096,
+          "minimum_memory_available_percent": 59.00639042415789,
+          "maximum_root_used_bytes": 13099696128,
+          "storage_first_bytes": 73545088,
+          "storage_last_bytes": 133918955,
+          "telemetry_storage_growth_bytes": 60373867,
+          "telemetry_decimal_gb_per_hour": 0.12074773449580199,
+          "container_resources": {
+            "flash-ticket-api-gateway-api-gateway-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.4869421487603306,
+              "cpu_max_percent_one_core": 10.71,
+              "memory_mean_bytes": 371009586.7768595,
+              "memory_max_bytes": 375285350.4
+            },
+            "flash-ticket-booking-service-booking-service-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 3.420495867768595,
+              "cpu_max_percent_one_core": 187.15,
+              "memory_mean_bytes": 510766569.1504132,
+              "memory_max_bytes": 528062873.6
+            },
+            "flash-ticket-collector": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 2.0759504132231403,
+              "cpu_max_percent_one_core": 6.19,
+              "memory_mean_bytes": 92144699.23966943,
+              "memory_max_bytes": 100715724.8
+            },
+            "flash-ticket-discovery-server-discovery-server-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.37,
+              "cpu_max_percent_one_core": 1.12,
+              "memory_mean_bytes": 355736774.0297521,
+              "memory_max_bytes": 357459558.4
+            },
+            "flash-ticket-event-service-event-service-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.5857851239669422,
+              "cpu_max_percent_one_core": 15.94,
+              "memory_mean_bytes": 417246588.8264463,
+              "memory_max_bytes": 419430400.0
+            },
+            "flash-ticket-infra-postgres-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.9366115702479338,
+              "cpu_max_percent_one_core": 9.11,
+              "memory_mean_bytes": 120336661.58016528,
+              "memory_max_bytes": 123312537.6
+            },
+            "flash-ticket-infra-rabbitmq-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 12.924876033057851,
+              "cpu_max_percent_one_core": 119.08,
+              "memory_mean_bytes": 157099216.18512398,
+              "memory_max_bytes": 230057574.4
+            },
+            "flash-ticket-infra-redis-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.935206611570248,
+              "cpu_max_percent_one_core": 2.52,
+              "memory_mean_bytes": 4262600.094677686,
+              "memory_max_bytes": 4615831.552
+            },
+            "flash-ticket-infra-user-db-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 10.48710743801653,
+              "cpu_max_percent_one_core": 58.38,
+              "memory_mean_bytes": 93990886.27305785,
+              "memory_max_bytes": 252916531.2
+            },
+            "flash-ticket-keycloak-keycloak-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 1.1033884297520662,
+              "cpu_max_percent_one_core": 35.28,
+              "memory_mean_bytes": 636259451.5570248,
+              "memory_max_bytes": 637743923.2
+            },
+            "flash-ticket-payment-service-payment-service-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.4058677685950413,
+              "cpu_max_percent_one_core": 16.39,
+              "memory_mean_bytes": 506703120.5024793,
+              "memory_max_bytes": 509398220.8
+            },
+            "flash-ticket-ticket-service-ticket-service-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.3836363636363636,
+              "cpu_max_percent_one_core": 11.61,
+              "memory_mean_bytes": 429271415.74876034,
+              "memory_max_bytes": 430859878.4
+            },
+            "flash-ticket-user-service-user-service-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.26975206611570246,
+              "cpu_max_percent_one_core": 2.2,
+              "memory_mean_bytes": 356786216.6214876,
+              "memory_max_bytes": 359451852.8
+            }
+          },
+          "collector_counter_series": {
+            "otelcol_exporter_queue_size{data_type=\"logs\",exporter=\"otlp\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": null
+            },
+            "otelcol_exporter_queue_size{data_type=\"metrics\",exporter=\"otlp\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": null
+            },
+            "otelcol_exporter_queue_size{data_type=\"traces\",exporter=\"otlp\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": null
+            },
+            "otelcol_exporter_sent_log_records{exporter=\"file/logs\"}": {
+              "first": 19.0,
+              "last": 154.0,
+              "max": 154.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 135.0
+            },
+            "otelcol_exporter_sent_log_records{exporter=\"otlp\",server_address=\"10.0.0.215\",server_port=\"4317\"}": {
+              "first": 19.0,
+              "last": 154.0,
+              "max": 154.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 135.0
+            },
+            "otelcol_exporter_sent_metric_points{exporter=\"otlp\",server_address=\"10.0.0.215\",server_port=\"4317\"}": {
+              "first": 209789.0,
+              "last": 996876.0,
+              "max": 996876.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 787087.0
+            },
+            "otelcol_exporter_sent_spans{exporter=\"file/traces\"}": {
+              "first": 20402.0,
+              "last": 93260.0,
+              "max": 93260.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 72858.0
+            },
+            "otelcol_exporter_sent_spans{exporter=\"otlp\",server_address=\"10.0.0.215\",server_port=\"4317\"}": {
+              "first": 20402.0,
+              "last": 93260.0,
+              "max": 93260.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 72858.0
+            },
+            "otelcol_receiver_accepted_log_records{receiver=\"filelog/api-gateway\",transport=\"\"}": {
+              "first": 2.0,
+              "last": 8.0,
+              "max": 8.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 6.0
+            },
+            "otelcol_receiver_accepted_log_records{receiver=\"filelog/booking-service\",transport=\"\"}": {
+              "first": 2.0,
+              "last": 73.0,
+              "max": 73.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 71.0
+            },
+            "otelcol_receiver_accepted_log_records{receiver=\"filelog/discovery-server\",transport=\"\"}": {
+              "first": 8.0,
+              "last": 42.0,
+              "max": 42.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 34.0
+            },
+            "otelcol_receiver_accepted_log_records{receiver=\"filelog/event-service\",transport=\"\"}": {
+              "first": 2.0,
+              "last": 8.0,
+              "max": 8.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 6.0
+            },
+            "otelcol_receiver_accepted_log_records{receiver=\"filelog/payment-service\",transport=\"\"}": {
+              "first": 2.0,
+              "last": 8.0,
+              "max": 8.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 6.0
+            },
+            "otelcol_receiver_accepted_log_records{receiver=\"filelog/ticket-service\",transport=\"\"}": {
+              "first": 2.0,
+              "last": 8.0,
+              "max": 8.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 6.0
+            },
+            "otelcol_receiver_accepted_log_records{receiver=\"filelog/user-service\",transport=\"\"}": {
+              "first": 1.0,
+              "last": 7.0,
+              "max": 7.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 6.0
+            },
+            "otelcol_receiver_accepted_metric_points{receiver=\"docker_stats\",transport=\"\"}": {
+              "first": 6720.0,
+              "last": 31920.0,
+              "max": 31920.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 25200.0
+            },
+            "otelcol_receiver_accepted_metric_points{receiver=\"hostmetrics\",transport=\"\"}": {
+              "first": 10896.0,
+              "last": 51756.0,
+              "max": 51756.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 40860.0
+            },
+            "otelcol_receiver_accepted_metric_points{receiver=\"mongodb\",transport=\"\"}": {
+              "first": 3936.0,
+              "last": 18696.0,
+              "max": 18696.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 14760.0
+            },
+            "otelcol_receiver_accepted_metric_points{receiver=\"otlp\",transport=\"http\"}": {
+              "first": 19344.0,
+              "last": 91471.0,
+              "max": 91471.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 72127.0
+            },
+            "otelcol_receiver_accepted_metric_points{receiver=\"otlp/keycloak\",transport=\"http\"}": {
+              "first": 2400.0,
+              "last": 11400.0,
+              "max": 11400.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 9000.0
+            },
+            "otelcol_receiver_accepted_metric_points{receiver=\"postgresql\",transport=\"\"}": {
+              "first": 154032.0,
+              "last": 731652.0,
+              "max": 731652.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 577620.0
+            },
+            "otelcol_receiver_accepted_metric_points{receiver=\"prometheus/self\",transport=\"http\"}": {
+              "first": 6027.0,
+              "last": 29607.0,
+              "max": 29607.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 23580.0
+            },
+            "otelcol_receiver_accepted_metric_points{receiver=\"rabbitmq\",transport=\"\"}": {
+              "first": 4752.0,
+              "last": 22572.0,
+              "max": 22572.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 17820.0
+            },
+            "otelcol_receiver_accepted_metric_points{receiver=\"redis\",transport=\"\"}": {
+              "first": 1632.0,
+              "last": 7752.0,
+              "max": 7752.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 6120.0
+            },
+            "otelcol_receiver_accepted_spans{receiver=\"otlp\",transport=\"http\"}": {
+              "first": 14444.0,
+              "last": 66475.0,
+              "max": 66475.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 52031.0
+            },
+            "otelcol_receiver_accepted_spans{receiver=\"otlp/keycloak\",transport=\"http\"}": {
+              "first": 5958.0,
+              "last": 26789.0,
+              "max": 26789.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 20831.0
+            },
+            "otelcol_receiver_refused_log_records{receiver=\"filelog/api-gateway\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_log_records{receiver=\"filelog/booking-service\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_log_records{receiver=\"filelog/discovery-server\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_log_records{receiver=\"filelog/event-service\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_log_records{receiver=\"filelog/payment-service\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_log_records{receiver=\"filelog/ticket-service\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_log_records{receiver=\"filelog/user-service\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_metric_points{receiver=\"docker_stats\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_metric_points{receiver=\"hostmetrics\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_metric_points{receiver=\"mongodb\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_metric_points{receiver=\"otlp\",transport=\"http\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_metric_points{receiver=\"otlp/keycloak\",transport=\"http\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_metric_points{receiver=\"postgresql\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_metric_points{receiver=\"prometheus/self\",transport=\"http\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_metric_points{receiver=\"rabbitmq\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_metric_points{receiver=\"redis\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_spans{receiver=\"otlp\",transport=\"http\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_spans{receiver=\"otlp/keycloak\",transport=\"http\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            }
+          },
+          "collector_unavailable_samples": 0,
+          "oom_seen": false,
+          "restart_deltas": {
+            "/flash-ticket-payment-service-payment-service-1": 0,
+            "/flash-ticket-booking-service-booking-service-1": 1,
+            "/flash-ticket-infra-postgres-1": 0,
+            "/flash-ticket-ticket-service-ticket-service-1": 0,
+            "/flash-ticket-collector": 0,
+            "/flash-ticket-infra-redis-1": 0,
+            "/flash-ticket-discovery-server-discovery-server-1": 0,
+            "/flash-ticket-user-service-user-service-1": 0,
+            "/flash-ticket-event-service-event-service-1": 0,
+            "/flash-ticket-infra-user-db-1": 0,
+            "/flash-ticket-keycloak-keycloak-1": 0,
+            "/flash-ticket-api-gateway-api-gateway-1": 0,
+            "/flash-ticket-infra-rabbitmq-1": 0
+          },
+          "first_container_states": [
+            {
+              "name": "/flash-ticket-collector",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-api-gateway-api-gateway-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-booking-service-booking-service-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-keycloak-keycloak-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-payment-service-payment-service-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-ticket-service-ticket-service-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-event-service-event-service-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-user-service-user-service-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-discovery-server-discovery-server-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-infra-postgres-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-infra-user-db-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 1
+            },
+            {
+              "name": "/flash-ticket-infra-redis-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-infra-rabbitmq-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            }
+          ],
+          "last_container_states": [
+            {
+              "name": "/flash-ticket-collector",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-api-gateway-api-gateway-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-booking-service-booking-service-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 1
+            },
+            {
+              "name": "/flash-ticket-keycloak-keycloak-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-payment-service-payment-service-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-ticket-service-ticket-service-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-event-service-event-service-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-user-service-user-service-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-discovery-server-discovery-server-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-infra-postgres-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-infra-user-db-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 1
+            },
+            {
+              "name": "/flash-ticket-infra-redis-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-infra-rabbitmq-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            }
+          ],
+          "kernel_oom_events": [
+            {
+              "utc": "2026-11-10T21:04:18+00:00",
+              "epoch": 1794344658.0,
+              "container": "flash-ticket-booking-service-booking-service-1",
+              "limit_bytes": 536870912,
+              "scope": "container memory cgroup",
+              "source": "unplanned-oom.json#/kernel_evidence"
+            }
+          ],
+          "stability_passed": false
+        },
+        "light_load": {
+          "samples": 121,
+          "first_utc": "2026-11-10T21:15:00.000081+00:00",
+          "last_utc": "2026-11-10T21:45:00.000086+00:00",
+          "actual_seconds": 1800.0000047683716,
+          "cpu_mean_percent_machine": 21.227982310743226,
+          "cpu_max_percent_machine": 95.08032128514057,
+          "minimum_memory_available_bytes": 7331540992,
+          "minimum_memory_available_percent": 58.6313636868381,
+          "maximum_root_used_bytes": 13183995904,
+          "storage_first_bytes": 133918955,
+          "storage_last_bytes": 212574796,
+          "telemetry_storage_growth_bytes": 78655841,
+          "telemetry_decimal_gb_per_hour": 0.15731168158326636,
+          "container_resources": {
+            "flash-ticket-api-gateway-api-gateway-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 1.928099173553719,
+              "cpu_max_percent_one_core": 15.89,
+              "memory_mean_bytes": 393177869.96363634,
+              "memory_max_bytes": 402233753.6
+            },
+            "flash-ticket-booking-service-booking-service-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 4.342231404958678,
+              "cpu_max_percent_one_core": 168.4,
+              "memory_mean_bytes": 512203378.24793386,
+              "memory_max_bytes": 525546291.2
+            },
+            "flash-ticket-collector": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 2.1020661157024794,
+              "cpu_max_percent_one_core": 4.41,
+              "memory_mean_bytes": 94825067.47768594,
+              "memory_max_bytes": 101124669.44
+            },
+            "flash-ticket-discovery-server-discovery-server-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.35851239669421486,
+              "cpu_max_percent_one_core": 0.46,
+              "memory_mean_bytes": 360938057.6264463,
+              "memory_max_bytes": 362283008.0
+            },
+            "flash-ticket-event-service-event-service-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.30892561983471073,
+              "cpu_max_percent_one_core": 2.12,
+              "memory_mean_bytes": 429582522.1818182,
+              "memory_max_bytes": 432327884.8
+            },
+            "flash-ticket-infra-postgres-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.8696694214876033,
+              "cpu_max_percent_one_core": 7.63,
+              "memory_mean_bytes": 120896479.84132232,
+              "memory_max_bytes": 123417395.2
+            },
+            "flash-ticket-infra-rabbitmq-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 11.673471074380165,
+              "cpu_max_percent_one_core": 109.71,
+              "memory_mean_bytes": 156295019.05454546,
+              "memory_max_bytes": 232783872.0
+            },
+            "flash-ticket-infra-redis-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.9520661157024793,
+              "cpu_max_percent_one_core": 2.63,
+              "memory_mean_bytes": 4276162.255338843,
+              "memory_max_bytes": 4632608.768
+            },
+            "flash-ticket-infra-user-db-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 10.749586776859504,
+              "cpu_max_percent_one_core": 60.34,
+              "memory_mean_bytes": 102377674.43041323,
+              "memory_max_bytes": 254908825.6
+            },
+            "flash-ticket-keycloak-keycloak-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.643305785123967,
+              "cpu_max_percent_one_core": 20.0,
+              "memory_mean_bytes": 638212749.3289256,
+              "memory_max_bytes": 639316787.2
+            },
+            "flash-ticket-payment-service-payment-service-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.1750413223140496,
+              "cpu_max_percent_one_core": 0.69,
+              "memory_mean_bytes": 511005748.4694215,
+              "memory_max_bytes": 512229376.0
+            },
+            "flash-ticket-ticket-service-ticket-service-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.20677685950413224,
+              "cpu_max_percent_one_core": 0.75,
+              "memory_mean_bytes": 431586082.27438015,
+              "memory_max_bytes": 432537600.0
+            },
+            "flash-ticket-user-service-user-service-1": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.19768595041322315,
+              "cpu_max_percent_one_core": 2.3,
+              "memory_mean_bytes": 361553337.75867766,
+              "memory_max_bytes": 363646156.8
+            }
+          },
+          "collector_counter_series": {
+            "otelcol_exporter_queue_size{data_type=\"logs\",exporter=\"otlp\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": null
+            },
+            "otelcol_exporter_queue_size{data_type=\"metrics\",exporter=\"otlp\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": null
+            },
+            "otelcol_exporter_queue_size{data_type=\"traces\",exporter=\"otlp\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": null
+            },
+            "otelcol_exporter_sent_log_records{exporter=\"file/logs\"}": {
+              "first": 154.0,
+              "last": 309.0,
+              "max": 309.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 155.0
+            },
+            "otelcol_exporter_sent_log_records{exporter=\"otlp\",server_address=\"10.0.0.215\",server_port=\"4317\"}": {
+              "first": 154.0,
+              "last": 309.0,
+              "max": 309.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 155.0
+            },
+            "otelcol_exporter_sent_metric_points{exporter=\"otlp\",server_address=\"10.0.0.215\",server_port=\"4317\"}": {
+              "first": 996876.0,
+              "last": 1783979.0,
+              "max": 1783979.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 787103.0
+            },
+            "otelcol_exporter_sent_spans{exporter=\"file/traces\"}": {
+              "first": 93260.0,
+              "last": 184129.0,
+              "max": 184129.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 90869.0
+            },
+            "otelcol_exporter_sent_spans{exporter=\"otlp\",server_address=\"10.0.0.215\",server_port=\"4317\"}": {
+              "first": 93260.0,
+              "last": 184129.0,
+              "max": 184129.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 90869.0
+            },
+            "otelcol_receiver_accepted_log_records{receiver=\"filelog/api-gateway\",transport=\"\"}": {
+              "first": 8.0,
+              "last": 28.0,
+              "max": 28.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 20.0
+            },
+            "otelcol_receiver_accepted_log_records{receiver=\"filelog/booking-service\",transport=\"\"}": {
+              "first": 73.0,
+              "last": 150.0,
+              "max": 150.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 77.0
+            },
+            "otelcol_receiver_accepted_log_records{receiver=\"filelog/discovery-server\",transport=\"\"}": {
+              "first": 42.0,
+              "last": 76.0,
+              "max": 76.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 34.0
+            },
+            "otelcol_receiver_accepted_log_records{receiver=\"filelog/event-service\",transport=\"\"}": {
+              "first": 8.0,
+              "last": 14.0,
+              "max": 14.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 6.0
+            },
+            "otelcol_receiver_accepted_log_records{receiver=\"filelog/payment-service\",transport=\"\"}": {
+              "first": 8.0,
+              "last": 14.0,
+              "max": 14.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 6.0
+            },
+            "otelcol_receiver_accepted_log_records{receiver=\"filelog/ticket-service\",transport=\"\"}": {
+              "first": 8.0,
+              "last": 14.0,
+              "max": 14.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 6.0
+            },
+            "otelcol_receiver_accepted_log_records{receiver=\"filelog/user-service\",transport=\"\"}": {
+              "first": 7.0,
+              "last": 13.0,
+              "max": 13.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 6.0
+            },
+            "otelcol_receiver_accepted_metric_points{receiver=\"docker_stats\",transport=\"\"}": {
+              "first": 31920.0,
+              "last": 57120.0,
+              "max": 57120.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 25200.0
+            },
+            "otelcol_receiver_accepted_metric_points{receiver=\"hostmetrics\",transport=\"\"}": {
+              "first": 51756.0,
+              "last": 92616.0,
+              "max": 92616.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 40860.0
+            },
+            "otelcol_receiver_accepted_metric_points{receiver=\"mongodb\",transport=\"\"}": {
+              "first": 18696.0,
+              "last": 33456.0,
+              "max": 33456.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 14760.0
+            },
+            "otelcol_receiver_accepted_metric_points{receiver=\"otlp\",transport=\"http\"}": {
+              "first": 91471.0,
+              "last": 163614.0,
+              "max": 163614.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 72143.0
+            },
+            "otelcol_receiver_accepted_metric_points{receiver=\"otlp/keycloak\",transport=\"http\"}": {
+              "first": 11400.0,
+              "last": 20400.0,
+              "max": 20400.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 9000.0
+            },
+            "otelcol_receiver_accepted_metric_points{receiver=\"postgresql\",transport=\"\"}": {
+              "first": 731652.0,
+              "last": 1309272.0,
+              "max": 1309272.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 577620.0
+            },
+            "otelcol_receiver_accepted_metric_points{receiver=\"prometheus/self\",transport=\"http\"}": {
+              "first": 29607.0,
+              "last": 53187.0,
+              "max": 53187.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 23580.0
+            },
+            "otelcol_receiver_accepted_metric_points{receiver=\"rabbitmq\",transport=\"\"}": {
+              "first": 22572.0,
+              "last": 40392.0,
+              "max": 40392.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 17820.0
+            },
+            "otelcol_receiver_accepted_metric_points{receiver=\"redis\",transport=\"\"}": {
+              "first": 7752.0,
+              "last": 13872.0,
+              "max": 13872.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 6120.0
+            },
+            "otelcol_receiver_accepted_spans{receiver=\"otlp\",transport=\"http\"}": {
+              "first": 66475.0,
+              "last": 136576.0,
+              "max": 136576.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 70101.0
+            },
+            "otelcol_receiver_accepted_spans{receiver=\"otlp/keycloak\",transport=\"http\"}": {
+              "first": 26789.0,
+              "last": 47553.0,
+              "max": 47553.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 20764.0
+            },
+            "otelcol_receiver_refused_log_records{receiver=\"filelog/api-gateway\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_log_records{receiver=\"filelog/booking-service\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_log_records{receiver=\"filelog/discovery-server\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_log_records{receiver=\"filelog/event-service\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_log_records{receiver=\"filelog/payment-service\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_log_records{receiver=\"filelog/ticket-service\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_log_records{receiver=\"filelog/user-service\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_metric_points{receiver=\"docker_stats\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_metric_points{receiver=\"hostmetrics\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_metric_points{receiver=\"mongodb\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_metric_points{receiver=\"otlp\",transport=\"http\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_metric_points{receiver=\"otlp/keycloak\",transport=\"http\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_metric_points{receiver=\"postgresql\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_metric_points{receiver=\"prometheus/self\",transport=\"http\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_metric_points{receiver=\"rabbitmq\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_metric_points{receiver=\"redis\",transport=\"\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_spans{receiver=\"otlp\",transport=\"http\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_spans{receiver=\"otlp/keycloak\",transport=\"http\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            }
+          },
+          "collector_unavailable_samples": 0,
+          "oom_seen": false,
+          "restart_deltas": {
+            "/flash-ticket-payment-service-payment-service-1": 0,
+            "/flash-ticket-booking-service-booking-service-1": 1,
+            "/flash-ticket-infra-postgres-1": 0,
+            "/flash-ticket-ticket-service-ticket-service-1": 0,
+            "/flash-ticket-collector": 0,
+            "/flash-ticket-infra-redis-1": 0,
+            "/flash-ticket-discovery-server-discovery-server-1": 0,
+            "/flash-ticket-user-service-user-service-1": 0,
+            "/flash-ticket-event-service-event-service-1": 0,
+            "/flash-ticket-infra-user-db-1": 0,
+            "/flash-ticket-keycloak-keycloak-1": 0,
+            "/flash-ticket-api-gateway-api-gateway-1": 0,
+            "/flash-ticket-infra-rabbitmq-1": 0
+          },
+          "first_container_states": [
+            {
+              "name": "/flash-ticket-collector",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-api-gateway-api-gateway-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-booking-service-booking-service-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 1
+            },
+            {
+              "name": "/flash-ticket-keycloak-keycloak-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-payment-service-payment-service-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-ticket-service-ticket-service-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-event-service-event-service-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-user-service-user-service-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-discovery-server-discovery-server-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-infra-postgres-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-infra-user-db-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 1
+            },
+            {
+              "name": "/flash-ticket-infra-redis-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-infra-rabbitmq-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            }
+          ],
+          "last_container_states": [
+            {
+              "name": "/flash-ticket-collector",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-api-gateway-api-gateway-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-booking-service-booking-service-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 2
+            },
+            {
+              "name": "/flash-ticket-keycloak-keycloak-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-payment-service-payment-service-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-ticket-service-ticket-service-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-event-service-event-service-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-user-service-user-service-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-discovery-server-discovery-server-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-infra-postgres-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-infra-user-db-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 1
+            },
+            {
+              "name": "/flash-ticket-infra-redis-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-infra-rabbitmq-1",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            }
+          ],
+          "kernel_oom_events": [
+            {
+              "utc": "2026-11-10T21:40:18+00:00",
+              "epoch": 1794346818.0,
+              "container": "flash-ticket-booking-service-booking-service-1",
+              "limit_bytes": 536870912,
+              "scope": "container memory cgroup",
+              "source": "unplanned-oom.json#/kernel_evidence"
+            }
+          ],
+          "stability_passed": false
+        }
+      }
+    },
+    "obs": {
+      "memory_total_bytes": 11449561088,
+      "sample_count": 241,
+      "storage_paths": [
+        "/opt/flash-ticket-obs/pinned/data",
+        "/var/lib/docker/volumes/flash-ticket-obs-pinned_grafana-data/_data",
+        "/var/lib/docker/volumes/flash-ticket-obs-pinned_loki-data/_data",
+        "/var/lib/docker/volumes/flash-ticket-obs-pinned_prometheus-data/_data",
+        "/var/lib/docker/volumes/flash-ticket-obs-pinned_tempo-data/_data"
+      ],
+      "windows": {
+        "idle": {
+          "samples": 121,
+          "first_utc": "2026-11-10T20:45:00.000083+00:00",
+          "last_utc": "2026-11-10T21:15:00.000079+00:00",
+          "actual_seconds": 1799.9999952316284,
+          "cpu_mean_percent_machine": 3.2607283570907244,
+          "cpu_max_percent_machine": 10.936454849498322,
+          "minimum_memory_available_bytes": 9903525888,
+          "minimum_memory_available_percent": 86.49699156048557,
+          "maximum_root_used_bytes": 12751548416,
+          "storage_first_bytes": 920044188,
+          "storage_last_bytes": 1342130711,
+          "telemetry_storage_growth_bytes": 422086523,
+          "telemetry_decimal_gb_per_hour": 0.8441730482362949,
+          "container_resources": {
+            "flash-ticket-obs-collector": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.7034710743801653,
+              "cpu_max_percent_one_core": 5.03,
+              "memory_mean_bytes": 97772692.60694215,
+              "memory_max_bytes": 109156761.6
+            },
+            "flash-ticket-obs-grafana": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.46975206611570247,
+              "cpu_max_percent_one_core": 0.81,
+              "memory_mean_bytes": 228355588.23140496,
+              "memory_max_bytes": 228694425.6
+            },
+            "flash-ticket-obs-loki": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.4146280991735537,
+              "cpu_max_percent_one_core": 0.87,
+              "memory_mean_bytes": 57552090.34049587,
+              "memory_max_bytes": 62998446.08
+            },
+            "flash-ticket-obs-prometheus": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.3503305785123967,
+              "cpu_max_percent_one_core": 0.93,
+              "memory_mean_bytes": 103036977.42280991,
+              "memory_max_bytes": 110415052.8
+            },
+            "flash-ticket-obs-tempo": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 1.537190082644628,
+              "cpu_max_percent_one_core": 74.47,
+              "memory_mean_bytes": 186349287.03471074,
+              "memory_max_bytes": 333027737.6
+            }
+          },
+          "collector_counter_series": {
+            "otelcol_exporter_queue_size{data_type=\"logs\",exporter=\"otlp_http/loki\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": null
+            },
+            "otelcol_exporter_queue_size{data_type=\"metrics\",exporter=\"otlp_http/prometheus\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": null
+            },
+            "otelcol_exporter_queue_size{data_type=\"traces\",exporter=\"otlp/tempo\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": null
+            },
+            "otelcol_exporter_sent_log_records{exporter=\"file/logs\"}": {
+              "first": 19.0,
+              "last": 154.0,
+              "max": 154.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 135.0
+            },
+            "otelcol_exporter_sent_log_records{exporter=\"otlp_http/loki\",server_address=\"127.0.0.1\",server_port=\"3100\",url_path=\"/otlp/v1/logs\"}": {
+              "first": 19.0,
+              "last": 154.0,
+              "max": 154.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 135.0
+            },
+            "otelcol_exporter_sent_metric_points{exporter=\"file/metrics\"}": {
+              "first": 216220.0,
+              "last": 1051925.0,
+              "max": 1051925.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 835705.0
+            },
+            "otelcol_exporter_sent_metric_points{exporter=\"otlp_http/prometheus\",server_address=\"127.0.0.1\",server_port=\"9090\",url_path=\"/api/v1/otlp/v1/metrics\"}": {
+              "first": 218957.0,
+              "last": 1065462.0,
+              "max": 1065462.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 846505.0
+            },
+            "otelcol_exporter_sent_spans{exporter=\"file/traces\"}": {
+              "first": 20302.0,
+              "last": 93160.0,
+              "max": 93160.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 72858.0
+            },
+            "otelcol_exporter_sent_spans{exporter=\"otlp/tempo\",server_address=\"127.0.0.1\",server_port=\"14317\"}": {
+              "first": 20302.0,
+              "last": 93160.0,
+              "max": 93160.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 72858.0
+            },
+            "otelcol_receiver_accepted_log_records{receiver=\"otlp\",transport=\"grpc\"}": {
+              "first": 19.0,
+              "last": 154.0,
+              "max": 154.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 135.0
+            },
+            "otelcol_receiver_accepted_metric_points{receiver=\"otlp\",transport=\"grpc\"}": {
+              "first": 205897.0,
+              "last": 992984.0,
+              "max": 992984.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 787087.0
+            },
+            "otelcol_receiver_accepted_metric_points{receiver=\"prometheus/self\",transport=\"http\"}": {
+              "first": 2737.0,
+              "last": 13537.0,
+              "max": 13537.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 10800.0
+            },
+            "otelcol_receiver_accepted_spans{receiver=\"otlp\",transport=\"grpc\"}": {
+              "first": 20302.0,
+              "last": 93160.0,
+              "max": 93160.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 72858.0
+            },
+            "otelcol_receiver_refused_log_records{receiver=\"otlp\",transport=\"grpc\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_metric_points{receiver=\"otlp\",transport=\"grpc\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_metric_points{receiver=\"prometheus/self\",transport=\"http\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_spans{receiver=\"otlp\",transport=\"grpc\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            }
+          },
+          "collector_unavailable_samples": 0,
+          "oom_seen": false,
+          "restart_deltas": {
+            "/flash-ticket-lgtm": 0,
+            "/flash-ticket-obs-prometheus": 0,
+            "/flash-ticket-obs-tempo": 0,
+            "/flash-ticket-obs-collector": 0,
+            "/flash-ticket-obs-grafana": 0,
+            "/flash-ticket-obs-loki": 0
+          },
+          "first_container_states": [
+            {
+              "name": "/flash-ticket-obs-prometheus",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-obs-loki",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-obs-tempo",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-obs-grafana",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-obs-collector",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-lgtm",
+              "status": "exited",
+              "oom_killed": false,
+              "restart_count": 0
+            }
+          ],
+          "last_container_states": [
+            {
+              "name": "/flash-ticket-obs-prometheus",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-obs-loki",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-obs-tempo",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-obs-grafana",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-obs-collector",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-lgtm",
+              "status": "exited",
+              "oom_killed": false,
+              "restart_count": 0
+            }
+          ],
+          "kernel_oom_events": [],
+          "stability_passed": true
+        },
+        "light_load": {
+          "samples": 121,
+          "first_utc": "2026-11-10T21:15:00.000079+00:00",
+          "last_utc": "2026-11-10T21:45:00.000085+00:00",
+          "actual_seconds": 1800.000006198883,
+          "cpu_mean_percent_machine": 3.2476027945624226,
+          "cpu_max_percent_machine": 7.730923694779113,
+          "minimum_memory_available_bytes": 9909293056,
+          "minimum_memory_available_percent": 86.54736177079909,
+          "maximum_root_used_bytes": 13183954944,
+          "storage_first_bytes": 1342130711,
+          "storage_last_bytes": 1772737265,
+          "telemetry_storage_growth_bytes": 430606554,
+          "telemetry_decimal_gb_per_hour": 0.8612131050341337,
+          "container_resources": {
+            "flash-ticket-obs-collector": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.6827272727272727,
+              "cpu_max_percent_one_core": 2.85,
+              "memory_mean_bytes": 109813811.4538843,
+              "memory_max_bytes": 119852236.8
+            },
+            "flash-ticket-obs-grafana": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.4696694214876033,
+              "cpu_max_percent_one_core": 0.58,
+              "memory_mean_bytes": 228456112.87272727,
+              "memory_max_bytes": 228799283.2
+            },
+            "flash-ticket-obs-loki": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.4027272727272727,
+              "cpu_max_percent_one_core": 0.73,
+              "memory_mean_bytes": 59630610.61818182,
+              "memory_max_bytes": 81201725.44
+            },
+            "flash-ticket-obs-prometheus": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.3867768595041322,
+              "cpu_max_percent_one_core": 3.14,
+              "memory_mean_bytes": 110823217.50743802,
+              "memory_max_bytes": 115448217.6
+            },
+            "flash-ticket-obs-tempo": {
+              "samples": 121,
+              "cpu_mean_percent_one_core": 0.3868595041322314,
+              "cpu_max_percent_one_core": 4.57,
+              "memory_mean_bytes": 205140462.22809917,
+              "memory_max_bytes": 313419366.4
+            }
+          },
+          "collector_counter_series": {
+            "otelcol_exporter_queue_size{data_type=\"logs\",exporter=\"otlp_http/loki\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": null
+            },
+            "otelcol_exporter_queue_size{data_type=\"metrics\",exporter=\"otlp_http/prometheus\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": null
+            },
+            "otelcol_exporter_queue_size{data_type=\"traces\",exporter=\"otlp/tempo\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": null
+            },
+            "otelcol_exporter_sent_log_records{exporter=\"file/logs\"}": {
+              "first": 154.0,
+              "last": 309.0,
+              "max": 309.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 155.0
+            },
+            "otelcol_exporter_sent_log_records{exporter=\"otlp_http/loki\",server_address=\"127.0.0.1\",server_port=\"3100\",url_path=\"/otlp/v1/logs\"}": {
+              "first": 154.0,
+              "last": 309.0,
+              "max": 309.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 155.0
+            },
+            "otelcol_exporter_sent_metric_points{exporter=\"file/metrics\"}": {
+              "first": 1051925.0,
+              "last": 1895472.0,
+              "max": 1895472.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 843547.0
+            },
+            "otelcol_exporter_sent_metric_points{exporter=\"otlp_http/prometheus\",server_address=\"127.0.0.1\",server_port=\"9090\",url_path=\"/api/v1/otlp/v1/metrics\"}": {
+              "first": 1065462.0,
+              "last": 1919809.0,
+              "max": 1919809.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 854347.0
+            },
+            "otelcol_exporter_sent_spans{exporter=\"file/traces\"}": {
+              "first": 93160.0,
+              "last": 184029.0,
+              "max": 184029.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 90869.0
+            },
+            "otelcol_exporter_sent_spans{exporter=\"otlp/tempo\",server_address=\"127.0.0.1\",server_port=\"14317\"}": {
+              "first": 93160.0,
+              "last": 184029.0,
+              "max": 184029.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 90869.0
+            },
+            "otelcol_receiver_accepted_log_records{receiver=\"otlp\",transport=\"grpc\"}": {
+              "first": 154.0,
+              "last": 309.0,
+              "max": 309.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 155.0
+            },
+            "otelcol_receiver_accepted_metric_points{receiver=\"otlp\",transport=\"grpc\"}": {
+              "first": 992984.0,
+              "last": 1780087.0,
+              "max": 1780087.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 787103.0
+            },
+            "otelcol_receiver_accepted_metric_points{receiver=\"prometheus/self\",transport=\"http\"}": {
+              "first": 13537.0,
+              "last": 24337.0,
+              "max": 24337.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 10800.0
+            },
+            "otelcol_receiver_accepted_spans{receiver=\"otlp\",transport=\"grpc\"}": {
+              "first": 93160.0,
+              "last": 184029.0,
+              "max": 184029.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 90869.0
+            },
+            "otelcol_receiver_refused_log_records{receiver=\"otlp\",transport=\"grpc\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_metric_points{receiver=\"otlp\",transport=\"grpc\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_metric_points{receiver=\"prometheus/self\",transport=\"http\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            },
+            "otelcol_receiver_refused_spans{receiver=\"otlp\",transport=\"grpc\"}": {
+              "first": 0.0,
+              "last": 0.0,
+              "max": 0.0,
+              "samples": 121,
+              "missing_samples": 0,
+              "resets": 0,
+              "delta": 0.0
+            }
+          },
+          "collector_unavailable_samples": 0,
+          "oom_seen": false,
+          "restart_deltas": {
+            "/flash-ticket-lgtm": 0,
+            "/flash-ticket-obs-prometheus": 0,
+            "/flash-ticket-obs-tempo": 0,
+            "/flash-ticket-obs-collector": 0,
+            "/flash-ticket-obs-grafana": 0,
+            "/flash-ticket-obs-loki": 0
+          },
+          "first_container_states": [
+            {
+              "name": "/flash-ticket-obs-prometheus",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-obs-loki",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-obs-tempo",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-obs-grafana",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-obs-collector",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-lgtm",
+              "status": "exited",
+              "oom_killed": false,
+              "restart_count": 0
+            }
+          ],
+          "last_container_states": [
+            {
+              "name": "/flash-ticket-obs-prometheus",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-obs-loki",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-obs-tempo",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-obs-grafana",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-obs-collector",
+              "status": "running",
+              "oom_killed": false,
+              "restart_count": 0
+            },
+            {
+              "name": "/flash-ticket-lgtm",
+              "status": "exited",
+              "oom_killed": false,
+              "restart_count": 0
+            }
+          ],
+          "kernel_oom_events": [],
+          "stability_passed": true
+        }
+      }
+    }
+  },
+  "authoritative_kernel_oom_events": [
+    {
+      "utc": "2026-11-10T21:04:18+00:00",
+      "epoch": 1794344658.0,
+      "container": "flash-ticket-booking-service-booking-service-1",
+      "limit_bytes": 536870912,
+      "scope": "container memory cgroup",
+      "source": "unplanned-oom.json#/kernel_evidence"
+    },
+    {
+      "utc": "2026-11-10T21:40:18+00:00",
+      "epoch": 1794346818.0,
+      "container": "flash-ticket-booking-service-booking-service-1",
+      "limit_bytes": 536870912,
+      "scope": "container memory cgroup",
+      "source": "unplanned-oom.json#/kernel_evidence"
+    }
+  ]
+}

@@ -1,0 +1,283 @@
+{
+ "schema": "T032-tracerca-dropnew-v1",
+ "design": "results/T-032/thiet-ke-phep-doi-013.md mục 3",
+ "note": "Đổi đầu vào để chẩn đoán; không thay số đã chấm.",
+ "methods_executed": [
+  "tracerca (adapter native, đầu vào đã bỏ thao tác thiếu nền)"
+ ],
+ "sources": {
+  "plan_sha256": "2e26428c26ef2fd699a72abdd9e30662b7cbda61f97aec3c3eca1e33d89b2ebe",
+  "labels_sha256": "d5923b59698000370fa45b1ded8b7c3a1e39eeeef4e450d9cdc9350940fd2f53"
+ },
+ "summary": {
+  "n_cases": 1,
+  "source_status": {
+   "ERROR": 1
+  },
+  "tool_errors": 0,
+  "self_check": {
+   "cases_source_ok": 0,
+   "no_span_dropped": 0,
+   "ranks_equal_frozen": 0,
+   "not_equal": []
+  },
+  "error_source_cases": [
+   {
+    "opaque_id": "dev-03d4910932",
+    "cell": "ts-route-service|socket",
+    "branch_status": "OK",
+    "branch_error": null,
+    "root": "ts-route-service",
+    "root_ranked": true,
+    "root_rank_min": 2,
+    "root_rank_max": 2,
+    "n_entities": 27,
+    "top": [
+     "ts-travel2-service"
+    ],
+    "above_root": [
+     "ts-travel2-service"
+    ],
+    "drop": {
+     "rows": 322096,
+     "spans_after": 158370,
+     "traces_after": 1320,
+     "new_operations": [
+      "ts-order-other-service_getMore ts.orders"
+     ],
+     "spans_dropped": 527,
+     "traces_touched": 195
+    }
+   }
+  ],
+  "error_source_hit1": 0,
+  "error_source_hit5": 1
+ },
+ "cases": [
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-03d4910932",
+   "source_status": "ERROR",
+   "span_source": "parquet gốc qua cua_so.cat_span",
+   "t_seconds": 1706089779,
+   "drop": {
+    "rows": 322096,
+    "spans_after": 158370,
+    "traces_after": 1320,
+    "new_operations": [
+     "ts-order-other-service_getMore ts.orders"
+    ],
+    "spans_dropped": 527,
+    "traces_touched": 195
+   },
+   "branch_status": "OK",
+   "branch_error": null,
+   "entity_ranking": [
+    {
+     "entity": "ts-travel2-service",
+     "rank_min": 1,
+     "rank_max": 1,
+     "score": 0.18347547493344163,
+     "operation": "ts-travel2-service_GET"
+    },
+    {
+     "entity": "ts-route-service",
+     "rank_min": 2,
+     "rank_max": 2,
+     "score": 0.166094926015053,
+     "operation": "ts-route-service_GET /api/v1/routeservice/routes/{routeId}"
+    },
+    {
+     "entity": "ts-travel-service",
+     "rank_min": 3,
+     "rank_max": 3,
+     "score": 0.1256368563685637,
+     "operation": "ts-travel-service_GET"
+    },
+    {
+     "entity": "ts-seat-service",
+     "rank_min": 4,
+     "rank_max": 4,
+     "score": 0.1132177681473456,
+     "operation": "ts-seat-service_GET"
+    },
+    {
+     "entity": "ts-basic-service",
+     "rank_min": 5,
+     "rank_max": 5,
+     "score": 0.07748089109557718,
+     "operation": "ts-basic-service_POST /api/v1/basicservice/basic/travel"
+    },
+    {
+     "entity": "ts-ticketinfo-service",
+     "rank_min": 6,
+     "rank_max": 6,
+     "score": 0.07721957274449599,
+     "operation": "ts-ticketinfo-service_POST /api/v1/ticketinfoservice/ticketinfo"
+    },
+    {
+     "entity": "ts-food-service",
+     "rank_min": 7,
+     "rank_max": 7,
+     "score": 0.012233229173592182,
+     "operation": "ts-food-service_GET"
+    },
+    {
+     "entity": "ts-admin-travel-service",
+     "rank_min": 8,
+     "rank_max": 8,
+     "score": 0.012205872380823218,
+     "operation": "ts-admin-travel-service_GET"
+    },
+    {
+     "entity": "ts-station-service",
+     "rank_min": 9,
+     "rank_max": 9,
+     "score": 0.011297865444274668,
+     "operation": "ts-station-service_GET /api/v1/stationservice/stations/id/{stationNameForId}"
+    },
+    {
+     "entity": "ts-train-service",
+     "rank_min": 10,
+     "rank_max": 10,
+     "score": 0.008607021517553793,
+     "operation": "ts-train-service_GET /api/v1/trainservice/trains/{id}"
+    },
+    {
+     "entity": "ts-order-other-service",
+     "rank_min": 11,
+     "rank_max": 11,
+     "score": 0.00455379166403137,
+     "operation": "ts-order-other-service_OrderOtherRepository.findByTravelDateAndTrainNumber"
+    },
+    {
+     "entity": "ts-auth-service",
+     "rank_min": 12,
+     "rank_max": 12,
+     "score": 0.003850494589391224,
+     "operation": "ts-auth-service_POST /api/v1/users/login"
+    },
+    {
+     "entity": "ts-preserve-service",
+     "rank_min": 13,
+     "rank_max": 13,
+     "score": 0.0019085270261059233,
+     "operation": "ts-preserve-service_POST /api/v1/preserveservice/preserve"
+    },
+    {
+     "entity": "ts-config-service",
+     "rank_min": 14,
+     "rank_max": 14,
+     "score": 0.0015086748805632386,
+     "operation": "ts-config-service_ConfigRepository.findByName"
+    },
+    {
+     "entity": "ts-preserve-other-service",
+     "rank_min": 15,
+     "rank_max": 15,
+     "score": 0.0014998636487592036,
+     "operation": "ts-preserve-other-service_POST /api/v1/preserveotherservice/preserveOther"
+    },
+    {
+     "entity": "ts-order-service",
+     "rank_min": 16,
+     "rank_max": 16,
+     "score": 0.0012249064307587616,
+     "operation": "ts-order-service_POST"
+    },
+    {
+     "entity": "ts-user-service",
+     "rank_min": 17,
+     "rank_max": 17,
+     "score": 0.0004086636697997548,
+     "operation": "ts-user-service_find ts-user-mongo.user"
+    },
+    {
+     "entity": "ts-food-map-service",
+     "rank_min": 18,
+     "rank_max": 18,
+     "score": 0.00040669694299464516,
+     "operation": "ts-food-map-service_GET /api/v1/foodmapservice/trainfoods/{tripId}"
+    },
+    {
+     "entity": "ts-price-service",
+     "rank_min": 19,
+     "rank_max": 19,
+     "score": 0.00039085401602501464,
+     "operation": "ts-price-service_find ts.price_config"
+    },
+    {
+     "entity": "ts-assurance-service",
+     "rank_min": 20,
+     "rank_max": 20,
+     "score": 0.0002726281352235551,
+     "operation": "ts-assurance-service_update ts.assurance"
+    },
+    {
+     "entity": "ts-consign-price-service",
+     "rank_min": 21,
+     "rank_max": 22,
+     "score": 0.0002723311546840959,
+     "operation": "ts-consign-price-service_ConsignPriceConfigRepository.findByIndex"
+    },
+    {
+     "entity": "ts-consign-service",
+     "rank_min": 21,
+     "rank_max": 22,
+     "score": 0.0002723311546840959,
+     "operation": "ts-consign-service_PUT /api/v1/consignservice/consigns"
+    },
+    {
+     "entity": "ts-admin-basic-info-service",
+     "rank_min": 23,
+     "rank_max": 23,
+     "score": 0.00027207182696231805,
+     "operation": "ts-admin-basic-info-service_GET /api/v1/adminbasicservice/adminbasic/configs"
+    },
+    {
+     "entity": "ts-contacts-service",
+     "rank_min": 24,
+     "rank_max": 25,
+     "score": 0.0002719793295709526,
+     "operation": "ts-contacts-service_find ts.contacts"
+    },
+    {
+     "entity": "ts-security-service",
+     "rank_min": 24,
+     "rank_max": 25,
+     "score": 0.0002719793295709526,
+     "operation": "ts-security-service_GET"
+    },
+    {
+     "entity": "ts-payment-service",
+     "rank_min": 26,
+     "rank_max": 26,
+     "score": 0.00013632335900756593,
+     "operation": "ts-payment-service_update ts.payment"
+    },
+    {
+     "entity": "ts-inside-payment-service",
+     "rank_min": 27,
+     "rank_max": 27,
+     "score": 0.00013599891200870393,
+     "operation": "ts-inside-payment-service_GET"
+    }
+   ],
+   "n_entities": 27,
+   "frozen_status": "ERROR",
+   "root": "ts-route-service",
+   "fault": "socket",
+   "cell": "ts-route-service|socket",
+   "root_ranked": true,
+   "root_rank_min": 2,
+   "root_rank_max": 2,
+   "above_root": [
+    "ts-travel2-service"
+   ],
+   "top": [
+    "ts-travel2-service"
+   ],
+   "wall_s": 19.3
+  }
+ ]
+}

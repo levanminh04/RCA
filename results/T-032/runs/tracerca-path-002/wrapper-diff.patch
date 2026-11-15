@@ -1,0 +1,101 @@
+--- replay_tracerca.py
++++ replay_tracerca_v2.py
+@@ -69,6 +69,67 @@
+     return entry, frozen, index26, code_hashes
+ 
+ 
++
++LOWERCASE_PARENT = Path("/home/ubuntu/rca/T-032/sources/rcaeval")
++LOWERCASE_INVENTORY = Path("/home/ubuntu/rca/T-032/sources/tracerca-path-002-inventory.json")
++LOWERCASE_INVENTORY_SHA256 = "c07cbd357b860d164a8d4eef0177015e8620928107192a2b98301e79b3ad0bd5"
++LOWERCASE_REVISION = "259ea4167160256a74ad30004aa3d96a998c846e"
++
++
++def lowercase_file(path, expected, authority, audit):
++    path = Path(path)
++    task_sources = Path("/home/ubuntu/rca/T-032/sources")
++    if task_sources not in path.parents or path.resolve() != path or path.is_symlink():
++        raise ReplayError("lowercase code/metadata escaped or redirected")
++    actual = sha(path)
++    audit.append({"path": str(path), "authority": authority, "expected": expected,
++                  "actual": actual, "pass": actual == expected, "bytes": path.stat().st_size})
++    if actual != expected:
++        raise ReplayError("lowercase source/metadata hash differs: " + str(path))
++    return path
++
++
++def lowercase_closure(audit):
++    metadata = read(lowercase_file(LOWERCASE_INVENTORY, LOWERCASE_INVENTORY_SHA256,
++                                  "approved byte-identical TraceRCA lowercase closure", audit))
++    if metadata.get("revision") != LOWERCASE_REVISION or metadata.get("remote_parent") != str(LOWERCASE_PARENT):
++        raise ReplayError("lowercase closure revision/root changed")
++    if LOWERCASE_PARENT.resolve() != LOWERCASE_PARENT or LOWERCASE_PARENT.is_symlink():
++        raise ReplayError("lowercase closure root redirected")
++    rows = metadata["files"]
++    if len(rows) != metadata["file_count"] or sum(row["bytes"] for row in rows) != metadata["total_bytes"]:
++        raise ReplayError("lowercase closure inventory count/size changed")
++    if metadata["total_bytes"] > 5 * 1024 * 1024:
++        raise ReplayError("lowercase closure exceeds approved 5 MiB")
++    expected_modules = {}
++    for row in rows:
++        relative = Path(row["package_relative"])
++        if (relative.is_absolute() or ".." in relative.parts or relative.parts[0] != "RCAEval"
++                or relative.suffix != ".py" or row["module"] in expected_modules):
++            raise ReplayError("invalid/duplicate lowercase closure row")
++        path = LOWERCASE_PARENT / relative
++        if path.resolve() != path or path.is_symlink():
++            raise ReplayError("lowercase code redirected: " + str(path))
++        lowercase_file(path, row["sha256"], "RCAEval@" + LOWERCASE_REVISION + ":" + relative.as_posix(), audit)
++        if path.stat().st_size != row["bytes"]:
++            raise ReplayError("lowercase source byte size differs")
++        expected_modules[row["module"]] = row
++    for name, module in sorted(sys.modules.items()):
++        if name != "RCAEval" and not name.startswith("RCAEval."):
++            continue
++        row = expected_modules.get(name)
++        imported_file = getattr(module, "__file__", None)
++        if row is None or imported_file is None:
++            raise ReplayError("unknown/namespace RCAEval import: " + name)
++        path = Path(imported_file).resolve()
++        allowed = LOWERCASE_PARENT / row["package_relative"]
++        if path != allowed or sha(path) != row["sha256"]:
++            raise ReplayError("RCAEval import fell back or changed: " + name)
++        audit.append({"module": name, "path": str(path), "expected": row["sha256"],
++                      "actual": sha(path), "pass": True, "authority": "lowercase closure actual import"})
++    return metadata
++
++
+ def external_sources(audit):
+     manifest = read(safe_source(M26))
+     relative = "results/T-026/runs/session-005/external-code-manifest.json"
+@@ -76,8 +137,10 @@
+     suffix = "RCAEval/RCAEval/e2e/tracerca.py"
+     module_name = "RCAEval.e2e.tracerca"
+     expected = external["external_source_hashes"]["D:/RCA-ext/src/" + suffix]
++    closure = lowercase_closure(audit)
+     path = Path(importlib.import_module(module_name).__file__).resolve()
+-    allowed = Path("/home/ubuntu/rca/T-025/src") / suffix
++    lowercase_closure(audit)
++    allowed = LOWERCASE_PARENT / "RCAEval/e2e/tracerca.py"
+     actual = sha(path)
+     row = {"module": module_name, "path": str(path), "expected": expected, "actual": actual,
+            "pass": path == allowed.resolve() and actual == expected, "authority": relative}
+@@ -89,7 +152,8 @@
+     versions = {"numpy": np.__version__, "pandas": pd.__version__}
+     if versions != {"numpy": "1.26.4", "pandas": "2.2.3"}:
+         raise ReplayError("TraceRCA numerical package versions differ from source environment")
+-    return {"modules": [row], "versions": versions}
++    return {"modules": [row], "versions": versions, "closure_inventory_sha256": LOWERCASE_INVENTORY_SHA256,
++            "closure_count": closure["file_count"], "closure_revision": LOWERCASE_REVISION}
+ 
+ def verify_tracerca(directory, summary):
+     """Restore observed rows, verify native formulas/filter, and retain ERROR state.
+@@ -473,7 +537,7 @@
+     directory = new_directory(args.new_run_dir)
+     dump(directory / "invocation.json", {"at_utc": now(), "argv": sys.argv, "command": args.command,
+         "scripts": {name: sha(Path(__file__).with_name(name)) for name in
+-            ("capture_tracerca.py", "replay_tracerca.py", "capture_microrank.py", "replay_microrank.py")},
++            ("capture_tracerca.py", "replay_tracerca_v2.py", "capture_microrank.py", "replay_microrank.py")},
+         "python": sys.version, "hashseed": os.environ.get("PYTHONHASHSEED"), "source_repo": str(REPO)})
+     try:
+         return fixtures(directory) if args.command == "fixture" else one(directory, args.dataset, args.opaque_id)

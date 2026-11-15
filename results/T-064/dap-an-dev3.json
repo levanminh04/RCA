@@ -1,0 +1,187 @@
+{
+ "ghi_utc": "2026-11-14T12:10:59Z",
+ "muc_dich": "đáp án tập chọn dev bản 3 cho bộ chấm T-064 (WHY-95, WHY-97), khai TRƯỚC khi chấm biến thể; chỉ phía chấm",
+ "nguon": {
+  "results/T-059/danh-muc-loi.json": "3d11fafd8afa2d26270cf12eb06fc62aa6965f066aaff202e95890e665a364e1",
+  "results/T-063/o-dev-bo-sung.md": "f21d0c286f74168ccfc686b7046278205769ad906ab9f503013364ab346109df",
+  "results/T-063/thu3/BAN-GIAO-B.md": "b076ae6277ddb636b34dbb67b07c8e3f3281e4f53bf54531efd358522622d266",
+  "results/T-063/thu3/KE-HOACH.md": "67188dea49d2adf09cca37d7a3d4d6452209beeb6f6fc96c227a00e4eba90ca1"
+ },
+ "o_loi": [
+  {
+   "o": "EVENT-DB-LAT",
+   "nguon_o_T059": "EVENT-DB-LAT",
+   "split_T059": "phát triển",
+   "root": {
+    "type": "edge",
+    "caller": "event-service",
+    "callee": "event_db",
+    "kind": "data"
+   },
+   "tap_chap_nhan": [
+    "event-service",
+    "event_db"
+   ],
+   "ghi_chu": ""
+  },
+  {
+   "o": "REDIS-BOOK",
+   "nguon_o_T059": "REDIS-BOOK",
+   "split_T059": "phát triển",
+   "root": {
+    "type": "edge",
+    "caller": "booking-service",
+    "callee": "cache",
+    "kind": "data"
+   },
+   "tap_chap_nhan": [
+    "booking-service",
+    "cache"
+   ],
+   "ghi_chu": ""
+  },
+  {
+   "o": "NET-GW-BOOK",
+   "nguon_o_T059": "NET-GW-BOOK",
+   "split_T059": "phát triển",
+   "root": {
+    "type": "edge",
+    "caller": "api-gateway",
+    "callee": "booking-service",
+    "kind": "http"
+   },
+   "tap_chap_nhan": [
+    "api-gateway",
+    "booking-service"
+   ],
+   "ghi_chu": ""
+  },
+  {
+   "o": "HTTP5-EVENT",
+   "nguon_o_T059": "HTTP5-EVENT",
+   "split_T059": "phát triển",
+   "root": {
+    "type": "node",
+    "id": "event-service"
+   },
+   "tap_chap_nhan": [
+    "event-service"
+   ],
+   "ghi_chu": ""
+  },
+  {
+   "o": "HTTP5-EVENT-FLASH",
+   "nguon_o_T059": "HTTP5-EVENT",
+   "split_T059": "phát triển",
+   "root": {
+    "type": "node",
+    "id": "event-service"
+   },
+   "tap_chap_nhan": [
+    "event-service"
+   ],
+   "ghi_chu": "cùng hook/đích với HTTP5-EVENT dưới tải ×3 từ t (WHY-83 thay SLOW-BOOK-FLASH)"
+  },
+  {
+   "o": "CPU-BOOK-1",
+   "nguon_o_T059": "CPU-BOOK",
+   "split_T059": "phát triển",
+   "root": {
+    "type": "node",
+    "id": "booking-service"
+   },
+   "tap_chap_nhan": [
+    "booking-service"
+   ],
+   "ghi_chu": "1 luồng đốt (o-dev-bo-sung.md)"
+  },
+  {
+   "o": "CPU-BOOK-2",
+   "nguon_o_T059": "CPU-BOOK",
+   "split_T059": "phát triển",
+   "root": {
+    "type": "node",
+    "id": "booking-service"
+   },
+   "tap_chap_nhan": [
+    "booking-service"
+   ],
+   "ghi_chu": "2 luồng = CPU-BOOK T-062"
+  },
+  {
+   "o": "PAUSE-PAYMENT",
+   "nguon_o_T059": null,
+   "split_T059": "dev bổ sung T-063",
+   "root": {
+    "type": "node",
+    "id": "payment-service"
+   },
+   "tap_chap_nhan": [
+    "payment-service"
+   ],
+   "ghi_chu": "results/T-063/o-dev-bo-sung.md dòng PAUSE-PAYMENT"
+  },
+  {
+   "o": "POOL-EVENT",
+   "nguon_o_T059": null,
+   "split_T059": "dev bổ sung T-063 (thu bù 3)",
+   "root": {
+    "type": "node",
+    "id": "event-service"
+   },
+   "tap_chap_nhan": [
+    "event-service"
+   ],
+   "ghi_chu": "pool Hikari Event là vị trí vật lý, service là nút chiếu (như POOL-BOOK T-059); WHY-91"
+  },
+  {
+   "o": "CONSUMER-BOOK-SLOW-X3",
+   "nguon_o_T059": null,
+   "split_T059": "dev bổ sung T-063 (thu bù 3)",
+   "root": {
+    "type": "edge",
+    "caller": "booking-service",
+    "callee": "broker",
+    "kind": "message"
+   },
+   "tap_chap_nhan": [
+    "booking-service",
+    "broker"
+   ],
+   "ghi_chu": "Minh quyết A (\"A, báo kèm điểm B\", DECISIONS 14/11; WHY-97); sửa sau khai trước thu3/KE-HOACH.md §2"
+  },
+  {
+   "o": "RECREATE-PAY",
+   "nguon_o_T059": null,
+   "split_T059": "dev bổ sung T-063 (thu bù 3)",
+   "root": {
+    "type": "node",
+    "id": "payment-service"
+   },
+   "tap_chap_nhan": [
+    "payment-service"
+   ],
+   "ghi_chu": "ca thật cho H8-adapter; Sửa sau 2 (WHY-93)"
+  }
+ ],
+ "o_khong_loi": [
+  {
+   "o": "BINH-THUONG",
+   "vai_tro": "ca không tiêm lỗi (K)"
+  },
+  {
+   "o": "FLASH-HEALTHY",
+   "vai_tro": "ca không tiêm lỗi (K), nhóm riêng FLASH",
+   "nguon_o_T059": "FLASH-HEALTHY"
+  },
+  {
+   "o": "BINH-THUONG-X3",
+   "vai_tro": "ca không tiêm lỗi (K), tải ×3, đối chứng ô H4 (WHY-92)"
+  }
+ ],
+ "quy_uoc": "tập chấp nhận rỗng ở T-059 với gốc nút → tập = {nút gốc}; ô gốc cạnh: bảng cạnh chấm đúng cạnh có hướng+loại (tieu-chi-chon §2)",
+ "goc": {
+  "file": "results/T-064/dap-an-dev2.json",
+  "sha256": "1d6f3cb1e45a001a66c3b9af76c33413e97abe6c147fdc29ea945433f9bed19c"
+ }
+}

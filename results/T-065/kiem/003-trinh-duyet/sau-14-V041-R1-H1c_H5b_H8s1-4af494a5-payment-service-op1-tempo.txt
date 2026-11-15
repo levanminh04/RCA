@@ -1,0 +1,353 @@
+- link "Skip to main content":
+  - /url: "#pageContent"
+  - generic: Skip to main content
+- link "Grafana":
+  - /url: /
+  - img "Grafana"
+- link "Grafana":
+  - /url: /
+- button "Close menu":
+- navigation "Navigation":
+  - list "Navigation":
+    - link "Bookmarks":
+      - /url: /bookmarks
+      - paragraph: Bookmarks
+    - 'button "Expand section: Bookmarks"':
+    - link "Starred":
+      - /url: /dashboards?starred
+      - paragraph: Starred
+    - 'button "Expand section: Starred"':
+    - link "Dashboards":
+      - /url: /dashboards
+      - paragraph: Dashboards
+    - 'button "Collapse section: Dashboards" [expanded]':
+    - list:
+      - link "Playlists":
+        - /url: /playlists
+        - paragraph: Playlists
+      - link "Snapshots":
+        - /url: /dashboard/snapshots
+        - paragraph: Snapshots
+      - link "Library panels":
+        - /url: /library-panels
+        - paragraph: Library panels
+      - link "Shared dashboards":
+        - /url: /dashboard/public
+        - paragraph: Shared dashboards
+      - link "Recently deleted":
+        - /url: /dashboard/recently-deleted
+        - paragraph: Recently deleted
+    - link "Explore":
+      - /url: /explore
+      - paragraph: Explore
+    - link "Drilldown":
+      - /url: /drilldown
+      - paragraph: Drilldown
+    - 'button "Expand section: Drilldown"':
+    - link "Alerting":
+      - /url: /alerting
+      - paragraph: Alerting
+    - 'button "Expand section: Alerting"':
+    - link "Connections":
+      - /url: /connections
+      - paragraph: Connections
+    - 'button "Collapse section: Connections" [expanded]':
+    - list:
+      - link "Add new connection":
+        - /url: /connections/add-new-connection
+        - paragraph: Add new connection
+      - link "Data sources":
+        - /url: /connections/datasources
+        - paragraph: Data sources
+    - link "Administration":
+      - /url: /admin
+      - paragraph: Administration
+    - 'button "Expand section: Administration"':
+  - separator
+  - button "Undock menu":
+- banner:
+  - navigation "Breadcrumbs":
+    - list:
+      - link "Explore":
+        - /url: /explore
+      - generic: Tempo
+  - button "Search..."
+  - generic: ctrl+k
+  - button "New":
+  - button "Help":
+  - button "Profile":
+    - img "User avatar"
+- main:
+  - heading "Explore" [level=1]
+  - navigation "Explore toolbar":
+    - navigation "Search links":
+      - button "Content outline" [expanded]:
+        - generic: Outline
+      - img "Tempo logo"
+      - combobox "Select a data source"
+      - button "Go queryless":
+        - generic: Go queryless
+    - button "Split the pane":
+      - generic: Split
+    - button "Add":
+      - generic: Add
+    - button "Move time range backwards":
+    - 'button "Time range selected: 2026-11-13 14:50:38 to 2026-11-13 15:00:37"':
+    - button "Move time range forwards":
+    - button "Zoom out time range":
+    - button "Run query":
+    - button "Auto refresh turned off. Choose refresh time interval":
+    - button "Copy shortened URL":
+    - button "Open copy link options":
+  - button "Collapse outline" [expanded]:
+    - img "arrow-from-right"
+  - button "Queries":
+    - img "arrow"
+    - generic: Queries
+  - button "Table":
+    - img "table"
+    - generic: Table
+  - button "Collapse query row" [expanded]:
+  - button "A":
+    - generic: A
+  - emphasis: (Tempo)
+  - button "Show data source help":
+  - button "Duplicate query":
+  - button "Hide response":
+  - button "Remove query":
+  - button "Drag and drop to reorder":
+    - img "Drag and drop to reorder"
+  - generic: Query type
+  - radiogroup:
+    - radio "Search"
+    - generic "Search":
+      - generic: Search
+    - radio "TraceQL" [checked]
+    - generic "TraceQL":
+      - generic: TraceQL
+    - radio "Trace ID"
+    - generic "Trace ID":
+      - generic: Trace ID
+    - radio "Service Graph"
+    - generic "Service Graph":
+      - generic: Service Graph
+  - button "Import trace":
+    - generic: Import trace
+  - text: Build complex queries using TraceQL to select a list of traces.
+  - link "Documentation":
+    - /url: https://grafana.com/docs/tempo/latest/traceql/
+    - text: Documentation
+  - code:
+    - generic: "{ resource.service.name = \"payment-service\" && name = \"POST /api/v1/payments\" }"
+    - textbox "Editor content;Press Alt+F1 for Accessibility Options.": "{ resource.service.name = \"payment-service\" && name = \"POST /api/v1/payments\" }"
+  - 'button "Search Options Limit: 50 Spans Limit: 3 Table Format: Traces | Streaming: Disabled"':
+  - heading "Search Options" [level=6]
+  - generic: "Limit: 50"
+  - generic: "Spans Limit: 3"
+  - generic: "Table Format: Traces"
+  - generic: "|"
+  - generic: "Streaming: Disabled"
+  - 'button "Metrics Options Step: auto Type: Range | Streaming: Disabled"':
+  - heading "Metrics Options" [level=6]
+  - generic: "Step: auto"
+  - generic: "Type: Range"
+  - generic: "|"
+  - generic: "Streaming: Disabled"
+  - button "Add query":
+    - generic: Add query
+  - button "Query history":
+    - generic: Query history
+  - button "Query inspector":
+    - generic: Query inspector
+  - main:
+    - region "Table - Traces":
+      - heading "Table - Traces" [level=2]
+      - treegrid:
+        - row "Expand nested rows Trace ID Start time Service Name Duration":
+          - columnheader "Expand nested rows":
+            - generic: Expand nested rows
+          - columnheader "Trace ID":
+            - button "Trace ID"
+          - columnheader "Start time":
+            - button "Start time"
+          - columnheader "Service":
+            - button "Service"
+          - columnheader "Name":
+            - button "Name"
+          - columnheader "Duration":
+            - button "Duration"
+        - row "Expand row 55e30b1e4afb3b6390badf45ebf65dfd 2026-11-13 14:59:21 api-gateway POST payment 21 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "55e30b1e4afb3b6390badf45ebf65dfd":
+            - link "55e30b1e4afb3b6390badf45ebf65dfd":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794556238000%22%2C%22to%22%3A%221794556837999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%2255e30b1e4afb3b6390badf45ebf65dfd%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:59:21"
+          - gridcell "api-gateway"
+          - gridcell "POST payment"
+          - gridcell "21 ms"
+        - row "Expand row 1e8902814ffad03e09d6fc2f9a025e88 2026-11-13 14:59:07 api-gateway POST payment 27 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "1e8902814ffad03e09d6fc2f9a025e88":
+            - link "1e8902814ffad03e09d6fc2f9a025e88":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794556238000%22%2C%22to%22%3A%221794556837999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%221e8902814ffad03e09d6fc2f9a025e88%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:59:07"
+          - gridcell "api-gateway"
+          - gridcell "POST payment"
+          - gridcell "27 ms"
+        - row "Expand row 31735f797b9f0b92b3ae4e28bddc5fcd 2026-11-13 14:59:04 api-gateway POST payment 30 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "31735f797b9f0b92b3ae4e28bddc5fcd":
+            - link "31735f797b9f0b92b3ae4e28bddc5fcd":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794556238000%22%2C%22to%22%3A%221794556837999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%2231735f797b9f0b92b3ae4e28bddc5fcd%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:59:04"
+          - gridcell "api-gateway"
+          - gridcell "POST payment"
+          - gridcell "30 ms"
+        - row "Expand row c87b3f5def81c93341a246a246c5e15 2026-11-13 14:58:47 api-gateway POST payment 30 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "c87b3f5def81c93341a246a246c5e15":
+            - link "c87b3f5def81c93341a246a246c5e15":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794556238000%22%2C%22to%22%3A%221794556837999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22c87b3f5def81c93341a246a246c5e15%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:58:47"
+          - gridcell "api-gateway"
+          - gridcell "POST payment"
+          - gridcell "30 ms"
+        - row "Expand row 2e7d071ef4e4a2c5e45829be7064b647 2026-11-13 14:58:45 api-gateway POST payment 32 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "2e7d071ef4e4a2c5e45829be7064b647":
+            - link "2e7d071ef4e4a2c5e45829be7064b647":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794556238000%22%2C%22to%22%3A%221794556837999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%222e7d071ef4e4a2c5e45829be7064b647%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:58:45"
+          - gridcell "api-gateway"
+          - gridcell "POST payment"
+          - gridcell "32 ms"
+        - row "Expand row 3e420bdc1b52ecf3e8724200147062c1 2026-11-13 14:58:36 api-gateway POST payment 29 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "3e420bdc1b52ecf3e8724200147062c1":
+            - link "3e420bdc1b52ecf3e8724200147062c1":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794556238000%22%2C%22to%22%3A%221794556837999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%223e420bdc1b52ecf3e8724200147062c1%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:58:36"
+          - gridcell "api-gateway"
+          - gridcell "POST payment"
+          - gridcell "29 ms"
+        - row "Expand row 46ee2df831f6b26bcada494cecb54d03 2026-11-13 14:58:12 api-gateway POST payment 40 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "46ee2df831f6b26bcada494cecb54d03":
+            - link "46ee2df831f6b26bcada494cecb54d03":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794556238000%22%2C%22to%22%3A%221794556837999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%2246ee2df831f6b26bcada494cecb54d03%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:58:12"
+          - gridcell "api-gateway"
+          - gridcell "POST payment"
+          - gridcell "40 ms"
+        - row "Expand row 6030bdc5959508bc51f0ed92fe79a60 2026-11-13 14:58:00 api-gateway POST payment 20 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "6030bdc5959508bc51f0ed92fe79a60":
+            - link "6030bdc5959508bc51f0ed92fe79a60":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794556238000%22%2C%22to%22%3A%221794556837999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%226030bdc5959508bc51f0ed92fe79a60%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:58:00"
+          - gridcell "api-gateway"
+          - gridcell "POST payment"
+          - gridcell "20 ms"
+        - row "Expand row 43b47dc3c4f3a47782adbea7bda547fb 2026-11-13 14:57:57 api-gateway POST payment 19 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "43b47dc3c4f3a47782adbea7bda547fb":
+            - link "43b47dc3c4f3a47782adbea7bda547fb":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794556238000%22%2C%22to%22%3A%221794556837999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%2243b47dc3c4f3a47782adbea7bda547fb%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:57:57"
+          - gridcell "api-gateway"
+          - gridcell "POST payment"
+          - gridcell "19 ms"
+        - row "Expand row 26eab8d53fe398a4c1ea9548d276f04b 2026-11-13 14:57:46 api-gateway POST payment 22 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "26eab8d53fe398a4c1ea9548d276f04b":
+            - link "26eab8d53fe398a4c1ea9548d276f04b":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794556238000%22%2C%22to%22%3A%221794556837999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%2226eab8d53fe398a4c1ea9548d276f04b%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:57:46"
+          - gridcell "api-gateway"
+          - gridcell "POST payment"
+          - gridcell "22 ms"
+        - row "Expand row 157d624a940c13d6aa397f917a508fd6 2026-11-13 14:57:41 api-gateway POST payment 23 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "157d624a940c13d6aa397f917a508fd6":
+            - link "157d624a940c13d6aa397f917a508fd6":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794556238000%22%2C%22to%22%3A%221794556837999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22157d624a940c13d6aa397f917a508fd6%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:57:41"
+          - gridcell "api-gateway"
+          - gridcell "POST payment"
+          - gridcell "23 ms"
+        - row "Expand row 181ada59c0ef4f78c24e12d48102b880 2026-11-13 14:57:21 api-gateway POST payment 40 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "181ada59c0ef4f78c24e12d48102b880":
+            - link "181ada59c0ef4f78c24e12d48102b880":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794556238000%22%2C%22to%22%3A%221794556837999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22181ada59c0ef4f78c24e12d48102b880%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:57:21"
+          - gridcell "api-gateway"
+          - gridcell "POST payment"
+          - gridcell "40 ms"
+        - row "Expand row 3c0ace21fc5f7d2b5f8952cdc7eadf6b 2026-11-13 14:57:12 api-gateway POST payment 28 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "3c0ace21fc5f7d2b5f8952cdc7eadf6b":
+            - link "3c0ace21fc5f7d2b5f8952cdc7eadf6b":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794556238000%22%2C%22to%22%3A%221794556837999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%223c0ace21fc5f7d2b5f8952cdc7eadf6b%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:57:12"
+          - gridcell "api-gateway"
+          - gridcell "POST payment"
+          - gridcell "28 ms"
+        - row "Expand row 59412d5d9941fa4d1d722287c744a073 2026-11-13 14:57:10 api-gateway POST payment 39 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "59412d5d9941fa4d1d722287c744a073":
+            - link "59412d5d9941fa4d1d722287c744a073":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794556238000%22%2C%22to%22%3A%221794556837999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%2259412d5d9941fa4d1d722287c744a073%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:57:10"
+          - gridcell "api-gateway"
+          - gridcell "POST payment"
+          - gridcell "39 ms"
+        - row "Expand row 31efdc8c9d61ac2b76fecc1420a15447 2026-11-13 14:57:07 api-gateway POST payment 32 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "31efdc8c9d61ac2b76fecc1420a15447":
+            - link "31efdc8c9d61ac2b76fecc1420a15447":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794556238000%22%2C%22to%22%3A%221794556837999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%2231efdc8c9d61ac2b76fecc1420a15447%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:57:07"
+          - gridcell "api-gateway"
+          - gridcell "POST payment"
+          - gridcell "32 ms"
+        - row "Expand row 4cfecf69ee2928c57a9eea9fe6da8f4c 2026-11-13 14:57:05 api-gateway POST payment 32 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "4cfecf69ee2928c57a9eea9fe6da8f4c":
+            - link "4cfecf69ee2928c57a9eea9fe6da8f4c":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794556238000%22%2C%22to%22%3A%221794556837999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%224cfecf69ee2928c57a9eea9fe6da8f4c%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:57:05"
+          - gridcell "api-gateway"
+          - gridcell "POST payment"
+          - gridcell "32 ms"
+        - row "Expand row 55f088c774dddb9a0d62d96c1155f14b 2026-11-13 14:56:53 api-gateway POST payment 21 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "55f088c774dddb9a0d62d96c1155f14b":
+            - link "55f088c774dddb9a0d62d96c1155f14b":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794556238000%22%2C%22to%22%3A%221794556837999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%2255f088c774dddb9a0d62d96c1155f14b%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:56:53"
+          - gridcell "api-gateway"
+          - gridcell "POST payment"
+          - gridcell "21 ms"
+- log
+- alert
+- alert
+- complementary
+- complementary

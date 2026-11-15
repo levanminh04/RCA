@@ -1,0 +1,198 @@
+{
+  "id": "a89954d1",
+  "kind": "prometheus",
+  "origin": "bang-bang-chung",
+  "href": "/explore?schemaVersion=1&orgId=1&panes=%7B%22a%22%3A%7B%22datasource%22%3A%22prometheus%22%2C%22queries%22%3A%5B%7B%22datasource%22%3A%7B%22type%22%3A%22prometheus%22%2C%22uid%22%3A%22prometheus%22%7D%2C%22expr%22%3A%22%28sum+by%28service_name%29+%28rate%28http_server_request_duration_seconds_count%7Bhttp_response_status_code%3D~%5C%225..%5C%22%7D%5B1m%5D%29%29+or+on%28service_name%29+%280+%2A+%28sum+by%28service_name%29+%28rate%28http_server_request_duration_seconds_count%5B1m%5D%29%29%29%29%29+and+on%28service_name%29+label_replace%28vector%281%29%2C+%5C%22service_name%5C%22%2C+%5C%22event-service%5C%22%2C+%5C%22%5C%22%2C+%5C%22%5C%22%29%22%2C%22range%22%3Atrue%2C%22refId%22%3A%22A%22%7D%5D%2C%22range%22%3A%7B%22from%22%3A%221794433645000%22%2C%22to%22%3A%221794434245000%22%7D%7D%7D",
+  "url": "http://127.0.0.1:13000/explore?schemaVersion=1&panes=%7B%22gp4%22%3A%7B%22datasource%22%3A%22prometheus%22%2C%22queries%22%3A%5B%7B%22datasource%22%3A%7B%22type%22%3A%22prometheus%22%2C%22uid%22%3A%22prometheus%22%7D%2C%22expr%22%3A%22%28sum+by%28service_name%29+%28rate%28http_server_request_duration_seconds_count%7Bhttp_response_status_code%3D%7E%5C%225..%5C%22%7D%5B1m%5D%29%29+or+on%28service_name%29+%280+*+%28sum+by%28service_name%29+%28rate%28http_server_request_duration_seconds_count%5B1m%5D%29%29%29%29%29+and+on%28service_name%29+label_replace%28vector%281%29%2C+%5C%22service_name%5C%22%2C+%5C%22event-service%5C%22%2C+%5C%22%5C%22%2C+%5C%22%5C%22%29%22%2C%22range%22%3Atrue%2C%22refId%22%3A%22A%22%7D%5D%2C%22range%22%3A%7B%22from%22%3A%221794433645000%22%2C%22to%22%3A%221794434245000%22%7D%2C%22compact%22%3Afalse%7D%7D&orgId=1",
+  "panes": {
+    "gp4": {
+      "datasource": "prometheus",
+      "queries": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "(sum by(service_name) (rate(http_server_request_duration_seconds_count{http_response_status_code=~\"5..\"}[1m])) or on(service_name) (0 * (sum by(service_name) (rate(http_server_request_duration_seconds_count[1m]))))) and on(service_name) label_replace(vector(1), \"service_name\", \"event-service\", \"\", \"\")",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "range": {
+        "from": "1794433645000",
+        "to": "1794434245000"
+      },
+      "compact": false
+    }
+  },
+  "body": "Skip to main content\nGrafana\n\nBookmarks\n\nStarred\n\nDashboards\n\nExplore\n\nDrilldown\n\nAlerting\n\nConnections\n\nAdministration\n\nExplore\nPrometheus\nSearch...\nctrl+k\nExplore\nOutline\nGo queryless\nSplit\nAdd\n2026-11-11 21:47:25 to 2026-11-11 21:57:25\nRun query\nShare\nQueries\nGraph\nA\n(Prometheus)\nExplain\nBuilder\nCode\nMetrics browser\n(sum by(service_name) (rate(http_server_request_duration_seconds_count{http_response_status_code=~\"5..\"}[1m])) or on\n(service_name) (0 * (sum by(service_name) (rate(http_server_request_duration_seconds_count[1m]))))) and on(service_name) \nlabel_replace(vector(1), \"service_name\", \"event-service\", \"\", \"\")\nOptions\nLegend: Verbose\nFormat: Time series\nStep: auto\nType: Range\nExemplars: false\nAdd query\nQuery history\nQuery inspector\nGraph\nLines\nBars\nPoints\nStacked lines\nStacked bars\n{service_name=\"event-service\"}",
+  "captures": [
+    {
+      "status": 200,
+      "request": {
+        "queries": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            },
+            "expr": "(sum by(service_name) (rate(http_server_request_duration_seconds_count{http_response_status_code=~\"5..\"}[1m])) or on(service_name) (0 * (sum by(service_name) (rate(http_server_request_duration_seconds_count[1m]))))) and on(service_name) label_replace(vector(1), \"service_name\", \"event-service\", \"\", \"\")",
+            "range": true,
+            "refId": "A",
+            "exemplar": false,
+            "requestId": "21640A",
+            "utcOffsetSec": 0,
+            "interval": "",
+            "legendFormat": "",
+            "datasourceId": 1,
+            "intervalMs": 15000,
+            "maxDataPoints": 1280
+          }
+        ],
+        "from": "1794433645000",
+        "to": "1794434245000"
+      },
+      "response": {
+        "results": {
+          "A": {
+            "status": 200,
+            "frames": [
+              {
+                "schema": {
+                  "refId": "A",
+                  "meta": {
+                    "type": "timeseries-multi",
+                    "typeVersion": [
+                      0,
+                      1
+                    ],
+                    "custom": {
+                      "calculatedMinStep": 15000,
+                      "resultType": "matrix"
+                    },
+                    "executedQueryString": "Expr: (sum by(service_name) (rate(http_server_request_duration_seconds_count{http_response_status_code=~\"5..\"}[1m])) or on(service_name) (0 * (sum by(service_name) (rate(http_server_request_duration_seconds_count[1m]))))) and on(service_name) label_replace(vector(1), \"service_name\", \"event-service\", \"\", \"\")\nStep: 15s"
+                  },
+                  "fields": [
+                    {
+                      "name": "Time",
+                      "type": "time",
+                      "typeInfo": {
+                        "frame": "time.Time"
+                      },
+                      "config": {
+                        "interval": 15000
+                      }
+                    },
+                    {
+                      "name": "Value",
+                      "type": "number",
+                      "typeInfo": {
+                        "frame": "float64"
+                      },
+                      "labels": {
+                        "service_name": "event-service"
+                      },
+                      "config": {
+                        "displayNameFromDS": "{service_name=\"event-service\"}"
+                      }
+                    }
+                  ]
+                },
+                "data": {
+                  "values": [
+                    [
+                      1794433635000,
+                      1794433650000,
+                      1794433665000,
+                      1794433680000,
+                      1794433695000,
+                      1794433710000,
+                      1794433725000,
+                      1794433740000,
+                      1794433755000,
+                      1794433770000,
+                      1794433785000,
+                      1794433800000,
+                      1794433815000,
+                      1794433830000,
+                      1794433845000,
+                      1794433860000,
+                      1794433875000,
+                      1794433890000,
+                      1794433905000,
+                      1794433920000,
+                      1794433935000,
+                      1794433950000,
+                      1794433965000,
+                      1794433980000,
+                      1794433995000,
+                      1794434010000,
+                      1794434025000,
+                      1794434040000,
+                      1794434055000,
+                      1794434070000,
+                      1794434085000,
+                      1794434100000,
+                      1794434115000,
+                      1794434130000,
+                      1794434145000,
+                      1794434160000,
+                      1794434175000,
+                      1794434190000,
+                      1794434205000,
+                      1794434220000,
+                      1794434235000
+                    ],
+                    [
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0.4200000000000001,
+                      0.5799884002319954,
+                      1.5800000000000003,
+                      2.42,
+                      2.8400568011360234,
+                      2.16,
+                      2.1600000000000006,
+                      2.84,
+                      2.8400000000000007,
+                      2.16,
+                      2.1600000000000006,
+                      2.84,
+                      2.8400000000000007,
+                      2.16,
+                      2.1600000000000006,
+                      2.84,
+                      2.8400000000000007,
+                      2.16,
+                      2.1600000000000006,
+                      2.84
+                    ]
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

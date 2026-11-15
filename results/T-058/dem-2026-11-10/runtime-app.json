@@ -1,0 +1,466 @@
+{
+  "role": "app",
+  "utc": "2026-11-10T22:30:06.424570+00:00",
+  "containers": [
+    {
+      "name": "/flash-ticket-collector",
+      "id": "a0d2abe7892f8425ccbeaeb24fdecad5518aac0a10345ef6bac019eac0c28880",
+      "requested_image": "otel/opentelemetry-collector-contrib@sha256:e40d61f10c9a617cca1ffd1be4d7e2b3a4b0f0001798ff07e58cabe82e618cea",
+      "image_id": "sha256:e40d61f10c9a617cca1ffd1be4d7e2b3a4b0f0001798ff07e58cabe82e618cea",
+      "repo_digests": [
+        "otel/opentelemetry-collector-contrib@sha256:e40d61f10c9a617cca1ffd1be4d7e2b3a4b0f0001798ff07e58cabe82e618cea"
+      ],
+      "architecture": "arm64",
+      "source_revision": "b9425f263115f328bc3bd4e65b825101b499f144",
+      "created": "2026-11-10T21:47:58.320705294Z",
+      "started_at": "2026-11-10T21:47:58.65597222Z",
+      "running": true,
+      "paused": false,
+      "oom_killed": false,
+      "restart_count": 0,
+      "network_mode": "host",
+      "ports": {},
+      "safe_settings": {}
+    },
+    {
+      "name": "/flash-ticket-payment-service-payment-service-1",
+      "id": "54208b6e9b250f45b84d90abbbdc774ab09e241b5dfcabc8b3136ce888287310",
+      "requested_image": "ft-local/payment-service:arm64-5c6d1c13",
+      "image_id": "sha256:a88fdba5c8e4c271e550a6e42b750499055371405dc41a0b14d5d0637862f339",
+      "repo_digests": [
+        "ft-local/payment-service@sha256:a88fdba5c8e4c271e550a6e42b750499055371405dc41a0b14d5d0637862f339"
+      ],
+      "architecture": "arm64",
+      "source_revision": "5c6d1c13ffad9110c9827f2cf0ced98fb9919258",
+      "created": "2026-11-10T21:47:51.647069467Z",
+      "started_at": "2026-11-10T21:47:56.769361741Z",
+      "running": true,
+      "paused": false,
+      "oom_killed": false,
+      "restart_count": 0,
+      "network_mode": "host",
+      "ports": {},
+      "safe_settings": {
+        "JAVA_TOOL_OPTIONS": "-javaagent:/otel/opentelemetry-javaagent.jar -XX:MaxRAMPercentage=50.0 -Duser.timezone=UTC -Dotel.instrumentation.common.logging.trace-id-key=traceId -Dotel.instrumentation.common.logging.span-id-key=spanId",
+        "OTEL_SERVICE_NAME": "payment-service",
+        "OTEL_RESOURCE_ATTRIBUTES": "deployment.environment=exp,host.id=exp-app,service.instance.id=payment-service-1,service.version=5c6d1c13ffad9110c9827f2cf0ced98fb9919258",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://127.0.0.1:4318",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_TRACES_SAMPLER": "parentbased_always_on",
+        "OTEL_LOGS_EXPORTER": "none",
+        "OTEL_METRIC_EXPORT_INTERVAL": "10000",
+        "KEYCLOAK_ISSUER_URI": "http://10.0.0.158:8080/realms/flash-ticket",
+        "SERVER_ADDRESS": "127.0.0.1"
+      }
+    },
+    {
+      "name": "/flash-ticket-booking-service-booking-service-1",
+      "id": "fd687dc07a80059807f9d2860ff6c15053b130ad471176e6ea4219f98f48faba",
+      "requested_image": "ft-local/booking-service:arm64-e4304048",
+      "image_id": "sha256:87911e6dba95d6c99e657a692e1a8d4fb1e3d2e45f06d594e318b71a6c901c09",
+      "repo_digests": [
+        "ft-local/booking-service@sha256:87911e6dba95d6c99e657a692e1a8d4fb1e3d2e45f06d594e318b71a6c901c09"
+      ],
+      "architecture": "arm64",
+      "source_revision": "e43040487c8f8090a7e171a5b058325fd8e196b5",
+      "created": "2026-11-10T21:47:46.559531127Z",
+      "started_at": "2026-11-10T21:47:51.335315498Z",
+      "running": true,
+      "paused": false,
+      "oom_killed": false,
+      "restart_count": 0,
+      "network_mode": "host",
+      "ports": {},
+      "safe_settings": {
+        "JAVA_TOOL_OPTIONS": "-javaagent:/otel/opentelemetry-javaagent.jar -XX:MaxRAMPercentage=50.0 -Duser.timezone=UTC -Dotel.instrumentation.common.logging.trace-id-key=traceId -Dotel.instrumentation.common.logging.span-id-key=spanId",
+        "OTEL_SERVICE_NAME": "booking-service",
+        "OTEL_RESOURCE_ATTRIBUTES": "deployment.environment=exp,host.id=exp-app,service.instance.id=booking-service-1,service.version=e43040487c8f8090a7e171a5b058325fd8e196b5",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://127.0.0.1:4318",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_TRACES_SAMPLER": "parentbased_always_on",
+        "OTEL_LOGS_EXPORTER": "none",
+        "OTEL_METRIC_EXPORT_INTERVAL": "10000",
+        "KEYCLOAK_ISSUER_URI": "http://10.0.0.158:8080/realms/flash-ticket",
+        "SERVER_ADDRESS": "127.0.0.1"
+      }
+    },
+    {
+      "name": "/flash-ticket-event-service-event-service-1",
+      "id": "61b53b5ccff99e2e1165d50f3ff6f5f2f4d91ae4de569d2a74bf0cd55026604c",
+      "requested_image": "ft-local/event-service:arm64-9eea593a",
+      "image_id": "sha256:b5fb8c96ed138fddc8e5d102c4c78909b7f2de692efbe4ef148df0d9776a3ce0",
+      "repo_digests": [
+        "ft-local/event-service@sha256:b5fb8c96ed138fddc8e5d102c4c78909b7f2de692efbe4ef148df0d9776a3ce0"
+      ],
+      "architecture": "arm64",
+      "source_revision": "9eea593a14eb50522e7be987b56ad5f0d0c0da72",
+      "created": "2026-11-10T21:47:41.775852303Z",
+      "started_at": "2026-11-10T21:47:46.188978825Z",
+      "running": true,
+      "paused": false,
+      "oom_killed": false,
+      "restart_count": 0,
+      "network_mode": "host",
+      "ports": {},
+      "safe_settings": {
+        "JAVA_TOOL_OPTIONS": "-javaagent:/otel/opentelemetry-javaagent.jar -XX:MaxRAMPercentage=50.0 -Duser.timezone=UTC -Dotel.instrumentation.common.logging.trace-id-key=traceId -Dotel.instrumentation.common.logging.span-id-key=spanId",
+        "OTEL_SERVICE_NAME": "event-service",
+        "OTEL_RESOURCE_ATTRIBUTES": "deployment.environment=exp,host.id=exp-app,service.instance.id=event-service-1,service.version=9eea593a14eb50522e7be987b56ad5f0d0c0da72",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://127.0.0.1:4318",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_TRACES_SAMPLER": "parentbased_always_on",
+        "OTEL_LOGS_EXPORTER": "none",
+        "OTEL_METRIC_EXPORT_INTERVAL": "10000",
+        "KEYCLOAK_ISSUER_URI": "http://10.0.0.158:8080/realms/flash-ticket",
+        "SERVER_ADDRESS": "127.0.0.1"
+      }
+    },
+    {
+      "name": "/flash-ticket-keycloak-keycloak-1",
+      "id": "c89f238e413478245870c7dd8d4beba937ae69ff2c9d7fd1648a651d70100777",
+      "requested_image": "ft-local/keycloak:arm64-776d9c9e",
+      "image_id": "sha256:16cff9e9fe2bbf3a224912c2147c794612ea0e7361a3877e1ee62c525ee008eb",
+      "repo_digests": [
+        "ft-local/keycloak@sha256:16cff9e9fe2bbf3a224912c2147c794612ea0e7361a3877e1ee62c525ee008eb"
+      ],
+      "architecture": "arm64",
+      "source_revision": "776d9c9ecbb7e8b2226820852ed254b20946409b",
+      "created": "2026-11-10T21:47:39.722513923Z",
+      "started_at": "2026-11-10T21:47:41.374718594Z",
+      "running": true,
+      "paused": false,
+      "oom_killed": false,
+      "restart_count": 0,
+      "network_mode": "flash-ticket-infra",
+      "ports": {
+        "8080/tcp": [
+          {
+            "HostIp": "10.0.0.158",
+            "HostPort": "8080"
+          }
+        ]
+      },
+      "safe_settings": {
+        "JAVA_TOOL_OPTIONS": "-javaagent:/otel/opentelemetry-javaagent.jar -XX:MaxRAMPercentage=50.0 -Duser.timezone=UTC -Dotel.instrumentation.common.logging.trace-id-key=traceId -Dotel.instrumentation.common.logging.span-id-key=spanId",
+        "OTEL_SERVICE_NAME": "keycloak",
+        "OTEL_RESOURCE_ATTRIBUTES": "deployment.environment=exp,host.id=exp-app,service.instance.id=keycloak-1,service.version=776d9c9ecbb7e8b2226820852ed254b20946409b",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://10.0.0.158:4318",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_TRACES_SAMPLER": "parentbased_always_on",
+        "OTEL_LOGS_EXPORTER": "none",
+        "OTEL_METRIC_EXPORT_INTERVAL": "10000",
+        "KC_HOSTNAME": "http://10.0.0.158:8080"
+      }
+    },
+    {
+      "name": "/flash-ticket-discovery-server-discovery-server-1",
+      "id": "90c97fa0310c6caa26cb74b5af6f1dad25e7b27c36402e7bcc7c485029b0f3d7",
+      "requested_image": "ft-local/discovery-server:arm64-5c6d1c13",
+      "image_id": "sha256:ee1f1e3e895eaa570b1e0f668489a81c8846dcefc51c4943376cfd130d8acdcd",
+      "repo_digests": [
+        "ft-local/discovery-server@sha256:ee1f1e3e895eaa570b1e0f668489a81c8846dcefc51c4943376cfd130d8acdcd"
+      ],
+      "architecture": "arm64",
+      "source_revision": "5c6d1c13ffad9110c9827f2cf0ced98fb9919258",
+      "created": "2026-11-10T21:47:39.100582267Z",
+      "started_at": "2026-11-10T21:47:39.409384912Z",
+      "running": true,
+      "paused": false,
+      "oom_killed": false,
+      "restart_count": 0,
+      "network_mode": "host",
+      "ports": {},
+      "safe_settings": {
+        "JAVA_TOOL_OPTIONS": "-javaagent:/otel/opentelemetry-javaagent.jar -XX:MaxRAMPercentage=50.0 -Duser.timezone=UTC -Dotel.instrumentation.common.logging.trace-id-key=traceId -Dotel.instrumentation.common.logging.span-id-key=spanId",
+        "OTEL_SERVICE_NAME": "discovery-server",
+        "OTEL_RESOURCE_ATTRIBUTES": "deployment.environment=exp,host.id=exp-app,service.instance.id=discovery-server-1,service.version=5c6d1c13ffad9110c9827f2cf0ced98fb9919258",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://127.0.0.1:4318",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_TRACES_SAMPLER": "parentbased_always_on",
+        "OTEL_LOGS_EXPORTER": "none",
+        "OTEL_METRIC_EXPORT_INTERVAL": "10000",
+        "KEYCLOAK_ISSUER_URI": "http://10.0.0.158:8080/realms/flash-ticket",
+        "SERVER_ADDRESS": "127.0.0.1"
+      }
+    },
+    {
+      "name": "/flash-ticket-api-gateway-api-gateway-1",
+      "id": "2c46a20185a513e05a32ca5ae302520a6c380c7a68fe0c5c5468200e56b8baab",
+      "requested_image": "ft-local/api-gateway:arm64-9eea593a",
+      "image_id": "sha256:3058e6775fa4eb62f262c9dc46104907ad8629fe999cb0b29a8ddb6231f9ded4",
+      "repo_digests": [
+        "ft-local/api-gateway@sha256:3058e6775fa4eb62f262c9dc46104907ad8629fe999cb0b29a8ddb6231f9ded4"
+      ],
+      "architecture": "arm64",
+      "source_revision": "9eea593a14eb50522e7be987b56ad5f0d0c0da72",
+      "created": "2026-11-10T20:33:44.428399279Z",
+      "started_at": "2026-11-10T20:33:49.77036331Z",
+      "running": true,
+      "paused": false,
+      "oom_killed": false,
+      "restart_count": 0,
+      "network_mode": "host",
+      "ports": {},
+      "safe_settings": {
+        "JAVA_TOOL_OPTIONS": "-javaagent:/otel/opentelemetry-javaagent.jar -XX:MaxRAMPercentage=50.0 -Duser.timezone=UTC -Dotel.instrumentation.common.logging.trace-id-key=traceId -Dotel.instrumentation.common.logging.span-id-key=spanId",
+        "OTEL_SERVICE_NAME": "api-gateway",
+        "OTEL_RESOURCE_ATTRIBUTES": "deployment.environment=exp,host.id=exp-app,service.instance.id=api-gateway-1,service.version=9eea593a14eb50522e7be987b56ad5f0d0c0da72",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://127.0.0.1:4318",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_TRACES_SAMPLER": "parentbased_always_on",
+        "OTEL_LOGS_EXPORTER": "none",
+        "OTEL_METRIC_EXPORT_INTERVAL": "10000",
+        "KEYCLOAK_ISSUER_URI": "http://10.0.0.158:8080/realms/flash-ticket",
+        "SERVER_ADDRESS": "10.0.0.158"
+      }
+    },
+    {
+      "name": "/flash-ticket-ticket-service-ticket-service-1",
+      "id": "fdc0f34b4399d36353168e33e59db8c82e0b4eed206e110b42e608917a86f89b",
+      "requested_image": "ft-local/ticket-service:arm64-5c6d1c13",
+      "image_id": "sha256:4caf3aef945237e9b5c356a67025c23f63b0e35e2d56dd75fca0da6f273f1f2d",
+      "repo_digests": [
+        "ft-local/ticket-service@sha256:4caf3aef945237e9b5c356a67025c23f63b0e35e2d56dd75fca0da6f273f1f2d"
+      ],
+      "architecture": "arm64",
+      "source_revision": "5c6d1c13ffad9110c9827f2cf0ced98fb9919258",
+      "created": "2026-11-10T20:17:22.714837071Z",
+      "started_at": "2026-11-10T20:17:26.785927293Z",
+      "running": true,
+      "paused": false,
+      "oom_killed": false,
+      "restart_count": 0,
+      "network_mode": "host",
+      "ports": {},
+      "safe_settings": {
+        "JAVA_TOOL_OPTIONS": "-javaagent:/otel/opentelemetry-javaagent.jar -XX:MaxRAMPercentage=50.0 -Duser.timezone=UTC -Dotel.instrumentation.common.logging.trace-id-key=traceId -Dotel.instrumentation.common.logging.span-id-key=spanId",
+        "OTEL_SERVICE_NAME": "ticket-service",
+        "OTEL_RESOURCE_ATTRIBUTES": "deployment.environment=exp,host.id=exp-app,service.instance.id=ticket-service-1,service.version=5c6d1c13ffad9110c9827f2cf0ced98fb9919258",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://127.0.0.1:4318",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_TRACES_SAMPLER": "parentbased_always_on",
+        "OTEL_LOGS_EXPORTER": "none",
+        "OTEL_METRIC_EXPORT_INTERVAL": "10000",
+        "KEYCLOAK_ISSUER_URI": "http://10.0.0.158:8080/realms/flash-ticket",
+        "SERVER_ADDRESS": "127.0.0.1"
+      }
+    },
+    {
+      "name": "/flash-ticket-user-service-user-service-1",
+      "id": "b1941647dffa44ef2cbb45d7301f4f474ffcf7719ef51d5c4e2194c6aab02c19",
+      "requested_image": "ft-local/user-service:arm64-22067803",
+      "image_id": "sha256:9378302374e9728c7c8dccf1cd2e90e75a616881e8342617e0f1612a21564fee",
+      "repo_digests": [
+        "ft-local/user-service@sha256:9378302374e9728c7c8dccf1cd2e90e75a616881e8342617e0f1612a21564fee"
+      ],
+      "architecture": "arm64",
+      "source_revision": "220678030517c46a1db815a44779fe1075cc8b46",
+      "created": "2026-11-10T20:16:26.143971324Z",
+      "started_at": "2026-11-10T20:16:30.281797034Z",
+      "running": true,
+      "paused": false,
+      "oom_killed": false,
+      "restart_count": 0,
+      "network_mode": "host",
+      "ports": {},
+      "safe_settings": {
+        "JAVA_TOOL_OPTIONS": "-javaagent:/otel/opentelemetry-javaagent.jar -XX:MaxRAMPercentage=50.0 -Duser.timezone=UTC -Dotel.instrumentation.common.logging.trace-id-key=traceId -Dotel.instrumentation.common.logging.span-id-key=spanId",
+        "OTEL_SERVICE_NAME": "user-service",
+        "OTEL_RESOURCE_ATTRIBUTES": "deployment.environment=exp,host.id=exp-app,service.instance.id=user-service-1,service.version=220678030517c46a1db815a44779fe1075cc8b46",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://127.0.0.1:4318",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_TRACES_SAMPLER": "parentbased_always_on",
+        "OTEL_LOGS_EXPORTER": "none",
+        "OTEL_METRIC_EXPORT_INTERVAL": "10000",
+        "KEYCLOAK_ISSUER_URI": "http://10.0.0.158:8080/realms/flash-ticket",
+        "SERVER_ADDRESS": "127.0.0.1"
+      }
+    },
+    {
+      "name": "/flash-ticket-infra-postgres-1",
+      "id": "118469dc200541d6b20a9e469616bbf465f79caed302196b653e45f8f682a2bc",
+      "requested_image": "postgres:16.15",
+      "image_id": "sha256:f9a7b9ebf6f56201f949db745e47bc423c0f0f8294bafe991cc10bf74b029657",
+      "repo_digests": [
+        "postgres@sha256:f9a7b9ebf6f56201f949db745e47bc423c0f0f8294bafe991cc10bf74b029657"
+      ],
+      "architecture": "arm64",
+      "source_revision": null,
+      "created": "2026-11-10T20:09:04.074891777Z",
+      "started_at": "2026-11-10T20:09:04.405789773Z",
+      "running": true,
+      "paused": false,
+      "oom_killed": false,
+      "restart_count": 0,
+      "network_mode": "flash-ticket-infra",
+      "ports": {
+        "5432/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "5432"
+          }
+        ]
+      },
+      "safe_settings": {}
+    },
+    {
+      "name": "/flash-ticket-infra-user-db-1",
+      "id": "d71d5fae554ed9c62fdced68854327a2917e196f97276adbbff7119703130402",
+      "requested_image": "mongo:7.0",
+      "image_id": "sha256:8bb4442761a63a8dda452744082cdac9644b429807eb977b42324a63cef59ca4",
+      "repo_digests": [
+        "mongo@sha256:8bb4442761a63a8dda452744082cdac9644b429807eb977b42324a63cef59ca4"
+      ],
+      "architecture": "arm64",
+      "source_revision": null,
+      "created": "2026-11-10T20:00:24.346736266Z",
+      "started_at": "2026-11-10T20:00:47.678277365Z",
+      "running": true,
+      "paused": false,
+      "oom_killed": false,
+      "restart_count": 1,
+      "network_mode": "flash-ticket-infra_default",
+      "ports": {
+        "27017/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "27017"
+          }
+        ]
+      },
+      "safe_settings": {}
+    },
+    {
+      "name": "/flash-ticket-infra-redis-1",
+      "id": "f6a6eef5aae3cbd3c8744f6dbf7fa57b2cb94a10af1115757c7d7ba3cb85485d",
+      "requested_image": "redis:7.4.11-alpine",
+      "image_id": "sha256:d9436322172a5b482c187bf1f363d3c4fea086fcca6b9c8a94de8f0f39ed3193",
+      "repo_digests": [
+        "redis@sha256:d9436322172a5b482c187bf1f363d3c4fea086fcca6b9c8a94de8f0f39ed3193"
+      ],
+      "architecture": "arm64",
+      "source_revision": null,
+      "created": "2026-11-10T20:00:24.265041951Z",
+      "started_at": "2026-11-10T20:00:41.329548518Z",
+      "running": true,
+      "paused": false,
+      "oom_killed": false,
+      "restart_count": 0,
+      "network_mode": "flash-ticket-infra",
+      "ports": {
+        "6379/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "6379"
+          }
+        ]
+      },
+      "safe_settings": {}
+    },
+    {
+      "name": "/flash-ticket-infra-rabbitmq-1",
+      "id": "9f765fe86e8bd1391769ec34d5637e8297383e4e1a6a3f57788522d862891978",
+      "requested_image": "rabbitmq:4.3.6-management",
+      "image_id": "sha256:54cb013d76cd1fd6c0a0708f34062ad61c452bb6f016b434c6c33f1a765d2b58",
+      "repo_digests": [
+        "rabbitmq@sha256:54cb013d76cd1fd6c0a0708f34062ad61c452bb6f016b434c6c33f1a765d2b58"
+      ],
+      "architecture": "arm64",
+      "source_revision": null,
+      "created": "2026-11-10T20:00:24.261233026Z",
+      "started_at": "2026-11-10T20:00:41.040179753Z",
+      "running": true,
+      "paused": false,
+      "oom_killed": false,
+      "restart_count": 0,
+      "network_mode": "flash-ticket-infra",
+      "ports": {
+        "15672/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "15672"
+          }
+        ],
+        "5672/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "5672"
+          }
+        ]
+      },
+      "safe_settings": {}
+    }
+  ],
+  "files": {
+    "/opt/flash-ticket-app/compose-exp/booking-service.yml": {
+      "bytes": 190,
+      "sha256": "5467355015bc87156e5e2dc867446f9ea50d603e1c20da5a85f368d56944979d"
+    },
+    "/opt/flash-ticket-app/compose-exp/_common.yml": {
+      "bytes": 503,
+      "sha256": "d2a046f06506cd30122ebfe37e9804fc26293750777491f159395db7460c7564"
+    },
+    "/opt/flash-ticket-app/compose-exp/keycloak.yml": {
+      "bytes": 690,
+      "sha256": "9ed984d15692b09b776876a073ceaf6def10ab36bbbb8bcb5ddd316aa5cf2aba"
+    },
+    "/opt/flash-ticket-app/compose-exp/discovery-server.yml": {
+      "bytes": 194,
+      "sha256": "5a421a1740b2a00451c06ce2418535e7496b3788581dd045db19c4d106126520"
+    },
+    "/opt/flash-ticket-app/compose-exp/ticket-service.yml": {
+      "bytes": 362,
+      "sha256": "a7929d3261a8f3a534dca688b34023d22b86d3e41fadfdff64f4926caa1f5979"
+    },
+    "/opt/flash-ticket-app/compose-exp/api-gateway.yml": {
+      "bytes": 184,
+      "sha256": "c24040a790763ba728d69b9c25f7c6ae249461793b52e4ba424e4a97e79270c9"
+    },
+    "/opt/flash-ticket-app/compose-exp/user-service.yml": {
+      "bytes": 186,
+      "sha256": "a82a7362cf1813770ff69ce61a8e806e408b2071e686b469055e343637bbf360"
+    },
+    "/opt/flash-ticket-app/compose-exp/event-service.yml": {
+      "bytes": 186,
+      "sha256": "359b8eb832b50b0da5dc70bb4d93b5adcd41193e75d35f8955c075b8f84338ad"
+    },
+    "/opt/flash-ticket-app/compose-exp/payment-service.yml": {
+      "bytes": 191,
+      "sha256": "5937771d86d7af895c3cfe957ac4fce5f0efff2768a699795737c723eca576e6"
+    },
+    "/opt/flash-ticket-app/collector/config.json": {
+      "bytes": 16447,
+      "sha256": "36217be717d3bcca64b88a6fe0d555913ae105d1f485b0e21bb47109ee7529c5"
+    },
+    "/opt/flash-ticket-app/collector/compose.json": {
+      "bytes": 914,
+      "sha256": "0d70a4e877aaeef75a19fbed66c4561d4a296f7ac92b08de1ee8c2fc2ac013f7"
+    }
+  },
+  "worktree_heads": {
+    "api-gateway": "9eea593a14eb50522e7be987b56ad5f0d0c0da72",
+    "booking-service": "e43040487c8f8090a7e171a5b058325fd8e196b5",
+    "discovery-server": "5c6d1c13ffad9110c9827f2cf0ced98fb9919258",
+    "event-service": "9eea593a14eb50522e7be987b56ad5f0d0c0da72",
+    "keycloak": "776d9c9ecbb7e8b2226820852ed254b20946409b",
+    "payment-service": "5c6d1c13ffad9110c9827f2cf0ced98fb9919258",
+    "ticket-service": "5c6d1c13ffad9110c9827f2cf0ced98fb9919258",
+    "user-service": "220678030517c46a1db815a44779fe1075cc8b46"
+  },
+  "agent": {
+    "version": "2.33.1",
+    "sha256": "e43a270df53c6f423e0ab157be9c27ccc01d5dc3232e162fe54777573db2f149",
+    "path": "/opt/flash-ticket-app/otel/opentelemetry-javaagent.jar"
+  },
+  "private_file_modes": {
+    "/opt/flash-ticket-app/env/event-service.env": "0o600",
+    "/opt/flash-ticket-app/env/user-service.env": "0o600",
+    "/opt/flash-ticket-app/env/booking-service.env": "0o600",
+    "/opt/flash-ticket-app/env/ticket-service.env": "0o600",
+    "/opt/flash-ticket-app/env/api-gateway.env": "0o600",
+    "/opt/flash-ticket-app/env/keycloak.env": "0o600",
+    "/opt/flash-ticket-app/env/payment-service.env": "0o600",
+    "/opt/flash-ticket-app/env/discovery-server.env": "0o600",
+    "/opt/flash-ticket-src/.env": "0o600"
+  }
+}

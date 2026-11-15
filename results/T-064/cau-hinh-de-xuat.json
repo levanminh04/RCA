@@ -1,0 +1,63 @@
+{
+ "ban": "V082-V066+H8a",
+ "quyet_dinh": "Minh chọn trong chat 14/11/2026 (giữa 16:12:41Z và 16:16:41Z): \"V082\" — docs/DECISIONS.md mục 14/11 \"Bản đề xuất cuối M1-FlashTicket\"; lý do WHY-98",
+ "cau_hinh": {
+  "thanh_phan": [
+   {
+    "ma": "H5-liveness",
+    "tham_so": {
+     "chet_im_giay": 60
+    }
+   },
+   {
+    "ma": "H8-san",
+    "tham_so": {
+     "delta_ms": 1
+    }
+   },
+   {
+    "ma": "H8-adapter"
+   }
+  ]
+ },
+ "cau_hinh_file": "results/T-064/bien-the/V082-V066+H8a/cau-hinh.json",
+ "cau_hinh_sha256": "451a8437ae99894141f39c6a2d4936ba0be61014953e936b18152ef8e14a898b",
+ "cau_hinh_file_sha256": "01a64b60d84a55626154328430f6986e502c1755f4b8fe6f112749cabd739625",
+ "quy_uoc_hash": "cau_hinh_sha256 = src/m1_ft/chay.py::sha_cau_hinh (JSON chuẩn hóa), trùng extra.m1_ft.cau_hinh_sha256 của đầu ra; cau_hinh_file_sha256 = hash byte file. Sửa 16:57Z sau T-065 L8; bản trước: cau-hinh-de-xuat-loi-hash.json",
+ "ma_nguon_sha256": "b0f79a4dffd552f6e6026172b9058cd54ee9272475d927e35f19e22b04411b8d",
+ "lenh_chay": "python -B src/m1_ft/chay_ca.py --id <ca> --cau-hinh results/T-064/bien-the/V082-V066+H8a/cau-hinh.json --ban V082-V066+H8a --ra <thư mục> --bo-sung <gói prometheus-bo-sung.json> (môi trường P7: /opt/flash-ticket-rca/venv trên exp-obs)",
+ "thanh_phan_bo": {
+  "H3-pool": "không đo được tác dụng (ô POOL-EVENT đã hạng 1 ở P7)",
+  "H4-queue": "không đo được tác dụng (ô CONSUMER-BOOK-SLOW-X3 đã hạng 1 ở P7)",
+  "H1c-canh-chung": "giữ được theo §4 l3 nhưng §5 xếp V082 trên V071 (tổng hạng 13 vs 14); V071 là bản thay thế có đầu ra cạnh",
+  "H8-log-kq (H8lk), H8-log-chuoi (H8lc)": "không tác dụng khi đã có H5b (phép 2)",
+  "H2": "đánh đổi (hạng tốt hơn, K tăng)",
+  "H1a, H1b": "xấu đi",
+  "H6a, H7, H7c, H8s0": "không tác dụng"
+ },
+ "diem_tap_chon_dev3_17": {
+  "nguon": "results/T-064/cham/chon-dev3-d0-v082-r9-A.json#/ban/V082-V066+H8a/chon",
+  "AC@1": "9/11",
+  "AC@3": "11/11",
+  "tong_hang_cat": 13,
+  "K": "4/6"
+ },
+ "diem_T062_9": {
+  "nguon": "results/T-064/cham/chon-dev3-d0-v082-r9-A.json#/ban/V082-V066+H8a/t062",
+  "AC@1": "5/5",
+  "AC@3": "5/5",
+  "K": "1/4"
+ },
+ "gioi_han": [
+  "V082 được thiết kế sau khi xem điểm tập chọn (sổ dòng 180, thiet_ke_sau_khi_xem_tap_chon) nên số dev lạc quan",
+  "chênh giữa các bản đầu bảng §5 là một ca",
+  "không có đầu ra cạnh",
+  "kênh live-down của V082 khi triển khai phải dựng theo lần dò mới nhất (bộ xuất results/T-064/kiem/r9/xuat_live_down_moi.py), không theo biểu thức T-063"
+ ],
+ "chi_muc_xuat": "results/T-064/ban-xuat/chi-muc-ban.json",
+ "do_nhay_doi_moc": {
+  "nguon": "results/T-064/cham/doi-moc-dev3-r9-A.json",
+  "tom_tat": "AC@3 11/11 ở mọi d ∈ {−60,−30,−15,0,+15,+30}; AC@1 9–10 trong [−60,+15], 6 ở +30 (điểm yếu chung của mọi bản); hồ sơ chọn §16–§17"
+ },
+ "r9": "15/11 (REVIEW-4 R9, WHY-99): kênh live-down theo lần dò mới nhất; chạy lại slot ebd5ef38; H5b không còn nhận chết im sai ở RECREATE-PAY; mọi chỉ số chấm không đổi (hồ sơ chọn §17). Bản trước: cau-hinh-de-xuat-2.json"
+}

@@ -1243,3 +1243,189 @@ Chọn chạy lại toàn bộ dưới v2 vì vân tay job gồm mọi pin code 
 **Kết luận phụ thuộc.** Bảng C-d3 OB bổ sung là **sửa sau khi đã xem test** (C-15 B), không là phép kiểm độc lập; không đổi A4 hay bảng chính. `src/m1/adapter.py` còn lỗi cho các lượt OB sau: sửa chính thức sau khi TORAI A nhận/chấm xong, đề xuất riêng kèm ghim mới.
 
 **Cập nhật 08/11/2026.** TORAI A đã tạm hoãn vô thời hạn (DECISIONS, mục “TORAI A tạm hoãn vô thời hạn”). Mốc sửa `src/m1/adapter.py` đổi thành: chỉ sửa khi có lượt chạy Nezha-OB mới, kèm ghim lại pin (DECISIONS, mục “mốc sửa adapter Nezha”). Câu “sau khi TORAI A nhận/chấm xong” ở trên không còn hiệu lực.
+
+## WHY-80. Vị trí, tải và nhãn cho T-059 — Gói sửa đã duyệt, 11/11/2026
+
+- **Chọn và vì sao.** `GET /api/v1/events/{id}` ở revision `9eea593a` đọc PostgreSQL qua `EventService.readPublic` và `EventRepository.find`. Dùng tuyến Event→event_db ở phát triển và Booking→booking_db ở đánh giá để kiểm chuyển vị trí trong cùng cơ chế trễ JDBC. Hai tuyến dùng cùng DB vật lý. Giữ proxy Event trong mọi ô, mọi pha và các đêm nền của chiến dịch để sự có mặt của proxy không chỉ ra nhãn. Phương án chỉ dùng Booking làm giảm cấu hình 2i, đồng thời bỏ cơ hội thử cạnh JDBC trên dữ liệu phát triển. Pool Event có cấu hình Hikari riêng nhưng thiếu hook, đầu dò và xác nhận hiệu lực. Consumer phát vé hiện chỉ có vị trí Ticket. Phạm vi chuyển vị trí đối với hai cơ chế này cần báo rõ.
+- **Nhãn và điều kiện.** Tiêm tại Hikari Booking chiếu về `booking-service`. Can thiệp ở DB đích chỉ nhận `booking_db` khi đường trực tiếp và đường qua proxy cùng xác nhận mất khả dụng, DB đối chứng vẫn khỏe. Tiêm trên tuyến JDBC giữ nhãn cạnh. Mất kết nối từ một caller có thể trông giống mất DB. Vì vậy cần kiểm độc lập và giữ riêng đáp án mà telemetry phân biệt được.
+- **Tải và quota.** Cùng hỗn hợp cho mọi ô, mọi pha, các đêm nền và đối chứng khỏe. Tốc độ được phép đổi theo lịch khai trước. Luồng đặc thù ưu tiên chạy chung ở nhịp thấp. Nếu cần hồ sơ riêng, đối chứng dùng cùng lịch nghiệp vụ và báo riêng phần suy được loại ca từ tuyến quan sát. Chi phí thêm gồm fixture, kiểm đúng nhịp và đo tải đến từng backend. Gateway ghim Spring Cloud BOM `2025.1.3`; kiểm bytecode JAR `5.0.3` thấy bucket theo route × khóa địa chỉ kết nối. B4 xác nhận revision/config hiệu lực và ghi ngưỡng số request/giây thực đến từng service, khoảng đo, giới hạn sức khỏe trước lượt chấm. Các cảnh báo của ca bị giới hạn vẫn được báo ở nhóm riêng. Ưu tiên giữ quota thật, chốt phương án quota thử trước khi khóa nếu cần vượt giới hạn của cấu hình thật. Đổi quota làm đổi điều kiện triển khai và phải ghi R-10.
+- **Phép so và giới hạn.** Báo kết quả ở mức tải tham chiếu trên vị trí đánh giá và hiệu ứng đổi tải trong cùng ô đánh giá. Đếm thêm mọi lượt của mức tải thứ hai vào dự toán. Ghi cả ca thiếu bằng chứng, ca bị giới hạn và ca tải suy giảm. Quy tắc này giúp phân biệt ảnh hưởng của vị trí, tải và cách sinh dữ liệu. Hiệu lực can thiệp, mức tải, số lượt và lợi ích đồ thị cần số đo sau. Căn cứ: SPEC T-059, D.9, WHY-04, B1.9 T-043, PLAN §5 và phản biện lượt 1–2.
+
+## WHY-81. T-064: chạy và chấm M1-FT trên `exp-obs` (cùng nền với P7) — 12/11/2026 21:30Z
+
+- **Chọn gì.** Mọi lần chạy M1-FT dùng để chấm (P7 tham chiếu, biến thể, tổ hợp) chạy trên `exp-obs` (aarch64) bằng đúng venv của P7 (`/opt/flash-ticket-rca/venv`, Python 3.12.3, numpy 1.26.4, scipy 1.14.1), user `rca`, từ thư mục làm việc riêng `/opt/rca-m1ft/` (không sửa thư mục ghim T-058). Laptop chỉ dùng cho kiểm đơn vị và thử nhanh, không dùng số của laptop trong bảng chấm.
+- **Vì sao.** Phép kiểm tương đương P7 (SPEC T-064 bước 2) trên laptop x86 (cùng phiên bản numpy/scipy) cho bản ghi lệch P7 ở chữ số cuối của số thực (vd. khóa hạng `0.3080217566889036` so với `0.30802175668890364`, `results/T-064/kiem/tuong-duong-p7-laptop-x86.json`), dù tất định trong từng máy. Trên `exp-obs` cả 9 ca trùng SHA hai lần chạy (`results/T-064/kiem/tuong-duong-p7-exp-obs.json#/tat_ca_trung`). Lệch ulp có thể đổi thứ tự khi hai khóa gần nhau, nên so biến thể với P7 phải trên cùng nền. Thêm nữa `exp-obs` nhanh hơn laptop (~6–10 s/ca so với ~10–18 s/ca, cùng file) — luật 19.
+- **Phương án đã xét.** (a) Chạy trên laptop và so "tương đương cấu trúc" (cùng thứ hạng/verdict): bỏ vì SPEC yêu cầu trùng SHA và vì lệch ulp có thể đổi thứ tự hòa. (b) Ép số thực về số chữ số cố định: đổi đầu ra P7, vi phạm "tắt thay đổi thì y hệt P7".
+- **Bằng chứng.** Hai file JSON trên; hash cây mã `src/m1` trên máy trùng bản ghim (`m1-source-pins.json`, 39/39) và trùng `src/m1` trong `/opt/flash-ticket-rca`.
+- **Kết luận phụ thuộc.** Mọi bảng chấm T-064. Nếu sau này đổi nền chạy, phải lặp phép kiểm tương đương trước khi dùng số.
+
+## WHY-82. T-064 H1c: xếp hạng cạnh trong danh sách chung nút + cạnh — 12/11/2026 22:40Z
+
+- **Chọn gì.** Biến thể H1c xuất cạnh theo **danh sách xếp hạng chung**: duyệt thứ hạng nút của bản (nhóm hòa theo thứ tự), ngay sau mỗi nhóm nút chèn các cạnh có cờ và được định vị `rieng_canh` (H1b) mà đầu mút tốt nhất thuộc nhóm đó, sắp theo điểm e giảm dần. Hạng của một cạnh = 1 + số phần tử (nút hoặc cạnh) đứng trước nó. Bảng nút chấm qua phép chiếu của tiêu chí (cạnh hạng k → hai đầu hạng k nếu chưa có hạng tốt hơn); bảng cạnh dùng đúng hạng này.
+- **Vì sao.** Kiểm cài đặt trên 9 ca T-062 (`results/T-064/cham/kiem-cai-dat-3.json`, vai trò kiểm cài đặt, **không** phải tập chọn): H1a/H1b xếp cạnh trong danh sách riêng, nên cạnh yếu giữa hai nút không phải gốc đứng hạng 1 (SLOW-BOOK: `payment-service→payment_db` e = 0,033; HTTP5-EVENT: `keycloak→keycloak_db` 0,037), phép chiếu đẩy hai đầu lên ngang gốc → AC@1 5 → 3,67. Hạng trong danh sách cạnh riêng không so được với hạng nút, trong khi tiêu chí chiếu theo cùng con số k. Danh sách chung làm con số k có cùng nghĩa ở hai bảng ("phần tử thứ k đáng nghi"). Cạnh đặt sau đầu mút tốt nhất vì bất thường cạnh là lời giải thích cho bất thường của nút đó.
+- **Phương án đã xét.** (a) Danh sách cạnh riêng (H1a/H1b) — giữ làm đối chứng, đã thấy điều kiện thất bại trên. (b) Ngưỡng điểm e tối thiểu cho cạnh — không có nguyên lý chọn ngưỡng, dễ khớp theo ca. (c) Đổi phép chiếu — là đổi tiêu chí sau khi xem kết quả, không được (tiêu chí mục 2).
+- **Điều kiện thất bại.** Cạnh không bao giờ đứng trên đầu mút tốt nhất của nó: gốc dạng cạnh có hạng cạnh ≥ 2 (vẫn có thể top 3). Nếu đầu mút tốt nhất của cạnh gốc xếp thấp (vd. nút bên gọi không bất thường), cạnh cũng xếp thấp.
+- **Bằng chứng / trạng thái.** Thiết kế sau khi xem kiểm cài đặt trên 9 ca T-062; tập chọn (dev bản 2) chưa có, chưa xem. Báo rõ trong hồ sơ chọn rằng H1c được thiết kế sau kiểm cài đặt trên 9 ca T-062.
+- **Kết luận phụ thuộc.** Bảng cạnh và bảng nút của mọi biến thể H1c; luật giữ 3 của tiêu chí cho H1.
+
+## WHY-83. T-063: thay SLOW-BOOK bằng HTTP5-EVENT ở hai mức tải trong đợt thu dev bản 2 — 12/11/2026 22:54Z
+
+- **Chọn gì.** Đợt thu dev bản 2 không dùng SLOW-BOOK; thay bằng HTTP5-EVENT ở tải chuẩn và HTTP5-EVENT-FLASH (cùng hook, cùng cường độ, tải ×3), hook Event nhắm sự kiện tải mới `3e7c1df9-ada4-4081-94a1-548b80a5da86`.
+- **Vì sao.** Hook `http.delay`/`http.error` của `src/rca-test` bắt buộc `targetId` (`RcaFaults.java:103`), Booking còn bắt buộc `subject` của chủ đơn (dòng 129). Tải mua vé (phụ lục 2) tạo đơn mới mỗi hành trình, nên SLOW-BOOK nhắm một đơn cố định không chạm lưu lượng thật. Sửa hook sang "mọi đơn" cần sửa `services/booking-service/src/rca-test` và build lại image — ngoài danh sách đường dẫn được ghi rõ trong quyền (`CHIEN-DICH-M1-FT.md` mục 6). T-059 `split_rules` "Phát triển" cho phép: "Nếu SLOW-BOOK chưa đạt thì thay bằng một ô dev đủ bằng chứng, ghi trước khi chạy", và yêu cầu một ô dev chạy ở hai mức tải để đối chiếu cùng lỗi dưới tải khác (phục vụ H7).
+- **Phương án đã xét.** (a) Sửa hook + build lại: hiệu quả nhất nhưng vượt phạm vi đường dẫn đã ghi → chỉ làm nếu Minh mở quyền. (b) Thêm bước "tra cứu đơn cố định" vào tải: làm đổi hỗn hợp tải vì một ô lỗi, chỉ chạm phần nhỏ lưu lượng. (c) Bỏ hẳn phép so hai mức tải: mất đối chứng cho H7.
+- **Hệ quả.** Mất ô "service chậm" ở Booking trong đợt dev (giữ CPU-BOOK, REDIS-BOOK, NET-GW-BOOK ở Booking). HTTP5-EVENT là lỗi 5xx (không phải chậm) — đối chiếu hai mức tải đo lỗi, không đo trễ. Ghi giới hạn này trong hồ sơ chọn.
+- **Kết luận phụ thuộc.** Danh mục ô và lịch đợt thu dev bản 2 (`results/T-063/o-dev-bo-sung.md`, `lich-2.json`); đánh giá H7.
+
+## WHY-84. T-063: revision FlashTicket cho đợt thu dev bản 2 — giữ image `6b21ed55` — 13/11/2026 02:18Z
+
+- **Chọn gì.** Đợt thu dev bản 2 chạy đúng các image đang chạy trên `exp-app`: 7 service `ft-local/<svc>:arm64-t062-6b21ed55` (booking/event build `-P rca-test`), Keycloak `ft-local/keycloak:arm64-776d9c9e`. Thay đổi so với T-062 chỉ ở cấu hình quan sát/tiêm (TD-01..08), không build lại.
+- **Vì sao.** Đầu nhánh `rca/quan-sat-log` là `fba6bc8` (merge `main`: K3s, bỏ API thống kê organizer của Event, cấu hình discovery Payment→Booking mặc định tắt, mở probe liveness/readiness). Đọc diff code nghiệp vụ `6b21ed55..fba6bc8` (`results/T-063/dong-bang/revision-ung-vien.md`): luồng mua trên Docker với discovery tắt không đổi hành vi; API bị bỏ không thuộc tải. Luồng lõi đã kiểm trên `6b21ed55` (giao dịch `COMPLETED` có vé, hai lượt 10 phút — `results/T-062/tai-2/lap-2-luot.md`). Build lại chỉ để theo `main` sẽ buộc kiểm lại luồng lõi mà không thêm tín hiệu cho H1–H8; Minh chốt không thu lại mỗi lần `main` có commit mới (DECISIONS, chiến dịch 13/11).
+- **Phương án đã xét.** Build từ `fba6bc8`: được liveness `permitAll` (đầu dò 200 thay 401) — lợi ích nhỏ, H5 đã dùng được mã 401. Build kèm sửa hook `src/rca-test`: ngoài đường dẫn được ghi rõ trong quyền (WHY-83).
+- **Kết luận phụ thuộc.** Hồ sơ đóng băng `results/T-063/dong-bang.md`; mọi ca dev bản 2. Nếu sau này dùng revision khác, dev bản 2 không còn là cùng hệ thống.
+
+## WHY-85. T-064 H8-sàn: sàn độ lớn 1 ms cho đơn vị thao tác — ghi bổ sung 13/11/2026 22:48Z
+
+- **Ghi muộn.** Mục này được thêm **sau** khi sàn đã dùng trong kết quả hai lượt chọn (thiếu sót của người làm, phản biện T-064 lượt 1 điểm R3). Nguyên lý dưới đây có từ trước khi chấm, trong docstring `src/m1_ft/thanh_phan/h8_san.py` và sổ `results/T-064/so-bien-the.jsonl` (dòng V002); mục này không thêm lý do mới sau khi xem điểm.
+- **Chọn gì.** Với đơn vị thao tác (`op|…`, `canh|…`), bỏ cờ của một hướng khi độ vượt trung bình của các mẫu A ngoài ngưỡng nhỏ hơn δ = 1 ms. Đơn vị metric, log, đếm không đổi. δ = 0 phải trùng P7 (đã kiểm, V001).
+- **Vì sao.** Quan sát (đã kiểm, `results/T-063/ca-nen/PHAN-TICH.md`, `results/T-064/cham/t062-p7.json`): E4 của P7 không có sàn độ lớn, nên thao tác nền dịch khoảng 0,1 ms với vài trăm mẫu vẫn được gắn cờ, và 4/4 ca không tiêm lỗi của T-062 bị kết luận có nguyên nhân.
+- **Trạng thái của con số 1 ms: ngưỡng thực dụng, giả thuyết chưa kiểm.** Lý do đã ghi trước là "dịch nhỏ hơn hạt lập lịch CPU thì không phân biệt được với nhiễu lập lịch". Đây là **suy luận chưa kiểm**: tài liệu CFS mô tả độ mịn lập lịch, không xác lập 1 ms là ranh giới giữa lỗi và nhiễu của phép đo này; chưa có số đo nhiễu trên máy thu. Trường hợp nó sai: nhiễu thật lớn hơn hoặc nhỏ hơn 1 ms nhiều lần. Không kiểm được trong task vì mỗi ô chỉ một lần thu; cần chạy lặp ca bình thường hoặc quét δ.
+- **Phương án đã xét.** (a) Không sàn (P7): K 4/5 trên tập A. (b) Sàn tương đối theo ngưỡng h: dự đoán từ số đã có là đổi CPU-BOOK-2 lấy EVENT-DB-LAT, chưa chạy (`results/T-064/phan-tich/ghi-chu-co-che-dev2.md` Q6). (c) Quét nhiều giá trị δ trên tập chọn: dễ khớp quá với 12–13 ca, chưa làm.
+- **Điều kiện thất bại (đã thấy).** Lỗi thật có độ vượt dưới 1 ms bị bỏ cờ: ở CPU-BOOK-2 hai thao tác của Booking có độ vượt khoảng 411 và 506 µs bị bỏ, đáp án tụt hạng 1 → 2. Độ vượt lớn nhất bị bỏ ở ba ca không lỗi là 762–985 µs, sát sàn, nên K nhạy với δ (`results/T-064/chu-thich-thao-tac-nen.md` mục 3).
+- **Bằng chứng.** Tập A: K 4 → 3, AC@1 và AC@3 không đổi, EVENT-DB-LAT 2 → 1, CPU-BOOK-2 1 → 2 (`results/T-064/cham/chon-dev2-luot1-tap12.json#/ban/V002-H8s1`). Một lần thu mỗi ô.
+- **Kết luận phụ thuộc.** Mọi bản có H8s1 (V002, V028, V034…) và vị trí đứng đầu của V002 theo §5 trên tập A. Nếu δ đổi, các kết luận này phải chấm lại.
+
+## WHY-86. T-064 H5b: thành phần "chết im" từ 60 s được xếp nhóm đầu — ghi bổ sung 13/11/2026 22:48Z
+
+- **Ghi muộn.** Thêm sau khi H5b đã dùng trong kết quả lượt chọn 2 (R3 của phản biện T-064 lượt 1). Nguyên lý có trước khi chấm, trong docstring `src/m1_ft/thanh_phan/h4_h5.py::_chet_im` và sổ biến thể (dòng V032, 13/11 19:31Z).
+- **Chọn gì.** Một service được coi là chết im khi đầu dò sống của chính nó phản hồi ở mọi mẫu trước t (ít nhất 4 mẫu), rồi từ mẫu không phản hồi đầu tiên sau t tới hết cửa sổ không phản hồi lại lần nào, và đoạn đó dài ít nhất 60 s. Thành phần chết im được đưa lên nhóm đầu của bảng xếp hạng.
+- **Vì sao.** Cơ chế đã lần (`ghi-chu-co-che-dev2.md` Q3): khi một service bị dừng suốt pha lỗi, mọi kênh của nó mất mẫu, P7 loại nó khỏi danh sách. H5 (kênh liveness chấm theo độ lớn) trả nó về danh sách nhưng kênh nhị phân có độ lớn tối đa 1, không so được với độ trễ hàng trăm của các service chịu hậu quả, nên chỉ đứng hạng 4.
+- **Vì sao 60 s.** Bằng 4 bước dò 15 s, để một lần dò hụt hay một lần khởi động lại ngắn không bị coi là chết. Con số này **chưa kiểm** trên ca khởi động lại thật; tập chọn không có ca như vậy.
+- **Phương án đã xét.** (a) H5 theo độ lớn: hạng 4 (V018). (b) H2 kênh tài nguyên: hạng 4 nhưng K tăng (V012). (c) Nhân hệ số cho kênh liveness: không có nguyên lý chọn hệ số.
+- **Điều kiện thất bại.** Service chết vì một service khác (hậu quả) vẫn được đưa lên nhóm đầu; đầu dò mất đường mạng nhưng service còn sống bị coi là chết; chết ngắn hơn 60 s không được nhận.
+- **Bằng chứng và giới hạn.** Tập B: PAUSE-PAYMENT vắng → hạng 1 (`results/T-064/cham/chon-dev2-luot2-tap13.json#/ban/V032-H5b/ca/46aab4be`); H5b chỉ báo chết im ở đúng ca này trong 22 ca (`results/T-064/kiem/kiem-luot2.json#/chet_im`). **Thiết kế sau khi xem đúng ca này, chỉ một ô**: đây không phải bằng chứng độc lập về hiệu quả.
+- **Kết luận phụ thuộc.** V032, V033, V034 và vị trí đứng đầu của V032 trên tập B; cả hai còn phụ thuộc việc Minh có nhận tập B hay không.
+
+## WHY-87. T-064 Kiểm độ nhạy mốc: dựng lại đầu vào từ gói ca với t' = t + d, xuất lại gói metric bổ sung quanh t'
+
+- **Chọn gì.** `chay_ca.py --doi-t d` dựng lại cả bảy tham số M1 từ gói ca (`m1_ft/doi_moc.py`), đi đúng đường của runner ghim `run-m1.py`: `adapt(..., t')`, cấu hình khóa P7 cộng `params_ca`, cùng các phép kiểm trường cấm và rò giá trị. Mọi nơi dùng t đều dùng t': `inputs[5]`, cửa sổ cắt span/log/metric của M1, `span_phu`, H5b. Gói metric bổ sung (chỉ có [t−300, t+300]) được xuất lại quanh t' bằng đúng bộ xuất `results/T-063/dong-goi/xuat_bo_sung.py`. Với 9 ca T-062, gói gốc quanh t chỉ được dùng khi các kênh cấu hình đọc tới (live-down, live-ms) rỗng; `chay_ca.py` kiểm điều này và từ chối nếu không đúng.
+- **Vì sao.** `method-input.json` của P7 chỉ chứa [t−300, t+300). Nếu chỉ đổi `inputs[5]`, cửa sổ của M1 hụt |d| giây ở một đầu: A ngắn đi khi d = +30, N ngắn đi khi d = −30. Khi đó phép kiểm độ nhạy trộn hai hiệu ứng, dời mốc và mất dữ liệu. Gói ca chứa dữ liệu thô [t−600, t+600). Cả 22 ca được đóng gói lúc t + 783…808 s, nên có đủ dữ liệu cho |d| ≤ 300.
+- **Đã xét.** (1) Chỉ đổi `inputs[5]`: bị loại vì trộn hiệu ứng như trên. (2) Cắt bớt cửa sổ còn [t'−270, t'+270]: bị loại vì đổi độ dài N/A so với P7. (3) Dùng gói bổ sung quanh t cho mọi ca: một phần cửa sổ của kênh live sẽ nằm ngoài gói, độ phủ A/N của kênh đó đổi.
+- **Bằng chứng.** Dựng lại với d = 0 cho `method-input.json` trùng byte bản đã lưu (laptop, a5539fba; trên `exp-obs` là bản V058, 22 ca, xem `BAN-GIAO-C.md`). `chay_ca.py` cũ và mới cho đầu ra trùng byte ở đường mặc định (V041, a5539fba). 26 gói bổ sung xuất lại: 252.125 điểm chung trùng giá trị gói gốc, 0 lệch (`doi-moc/kiem-bo-sung-doi-t.json`). Bộ đệm đầu vào kiểm hash khi đọc.
+- **Kết luận phụ thuộc.** Kết quả dời mốc ±30 s của P7, V032, V041 (V052–V057), phép thử giả d = −300 (V059).
+- **Giới hạn.** Mỗi ô một lần thu. Dời mốc là phép kiểm độ nhạy của phương pháp với mốc t do người dùng đưa vào, không phải đo dao động giữa các lần thu.
+
+## WHY-88. T-064 H8-adapter: nối chuỗi container khi chỉ khác nhãn runtime và không chồng lấn trong mốc mẫu gốc
+
+- **Chọn gì.** Trước adapter ghim, các chuỗi của cùng một metric logic (kênh, thực thể) được nối theo thời gian khi thỏa cả ba điều kiện: (i) chỉ khác nhau ở `container_id`, `container_name`, `service_instance_id`; (ii) không chồng lấn trong mốc mẫu gốc (`timestamp()`): mẫu cuối của chuỗi trước sớm hơn mẫu đầu của chuỗi sau; (iii) kênh có mốc mẫu gốc. Ở mỗi mốc đánh giá có nhiều điểm, giữ điểm có mốc gốc mới nhất. Không thỏa điều kiện thì giữ hành vi P7 (adapter ném lỗi). Mặc định tắt.
+- **Vì sao.** Đây là nhu cầu kỹ thuật (luật 18), không phải cách xử lý một hạn chế phương pháp. Khi một container bị tạo lại trong [t−600, t+600], P7 ERROR cả ca. FlashTicket Compose chạy một container cho mỗi service. Lần theo `thuong01`: trong mốc gốc, chuỗi cũ và mới không chồng lấn (ví dụ api-gateway [−609, −509] s và [−499, 591] s). Phần trông như chồng lấn trên lưới đánh giá là do lookback ~300 s của PromQL lặp lại mẫu cuối của container đã dừng. Giữ điểm có mốc gốc mới nhất cho đúng giá trị mà một chuỗi duy nhất đã cho.
+- **Đã xét.** (1) Cộng hoặc lấy trung bình các chuỗi: bị loại vì sai khi hai container không đồng thời (cộng lặp mẫu cũ vào mẫu mới) và vì cần khai phép gộp. (2) Bỏ nguồn bị trùng: mất kênh cpu/mem của thực thể vừa tạo lại, đúng nơi có thông tin. (3) Gộp cả khi chồng lấn: chỉ đúng với nhiều bản sao, cần phép gộp khai báo; chưa có trường hợp này nên không làm.
+- **Bằng chứng.** `phien-c/h8-adapter/dem-chuoi-trung.json` (37 gói: chỉ thuong01 bị lỗi). Test `src/m1_ft/tests/test_h8.py`: tách giả cpu+mem booking của a5539fba tại t+60 theo đúng ngữ nghĩa lookback; adapter ghim ném lỗi; nối lại cho rows, owners, indices, clocks, coverage, aliases trùng bản gốc; chồng lấn và khác nhãn ngoài runtime thì không nối. Trên exp-obs: thuong01 P7 ERROR, bản có H8-adapter chạy được (14 nhóm nối, 0 nhóm không nối); 22 ca trùng bản cha. **Đính chính chú thích mã:** `mat_mau` không phải chỉ số mất thông tin. Ở thuong01 `mat_mau` = 12: mỗi mẫu là mẫu gốc cuối của container cũ, nằm cùng bước lưới 15 s với mẫu đầu của container mới (ví dụ −509 s và −499 s), nên không phải mẫu mới nhất ở mốc đánh giá nào. Một chuỗi liên tục cũng không bao giờ trả các mẫu này. Docstring của `h8_adapter.py` ("điểm bị bỏ luôn là bản lặp… `mat_mau == 0`") cần sửa ở lần đóng gói mã kế tiếp; chưa sửa vì sẽ đổi `ma_nguon_sha256` đã ghi trong đầu ra.
+- **Kết luận phụ thuộc.** V060, V061; mọi bản sau có H8-adapter.
+- **Điều kiện thất bại.** Nhiều bản sao chạy song song; nhãn khác ngoài nhóm runtime (ví dụ chuyển host); container mới có mức tài nguyên khởi động khác hẳn nên bị gắn cờ (thông tin thật, nhưng có thể không phải gốc).
+
+## WHY-89. T-064 H8-log: kết cục nghiệp vụ theo hợp đồng B16 — phân loại dòng lỗi (H8-log-kq) và hai kênh metric (H8-log-chuoi)
+
+- **Chọn gì.** Trường `outcome` của log JSON được dùng theo ngữ nghĩa B16 (`B16-observability-baseline.md` dòng 56): FAILED ∪ UNKNOWN là kết cục lỗi; SUCCESS, REJECTED (từ chối theo luật nghiệp vụ) và RETRY (lỗi tạm, tự thử lại) là kết cục không lỗi.
+  - **H8-log-kq:** dòng có `outcome` được phân loại lỗi theo kết cục thay vì severity, trong kênh `log_loi` sẵn có (cùng đơn vị, E4 đếm, cổng D1, lớp lan ngược).
+  - **H8-log-chuoi:** thêm hai kênh metric 15 s theo service, qua đường metric chung (E4 phân vị + G3): `log-kq-loi` là tỷ lệ kết cục lỗi (lớp "lỗi"); `log-kq-ok` là số SUCCESS/s (lớp "lưu lượng"). Ô được đóng dấu ở đầu ô để không trộn N với A.
+  - Nút là thực thể ghi log. Không thêm cạnh. Nơi đặt: log ứng dụng, qua Collector, vào `raw-logs.jsonl` của gói ca (`bo_sung.log_phu`).
+- **Vì sao.** `outcome` là trường hợp đồng, còn severity do người viết code chọn. Kênh `log-kq-ok` phủ phần xử lý bất đồng bộ qua RabbitMQ (saga thanh toán, phát vé), phần mà kênh `workload` HTTP của P7 không thấy.
+- **Đã xét.**
+  - (1) Thêm đơn vị log mới bằng cách bọc `don_vi_log`: P7 dùng cổng D1, mà mốc N của mỗi đơn vị log được tính bên trong `chuoi._chay` từ dòng lỗi theo severity, nên đơn vị mới lệch số dòng và ERROR. Không thể làm mà không sửa `src/m1`.
+  - (2) Một đơn vị cho mỗi `reasonCode`: nhiều phép thử hơn, tăng cờ giả; chưa có căn cứ.
+  - (3) Tính RETRY là lỗi: RETRY|SMTP_UNAVAILABLE của ticket là nền liên tục khoảng 3.500 dòng/300 s, sẽ lấn tín hiệu FAILED.
+- **Bằng chứng đầu vào.** `h8-log/dem-log-nghiep-vu.json`, `cheo-severity-outcome-22ca.json`. Trong cửa sổ của 22 ca, ERROR trùng FAILED ở 10.424/10.424 dòng. H8-log-kq chỉ đổi lớp 4.490 dòng UNKNOWN, ở 10 ca. Kết quả chấm ở `BAN-GIAO-C.md`.
+- **Khai.** Thiết kế sau khi đã xem số đếm theo ca × service. Người làm biết mã ca ↔ ô (ví dụ event-service chỉ có log FAILED ở hai ca HTTP5-EVENT). Định nghĩa kênh theo B16, không chỉnh theo đáp án.
+- **Kết quả** (`cham/h8.json`): H8-log-kq không đổi đại lượng chấm nào (phép 1, 2). H8-log-chuoi: phép 1 GIU (l1), PAUSE-PAYMENT — → 4, tổng hạng 15 → 13, ở một ô đã xem trước; phép 2 không tác dụng.
+- **Kết luận phụ thuộc.** V062–V065.
+- **Điều kiện thất bại.** Dịch vụ chỉ ghi log khi lỗi (event-service): N rỗng. Phía gọi ghi FAILED cho lỗi của bên được gọi (lan ngược xử lý như `log_loi`). `log-kq-ok` đổi theo tải (H7 không áp cho kênh này). user-service không ghi log nghiệp vụ, nên không có kênh này.
+
+
+## WHY-90. T-063 — Build lại riêng Event từ `6b21ed55` + bản vá hook H3, thu trên "bản 3" — chép từ results/T-063/thu3/de-xuat-WHY.md ngày 14/11/2026 (điều phối)
+
+- **Chọn gì:** sửa `RcaFaults.java` của Event (bỏ phép so tên service ở `start()` và `poll()` để `pool.hold` chạy ở Event; điều kiện `subject` của `http()` giữ nguyên), commit `e557307` trên `rca/quan-sat-log`. Image Event build từ worktree tách tại `6b21ed55` (bản đang chạy) + đúng bản vá đó → commit cục bộ `76b34d5e`, image `ft-local/event-service:arm64-t063h3-76b34d5e`. Sáu service khác, env, compose, Collector, Toxiproxy giữ nguyên.
+- **Vì sao:** POOL-EVENT không thử được vì hook chỉ chạy ở Booking (`chay/D2B-KET-QUA.md`); Minh duyệt sửa hook (DECISIONS 14/11). Không build từ đầu nhánh `fba6bc8` vì nhánh đã merge code nghiệp vụ mới của Event (bỏ API thống kê) — sẽ đổi hành vi ngoài hook.
+- **Phương án đã xét:** (1) build từ `fba6bc8`: loại vì đổi code nghiệp vụ; (2) chấp nhận H3 "chưa thử được": loại vì Minh đã cho sửa; (3) chọn đúng nền `6b21ed55` + bản vá: chọn.
+- **Bằng chứng:** `thu3/thay-doi-may.md` T3-03…T3-05; test `RcaFaults*` 8/8 đạt trên `exp-app`; audit `pool.hold.started` ở Event khi tiêm thử (`thu3/KE-HOACH.md` bổ sung 2).
+- **Hệ quả, giới hạn:** ca thu bù 3 nằm trên bản triển khai khác bản đóng băng 2 (watchdog hook 100 ms chạy ở Event cả khi không tiêm; container Event mới). Không gộp thẳng với 13 ca bản 2; dùng BINH-THUONG và EVENT-DB-LAT trên bản 3 để so. Nhãn `service.version` của Event vẫn là `6b21ed55…` vì lấy từ env, env không đổi (image mang nhãn revision `76b34d5e`).
+- **Kết luận phụ thuộc:** mọi kết quả M1 trên ô POOL-EVENT, CONSUMER-BOOK-SLOW-X3 và hai ô đối chứng bản 3.
+
+
+## WHY-91. T-063 — Cường độ POOL-EVENT = 5 connection (cạn hẳn pool max 5) — chép từ results/T-063/thu3/de-xuat-WHY.md ngày 14/11/2026 (điều phối)
+
+- **Chọn gì:** `pool.hold` = 5 trên pool Hikari Event (max 5), 600 s.
+- **Vì sao:** quy tắc khai trước (`KE-HOACH.md` §4): chọn 4 nếu có `pending` > 0; chạy thử ×1: mức 4 cho `used` = 4, `pending` = 0 suốt pha, p50 không tăng → không có tín hiệu chờ pool. Mức 5: `used` 5, idle 0, `pending` 2–25 (tb 10,1), 5xx Event 0,18–0,34/s, p50 lên tới 10 s; 182/709 hành trình hỏng (`KE-HOACH.md` bổ sung 2; `do/thu-pool-prom.json`).
+- **Phương án đã xét:** 4 (bão hòa một phần) — không đủ tranh chấp ở tải ×1; tăng tải cho mức 4 — không làm vì đổi thêm một biến so với ô cũ.
+- **Hệ quả:** ô là "cạn hẳn pool", gần với triệu chứng DB không phản hồi ở phía người gọi; phân biệt dựa trên kênh pool (`used` = max, `pending` cao) và DB khỏe. Hook nhả rồi chiếm lại mỗi 120 s khi gia hạn lease.
+- **Kết luận phụ thuộc:** phân xử H3 trên POOL-EVENT.
+
+
+## WHY-92. T-063 — Ô H4: toxic bandwidth 1 KB/s trên AMQP của Booking dưới tải ×3, đối chứng BINH-THUONG-X3 — chép từ results/T-063/thu3/de-xuat-WHY.md ngày 14/11/2026 (điều phối)
+
+- **Chọn gì:** `CONSUMER-BOOK-SLOW-X3`: toxic bandwidth 1 KB/s downstream trên proxy `booking-amqp` cả pha lỗi, tải hành trình ×3 suốt chu kỳ; đối chứng `BINH-THUONG-X3` cùng bậc tải.
+- **Vì sao:** đợt 2 thử 3 cách ở tải ×1 không tồn queue. Đo trên bản hiện hành: byte broker→Booking ×1 tb 469 B/s, ×3 tb 1.393 B/s (`do/do-h4a-tom-tat.json`) — ×1 thấp hơn mức giới hạn nhỏ nhất của toxiproxy (1 KB/s), ×3 cao hơn. Thử 150 s ở ×3: tồn queue Booking 0 → 109, về 0 sau gỡ, cùng một kết nối, không có log heartbeat/ngắt (`KE-HOACH.md` bổ sung 3).
+- **Phương án đã xét:** (1) tải > ×3 hoặc tăng tỷ lệ mua: cần sửa `tai_linux.py`/k6 (Codex), không cần vì ×3 đạt; (2) hook làm chậm xử lý consumer trong `src/rca-test` Booking: chưa có quyền Minh; (3) chọn (×3 + bandwidth).
+- **Lệch kế hoạch đã ghi:** ngưỡng khả thi khai trước 1,5 KB/s ở ×3 không đạt (1,39 KB/s); vẫn thử trực tiếp vì phép thử rẻ và có điều kiện đạt riêng đã khai (`KE-HOACH.md` bổ sung 1).
+- **Hệ quả, giới hạn:** cơ chế là giới hạn thông lượng giao message tới consumer Booking, không phải khâu xử lý consumer chậm; ô chạy ở bậc tải khác 13 ca cũ (×3), nên chỉ so được với BINH-THUONG-X3. Chưa kiểm TTL/DLQ của queue khi tồn 600 s.
+- **Kết luận phụ thuộc:** phân xử H4; K của ca không lỗi ở tải ×3.
+
+
+## WHY-93. T-063/T-064 Nhận "Sửa sau 1" và "Sửa sau 2" của thu bù 3; ô RECREATE-PAY vào tập chọn; điều kiện thất bại lookback của H5b — ghi 14/11/2026 (điều phối)
+
+- **Chọn gì:** dùng `results/T-063/thu3/xac-nhan-ca-3-sua-sau.json` (6/6) theo quyết định Minh 14/11/2026 ("Nhận cả hai", DECISIONS). Ca RECREATE-PAY `ebd5ef38` và BINH-THUONG-X3 `1e5a3dc5` được xem là đã xác nhận.
+- **Vì sao:** Sửa 1 chỉ sửa script cho khớp điều kiện đã khai; Sửa 2 dùng cùng nguồn đầu dò, bỏ hiệu ứng lookback 5 phút của `query_range` (mẫu thô cho thấy payment phục hồi ở ~t+53 s). Phương án thu lại bị loại vì Minh nhận.
+- **Mặt trái:** cả hai sửa làm sau khi đã xem kết quả; ghi rõ ở `dieu-kien-xac-nhan-3.md`.
+- **Điều kiện thất bại của H5b (WHY-86), từ BAN-GIAO-C §4d:** kênh liveness `httpcheck_error` đẩy qua OTLP không có dấu stale, nên `query_range` giữ giá trị 1 tới ~t+343 trong khi mẫu thô chỉ hụt ở t+3…t+43. Thời gian hụt thật ~50 s < ngưỡng 60 s, nên H5b kích hoạt do lookback, không do thành phần thật sự im 60 s. **Chưa kiểm** hệ quả lên các ca khác; chưa quyết sửa bộ xuất (`results/T-063/dong-goi/xuat_bo_sung.py`) hay chỉ ghi giới hạn.
+- **Kết luận phụ thuộc:** mọi kết luận về H5b trên RECREATE-PAY; kết luận H8-adapter ở ca này (V060/V061 xếp payment hạng 1 nhờ nối chuỗi, không nhờ H5b).
+
+
+## WHY-94. T-064 Đính chính thời điểm của WHY-87, 88, 89 (REVIEW-3 R8) — ghi 14/11/2026 (điều phối, phiên 5)
+
+- **Sự kiện:** WHY-87 (dời mốc), WHY-88 (H8-adapter), WHY-89 (H8-log) được chép vào file này lúc 07:33–07:40Z 14/11, **sau** khi phiên C đã tính và chấm: sổ `results/T-064/so-bien-the.jsonl` ghi V052–V059 trước chấm 05:19:19Z, sau chấm 06:39:09Z; V060–V065 trước chấm 05:39:46Z, sau chấm 07:24:00Z. Tiêu đề ba mục không ghi "ghi muộn". Đây là vi phạm thứ tự của luật cứng 3 đã xảy ra.
+- **Phần có trước kết quả:** lý do kỹ thuật, kỳ vọng và cấu hình trong dòng sổ `truoc_cham` (05:19:19Z, 05:39:46Z); docstring `src/m1_ft/doi_moc.py`, `thanh_phan/h8_adapter.py`, `thanh_phan/h8_log.py` trong cây mã `05273b2e…`/`b0f79a4d…` đã ghim trước lô; nháp WHY trong `results/T-064/phien-c/NHAT-KY.md` lúc 05:47Z (giữa lô).
+- **Phần thêm sau kết quả:** đính chính `mat_mau` của H8-adapter (WHY-88), mọi câu dẫn số chấm.
+- **Hệ quả:** ba mục không là bằng chứng độc lập và không có hiệu lực ngược. Không chạy lại (không khôi phục được thứ tự). Kết luận dùng WHY-87–89 giữ đúng nhãn "thiết kế sau khi xem dev" đã ghi trong sổ.
+
+
+## WHY-95. T-064 Tập chọn dev bản 3 (17 ca) và đáp án cho ca thu bù 3 — ghi 14/11/2026 trước khi chấm (điều phối, phiên 5)
+
+- **Chọn gì:** tập chọn chính mới `results/T-064/tap-chon-dev3-17.json` = 13 ca của `tap-chon-dev2-13.json` + 4 ô thu bù 3 có vai mới: POOL-EVENT `86dea661` (H3), CONSUMER-BOOK-SLOW-X3 `659a9dfb1ab0` (H4), BINH-THUONG-X3 `1e5a3dc5` (ca không lỗi ×3, đối chứng của ô H4), RECREATE-PAY `ebd5ef38` (H8-adapter). Ca lỗi 11, ca không lỗi 6. Tập 13 ca giữ làm lịch sử và độ nhạy.
+- **Hai ca trùng vai không vào tập chính:** BINH-THUONG `7d1ee32f` và EVENT-DB-LAT `0a45b2e0` là lần thu thứ hai của ô đã có trong tập (ô cũ `eb48d6b3`/`729604d2`/`83073ed1`/`f20b0ca5`, `4af494a5`), thu để so bản 3 với bản 2 (WHY-90). Đưa vào tập chọn sẽ cho hai ô này trọng số gấp đôi và trái `tieu-chi-chon.md` §1 ("mỗi ô một lần thu"); chạy lặp để sau (hồ sơ chiến dịch §6). Hai ca được chạy cùng mọi bản và báo riêng thành nhóm "đối chứng bản 3" kèm tập 19 ca để báo độ nhạy, không dùng để chọn.
+- **Đáp án** (khuôn `dap-an-dev2.json`, nguồn `results/T-063/thu3/BAN-GIAO-B.md` §5, `thu3/KE-HOACH.md` §2): POOL-EVENT gốc nút `event-service`, tập {event-service} (T-059: pool là vị trí vật lý, service là nút chiếu, như POOL-BOOK); RECREATE-PAY gốc nút `payment-service`, tập {payment-service}; BINH-THUONG-X3 ca không lỗi (K). CONSUMER-BOOK-SLOW-X3: gốc cạnh `booking-service → broker`, loại `message`; bảng cạnh chấm đúng cạnh này. **Tập chấp nhận ở bảng nút chờ Minh** (có tính `broker` không; câu hỏi gửi 14/11 ~11:45Z). Ca này chỉ được chấm sau khi Minh trả lời; quyết định sẽ ghi DECISIONS và bổ sung vào mục này bằng một WHY mới.
+- **Phương án đã xét:** (1) gộp cả 6 ca (19 ca) làm tập chính: loại vì lý do trên; (2) chỉ thêm 3 ô lỗi, bỏ BINH-THUONG-X3: loại vì ô H4 chạy ở ×3 cần ca không lỗi cùng bậc tải để đo K (WHY-92); (3) chọn 17 ca.
+- **Giới hạn:** ô ×3 (CONSUMER, BINH-THUONG-X3) khác bậc tải với 13 ca cũ; bốn ô mới thu trên bản 3 (WHY-90); RECREATE-PAY và BINH-THUONG-X3 vào tập nhờ hai "Sửa sau" làm sau khi xem hậu kiểm (WHY-93). Người làm đã thấy đầu ra P7 của 5 ca thu bù 3 (bàn giao B) và kết quả V058/V032/V060/V061 trên RECREATE-PAY (bàn giao C) trước khi khai tập này.
+- **Kết luận phụ thuộc:** mọi áp §4, §5 trên tập dev bản 3; phân xử H3, H4, H8-adapter.
+
+
+## WHY-96. T-064 Lô 5: đối chứng bỏ toàn bộ quan hệ của V041 (REVIEW-3 R6), tổ hợp H3/H4/H8-adapter, thêm d ∈ {−60, −15, +15}, chạy song song laptop — ghi 14/11/2026 trước khi chạy (điều phối, phiên 5)
+
+- **Đối chứng R6.** V051 (V041 + DC) còn H1c (cạnh từ cặp span cha–con, chiếu về nút khi chấm) nên không phải bỏ toàn bộ quan hệ. Thêm V066 = V041 bỏ H1c (H5b + H8s1) và V067 = V066 + DC-bo-quan-he. Phép so: V041 → V067 (bỏ toàn bộ: H1c và E1/E2/E5); V041 → V066 (riêng H1c); V066 → V067 (riêng E1/E2/E5 trên nền không H1). Căn cứ "bỏ trọn": với E1 = `tat`, E2 = `tat`, E5 = False, E6 = `a`, lõi `src/m1` không dùng cạnh khi xếp hạng (PageRank chỉ ở E6b; E7 chỉ dựng vùng báo cáo); H5b, H8s1 không đọc cạnh. Phương án khác: chỉ thu hẹp chữ ở §12 (reviewer ưu tiên); loại vì SPEC hỏi trực tiếp "quan hệ có tác dụng tính toán không" và bản thay thế có cạnh V041 là ứng viên; chi phí 2 bản × 28 ca.
+- **Tổ hợp mới cho ô thu bù 3.** Luật giữ §4 cần phép 2 (bỏ khỏi bản gộp) cho H3, H4, H8-adapter. Bản gộp quanh bản đứng đầu: V070 = V032 + H8-adapter + H3 + H4; bỏ từng phần: V069 (bỏ H3), V068 (bỏ H4), V061 (bỏ cả hai; có sẵn); bỏ H8-adapter: so V061 với V032 (có sẵn). Bản có cạnh: V071 = V041 + H8-adapter, V072 = V071 + H3 + H4. Lý do kỹ thuật: H3, H4 thêm kênh tài nguyên pool/queue gán về service (đã cài, chưa có ô); H8-adapter cần để P7 không ERROR ở ca container tạo lại. Kỳ vọng: chưa biết; điều kiện thất bại của H3/H4 ghi ở docstring `h2_h3_kenh.py`, `h4_h5.py`.
+- **Dời mốc thêm.** d ∈ {−60, −15, +15} cho P7, V032, V041 trên 13 ca dev bản 2 và 9 ca T-062; d ∈ {−60, −30, −15, +15, +30} cho ba bản đó trên 6 ca thu bù 3. Cùng đường của WHY-87 (dựng lại đầu vào với t′ = t + d, xuất lại gói bổ sung quanh t′; |d| là bội của bước lưới 15 s). Mục đích: tìm ngưỡng lật ở các ô nhạy (HTTP5-EVENT, PAUSE-PAYMENT, 83073ed1) — chỉ báo cáo theo §7, không dùng chọn. Bản đề xuất cuối nếu khác ba bản này được chạy dời mốc ở lô sau.
+- **Chạy song song laptop (luật 19).** `exp-obs` (ARM 2 lõi) giữ phần cần Prometheus và ca RECREATE-PAY (dữ liệu thô chưa qua bộ quét, không chép về laptop): xuất bù, dời mốc, mọi bản trên `ebd5ef38`. Laptop (x86, 12 luồng) chạy phần d = 0 còn lại từ gói ca và gói bổ sung đã có trong repo. Điều kiện dùng kết quả laptop: chạy trước 4 cặp (bản, ca) đã có đầu ra `exp-obs` (V041, V061, V013, V018 trên ca dev bản 2) và đầu ra phải trùng byte `method-output-1.json`; lệch thì bỏ tuyến laptop, chạy hết trên `exp-obs`. Mỗi cặp chạy hai lần trùng SHA (WHY-81). Hash gói bổ sung trên laptop đối chiếu `SHA256SUMS` trên `exp-obs` trước khi chạy.
+- **Kết luận phụ thuộc:** phạm vi kết luận về quan hệ cho V041; giữ/bỏ H3, H4, H8-adapter; bản đề xuất trên tập dev bản 3; độ nhạy mốc.
+
+
+## WHY-97. T-064 Đáp án ô CONSUMER-BOOK-SLOW-X3: tập chấp nhận nút {booking-service, broker}, báo kèm {booking-service} — ghi 14/11/2026 trước khi chấm (điều phối, phiên 5)
+
+- **Chọn gì:** theo quyết định Minh ("A, báo kèm điểm B", DECISIONS 14/11), `results/T-064/dap-an-dev3.json` ghi tập chấp nhận nút của CONSUMER-BOOK-SLOW-X3 = {booking-service, broker}; `results/T-064/dap-an-dev3-B.json` giống hệt trừ tập này = {booking-service}, chỉ để báo độ nhạy. Gốc: cạnh booking-service → broker, loại `message` (bảng cạnh chấm đúng cạnh này ở cả hai bản đáp án).
+- **Vì sao:** T-059 `label_rules` "Chấm cạnh" (2): ô gốc cạnh được chấm định vị qua tập chấp nhận chung {caller, callee}, áp y hệt cho mọi phương pháp; các ô cạnh khác của tập chọn đã theo quy ước này (EVENT-DB-LAT, REDIS-BOOK, NET-GW-BOOK). `broker` có trong inventory nên phương pháp xếp được nó.
+- **Phương án đã xét:** B = {booking-service} đúng chữ khai trước ở `thu3/KE-HOACH.md` §2 nhưng lệch quy ước các ô cạnh khác; giữ làm phép độ nhạy.
+- **Mặt trái:** sửa sau khai trước (dù trước khi chấm biến thể); người làm đã thấy đầu ra P7 của ca (booking hạng 1, broker ở nhóm cuối), nên với P7 hai đáp án cho cùng điểm. Tập rộng hơn chỉ làm điểm lạc quan hơn ở bản xếp broker trên booking.
+- **Kết luận phụ thuộc:** điểm ca 659a9dfb1ab0 và phân xử H4 trên tập dev bản 3; nếu thứ tự §5 khác giữa A và B, hồ sơ chọn nêu rõ.
+
+## WHY-98. T-064 Bản đề xuất cuối V082 (H5b + H8s1 + H8a) — ghi 14/11/2026 sau quyết định Minh (điều phối, phiên 5)
+
+- **Chọn gì:** `V082-V066+H8a` = P7 + H5-liveness (chết im 60 s) + H8-san (1 ms) + H8-adapter; cấu hình `results/T-064/bien-the/V082-V066+H8a/cau-hinh.json`.
+- **Vì sao:** theo `tieu-chi-chon.md` §5 trên tập chọn dev bản 3 (17 ca: 11 lỗi, 6 không lỗi), V082 đứng đầu: AC@1 9/11, AC@3 11/11, tổng hạng cắt 13, K 4/6 (`results/T-064/cham/chon-dev3-d0-v082-A.json#/ban/V082-V066+H8a/chon`), so với P7 7/11, 9/11, 23, 5/6. Không hồi quy 9 ca T-062 (K 4 → 1). Đáp án A và B cho cùng kết quả. Phép 2 quanh V082: H8a giữ (l1, nhờ ca RECREATE-PAY), H8s1 giữ (l2, K −1).
+- **Phương án đã xét:** V061 (H5b + H8a; K 5/6), V071 (V082 + H1c; tổng hạng 14, cạnh đúng top 3 ở 3/4 ô cạnh — H1c đạt §4 l3 nhưng §5 đặt xếp hạng nút trước bảng cạnh), V068–V070 (thêm H3/H4: không đổi điểm), V072 (thêm H3+H4 vào V071: mất bảng cạnh do bước định vị cạnh (`CanhDinhVi`, `src/m1_ft/thanh_phan/h1_canh.py`) coi kênh pool là bằng chứng riêng bên gọi).
+- **Bằng chứng và giới hạn:** V082 thiết kế sau khi xem điểm tập chọn (sổ dòng 180) nên số dev lạc quan; chênh giữa các bản đầu bảng là một ca; lợi của H8a chỉ từ một ca (ebd5ef38); H3/H4 không được phân xử (ô của chúng đã hạng 1 ở P7). Bản không có đầu ra cạnh.
+- **Kết luận phụ thuộc:** cấu hình đề xuất, chỉ mục xuất cho T-065 (G-c), hồ sơ chọn §15, phản biện cuối T-064 và mọi đánh giá sau dùng V082.
+
+## WHY-99. T-064 Kênh liveness `live-down` theo "lần dò mới nhất" (REVIEW-4 R9) — ghi 15/11/2026 trước khi chạy lại (điều phối, phiên 5)
+
+- **Chọn gì:** kênh `live-down` tại bước s = 1 nếu lần dò có kết quả gần nhất trước s (trong 5 phút) là lỗi (mẫu thô `httpcheck_error` có giá trị 1); = 0 nếu là phản hồi (mẫu thô `httpcheck_status` có giá trị 1, mọi mã); không có lần dò nào thì bỏ điểm. Dựng từ mẫu thô (range vector) bằng bộ xuất mới `results/T-064/kiem/r9/xuat_live_down_moi.py`; logic `_chet_im` của H5b (`src/m1_ft/thanh_phan/h4_h5.py`) và các kênh khác không đổi.
+- **Vì sao:** biểu thức cũ `max by(http_url)(httpcheck_error) or …` qua `query_range` giữ mẫu lỗi cũ trong lookback, nên ở RECREATE-PAY (lỗi t+3…t+43, phản hồi lại từ t+53) H5b đọc thành "chết im" 285 s, trái điều kiện "không phản hồi lại tới hết cửa sổ" của WHY-86 (REVIEW-4 R9; điều kiện thất bại đã nêu ở WHY-93).
+- **Phương án đã xét:** `max_over_time(httpcheck_error[15s])` — loại: làm mất chết im ở PAUSE-PAYMENT 46aab4be, vì khi request treo đầu dò chỉ ghi lỗi mỗi ~30 s (`results/T-064/kiem/r9/so-live-down.json`). Giữ biểu thức cũ và khai lại nghĩa H5b là "đã thấy lỗi trong lookback" — loại: đổi nghĩa thành phần. Sửa bộ xuất đã ghim của T-063 — loại: đổi pin T-063.
+- **Bằng chứng:** phép kiểm chỉ đọc `results/T-064/kiem/r9/so-live-down-2.json`: trên 140 gói có kênh, 134 không lệch điểm nào; chỉ 6 gói ebd5ef38 lệch; chết im mất ở 5 gói ebd5ef38 (d −60…+15) và giữ ở 46aab4be mọi mốc. Ngữ nghĩa mới được chọn sau khi đã thấy hai ca này (sửa sau, dev).
+- **Kết luận phụ thuộc:** H5b trên RECREATE-PAY; điểm của 12 slot chạy lại (V061, V068–V072, V082 ở d = 0; V082 ở d −60, −30, −15, +15, +30); bản kế tiếp của chỉ mục xuất, cấu hình đề xuất, hồ sơ chọn §15–16.

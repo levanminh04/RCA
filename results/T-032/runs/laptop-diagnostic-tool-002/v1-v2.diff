@@ -1,0 +1,129 @@
+--- results\T-032\scripts\diagnose_microrank_laptop_v1.py
++++ results\T-032\scripts\diagnose_microrank_laptop_v2.py
+@@ -1,13 +1,8 @@
+-"""One approved laptop diagnostic, with a historical-thread evidence gate.
+-
+-The source thread environment is OPEN. This preparation cannot start either
+-method call until that evidence/exception has been separately approved and
+-recorded in a new reviewed wrapper version. Current unset values are not a
+-claim about the historical frozen run. No CLI switch bypasses this gate.
+-
+-Only the declared case is supported: native -> frozen exact, then observed
+-only if native passed. The original comparator and capture verifier are used
+-without numerical tolerance; Windows cost measurement is wrapper metadata.
++"""One approved source-laptop diagnostic with Q-100 current-thread exception.
++
++Historical thread values remain OPEN. Only currently unset five variables
++are authorized; native/frozen and observed/native/frozen remain exact.
++No method, adapter, input, score threshold or case changes.
+ """
+ from __future__ import annotations
+ 
+@@ -34,16 +29,18 @@
+ DATASET = "RE2-TT"
+ MAX_WALL_S = 600
+ MAX_NEW_BYTES = 150 * 1024 * 1024
+-MAX_TASK_BYTES = 8 * 1024 * 1024 * 1024
++MAX_TASK_BYTES = 12 * 1024 * 1024 * 1024
++MAX_LOCAL_BYTES = 2 * 1024 * 1024 * 1024
+ MAX_TREE_RSS = 2 * 2143158272
+ MIN_AVAILABLE_RAM = MAX_TREE_RSS + 256 * 1024 * 1024
+ MIN_REMAINING_RAM = 256 * 1024 * 1024
+ RESERVE_BYTES = 64 * 1024
+ POLL_S = 0.5
+-THREAD_NAMES = ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS")
++THREAD_NAMES = ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS", "VECLIB_MAXIMUM_THREADS")
+ # Missing historical recording is not equivalent to historically unset.
+ SOURCE_THREAD_ENV = None
+-SOURCE_THREAD_AUTHORITY = None
++SOURCE_THREAD_AUTHORITY = "Historical values not recorded; Q-100 authorizes current unset values only"
++CURRENT_THREAD_ENV = {name: None for name in THREAD_NAMES}
+ SOURCE_EVIDENCE_SEARCHED = (
+     "results/T-031/moi-truong.json",
+     "results/T-031/scripts/chay.py",
+@@ -155,13 +152,16 @@
+ 
+ 
+ def environment_metadata():
++    import numpy, scipy.linalg
++    from threadpoolctl import threadpool_info
+     versions = {name: importlib.metadata.version(name) for name in PACKAGES}
+     return {"at_utc": now(), "python": sys.version, "version_tuple": list(sys.version_info[:3]),
+             "executable": sys.executable, "prefix": sys.prefix, "base_prefix": sys.base_prefix,
+             "packages": versions, "hashseed": os.environ.get("PYTHONHASHSEED"),
+             "pythonpath": os.environ.get("PYTHONPATH"),
+             "thread_environment_current": {name: os.environ.get(name) for name in THREAD_NAMES},
+-            "threadpool_status": "not initialized during historical-thread preflight",
++            "threadpool_status": "current measurement only, not historical evidence",
++            "threadpools_current": threadpool_info(),
+             "source_thread_environment": SOURCE_THREAD_ENV,
+             "source_thread_authority": SOURCE_THREAD_AUTHORITY,
+             "source_thread_status": "OPEN" if SOURCE_THREAD_ENV is None else "RECORDED",
+@@ -177,12 +177,10 @@
+     require(os.environ.get("PYTHONDONTWRITEBYTECODE") == "1" and sys.dont_write_bytecode,
+             "bytecode must be disabled")
+     require(sys.gettrace() is None and sys.getprofile() is None, "pre-existing trace/profile hook")
+-    require(SOURCE_THREAD_ENV is not None and SOURCE_THREAD_AUTHORITY is not None,
+-            "source_thread_env is OPEN: FAIL_STOP before native; current unset is not historical evidence")
+-    require(isinstance(SOURCE_THREAD_ENV, dict) and set(SOURCE_THREAD_ENV) == set(THREAD_NAMES),
+-            "historical thread environment schema is incomplete")
+-    require(metadata["thread_environment_current"] == SOURCE_THREAD_ENV,
+-            "current thread variables differ from the recorded source")
++    require(SOURCE_THREAD_ENV is None, "historical thread values must remain OPEN")
++    require(metadata["thread_environment_current"] == CURRENT_THREAD_ENV,
++            "Q-100 requires all five current thread variables unset")
++
+ 
+ 
+ def replay_module():
+@@ -310,12 +308,16 @@
+         _entry_after, _frozen_after, _index_after, after_hashes = replay.source_for(DATASET, OID, audit)
+         require(after_hashes == code_hashes, "source code binding changed")
+         require(not replay.exact_differences(frozen, _frozen_after), "frozen record changed")
++        metadata_after = environment_metadata()
++        environment_guard(metadata_after)
++        require(metadata_after["thread_environment_current"] == metadata["thread_environment_current"], "child thread environment changed")
++        require(metadata_after["threadpools_current"] == metadata["threadpools_current"], "child BLAS/threadpool changed")
+         pin_after = source_pins()
+         imports_after = replay.loaded_sources(code_hashes)
+         dump_new(directory / "source-checks.json", {"checks": audit, "pin_checks_after": pin_after,
+                  "input_checks_after": after_inputs, "actual_imports_after": imports_after,
+                  "functions_unchanged": True, "hooks_restored": True,
+-                 "threadpools_current_after": threadpool_info()})
++                 "threadpools_current_after": threadpool_info(), "environment_after": metadata_after})
+         dump_new(directory / "check.json", {"status": "PASS" if not differences else "FAIL_STOP",
+                  "mode": mode, "dataset": DATASET, "opaque_id": OID,
+                  "frozen_sha256": frozen_sha256, "job_sha256": job_sha256,
+@@ -351,7 +353,8 @@
+         size = logical_size(OUT)
+         self.peak_bytes = max(self.peak_bytes, size)
+         require(size <= MAX_NEW_BYTES - RESERVE_BYTES, "150 MiB new-byte budget reached")
+-        require(self.other_task_bytes + size <= MAX_TASK_BYTES - RESERVE_BYTES, "8 GiB combined task-byte budget reached")
++        require(self.other_task_bytes + size <= MAX_TASK_BYTES - RESERVE_BYTES, "12 GiB combined task-byte budget reached")
++        require(logical_size(REPO / "results/T-032") <= MAX_LOCAL_BYTES - RESERVE_BYTES, "2 GiB laptop task-byte budget reached")
+         require(shutil.disk_usage(OUT).free >= MAX_NEW_BYTES - size + RESERVE_BYTES, "insufficient disk for remaining diagnostic budget")
+         require(self.psutil.virtual_memory().available >= MIN_REMAINING_RAM, "remaining laptop RAM below guard reserve")
+         if self.child is not None and self.child.poll() is None:
+@@ -474,7 +477,7 @@
+                  "searched": list(SOURCE_EVIDENCE_SEARCHED), "historical_values_recovered": False,
+                  "current_values": metadata["thread_environment_current"],
+                  "current_values_are_historical_evidence": False,
+-                 "consequence": "FAIL_STOP before native until source evidence or separate exception is approved"})
++                 "consequence": "Q-100 permits current unset values; historical thread environment remains OPEN"})
+         dump_new(OUT / "invocation.json", {"at_utc": now(), "argv": sys.argv, "pid": os.getpid(),
+                  "script_sha256": sha(__file__), "source_pin_checks": audit,
+                  "limits": {"max_wall_s": MAX_WALL_S, "max_new_bytes": MAX_NEW_BYTES,
+@@ -505,8 +508,12 @@
+         observed_check = run_child(guard, replay, "observed", job, entry, frozen)
+         _entry_after, frozen_after, _index_after, after_hashes = replay.source_for(DATASET, OID, audit)
+         require(after_hashes == code_hashes and not replay.exact_differences(frozen, frozen_after), "final frozen/code binding changed")
++        metadata_after = environment_metadata()
++        environment_guard(metadata_after)
++        require(metadata_after["thread_environment_current"] == metadata["thread_environment_current"], "controller thread environment changed")
++        require(metadata_after["threadpools_current"] == metadata["threadpools_current"], "controller BLAS/threadpool changed")
+         dump_new(OUT / "final-source-checks.json", {"checks": audit, "pins_after": source_pins(),
+-                 "input_checks_after": verify_inputs(job, frozen), "actual_imports_after": replay.loaded_sources(code_hashes)})
++                 "input_checks_after": verify_inputs(job, frozen), "actual_imports_after": replay.loaded_sources(code_hashes), "environment_after": metadata_after})
+         guard.check()
+         progress("DIAGNOSTIC_EXACT_COMPLETE", native_observed_frozen_exact=True)
+         dump_new(OUT / "check.json", {"status": "PASS_SINGLE_CASE_EXACT_DIAGNOSTIC", "dataset": DATASET,

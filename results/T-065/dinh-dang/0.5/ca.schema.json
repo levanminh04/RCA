@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "t065-case-0.5",
+  "title": "T-065 case export 0.5",
+  "description": "Thêm hai quy ước hash cấu hình có tên riêng và slot lỗi chạy không có đầu ra phương pháp. Kiểm ngữ nghĩa bằng codex/l8b-kiem.py export.",
+  "type": "object",
+  "required": ["phien_ban_dinh_dang", "ban", "ca", "cua_so_ms", "trang_thai_chay", "loi_chay", "entity_ranking", "ranking_rows", "co_m1", "don_vi_m1", "canh_xep_hang", "trang_thai_canh", "thao_tac", "services"],
+  "properties": {
+    "phien_ban_dinh_dang": {"const": "0.5"},
+    "ban": {
+      "type": "object",
+      "required": ["ban", "trang_thai", "cau_hinh_sha256", "cau_hinh_file_sha256", "ma_nguon_sha256", "nguon_output", "sha256_output"],
+      "properties": {
+        "ban": {"type": "string"},
+        "trang_thai": {"enum": ["khoa_P7", "de_xuat", "thay_the"]},
+        "cau_hinh_sha256": {"$ref": "#/$defs/hash"},
+        "cau_hinh_file_sha256": {"$ref": "#/$defs/hash"},
+        "ma_nguon_sha256": {"$ref": "#/$defs/hash"},
+        "sha256_output": {"$ref": "#/$defs/hash"},
+        "nguon_output": {"type": ["string", "null"]}
+      }
+    },
+    "ca": {"type": "string"},
+    "cua_so_ms": {"type": "array", "items": {"type": "integer"}, "minItems": 2, "maxItems": 2},
+    "trang_thai_chay": {"type": "string"},
+    "loi_chay": {"type": ["string", "null"]},
+    "entity_ranking": {"type": "array"},
+    "ranking_rows": {"type": "array"},
+    "co_m1": {"type": "array"},
+    "don_vi_m1": {"type": "array"},
+    "canh_xep_hang": {"type": "array"},
+    "trang_thai_canh": {"type": "string"},
+    "thao_tac": {"type": "array"},
+    "services": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+  },
+  "allOf": [{
+    "if": {"properties": {"trang_thai_chay": {"const": "LOI_CHAY"}}},
+    "then": {
+      "properties": {
+        "loi_chay": {"type": "string"},
+        "entity_ranking": {"maxItems": 0},
+        "ranking_rows": {"maxItems": 0},
+        "co_m1": {"maxItems": 0},
+        "don_vi_m1": {"maxItems": 0},
+        "canh_xep_hang": {"maxItems": 0},
+        "thao_tac": {"maxItems": 0}
+      }
+    }
+  }],
+  "$defs": {"hash": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}}
+}

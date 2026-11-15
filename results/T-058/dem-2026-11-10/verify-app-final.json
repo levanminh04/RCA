@@ -1,0 +1,134 @@
+{
+  "utc": "2026-11-10T22:29:58.620882+00:00",
+  "token_http_status": 200,
+  "issuer": "http://10.0.0.158:8080/realms/flash-ticket",
+  "checks": [
+    {
+      "service": "discovery-server",
+      "http_status": 200,
+      "health": "UP"
+    },
+    {
+      "service": "api-gateway",
+      "http_status": 403,
+      "health": null
+    },
+    {
+      "service": "user-service",
+      "http_status": 200,
+      "health": "UP"
+    },
+    {
+      "service": "event-service",
+      "http_status": 200,
+      "health": "UP"
+    },
+    {
+      "service": "ticket-service",
+      "http_status": 200,
+      "health": "UP"
+    },
+    {
+      "service": "booking-service",
+      "http_status": 200,
+      "health": "UP"
+    },
+    {
+      "service": "payment-service",
+      "http_status": 403,
+      "health": null
+    },
+    {
+      "gateway_api": "/api/v1/events",
+      "http_status": 200,
+      "response_keys": [
+        "items",
+        "nextCursor"
+      ]
+    }
+  ],
+  "token_claims": {
+    "iss": "http://10.0.0.158:8080/realms/flash-ticket",
+    "aud": "flash-ticket-api",
+    "azp": "internal-service",
+    "realm_access": {
+      "roles": [
+        "INTERNAL_SERVICE"
+      ]
+    }
+  },
+  "issuer_matches": true,
+  "buyer_token_http_status": 200,
+  "buyer_claims": {
+    "iss": "http://10.0.0.158:8080/realms/flash-ticket",
+    "aud": [
+      "flash-ticket-api",
+      "account"
+    ],
+    "azp": "frontend",
+    "realm_access": {
+      "roles": [
+        "offline_access",
+        "default-roles-flash-ticket",
+        "BUYER",
+        "uma_authorization"
+      ]
+    }
+  },
+  "eureka": [
+    {
+      "name": "TICKET-SERVICE",
+      "instances": [
+        {
+          "status": "UP",
+          "port": 8084
+        }
+      ]
+    },
+    {
+      "name": "API-GATEWAY",
+      "instances": [
+        {
+          "status": "UP",
+          "port": 8081
+        }
+      ]
+    },
+    {
+      "name": "BOOKING-SERVICE",
+      "instances": [
+        {
+          "status": "UP",
+          "port": 8082
+        }
+      ]
+    },
+    {
+      "name": "PAYMENT-SERVICE",
+      "instances": [
+        {
+          "status": "UP",
+          "port": 8083
+        }
+      ]
+    },
+    {
+      "name": "EVENT-SERVICE",
+      "instances": [
+        {
+          "status": "UP",
+          "port": 8086
+        }
+      ]
+    },
+    {
+      "name": "USER-SERVICE",
+      "instances": [
+        {
+          "status": "UP",
+          "port": 8085
+        }
+      ]
+    }
+  ]
+}

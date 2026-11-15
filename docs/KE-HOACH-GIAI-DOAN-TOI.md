@@ -576,8 +576,8 @@ Giả định: mỗi request 10 span; mỗi span 450 B (suy từ tài liệu Tem
 
 | Kịch bản | Cách tạo | Đáp án | Kiểm điều gì |
 |---|---|---|---|
-| Đường truy cập DB của Booking chậm | Toxiproxy | Cạnh Booking→DB | Bài học 1; cạnh dữ liệu |
-| Cạn pool kết nối hoặc mất DB | Toxiproxy | Cạnh Booking→DB | Bài học 2 |
+| Đường truy cập DB chậm | Toxiproxy | Cạnh Event→event_db (phát triển), Booking→booking_db (đánh giá) | Bài học 1; cạnh dữ liệu |
+| Cạn pool kết nối hoặc mất DB | Hook Hikari hoặc can thiệp cô lập ở DB đích | booking-service khi pool cạn; booking_db khi xác nhận DB đích mất khả dụng | Bài học 2 |
 | Redis chậm | Toxiproxy | Cạnh tới Redis | Cạnh dữ liệu |
 | Consumer phát vé dừng | Pumba pause | ticket-service | Cạnh thông điệp; Bài học 5 |
 | Thao tác trả lỗi 5xx | Cờ trong code | Service đó | Bài học 2 |
@@ -588,7 +588,7 @@ Giả định: mỗi request 10 span; mỗi span 450 B (suy từ tài liệu Tem
 | Saga phải bù trừ | Cờ lỗi khi phát vé | ticket-service | Luồng bất đồng bộ |
 | Flash sale, không có lỗi | k6 tăng tải đột biến | Không có root | Báo động giả; câu phụ của RQ5 |
 
-- Cột "Đáp án" ở bảng trên là vị trí tiêm. SPEC P10 tách ba trường: vị trí tiêm; cơ chế; đáp án mà telemetry phân biệt được, kèm số đo xác nhận can thiệp. Ví dụ "đường DB chậm" và "cạn pool hoặc mất DB" phải là các can thiệp tách riêng vào pool, DB và đường mạng. Thiếu quan sát thì ghi giới hạn; không đổi nhãn thật.
+- Cột "Đáp án" ở bảng trên là vị trí tiêm. SPEC P10 tách ba trường: vị trí tiêm; cơ chế; đáp án mà telemetry phân biệt được, kèm số đo xác nhận can thiệp. Ví dụ "đường DB chậm" và "cạn pool hoặc mất DB" phải là các can thiệp tách riêng vào pool, DB và đường mạng. Thiếu quan sát thì ghi giới hạn; không đổi nhãn thật. Tách mất DB tại đích khỏi mất kết nối riêng trên tuyến Booking→DB. Xem WHY-80 và danh mục T-059.
 
 **Luật chống thiên lệch "hệ thống tự thiết kế"** (bắt buộc theo M-24; để mục tiêu M-18 bảo vệ được trước hội đồng):
 1. Khai danh mục kịch bản và quy tắc nhãn trước khi chạy.
@@ -606,7 +606,7 @@ Giả định: mỗi request 10 span; mỗi span 450 B (suy từ tài liệu Tem
 **Cỡ chiến dịch** [TÍNH]:
 - Khoảng 20 ô × 3 lần lặp ≈ 60 sự cố; mỗi chu kỳ khoảng 30 phút.
 - Cộng 10–30 giờ chạy nền, tổng 40–60 giờ máy, tức 3–4 đêm.
-- Dự toán này là cho đợt đánh giá, chưa gồm đợt phát triển (chi phí OPEN).
+- Dự toán này là cho đợt đánh giá, chưa gồm đợt phát triển (chi phí OPEN). Khi chốt số lượt, tính thêm từng lần lặp ở mức tải thứ hai của các ô đánh giá được chọn. Số ô đủ điều kiện và mức tải còn OPEN đến B4.
 
 ### D.10 OpenTelemetry Demo
 

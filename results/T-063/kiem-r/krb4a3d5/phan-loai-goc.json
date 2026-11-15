@@ -1,0 +1,776 @@
+{
+ "krb4a3d5": {
+  "t": 1794524225,
+  "so_span_cua_so": 149630,
+  "theo_service_nhom": {
+   "api-gateway|client_goc_db": 20,
+   "api-gateway|client_goc_khac": 40,
+   "api-gateway|diem_vao_http": 3094,
+   "booking-service|client_goc_db": 63,
+   "booking-service|client_goc_khac": 328,
+   "booking-service|job_hop_le": 538,
+   "discovery-server|client_goc_khac": 120,
+   "event-service|client_goc_db": 29,
+   "event-service|client_goc_khac": 40,
+   "event-service|job_hop_le": 599,
+   "keycloak|client_goc_db": 195,
+   "keycloak|diem_vao_http": 40,
+   "keycloak|internal_khac": 3204,
+   "payment-service|client_goc_db": 41,
+   "payment-service|client_goc_khac": 40,
+   "payment-service|diem_vao_http": 288,
+   "payment-service|job_hop_le": 1074,
+   "ticket-service|client_goc_db": 39,
+   "ticket-service|client_goc_khac": 40,
+   "ticket-service|job_hop_le": 1768,
+   "user-service|client_goc_db": 40,
+   "user-service|client_goc_khac": 40,
+   "user-service|job_hop_le": 20
+  },
+  "chi_tiet": [
+   {
+    "service": "keycloak",
+    "nhom": "internal_khac",
+    "scope": "io.opentelemetry.hibernate-6.0",
+    "kind": "INTERNAL",
+    "ten": "SELECT org.keycloak.models.jpa.session.PersistentUserSessionEntity",
+    "so": 1935,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "user-session-purge-expired"
+    }
+   },
+   {
+    "service": "api-gateway",
+    "nhom": "diem_vao_http",
+    "scope": "io.opentelemetry.netty-4.1",
+    "kind": "SERVER",
+    "ten": "GET event",
+    "so": 1438,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "reactor-http-nio-1",
+     "http.route": "event",
+     "server.address": "129.221.208.47"
+    }
+   },
+   {
+    "service": "api-gateway",
+    "nhom": "diem_vao_http",
+    "scope": "io.opentelemetry.netty-4.1",
+    "kind": "SERVER",
+    "ten": "GET booking",
+    "so": 1116,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "reactor-http-nio-1",
+     "http.route": "booking",
+     "server.address": "129.221.208.47"
+    }
+   },
+   {
+    "service": "keycloak",
+    "nhom": "internal_khac",
+    "scope": "io.opentelemetry.hibernate-6.0",
+    "kind": "INTERNAL",
+    "ten": "SELECT org.keycloak.models.jpa.entities.OutboxEntryEntity",
+    "so": 600,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "Timer-0"
+    }
+   },
+   {
+    "service": "keycloak",
+    "nhom": "internal_khac",
+    "scope": "io.opentelemetry.hibernate-6.0",
+    "kind": "INTERNAL",
+    "ten": "DELETE org.keycloak.models.jpa.entities.OutboxEntryEntity",
+    "so": 600,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "Timer-0"
+    }
+   },
+   {
+    "service": "event-service",
+    "nhom": "job_hop_le",
+    "scope": "io.opentelemetry.spring-scheduling-3.1",
+    "kind": "INTERNAL",
+    "ten": "OutboxWorker.relay",
+    "so": 599,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "scheduling-1",
+     "code.function": "relay",
+     "code.namespace": "com.flashticket.event_service.messaging.OutboxWorker"
+    }
+   },
+   {
+    "service": "ticket-service",
+    "nhom": "job_hop_le",
+    "scope": "io.opentelemetry.spring-scheduling-3.1",
+    "kind": "INTERNAL",
+    "ten": "TicketJobs.cancel",
+    "so": 599,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "scheduling-2",
+     "code.function": "cancel",
+     "code.namespace": "com.flashticket.ticket_service.worker.TicketJobs"
+    }
+   },
+   {
+    "service": "ticket-service",
+    "nhom": "job_hop_le",
+    "scope": "io.opentelemetry.spring-scheduling-3.1",
+    "kind": "INTERNAL",
+    "ten": "TicketJobs.publish",
+    "so": 598,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "scheduling-3",
+     "code.function": "publish",
+     "code.namespace": "com.flashticket.ticket_service.worker.TicketJobs"
+    }
+   },
+   {
+    "service": "payment-service",
+    "nhom": "job_hop_le",
+    "scope": "io.opentelemetry.spring-scheduling-3.1",
+    "kind": "INTERNAL",
+    "ten": "PaymentWorker.publishOutbox",
+    "so": 594,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "scheduling-1",
+     "code.function": "publishOutbox",
+     "code.namespace": "com.flashticket.payment_service.worker.PaymentWorker"
+    }
+   },
+   {
+    "service": "ticket-service",
+    "nhom": "job_hop_le",
+    "scope": "io.opentelemetry.spring-scheduling-3.1",
+    "kind": "INTERNAL",
+    "ten": "TicketJobs.deliver",
+    "so": 571,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "scheduling-1",
+     "code.function": "deliver",
+     "code.namespace": "com.flashticket.ticket_service.worker.TicketJobs"
+    }
+   },
+   {
+    "service": "booking-service",
+    "nhom": "job_hop_le",
+    "scope": "io.opentelemetry.spring-scheduling-3.1",
+    "kind": "INTERNAL",
+    "ten": "BookingOutboxWorker.publishDueBookingMessages",
+    "so": 298,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "scheduling-1",
+     "code.function": "publishDueBookingMessages",
+     "code.namespace": "com.flashticket.booking_service.messaging.BookingOutboxWorker"
+    }
+   },
+   {
+    "service": "booking-service",
+    "nhom": "client_goc_khac",
+    "scope": "io.opentelemetry.rabbitmq-2.7",
+    "kind": "CLIENT",
+    "ten": "basic.ack",
+    "so": 288,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#0-1"
+    }
+   },
+   {
+    "service": "api-gateway",
+    "nhom": "diem_vao_http",
+    "scope": "io.opentelemetry.netty-4.1",
+    "kind": "SERVER",
+    "ten": "POST booking",
+    "so": 252,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "reactor-http-nio-2",
+     "http.route": "booking",
+     "server.address": "129.221.208.47"
+    }
+   },
+   {
+    "service": "payment-service",
+    "nhom": "diem_vao_http",
+    "scope": "io.opentelemetry.tomcat-10.0",
+    "kind": "SERVER",
+    "ten": "GET /api/v1/payments/vnpay/ipn",
+    "so": 144,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "http-nio-127.0.0.1-8083-exec-4",
+     "http.route": "/api/v1/payments/vnpay/ipn",
+     "server.address": "127.0.0.1"
+    }
+   },
+   {
+    "service": "payment-service",
+    "nhom": "diem_vao_http",
+    "scope": "io.opentelemetry.tomcat-10.0",
+    "kind": "SERVER",
+    "ten": "GET /api/v1/payments/vnpay/return",
+    "so": 144,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "http-nio-127.0.0.1-8083-exec-5",
+     "http.route": "/api/v1/payments/vnpay/return",
+     "server.address": "127.0.0.1"
+    }
+   },
+   {
+    "service": "api-gateway",
+    "nhom": "diem_vao_http",
+    "scope": "io.opentelemetry.netty-4.1",
+    "kind": "SERVER",
+    "ten": "POST payment",
+    "so": 144,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "reactor-http-nio-2",
+     "http.route": "payment",
+     "server.address": "129.221.208.47"
+    }
+   },
+   {
+    "service": "api-gateway",
+    "nhom": "diem_vao_http",
+    "scope": "io.opentelemetry.netty-4.1",
+    "kind": "SERVER",
+    "ten": "GET ticket",
+    "so": 144,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "reactor-http-nio-2",
+     "http.route": "ticket",
+     "server.address": "129.221.208.47"
+    }
+   },
+   {
+    "service": "keycloak",
+    "nhom": "client_goc_db",
+    "scope": "io.opentelemetry.jdbc",
+    "kind": "CLIENT",
+    "ten": "SELECT keycloak_db.JGROUPS_PING",
+    "so": 140,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "jgroups-36,c89f238e4134-47605(v=16.0.15)",
+     "db.statement": "SELECT address, name, ip, coord, coordinated_by, last_update FROM JGROUPS_PING WHERE cluster_name=?",
+     "server.address": "postgres"
+    }
+   },
+   {
+    "service": "booking-service",
+    "nhom": "job_hop_le",
+    "scope": "io.opentelemetry.spring-scheduling-3.1",
+    "kind": "INTERNAL",
+    "ten": "OrderExpiryWorker.expireDueOrders",
+    "so": 120,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "scheduling-2",
+     "code.function": "expireDueOrders",
+     "code.namespace": "com.flashticket.booking_service.order.OrderExpiryWorker"
+    }
+   },
+   {
+    "service": "discovery-server",
+    "nhom": "client_goc_khac",
+    "scope": "io.opentelemetry.apache-httpclient-4.0",
+    "kind": "CLIENT",
+    "ten": "POST",
+    "so": 120,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "TaskBatchingWorker-target_localhost-7",
+     "server.address": "localhost"
+    }
+   },
+   {
+    "service": "payment-service",
+    "nhom": "job_hop_le",
+    "scope": "io.opentelemetry.spring-scheduling-3.1",
+    "kind": "INTERNAL",
+    "ten": "PaymentWorker.selectEventRefundOrders",
+    "so": 120,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "scheduling-1",
+     "code.function": "selectEventRefundOrders",
+     "code.namespace": "com.flashticket.payment_service.worker.PaymentWorker"
+    }
+   },
+   {
+    "service": "payment-service",
+    "nhom": "job_hop_le",
+    "scope": "io.opentelemetry.spring-scheduling-3.1",
+    "kind": "INTERNAL",
+    "ten": "PaymentWorker.recoverSagas",
+    "so": 120,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "scheduling-1",
+     "code.function": "recoverSagas",
+     "code.namespace": "com.flashticket.payment_service.worker.PaymentWorker"
+    }
+   },
+   {
+    "service": "payment-service",
+    "nhom": "job_hop_le",
+    "scope": "io.opentelemetry.spring-scheduling-3.1",
+    "kind": "INTERNAL",
+    "ten": "PaymentWorker.sendRefunds",
+    "so": 120,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "scheduling-1",
+     "code.function": "sendRefunds",
+     "code.namespace": "com.flashticket.payment_service.worker.PaymentWorker"
+    }
+   },
+   {
+    "service": "payment-service",
+    "nhom": "job_hop_le",
+    "scope": "io.opentelemetry.spring-scheduling-3.1",
+    "kind": "INTERNAL",
+    "ten": "PaymentWorker.pollRefunds",
+    "so": 120,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "scheduling-1",
+     "code.function": "pollRefunds",
+     "code.namespace": "com.flashticket.payment_service.worker.PaymentWorker"
+    }
+   },
+   {
+    "service": "booking-service",
+    "nhom": "job_hop_le",
+    "scope": "io.opentelemetry.spring-scheduling-3.1",
+    "kind": "INTERNAL",
+    "ten": "EventCancellationWorker.cancelOrdersForCancelledEvents",
+    "so": 120,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "scheduling-2",
+     "code.function": "cancelOrdersForCancelledEvents",
+     "code.namespace": "com.flashticket.booking_service.order.EventCancellationWorker"
+    }
+   },
+   {
+    "service": "booking-service",
+    "nhom": "client_goc_db",
+    "scope": "io.opentelemetry.jdbc",
+    "kind": "CLIENT",
+    "ten": "booking_db",
+    "so": 43,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "DiscoveryClient-InstanceInfoReplicator-%d",
+     "db.statement": "",
+     "server.address": "127.0.0.1"
+    }
+   },
+   {
+    "service": "payment-service",
+    "nhom": "client_goc_db",
+    "scope": "io.opentelemetry.jdbc",
+    "kind": "CLIENT",
+    "ten": "payment_db",
+    "so": 41,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "DiscoveryClient-InstanceInfoReplicator-%d",
+     "db.statement": "",
+     "server.address": "127.0.0.1"
+    }
+   },
+   {
+    "service": "keycloak",
+    "nhom": "diem_vao_http",
+    "scope": "io.opentelemetry.netty-4.1",
+    "kind": "SERVER",
+    "ten": "POST /realms/{realm}/protocol/{protocol}/token",
+    "so": 40,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "vert.x-eventloop-thread-0",
+     "http.route": "/realms/{realm}/protocol/{protocol}/token",
+     "server.address": "129.221.208.47"
+    }
+   },
+   {
+    "service": "ticket-service",
+    "nhom": "client_goc_db",
+    "scope": "io.opentelemetry.jdbc",
+    "kind": "CLIENT",
+    "ten": "ticket_db",
+    "so": 39,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "HikariPool-1:housekeeper",
+     "db.statement": "",
+     "server.address": "127.0.0.1"
+    }
+   },
+   {
+    "service": "event-service",
+    "nhom": "client_goc_db",
+    "scope": "io.opentelemetry.jdbc",
+    "kind": "CLIENT",
+    "ten": "event_db",
+    "so": 29,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "DiscoveryClient-InstanceInfoReplicator-%d",
+     "db.statement": "",
+     "server.address": "127.0.0.1"
+    }
+   },
+   {
+    "service": "booking-service",
+    "nhom": "client_goc_db",
+    "scope": "io.opentelemetry.lettuce-5.1",
+    "kind": "CLIENT",
+    "ten": "INFO",
+    "so": 20,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "lettuce-nioEventLoop-4-1",
+     "db.statement": "INFO server",
+     "server.address": "127.0.0.1"
+    }
+   },
+   {
+    "service": "payment-service",
+    "nhom": "client_goc_khac",
+    "scope": "io.opentelemetry.apache-httpclient-5.0",
+    "kind": "CLIENT",
+    "ten": "PUT",
+    "so": 20,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "DiscoveryClient-HeartbeatExecutor-%d",
+     "server.address": "127.0.0.1"
+    }
+   },
+   {
+    "service": "payment-service",
+    "nhom": "client_goc_khac",
+    "scope": "io.opentelemetry.apache-httpclient-5.0",
+    "kind": "CLIENT",
+    "ten": "GET",
+    "so": 20,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "DiscoveryClient-CacheRefreshExecutor-%d",
+     "server.address": "127.0.0.1"
+    }
+   },
+   {
+    "service": "api-gateway",
+    "nhom": "client_goc_db",
+    "scope": "io.opentelemetry.lettuce-5.1",
+    "kind": "CLIENT",
+    "ten": "INFO",
+    "so": 20,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "lettuce-nioEventLoop-5-1",
+     "db.statement": "INFO server",
+     "server.address": "127.0.0.1"
+    }
+   },
+   {
+    "service": "api-gateway",
+    "nhom": "client_goc_khac",
+    "scope": "io.opentelemetry.apache-httpclient-5.0",
+    "kind": "CLIENT",
+    "ten": "PUT",
+    "so": 20,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "DiscoveryClient-HeartbeatExecutor-%d",
+     "server.address": "127.0.0.1"
+    }
+   },
+   {
+    "service": "user-service",
+    "nhom": "client_goc_khac",
+    "scope": "io.opentelemetry.apache-httpclient-5.0",
+    "kind": "CLIENT",
+    "ten": "GET",
+    "so": 20,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "DiscoveryClient-CacheRefreshExecutor-%d",
+     "server.address": "127.0.0.1"
+    }
+   },
+   {
+    "service": "user-service",
+    "nhom": "client_goc_khac",
+    "scope": "io.opentelemetry.apache-httpclient-5.0",
+    "kind": "CLIENT",
+    "ten": "PUT",
+    "so": 20,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "DiscoveryClient-HeartbeatExecutor-%d",
+     "server.address": "127.0.0.1"
+    }
+   },
+   {
+    "service": "user-service",
+    "nhom": "client_goc_db",
+    "scope": "io.opentelemetry.mongo-4.0",
+    "kind": "CLIENT",
+    "ten": "listDatabases admin",
+    "so": 20,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "DiscoveryClient-InstanceInfoReplicator-%d",
+     "db.statement": "{\"listDatabases\": \"?\", \"nameOnly\": \"?\", \"$db\": \"?\", \"lsid\": {\"id\": \"?\"}}",
+     "server.address": "127.0.0.1"
+    }
+   },
+   {
+    "service": "user-service",
+    "nhom": "client_goc_db",
+    "scope": "io.opentelemetry.mongo-4.0",
+    "kind": "CLIENT",
+    "ten": "hello admin",
+    "so": 20,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "DiscoveryClient-InstanceInfoReplicator-%d",
+     "db.statement": "{\"hello\": \"?\", \"$db\": \"?\", \"lsid\": {\"id\": \"?\"}}",
+     "server.address": "127.0.0.1"
+    }
+   },
+   {
+    "service": "user-service",
+    "nhom": "job_hop_le",
+    "scope": "io.opentelemetry.spring-scheduling-3.1",
+    "kind": "INTERNAL",
+    "ten": "OrganizerRecovery.recover",
+    "so": 20,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "scheduling-1",
+     "code.function": "recover",
+     "code.namespace": "com.flashticket.user_service.service.OrganizerRecovery"
+    }
+   },
+   {
+    "service": "event-service",
+    "nhom": "client_goc_khac",
+    "scope": "io.opentelemetry.apache-httpclient-5.0",
+    "kind": "CLIENT",
+    "ten": "PUT",
+    "so": 20,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "DiscoveryClient-HeartbeatExecutor-%d",
+     "server.address": "127.0.0.1"
+    }
+   },
+   {
+    "service": "event-service",
+    "nhom": "client_goc_khac",
+    "scope": "io.opentelemetry.apache-httpclient-5.0",
+    "kind": "CLIENT",
+    "ten": "GET",
+    "so": 20,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "DiscoveryClient-CacheRefreshExecutor-%d",
+     "server.address": "127.0.0.1"
+    }
+   },
+   {
+    "service": "booking-service",
+    "nhom": "client_goc_khac",
+    "scope": "io.opentelemetry.apache-httpclient-5.0",
+    "kind": "CLIENT",
+    "ten": "PUT",
+    "so": 20,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "DiscoveryClient-HeartbeatExecutor-%d",
+     "server.address": "127.0.0.1"
+    }
+   },
+   {
+    "service": "booking-service",
+    "nhom": "client_goc_khac",
+    "scope": "io.opentelemetry.apache-httpclient-5.0",
+    "kind": "CLIENT",
+    "ten": "GET",
+    "so": 20,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "DiscoveryClient-CacheRefreshExecutor-%d",
+     "server.address": "127.0.0.1"
+    }
+   },
+   {
+    "service": "ticket-service",
+    "nhom": "client_goc_khac",
+    "scope": "io.opentelemetry.apache-httpclient-5.0",
+    "kind": "CLIENT",
+    "ten": "PUT",
+    "so": 20,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "DiscoveryClient-HeartbeatExecutor-%d",
+     "server.address": "127.0.0.1"
+    }
+   },
+   {
+    "service": "ticket-service",
+    "nhom": "client_goc_khac",
+    "scope": "io.opentelemetry.apache-httpclient-5.0",
+    "kind": "CLIENT",
+    "ten": "GET",
+    "so": 20,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "DiscoveryClient-CacheRefreshExecutor-%d",
+     "server.address": "127.0.0.1"
+    }
+   },
+   {
+    "service": "api-gateway",
+    "nhom": "client_goc_khac",
+    "scope": "io.opentelemetry.apache-httpclient-5.0",
+    "kind": "CLIENT",
+    "ten": "GET",
+    "so": 20,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "DiscoveryClient-CacheRefreshExecutor-%d",
+     "server.address": "127.0.0.1"
+    }
+   },
+   {
+    "service": "keycloak",
+    "nhom": "internal_khac",
+    "scope": "io.opentelemetry.hibernate-6.0",
+    "kind": "INTERNAL",
+    "ten": "DELETE org.keycloak.models.jpa.session.PersistentClientSessionEntity",
+    "so": 20,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "user-session-purge-expired"
+    }
+   },
+   {
+    "service": "keycloak",
+    "nhom": "internal_khac",
+    "scope": "io.opentelemetry.hibernate-6.0",
+    "kind": "INTERNAL",
+    "ten": "DELETE org.keycloak.models.jpa.session.PersistentUserSessionEntity",
+    "so": 20,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "user-session-purge-expired"
+    }
+   },
+   {
+    "service": "keycloak",
+    "nhom": "client_goc_db",
+    "scope": "io.opentelemetry.jdbc",
+    "kind": "CLIENT",
+    "ten": "DELETE keycloak_db.JGROUPS_PING",
+    "so": 19,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "jgroups-36,c89f238e4134-47605(v=16.0.15)",
+     "db.statement": "DELETE from JGROUPS_PING WHERE address=?",
+     "server.address": "postgres"
+    }
+   },
+   {
+    "service": "keycloak",
+    "nhom": "client_goc_db",
+    "scope": "io.opentelemetry.jdbc",
+    "kind": "CLIENT",
+    "ten": "INSERT keycloak_db.JGROUPS_PING",
+    "so": 19,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "jgroups-36,c89f238e4134-47605(v=16.0.15)",
+     "db.statement": "INSERT INTO JGROUPS_PING (address, name, cluster_name, ip, coord, last_update, coordinated_by) values (?, ?, ?, ?, ?, ?, ?)",
+     "server.address": "postgres"
+    }
+   },
+   {
+    "service": "keycloak",
+    "nhom": "internal_khac",
+    "scope": "io.opentelemetry.hibernate-6.0",
+    "kind": "INTERNAL",
+    "ten": "UPDATE org.keycloak.models.jpa.session.PersistentUserSessionEntity",
+    "so": 16,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "user-session-purge-expired"
+    }
+   },
+   {
+    "service": "keycloak",
+    "nhom": "client_goc_db",
+    "scope": "io.opentelemetry.jdbc",
+    "kind": "CLIENT",
+    "ten": "keycloak_db",
+    "so": 13,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "agroal-11",
+     "db.statement": "",
+     "server.address": "postgres"
+    }
+   },
+   {
+    "service": "keycloak",
+    "nhom": "internal_khac",
+    "scope": "io.opentelemetry.hibernate-6.0",
+    "kind": "INTERNAL",
+    "ten": "SELECT org.keycloak.models.jpa.entities.RealmEntity",
+    "so": 4,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "user-session-purge-expired"
+    }
+   },
+   {
+    "service": "keycloak",
+    "nhom": "internal_khac",
+    "scope": "io.opentelemetry.hibernate-6.0",
+    "kind": "INTERNAL",
+    "ten": "Session.find org.keycloak.storage.configuration.jpa.entity.ServerConfigEntity",
+    "so": 4,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "kc-expiration-tasks-1466-2"
+    }
+   },
+   {
+    "service": "keycloak",
+    "nhom": "internal_khac",
+    "scope": "io.opentelemetry.hibernate-6.0",
+    "kind": "INTERNAL",
+    "ten": "Session.merge org.keycloak.storage.configuration.jpa.entity.ServerConfigEntity",
+    "so": 2,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "kc-expiration-tasks-1466-2"
+    }
+   },
+   {
+    "service": "keycloak",
+    "nhom": "internal_khac",
+    "scope": "io.opentelemetry.hibernate-6.0",
+    "kind": "INTERNAL",
+    "ten": "SELECT org.keycloak.loginfailures.jpa.LoginFailureEntity",
+    "so": 2,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "kc-expiration-tasks-1466-2"
+    }
+   },
+   {
+    "service": "keycloak",
+    "nhom": "client_goc_db",
+    "scope": "io.opentelemetry.jdbc",
+    "kind": "CLIENT",
+    "ten": "UPDATE keycloak_db.SERVER_CONFIG",
+    "so": 2,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "kc-expiration-tasks-1466-2",
+     "db.statement": "update SERVER_CONFIG set VALUE=?,VERSION=? where SERVER_CONFIG_KEY=? and VERSION=?",
+     "server.address": "postgres"
+    }
+   },
+   {
+    "service": "keycloak",
+    "nhom": "client_goc_db",
+    "scope": "io.opentelemetry.jdbc",
+    "kind": "CLIENT",
+    "ten": "SELECT keycloak_db.SERVER_CONFIG",
+    "so": 2,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "kc-expiration-tasks-1466-2",
+     "db.statement": "select VERSION as version_ from SERVER_CONFIG where SERVER_CONFIG_KEY=?",
+     "server.address": "postgres"
+    }
+   },
+   {
+    "service": "keycloak",
+    "nhom": "internal_khac",
+    "scope": "io.opentelemetry.hibernate-6.0",
+    "kind": "INTERNAL",
+    "ten": "SELECT org.keycloak.storage.configuration.jpa.entity.ServerConfigEntity",
+    "so": 1,
+    "vi_du_thuoc_tinh": {
+     "thread.name": "kc-expiration-tasks-1466-2"
+    }
+   }
+  ]
+ }
+}

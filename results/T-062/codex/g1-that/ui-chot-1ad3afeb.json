@@ -1,0 +1,209 @@
+{
+  "url": "http://127.0.0.2:13000/d/rca-g2/rca-e28094-xem-su-co-g2?var-thu_muc=rca&var-ca=1ad3afeb&var-dv=event-service&from=2026-11-11T21:16:16.000Z&to=2026-11-11T21:26:16.000Z&timezone=browser&var-dv_svc=event-service&var-t_tu=1794431776000&var-t_den=1794432376000",
+  "record": "Sự cố đang xem: 1ad3afeb\nMã sự cố\n1ad3afeb\nKết luận của M1\nM1 thấy thành phần có bất thường tự sinh\nTrạng thái lượt M1\nchạy xong (OK)\nMốc sự cố\n2026-11-11 21:21:16 UTC (do bộ điều phối cấp)\nCửa sổ nền / sự cố\n21:16:16 → 21:21:16 UTC | 21:21:16 → 21:26:16 UTC\nM1 nghi là nguồn\n#1 event-service, #2 keycloak\nBị kéo theo\n#3 api-gateway\nThiếu dữ liệu\nkhông có\nVùng nghi ngờ\ngốc: event-service · cách 1: api-gateway, event-service · cách 2: api-gateway, event-service, keycloak\nĐộ phủ\n17/17 thành phần có hạng; 14 cạnh gọi quan sát; 9 thành phần không có cạnh (DB, broker… M1 không thấy cạnh)",
+  "ranks": "Bảng hạng thành phần — sự cố 1ad3afeb\nHạng\nThành phần (bấm để xem bằng chứng)\nVai trò\nĐồng hạng\nSố kênh có cờ\nVùng nghi ngờ\n#1\nevent-service\nnghi là nguồn\n13\ngốc vùng nghi ngờ\n#2\nkeycloak\nnghi là nguồn\n1\ntrong vùng (cách 2)\n#3\napi-gateway\nbị kéo theo\n2\ntrong vùng (cách 1)\nbooking-service\nbình thường\n0\nbooking_db\nbình thường\n0\nbroker\nbình thường\n0\ncache\nbình thường\n0\nconfig-discovery\nbình thường\n0\nevent_db\nbình thường\n0\nkeycloak_db\nbình thường\n0\nmongodb-instance\nbình thường\n0\npayment-service\nbình thường\n0\npayment_db\nbình thường\n0\npostgresql-shared-instance\nbình thường\n0\nticket-service\nbình thường\n0\nticket_db\nbình thường\n0",
+  "evidence": "Bằng chứng của event-service — các kênh M1 gắn cờ\nKênh có cờ\nLoại\nHướng\nKiểu lan (E5)\nKhởi phát\nĐiểm s\nMở dữ liệu gốc\nĐơn vị M1\nOutboxWorker.relay\nthao tác (span)\ntăng ↑\nkhông lan\n21:21:16 UTC\n1328.828\nTempo ↗\nop|event-service|OutboxWorker.relay\nSELECT event_db\nthao tác (span)\ntăng ↑\nkhông lan\n21:21:16 UTC\n615.143\nTempo ↗\nop|event-service|SELECT event_db\nSELECT event_schema.tbl_event_images\nthao tác (span)\ntăng ↑\nkhông lan\n21:21:16 UTC\n644.153\nTempo ↗\nop|event-service|SELECT event_schema.tbl_event_images\nSELECT event_schema.tbl_event_layouts\nthao tác (span)\ntăng ↑\nkhông lan\n21:21:16 UTC\n620.177\nTempo ↗\nop|event-service|SELECT event_schema.tbl_event_layouts\nSELECT event_schema.tbl_event_seats\nthao tác (span)\ntăng ↑\nkhông lan\n21:21:16 UTC\n523.788\nTempo ↗\nop|event-service|SELECT event_schema.tbl_event_seats\nSELECT event_schema.tbl_event_sectors\nthao tác (span)\ntăng ↑\nkhông lan\n21:21:16 UTC\n570.618\nTempo ↗\nop|event-service|SELECT event_schema.tbl_event_sectors\nSELECT event_schema.tbl_outbox_messages\nthao tác (span)\ntăng ↑\nkhông lan\n21:21:16 UTC\n183.910\nTempo ↗\nop|event-service|SELECT event_schema.tbl_outbox_messages\nSELECT event_schema.tbl_promotions\nthao tác (span)\ntăng ↑\nkhông lan\n21:21:16 UTC\n522.885\nTempo ↗\nop|event-service|SELECT event_schema.tbl_promotions\nSELECT event_schema.tbl_ticket_types\nthao tác (span)\ntăng ↑\nkhông lan\n21:21:16 UTC\n552.397\nTempo ↗\nop|event-service|SELECT event_schema.tbl_ticket_types\nTransaction.commit\nthao tác (span)\ntăng ↑\nkhông lan\n21:21:16 UTC\n687.951\nTempo ↗\nop|event-service|Transaction.commit",
+  "evidenceRenderedLinks": [
+    {
+      "text": "Tempo ↗",
+      "url": "/explore?schemaVersion=1&orgId=1&panes=%257B%2522a%2522%253A%257B%2522datasource%2522%253A%2522tempo%2522%252C%2522queries%2522%253A%255B%257B%2522datasource%2522%253A%257B%2522type%2522%253A%2522tempo%2522%252C%2522uid%2522%253A%2522tempo%2522%257D%252C%2522limit%2522%253A50%252C%2522query%2522%253A%2522%257B+resource.service.name+%253D+%255C%2522event-service%255C%2522+%255Cu0026%255Cu0026+name+%253D+%255C%2522OutboxWorker.relay%255C%2522+%257D%2522%252C%2522queryType%2522%253A%2522traceql%2522%252C%2522refId%2522%253A%2522A%2522%252C%2522tableType%2522%253A%2522traces%2522%257D%255D%252C%2522range%2522%253A%257B%2522from%2522%253A%25221794431776000%2522%252C%2522to%2522%253A%25221794432376000%2522%257D%257D%257D"
+    },
+    {
+      "text": "Tempo ↗",
+      "url": "/explore?schemaVersion=1&orgId=1&panes=%257B%2522a%2522%253A%257B%2522datasource%2522%253A%2522tempo%2522%252C%2522queries%2522%253A%255B%257B%2522datasource%2522%253A%257B%2522type%2522%253A%2522tempo%2522%252C%2522uid%2522%253A%2522tempo%2522%257D%252C%2522limit%2522%253A50%252C%2522query%2522%253A%2522%257B+resource.service.name+%253D+%255C%2522event-service%255C%2522+%255Cu0026%255Cu0026+name+%253D+%255C%2522SELECT+event_db%255C%2522+%257D%2522%252C%2522queryType%2522%253A%2522traceql%2522%252C%2522refId%2522%253A%2522A%2522%252C%2522tableType%2522%253A%2522traces%2522%257D%255D%252C%2522range%2522%253A%257B%2522from%2522%253A%25221794431776000%2522%252C%2522to%2522%253A%25221794432376000%2522%257D%257D%257D"
+    },
+    {
+      "text": "Tempo ↗",
+      "url": "/explore?schemaVersion=1&orgId=1&panes=%257B%2522a%2522%253A%257B%2522datasource%2522%253A%2522tempo%2522%252C%2522queries%2522%253A%255B%257B%2522datasource%2522%253A%257B%2522type%2522%253A%2522tempo%2522%252C%2522uid%2522%253A%2522tempo%2522%257D%252C%2522limit%2522%253A50%252C%2522query%2522%253A%2522%257B+resource.service.name+%253D+%255C%2522event-service%255C%2522+%255Cu0026%255Cu0026+name+%253D+%255C%2522SELECT+event_schema.tbl_event_images%255C%2522+%257D%2522%252C%2522queryType%2522%253A%2522traceql%2522%252C%2522refId%2522%253A%2522A%2522%252C%2522tableType%2522%253A%2522traces%2522%257D%255D%252C%2522range%2522%253A%257B%2522from%2522%253A%25221794431776000%2522%252C%2522to%2522%253A%25221794432376000%2522%257D%257D%257D"
+    },
+    {
+      "text": "Tempo ↗",
+      "url": "/explore?schemaVersion=1&orgId=1&panes=%257B%2522a%2522%253A%257B%2522datasource%2522%253A%2522tempo%2522%252C%2522queries%2522%253A%255B%257B%2522datasource%2522%253A%257B%2522type%2522%253A%2522tempo%2522%252C%2522uid%2522%253A%2522tempo%2522%257D%252C%2522limit%2522%253A50%252C%2522query%2522%253A%2522%257B+resource.service.name+%253D+%255C%2522event-service%255C%2522+%255Cu0026%255Cu0026+name+%253D+%255C%2522SELECT+event_schema.tbl_event_layouts%255C%2522+%257D%2522%252C%2522queryType%2522%253A%2522traceql%2522%252C%2522refId%2522%253A%2522A%2522%252C%2522tableType%2522%253A%2522traces%2522%257D%255D%252C%2522range%2522%253A%257B%2522from%2522%253A%25221794431776000%2522%252C%2522to%2522%253A%25221794432376000%2522%257D%257D%257D"
+    },
+    {
+      "text": "Tempo ↗",
+      "url": "/explore?schemaVersion=1&orgId=1&panes=%257B%2522a%2522%253A%257B%2522datasource%2522%253A%2522tempo%2522%252C%2522queries%2522%253A%255B%257B%2522datasource%2522%253A%257B%2522type%2522%253A%2522tempo%2522%252C%2522uid%2522%253A%2522tempo%2522%257D%252C%2522limit%2522%253A50%252C%2522query%2522%253A%2522%257B+resource.service.name+%253D+%255C%2522event-service%255C%2522+%255Cu0026%255Cu0026+name+%253D+%255C%2522SELECT+event_schema.tbl_event_seats%255C%2522+%257D%2522%252C%2522queryType%2522%253A%2522traceql%2522%252C%2522refId%2522%253A%2522A%2522%252C%2522tableType%2522%253A%2522traces%2522%257D%255D%252C%2522range%2522%253A%257B%2522from%2522%253A%25221794431776000%2522%252C%2522to%2522%253A%25221794432376000%2522%257D%257D%257D"
+    },
+    {
+      "text": "Tempo ↗",
+      "url": "/explore?schemaVersion=1&orgId=1&panes=%257B%2522a%2522%253A%257B%2522datasource%2522%253A%2522tempo%2522%252C%2522queries%2522%253A%255B%257B%2522datasource%2522%253A%257B%2522type%2522%253A%2522tempo%2522%252C%2522uid%2522%253A%2522tempo%2522%257D%252C%2522limit%2522%253A50%252C%2522query%2522%253A%2522%257B+resource.service.name+%253D+%255C%2522event-service%255C%2522+%255Cu0026%255Cu0026+name+%253D+%255C%2522SELECT+event_schema.tbl_event_sectors%255C%2522+%257D%2522%252C%2522queryType%2522%253A%2522traceql%2522%252C%2522refId%2522%253A%2522A%2522%252C%2522tableType%2522%253A%2522traces%2522%257D%255D%252C%2522range%2522%253A%257B%2522from%2522%253A%25221794431776000%2522%252C%2522to%2522%253A%25221794432376000%2522%257D%257D%257D"
+    },
+    {
+      "text": "Tempo ↗",
+      "url": "/explore?schemaVersion=1&orgId=1&panes=%257B%2522a%2522%253A%257B%2522datasource%2522%253A%2522tempo%2522%252C%2522queries%2522%253A%255B%257B%2522datasource%2522%253A%257B%2522type%2522%253A%2522tempo%2522%252C%2522uid%2522%253A%2522tempo%2522%257D%252C%2522limit%2522%253A50%252C%2522query%2522%253A%2522%257B+resource.service.name+%253D+%255C%2522event-service%255C%2522+%255Cu0026%255Cu0026+name+%253D+%255C%2522SELECT+event_schema.tbl_outbox_messages%255C%2522+%257D%2522%252C%2522queryType%2522%253A%2522traceql%2522%252C%2522refId%2522%253A%2522A%2522%252C%2522tableType%2522%253A%2522traces%2522%257D%255D%252C%2522range%2522%253A%257B%2522from%2522%253A%25221794431776000%2522%252C%2522to%2522%253A%25221794432376000%2522%257D%257D%257D"
+    },
+    {
+      "text": "Tempo ↗",
+      "url": "/explore?schemaVersion=1&orgId=1&panes=%257B%2522a%2522%253A%257B%2522datasource%2522%253A%2522tempo%2522%252C%2522queries%2522%253A%255B%257B%2522datasource%2522%253A%257B%2522type%2522%253A%2522tempo%2522%252C%2522uid%2522%253A%2522tempo%2522%257D%252C%2522limit%2522%253A50%252C%2522query%2522%253A%2522%257B+resource.service.name+%253D+%255C%2522event-service%255C%2522+%255Cu0026%255Cu0026+name+%253D+%255C%2522SELECT+event_schema.tbl_promotions%255C%2522+%257D%2522%252C%2522queryType%2522%253A%2522traceql%2522%252C%2522refId%2522%253A%2522A%2522%252C%2522tableType%2522%253A%2522traces%2522%257D%255D%252C%2522range%2522%253A%257B%2522from%2522%253A%25221794431776000%2522%252C%2522to%2522%253A%25221794432376000%2522%257D%257D%257D"
+    },
+    {
+      "text": "Tempo ↗",
+      "url": "/explore?schemaVersion=1&orgId=1&panes=%257B%2522a%2522%253A%257B%2522datasource%2522%253A%2522tempo%2522%252C%2522queries%2522%253A%255B%257B%2522datasource%2522%253A%257B%2522type%2522%253A%2522tempo%2522%252C%2522uid%2522%253A%2522tempo%2522%257D%252C%2522limit%2522%253A50%252C%2522query%2522%253A%2522%257B+resource.service.name+%253D+%255C%2522event-service%255C%2522+%255Cu0026%255Cu0026+name+%253D+%255C%2522SELECT+event_schema.tbl_ticket_types%255C%2522+%257D%2522%252C%2522queryType%2522%253A%2522traceql%2522%252C%2522refId%2522%253A%2522A%2522%252C%2522tableType%2522%253A%2522traces%2522%257D%255D%252C%2522range%2522%253A%257B%2522from%2522%253A%25221794431776000%2522%252C%2522to%2522%253A%25221794432376000%2522%257D%257D%257D"
+    },
+    {
+      "text": "Tempo ↗",
+      "url": "/explore?schemaVersion=1&orgId=1&panes=%257B%2522a%2522%253A%257B%2522datasource%2522%253A%2522tempo%2522%252C%2522queries%2522%253A%255B%257B%2522datasource%2522%253A%257B%2522type%2522%253A%2522tempo%2522%252C%2522uid%2522%253A%2522tempo%2522%257D%252C%2522limit%2522%253A50%252C%2522query%2522%253A%2522%257B+resource.service.name+%253D+%255C%2522event-service%255C%2522+%255Cu0026%255Cu0026+name+%253D+%255C%2522Transaction.commit%255C%2522+%257D%2522%252C%2522queryType%2522%253A%2522traceql%2522%252C%2522refId%2522%253A%2522A%2522%252C%2522tableType%2522%253A%2522traces%2522%257D%255D%252C%2522range%2522%253A%257B%2522from%2522%253A%25221794431776000%2522%252C%2522to%2522%253A%25221794432376000%2522%257D%257D%257D"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "api-gateway",
+      "text": "#3bị kéo theoapi-gateway",
+      "color": "#FF9830"
+    },
+    {
+      "id": "booking-service",
+      "text": "bình thườngbooking-service",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "booking_db",
+      "text": "bình thườngbooking_db",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "broker",
+      "text": "bình thườngbroker",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "cache",
+      "text": "bình thườngcache",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "config-discovery",
+      "text": "bình thườngconfig-discovery",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "event-service",
+      "text": "#1nghi là nguồnevent-service",
+      "color": "#E02F44"
+    },
+    {
+      "id": "event_db",
+      "text": "bình thườngevent_db",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "keycloak",
+      "text": "#2nghi là nguồnkeycloak",
+      "color": "#E02F44"
+    },
+    {
+      "id": "keycloak_db",
+      "text": "bình thườngkeycloak_db",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "mongodb-instance",
+      "text": "bình thườngmongodb-instance",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "payment-service",
+      "text": "bình thườngpayment-service",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "payment_db",
+      "text": "bình thườngpayment_db",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "postgresql-shared-instance",
+      "text": "bình thườngpostgresql-shared-instance",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "ticket-service",
+      "text": "bình thườngticket-service",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "ticket_db",
+      "text": "bình thườngticket_db",
+      "color": "#8E8E8E"
+    },
+    {
+      "id": "user-service",
+      "text": "bình thườnguser-service",
+      "color": "#8E8E8E"
+    }
+  ],
+  "edgeCount": 14,
+  "livePanels": {
+    "7": "Vì sao event-service bị coi là kéo theo (giải thích E5 của M1)\nKênh của event-service\nĐược giải thích bởi\nĐường lan\nQuy tắc E5\nTrạng thái\nlatency-50 ↑\nkeycloak: SELECT keycloak_db.OFFLINE_USER_SESSION ↑\nevent-service → keycloak\nlan ngược\náp dụng\nlatency-90 ↑\nkeycloak: SELECT keycloak_db.OFFLINE_USER_SESSION ↑\nevent-service → keycloak\nlan ngược\náp dụng",
+    "9": "Request/giây theo thao tác — event-service\nSeries color\nName\nMax\nGET /actuator/health\n0 req/s\nGET /api/v1/events\n0 req/s\nGET /api/v1/events/{id}\n2.82 req/s",
+    "10": "Độ trễ p90 theo thao tác — event-service\nSeries color\nName\nMax\nGET /actuator/health\nGET /api/v1/events\nGET /api/v1/events/{id}\n475 ms",
+    "11": "Lỗi 5xx/giây theo thao tác — event-service\nSeries color\nName\nMax\nGET /api/v1/events/{id}\n0 req/s",
+    "12": "Trace của event-service trong khung giờ (bấm Trace ID để xem cây span cha → con)\nExpand nested rows\nTrace ID\nStart time\nService\nName\nDuration\nabb6dfe0f0842b31342e1721b11a25\n2026-11-11 21:25:35\napi-gateway\nGET event\n349 ms\naeae8504f7c9b8abfea63125069ab2\n2026-11-11 21:25:19\nevent-service\nOutboxWorker.relay\n93 ms\n30cb136305c9c9e6686ee2e6fdea90f\n2026-11-11 21:25:18\napi-gateway\nGET event\n348 ms\n6c2c0ac3ca24c946e87163281976fbe\n2026-11-11 21:24:57\nevent-service\nOutboxWorker.relay\n92 ms\n4b96ee6aa0648472ba7210186e4301b\n2026-11-11 21:24:13\napi-gateway\nGET event\n347 ms\n30bab95b28ad2deee2621619d961443\n2026-11-11 21:24:12\napi-gateway\nGET event\n348 ms\n2a1d6c77aaee636dcb3c2781284526c\n2026-11-11 21:24:07\nevent-service\nOutboxWorker.relay\n92 ms\n30b17ab5e51daae8a07c8cc3ee8b58f\n2026-11-11 21:23:59\napi-gateway\nGET event\n348 ms\nf7fe3bcd2952366c2859e688b32036\n2026-11-11 21:23:57\napi-gateway\nGET event\n348 ms\n628ea4d0a2838ea6f3c8a0712e3aca9\n2026-11-11 21:23:39\napi-gateway\nGET event\n350 ms",
+    "13": "Log của event-service có chữ error/exception/warn\nNo data"
+  },
+  "nodeMatches": true,
+  "nodeLinks": [
+    {
+      "text": "Tempo: trace của service ↗",
+      "url": "/explore?schemaVersion=1&orgId=1&panes=%7B%22a%22%3A%7B%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22queryType%22%3A%22traceql%22%2C%22query%22%3A%22%7Bresource.service.name%3D%5C%22event-service%5C%22%7D%22%2C%22limit%22%3A50%2C%22tableType%22%3A%22traces%22%2C%22refId%22%3A%22A%22%2C%22datasource%22%3A%7B%22type%22%3A%22tempo%22%2C%22uid%22%3A%22tempo%22%7D%7D%5D%2C%22range%22%3A%7B%22from%22%3A%221794431776000%22%2C%22to%22%3A%221794432376000%22%7D%7D%7D",
+      "ds": "tempo",
+      "range": {
+        "from": "1794431776000",
+        "to": "1794432376000"
+      },
+      "query": {
+        "queryType": "traceql",
+        "query": "{resource.service.name=\"event-service\"}",
+        "limit": 50,
+        "tableType": "traces",
+        "refId": "A",
+        "datasource": {
+          "type": "tempo",
+          "uid": "tempo"
+        }
+      },
+      "windowMatches": true
+    },
+    {
+      "text": "Loki: log của service ↗",
+      "url": "/explore?schemaVersion=1&orgId=1&panes=%7B%22a%22%3A%7B%22datasource%22%3A%22loki%22%2C%22queries%22%3A%5B%7B%22expr%22%3A%22%7Bservice_name%3D%5C%22event-service%5C%22%7D%22%2C%22queryType%22%3A%22range%22%2C%22refId%22%3A%22A%22%2C%22datasource%22%3A%7B%22type%22%3A%22loki%22%2C%22uid%22%3A%22loki%22%7D%7D%5D%2C%22range%22%3A%7B%22from%22%3A%221794431776000%22%2C%22to%22%3A%221794432376000%22%7D%7D%7D",
+      "ds": "loki",
+      "range": {
+        "from": "1794431776000",
+        "to": "1794432376000"
+      },
+      "query": {
+        "expr": "{service_name=\"event-service\"}",
+        "queryType": "range",
+        "refId": "A",
+        "datasource": {
+          "type": "loki",
+          "uid": "loki"
+        }
+      },
+      "windowMatches": true
+    },
+    {
+      "text": "Prometheus: số request mỗi giây theo route ↗",
+      "url": "/explore?schemaVersion=1&orgId=1&panes=%7B%22a%22%3A%7B%22datasource%22%3A%22prometheus%22%2C%22queries%22%3A%5B%7B%22expr%22%3A%22sum%20by%20%28http_request_method%2C%20http_route%29%20%28rate%28http_server_request_duration_seconds_count%7Bservice_name%3D%5C%22event-service%5C%22%7D%5B1m%5D%29%29%22%2C%22range%22%3Atrue%2C%22refId%22%3A%22A%22%2C%22datasource%22%3A%7B%22type%22%3A%22prometheus%22%2C%22uid%22%3A%22prometheus%22%7D%7D%5D%2C%22range%22%3A%7B%22from%22%3A%221794431776000%22%2C%22to%22%3A%221794432376000%22%7D%7D%7D",
+      "ds": "prometheus",
+      "range": {
+        "from": "1794431776000",
+        "to": "1794432376000"
+      },
+      "query": {
+        "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"event-service\"}[1m]))",
+        "range": true,
+        "refId": "A",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        }
+      },
+      "windowMatches": true
+    }
+  ],
+  "answerTextOccurrences": [
+    "Trang phát lại (có đáp án — chỉ mở khi chấm xong)"
+  ]
+}

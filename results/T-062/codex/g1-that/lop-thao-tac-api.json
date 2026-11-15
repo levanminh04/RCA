@@ -1,0 +1,1573 @@
+{
+  "e8661e0a": {
+    "9": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"event-service\"}[1m]))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794444870000",
+      "to": "1794445470000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        }
+      ],
+      "errors": []
+    },
+    "10": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "histogram_quantile(0.9, sum by (le, http_request_method, http_route) (rate(http_server_request_duration_seconds_bucket{service_name=\"event-service\"}[1m])))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794444870000",
+      "to": "1794445470000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        }
+      ],
+      "errors": []
+    },
+    "11": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"event-service\", http_response_status_code=~\"5..\"}[1m]))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794444870000",
+      "to": "1794445470000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        }
+      ],
+      "errors": []
+    },
+    "12": {
+      "query": [
+        {
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "limit": 50,
+          "query": "{resource.service.name=\"event-service\"}",
+          "queryType": "traceql",
+          "refId": "A",
+          "tableType": "traces"
+        }
+      ],
+      "from": "1794444870000",
+      "to": "1794445470000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "traceID",
+            "startTime",
+            "traceService",
+            "traceName",
+            "traceDuration",
+            "nested"
+          ],
+          "rows": 50
+        }
+      ],
+      "errors": []
+    },
+    "13": {
+      "query": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "{service_name=\"event-service\"} |~ \"(?i)error|exception|warn\"",
+          "maxLines": 200,
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "from": "1794444870000",
+      "to": "1794445470000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "labels",
+            "Time",
+            "Line",
+            "tsNs",
+            "labelTypes",
+            "id"
+          ],
+          "rows": 0
+        }
+      ],
+      "errors": []
+    }
+  },
+  "00eaea92": {
+    "9": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"payment-service\"}[1m]))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794442999000",
+      "to": "1794443599000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        }
+      ],
+      "errors": []
+    },
+    "10": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "histogram_quantile(0.9, sum by (le, http_request_method, http_route) (rate(http_server_request_duration_seconds_bucket{service_name=\"payment-service\"}[1m])))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794442999000",
+      "to": "1794443599000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        }
+      ],
+      "errors": []
+    },
+    "11": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"payment-service\", http_response_status_code=~\"5..\"}[1m]))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794442999000",
+      "to": "1794443599000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [],
+          "rows": 0
+        }
+      ],
+      "errors": []
+    },
+    "12": {
+      "query": [
+        {
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "limit": 50,
+          "query": "{resource.service.name=\"payment-service\"}",
+          "queryType": "traceql",
+          "refId": "A",
+          "tableType": "traces"
+        }
+      ],
+      "from": "1794442999000",
+      "to": "1794443599000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "traceID",
+            "startTime",
+            "traceService",
+            "traceName",
+            "traceDuration",
+            "nested"
+          ],
+          "rows": 50
+        }
+      ],
+      "errors": []
+    },
+    "13": {
+      "query": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "{service_name=\"payment-service\"} |~ \"(?i)error|exception|warn\"",
+          "maxLines": 200,
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "from": "1794442999000",
+      "to": "1794443599000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "labels",
+            "Time",
+            "Line",
+            "tsNs",
+            "labelTypes",
+            "id"
+          ],
+          "rows": 0
+        }
+      ],
+      "errors": []
+    }
+  },
+  "bf17acbf": {
+    "9": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"booking-service\"}[1m]))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794441125000",
+      "to": "1794441725000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        }
+      ],
+      "errors": []
+    },
+    "10": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "histogram_quantile(0.9, sum by (le, http_request_method, http_route) (rate(http_server_request_duration_seconds_bucket{service_name=\"booking-service\"}[1m])))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794441125000",
+      "to": "1794441725000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        }
+      ],
+      "errors": []
+    },
+    "11": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"booking-service\", http_response_status_code=~\"5..\"}[1m]))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794441125000",
+      "to": "1794441725000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [],
+          "rows": 0
+        }
+      ],
+      "errors": []
+    },
+    "12": {
+      "query": [
+        {
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "limit": 50,
+          "query": "{resource.service.name=\"booking-service\"}",
+          "queryType": "traceql",
+          "refId": "A",
+          "tableType": "traces"
+        }
+      ],
+      "from": "1794441125000",
+      "to": "1794441725000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "traceID",
+            "startTime",
+            "traceService",
+            "traceName",
+            "traceDuration",
+            "nested"
+          ],
+          "rows": 50
+        }
+      ],
+      "errors": []
+    },
+    "13": {
+      "query": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "{service_name=\"booking-service\"} |~ \"(?i)error|exception|warn\"",
+          "maxLines": 200,
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "from": "1794441125000",
+      "to": "1794441725000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "labels",
+            "Time",
+            "Line",
+            "tsNs",
+            "labelTypes",
+            "id"
+          ],
+          "rows": 0
+        }
+      ],
+      "errors": []
+    }
+  },
+  "f728fce2": {
+    "9": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"booking-service\"}[1m]))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794439254000",
+      "to": "1794439854000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        }
+      ],
+      "errors": []
+    },
+    "10": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "histogram_quantile(0.9, sum by (le, http_request_method, http_route) (rate(http_server_request_duration_seconds_bucket{service_name=\"booking-service\"}[1m])))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794439254000",
+      "to": "1794439854000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        }
+      ],
+      "errors": []
+    },
+    "11": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"booking-service\", http_response_status_code=~\"5..\"}[1m]))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794439254000",
+      "to": "1794439854000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [],
+          "rows": 0
+        }
+      ],
+      "errors": []
+    },
+    "12": {
+      "query": [
+        {
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "limit": 50,
+          "query": "{resource.service.name=\"booking-service\"}",
+          "queryType": "traceql",
+          "refId": "A",
+          "tableType": "traces"
+        }
+      ],
+      "from": "1794439254000",
+      "to": "1794439854000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "traceID",
+            "startTime",
+            "traceService",
+            "traceName",
+            "traceDuration",
+            "nested"
+          ],
+          "rows": 50
+        }
+      ],
+      "errors": []
+    },
+    "13": {
+      "query": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "{service_name=\"booking-service\"} |~ \"(?i)error|exception|warn\"",
+          "maxLines": 200,
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "from": "1794439254000",
+      "to": "1794439854000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "labels",
+            "Time",
+            "Line",
+            "tsNs",
+            "labelTypes",
+            "id"
+          ],
+          "rows": 0
+        }
+      ],
+      "errors": []
+    }
+  },
+  "6c1a9fd8": {
+    "9": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"event-service\"}[1m]))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794437382000",
+      "to": "1794437982000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        }
+      ],
+      "errors": []
+    },
+    "10": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "histogram_quantile(0.9, sum by (le, http_request_method, http_route) (rate(http_server_request_duration_seconds_bucket{service_name=\"event-service\"}[1m])))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794437382000",
+      "to": "1794437982000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        }
+      ],
+      "errors": []
+    },
+    "11": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"event-service\", http_response_status_code=~\"5..\"}[1m]))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794437382000",
+      "to": "1794437982000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        }
+      ],
+      "errors": []
+    },
+    "12": {
+      "query": [
+        {
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "limit": 50,
+          "query": "{resource.service.name=\"event-service\"}",
+          "queryType": "traceql",
+          "refId": "A",
+          "tableType": "traces"
+        }
+      ],
+      "from": "1794437382000",
+      "to": "1794437982000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "traceID",
+            "startTime",
+            "traceService",
+            "traceName",
+            "traceDuration",
+            "nested"
+          ],
+          "rows": 50
+        }
+      ],
+      "errors": []
+    },
+    "13": {
+      "query": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "{service_name=\"event-service\"} |~ \"(?i)error|exception|warn\"",
+          "maxLines": 200,
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "from": "1794437382000",
+      "to": "1794437982000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "labels",
+            "Time",
+            "Line",
+            "tsNs",
+            "labelTypes",
+            "id"
+          ],
+          "rows": 0
+        }
+      ],
+      "errors": []
+    }
+  },
+  "2e2a5541": {
+    "9": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"booking-service\"}[1m]))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794435513000",
+      "to": "1794436113000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        }
+      ],
+      "errors": []
+    },
+    "10": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "histogram_quantile(0.9, sum by (le, http_request_method, http_route) (rate(http_server_request_duration_seconds_bucket{service_name=\"booking-service\"}[1m])))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794435513000",
+      "to": "1794436113000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        }
+      ],
+      "errors": []
+    },
+    "11": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"booking-service\", http_response_status_code=~\"5..\"}[1m]))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794435513000",
+      "to": "1794436113000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [],
+          "rows": 0
+        }
+      ],
+      "errors": []
+    },
+    "12": {
+      "query": [
+        {
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "limit": 50,
+          "query": "{resource.service.name=\"booking-service\"}",
+          "queryType": "traceql",
+          "refId": "A",
+          "tableType": "traces"
+        }
+      ],
+      "from": "1794435513000",
+      "to": "1794436113000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "traceID",
+            "startTime",
+            "traceService",
+            "traceName",
+            "traceDuration",
+            "nested"
+          ],
+          "rows": 50
+        }
+      ],
+      "errors": []
+    },
+    "13": {
+      "query": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "{service_name=\"booking-service\"} |~ \"(?i)error|exception|warn\"",
+          "maxLines": 200,
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "from": "1794435513000",
+      "to": "1794436113000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "labels",
+            "Time",
+            "Line",
+            "tsNs",
+            "labelTypes",
+            "id"
+          ],
+          "rows": 0
+        }
+      ],
+      "errors": []
+    }
+  },
+  "a89954d1": {
+    "9": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"event-service\"}[1m]))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794433645000",
+      "to": "1794434245000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        }
+      ],
+      "errors": []
+    },
+    "10": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "histogram_quantile(0.9, sum by (le, http_request_method, http_route) (rate(http_server_request_duration_seconds_bucket{service_name=\"event-service\"}[1m])))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794433645000",
+      "to": "1794434245000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        }
+      ],
+      "errors": []
+    },
+    "11": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"event-service\", http_response_status_code=~\"5..\"}[1m]))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794433645000",
+      "to": "1794434245000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        }
+      ],
+      "errors": []
+    },
+    "12": {
+      "query": [
+        {
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "limit": 50,
+          "query": "{resource.service.name=\"event-service\"}",
+          "queryType": "traceql",
+          "refId": "A",
+          "tableType": "traces"
+        }
+      ],
+      "from": "1794433645000",
+      "to": "1794434245000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "traceID",
+            "startTime",
+            "traceService",
+            "traceName",
+            "traceDuration",
+            "nested"
+          ],
+          "rows": 50
+        }
+      ],
+      "errors": []
+    },
+    "13": {
+      "query": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "{service_name=\"event-service\"} |~ \"(?i)error|exception|warn\"",
+          "maxLines": 200,
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "from": "1794433645000",
+      "to": "1794434245000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "labels",
+            "Time",
+            "Line",
+            "tsNs",
+            "labelTypes",
+            "id"
+          ],
+          "rows": 200
+        }
+      ],
+      "errors": []
+    }
+  },
+  "1ad3afeb": {
+    "9": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"event-service\"}[1m]))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794431776000",
+      "to": "1794432376000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        }
+      ],
+      "errors": []
+    },
+    "10": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "histogram_quantile(0.9, sum by (le, http_request_method, http_route) (rate(http_server_request_duration_seconds_bucket{service_name=\"event-service\"}[1m])))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794431776000",
+      "to": "1794432376000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        }
+      ],
+      "errors": []
+    },
+    "11": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"event-service\", http_response_status_code=~\"5..\"}[1m]))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794431776000",
+      "to": "1794432376000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        }
+      ],
+      "errors": []
+    },
+    "12": {
+      "query": [
+        {
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "limit": 50,
+          "query": "{resource.service.name=\"event-service\"}",
+          "queryType": "traceql",
+          "refId": "A",
+          "tableType": "traces"
+        }
+      ],
+      "from": "1794431776000",
+      "to": "1794432376000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "traceID",
+            "startTime",
+            "traceService",
+            "traceName",
+            "traceDuration",
+            "nested"
+          ],
+          "rows": 50
+        }
+      ],
+      "errors": []
+    },
+    "13": {
+      "query": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "{service_name=\"event-service\"} |~ \"(?i)error|exception|warn\"",
+          "maxLines": 200,
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "from": "1794431776000",
+      "to": "1794432376000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "labels",
+            "Time",
+            "Line",
+            "tsNs",
+            "labelTypes",
+            "id"
+          ],
+          "rows": 0
+        }
+      ],
+      "errors": []
+    }
+  },
+  "a5539fba": {
+    "9": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"keycloak\"}[1m]))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794429904000",
+      "to": "1794430504000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        }
+      ],
+      "errors": []
+    },
+    "10": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "histogram_quantile(0.9, sum by (le, http_request_method, http_route) (rate(http_server_request_duration_seconds_bucket{service_name=\"keycloak\"}[1m])))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794429904000",
+      "to": "1794430504000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        },
+        {
+          "refId": "A",
+          "fields": [
+            "Time",
+            "Value"
+          ],
+          "rows": 41
+        }
+      ],
+      "errors": []
+    },
+    "11": {
+      "query": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"keycloak\", http_response_status_code=~\"5..\"}[1m]))",
+          "legendFormat": "{{http_request_method}} {{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "from": "1794429904000",
+      "to": "1794430504000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [],
+          "rows": 0
+        }
+      ],
+      "errors": []
+    },
+    "12": {
+      "query": [
+        {
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "limit": 50,
+          "query": "{resource.service.name=\"keycloak\"}",
+          "queryType": "traceql",
+          "refId": "A",
+          "tableType": "traces"
+        }
+      ],
+      "from": "1794429904000",
+      "to": "1794430504000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "traceID",
+            "startTime",
+            "traceService",
+            "traceName",
+            "traceDuration",
+            "nested"
+          ],
+          "rows": 50
+        }
+      ],
+      "errors": []
+    },
+    "13": {
+      "query": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "{service_name=\"keycloak\"} |~ \"(?i)error|exception|warn\"",
+          "maxLines": 200,
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "from": "1794429904000",
+      "to": "1794430504000",
+      "frames": [
+        {
+          "refId": "A",
+          "fields": [
+            "labels",
+            "Time",
+            "Line",
+            "tsNs",
+            "labelTypes",
+            "id"
+          ],
+          "rows": 12
+        }
+      ],
+      "errors": []
+    }
+  }
+}

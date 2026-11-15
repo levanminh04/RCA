@@ -1,0 +1,139 @@
+{
+  "utc": "2026-11-10T22:37:18.208735+00:00",
+  "original_bins_preserved": "load-impact.json groups by actual client start against Docker confirmation; not rewritten",
+  "command_request_epoch": 1794349047.9558027,
+  "docker_confirmation_epoch": 1794349048.0107768,
+  "command_confirmation_bracket_seconds": 0.05497407913208008,
+  "requests_started_between_request_and_confirmation": [
+    {
+      "utc": "2026-11-10T22:17:28.000157+00:00",
+      "epoch": 1794349048.0001566,
+      "completed_epoch": 1794349073.0257564,
+      "scheduled_epoch": 1794349048.0,
+      "sequence": 3748,
+      "path": "/api/v1/events/68bbd408-d7c0-4236-b139-0ecf9cd5d826",
+      "status": 504,
+      "error": null,
+      "latency_ms": 25025.6,
+      "schedule_lag_ms": 0.157
+    }
+  ],
+  "before_command_request_5m": {
+    "requests": 300,
+    "non200": 0
+  },
+  "by_path": {
+    "/api/v1/events": {
+      "non200_after_command_requested": 109,
+      "first_non200_request": {
+        "utc": "2026-11-10T22:17:30.000153+00:00",
+        "epoch": 1794349050.0001526,
+        "completed_epoch": 1794349075.018612,
+        "scheduled_epoch": 1794349050.0,
+        "sequence": 3750,
+        "path": "/api/v1/events",
+        "status": 504,
+        "error": null,
+        "latency_ms": 25018.459,
+        "schedule_lag_ms": 0.153
+      },
+      "last_non200_request": {
+        "utc": "2026-11-10T22:22:57.000159+00:00",
+        "epoch": 1794349377.0001593,
+        "completed_epoch": 1794349377.0093088,
+        "scheduled_epoch": 1794349377.0,
+        "sequence": 4077,
+        "path": "/api/v1/events",
+        "status": 503,
+        "error": null,
+        "latency_ms": 9.15,
+        "schedule_lag_ms": 0.159
+      },
+      "first_200_started_after_recovery_and_last_failure_completed": {
+        "utc": "2026-11-10T22:23:00.000161+00:00",
+        "epoch": 1794349380.0001607,
+        "completed_epoch": 1794349380.0129774,
+        "scheduled_epoch": 1794349380.0,
+        "sequence": 4080,
+        "path": "/api/v1/events",
+        "status": 200,
+        "error": null,
+        "latency_ms": 12.817,
+        "schedule_lag_ms": 0.161
+      },
+      "note": "For a path with no failure, this is continued availability, not evidence of recovery"
+    },
+    "/api/v1/events/68bbd408-d7c0-4236-b139-0ecf9cd5d826": {
+      "non200_after_command_requested": 111,
+      "first_non200_request": {
+        "utc": "2026-11-10T22:17:28.000157+00:00",
+        "epoch": 1794349048.0001566,
+        "completed_epoch": 1794349073.0257564,
+        "scheduled_epoch": 1794349048.0,
+        "sequence": 3748,
+        "path": "/api/v1/events/68bbd408-d7c0-4236-b139-0ecf9cd5d826",
+        "status": 504,
+        "error": null,
+        "latency_ms": 25025.6,
+        "schedule_lag_ms": 0.157
+      },
+      "last_non200_request": {
+        "utc": "2026-11-10T22:22:58.000162+00:00",
+        "epoch": 1794349378.0001624,
+        "completed_epoch": 1794349378.0059183,
+        "scheduled_epoch": 1794349378.0,
+        "sequence": 4078,
+        "path": "/api/v1/events/68bbd408-d7c0-4236-b139-0ecf9cd5d826",
+        "status": 503,
+        "error": null,
+        "latency_ms": 5.756,
+        "schedule_lag_ms": 0.162
+      },
+      "first_200_started_after_recovery_and_last_failure_completed": {
+        "utc": "2026-11-10T22:23:01.000157+00:00",
+        "epoch": 1794349381.000157,
+        "completed_epoch": 1794349381.0781848,
+        "scheduled_epoch": 1794349381.0,
+        "sequence": 4081,
+        "path": "/api/v1/events/68bbd408-d7c0-4236-b139-0ecf9cd5d826",
+        "status": 200,
+        "error": null,
+        "latency_ms": 78.028,
+        "schedule_lag_ms": 0.157
+      },
+      "note": "For a path with no failure, this is continued availability, not evidence of recovery"
+    },
+    "/api/v1/events/68bbd408-d7c0-4236-b139-0ecf9cd5d826/availability": {
+      "non200_after_command_requested": 0,
+      "first_non200_request": null,
+      "last_non200_request": null,
+      "first_200_started_after_recovery_and_last_failure_completed": {
+        "utc": "2026-11-10T22:22:29.000157+00:00",
+        "epoch": 1794349349.000157,
+        "completed_epoch": 1794349349.0115101,
+        "scheduled_epoch": 1794349349.0,
+        "sequence": 4049,
+        "path": "/api/v1/events/68bbd408-d7c0-4236-b139-0ecf9cd5d826/availability",
+        "status": 200,
+        "error": null,
+        "latency_ms": 11.353,
+        "schedule_lag_ms": 0.157
+      },
+      "note": "For a path with no failure, this is continued availability, not evidence of recovery"
+    }
+  },
+  "plan_v2_assumption_correction": {
+    "claim": "All three read paths reach event-service",
+    "finding": "False: gateway routes /api/v1/events/*/availability to booking-service; catalog/detail to event-service",
+    "evidence": [
+      "Gateway application.yaml route predicates",
+      "load-impact.json#/windows/during/by_path"
+    ],
+    "treatment": "Keep frozen plan v2 unchanged; annotate after-output correction; do not change method input, t, thresholds or workload"
+  },
+  "limits": [
+    "Client request start/completion and Docker request/confirmation bracket the observations; no exact application impact onset is inferred",
+    "The total 4800-request log includes earlier OOM/reconfiguration failures; do not attribute them all to the deliberate pause",
+    "Availability remained 200 during the pause, so its success is not a recovery marker for event-service"
+  ]
+}

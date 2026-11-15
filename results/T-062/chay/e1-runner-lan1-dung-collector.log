@@ -1,0 +1,40 @@
+﻿{"t": "2026-11-11T20:25:52.066525+00:00", "msg": "load started", "tag": "e1-e610fd62", "flash": false, "out": "utc                : 2026-11-11T20:25:47.1099891Z\nmachine            : tai\nflow               : PKCE\nexpires_in         : 300\nrefresh_expires_in : 1800\n\nc05430da8bd62e98c4d683e68efce80b6372fa461388363844cdc0a93b7670f4"}
+{"t": "2026-11-11T20:37:46.550373+00:00", "msg": "STOP giữa chu kỳ", "i": 0}
+py : Traceback (most recent call last):
+At line:1 char:470
++ ... 831c56.log; py -3 -B results\T-062\chay\runner.py e1 --lich results\T ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last)::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "D:\RCA-flashticket\results\T-062\chay\runner.py", line 191, in run_e1
+    wait_until(S + PHASE + 480, 'lỗi'); ledger('probe', opaque_id=oid, phase='fault+480', probe=inj('probe', cell))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\RCA-flashticket\results\T-062\chay\runner.py", line 79, in wait_until
+    if stopped(): raise KeyboardInterrupt('STOP')
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt: STOP
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\RCA-flashticket\results\T-062\chay\runner.py", line 222, in <module>
+    elif mode == 'e1': run_e1(sys.argv[3] if len(sys.argv) > 3 else CHAY / 'lich.json')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\RCA-flashticket\results\T-062\chay\runner.py", line 203, in run_e1
+    ledger('cycle-stopped', opaque_id=oid); finish_load(tag); break
+                                            ^^^^^^^^^^^^^^^^
+  File "D:\RCA-flashticket\results\T-062\chay\runner.py", line 94, in finish_load
+    st = ps(f"Get-Tai -Tag {tag} -May tai")
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\RCA-flashticket\results\T-062\chay\runner.py", line 66, in ps
+    if r.returncode != 0: raise RuntimeError(f'ps rc={r.returncode}: {(r.stdout + r.stderr)[-800:]}')
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: ps rc=1: STOP exists
+At D:\RCA-flashticket\results\T-062\tai\c1.ps1:5 char:38
++  if(Test-Path D:/RCA-overnight/STOP){throw 'STOP exists'}
++                                      ~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (STOP exists:String) [], RuntimeException
+    + FullyQualifiedErrorId : STOP exists
+ 
+

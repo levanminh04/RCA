@@ -1,0 +1,353 @@
+- link "Skip to main content":
+  - /url: "#pageContent"
+  - generic: Skip to main content
+- link "Grafana":
+  - /url: /
+  - img "Grafana"
+- link "Grafana":
+  - /url: /
+- button "Close menu":
+- navigation "Navigation":
+  - list "Navigation":
+    - link "Bookmarks":
+      - /url: /bookmarks
+      - paragraph: Bookmarks
+    - 'button "Expand section: Bookmarks"':
+    - link "Starred":
+      - /url: /dashboards?starred
+      - paragraph: Starred
+    - 'button "Expand section: Starred"':
+    - link "Dashboards":
+      - /url: /dashboards
+      - paragraph: Dashboards
+    - 'button "Collapse section: Dashboards" [expanded]':
+    - list:
+      - link "Playlists":
+        - /url: /playlists
+        - paragraph: Playlists
+      - link "Snapshots":
+        - /url: /dashboard/snapshots
+        - paragraph: Snapshots
+      - link "Library panels":
+        - /url: /library-panels
+        - paragraph: Library panels
+      - link "Shared dashboards":
+        - /url: /dashboard/public
+        - paragraph: Shared dashboards
+      - link "Recently deleted":
+        - /url: /dashboard/recently-deleted
+        - paragraph: Recently deleted
+    - link "Explore":
+      - /url: /explore
+      - paragraph: Explore
+    - link "Drilldown":
+      - /url: /drilldown
+      - paragraph: Drilldown
+    - 'button "Expand section: Drilldown"':
+    - link "Alerting":
+      - /url: /alerting
+      - paragraph: Alerting
+    - 'button "Expand section: Alerting"':
+    - link "Connections":
+      - /url: /connections
+      - paragraph: Connections
+    - 'button "Collapse section: Connections" [expanded]':
+    - list:
+      - link "Add new connection":
+        - /url: /connections/add-new-connection
+        - paragraph: Add new connection
+      - link "Data sources":
+        - /url: /connections/datasources
+        - paragraph: Data sources
+    - link "Administration":
+      - /url: /admin
+      - paragraph: Administration
+    - 'button "Expand section: Administration"':
+  - separator
+  - button "Undock menu":
+- banner:
+  - navigation "Breadcrumbs":
+    - list:
+      - link "Explore":
+        - /url: /explore
+      - generic: Tempo
+  - button "Search..."
+  - generic: ctrl+k
+  - button "New":
+  - button "Help":
+  - button "Profile":
+    - img "User avatar"
+- main:
+  - heading "Explore" [level=1]
+  - navigation "Explore toolbar":
+    - navigation "Search links":
+      - button "Content outline" [expanded]:
+        - generic: Outline
+      - img "Tempo logo"
+      - combobox "Select a data source"
+      - button "Go queryless":
+        - generic: Go queryless
+    - button "Split the pane":
+      - generic: Split
+    - button "Add":
+      - generic: Add
+    - button "Move time range backwards":
+    - 'button "Time range selected: 2026-11-13 15:21:58 to 2026-11-13 15:31:57"':
+    - button "Move time range forwards":
+    - button "Zoom out time range":
+    - button "Run query":
+    - button "Auto refresh turned off. Choose refresh time interval":
+    - button "Copy shortened URL":
+    - button "Open copy link options":
+  - button "Collapse outline" [expanded]:
+    - img "arrow-from-right"
+  - button "Queries":
+    - img "arrow"
+    - generic: Queries
+  - button "Table":
+    - img "table"
+    - generic: Table
+  - button "Collapse query row" [expanded]:
+  - button "A":
+    - generic: A
+  - emphasis: (Tempo)
+  - button "Show data source help":
+  - button "Duplicate query":
+  - button "Hide response":
+  - button "Remove query":
+  - button "Drag and drop to reorder":
+    - img "Drag and drop to reorder"
+  - generic: Query type
+  - radiogroup:
+    - radio "Search"
+    - generic "Search":
+      - generic: Search
+    - radio "TraceQL" [checked]
+    - generic "TraceQL":
+      - generic: TraceQL
+    - radio "Trace ID"
+    - generic "Trace ID":
+      - generic: Trace ID
+    - radio "Service Graph"
+    - generic "Service Graph":
+      - generic: Service Graph
+  - button "Import trace":
+    - generic: Import trace
+  - text: Build complex queries using TraceQL to select a list of traces.
+  - link "Documentation":
+    - /url: https://grafana.com/docs/tempo/latest/traceql/
+    - text: Documentation
+  - code:
+    - generic: "{ resource.service.name = \"booking-service\" && name = \"booking.accept-payment.v1 process\" }"
+    - textbox "Editor content;Press Alt+F1 for Accessibility Options.": "{ resource.service.name = \"booking-service\" && name = \"booking.accept-payment.v1 process\" }"
+  - 'button "Search Options Limit: 50 Spans Limit: 3 Table Format: Traces | Streaming: Disabled"':
+  - heading "Search Options" [level=6]
+  - generic: "Limit: 50"
+  - generic: "Spans Limit: 3"
+  - generic: "Table Format: Traces"
+  - generic: "|"
+  - generic: "Streaming: Disabled"
+  - 'button "Metrics Options Step: auto Type: Range | Streaming: Disabled"':
+  - heading "Metrics Options" [level=6]
+  - generic: "Step: auto"
+  - generic: "Type: Range"
+  - generic: "|"
+  - generic: "Streaming: Disabled"
+  - button "Add query":
+    - generic: Add query
+  - button "Query history":
+    - generic: Query history
+  - button "Query inspector":
+    - generic: Query inspector
+  - main:
+    - region "Table - Traces":
+      - heading "Table - Traces" [level=2]
+      - treegrid:
+        - row "Expand nested rows Trace ID Start time Service Name Duration":
+          - columnheader "Expand nested rows":
+            - generic: Expand nested rows
+          - columnheader "Trace ID":
+            - button "Trace ID"
+          - columnheader "Start time":
+            - button "Start time"
+          - columnheader "Service":
+            - button "Service"
+          - columnheader "Name":
+            - button "Name"
+          - columnheader "Duration":
+            - button "Duration"
+        - row "Expand row 412208096cd37f2357f009534f0b7b0c 2026-11-13 15:31:53 payment-service PaymentWorker.publishOutbox 62 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "412208096cd37f2357f009534f0b7b0c":
+            - link "412208096cd37f2357f009534f0b7b0c":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794558118000%22%2C%22to%22%3A%221794558717999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22412208096cd37f2357f009534f0b7b0c%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 15:31:53"
+          - gridcell "payment-service"
+          - gridcell "PaymentWorker.publishOutbox"
+          - gridcell "62 ms"
+        - row "Expand row 4c3962f07d41f26a065578f2d50f4fca 2026-11-13 15:31:45 payment-service PaymentWorker.publishOutbox 25 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "4c3962f07d41f26a065578f2d50f4fca":
+            - link "4c3962f07d41f26a065578f2d50f4fca":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794558118000%22%2C%22to%22%3A%221794558717999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%224c3962f07d41f26a065578f2d50f4fca%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 15:31:45"
+          - gridcell "payment-service"
+          - gridcell "PaymentWorker.publishOutbox"
+          - gridcell "25 ms"
+        - row "Expand row 416531052dbb4565fc62d30bf9005684 2026-11-13 15:31:35 payment-service PaymentWorker.publishOutbox 94 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "416531052dbb4565fc62d30bf9005684":
+            - link "416531052dbb4565fc62d30bf9005684":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794558118000%22%2C%22to%22%3A%221794558717999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22416531052dbb4565fc62d30bf9005684%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 15:31:35"
+          - gridcell "payment-service"
+          - gridcell "PaymentWorker.publishOutbox"
+          - gridcell "94 ms"
+        - row "Expand row 1ad08a233eb1dfa4fb85612be210d07e 2026-11-13 15:31:31 payment-service PaymentWorker.publishOutbox 64 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "1ad08a233eb1dfa4fb85612be210d07e":
+            - link "1ad08a233eb1dfa4fb85612be210d07e":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794558118000%22%2C%22to%22%3A%221794558717999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%221ad08a233eb1dfa4fb85612be210d07e%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 15:31:31"
+          - gridcell "payment-service"
+          - gridcell "PaymentWorker.publishOutbox"
+          - gridcell "64 ms"
+        - row "Expand row 3f557b6451b13d0e25104fa18b0ab8d5 2026-11-13 15:31:28 payment-service PaymentWorker.publishOutbox 38 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "3f557b6451b13d0e25104fa18b0ab8d5":
+            - link "3f557b6451b13d0e25104fa18b0ab8d5":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794558118000%22%2C%22to%22%3A%221794558717999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%223f557b6451b13d0e25104fa18b0ab8d5%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 15:31:28"
+          - gridcell "payment-service"
+          - gridcell "PaymentWorker.publishOutbox"
+          - gridcell "38 ms"
+        - row "Expand row c5cf9d6bad5e6e915dda8b046cb85c4 2026-11-13 15:31:17 payment-service PaymentWorker.publishOutbox 289 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "c5cf9d6bad5e6e915dda8b046cb85c4":
+            - link "c5cf9d6bad5e6e915dda8b046cb85c4":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794558118000%22%2C%22to%22%3A%221794558717999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22c5cf9d6bad5e6e915dda8b046cb85c4%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 15:31:17"
+          - gridcell "payment-service"
+          - gridcell "PaymentWorker.publishOutbox"
+          - gridcell "289 ms"
+        - row "Expand row 18bc08dd3adface2fea17c09bdcb463c 2026-11-13 15:30:46 payment-service PaymentWorker.publishOutbox 48 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "18bc08dd3adface2fea17c09bdcb463c":
+            - link "18bc08dd3adface2fea17c09bdcb463c":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794558118000%22%2C%22to%22%3A%221794558717999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%2218bc08dd3adface2fea17c09bdcb463c%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 15:30:46"
+          - gridcell "payment-service"
+          - gridcell "PaymentWorker.publishOutbox"
+          - gridcell "48 ms"
+        - row "Expand row 5ae07d9cd52c5a3d8a798d5e84e4881e 2026-11-13 15:30:29 payment-service PaymentWorker.publishOutbox 30 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "5ae07d9cd52c5a3d8a798d5e84e4881e":
+            - link "5ae07d9cd52c5a3d8a798d5e84e4881e":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794558118000%22%2C%22to%22%3A%221794558717999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%225ae07d9cd52c5a3d8a798d5e84e4881e%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 15:30:29"
+          - gridcell "payment-service"
+          - gridcell "PaymentWorker.publishOutbox"
+          - gridcell "30 ms"
+        - row "Expand row 115917e9c93b618a8d796f32d5608d7e 2026-11-13 15:30:26 payment-service PaymentWorker.publishOutbox 51 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "115917e9c93b618a8d796f32d5608d7e":
+            - link "115917e9c93b618a8d796f32d5608d7e":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794558118000%22%2C%22to%22%3A%221794558717999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22115917e9c93b618a8d796f32d5608d7e%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 15:30:26"
+          - gridcell "payment-service"
+          - gridcell "PaymentWorker.publishOutbox"
+          - gridcell "51 ms"
+        - row "Expand row 29ef88c80ad59a4bad1ae7c1a5d0acf4 2026-11-13 15:30:10 payment-service PaymentWorker.publishOutbox 38 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "29ef88c80ad59a4bad1ae7c1a5d0acf4":
+            - link "29ef88c80ad59a4bad1ae7c1a5d0acf4":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794558118000%22%2C%22to%22%3A%221794558717999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%2229ef88c80ad59a4bad1ae7c1a5d0acf4%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 15:30:10"
+          - gridcell "payment-service"
+          - gridcell "PaymentWorker.publishOutbox"
+          - gridcell "38 ms"
+        - row "Expand row 3bdbb321fda1c29fc856c165b76a0d4d 2026-11-13 15:29:56 payment-service PaymentWorker.publishOutbox 33 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "3bdbb321fda1c29fc856c165b76a0d4d":
+            - link "3bdbb321fda1c29fc856c165b76a0d4d":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794558118000%22%2C%22to%22%3A%221794558717999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%223bdbb321fda1c29fc856c165b76a0d4d%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 15:29:56"
+          - gridcell "payment-service"
+          - gridcell "PaymentWorker.publishOutbox"
+          - gridcell "33 ms"
+        - row "Expand row ba786df5b2cdcaa8225d6c5834f222 2026-11-13 15:29:51 payment-service PaymentWorker.publishOutbox 24 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "ba786df5b2cdcaa8225d6c5834f222":
+            - link "ba786df5b2cdcaa8225d6c5834f222":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794558118000%22%2C%22to%22%3A%221794558717999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22ba786df5b2cdcaa8225d6c5834f222%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 15:29:51"
+          - gridcell "payment-service"
+          - gridcell "PaymentWorker.publishOutbox"
+          - gridcell "24 ms"
+        - row "Expand row 3be168b886ecfb3828378f601165a649 2026-11-13 15:29:37 payment-service PaymentWorker.publishOutbox 53 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "3be168b886ecfb3828378f601165a649":
+            - link "3be168b886ecfb3828378f601165a649":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794558118000%22%2C%22to%22%3A%221794558717999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%223be168b886ecfb3828378f601165a649%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 15:29:37"
+          - gridcell "payment-service"
+          - gridcell "PaymentWorker.publishOutbox"
+          - gridcell "53 ms"
+        - row "Expand row 169fd30083a916abdabeeb4c467d3e87 2026-11-13 15:29:34 payment-service PaymentWorker.publishOutbox 55 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "169fd30083a916abdabeeb4c467d3e87":
+            - link "169fd30083a916abdabeeb4c467d3e87":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794558118000%22%2C%22to%22%3A%221794558717999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22169fd30083a916abdabeeb4c467d3e87%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 15:29:34"
+          - gridcell "payment-service"
+          - gridcell "PaymentWorker.publishOutbox"
+          - gridcell "55 ms"
+        - row "Expand row 8f913fd5b121e2710fd633146d60434 2026-11-13 15:29:23 payment-service PaymentWorker.publishOutbox 25 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "8f913fd5b121e2710fd633146d60434":
+            - link "8f913fd5b121e2710fd633146d60434":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794558118000%22%2C%22to%22%3A%221794558717999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%228f913fd5b121e2710fd633146d60434%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 15:29:23"
+          - gridcell "payment-service"
+          - gridcell "PaymentWorker.publishOutbox"
+          - gridcell "25 ms"
+        - row "Expand row 5cdbe3034bf0abbf4b4c9806f37a355a 2026-11-13 15:29:20 payment-service PaymentWorker.publishOutbox 37 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "5cdbe3034bf0abbf4b4c9806f37a355a":
+            - link "5cdbe3034bf0abbf4b4c9806f37a355a":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794558118000%22%2C%22to%22%3A%221794558717999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%225cdbe3034bf0abbf4b4c9806f37a355a%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 15:29:20"
+          - gridcell "payment-service"
+          - gridcell "PaymentWorker.publishOutbox"
+          - gridcell "37 ms"
+        - row "Expand row 17e6a33bb131fcc6be0ae120e787f104 2026-11-13 15:29:14 payment-service PaymentWorker.publishOutbox 25 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "17e6a33bb131fcc6be0ae120e787f104":
+            - link "17e6a33bb131fcc6be0ae120e787f104":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794558118000%22%2C%22to%22%3A%221794558717999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%2217e6a33bb131fcc6be0ae120e787f104%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 15:29:14"
+          - gridcell "payment-service"
+          - gridcell "PaymentWorker.publishOutbox"
+          - gridcell "25 ms"
+- log
+- alert
+- alert
+- complementary
+- complementary

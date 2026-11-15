@@ -1,0 +1,124 @@
+{
+ "queries": [
+  {
+   "panel": 31,
+   "kho": "prometheus",
+   "trang_thai": "rong",
+   "so_dong": 0,
+   "utc": "2026-11-14T01:37:23Z",
+   "tu_utc": "2026-11-13T09:55:52.000Z",
+   "den_loai_tru": "2026-11-13T10:05:52.000Z",
+   "dien_giai": "Truy v?n th?nh c?ng, kh?ng c? d? li?u kh?p trong c?a s? ? kho hi?n t?i; ch?a x?c ??nh nguy?n nh?n r?ng.",
+   "loi": "",
+   "request": {
+    "refId": "31_A",
+    "datasource": {
+     "type": "prometheus",
+     "uid": "prometheus"
+    },
+    "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"payment_db\"}[1m]))",
+    "legendFormat": "{{http_request_method}} {{http_route}}",
+    "range": true,
+    "intervalMs": 15000,
+    "maxDataPoints": 1000
+   }
+  },
+  {
+   "panel": 32,
+   "kho": "prometheus",
+   "trang_thai": "rong",
+   "so_dong": 0,
+   "utc": "2026-11-14T01:37:23Z",
+   "tu_utc": "2026-11-13T09:55:52.000Z",
+   "den_loai_tru": "2026-11-13T10:05:52.000Z",
+   "dien_giai": "Truy v?n th?nh c?ng, kh?ng c? d? li?u kh?p trong c?a s? ? kho hi?n t?i; ch?a x?c ??nh nguy?n nh?n r?ng.",
+   "loi": "",
+   "request": {
+    "refId": "32_A",
+    "datasource": {
+     "type": "prometheus",
+     "uid": "prometheus"
+    },
+    "expr": "histogram_quantile(0.9, sum by (le, http_request_method, http_route) (rate(http_server_request_duration_seconds_bucket{service_name=\"payment_db\"}[1m])))",
+    "legendFormat": "{{http_request_method}} {{http_route}}",
+    "range": true,
+    "intervalMs": 15000,
+    "maxDataPoints": 1000
+   }
+  },
+  {
+   "panel": 33,
+   "kho": "prometheus",
+   "trang_thai": "rong",
+   "so_dong": 0,
+   "utc": "2026-11-14T01:37:23Z",
+   "tu_utc": "2026-11-13T09:55:52.000Z",
+   "den_loai_tru": "2026-11-13T10:05:52.000Z",
+   "dien_giai": "Truy v?n th?nh c?ng, kh?ng c? d? li?u kh?p trong c?a s? ? kho hi?n t?i; ch?a x?c ??nh nguy?n nh?n r?ng.",
+   "loi": "",
+   "request": {
+    "refId": "33_A",
+    "datasource": {
+     "type": "prometheus",
+     "uid": "prometheus"
+    },
+    "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"payment_db\", http_response_status_code=~\"5..\"}[1m]))",
+    "legendFormat": "{{http_request_method}} {{http_route}}",
+    "range": true,
+    "intervalMs": 15000,
+    "maxDataPoints": 1000
+   }
+  },
+  {
+   "panel": 34,
+   "kho": "tempo",
+   "trang_thai": "rong",
+   "so_dong": 0,
+   "utc": "2026-11-14T01:37:23Z",
+   "tu_utc": "2026-11-13T09:55:52.000Z",
+   "den_loai_tru": "2026-11-13T10:05:52.000Z",
+   "dien_giai": "Truy v?n th?nh c?ng, kh?ng c? d? li?u kh?p trong c?a s? ? kho hi?n t?i; ch?a x?c ??nh nguy?n nh?n r?ng.",
+   "loi": "",
+   "request": {
+    "refId": "34_A",
+    "datasource": {
+     "type": "tempo",
+     "uid": "tempo"
+    },
+    "queryType": "traceql",
+    "query": "{resource.service.name=\"payment_db\"}",
+    "limit": 50,
+    "tableType": "traces",
+    "intervalMs": 15000,
+    "maxDataPoints": 1000
+   }
+  },
+  {
+   "panel": 35,
+   "kho": "loki",
+   "trang_thai": "rong",
+   "so_dong": 0,
+   "utc": "2026-11-14T01:37:23Z",
+   "tu_utc": "2026-11-13T09:55:52.000Z",
+   "den_loai_tru": "2026-11-13T10:05:52.000Z",
+   "dien_giai": "Truy v?n th?nh c?ng, kh?ng c? d? li?u kh?p trong c?a s? ? kho hi?n t?i; ch?a x?c ??nh nguy?n nh?n r?ng.",
+   "loi": "",
+   "request": {
+    "refId": "35_A",
+    "datasource": {
+     "type": "loki",
+     "uid": "loki"
+    },
+    "expr": "{service_name=\"payment_db\"} |~ \"(?i)error|exception|warn\"",
+    "queryType": "range",
+    "maxLines": 200,
+    "intervalMs": 15000,
+    "maxDataPoints": 1000
+   }
+  }
+ ],
+ "window": [
+  1794563752000,
+  1794564351999
+ ]
+}

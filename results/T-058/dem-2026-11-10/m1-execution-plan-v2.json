@@ -1,0 +1,86 @@
+{
+  "version": 2,
+  "frozen_utc": "2026-11-10T21:52:40.031190+00:00",
+  "amendment": "Sửa sau khi thấy OOM, trước khi có đầu ra M1, theo STEER #4. Không đổi phương pháp P7 hoặc ngưỡng theo kết quả.",
+  "previous_plan": {
+    "path": "m1-execution-plan.json",
+    "sha256": "6f55f03f583e82cc73577e9afaeb09f5fd5cf61442b68a3b021f3660bb623b3b",
+    "status": "preserved; both planned cases canceled; no M1 output produced"
+  },
+  "observations": [
+    "Booking cgroup OOM in both C3 phases; they are not clean baseline windows",
+    "Original t=21:35 window also not used as a clean control per STEER #4"
+  ],
+  "recovery_confirmed_utc": "2026-11-10T21:50:53.940859+00:00",
+  "limits_after": {
+    "discovery-server": [
+      "384m",
+      "768m"
+    ],
+    "keycloak": [
+      "768m",
+      "1536m"
+    ],
+    "event-service": [
+      "512m",
+      "1g"
+    ],
+    "booking-service": [
+      "512m",
+      "1g"
+    ],
+    "payment-service": [
+      "512m",
+      "1g"
+    ]
+  },
+  "stability_rule": "Require no unexpected restart/cgroup OOM and all scheduled load responses 200 from recovery through 10 minute settling and normal method window; otherwise reject the clean-control interpretation and do not inject into an unstable system",
+  "normal_start_rule": "ceil((recovery epoch + 600 seconds)/60)*60",
+  "planned_cases": [
+    {
+      "opaque_id": "c12e47ab",
+      "operator_only_role": "normal after memory repair",
+      "t": 1794348360,
+      "method_bounds_utc": [
+        "2026-11-10T22:01:00+00:00",
+        "2026-11-10T22:11:00+00:00"
+      ],
+      "raw_bounds_utc": [
+        "2026-11-10T21:56:00+00:00",
+        "2026-11-10T22:16:00+00:00"
+      ]
+    },
+    {
+      "opaque_id": "f4a8c021",
+      "operator_only_role": "one reversible process pause",
+      "component": "event-service",
+      "reason_for_component": "All three fixed read paths reach event-service; do not pause the service with cyclic unexplained OOM",
+      "scheduled_not_before_epoch": 1794349020,
+      "scheduled_not_before_utc": "2026-11-10T22:17:00+00:00",
+      "t_rule": "floor actual confirmed intervention epoch_ns/1e9; only t crosses to request.json",
+      "duration_seconds": 300
+    }
+  ],
+  "load_extension": {
+    "start_utc": "2026-11-10T22:15:00Z",
+    "seconds": 1200,
+    "rate": 1,
+    "output": "light-load-v2.jsonl",
+    "workers": 64,
+    "note": "The original 21:15-22:15 run remains unchanged; separate continuous extension to 22:35"
+  },
+  "freeze_rule": "Wait until each raw upper bound plus export flush; full raw inputs immutable and hashed",
+  "method_window_rule": "[t-300,t+300); unchanged P7 API and params; two identical repeat runs per pack",
+  "interpretation": "One probe plus one control, not SPEC 3+1; feasibility only; no accuracy or RQ5 claims",
+  "files_sha256": {
+    "src/m1/adapter_flashticket.py": "392026616108b5a97bb5f57df26be774f8469ff46d786526ea1dc05b8fdcdd20",
+    "stage-m1.py": "d3a97d4db5fef6397f210ee9d21dfc25a659d55e0c02871cdcc005d268abb430",
+    "run-m1.py": "7c8f731f0e8bba3bcae84cd5d7dabf14315ea92f4ca59bd94ff64d1614e9ab77",
+    "m1-p7-config.json": "eb7dddd705d50b7b184ad222950d18aec0b91b6b4d7607ba2ee61b8a1fdb4c68",
+    "m1-source-pins.json": "8aebdf2a74e07b60aaadc27d380b97d6d43cbedfcdc4526775a40295415290bd",
+    "flashticket-inventory-source.json": "7e09059caee66ed834454460f14ae442513a7597fe083b0e21075a5b148e6fb8",
+    "pause-probe-v2.py": "022679221be3ad04b1b68e6dbae61d9d1d6f0bd7730da3471d34851a0ccf4350",
+    "light-load-v2.py": "a87beef4396c2a05c9d20c238b816aaa42a69fb2ef14e4ba78cbd629a94d90eb",
+    "fix-jvm-memory.py": "f9293e4b83ee1672429c9eb7a33285db656e23e551b27a73ea17ed929b69bc6e"
+  }
+}

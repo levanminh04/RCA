@@ -1,0 +1,4 @@
+1. **Đã kiểm:** R5/R6 được xử lý đúng mức giới hạn; không có lỗi đáng kể mới. Đề xuất dừng lượt phản biện này, chưa nghiệm thu toàn T-063.
+2. **File:** chỉ tạo [REVIEW-3.md](D:/RCA-flashticket/tasks/T-063-quan-sat-thu-dev-2/REVIEW-3.md), có prompt bàn giao. Không commit, không đổi quyết định.
+3. **Kết quả kiểm:** 214/214 hash và 65/65 file trong manifest khớp; 13 cặp đầu ra P7 trùng; chuỗi sổ 127 dòng đúng. Truy lại Tempo xác nhận bốn span cha.
+4. **Còn mở:** bước thiếu span Payment, cơ chế cờ nền, ô lỗi H3/H4 và đầu ra hồ sơ còn thiếu. Minh vẫn cần quyết tập 12/13, cách báo FLASH-HEALTHY, quyền sửa hook H3 và nơi lưu gói.

@@ -1,0 +1,182 @@
+{
+ "goi_ca": "results\\T-063\\kiem-r\\krb4a3d5\\cases\\krb4a3d5",
+ "so_span": 279956,
+ "so_log": 11983,
+ "R": {
+  "R-01": {
+   "so_do": {
+    "span_theo_kind": {
+     "CLIENT": 156734,
+     "SERVER": 12920,
+     "CONSUMER": 1561,
+     "INTERNAL": 107180,
+     "PRODUCER": 1561
+    },
+    "client": 156734,
+    "client_co_dich": 153612,
+    "client_http": 6598,
+    "cap_client_server_khac_service": {
+     "api-gateway→booking-service": 2476,
+     "api-gateway→event-service": 2604,
+     "api-gateway→payment-service": 261,
+     "payment-service→booking-service": 261,
+     "payment-service→discovery-server": 80,
+     "api-gateway→ticket-service": 260,
+     "api-gateway→discovery-server": 80,
+     "user-service→discovery-server": 80,
+     "event-service→discovery-server": 80,
+     "ticket-service→discovery-server": 80,
+     "booking-service→discovery-server": 80,
+     "payment-service→keycloak": 7,
+     "event-service→keycloak": 3,
+     "booking-service→keycloak": 3,
+     "ticket-service→keycloak": 3
+    }
+   },
+   "dat": "THIEU",
+   "ly_do": "mọi CLIENT có server.address/peer và có cặp CLIENT→SERVER khác service"
+  },
+  "R-02": {
+   "so_do": {
+    "server": 12920,
+    "server_co_http_route": 12920,
+    "ten_span_chua_uuid": 0,
+    "vi_du_ten_chua_uuid": [],
+    "so_ten_server_khac_nhau": 23
+   },
+   "dat": "DAT",
+   "ly_do": "không tên span nào chứa UUID; ≥95% SERVER có http.route. Bảng ánh xạ B13→tên span: CHUA_KIEM (ngoài dữ liệu)"
+  },
+  "R-03": {
+   "so_do": {
+    "span_db_client": 147014,
+    "nhom_service_he_db_namespace_dich": {
+     "ticket-service | postgresql | ticket_db | 127.0.0.1:5432": 36261,
+     "payment-service | postgresql | payment_db | 127.0.0.1:5432": 32119,
+     "booking-service | postgresql | booking_db | 127.0.0.1:5432": 29486,
+     "event-service | postgresql | event_db | 127.0.0.1:15433": 29401,
+     "keycloak | postgresql | keycloak_db | postgres:5432": 8516,
+     "api-gateway | redis | None | 127.0.0.1:6379": 5641,
+     "booking-service | redis | None | 127.0.0.1:16379": 5390,
+     "user-service | mongodb | user_db | 127.0.0.1:27017": 120,
+     "user-service | mongodb | admin | 127.0.0.1:27017": 80
+    }
+   },
+   "dat": "DAT",
+   "ly_do": "span CLIENT có db.system, tên DB logic (trừ redis), địa chỉ instance. Bảng DB logic→instance→host theo thời gian: CHUA_KIEM"
+  },
+  "R-04": {
+   "so_do": {
+    "producer": 1561,
+    "consumer": 1561,
+    "consumer_co_queue": 1561,
+    "producer_co_exchange_routing": 1561,
+    "consumer_co_link": 0
+   },
+   "dat": "DAT",
+   "ly_do": "cần lưu lượng có message trong cửa sổ; tải đọc cố định T-062 có thể không sinh message"
+  },
+  "R-05": {
+   "so_do": {
+    "a_host_trace_log_metric": [
+     true,
+     true,
+     true
+    ],
+    "b_log_body_instance_ngoai_trace": {
+     "api-gateway": [],
+     "booking-service": [],
+     "ticket-service": []
+    },
+    "so_service_log_co_instance": 3,
+    "c_metric_instance": "metric dịch vụ không mang service_instance_id; metric DB có instance PostgreSQL chung (xem metric_db_instance), chưa nối theo loại thực thể",
+    "c_metric_instance_ngoai_trace": {},
+    "KHONG_KHOP_RESOURCE_LOG": {
+     "api-gateway": [
+      "api-gateway-1"
+     ],
+     "booking-service": [
+      "booking-service-1"
+     ],
+     "ticket-service": [
+      "ticket-service-1"
+     ]
+    }
+   },
+   "metric_db_instance": [
+    "booking_db@instance-20261111-0142:5432",
+    "event_db@instance-20261111-0142:5432",
+    "keycloak_db@instance-20261111-0142:5432",
+    "payment_db@instance-20261111-0142:5432",
+    "ticket_db@instance-20261111-0142:5432"
+   ],
+   "dat": "MOT_PHAN",
+   "ly_do": "(a) host trên trace/log/metric; (b) instanceId thân log B16 thuộc instance trace; (c) instance metric thuộc trace nếu có. Resource log lệch được báo riêng; bảng service→instance→host theo thời gian: CHUA_KIEM"
+  },
+  "R-06": {
+   "so_do": {
+    "log_ung_dung_B16": 11782,
+    "co_trace_span_id": 11782,
+    "span_ton_tai_trong_export": 11782,
+    "theo_service_[tong,co_traceId,noi_duoc]": {
+     "api-gateway": [
+      5601,
+      5601,
+      5601
+     ],
+     "booking-service": [
+      1815,
+      1815,
+      1815
+     ],
+     "ticket-service": [
+      4366,
+      4366,
+      4366
+     ]
+    }
+   },
+   "dat": "DAT",
+   "ly_do": "≥95% log có spanId nối được vào span có trong export (log runtime không request thì không có traceId — đúng chuẩn)"
+  },
+  "R-08": {
+   "so_do": {
+    "log_request_gateway": 5601,
+    "co_traceId": 5601,
+    "co_span_server_gateway": 5601
+   },
+   "dat": "DAT",
+   "ly_do": "mỗi request gateway (log B16) có đúng span SERVER gateway cùng trace. Drop của agent: CHUA_KIEM"
+  },
+  "R-09": {
+   "so_do": {
+    "span_co_parent_vang": 0,
+    "theo_service_kind": {},
+    "span_goc": 23504
+   },
+   "dat": "CHUA_KIEM",
+   "ly_do": "parent vắng có thể do biên cửa sổ đóng gói (span cha ngoài [t-600,t+600)); cần phân loại (a)(b)(c) theo B16 §3 — báo số, chưa quy cơ chế"
+  },
+  "R-10": {
+   "so_do": {
+    "service_version": {
+     "booking-service": "6b21ed55ecfef2217a90d23b560e44af2d425b36",
+     "ticket-service": "6b21ed55ecfef2217a90d23b560e44af2d425b36",
+     "keycloak": "776d9c9ecbb7e8b2226820852ed254b20946409b",
+     "event-service": "6b21ed55ecfef2217a90d23b560e44af2d425b36",
+     "payment-service": "6b21ed55ecfef2217a90d23b560e44af2d425b36",
+     "api-gateway": "6b21ed55ecfef2217a90d23b560e44af2d425b36",
+     "discovery-server": "6b21ed55ecfef2217a90d23b560e44af2d425b36",
+     "user-service": "6b21ed55ecfef2217a90d23b560e44af2d425b36"
+    }
+   },
+   "dat": "DAT",
+   "ly_do": "mọi service ứng dụng cùng một commit (results/T-062/ha-tang/A2-lan2-build-manifest.json có image id/commit)"
+  },
+  "R-07": {
+   "so_do": {},
+   "dat": "CHUA_KIEM",
+   "ly_do": "manifest lượt (commit, image, agent, sampling, đồng hồ, lịch tải, mốc tiêm) nằm ở ha-tang/, tai/may-tai.md, tiem-loi/so.jsonl; onset/hồi phục độc lập: đầu dò trong sổ — tổng hợp ở báo cáo B1"
+  }
+ }
+}

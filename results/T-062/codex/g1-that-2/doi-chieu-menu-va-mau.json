@@ -1,0 +1,623 @@
+[
+  {
+    "id": "e8661e0a",
+    "links": [
+      {
+        "text": "Tempo: trace của service ↗",
+        "datasource": "tempo",
+        "query": [
+          {
+            "queryType": "traceql",
+            "query": "{resource.service.name=\"event-service\"}",
+            "limit": 50,
+            "tableType": "traces",
+            "refId": "A",
+            "datasource": {
+              "type": "tempo",
+              "uid": "tempo"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794444870000",
+          "to": "1794445470000"
+        },
+        "windowOK": true
+      },
+      {
+        "text": "Loki: log của service ↗",
+        "datasource": "loki",
+        "query": [
+          {
+            "expr": "{service_name=\"event-service\"}",
+            "queryType": "range",
+            "refId": "A",
+            "datasource": {
+              "type": "loki",
+              "uid": "loki"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794444870000",
+          "to": "1794445470000"
+        },
+        "windowOK": true
+      },
+      {
+        "text": "Prometheus: số request mỗi giây theo route ↗",
+        "datasource": "prometheus",
+        "query": [
+          {
+            "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"event-service\"}[1m]))",
+            "range": true,
+            "refId": "A",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794444870000",
+          "to": "1794445470000"
+        },
+        "windowOK": true
+      }
+    ],
+    "nodes": 17,
+    "colorErrors": []
+  },
+  {
+    "id": "00eaea92",
+    "links": [
+      {
+        "text": "Tempo: trace của service ↗",
+        "datasource": "tempo",
+        "query": [
+          {
+            "queryType": "traceql",
+            "query": "{resource.service.name=\"payment-service\"}",
+            "limit": 50,
+            "tableType": "traces",
+            "refId": "A",
+            "datasource": {
+              "type": "tempo",
+              "uid": "tempo"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794442999000",
+          "to": "1794443599000"
+        },
+        "windowOK": true
+      },
+      {
+        "text": "Loki: log của service ↗",
+        "datasource": "loki",
+        "query": [
+          {
+            "expr": "{service_name=\"payment-service\"}",
+            "queryType": "range",
+            "refId": "A",
+            "datasource": {
+              "type": "loki",
+              "uid": "loki"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794442999000",
+          "to": "1794443599000"
+        },
+        "windowOK": true
+      },
+      {
+        "text": "Prometheus: số request mỗi giây theo route ↗",
+        "datasource": "prometheus",
+        "query": [
+          {
+            "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"payment-service\"}[1m]))",
+            "range": true,
+            "refId": "A",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794442999000",
+          "to": "1794443599000"
+        },
+        "windowOK": true
+      }
+    ],
+    "nodes": 17,
+    "colorErrors": []
+  },
+  {
+    "id": "bf17acbf",
+    "links": [
+      {
+        "text": "Tempo: trace của service ↗",
+        "datasource": "tempo",
+        "query": [
+          {
+            "queryType": "traceql",
+            "query": "{resource.service.name=\"booking-service\"}",
+            "limit": 50,
+            "tableType": "traces",
+            "refId": "A",
+            "datasource": {
+              "type": "tempo",
+              "uid": "tempo"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794441125000",
+          "to": "1794441725000"
+        },
+        "windowOK": true
+      },
+      {
+        "text": "Loki: log của service ↗",
+        "datasource": "loki",
+        "query": [
+          {
+            "expr": "{service_name=\"booking-service\"}",
+            "queryType": "range",
+            "refId": "A",
+            "datasource": {
+              "type": "loki",
+              "uid": "loki"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794441125000",
+          "to": "1794441725000"
+        },
+        "windowOK": true
+      },
+      {
+        "text": "Prometheus: số request mỗi giây theo route ↗",
+        "datasource": "prometheus",
+        "query": [
+          {
+            "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"booking-service\"}[1m]))",
+            "range": true,
+            "refId": "A",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794441125000",
+          "to": "1794441725000"
+        },
+        "windowOK": true
+      }
+    ],
+    "nodes": 17,
+    "colorErrors": []
+  },
+  {
+    "id": "f728fce2",
+    "links": [
+      {
+        "text": "Tempo: trace của service ↗",
+        "datasource": "tempo",
+        "query": [
+          {
+            "queryType": "traceql",
+            "query": "{resource.service.name=\"booking-service\"}",
+            "limit": 50,
+            "tableType": "traces",
+            "refId": "A",
+            "datasource": {
+              "type": "tempo",
+              "uid": "tempo"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794439254000",
+          "to": "1794439854000"
+        },
+        "windowOK": true
+      },
+      {
+        "text": "Loki: log của service ↗",
+        "datasource": "loki",
+        "query": [
+          {
+            "expr": "{service_name=\"booking-service\"}",
+            "queryType": "range",
+            "refId": "A",
+            "datasource": {
+              "type": "loki",
+              "uid": "loki"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794439254000",
+          "to": "1794439854000"
+        },
+        "windowOK": true
+      },
+      {
+        "text": "Prometheus: số request mỗi giây theo route ↗",
+        "datasource": "prometheus",
+        "query": [
+          {
+            "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"booking-service\"}[1m]))",
+            "range": true,
+            "refId": "A",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794439254000",
+          "to": "1794439854000"
+        },
+        "windowOK": true
+      }
+    ],
+    "nodes": 17,
+    "colorErrors": []
+  },
+  {
+    "id": "6c1a9fd8",
+    "links": [
+      {
+        "text": "Tempo: trace của service ↗",
+        "datasource": "tempo",
+        "query": [
+          {
+            "queryType": "traceql",
+            "query": "{resource.service.name=\"event-service\"}",
+            "limit": 50,
+            "tableType": "traces",
+            "refId": "A",
+            "datasource": {
+              "type": "tempo",
+              "uid": "tempo"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794437382000",
+          "to": "1794437982000"
+        },
+        "windowOK": true
+      },
+      {
+        "text": "Loki: log của service ↗",
+        "datasource": "loki",
+        "query": [
+          {
+            "expr": "{service_name=\"event-service\"}",
+            "queryType": "range",
+            "refId": "A",
+            "datasource": {
+              "type": "loki",
+              "uid": "loki"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794437382000",
+          "to": "1794437982000"
+        },
+        "windowOK": true
+      },
+      {
+        "text": "Prometheus: số request mỗi giây theo route ↗",
+        "datasource": "prometheus",
+        "query": [
+          {
+            "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"event-service\"}[1m]))",
+            "range": true,
+            "refId": "A",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794437382000",
+          "to": "1794437982000"
+        },
+        "windowOK": true
+      }
+    ],
+    "nodes": 17,
+    "colorErrors": []
+  },
+  {
+    "id": "2e2a5541",
+    "links": [
+      {
+        "text": "Tempo: trace của service ↗",
+        "datasource": "tempo",
+        "query": [
+          {
+            "queryType": "traceql",
+            "query": "{resource.service.name=\"booking-service\"}",
+            "limit": 50,
+            "tableType": "traces",
+            "refId": "A",
+            "datasource": {
+              "type": "tempo",
+              "uid": "tempo"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794435513000",
+          "to": "1794436113000"
+        },
+        "windowOK": true
+      },
+      {
+        "text": "Loki: log của service ↗",
+        "datasource": "loki",
+        "query": [
+          {
+            "expr": "{service_name=\"booking-service\"}",
+            "queryType": "range",
+            "refId": "A",
+            "datasource": {
+              "type": "loki",
+              "uid": "loki"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794435513000",
+          "to": "1794436113000"
+        },
+        "windowOK": true
+      },
+      {
+        "text": "Prometheus: số request mỗi giây theo route ↗",
+        "datasource": "prometheus",
+        "query": [
+          {
+            "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"booking-service\"}[1m]))",
+            "range": true,
+            "refId": "A",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794435513000",
+          "to": "1794436113000"
+        },
+        "windowOK": true
+      }
+    ],
+    "nodes": 17,
+    "colorErrors": []
+  },
+  {
+    "id": "a89954d1",
+    "links": [
+      {
+        "text": "Tempo: trace của service ↗",
+        "datasource": "tempo",
+        "query": [
+          {
+            "queryType": "traceql",
+            "query": "{resource.service.name=\"event-service\"}",
+            "limit": 50,
+            "tableType": "traces",
+            "refId": "A",
+            "datasource": {
+              "type": "tempo",
+              "uid": "tempo"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794433645000",
+          "to": "1794434245000"
+        },
+        "windowOK": true
+      },
+      {
+        "text": "Loki: log của service ↗",
+        "datasource": "loki",
+        "query": [
+          {
+            "expr": "{service_name=\"event-service\"}",
+            "queryType": "range",
+            "refId": "A",
+            "datasource": {
+              "type": "loki",
+              "uid": "loki"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794433645000",
+          "to": "1794434245000"
+        },
+        "windowOK": true
+      },
+      {
+        "text": "Prometheus: số request mỗi giây theo route ↗",
+        "datasource": "prometheus",
+        "query": [
+          {
+            "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"event-service\"}[1m]))",
+            "range": true,
+            "refId": "A",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794433645000",
+          "to": "1794434245000"
+        },
+        "windowOK": true
+      }
+    ],
+    "nodes": 17,
+    "colorErrors": []
+  },
+  {
+    "id": "1ad3afeb",
+    "links": [
+      {
+        "text": "Tempo: trace của service ↗",
+        "datasource": "tempo",
+        "query": [
+          {
+            "queryType": "traceql",
+            "query": "{resource.service.name=\"event-service\"}",
+            "limit": 50,
+            "tableType": "traces",
+            "refId": "A",
+            "datasource": {
+              "type": "tempo",
+              "uid": "tempo"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794431776000",
+          "to": "1794432376000"
+        },
+        "windowOK": true
+      },
+      {
+        "text": "Loki: log của service ↗",
+        "datasource": "loki",
+        "query": [
+          {
+            "expr": "{service_name=\"event-service\"}",
+            "queryType": "range",
+            "refId": "A",
+            "datasource": {
+              "type": "loki",
+              "uid": "loki"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794431776000",
+          "to": "1794432376000"
+        },
+        "windowOK": true
+      },
+      {
+        "text": "Prometheus: số request mỗi giây theo route ↗",
+        "datasource": "prometheus",
+        "query": [
+          {
+            "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"event-service\"}[1m]))",
+            "range": true,
+            "refId": "A",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794431776000",
+          "to": "1794432376000"
+        },
+        "windowOK": true
+      }
+    ],
+    "nodes": 17,
+    "colorErrors": []
+  },
+  {
+    "id": "a5539fba",
+    "links": [
+      {
+        "text": "Tempo: trace của service ↗",
+        "datasource": "tempo",
+        "query": [
+          {
+            "queryType": "traceql",
+            "query": "{resource.service.name=\"keycloak\"}",
+            "limit": 50,
+            "tableType": "traces",
+            "refId": "A",
+            "datasource": {
+              "type": "tempo",
+              "uid": "tempo"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794429904000",
+          "to": "1794430504000"
+        },
+        "windowOK": true
+      },
+      {
+        "text": "Loki: log của service ↗",
+        "datasource": "loki",
+        "query": [
+          {
+            "expr": "{service_name=\"keycloak\"}",
+            "queryType": "range",
+            "refId": "A",
+            "datasource": {
+              "type": "loki",
+              "uid": "loki"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794429904000",
+          "to": "1794430504000"
+        },
+        "windowOK": true
+      },
+      {
+        "text": "Prometheus: số request mỗi giây theo route ↗",
+        "datasource": "prometheus",
+        "query": [
+          {
+            "expr": "sum by (http_request_method, http_route) (rate(http_server_request_duration_seconds_count{service_name=\"keycloak\"}[1m]))",
+            "range": true,
+            "refId": "A",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            }
+          }
+        ],
+        "range": {
+          "from": "1794429904000",
+          "to": "1794430504000"
+        },
+        "windowOK": true
+      }
+    ],
+    "nodes": 17,
+    "colorErrors": []
+  }
+]

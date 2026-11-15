@@ -515,3 +515,164 @@ Minh: “LESSONS LÀ PHẢI CHUNG, SAO LẠI GHIM ?”; “GHI SL39, BỎ GHIM�
 ## Khép T-054, T-055, T-056; hoãn P8; mục tiêu FlashTicket 7 ngày, 09/11/2026
 
 Minh: “58 LÀ TRIỂN KHAI LLM CHO DEV ... TÔI MUỐN HOÃN PHẦN NÀY SANG PHẦN TIẾP THEO. T56 chạy xong chưa ? rồi thì khéo 3 task lại, trình kế hoạch tiếp theo, tôi muốn 7 ngày tới cần chạy được rca cho flash ticket bản đầu tiên”. Nghiệm thu ba task khi lượt kiểm lại cuối của Codex (T-054 đính chính 004, T-056 D6–D10) chưa làm; OPEN giữ nguyên. P8/LLM hoãn. Mục tiêu: RCA bản đầu chạy trên FlashTicket trong 7 ngày (tới 16/11/2026).
+
+## FlashTicket làm nguồn dữ liệu RCA — trả lời kế hoạch triển khai, 10/11/2026
+
+Minh trả lời các câu Q1–Q13 của `docs/techstack/PLAN-TRIEN-KHAI.md` §9 (chat 10/11/2026; chi tiết ở §9.1 file đó). Tiền và hạn: “đủ tiền đủ hạn để làm nên tôi không muốn nhắc đến vấn đề sợ không đủ dùng nữa , mạnh dạn đề xuất”. Grafana Cloud: “nếu không có tác dụng nhiều thì cứ tạm hoãn”. Q5, Q7, Q8: đồng ý (mã task T-058, T-059, T-060). Việc phía hệ thống (Q6): “tôi sẽ làm cái này, không đợi nhóm hệ thống”. Q9–Q12: “đồng ý đề xuất nhưng không yêu cầu cứng, có thể thay đổi”. Phương án P-E: “tôi thấy (P-E) hợp lý ... sau khi nghe bạn giải thích”; Q3 chưa trả lời. Luật 19: Minh nêu luật này dành cho khi chạy dữ liệu công khai; phát triển và thử tích hợp chạy local trước. Env và mật khẩu máy 84: “cần thì bảo tôi lấy ,đồ án chung chứ không phải private mà lo không có”. Máy 84 “chỉ là tạm thời, sau này có thể sẽ cân nhắc paid để dùng instance cao hơn”. Minh duyệt hai gói sửa plan (“duyệt Đề xuất sửa plan”; “Duyệt, ghi vào plan”): thêm P-F, chặng tới 16/11 theo §6.1, dựng `exp-app` bằng compose và script của nhóm theo digest, nginx chốt trước B5.
+
+## Phương án triển khai P-E và nơi demo phát hiện–chẩn đoán, 10/11/2026
+
+Minh: “chọn P-E nhé” (Q1) và “chốt demo phần phát hiện và chẩn đoán trên exp-app cộng exp-obs” (Q3). Máy 84 giữ chức năng bán vé. Minh duyệt ghi: “duyệt ghi decission” (chat 10/11/2026).
+
+## T-058 — chuyển sang Oracle ARM, cách B, lượt đêm do Codex làm, 11/11/2026
+
+Minh (chat 11/11/2026): “tôi quyết định sử dụng oracle , không dùng aws nữa”; “chọn cách B” (sửa CD của repo FlashTicket thành build đa kiến trúc; chưa làm, lượt đêm build ARM trực tiếp trên `exp-app`); “duyệt dùng codex ... model sol 6.1 high, cấp full access. bạn hãy điều phối vì bạn đã có đầy đủ ngữ cảnh ... nếu hết thì claude làm tiếp”; về kết quả lượt đêm: “duyệt ghi”. Hai máy: `exp-app` `129.221.208.47`, `exp-obs` `213.35.116.128` (Oracle A1, ARM). Chi tiết ở `tasks/T-058-ha-tang-rca-ban-dau/SPEC.md` mục đính chính và `results/T-058/thay-doi-ha-tang-2026-11-11.md`.
+
+## Giai đoạn 2 — CD đa kiến trúc đang làm, tạm dùng image ARM tự build, 11/11/2026
+
+Minh (chat 11/11/2026): “như mục chuyển x84 thì nhóm đang làm nhưng chưa có ngay nên tạm cứ dùng như hiện tại”; duyệt ghi: “duyệt ghi theo đề xuất”. Việc CD build đa kiến trúc (`docs/techstack/KE-HOACH-GIAI-DOAN-2.md` §4a, cách B ngày 11/11) do nhóm làm, chưa xong. Trong lúc chờ, `exp-app` tiếp tục chạy image ARM tự build từ đúng commit của máy 84 (`results/T-058/so-khac-phuc.md` KP-01).
+
+## T-059 — Duyệt sửa danh mục mức service sau phản biện, 11/11/2026
+
+Minh (chat 11/11/2026): “task 59 nếu không có bất đồng nào nữa thì duyệt sửa”. Codex đồng ý với Claude lượt 2 về gói danh mục mức service. Thêm cạnh Event→event_db ở đợt phát triển, giữ Booking→booking_db ở đợt đánh giá. Proxy JDBC Event nằm trong topology cố định của chiến dịch. Pool Event là ứng viên. Pause consumer phát vé chỉ dành đánh giá vì vị trí đã xác định là Ticket.
+
+Khai hỗn hợp tải chung cho mọi ô, mọi pha, các đêm nền và đối chứng khỏe. Ưu tiên đưa luồng thanh toán–phát vé và hoàn tiền vào hỗn hợp theo nhịp thấp nếu fixture cho phép. Hồ sơ riêng phải có đối chứng cùng lịch và báo riêng giới hạn nếu tập nút có dữ liệu làm lộ loại ca. Giữ quota Gateway hiện hành nếu đạt hai mức tải khỏe. Nếu phải dùng quota thử, trình riêng và chốt trước khóa, dùng cùng cấu hình ở phát triển và đánh giá. Chốt ngưỡng tải thực đến từng backend bằng số trước khi chạy lượt chấm. Báo mọi cảnh báo ở nhóm bị giới hạn và báo riêng mẫu số.
+
+Giữ chia theo ô. Các lần lặp hai mức tải của một ô đánh giá vẫn ở phía đánh giá và tính thêm vào dự toán. Nhãn pool, DB đích và tuyến JDBC theo điểm tiêm đã xác nhận. P59-1 là đề xuất riêng về chấm mức thao tác. Quyết định này duyệt sửa định nghĩa mức service, chưa nghiệm thu bảng đã ghi hoặc B4. Lý do tại WHY-80.
+
+## T-061 và nhánh G — lớp thao tác, gói sửa, nguồn dữ liệu G2, Infinity trên exp-obs, nghiệm thu T-059/T-061, 11/11/2026
+
+- **Lớp thao tác:** Minh: “đồng ý làm 1 trước”. Hướng 1 (hiển thị nút thao tác, cạnh cha–con quan sát được, trạng thái và cờ M1 đã tính) làm trước; hướng 2 (M1 xếp hạng thao tác) giữ ở mức ứng viên. Phần D của T-061 chưa duyệt SPEC.
+- **P59-1 (T-059):** Minh: “nếu không có phản đối nào thì duyệt ghi”. Ghi ứng viên nhãn thao tác vào danh mục; chỉ dùng cho chấm mức thao tác, không là đầu vào M1, không cần cho xếp hạng service hay hiển thị hướng 1.
+- **Gói C (T-061):** Minh: “Duyệt gói C”. Định dạng 0.2 (NO_EVIDENCE/ERROR/UNSUPPORTED, mốc lỗi từ `request.json`, chỉ chế độ a), phát lại kiểm đủ đợt theo `m1-launch-record.json`, nạp adapter từ byte đã kiểm, xóa file `.pyc` ghi ngoài phạm vi, thử Infinity cục bộ.
+- **Nguồn dữ liệu G2 và việc chấm:** Minh: “duyệt theo đề xuất”. Chọn Infinity; danh sách sự cố bằng file chỉ mục; việc chấm giữ bằng script đọc file đã băm, không làm trong Grafana. Chỉ chuyển PostgreSQL khi plugin không dùng được trên `exp-obs`, file chỉ mục không dùng được, hoặc G3 sinh sự cố liên tục tới mức file không quản lý nổi.
+- **Infinity trên exp-obs:** Minh: “duyệt việc 4”; “CLAUDE LÀM LUÔN, KHÔNG GỌI LẠI CODEX T58 NỮA”. Claude cài Infinity 4.1.6 (arm64) trên `exp-obs`, sửa `pinned/compose.json` phần grafana; hash cấu hình ghim T-058 đổi `c6be32e0…` → `684d39bd…`, ghi nhận trong repo (`results/T-061/exp-obs/README.md`, STATE), không báo Codex.
+- **Nghiệm thu:** Minh: “duyệt T59 61, DỌN DẸP STATE CHO ĐÚNG VÀ NGHIỆM THU”. T-059 và T-061 nghiệm thu khi lượt kiểm cuối chưa làm (T-059: Claude chưa kiểm bản ghi phiên 2–3; T-061: Codex chưa kiểm phiên 2). STATE dọn lại.
+
+Minh duyệt ghi: “duyệt ghi decision” (chat 11/11/2026).
+
+## Chiến dịch M1-FlashTicket — tải mua vé, quan sát, chọn M1, giao diện; quyền chạy xuyên suốt, 12–13/11/2026
+
+Ghi theo quyền Minh cấp trong gói chiến dịch (chỉ thêm mục mới, chép nguyên lời). Hồ sơ đầy đủ: `tasks/T-062-dem-chang-1-4/CHIEN-DICH-M1-FT.md`.
+
+- **Baseline:** Minh: “tôi chốt chỉ khi nào M1 hoàn thiện, tinh chỉnh và khóa thì mới mang ra so với baseline và chỉ chọn các baseline tiêu biểu, không chọn hết. chọn cái nào thì sau này quyết”.
+- **Tải chuẩn:** Minh: “rõ ràng là tôi yêu cầu làm đầy đủ”; “Đã duyệt bổ sung gói hoàn thiện tải chuẩn vào T-062, có luồng đặt vé và thanh toán”; “B1 — tải mua vé : việc này để claude lên kịch bản, claude điều phối”.
+- **Không thu lại theo từng commit; API lõi là đủ:** Minh: “không cần hoàn thiện đầy dủ các api vì đội hệ thống chưa làm kịp nhưng cần có các api core … không thể mỗi lần commit mới lại thu lại dữ liệu hàng tiếng đồng hồ được”.
+- **Một lần thu mỗi ca:** Minh: “Giữ một lần chạy cho mỗi ca ở giai đoạn này, chạy lặp để sau”.
+- **Thao tác nền:** Minh chọn: “Giữ tín hiệu và cách chạy hiện tại. Sau chạy, chỉ rõ thao tác nào khiến M1 gắn cờ. Đối chiếu mức thay đổi với ảnh hưởng giao dịch. Chú thích những trường hợp thao tác nền thay đổi nhỏ, với bằng chứng của từng ca. Kết quả thô của M1 vẫn được giữ.”
+- **Collector (KP-19):** Minh: “Docker ghi tên service vào từng dòng log, Collector đọc mọi file log và lấy service.name từ dòng log. làm theo như vậy”.
+- **CPU-BOOK:** Minh: “kiểm CPU từng container trước khi kết luận nguyên nhân lan chậm. Giảm cường độ là ứng viên, chưa đủ căn cứ chốt ngay quota 0,5.”
+- **Span cha rỗng và dữ liệu:** Minh: “các case có span parent rỗng thì cần kiểm luôn … nếu có thể thì bổ sung instrumentation , mục tiêu là làm dữ liệu dồi dào và đầy đủ cho rca nhất có thể, một phương án tốt chạy trên dữ liệu xấu thì cũng không có tác dụng”.
+- **B16:** Minh: “tôi cần agent tự phản biện lại b16 … cần đề xuất chu toàn hơn, tham khảo các best practice, tránh gây tech debt”.
+- **Mục tiêu chiến dịch:** Minh: “Lấy M1 bản P7 đã chọn và khóa trước đây làm nền để phát triển phiên bản thích nghi với FlashTicket, tập trung khai thác dữ liệu quan sát phong phú hơn của FlashTicket và xử lý những hạn chế bộc lộ khi áp dụng thực tế. Tôi muốn một chiến dịch làm việc liên tục, kết thúc bằng bản M1 đã tinh chỉnh mà Claude đề xuất chọn, kèm code chạy được, cấu hình, kết quả từng ca và bằng chứng vì sao giữ hoặc bỏ từng thay đổi, cùng với đó là dashboard. Claude điều phối nhiều session cho các việc độc lập, trực tiếp xử lý thiết kế phương pháp và phân tích cơ chế khó, giao việc vừa sức cho Codex dùng gpt-6.1-sol, reasoning high. Rà và thử đầy đủ các hướng có căn cứ, gồm đồ thị DB/cache/broker và cạnh phụ thuộc, JVM/pool/queue, thành phần “chết im”, thao tác nền và phân biệt tải tăng với sự cố, cùng những điều chỉnh khác được đề xuất rõ lý do. … Dùng lại kết quả hợp lệ, giữ một lần thu mỗi ca ở giai đoạn hiện tại và chạy nhiều biến thể trên dữ liệu đã lưu. Đề xuất cách chọn ứng viên trước khi chấm các biến thể, đo cả khả năng tìm đúng gốc lẫn kết luận ở ca khỏe, ghi rõ đánh đổi và giới hạn. Bản được chọn là ứng viên M1 cho FlashTicket để tôi xem xét tiếp.”
+- **Giao diện Grafana:** Minh: “Bổ sung nhánh hoàn thiện giao diện Grafana vào cùng chiến dịch phát triển M1 cho FlashTicket, giao Codex dùng gpt-6.1-sol, reasoning high thực hiện song song các phần độc lập. … Bổ sung luồng bấm một service để xem bảng và đồ thị các thao tác bên trong service, rồi mở bằng chứng của từng thao tác. … Codex cần kiểm thao tác thực trên trình duyệt và giữ bằng chứng kiểm. Claude chịu trách nhiệm điều phối, kiểm kết quả và gọi Codex tiếp tục khi hạn mức hồi, dựa trên checkpoint đã lưu.”
+- **Duyệt gói và lệnh ghi file (13/11):** Minh: “tổng thể đề xuất đã ổn, tuy nhiên tiếp thu các yếu tố bên dưới đây của codex , claude 4:00 sẽ hồi phục usage, nếu hết usage giữa chừng cần tự động làm tiếp khi usage hồi phục. codex lần reset tiếp theo là 2 giờ 30 phút nữa, tạo ghi đầy đủ tài liệu, mọi thông tin đã bàn bạc và đã chốt, đầy đủ ngữ cảnh, phiên dài nên yêu cầu ghi checkpoint đầy đủ để đề phòng nén context, soạn prompt cho phiên mới để tôi dán với đầy đủ ngữ cảnh, tôi sẽ gửi prompt và đi ngủ và chờ kết quả vào sàng mai”. Gói được duyệt là bản Claude trình sau hai lượt phản biện của Codex, cộng các điều chỉnh Codex nêu ở lượt ba (mốc 5 ngày chỉ để báo tiến độ; kết thúc tìm kiếm theo tiêu chí hoàn thành; quyền hoàn thiện đầu vào cho H1–H8; tự xử lý thiếu đầu vào trong quyền). Bốn hồ sơ: phụ lục 2 T-062 (Codex làm, Claude phản biện), T-063 (Claude làm, Codex phản biện), T-064 (Claude làm, Codex phản biện), T-065 (Codex làm, Claude phản biện).
+- **Vẫn giữ:** Minh: “Chưa merge production.” Không push `main`.
+- **Chưa có lời Minh riêng (Claude diễn giải, chờ xác nhận):** phạm vi thu bổ sung/thu lại; commit cục bộ ở mỗi mốc; thứ tự ưu tiên khi nhiều bản cùng đạt; bản triển khai lên `exp-app` trước khi đóng băng. Xem `CHIEN-DICH-M1-FT.md` mục 9.
+
+## Bổ sung quyền điều phối chiến dịch nhiều ngày, 13/11/2026
+
+Minh duyệt gói sửa bốn SPEC và bốn file điều phối đã trình trong chat, đồng thời yêu cầu prompt tiếp quản đầy đủ. Nguyên lời: “duyệt sửa, không ảnh hưởng đến plan chính nhé, sau đó soạn prompt đầy đủ chi tiết tôi chỉ việc dán mà không cần duyệt thẻm gì, cho claude toàn quyền điều phối và triển khai”.
+
+- Claude tự điều phối và triển khai tới M4 trong phạm vi chiến dịch đã cấp, giao việc, tiếp nhận lại khi hồi hạn mức và tổ chức kiểm/phản biện theo phân vai của các task. Các việc trong gói không chờ duyệt lại hoặc chờ Minh chuyển prompt giữa các phiên. Báo cáo sáng và mốc thời gian là cập nhật tiến độ, sau báo cáo tiếp tục phần trong quyền.
+- Claude tự quyết thu bổ sung/thu lại khi cần hoàn thiện đầu vào H1–H8 hoặc khắc phục lượt thu sai, sau khi rà khả năng dùng lại và xuất bù. Ghi phạm vi ảnh hưởng, lý do, chi phí và giữ các lượt cũ. Một lần thu chính mỗi ca, các lần lặp để sau.
+- Claude áp dụng tiêu chí chọn đã trình tại `results/T-064/tieu-chi-chon.md`, tự chọn biến thể, tổ hợp và ứng viên theo tiêu chí ấy. Việc đổi tiêu chí sau khi đã xem kết quả vẫn theo quyền tương ứng. Lựa chọn quan trọng được ghi WHY trước khi dùng vào kết quả.
+- Claude kiểm luồng lõi rồi tự chọn revision phù hợp trong nhánh `rca/quan-sat-log`, ghi lý do, commit, image và cấu hình trước khi đóng băng. Việc chưa commit repo RCA không chặn nghiên cứu, tiếp tục lưu bằng manifest và trình commit sau.
+- Các nhánh chạy theo đầu vào từng phần và kiểm tích hợp sau thay đổi có ảnh hưởng. Giữ mục tiêu H1–H8, mốc M0–M4, bản P7, tiêu chí chọn và các giới hạn hiện hành về production, code nghiệp vụ, dữ liệu khóa và ô đánh giá.
+
+Phạm vi cập nhật hồ sơ gồm `SPEC-PHU-LUC-2.md`, SPEC T-063/T-064/T-065 và `CHIEN-DICH-M1-FT.md`, `CHECKPOINT-CHIEN-DICH.md`, `PROMPT-PHIEN-MOI.md`, `LICH-TU-TIEP-NHAN.md` trong thư mục T-062. Bổ sung này giải quyết bốn mục chờ xác nhận của hồ sơ trước trong phạm vi nêu trên. Không phải duyệt nghiệm thu, khóa M1, mở test hay commit/push repo RCA.
+
+## Đánh thức Claude bằng lịch tự tiếp nhận, 13/11/2026
+
+Minh (chat, ~02:30Z 13/11): "codex đã đổi accout và khôi phục usage, tiếp tục giúp tôi , cho phép đánh thức claude, trước đó usage khôi phuc nhưng không thấy tự động làm việc tiếp".
+
+- Cho phép Claude tạo lịch tự tiếp nhận `m1ft-tiep-nhan` (ứng dụng Claude desktop, mỗi giờ phút 20–21, chế độ Auto) để tự làm tiếp chiến dịch khi hạn mức hồi. Đã tạo 02:33Z; prompt theo `tasks/T-062-dem-chang-1-4/LICH-TU-TIEP-NHAN.md`. Tắt: xóa trong ứng dụng, ghi "DỪNG LỊCH" vào checkpoint, hoặc tạo `D:/RCA-overnight/STOP`.
+- Codex đổi tài khoản, hạn mức hồi; Claude gọi tiếp phiên Codex L1 ngay.
+
+## Chạy bộ điều phối đợt thu trên `exp-obs`, 13/11/2026
+
+Minh (chat ~05:10Z 13/11, sau khi mạng laptop mất ~40 phút): "chưa phát đợt thu đúng không, vừa rồi tôi lỡ tắt mạng hơi lâu, bạn xem có gì ảnh hưởng không, tiếp tục giúp tôi, đảm bảo tính đúng đắn là trên hết, không chấp nhận rủi ro"; chọn phương án "Chuyển lên exp-obs (Khuyến nghị)" cho câu hỏi nơi chạy bộ điều phối.
+
+- Bộ điều phối đợt thu dev bản 2 chạy trên `exp-obs`, không phụ thuộc mạng laptop. Cho phép đặt khóa SSH tới `exp-app` và máy tải lên `exp-obs` trong thư mục riêng, quyền 600, chỉ dùng cho bộ điều phối; gỡ sau đợt thu.
+- Tính đúng đắn ưu tiên trên tiến độ; chạy thử ngắn trên máy chủ trước khi phát.
+
+## Tập chọn dev bản 2: nhận "Sửa sau 1", dùng 13 ca, 13/11/2026
+
+Minh (chat ~23:19Z 13/11, phiên `ed8b9c01…`), trả lời câu hỏi "Chấp nhận "Sửa sau 1" để PAUSE-PAYMENT vào tập chọn (13 ca)?": "Đồng ý, dùng 13 ca".
+
+- Nhận "Sửa sau 1" trong `results/T-063/chay/dieu-kien-xac-nhan.md`: pause được xác nhận khi cờ Paused cuối chuỗi `payment_state` là `true` ở t+60 và t+330. Kết quả hậu kiểm dùng là `results/T-063/chay/xac-nhan-ca-2.json` (13/13).
+- T-064 chọn trên tập 13 ca (tập B, `results/T-064/tap-chon-dev2-13.json`). Kết quả tập 12 ca giữ làm lịch sử, không xóa.
+- Không phải nghiệm thu T-063/T-064, không đổi tiêu chí chọn `results/T-064/tieu-chi-chon.md`.
+
+## Hook thử H3, folder Grafana, Codex kiểm giao diện qua Codex app, 14/11/2026
+
+Minh (chat ~03:55Z 14/11, phiên `ed8b9c01…`):
+- "cho codex kiểm giao diện được không, đánh giá độ khó của phần này, codex có thể truy cập và thao tác trên chrome nhé và tôi giao qua codex app."
+- "viết prompt cho codex, không tự giới hạn khả năng của codex nhé, cứ yêu cầu codex làm kiểm đủ, nếu không làm được thì codex tự báo sau, yêu cầu codex ghi báo cáo và note đầy đủ để bản giao cho claude, tránh thất thoát."
+- "duyệt Hook thử H3, về Folder Grafana thì bạn hãy tự đề xuất, miễn là trình bày lưu trữ khoa học, dễ xem"
+
+Ghi nhận:
+- **Hook thử H3:** duyệt sửa hook thử `RcaFaults.java` cho ô POOL-EVENT trên nhánh `rca/quan-sat-log` (vẫn không sửa code nghiệp vụ), để thu ô lỗi pool cho H3.
+- **Codex kiểm giao diện:** Codex (người làm T-065) bấm thật Grafana trên Chrome đã đăng nhập của Minh. Minh giao qua Codex app bằng brief `results/T-065/codex/L5-brief.md`. Claude vẫn là người phản biện T-065.
+- **Folder Grafana:** Minh giao Claude chọn cách sắp xếp. Cách chọn ghi trong brief L5. Việc này mở rộng phạm vi máy của T-065: được sửa `provider.yaml` và chuyển file dashboard đã có sang thư mục con trong thư mục provisioning, giữ nguyên UID và nội dung JSON của dashboard cũ, ghi hash trước/sau và cách hoàn tác.
+
+## Sửa cơ chế lịch tự tiếp nhận, 14/11/2026
+
+Minh (chat ~04:10Z 14/11, phiên `ed8b9c01…`), trả lời câu hỏi "Duyệt sửa lịch: dò 15 phút một lần và tiếp quản ngay khi chủ đã dừng?": "duyệt sửa lịch".
+Bối cảnh, lời Minh trước đó: "tôi muốn độ trễ nhỏ nhất nhưng cũng không dùng claude giám sát liên tục".
+
+- Lịch `m1ft-tiep-nhan` dò 15 phút một lần, thay cho mỗi giờ.
+- Mỗi lần dò chỉ đọc file nhỏ `tasks/T-062-dem-chang-1-4/DIEU-PHOI-TRANG-THAI.json`; chỉ đọc checkpoint khi tiếp quản.
+- Tiếp quản ngay khi phiên chủ đã dừng và không còn lệnh nền nào của chủ đang chạy, không chờ nhịp tim đủ 45 phút. Ngưỡng 45 phút chỉ còn là đường dự phòng khi file trạng thái thiếu hoặc hỏng.
+- Phiên điều phối phải cập nhật file trạng thái khi tiếp quản, khi phát lệnh nền dài, và trước khi kết thúc lượt (ghi `ket_luot` hoặc `cho_lenh_nen`).
+- Bản prompt cũ của lịch giữ ở `tasks/T-062-dem-chang-1-4/lich-skill-truoc-sua-2026-11-14.md`.
+
+## Thu bù 3 (T-063): nhận "Sửa sau 1" và "Sửa sau 2", 14/11/2026
+
+Minh (chat ~11:00Z 14/11, phiên `ed8b9c01…`), trả lời câu hỏi "Nhận "Sửa sau 1" và "Sửa sau 2" của đợt thu bù 3?": "Nhận cả hai".
+
+- Nhận hai sửa trong `results/T-063/thu3/dieu-kien-xac-nhan-3.md`, mục "Sửa sau — 14/11/2026 ~10:50Z":
+  - Sửa sau 1 (sửa cài đặt): C0 dùng đúng bộ ô không lỗi, gồm BINH-THUONG-X3.
+  - Sửa sau 2 (sửa điều kiện): ô RECREATE-PAY "phục hồi" = không có mẫu thô `httpcheck_error` nào trong [t + 180, t + 570], thay cho `query_range` bị lookback 5 phút.
+- Kết quả hậu kiểm dùng: `results/T-063/thu3/xac-nhan-ca-3-sua-sau.json` (6/6). Bản theo điều kiện khai trước `xac-nhan-ca-3.json` (4/6) giữ làm lịch sử, không xóa.
+- Hệ quả: BINH-THUONG-X3 (đối chứng cùng bậc tải cho ô H4) và RECREATE-PAY (ca thật cho H8-adapter) được dùng trong T-064. Hai sửa làm sau khi xem kết quả hậu kiểm; báo cáo phải ghi rõ điều này.
+- Không phải nghiệm thu T-063/T-064, không đổi tiêu chí chọn `results/T-064/tieu-chi-chon.md`.
+
+## Tập chấp nhận ô H4 CONSUMER-BOOK-SLOW-X3 (T-064): tính `broker`, báo kèm điểm khi không tính, 14/11/2026
+
+Minh (chat ~11:45Z 14/11, phiên `ed8b9c01…`; phiên đó chuyển sang phiên điều phối `local_feddcc0c` và giao phiên này ghi), trả lời câu hỏi "ca H4 `659a9dfb1ab0` có tính `broker` là đáp đúng ở bảng nút không? A = {booking-service, broker}; B = {booking-service}": "A, báo kèm điểm B".
+
+- Chấm chính theo A: tập chấp nhận nút của ô CONSUMER-BOOK-SLOW-X3 = {booking-service, broker} (cùng quy ước "tập chấp nhận chung {caller, callee}" của T-059 `label_rules` "Chấm cạnh" (2), như EVENT-DB-LAT). Bảng cạnh không đổi: chấm đúng cạnh booking-service → broker, loại message.
+- Báo thêm điểm theo B ({booking-service}) làm phép độ nhạy. Nếu A và B cho thứ tự chọn bản khác nhau, hồ sơ chọn phải nêu rõ.
+- Đây là sửa sau khai trước (`results/T-063/thu3/KE-HOACH.md` §2 ghi "booking-service; cạnh booking-service ↔ broker"), làm trước khi chấm biến thể; người làm đã thấy đầu ra P7 của ca này (booking hạng 1). Lý do và hệ quả: WHY-97.
+
+## Bản đề xuất cuối M1-FlashTicket (T-064): V082, 14/11/2026
+
+Minh (chat 14/11, giữa 16:12:41Z và 16:16:41Z — suy từ giờ ghi file ngay trước câu hỏi và ngay sau câu trả lời; phiên điều phối `local_feddcc0c`), trả lời câu hỏi "Chọn bản cuối nào cho M1-FlashTicket?" (hai phương án: V082 = H5b + H8s1 + H8a, đứng đầu §5; V071 = V082 + H1c, có đầu ra cạnh): "V082".
+
+- Bản đề xuất cuối: `V082-V066+H8a` (`results/T-064/cau-hinh-de-xuat.json`). V071 giữ làm bản thay thế có đầu ra cạnh trong `results/T-064/ban-xuat/chi-muc-ban.json`.
+- Trước đó Minh duyệt chạy V082 (chat trước 15:46Z): "chạy thêm tổ hợp H5b+H8s1+H8a mất khoảng 40 60 phút ? nếu vậy thì duyệt ?".
+- Không phải nghiệm thu T-064; độ nhạy dời mốc của V082 và phản biện cuối còn chờ. Lý do và giới hạn: WHY-98.
+
+## Sửa R9, R10 (T-064, REVIEW-4) và S1 (T-065, REVIEW-3), 15/11/2026
+
+Minh (chat phiên `ed8b9c01…` ngày 15/11 khoảng 02:10Z; phiên đó chuyển lời cho phiên điều phối `local_feddcc0c`, phiên điều phối ghi), trả lời câu hỏi "Duyệt sửa R9, R10 (T-064) và S1 (T-065)?": "Duyệt cả ba".
+
+- R9 (T-064): bộ xuất kênh liveness mới theo "lần dò mới nhất" đặt trong `results/T-064/kiem/`; không sửa `src/m1_ft` và bộ xuất đã ghim của T-063; ghi WHY-99. Xuất lại 6 gói của ca ebd5ef38 vào thư mục mới. Chạy lại 12 cặp: V061, V068–V072, V082 ở d = 0 và V082 ở 5 mốc dời. Chấm lại; lập bản kế tiếp cho chỉ mục xuất, cấu hình đề xuất, hồ sơ chọn §15–16 và manifest; giữ nguyên kết quả cũ.
+- R10 (T-064): thêm mục cơ chế cho ca 1e5a3dc5 và bảng chú thích nền, đối chiếu 7d1ee32f; chỉ dùng file đã có.
+- S1 (T-065): theo gói sửa trong LOG T-065 (lượt L9). Sửa Mục lục Grafana: V082 là đề xuất cuối, V071 là bản thay thế, `t065-l4-*` là lưu trữ. Chuyển hai file `t065-l4-*.json` vào "9 · Lưu trữ", giữ nguyên UID và byte; ghi hash trước/sau và cách hoàn tác; kiểm bằng API folders và một ảnh Mục lục. Nếu dùng Codex: gpt-6.1-sol, mức max; mỗi lúc một lượt Codex.
+- Trong lúc làm thấy cần làm khác đề xuất: dừng và trình lại.
+
+## M4 chiến dịch M1-FlashTicket: trả lời 9 câu hỏi, 15/11/2026
+
+Minh (chat phiên điều phối `local_feddcc0c`, 15/11/2026 khoảng 06:09Z), trả lời 9 câu hỏi M4 ở `tasks/T-064-m1-flashticket/LOG.md` mục "M4 — kết thúc phiên điều phối 5", kèm 5 ảnh U1: "Tôi đồng ý các đề xuất 1–8. T-065 nghiệm thu sau khi lưu ảnh S1 và bổ sung ảnh U1. Mục 9 lưu dữ liệu lớn tại [đường dẫn]; trình danh sách file trước khi commit/push."
+
+- (1) Dừng phản biện T-063 (thu3), T-064, T-065; nghiệm thu T-063 và T-064 với phần OPEN đã ghi; T-065 nghiệm thu sau khi lưu ảnh S1 (`results/T-065/kiem/009-s1-anh-minh/`) và ảnh U1 (`results/T-065/kiem/011-u1-anh-minh/`).
+- (2) Thứ tự §5 của `results/T-064/tieu-chi-chon.md` "xếp hạng nút trước K" là quy tắc chung.
+- (3) Hoàn tác image Event bản 3 trên exp-app về `ft-local/event-service:arm64-t062-6b21ed55`; giữ image bản 3 trong Docker.
+- (4) Xóa khóa SSH `exp-obs:~/rca-dieu-phoi/keys` (chiến dịch không thu thêm).
+- (5) Tắt lịch `m1ft-tiep-nhan` sau khi xử lý M4.
+- (6) T-065: S2 thêm câu "V082 vẫn dùng quan hệ E1/E2/E5 bên trong"; S3 giữ OPEN; S4 áp đính chính đã nhận vào báo cáo; R4 xác nhận hồi tố việc xóa folder Grafana `RCA` rỗng.
+- (7) FLASH-HEALTHY: giữ đếm thô trong K, báo nhóm riêng.
+- (8) Biến thể chịu được khởi phát muộn và phân xử H3/H4: để ngoài chiến dịch, mở task sau nếu cần.
+- (9) Dữ liệu lớn lưu ngoài git; đường dẫn Minh chưa ghi cụ thể (lời Minh còn "[đường dẫn]") — chờ Minh cho đường dẫn. Trình danh sách file trước khi commit/push.

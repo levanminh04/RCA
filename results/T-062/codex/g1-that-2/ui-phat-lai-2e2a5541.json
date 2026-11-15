@@ -1,0 +1,81 @@
+{
+  "id": "2e2a5541",
+  "url": "http://127.0.0.1:13000/d/rca-g2-phat-lai/rca-e28094-phat-lai-co-dap-an-g2?var-thu_muc=rca%2Fphat-lai&var-ca=2e2a5541&var-dv=booking-service&from=2026-11-11T22:08:33.000Z&to=2026-11-11T22:38:33.000Z&timezone=browser&var-dv_svc=booking-service&var-t_tu=1794435513000&var-t_den=1794436113000",
+  "panels": {
+    "3": "Sự cố đang xem: 2e2a5541\nMã sự cố\n2e2a5541\nKết luận của M1\nM1 thấy thành phần có bất thường tự sinh\nTrạng thái lượt M1\nchạy xong (OK)\nMốc sự cố\n2026-11-11 22:23:33 UTC (do bộ điều phối cấp)\nCửa sổ nền / sự cố\n22:18:33 → 22:23:33 UTC | 22:23:33 → 22:28:33 UTC\nM1 nghi là nguồn\n#1 booking-service, #2 keycloak, #3 payment-service\nBị kéo theo\n#4 api-gateway\nThiếu dữ liệu\nkhông có\nVùng nghi ngờ\ngốc: booking-service · cách 1: api-gateway, booking-service · cách 2: api-gateway, booking-service, keycloak, payment-service\nĐộ phủ\nM1 trả hạng cho 17/17 thành phần (kể cả nhóm bình thường xếp chung hạng); 14 cạnh gọi quan sát; 9 thành phần không có cạnh (DB, broker… M1 không thấy cạnh)\n◆ ĐÁP ÁN: root khai trước\nbooking-service\nHọ lỗi\nD9-06 — booking-service\nTập chấp nhận mức nút (◆ trên đồ thị)\nbooking-service\nHạng tốt nhất trong tập (theo e2, mức nút; không phải kết luận M1 định vị đúng cạnh)\n#1\nNhận xét phát lại\nĐáp án: booking-service (ô SLOW-BOOK, họ D9-06). Hạng tốt nhất trong tập chấp nhận ['booking-service']: #1. Hạng 1 của M1: booking-service.\nCảnh báo\nBản phát lại: đáp án ghép SAU khi kết quả cả đợt đã băm; không dùng để chẩn đoán trực tuyến.",
+    "4": "Đồ thị dịch vụ — sự cố 2e2a5541 (phát lại)\n#4\nbị kéo theo\napi-gateway\n\n#1\nnghi là nguồn\n◆ booking-service\n\n\nbình thường\nbooking_db\n\n\nbình thường\nbroker\n\n\nbình thường\ncache\n\n\nbình thường\nconfig-discovery\n\n\nbình thường\nevent-service\n\n\nbình thường\nevent_db\n\n#2\nnghi là nguồn\nkeycloak\n\n\nbình thường\nkeycloak_db\n\n\nbình thường\nmongodb-instance\n\n#3\nnghi là nguồn\npayment-service\n\n\nbình thường\npayment_db\n\n\nbình thường\npostgresql-shared-instance\n\n\nbình thường\nticket-service\n\n\nbình thường\nticket_db\n\n\nbình thường\nuser-service\n\nHạng (chữ trên nút)\nVai trò (chữ dưới nút)\nMàu theo vai trò",
+    "5": "Bảng hạng thành phần — sự cố 2e2a5541\nHạng\nThành phần (bấm để xem bằng chứng)\nVai trò\nĐồng hạng\nSố kênh có cờ\nVùng nghi ngờ\n#1\nbooking-service\nnghi là nguồn\n8\ngốc vùng nghi ngờ\n#2\nkeycloak\nnghi là nguồn\n1\ntrong vùng (cách 2)\n#3\npayment-service\nnghi là nguồn\n4\ntrong vùng (cách 2)\n#4\napi-gateway\nbị kéo theo\n2\ntrong vùng (cách 1)\nbooking_db\nbình thường\n0\nbroker\nbình thường\n0\ncache\nbình thường\n0\nconfig-discovery\nbình thường\n0\nevent-service\nbình thường\n0\nevent_db\nbình thường\n0\nkeycloak_db\nbình thường\n0\nmongodb-instance\nbình thường\n0\npayment_db\nbình thường\n0\npostgresql-shared-instance\nbình thường\n0\nticket-service\nbình thường\n0\nticket_db\nbình thường\n0",
+    "6": "Bằng chứng của booking-service — các kênh M1 gắn cờ\nKênh có cờ\nLoại\nHướng\nKiểu lan (E5)\nKhởi phát\nĐiểm s\nMở dữ liệu gốc\nĐơn vị M1\nGET /api/v1/orders/{orderId}\nthao tác (span)\ntăng ↑\nkhông lan\n22:23:33 UTC\n10767.059\nTempo ↗\nop|booking-service|GET /api/v1/orders/{orderId}\nSELECT booking_schema.tbl_order_items\nthao tác (span)\ntăng ↑\nkhông lan\n22:23:33 UTC\n126.918\nTempo ↗\nop|booking-service|SELECT booking_schema.tbl_order_items\nSELECT booking_schema.tbl_orders\nthao tác (span)\ntăng ↑\nkhông lan\n22:23:33 UTC\n251.981\nTempo ↗\nop|booking-service|SELECT booking_schema.tbl_orders\nworkload\nchỉ số (metric)\ngiảm ↓\nlan xuôi\n22:23:43 UTC\n0.711\nPrometheus ↗\nmetric|booking-service_workload\nTransaction.commit\nthao tác (span)\ntăng ↑\nkhông lan\n22:23:43 UTC\n130.000\nTempo ↗\nop|booking-service|Transaction.commit\nSELECT booking_schema.tbl_outbox_messages\nthao tác (span)\ntăng ↑\nkhông lan\n22:23:53 UTC\n29.693\nTempo ↗\nop|booking-service|SELECT booking_schema.tbl_outbox_messages\nlatency-50\nchỉ số (metric)\ntăng ↑\nlan ngược\n22:24:03 UTC\n17558.894\nPrometheus ↗\nmetric|booking-service_latency-50\nlatency-90\nchỉ số (metric)\ntăng ↑\nlan ngược\n22:24:03 UTC\n13092.682\nPrometheus ↗\nmetric|booking-service_latency-90",
+    "7": "Vì sao booking-service bị coi là kéo theo (giải thích E5 của M1)\nKênh của booking-service\nĐược giải thích bởi\nĐường lan\nQuy tắc E5\nTrạng thái\nlatency-50 ↑\nkeycloak: DELETE org.keycloak.models.jpa.entities.OutboxEntryEntity ↑\nbooking-service → keycloak\nlan ngược\náp dụng\nlatency-90 ↑\nkeycloak: DELETE org.keycloak.models.jpa.entities.OutboxEntryEntity ↑\nbooking-service → keycloak\nlan ngược\náp dụng\nworkload ↓\napi-gateway: latency-50 ↑\napi-gateway → booking-service\nlan xuôi\náp dụng\nworkload ↓\napi-gateway: latency-90 ↑\napi-gateway → booking-service\nlan xuôi\náp dụng"
+  },
+  "markers": [
+    {
+      "label": "Node: api-gateway",
+      "text": "#4bị kéo theoapi-gateway"
+    },
+    {
+      "label": "Node: ◆ booking-service",
+      "text": "#1nghi là nguồn◆ booking-service"
+    },
+    {
+      "label": "Node: booking_db",
+      "text": "bình thườngbooking_db"
+    },
+    {
+      "label": "Node: broker",
+      "text": "bình thườngbroker"
+    },
+    {
+      "label": "Node: cache",
+      "text": "bình thườngcache"
+    },
+    {
+      "label": "Node: config-discovery",
+      "text": "bình thườngconfig-discovery"
+    },
+    {
+      "label": "Node: event-service",
+      "text": "bình thườngevent-service"
+    },
+    {
+      "label": "Node: event_db",
+      "text": "bình thườngevent_db"
+    },
+    {
+      "label": "Node: keycloak",
+      "text": "#2nghi là nguồnkeycloak"
+    },
+    {
+      "label": "Node: keycloak_db",
+      "text": "bình thườngkeycloak_db"
+    },
+    {
+      "label": "Node: mongodb-instance",
+      "text": "bình thườngmongodb-instance"
+    },
+    {
+      "label": "Node: payment-service",
+      "text": "#3nghi là nguồnpayment-service"
+    },
+    {
+      "label": "Node: payment_db",
+      "text": "bình thườngpayment_db"
+    },
+    {
+      "label": "Node: postgresql-shared-instance",
+      "text": "bình thườngpostgresql-shared-instance"
+    },
+    {
+      "label": "Node: ticket-service",
+      "text": "bình thườngticket-service"
+    },
+    {
+      "label": "Node: ticket_db",
+      "text": "bình thườngticket_db"
+    },
+    {
+      "label": "Node: user-service",
+      "text": "bình thườnguser-service"
+    }
+  ]
+}

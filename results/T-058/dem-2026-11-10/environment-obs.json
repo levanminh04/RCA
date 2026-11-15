@@ -1,0 +1,325 @@
+{
+  "role": "obs",
+  "utc": "2026-11-10T22:33:00.228336+00:00",
+  "commands": [
+    {
+      "command": [
+        "uname",
+        "-a"
+      ],
+      "exit_code": 0,
+      "output": "Linux exp-obs 7.0.0-1013-oracle #13~24.04.1-Ubuntu SMP PREEMPT Fri Sep 25 09:43:58 UTC 2026 aarch64 aarch64 aarch64 GNU/Linux"
+    },
+    {
+      "command": [
+        "cat",
+        "/etc/os-release"
+      ],
+      "exit_code": 0,
+      "output": "PRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.5 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo"
+    },
+    {
+      "command": [
+        "nproc"
+      ],
+      "exit_code": 0,
+      "output": "2"
+    },
+    {
+      "command": [
+        "free",
+        "-m"
+      ],
+      "exit_code": 0,
+      "output": "total        used        free      shared  buff/cache   available\nMem:           10919        1425         429           5        9288        9493\nSwap:              0           0           0"
+    },
+    {
+      "command": [
+        "df",
+        "-h",
+        "/"
+      ],
+      "exit_code": 0,
+      "output": "Filesystem      Size  Used Avail Use% Mounted on\n/dev/sda1       135G   14G  122G  10% /"
+    },
+    {
+      "command": [
+        "docker",
+        "version"
+      ],
+      "exit_code": 0,
+      "output": "Client: Docker Engine - Community\n Version:           29.9.3\n API version:       1.56\n Go version:        go1.26.10\n Git commit:        5457199\n Built:             Tue Nov  3 21:41:21 2026\n OS/Arch:           linux/arm64\n Context:           default\n\nServer: Docker Engine - Community\n Engine:\n  Version:          29.9.3\n  API version:      1.56 (minimum version 1.40)\n  Go version:       go1.26.10\n  Git commit:       70efc0e\n  Built:            Tue Nov  3 21:41:21 2026\n  OS/Arch:          linux/arm64\n  Experimental:     false\n containerd:\n  Version:          v2.4.2\n  GitCommit:        b7a25261e029d68978bbf290df0a62fc819b3c51\n runc:\n  Version:          1.5.2\n  GitCommit:        v1.5.2-0-g29dd3dc2\n docker-init:\n  Version:          0.19.0\n  GitCommit:        de40ad0"
+    },
+    {
+      "command": [
+        "docker",
+        "compose",
+        "version"
+      ],
+      "exit_code": 0,
+      "output": "Docker Compose version v5.7.0"
+    },
+    {
+      "command": [
+        "chronyc",
+        "tracking"
+      ],
+      "exit_code": 0,
+      "output": "Reference ID    : 8E5B671A (26.103.91.142.hosted.by.hostdzire.com)\nStratum         : 3\nRef time (UTC)  : Tue Nov 10 22:31:08 2026\nSystem time     : 0.000002008 seconds fast of NTP time\nLast offset     : +0.000012730 seconds\nRMS offset      : 0.000299947 seconds\nFrequency       : 9.789 ppm slow\nResidual freq   : +0.000 ppm\nSkew            : 0.018 ppm\nRoot delay      : 0.005455294 seconds\nRoot dispersion : 0.000423767 seconds\nUpdate interval : 1030.8 seconds\nLeap status     : Normal"
+    },
+    {
+      "command": [
+        "sudo",
+        "iptables",
+        "-S",
+        "INPUT"
+      ],
+      "exit_code": 0,
+      "output": "-P INPUT ACCEPT\n-A INPUT -s 10.0.0.0/24 -j ACCEPT\n-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT\n-A INPUT -p icmp -j ACCEPT\n-A INPUT -i lo -j ACCEPT\n-A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT\n-A INPUT -j REJECT --reject-with icmp-host-prohibited"
+    },
+    {
+      "command": [
+        "sudo",
+        "iptables",
+        "-S",
+        "DOCKER-USER"
+      ],
+      "exit_code": 0,
+      "output": "-N DOCKER-USER"
+    },
+    {
+      "command": [
+        "sudo",
+        "ss",
+        "-ltnp"
+      ],
+      "exit_code": 0,
+      "output": "State  Recv-Q Send-Q Local Address:Port  Peer Address:PortProcess                                                   \nLISTEN 0      4096       127.0.0.1:13133      0.0.0.0:*    users:((\"otelcol-contrib\",pid=17822,fd=7))               \nLISTEN 0      4096      10.0.0.215:4318       0.0.0.0:*    users:((\"otelcol-contrib\",pid=17822,fd=13))              \nLISTEN 0      4096      10.0.0.215:4317       0.0.0.0:*    users:((\"otelcol-contrib\",pid=17822,fd=12))              \nLISTEN 0      4096       127.0.0.1:14317      0.0.0.0:*    users:((\"docker-proxy\",pid=17691,fd=8))                  \nLISTEN 0      4096         0.0.0.0:111        0.0.0.0:*    users:((\"rpcbind\",pid=749,fd=4),(\"systemd\",pid=1,fd=138))\nLISTEN 0      4096         0.0.0.0:22         0.0.0.0:*    users:((\"sshd\",pid=7776,fd=3),(\"systemd\",pid=1,fd=129))  \nLISTEN 0      4096      127.0.0.54:53         0.0.0.0:*    users:((\"systemd-resolve\",pid=7772,fd=17))               \nLISTEN 0      4096   127.0.0.53%lo:53         0.0.0.0:*    users:((\"systemd-resolve\",pid=7772,fd=15))               \nLISTEN 0      4096       127.0.0.1:9090       0.0.0.0:*    users:((\"docker-proxy\",pid=17984,fd=8))                  \nLISTEN 0      4096       127.0.0.1:8888       0.0.0.0:*    users:((\"otelcol-contrib\",pid=17822,fd=4))               \nLISTEN 0      4096      10.0.0.215:3000       0.0.0.0:*    users:((\"docker-proxy\",pid=17770,fd=8))                  \nLISTEN 0      4096       127.0.0.1:3100       0.0.0.0:*    users:((\"docker-proxy\",pid=17904,fd=8))                  \nLISTEN 0      4096       127.0.0.1:3200       0.0.0.0:*    users:((\"docker-proxy\",pid=17676,fd=8))                  \nLISTEN 0      4096            [::]:111           [::]:*    users:((\"rpcbind\",pid=749,fd=6),(\"systemd\",pid=1,fd=140))\nLISTEN 0      4096            [::]:22            [::]:*    users:((\"sshd\",pid=7776,fd=4),(\"systemd\",pid=1,fd=130))"
+    },
+    {
+      "command": [
+        "docker",
+        "ps",
+        "--format",
+        "{{.Names}} {{.Status}} {{.Ports}}"
+      ],
+      "exit_code": 0,
+      "output": "flash-ticket-obs-prometheus Up 2 hours 127.0.0.1:9090->9090/tcp\nflash-ticket-obs-loki Up 2 hours 127.0.0.1:3100->3100/tcp\nflash-ticket-obs-tempo Up 2 hours 127.0.0.1:3200->3200/tcp, 127.0.0.1:14317->4317/tcp\nflash-ticket-obs-grafana Up 2 hours 10.0.0.215:3000->3000/tcp\nflash-ticket-obs-collector Up 2 hours"
+    },
+    {
+      "command": [
+        "systemctl",
+        "is-enabled",
+        "docker",
+        "chrony",
+        "netfilter-persistent"
+      ],
+      "exit_code": 0,
+      "output": "enabled\nenabled\nenabled"
+    }
+  ],
+  "containers": [
+    {
+      "name": "/flash-ticket-obs-prometheus",
+      "image_id": "sha256:e04987641b57704f408e31f6373ba4138ecf27cb4a165d24aabb6c38fddd0f06",
+      "image_name": "prom/prometheus@sha256:e04987641b57704f408e31f6373ba4138ecf27cb4a165d24aabb6c38fddd0f06",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "OOMKilled": false,
+        "Restarting": false,
+        "StartedAt": "2026-11-10T20:37:15.416256314Z",
+        "Health": null
+      },
+      "restart_count": 0,
+      "memory_limit": 1610612736,
+      "ports": {
+        "9090/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "9090"
+          }
+        ]
+      }
+    },
+    {
+      "name": "/flash-ticket-obs-loki",
+      "image_id": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+      "image_name": "grafana/loki@sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "OOMKilled": false,
+        "Restarting": false,
+        "StartedAt": "2026-11-10T20:37:15.09200684Z",
+        "Health": null
+      },
+      "restart_count": 0,
+      "memory_limit": 1073741824,
+      "ports": {
+        "3100/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "3100"
+          }
+        ]
+      }
+    },
+    {
+      "name": "/flash-ticket-obs-tempo",
+      "image_id": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+      "image_name": "grafana/tempo@sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "OOMKilled": false,
+        "Restarting": false,
+        "StartedAt": "2026-11-10T20:37:14.55833181Z",
+        "Health": null
+      },
+      "restart_count": 0,
+      "memory_limit": 2147483648,
+      "ports": {
+        "3200/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "3200"
+          }
+        ],
+        "4317/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "14317"
+          }
+        ]
+      }
+    },
+    {
+      "name": "/flash-ticket-obs-grafana",
+      "image_id": "sha256:488984b716c0862639f91a698adbe2862677a5a07bad42da5f03f3030883b205",
+      "image_name": "grafana/grafana@sha256:488984b716c0862639f91a698adbe2862677a5a07bad42da5f03f3030883b205",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "OOMKilled": false,
+        "Restarting": false,
+        "StartedAt": "2026-11-10T20:37:14.757192024Z",
+        "Health": null
+      },
+      "restart_count": 0,
+      "memory_limit": 805306368,
+      "ports": {
+        "3000/tcp": [
+          {
+            "HostIp": "10.0.0.215",
+            "HostPort": "3000"
+          }
+        ]
+      }
+    },
+    {
+      "name": "/flash-ticket-obs-collector",
+      "image_id": "sha256:e40d61f10c9a617cca1ffd1be4d7e2b3a4b0f0001798ff07e58cabe82e618cea",
+      "image_name": "otel/opentelemetry-collector-contrib@sha256:e40d61f10c9a617cca1ffd1be4d7e2b3a4b0f0001798ff07e58cabe82e618cea",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "OOMKilled": false,
+        "Restarting": false,
+        "StartedAt": "2026-11-10T20:37:14.940671409Z",
+        "Health": null
+      },
+      "restart_count": 0,
+      "memory_limit": 805306368,
+      "ports": {}
+    },
+    {
+      "name": "/flash-ticket-lgtm",
+      "image_id": "sha256:72e05804790e6e0d8c0b70a6d5ff1f721ef7b203463374631e99aa3429bd0cf6",
+      "image_name": "grafana/otel-lgtm:0.40.0",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "OOMKilled": false,
+        "Restarting": false,
+        "StartedAt": "2026-11-10T19:57:36.707703701Z",
+        "Health": {
+          "Status": "unhealthy",
+          "FailingStreak": 1,
+          "Log": [
+            {
+              "Start": "2026-11-10T20:18:40.231434484Z",
+              "End": "2026-11-10T20:18:40.312784281Z",
+              "ExitCode": 0,
+              "Output": "Checking Grafana\nGrafana healthy\nChecking Loki\nLoki healthy\nChecking Tempo\nTempo healthy\nChecking Mimir\nMimir healthy\nChecking OTel Collector\nOTel Collector healthy\nAll running services healthy\n"
+            },
+            {
+              "Start": "2026-11-10T20:19:10.313401031Z",
+              "End": "2026-11-10T20:19:10.439029823Z",
+              "ExitCode": 0,
+              "Output": "Checking Grafana\nGrafana healthy\nChecking Loki\nLoki healthy\nChecking Tempo\nTempo healthy\nChecking Mimir\nMimir healthy\nChecking OTel Collector\nOTel Collector healthy\nAll running services healthy\n"
+            },
+            {
+              "Start": "2026-11-10T20:19:40.441652672Z",
+              "End": "2026-11-10T20:19:40.507268596Z",
+              "ExitCode": 0,
+              "Output": "Checking Grafana\nGrafana healthy\nChecking Loki\nLoki healthy\nChecking Tempo\nTempo healthy\nChecking Mimir\nMimir healthy\nChecking OTel Collector\nOTel Collector healthy\nAll running services healthy\n"
+            },
+            {
+              "Start": "2026-11-10T20:20:10.507962729Z",
+              "End": "2026-11-10T20:20:10.572537846Z",
+              "ExitCode": 0,
+              "Output": "Checking Grafana\nGrafana healthy\nChecking Loki\nLoki healthy\nChecking Tempo\nTempo healthy\nChecking Mimir\nMimir healthy\nChecking OTel Collector\nOTel Collector healthy\nAll running services healthy\n"
+            },
+            {
+              "Start": "2026-11-10T20:20:40.573561292Z",
+              "End": "2026-11-10T20:20:40.636936036Z",
+              "ExitCode": 1,
+              "Output": "Checking Grafana\nGrafana not running (skipping)\nChecking Loki\nLoki unhealthy\n"
+            }
+          ]
+        }
+      },
+      "restart_count": 0,
+      "memory_limit": 6442450944,
+      "ports": {
+        "3000/tcp": [
+          {
+            "HostIp": "10.0.0.215",
+            "HostPort": "3000"
+          }
+        ],
+        "3100/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "3100"
+          }
+        ],
+        "3200/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "3200"
+          }
+        ],
+        "4317/tcp": [
+          {
+            "HostIp": "10.0.0.215",
+            "HostPort": "4317"
+          }
+        ],
+        "4318/tcp": [
+          {
+            "HostIp": "10.0.0.215",
+            "HostPort": "4318"
+          }
+        ],
+        "9090/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "9090"
+          }
+        ]
+      }
+    }
+  ]
+}

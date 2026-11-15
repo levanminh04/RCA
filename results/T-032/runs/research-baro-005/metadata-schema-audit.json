@@ -1,0 +1,152 @@
+{
+  "task": "T-032",
+  "status": "METADATA_SCHEMA_SELFCHECK_PASS_NOT_FULL_RESEARCH_RUN",
+  "old_script_sha256": "428750eb74ca81ee5ad87c8e854cdf92581d4b02c36116d2ab2cb555da75891b",
+  "new_script_sha256": "19e6e2dfdcce9381dd53e547015f4c1208f4292288e0156e85a38bea45d5908a",
+  "source_plan": {
+    "path": "results/T-032/runs/research-baro-004/plan.json",
+    "sha256": "144b56ab0a73e92f1d3ef2c4e3f2d6cd732d9581640d54412400369acc9ecc52"
+  },
+  "writer": {
+    "path": "results/T-032/scripts/capture_baro.py",
+    "sha256": "9453432f451268cba52cdd5036d3c067a71f603da043054646ff9c027317b2e6",
+    "context_lines": [
+      121,
+      127,
+      143,
+      144
+    ],
+    "snapshot_lines": [
+      254,
+      257,
+      293,
+      295
+    ]
+  },
+  "explanation": "summary column is call context; entity_mapping call JSON column is local col argument. Only this function has intentionally distinct column semantics in the frozen writer.",
+  "first_case": {
+    "opaque_id": "dev-03d4910932",
+    "check_sha256": "eb624864ce1cf511e9af52cf9230b3391be7b89dddc1060faf8332bfe078294b",
+    "capture_sha256": "314ca361047929ab47bc7cd3ebe84b2da18092a7a00769598edd5c11b9cbbb34",
+    "calls_checked": 2274,
+    "call_file_hashes_checked": 2274,
+    "function_counts": {
+      "main_preprocess": 1,
+      "rename_latency": 1,
+      "prepare": 1,
+      "drop_constant": 4,
+      "convert_mem_mb": 4,
+      "preprocess": 4,
+      "effective_scale": 564,
+      "fit": 564,
+      "transform": 564,
+      "native": 1,
+      "adapter_keys": 1,
+      "entity_mapping": 564,
+      "adapter": 1
+    },
+    "summary_column_semantics": "preparation/None for entity_mapping",
+    "example": {
+      "summary": {
+        "id": 1711,
+        "function": "entity_mapping",
+        "group": "preparation",
+        "column": null,
+        "exceptions": [],
+        "outcome": "return",
+        "path": "calls/1711-entity_mapping.json"
+      },
+      "snapshot": {
+        "function": "entity_mapping",
+        "group": "preparation",
+        "column": "ts-route-service_mem",
+        "entry": {},
+        "outcome": "return",
+        "exceptions": [],
+        "return": "ts-route-service"
+      }
+    },
+    "elapsed_s": 0.7350000000442378
+  },
+  "negative_checks": [
+    {
+      "mutation": "call.function",
+      "status": "REJECTED"
+    },
+    {
+      "mutation": "call.group",
+      "status": "REJECTED"
+    },
+    {
+      "mutation": "call.outcome",
+      "status": "REJECTED"
+    },
+    {
+      "mutation": "call.exceptions",
+      "status": "REJECTED"
+    },
+    {
+      "mutation": "call.column",
+      "status": "REJECTED"
+    },
+    {
+      "mutation": "call.return",
+      "status": "REJECTED"
+    },
+    {
+      "mutation": "summary.id",
+      "status": "REJECTED"
+    },
+    {
+      "mutation": "summary.path",
+      "status": "REJECTED"
+    },
+    {
+      "mutation": "summary.column",
+      "status": "REJECTED"
+    },
+    {
+      "mutation": "nonmapping.column",
+      "status": "REJECTED"
+    }
+  ],
+  "ast": {
+    "changed_existing_functions": [
+      "verify_case"
+    ],
+    "added_functions": [
+      "verify_call_reference"
+    ],
+    "other_functions_identical": true
+  },
+  "native_executed": false,
+  "raw_dataset_read": false,
+  "arrays_decoded": false,
+  "full_52_reader_execution": "NOT_PERFORMED",
+  "representative_readonly_schema_inspections": [
+    {
+      "opaque_id": "dev-03d4910932",
+      "calls": 2274,
+      "entity_mapping_column_differences": 564
+    },
+    {
+      "opaque_id": "dev-a5cabe5fa7",
+      "calls": 2290,
+      "entity_mapping_column_differences": 568
+    },
+    {
+      "opaque_id": "dev-14701a3bbb",
+      "calls": 1114,
+      "entity_mapping_column_differences": 274
+    }
+  ],
+  "unchanged_scientific_criteria": [
+    "full artifact and code pins",
+    "exact replay fields",
+    "exact scalar arithmetic",
+    "exact metric and entity ranking",
+    "source M5 denominator",
+    "locked groups and controls",
+    "no native rerun"
+  ]
+}

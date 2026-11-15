@@ -1,0 +1,425 @@
+{
+ "schema": "T032-microrank-merged-link-v1",
+ "design": "results/T-032/thiet-ke-phep-doi-013.md mục 4",
+ "fixtures": {
+  "subtree": {
+   "pass": true,
+   "checks": {
+    "sâu nhất bằng 4": true,
+    "A gốc thấy B, C, D nằm dưới, không thấy E": true,
+    "span B.server thấy C nằm dưới, không thấy D": true,
+    "lời gọi chậm tới C truyền lên A gốc qua hai đường": true,
+    "span 1 (A gọi B) bao lời gọi chậm tới C với phần vượt 100": true,
+    "span 8 tự mang lời gọi chậm": true,
+    "nhánh D không bao lời gọi chậm tới C": true,
+    "span mất cha E không truyền cho ai": true,
+    "span mang cờ của C nằm dưới span 1, không tính chính span": true,
+    "span mang cờ của B nằm dưới A gốc": true,
+    "span phía gọi mang cờ của A (span 1, 8) nằm dưới A gốc nên A gốc có bit A": true,
+    "span 1 không có span mang cờ của A nằm dưới": true,
+    "span 9 không có cờ nên C dưới span 8 không có cờ": true
+   }
+  },
+  "direct": {
+   "pass": true,
+   "checks": {
+    "span 1 (A phía gọi) có con trực tiếp thuộc B": true,
+    "span 1 không có con trực tiếp thuộc C": true,
+    "span 3 (B phía gọi) có con trực tiếp thuộc C": true,
+    "span 0 (A, con cùng dịch vụ) không có lời gọi trực tiếp": true
+   }
+  }
+ },
+ "min_calls": 20,
+ "min_F": 5,
+ "sources": {
+  "rankings_sha256": "5b74ef7e48455dd678cb9670fa462524b689a7b2213a74c43f1544402d08ce32",
+  "plan_sha256": "2e26428c26ef2fd699a72abdd9e30662b7cbda61f97aec3c3eca1e33d89b2ebe",
+  "labels_sha256": "d5923b59698000370fa45b1ded8b7c3a1e39eeeef4e450d9cdc9350940fd2f53"
+ },
+ "note": "Mô tả trên dev cho một nhánh chẩn đoán; không là nhãn lan; các cột chồng lấn, không cộng thành tỷ lệ nguyên nhân.",
+ "methods_executed": [],
+ "summary": {
+  "n_cases": 1,
+  "status": {
+   "OK": 1
+  },
+  "self_check": {
+   "mo15c1": {
+    "cases": 1,
+    "pass": 1,
+    "fail": []
+   },
+   "mo1p50c1": {
+    "cases": 1,
+    "pass": 1,
+    "fail": []
+   }
+  },
+  "by_dataset": {
+   "RE2-TT": {
+    "mo15c1": {
+     "cases_usable": 1,
+     "root_rank1": 0,
+     "root_not_rank1": 1,
+     "top_entity": {
+      "ts-admin-travel-service": 1
+     },
+     "reading_all": {
+      "gắn với root": 1
+     },
+     "by_top_entity": {
+      "ts-admin-travel-service": {
+       "cases": 1,
+       "reading": {
+        "gắn với root": 1
+       },
+       "operations": {
+        "ts-admin-travel-service_GET": 1
+       },
+       "class_vs_root": {
+        "phia_tren_gian_tiep": 1
+       },
+       "median_on_F": {
+        "direct": 0.0,
+        "below": 1.0,
+        "slow": 1.0,
+        "flag_below": 0.9615384615384616,
+        "linked": 1.0,
+        "r50": 1.0
+       },
+       "median_on_nonflagged": {
+        "direct": 0.0,
+        "below": 1.0,
+        "slow": 1.0,
+        "flag_below": 1.0,
+        "linked": 1.0
+       },
+       "median_best_other_linked": 0.358974358974359,
+       "case_list": [
+        {
+         "opaque_id": "dev-3ae0a6c15a",
+         "cell": "ts-train-service|cpu",
+         "root_rank": [
+          4,
+          4
+         ],
+         "operation": "ts-admin-travel-service_GET",
+         "F": 78,
+         "reading": "gắn với root",
+         "on_F": {
+          "n": 78,
+          "direct": 0.0,
+          "below": 1.0,
+          "slow": 1.0,
+          "flag_below": 0.9615384615384616,
+          "linked": 1.0,
+          "r50": 1.0
+         },
+         "edge_measurable": true,
+         "best_other": {
+          "service": "ts-route-service",
+          "linked": 0.358974358974359,
+          "slow": 0.3076923076923077,
+          "flag_below": 0.20512820512820512,
+          "below": 1.0
+         },
+         "trace_level": {
+          "own_traces": 39,
+          "has_root": 39,
+          "root_flagged": 39
+         }
+        }
+       ]
+      }
+     }
+    },
+    "mo1p50c1": {
+     "cases_usable": 1,
+     "root_rank1": 0,
+     "root_not_rank1": 1,
+     "top_entity": {
+      "ts-admin-travel-service": 1
+     },
+     "reading_all": {
+      "gắn với root": 1
+     },
+     "by_top_entity": {
+      "ts-admin-travel-service": {
+       "cases": 1,
+       "reading": {
+        "gắn với root": 1
+       },
+       "operations": {
+        "ts-admin-travel-service_GET": 1
+       },
+       "class_vs_root": {
+        "phia_tren_gian_tiep": 1
+       },
+       "median_on_F": {
+        "direct": 0.0,
+        "below": 1.0,
+        "slow": 1.0,
+        "flag_below": 0.9545454545454546,
+        "linked": 1.0,
+        "r50": 1.0
+       },
+       "median_on_nonflagged": {
+        "direct": 0.0,
+        "below": 1.0,
+        "slow": 1.0,
+        "flag_below": 1.0,
+        "linked": 1.0
+       },
+       "median_best_other_linked": 0.32954545454545453,
+       "case_list": [
+        {
+         "opaque_id": "dev-3ae0a6c15a",
+         "cell": "ts-train-service|cpu",
+         "root_rank": [
+          4,
+          4
+         ],
+         "operation": "ts-admin-travel-service_GET",
+         "F": 88,
+         "reading": "gắn với root",
+         "on_F": {
+          "n": 88,
+          "direct": 0.0,
+          "below": 1.0,
+          "slow": 1.0,
+          "flag_below": 0.9545454545454546,
+          "linked": 1.0,
+          "r50": 1.0
+         },
+         "edge_measurable": true,
+         "best_other": {
+          "service": "ts-route-service",
+          "linked": 0.32954545454545453,
+          "slow": 0.2840909090909091,
+          "flag_below": 0.19318181818181818,
+          "below": 1.0
+         },
+         "trace_level": {
+          "own_traces": 44,
+          "has_root": 44,
+          "root_flagged": 44
+         }
+        }
+       ]
+      }
+     }
+    }
+   },
+   "Nezha-OB": {
+    "mo15c1": {
+     "cases_usable": 0,
+     "root_rank1": 0,
+     "root_not_rank1": 0,
+     "top_entity": {},
+     "reading_all": {},
+     "by_top_entity": {}
+    },
+    "mo1p50c1": {
+     "cases_usable": 0,
+     "root_rank1": 0,
+     "root_not_rank1": 0,
+     "top_entity": {},
+     "reading_all": {},
+     "by_top_entity": {}
+    }
+   }
+  },
+  "prediction_nezha_frontend": {
+   "mo15c1": {
+    "cases_frontend_top": 0,
+    "attached": 0,
+    "not_attached": 0,
+    "unclear_or_few": 0,
+    "reading": null
+   },
+   "mo1p50c1": {
+    "cases_frontend_top": 0,
+    "attached": 0,
+    "not_attached": 0,
+    "unclear_or_few": 0,
+    "reading": null
+   }
+  }
+ },
+ "cases": [
+  {
+   "dataset": "RE2-TT",
+   "opaque_id": "dev-3ae0a6c15a",
+   "root": "ts-train-service",
+   "fault": "cpu",
+   "cell": "ts-train-service|cpu",
+   "status": "OK",
+   "branches": {
+    "mo15c1": {
+     "self_check": {
+      "traces_after": true,
+      "traces_after_with_root": true,
+      "baseline_traces": true,
+      "baseline_traces_used": true,
+      "slo_operations": true,
+      "new_traces": true,
+      "new_abnormal": true,
+      "new_normal": true,
+      "new_abnormal_also_native_abnormal": true,
+      "native_traces": true,
+      "native_abnormal": true,
+      "new_abnormal_traces_by_service": true,
+      "group_traces_with_flagged_span": true,
+      "sum_own": true
+     },
+     "self_check_pass": true,
+     "new_traces": 1358,
+     "new_abnormal": 86,
+     "abnormal_traces_without_flagged_span": 21,
+     "root_ranked": true,
+     "n_entities": 27,
+     "root_rank_min": 4,
+     "root_rank_max": 4,
+     "root_operation": "ts-train-service_GET /api/v1/trainservice/trains/{id}",
+     "root_own_count_traces": 45,
+     "root_wrong": true,
+     "top_entities": [
+      "ts-admin-travel-service"
+     ],
+     "links": [
+      {
+       "entity": "ts-admin-travel-service",
+       "operation": "ts-admin-travel-service_GET",
+       "F": 78,
+       "flagged_spans_all_traces": 90,
+       "nonflagged_spans_after": 2,
+       "F_without_parent_share": 0.0,
+       "own_count_traces": 39,
+       "root": {
+        "on_F": {
+         "n": 78,
+         "direct": 0.0,
+         "below": 1.0,
+         "slow": 1.0,
+         "flag_below": 0.9615384615384616,
+         "linked": 1.0,
+         "r50": 1.0
+        },
+        "on_nonflagged": {
+         "n": 2,
+         "direct": 0.0,
+         "below": 1.0,
+         "slow": 1.0,
+         "flag_below": 1.0,
+         "linked": 1.0,
+         "r50": 1.0
+        },
+        "edge_measurable": true
+       },
+       "trace_level": {
+        "own_traces": 39,
+        "has_root": 39,
+        "root_flagged": 39
+       },
+       "best_other": {
+        "service": "ts-route-service",
+        "linked": 0.358974358974359,
+        "slow": 0.3076923076923077,
+        "flag_below": 0.20512820512820512,
+        "below": 1.0
+       },
+       "best_other_flag_below": 0.20512820512820512,
+       "dist_up": 2,
+       "dist_down": null,
+       "class": "phia_tren_gian_tiep",
+       "reading": "gắn với root"
+      }
+     ]
+    },
+    "mo1p50c1": {
+     "self_check": {
+      "traces_after": true,
+      "traces_after_with_root": true,
+      "baseline_traces": true,
+      "baseline_traces_used": true,
+      "slo_operations": true,
+      "new_traces": true,
+      "new_abnormal": true,
+      "new_normal": true,
+      "new_abnormal_also_native_abnormal": true,
+      "native_traces": true,
+      "native_abnormal": true,
+      "new_abnormal_traces_by_service": true,
+      "group_traces_with_flagged_span": true,
+      "sum_own": true
+     },
+     "self_check_pass": true,
+     "new_traces": 1358,
+     "new_abnormal": 90,
+     "abnormal_traces_without_flagged_span": 23,
+     "root_ranked": true,
+     "n_entities": 27,
+     "root_rank_min": 4,
+     "root_rank_max": 4,
+     "root_operation": "ts-train-service_GET /api/v1/trainservice/trains/{id}",
+     "root_own_count_traces": 53,
+     "root_wrong": true,
+     "top_entities": [
+      "ts-admin-travel-service"
+     ],
+     "links": [
+      {
+       "entity": "ts-admin-travel-service",
+       "operation": "ts-admin-travel-service_GET",
+       "F": 88,
+       "flagged_spans_all_traces": 90,
+       "nonflagged_spans_after": 2,
+       "F_without_parent_share": 0.0,
+       "own_count_traces": 44,
+       "root": {
+        "on_F": {
+         "n": 88,
+         "direct": 0.0,
+         "below": 1.0,
+         "slow": 1.0,
+         "flag_below": 0.9545454545454546,
+         "linked": 1.0,
+         "r50": 1.0
+        },
+        "on_nonflagged": {
+         "n": 2,
+         "direct": 0.0,
+         "below": 1.0,
+         "slow": 1.0,
+         "flag_below": 1.0,
+         "linked": 1.0,
+         "r50": 1.0
+        },
+        "edge_measurable": true
+       },
+       "trace_level": {
+        "own_traces": 44,
+        "has_root": 44,
+        "root_flagged": 44
+       },
+       "best_other": {
+        "service": "ts-route-service",
+        "linked": 0.32954545454545453,
+        "slow": 0.2840909090909091,
+        "flag_below": 0.19318181818181818,
+        "below": 1.0
+       },
+       "best_other_flag_below": 0.19318181818181818,
+       "dist_up": 2,
+       "dist_down": null,
+       "class": "phia_tren_gian_tiep",
+       "reading": "gắn với root"
+      }
+     ]
+    }
+   },
+   "wall_s": 19.8
+  }
+ ]
+}

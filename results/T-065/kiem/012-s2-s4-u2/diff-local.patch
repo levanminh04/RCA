@@ -1,0 +1,157 @@
+diff --git "a/D:\\RCA-flashticket\\results\\T-065\\kiem\\012-s2-s4-u2\\ban-truoc\\kiem\\003-trinh-duyet\\BAO-CAO.md" "b/D:\\RCA-flashticket\\results\\T-065\\kiem\\003-trinh-duyet\\BAO-CAO.md"
+index 068a0189..b894d81a 100644
+--- "a/D:\\RCA-flashticket\\results\\T-065\\kiem\\012-s2-s4-u2\\ban-truoc\\kiem\\003-trinh-duyet\\BAO-CAO.md"
++++ "b/D:\\RCA-flashticket\\results\\T-065\\kiem\\003-trinh-duyet\\BAO-CAO.md"
+@@ -90,3 +90,15 @@ Máy: kiểm hai STOP trước các nhóm, runner3=0. Cuối09:21:08Z:358.9MiB/7
+ Lỗi công cụ cũng giữ lại: ID tab dạng số lỗi kiểu, chuỗi kết nối thành công; menu/combobox có lần không đổi trạng thái, timeout CDP, ảnh đang dựng trắng hoặc chụp lệch khung, clipboard rỗng, lệnh Python lỗi encoding và kiểm tái dựng lỗi. Không dùng các lượt ấy làm bằng chứng đạt. Nhật ký nhat-ky-bam.jsonl ghi từng thao tác, lỗi và DOM; ui05-t062-roundtrip.json có bảng rỗng là lượt lỗi, dùng bản UI06 sau cùng. Ảnh ui06-snapshot28-final.png thực tế là panel31–35, đã ghi đúng ở ui06-V041-live-panels.json; ảnh snapshot đúng là ui06-snapshot28-view.png. File inspector-ui05-p7-event-service-p31-avant.json rỗng do clipboard, giữ làm đầu ra lượt lỗi.
+ 
+ Lệch manifest tiếp nhận: 5.963 file được kiểm, chín hồ sơ lệch đã giải thích bằng l5-chot-khac.mjs, LOG, backup và tiền tố append-only;66 đầu ra T-064 khớp. Bản manifest trước lượt giữ nguyên tại codex/manifest-L5-truoc-UI04-suite.json. Chi tiết doi-chieu-lech-manifest-tiep-UI04.json. Chốt manifest mới sau khi ghi đầy đủ hồ sơ, không dùng nó để che lệch cũ.
++
++
++## Đính chính sau L5 — bằng chứng L6/L7 và bản G-c cuối
++
++Đoạn này bổ sung lịch sử, giữ nguyên nội dung và hồ sơ L5 trước đó. Nguồn: LOG T-065 mục L6–L9; `results/T-065/codex/L6-dap-review2.json#/checks`; `results/T-065/kiem/004-r1-ui06/doi-chieu-dich.json`.
++
++- R1: L5 chưa đủ bằng chứng bấm các data link sau UI06. L7 đã bổ sung 12/12 luồng gồm panel 4/22/23 trang chính và panel 4 phát lại trên ba mẫu; có request/response Inspector, kể cả lần bấm 19. Không coi bằng chứng cũ trước UI06 thay cho lượt kiểm này.
++- R2: trước 08:50Z, e8661e0a có 36/36 URL số; 21 ca khác có 67 URL số trong 1.665 lượt. Các DOM của 67 lượt chỉ Loading/vỏ trang, không là đối chứng panel sống. URL số là ứng viên, chưa xác nhận nguyên nhân 10 quan sát lịch sử loại (iii); vẫn thiếu request/response đúng giờ cũ.
++- R3: `results/T-065/kiem/003-trinh-duyet/panel-rong.json` là 586 bản ghi thô; sau gộp còn 568 khóa, trong đó 381 false positive và 187 panel (177 loại i, 10 loại iii) ở `results/T-065/kiem/003-trinh-duyet/doi-chieu-rong-snapshot.json`. Dùng file đối chiếu làm nguồn phân loại; giữ file thô.
++- N1 của L6: ba trang e8661e0a có 30/660 Start time hiển thị ngoài cửa sổ; không dùng các panel đó chứng minh truy vấn lịch sử đúng. Bằng chứng sau UI06 của ba bản đúng cửa sổ; chưa xác định được cơ chế quá khứ khi thiếu request đúng giờ.
++
++Bản G-c cuối p7/V082/V071 thuộc lượt L8b/L8c, không phải bộ bản tạm L4 của báo cáo này. Xem `results/T-065/kiem/006-gc-cuoi/BAO-CAO.md`, `results/T-065/kiem/007-gc-chrome/BAO-CAO.md` và phản hồi L9. Không tự nghiệm thu task, đóng RQ5/P10 hoặc mở test.
+
+diff --git "a/D:\\RCA-flashticket\\results\\T-065\\kiem\\012-s2-s4-u2\\ban-truoc\\BAN-GIAO-L5.md" "b/D:\\RCA-flashticket\\results\\T-065\\BAN-GIAO-L5.md"
+index eaa46cc7..618a9e01 100644
+--- "a/D:\\RCA-flashticket\\results\\T-065\\kiem\\012-s2-s4-u2\\ban-truoc\\BAN-GIAO-L5.md"
++++ "b/D:\\RCA-flashticket\\results\\T-065\\BAN-GIAO-L5.md"
+@@ -29,3 +29,15 @@ Kiểm chốt 2026-11-14T09:29:41.440771+00:00: ui06-integrity.json xác nhận5
+ 
+ 
+ 2026-11-14T09:31:27.100580+00:00 — Đã chốt và kiểm manifest: 6256/6256 hash khớp, LOG khớp, không file thiếu hoặc file mới chưa giải thích. Lệnh đã chạy: node results/T-065/l5-tong-hop.mjs manifest và phép kiểm checksum chỉ đọc. Sau khi nối biên bản này, dựng lại manifest để ghim chính LOG/checkpoint/biên nhận mới rồi kiểm checksum cuối trong chat. Không còn thao tác Chrome đang dở; G-c chờ bản M1-FT đề xuất cuối. Toàn bộ đầu ra cũ được giữ.
++
++
++## Đính chính sau L5 — bằng chứng L6/L7 và bản G-c cuối
++
++Đoạn này bổ sung lịch sử, giữ nguyên nội dung và hồ sơ L5 trước đó. Nguồn: LOG T-065 mục L6–L9; `results/T-065/codex/L6-dap-review2.json#/checks`; `results/T-065/kiem/004-r1-ui06/doi-chieu-dich.json`.
++
++- R1: L5 chưa đủ bằng chứng bấm các data link sau UI06. L7 đã bổ sung 12/12 luồng gồm panel 4/22/23 trang chính và panel 4 phát lại trên ba mẫu; có request/response Inspector, kể cả lần bấm 19. Không coi bằng chứng cũ trước UI06 thay cho lượt kiểm này.
++- R2: trước 08:50Z, e8661e0a có 36/36 URL số; 21 ca khác có 67 URL số trong 1.665 lượt. Các DOM của 67 lượt chỉ Loading/vỏ trang, không là đối chứng panel sống. URL số là ứng viên, chưa xác nhận nguyên nhân 10 quan sát lịch sử loại (iii); vẫn thiếu request/response đúng giờ cũ.
++- R3: `results/T-065/kiem/003-trinh-duyet/panel-rong.json` là 586 bản ghi thô; sau gộp còn 568 khóa, trong đó 381 false positive và 187 panel (177 loại i, 10 loại iii) ở `results/T-065/kiem/003-trinh-duyet/doi-chieu-rong-snapshot.json`. Dùng file đối chiếu làm nguồn phân loại; giữ file thô.
++- N1 của L6: ba trang e8661e0a có 30/660 Start time hiển thị ngoài cửa sổ; không dùng các panel đó chứng minh truy vấn lịch sử đúng. Bằng chứng sau UI06 của ba bản đúng cửa sổ; chưa xác định được cơ chế quá khứ khi thiếu request đúng giờ.
++
++Bản G-c cuối p7/V082/V071 thuộc lượt L8b/L8c, không phải bộ bản tạm L4 của báo cáo này. Xem `results/T-065/kiem/006-gc-cuoi/BAO-CAO.md`, `results/T-065/kiem/007-gc-chrome/BAO-CAO.md` và phản hồi L9. Không tự nghiệm thu task, đóng RQ5/P10 hoặc mở test.
+
+diff --git "a/D:\\RCA-flashticket\\results\\T-065\\kiem\\012-s2-s4-u2\\ban-truoc\\kiem\\010-chi-muc-3\\BAO-CAO.md" "b/D:\\RCA-flashticket\\results\\T-065\\kiem\\010-chi-muc-3\\BAO-CAO.md"
+index bfb6c122..3ab316b9 100644
+--- "a/D:\\RCA-flashticket\\results\\T-065\\kiem\\012-s2-s4-u2\\ban-truoc\\kiem\\010-chi-muc-3\\BAO-CAO.md"
++++ "b/D:\\RCA-flashticket\\results\\T-065\\kiem\\010-chi-muc-3\\BAO-CAO.md"
+@@ -45,3 +45,6 @@ Chưa có ảnh hoặc bấm UI thật của bản 3 trong L11b. Browser access
+ Dữ liệu/API bản 3 đã đạt phạm vi L11/L11b; bằng chứng UI mới còn thiếu. T-065 chưa nghiệm thu. S2–S4 chưa được duyệt, giữ nguyên; các OPEN về Loki và quan sát lịch sử giữ theo hồ sơ trước. Không thêm bằng chứng hiệu quả M1, không khép RQ5/P10 hay suy việc hiển thị đúng là nghiệm thu T-064.
+ 
+ Bước tiếp: Claude đọc nguồn/đầu ra trước rồi kiểm lại theo prompt-ban-giao.md; Minh chụp phần UI còn thiếu và quyết nghiệm thu. Không có job kiểm, thao tác UI hay tunnel mới đang chờ. Không sửa STATE/SPEC/docs/REVIEW/T-064; không commit/push. Đề xuất nội dung commit sau khi Minh duyệt: “T-065: xuất và hiển thị chỉ mục bản 3, giữ lịch sử L8b”.
++
++
++Đính chính L12 — U2 (15/11/2026): câu “Theo brief L11 và đính chính L11b của Minh” ở đầu báo cáo được đính chính thành “Theo brief L11 và đính chính L11b của phiên điều phối (Minh chuyển), trong phạm vi Minh đã duyệt”. Người soạn brief L11b là phiên điều phối; không ghi thành lời quyết trực tiếp mới của Minh. Giữ câu cũ làm lịch sử. Nguồn: results/T-065/codex/L11b-brief.md; tasks/T-065-giao-dien-grafana/REVIEW-5.md, U2.
+
+diff --git "a/D:\\RCA-flashticket\\results\\T-065\\kiem\\012-s2-s4-u2\\ban-truoc\\XONG.md" "b/D:\\RCA-flashticket\\results\\T-065\\XONG.md"
+index 251484e6..b6683ad0 100644
+--- "a/D:\\RCA-flashticket\\results\\T-065\\kiem\\012-s2-s4-u2\\ban-truoc\\XONG.md"
++++ "b/D:\\RCA-flashticket\\results\\T-065\\XONG.md"
+@@ -1,8 +1,14 @@
+-# T-065 L11/L11b — bản 3 đã triển khai, dữ liệu/API đạt; còn ảnh
++# T-065 — nghiệm thu theo M4; G-a, G-b, G-c đạt
+ 
+-2026-11-15T05:24:33.664Z
++2026-11-15T06:29:45.805Z. Minh quyết tại docs/DECISIONS.md mục “M4 chiến dịch M1-FlashTicket: trả lời 9 câu hỏi”: nghiệm thu sau khi lưu ảnh S1 và bổ sung ảnh U1. Hai điều kiện ảnh đã đáp ứng: [S1](kiem/009-s1-anh-minh/GHI-CHU.md) và [U1](kiem/011-u1-anh-minh/GHI-CHU.md) được lưu nguyên byte, ghim manifest. Đây là ghi nhận quyết định đã có, không là quyết định mới của Codex.
+ 
+-- Hai dashboard hiện hành giữ UID, đọc thư mục dữ liệu mới t065-l11-001 và ghi “chỉ mục bản 3”. Mục lục ghi đúng nguồn bản 3. Dữ liệu L8b và hồ sơ dừng L11 giữ nguyên.
+-- Hai slot ebd5ef38 đã cập nhật đầy đủ: 64 cờ, khóa payment mới, không còn nhận chết im H5b trong nguồn. 82 slot khác giữ byte. Kiểm ngữ nghĩa/schema 84 slot, API 18 trang và hai audit khóa đạt. Không restart Grafana.
+-- [Báo cáo và bằng chứng](kiem/010-chi-muc-3/BAO-CAO.md), [hoàn tác](kiem/010-chi-muc-3/l11b/HOAN-TAC.md), [prompt Claude](prompt-ban-giao.md). Ảnh S1 Minh cung cấp ở kiem/009 đã ghim manifest, giữ lịch sử bản 2.
+-- **Còn ảnh/bấm UI bản 3:** browser host không khả dụng; công cụ từ chối quyền điều khiển Chrome. [URL và phần Minh cần chụp](kiem/010-chi-muc-3/l11b/ANH-CAN-CHUP.md). API không thay bằng chứng UI. Chờ Claude kiểm và Minh quyết nghiệm thu; S2–S4 giữ nguyên, không khép RQ5/P10. Chưa commit/push.
++- **G-a đạt:** điều hướng, cửa sổ, phát lại và lời diễn giải; giữ các giới hạn quan sát lịch sử.
++- **G-b đạt:** lớp thao tác, bằng chứng và quan hệ quan sát đã kiểm; span link message chưa hỗ trợ.
++- **G-c đạt:** P7/V082/V071 dùng chỉ mục bản 3; dữ liệu/API L11b và ảnh U1 bổ sung. Ảnh không có bảng đủ 64 cờ hoặc chuỗi bấm từ Mục lục; dùng đúng bằng chứng dữ liệu/API và luồng L8c ở phần không đổi.
++- **L12 hoàn tất:** S2 thêm description panel 5 ở hai UID hiện hành, ghi rõ V082 vẫn dùng E1/E2/E5 trong lõi P7; target/query giữ. S4 nối nguyên khối L9 ở hai báo cáo. U2 nối đính chính nguồn brief L11b do điều phối soạn, Minh chuyển. **R4 đã được Minh xác nhận hồi tố** việc xóa folder RCA rỗng; không thêm thao tác folder.
++
++[Báo cáo L12 và OPEN](kiem/012-s2-s4-u2/BAO-CAO.md), [đối chiếu](kiem/012-s2-s4-u2/doi-chieu.json), [hoàn tác](kiem/012-s2-s4-u2/HOAN-TAC.md), [prompt bàn giao](prompt-ban-giao.md). Grafana đã GET khớp hai description mới; giữ lượt kiểm nạp đầu hết thời gian, sau đó xác nhận chỉ đọc. Không restart.
++
++**OPEN còn lại:** S3 — nguyên nhân booking-service vắng log, thiếu nguồn ứng dụng/Collector/nhãn/lưu giữ đúng giờ; cơ chế các quan sát (iii)/Start time lịch sử, thiếu request/response và trạng thái hiển thị đúng giờ; URL/breadcrumb khác nhau ở ảnh U1 đầu, chưa có dữ kiện phân xử. Hash cấp bản P7 null đúng nguồn; dev chưa cấp đáp án ở lớp phát lại; span link chưa có dữ liệu; bookmark thời gian số cũ cần chọn ca lại/link ISO. Đọc phần OPEN trong báo cáo để thấy giả thuyết, bằng chứng thiếu và hệ quả.
++
++T-065 hoàn thành phần giao diện minh họa/truy vết của DT18-NV3; hiệu quả phương pháp và RQ5/P10 không được đóng bằng nghiệm thu giao diện. Không có quyết định nghiên cứu mới; không ghi STATE/docs/SPEC/REVIEW/T-064. Chưa commit/push.
+
+diff --git "a/D:\\RCA-flashticket\\results\\T-065\\kiem\\012-s2-s4-u2\\ban-truoc\\CHECKPOINT.md" "b/D:\\RCA-flashticket\\results\\T-065\\CHECKPOINT.md"
+index 4258018a..46ec8bc3 100644
+--- "a/D:\\RCA-flashticket\\results\\T-065\\kiem\\012-s2-s4-u2\\ban-truoc\\CHECKPOINT.md"
++++ "b/D:\\RCA-flashticket\\results\\T-065\\CHECKPOINT.md"
+@@ -636,3 +636,21 @@ Chốt G-c đạt mẫu Chrome. 18 trang, 9 bảng mẫu, 9 request/response Exp
+ - Ảnh bản 3 chưa có: browser host unavailable; CUA không được cấp quyền Google Chrome. Không input/UI, không cài renderer/lách quyền. Minh chụp theo l11b/ANH-CAN-CHUP.md. Ảnh S1 009 đã ghim từ L11, giữ làm lịch sử bản 2.
+ - Tiếp: Claude đọc kiem/010-chi-muc-3/BAO-CAO.md và đầu ra theo prompt-ban-giao.md, chỉ chat khi chưa được cấp REVIEW mới; Minh chụp ảnh rồi quyết nghiệm thu. Không cần chạy lại M1/raw/chấm. S2–S4, OPEN cũ, RQ5/P10 giữ; không ghi STATE/docs/SPEC/REVIEW/T-064.
+ - Chốt tiếp: kiểm diff/tập file, prefix LOG/CHECKPOINT/thay-doi-may, manifest mới và STOP. Manifest trước giữ codex/manifest-L11b-truoc.json. Không có job/tunnel/UI mới còn dở; không commit/push.
++
++
++## L12 — 2026-11-15T06:24:43.581Z — S2 đã ghi file, nạp GET đang chờ xác minh
++
++- Đã kiểm pin hiện hành và ảnh; S4/U2 đã nối đúng, giữ prefix. Hai description S2 ghi đúng pin mới, không đổi target/query; nguồn và byte trước ở grafana-l12/ và kiem/012-s2-s4-u2/ban-truoc/.
++- Script apply dừng sau ba quan sát GET chưa khớp. Không restart, không sửa máy khác. Transcript ap-dung-001.jsonl giữ nguyên. Chưa chốt nghiệm thu; chỉ đọc chẩn đoán bằng doc-sau.py để xác định trường khác.
++- Bước tiếp: đọc kiem/012-s2-s4-u2/doc-sau-001.json sau lệnh SSH chỉ đọc. Nếu GET chưa đúng và cần thao tác ngoài brief, dừng trình điều phối, không tự đổi cách. S3 vẫn OPEN; R4 đã được Minh xác nhận hồi tố theo M4. Không ghi STATE/docs/REVIEW/T-064.
++
++
++## L12 — 2026-11-15T06:31:41.582Z — hoàn tất; nghiệm thu theo M4
++
++- Codex người làm; Claude phản biện. Minh đã quyết nghiệm thu sau lưu ảnh S1 và bổ sung U1; ảnh 009 đã ghim từ trước, 011 đủ năm ảnh + ghi chú/checksum đã kiểm và ghim trong manifest L12. G-a/G-b/G-c đạt trong phạm vi báo cáo. Quyết định dừng phản biện/nhận giới hạn theo M4, không là kết luận mới của agent.
++- S2 hoàn tất: đúng description panel 5 ở hai UID hiện hành; GET trước bằng pin L11b, nguồn mới grafana-l12/, byte cũ ban-truoc/. GET sau khớp nguồn; chỉ hai file máy đổi, targets/query và dữ liệu giữ; không restart. Lượt chờ nạp ba quan sát thất bại vẫn giữ; xác nhận chỉ đọc sau thành công.
++- S4 nối nguyên khối L9 vào BAO-CAO L5 và BAN-GIAO-L5, hash sau đúng dự kiến. U2 nối đúng một dòng đính chính nguồn điều phối vào báo cáo chỉ mục 3. R4 đã Minh xác nhận hồi tố, không thêm thao tác folder.
++- OPEN: S3 thiếu nguồn ứng dụng/Collector/nhãn/lưu giữ log đúng giờ; cơ chế các quan sát lịch sử thiếu request/response/dựng hình đúng giờ; URL/nội dung ảnh U1 đầu chưa phân xử. Giữ giới hạn P7 hash null, dev chưa cấp đáp án ở lớp phát lại, span link message, bookmark số cũ. Ảnh không chứa đủ 64 cờ/chuỗi bấm; không coi ảnh là phép kiểm ấy. Không đóng RQ5/P10.
++- File/hồ sơ: kiem/012-s2-s4-u2/BAO-CAO.md, doi-chieu.json, HOAN-TAC.md, kiem-cuoi.json; XONG.md; prompt-ban-giao.md; manifest mới giữ bản trước ở codex/manifest-L12-truoc.json. Không sửa STATE/docs/SPEC/REVIEW/T-064; không commit/push. Không có job/tunnel/UI mới đang dở.
++- Bước tiếp chính xác: điều phối đọc XONG.md, BAO-CAO L12 và mục L12 cuối LOG; cập nhật STATE theo quyền của điều phối. Không chạy lại M1/raw/chấm hoặc đóng OPEN nghiên cứu. Nếu cần kiểm pin: dùng Node REPL import kiem/012-s2-s4-u2/kiem-manifest.mjs rồi gọi kiemManifest() (chỉ đọc). Nếu Minh yêu cầu hoàn tác, đọc HOAN-TAC.md và kiểm pin/STOP trước.
++- Lệnh máy cuối đã chạy: Get-Content doc-sau.py | ssh ... 'sudo -n python3 -B -' (chỉ đọc), receipt doc-sau-001.json. Sau mục này chỉ chốt diff/tập file/manifest và kiểm checksum local.
+
+diff --git "a/D:\\RCA-flashticket\\results\\T-065\\kiem\\012-s2-s4-u2\\ban-truoc\\thay-doi-may.md" "b/D:\\RCA-flashticket\\results\\T-065\\thay-doi-may.md"
+index 8b3f0399..4de35aee 100644
+--- "a/D:\\RCA-flashticket\\results\\T-065\\kiem\\012-s2-s4-u2\\ban-truoc\\thay-doi-may.md"
++++ "b/D:\\RCA-flashticket\\results\\T-065\\thay-doi-may.md"
+@@ -125,3 +125,14 @@ API đã nạp đúng mục lục/folder, còn ảnh chưa làm do browser acces
+ Tạo /opt/flash-ticket-obs/rca-ket-qua/t065-l11-001/; giữ cây t065-l8b-001 đúng 2.233 pin nguồn/dữ liệu. Chỉ thay hai file t065-l8b-rca.json, t065-l8b-phat-lai.json trong nhánh Kết quả hiện hành và t065-l5-muc-luc.json trong Bắt đầu tại đây. Giữ UID, đổi nguồn dữ liệu/chữ chỉ mục; Mục lục đổi đúng nội dung panel. GET/hash live trước khớp pin; byte trước lưu tại may-l11/rollback và kiem/010-chi-muc-3/ban-truoc. Hash đầy đủ trước/sau ở may-l11/kiem/deploy.json và kiem/010-chi-muc-3/l11b/hash-du-kien.json. File provisioning khác/compose/provider/datasource giữ hash, không restart.
+ 
+ Hoàn tác chỉ khi Minh yêu cầu: sudo python3 -B /opt/flash-ticket-obs/rca-ket-qua/t065-l11-001/codex/l11-may.py rollback; guard GET/hash sau và byte backup trước; lệch pin dừng. Không xóa dữ liệu mới. Hướng dẫn kiểm sau và byte dự phòng: kiem/010-chi-muc-3/l11b/HOAN-TAC.md. Chưa chạy. API 18 trang và hai audit khóa đạt; ảnh bản 3 còn thiếu do công cụ không cấp quyền Chrome.
++
++
++## L12 — 2026-11-15T06:31:41.581Z — S2, hai description đã GET khớp
++
++Nguồn quyền: brief L12 và M4 15/11/2026. Panel 5 “Trạng thái đầu ra cạnh” giống nhau ở hai dashboard hiện hành, nên thêm description ở cả RCA/phát lại; dẫn vai trò E1/E2/E5 trong lõi P7. Không đổi targets/truy vấn/UID/variables/time/links hoặc dữ liệu. Nguồn mới grafana-l12/; giữ byte L11b.
++
++Chỉ hai file /opt/flash-ticket-obs/pinned/provisioning/dashboards/RCA FlashTicket/1 · Kết quả hiện hành/t065-l8b-rca.json và t065-l8b-phat-lai.json được ghi. GET và hash byte trước bằng pin sau L11b; sau đúng hai nguồn mới. Hash/pointer từng trường ở kiem/012-s2-s4-u2/noi-dung-va-diff.json#/S2/dashboards. Byte cũ lưu local trong ban-truoc/, không tạo file khác trên máy.
++
++Apply ghi xong nhưng hết ba quan sát nạp; giữ ap-dung-001.jsonl là lượt kiểm thất bại. Quan sát chỉ đọc sau lúc 2026-11-15T06:24:48.609905+00:00 GET khớp cả hai, không có ghi lại/restart. Chưa xác định thời điểm nạp chính xác hoặc nguyên nhân chậm. Đối chiếu inventory 13 file chỉ hai file trên đổi, machine StartedAt/RestartCount giữ. Nguồn: doi-chieu.json#/S2 và doc-sau-001.json.
++
++R4: M4 xác nhận hồi tố folder RCA rỗng đã xóa; L12 không thêm thao tác folder. S3 giữ OPEN. Hoàn tác chỉ hai file bằng mode rollback của s2-may.py qua stdin, guard pin sau/GET và byte trước; hướng dẫn ở kiem/012-s2-s4-u2/HOAN-TAC.md, chưa chạy. Không đổi compose/provider/datasource/kho quan sát; không restart, không tạo job/tunnel/UI mới.
+
+diff --git "a/D:\\RCA-flashticket\\results\\T-065\\kiem\\012-s2-s4-u2\\ban-truoc\\prompt-ban-giao.md" "b/D:\\RCA-flashticket\\results\\T-065\\prompt-ban-giao.md"
+index 8fc19a9a..84576574 100644
+--- "a/D:\\RCA-flashticket\\results\\T-065\\kiem\\012-s2-s4-u2\\ban-truoc\\prompt-ban-giao.md"
++++ "b/D:\\RCA-flashticket\\results\\T-065\\prompt-ban-giao.md"
+@@ -1,17 +1,19 @@
+-# Prompt bàn giao Claude — T-065 L11/L11b
++# Prompt bàn giao Claude — T-065 L12
++
++Để Minh chọn copy khi cần; không tự mở vòng phản biện sau quyết định M4.
+ 
+ ```text
+ Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
+ Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
+ 
+ Thông tin lượt này:
+-- Task hoặc đề xuất: T-065, tasks/T-065-giao-dien-grafana/; lượt L11 và L11b theo brief và đính chính 15/11/2026.
++- Task hoặc đề xuất: T-065, tasks/T-065-giao-dien-grafana/; lượt L12 theo brief ngày 15/11/2026.
+ - Công đoạn: kiểm lại phản hồi và sửa.
+-- Gói/cổng: Chiến dịch M1-FlashTicket; nhánh giao diện Grafana G-c sau G4.
++- Gói/cổng: Chiến dịch M1-FlashTicket; nhánh giao diện Grafana sau G4.
+ - Người làm và người phản biện chính thức: Codex là người làm; Claude là người phản biện theo SPEC.
+-- Tài liệu gốc: tasks/T-065-giao-dien-grafana/SPEC.md và LOG.md; docs/DECISIONS.md; results/T-064/ban-xuat/chi-muc-ban.json và chi-muc-ban-2.json; results/T-064/ho-so-chon.md; docs/WHY.md; nguồn DT18 và hướng dẫn cô trong docs/reference/sources/.
+-- Phản biện và phản hồi trước: tasks/T-065-giao-dien-grafana/REVIEW.md, REVIEW-2.md, REVIEW-3.md, REVIEW-4.md; phản hồi người làm trong REVIEW-3 và LOG L9–L11b.
+-- Code và kết quả liên quan: results/T-065/kiem/010-chi-muc-3/; may-l11/; grafana-l11/; kiem/009-s1-anh-minh/; XONG.md; CHECKPOINT.md; thay-doi-may.md; manifest.json và codex/manifest-L11b-truoc.json. Máy exp-obs theo hướng dẫn repo; nguồn thực thi kiem/010-chi-muc-3/l11b/l11-may.py và HOAN-TAC.md; các lệnh SSH đã chạy trong LOG.
++- Tài liệu gốc: AGENTS.md; tasks/T-065-giao-dien-grafana/SPEC.md và LOG.md; results/T-065/codex/L12-brief.md; docs/DECISIONS.md; results/T-064/ho-so-chon.md; docs/WHY.md; nguồn DT18 và hướng dẫn cô trong docs/reference/sources/.
++- Phản biện và phản hồi trước: tasks/T-065-giao-dien-grafana/REVIEW.md, REVIEW-2.md, REVIEW-3.md, REVIEW-4.md, REVIEW-5.md; phản hồi trong LOG T-065.
++- Code và kết quả liên quan: results/T-065/kiem/012-s2-s4-u2/; grafana-l12/; kiem/009-s1-anh-minh/; kiem/011-u1-anh-minh/; XONG.md; CHECKPOINT.md; thay-doi-may.md; manifest.json và codex/manifest-L12-truoc.json. Hướng dẫn lệnh máy trong HOAN-TAC.md và LOG.
+ - Phạm vi ghi được Minh cho phép trong lượt này: Chỉ đọc và trả lời trong chat; chưa được cấp quyền ghi bản REVIEW mới.
+ 
+ Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.

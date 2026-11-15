@@ -1,0 +1,151 @@
+--- before/results/T-032/doc-tay.md
++++ after/results/T-032/doc-tay.md
+@@ -11,6 +11,8 @@
+ - **Từ dùng.** "Root": dịch vụ gốc theo nhãn. "Trên root": được phương pháp xếp hạng tốt hơn root. "Phía trên root": dịch vụ gọi root trực tiếp hoặc gián tiếp. a, n, H của TraceRCA: số span mang cờ của thao tác, số span sau mốc của thao tác, tổng số span mang cờ của cả ca. Hạng ghi [nhỏ nhất, lớn nhất]; hai số khác nhau là có hòa.
+ - **Mức kết luận của mỗi mục:** *xác nhận ở mức tính toán* (đã có phép đổi đúng một bước làm đổi hạng, hoặc đẳng thức đã kiểm), *quan sát* (thấy trên trung gian, chưa có phép đổi), *chưa phân xử*.
+ 
++**Đính chính sau REVIEW (Minh duyệt 11/10).** Cờ, phiếu và hạng là đầu ra của cách chấm; chúng không tự xác nhận có/không có đáp ứng do lỗi. Bảng no_signal cũ thực chất đếm không hạng 1. Nezha-OB có mốc giả giữa nền (22/22 ca), nhưng cửa sổ ngắn/không tương đương; BARO/SimpleRCA trong bảng đó được nối từ mốc thật. Không dùng chúng làm đối chứng metric/log ở mốc giả. Đọc tay MicroRank gồm 48 đơn vị: 46 OK sai, 1 ERROR, 1 đối chứng đúng; ngoài phần đọc có 3 ERROR và 1 OK đúng. Bằng chứng kiểm số của mục 8 lưu ở runs/sua-review-001/kiem-so/.
++
+ ## 1. TraceRCA (bản trong thư viện RCAEval) — 14 nhóm, 20 đơn vị đọc
+ 
+ Phiếu gọn: `runs/tong-hop-phien-12-001/phieu-gon/tracerca.txt`. Chuỗi tính: mỗi thao tác có mean, std ở đoạn nền; span sau mốc vượt mean + 3·std mang cờ; điểm thao tác = 2a/(n + H); điểm dịch vụ là điểm lớn nhất trong các thao tác của nó.
+@@ -67,33 +69,33 @@
+ 1. **"Chờ root", tỷ lệ không cứu — `dev-14701a3bbb` (shippingservice|cpu_contention), hạng 2** (3 đơn vị cùng đường đi). Root: a = 41, n = 171 (24%). Trên root: `frontend`, thao tác là span phía gọi của lời gọi tới root, a = 122, n = 151 (81%), 100% là span chờ root. Root đứng đầu ở ba vị trí "phía gọi" của bảng A nhưng không ở span của chính nó. T-D không đổi; a/n xuống hạng 3; bước của bài gốc: `frontend` đứng đầu, root hạng 4. **Đọc:** tín hiệu của sự cố nằm ở span phía gọi của lời gọi tới root (81% vượt ngưỡng) nhiều hơn ở span của root (24%); phương pháp gắn span phía gọi cho `frontend`.
+ 2. **"Chờ root", tỷ lệ cứu — `dev-3e27669440` (adservice|cpu_contention), hạng 2** (1 đơn vị). Root 328/489 (67%), `frontend` 379/489 (78%), 100% span chờ root. Xếp theo a/n đưa root lên hạng 1, dù thao tác cao nhất của root có tỷ lệ thấp hơn của `frontend`; suy luận, chưa mở bảng theo thao tác: dưới cách xếp theo tỷ lệ, điểm của root lấy từ một thao tác khác của nó. Hai thao tác ở trên có cùng n = 489: đó là hai đầu của cùng một loại lời gọi.
+ 3. **"Không xét được", tỷ lệ không cứu — `dev-70629373f9` (paymentservice|cpu_contention), hạng 9** (1 đơn vị). Root 2/42 (5%). `checkoutservice` gọi trực tiếp root: 36/42 (86%), nhưng cạnh chỉ có 42 lời gọi sau mốc và dưới 20 ở một phía nên không tính được "lời gọi chậm". Sáu thực thể khác trên root có tỷ lệ 2–4% trên 874–2.996 span. **Đọc:** cùng hình dạng với đường đi 1 (span phía gọi 86%, span của root 5%), thêm phần khối lượng. Không gọi là "chờ root" vì thiếu điều kiện đo.
+-4. **"Không xét được", tỷ lệ cứu — `dev-3b92690644` (checkoutservice|return), hạng 7** (3 đơn vị). Root 4/132 (3%). Trên root là các thao tác đông span có tỷ lệ 1–4% (`currencyservice` 101/2.981, `frontend` 133/4.254…). a/n đưa root lên hạng 1 (cả khi chỉ xét thao tác từ 20 span); file kết quả không lưu thao tác nào của root thắng dưới cách xếp này. Lỗi `return` gần như không làm đổi thời lượng; hạng do nhiễu nền quyết định.
+-5. **Không chờ, tỷ lệ không cứu — `dev-27252dca60` (productcatalogservice|exception), hạng 8** (2 đơn vị). Root 3/1.089 (0,3%); root không đứng đầu ở vị trí trace nào. Không phép đổi nào đưa root lên: a/n hạng 8, a/n từ 20 span hạng 5, a hạng 4–5. **Đọc:** lỗi không để lại tín hiệu thời lượng; đây là giới hạn của kênh, không phải của bước tính.
++4. **"Không xét được", tỷ lệ cứu — dev-3b92690644 (checkoutservice|return), hạng 7** (3 đơn vị). Root 4/132 (3%). Các thao tác trên root có 1–4% cờ (currencyservice 101/2.981, frontend 133/4.254). a/n đưa root lên hạng 1; chưa lưu thao tác thắng của root trong nhánh ấy. Tỷ lệ cờ native nhỏ không chứng minh thời lượng không phản ứng với lỗi hoặc thứ hạng chỉ do nhiễu nền.
++5. **Không chờ, tỷ lệ không cứu — dev-27252dca60 (productcatalogservice|exception), hạng 8** (2 đơn vị). Root 3/1.089 (0,3%); không đứng đầu ở vị trí trace nào. a/n hạng 8, a/n từ 20 span hạng 5, a hạng 4–5. Đây là quan sát về cờ và cách chấm; đáp ứng thời lượng do lỗi chưa phân xử, chưa quy riêng cho thiếu dữ liệu.
+ 6. **Không chờ, tỷ lệ cứu — `dev-2bfc97b01e` (checkoutservice|network_delay), hạng 6** (2 đơn vị). Root 5/31 (16%). `frontend` 30/828 (4%), chỉ 13% span mang cờ là span chờ root; bốn thực thể khác 2–4% trên 489–3.869 span. a/n đưa root lên hạng 1. Cùng cơ chế với mục 1.3.
+-7. **"Chờ root" một phần — `dev-5467884de4` (recommendationservice|network_delay), hạng 7** (4 đơn vị). Root 7/450 (2%). `frontend`, span phía gọi của lời gọi tới root: 439/450 (98%), 99% là span chờ root. Năm thực thể khác 2–9% cũng đứng trên root. Không phép đổi nào cứu: a/n hạng 9, T-D không đổi. Bước của bài gốc đưa root lên hạng 2, `frontend` đứng đầu. **Đọc:** với lỗi trễ mạng, span của root không dài ra (2%), toàn bộ tín hiệu nằm ở span phía gọi (98%). Gỡ điểm của `frontend` cũng chưa đủ: root vẫn thua các thao tác đông span. Muốn xếp đúng phải **gắn tín hiệu của span phía gọi cho dịch vụ được gọi**, tức dùng cạnh gọi.
++7. **"Chờ root" một phần — dev-5467884de4 (recommendationservice|network_delay), hạng 7** (4 đơn vị). Root 7/450 (2%), span phía gọi của frontend 439/450 (98%), 99% là span chờ root. Năm thực thể khác 2–9% cũng đứng trên root. a/n hạng 9, T-D không đổi; bước theo bài đưa root hạng 2. Cờ hiện rõ hơn ở phía gọi; không có nghĩa span của root không đổi. Gắn bằng chứng phía gọi về dịch vụ được gọi là ứng viên cần đánh giá, chưa chứng minh phải dùng cách ấy mới xếp đúng.
+ 
+ Nhóm `k=5|M5` gồm năm trong bảy đường đi trên (các đơn vị 3–7); đối chứng ở k = 5 là `dev-14701a3bbb`, ca có root hạng 2 (đúng trong 5 hạng đầu). So hai bên: ở đối chứng root có 24% span mang cờ; ở năm đơn vị sai root có 0,3–16%.
+ 
+ ### 1.5 Nhóm `Nezha-OB|tracerca|k=1|M0` (2 đơn vị, một đường đi)
+ 
+ - **Đơn vị đọc:** `dev-1ac905bc95` (frontend|return), hạng 3. Root là điểm vào của hệ, không có dịch vụ nào phía trên (0/8 ứng viên). Root 11/409 (3%). Trên root: `checkoutservice` 10/38, `currencyservice` 66/2.178, đều là dịch vụ root gọi.
+-- **Đọc:** lỗi `return` không để lại tín hiệu thời lượng; thứ hạng là thứ hạng của nhiễu nền. Quan hệ gọi tới root không tồn tại ở ca này.
++- **Đọc:** root có 11 span mang cờ nhưng không hạng 1. Chưa tách cờ do lỗi khỏi nhiễu nền; không kết luận return không làm đổi thời lượng. Ca này không có cạnh đi vào root, còn cạnh root gọi dịch vụ khác vẫn có.
+ 
+ ### 1.6 Nhóm `k=1|M3` và `k=5|M3` (hòa)
+ 
+ - **`dev-396c8dbf7d` (emailservice|cpu_consumed), hạng [1, 3].** Root 38/38 (100%), điểm 0,0808, không thực thể nào có điểm cao hơn nhưng có hai thực thể bằng điểm. Lời gọi tới root chậm ở 100% lời gọi. T-D đưa root về hạng [1, 1]. **Đọc:** mỗi lời gọi tới root có hai span (phía gọi và phía được gọi) cùng số lượng và cùng vượt ngưỡng, nên hai thao tác có cùng a, n và cùng điểm. Bước tính điểm không phân biệt được hai đầu của một lời gọi; bỏ phần được span con phủ thì phân biệt được.
+-- **`dev-8ecd9880ed` (checkoutservice|return), hạng [5, 6] ở k = 5.** Root 2/28; root không đứng đầu ở vị trí trace nào. Hòa ở biên hạng 5 giữa các điểm rất nhỏ. Không có tín hiệu để phân xử.
++- **dev-8ecd9880ed (checkoutservice|return), hạng[5,6] ở k=5.** Root 2/28; không đứng đầu ở vị trí trace nào, hòa ở biên hạng 5 giữa điểm nhỏ. Chưa có bằng chứng phân xử đáp ứng do lỗi và cờ nền; không suy từ hạng ra dữ liệu không có dấu hiệu.
+ 
+ ### 1.7 Nhóm `k=1|M2`, `k=1|M6`, `k=5|M2`, `k=5|M6` (cùng một đơn vị)
+ 
+ - **`dev-7b7c973198` (emailservice|network_delay): root không được xếp.** Không thao tác nào của root có span mang cờ, nên root không có điểm hữu hạn và bị bộ lọc của adapter loại. Trong khi đó lời gọi tới root chậm ở 100% lời gọi, và root đứng đầu ở vị trí `in_u` (span phía gọi, phần chưa được span con phủ).
+-- **Đọc:** đây là dạng tận cùng của đường đi 7 ở mục 1.4: tín hiệu chỉ có trên cạnh, span của root không có gì, nên root rơi khỏi bảng. Bước của bài gốc cũng không cứu (root không có điểm dương).
++- **Đọc:** ca này không thao tác nào của root mang cờ theo ngưỡng đang dùng; adapter loại root vì không có điểm hữu hạn. Span phía gọi mang bằng chứng chậm. Đây là chuỗi tính toán cụ thể của ca này, không suy rộng rằng span của root luôn không có tín hiệu ở mọi ca trễ mạng.
+ 
+ ### 1.8 Điều rút ra từ phần đọc TraceRCA
+ 
+-- Có **ba đường thất bại khác nhau**, không phải một: (i) span phía gọi của lời gọi tới root được tính cho dịch vụ gọi (mục 1.2, 1.4 đường 1, 2, 3, 7; 1.6; 1.7); (ii) thao tác đông span thắng nhờ số tuyệt đối (1.2 ca thứ ba, 1.3, 1.4 đường 4, 6); (iii) lỗi không để lại tín hiệu thời lượng (1.4 đường 5; 1.5; 1.6 ca thứ hai). Một ca có thể dính hai đường.
++- Có ba đường quan sát: gắn span phía gọi cho dịch vụ gọi; thao tác đông span thắng nhờ số tuyệt đối; root ít cờ và không được cách chấm hiện tại tách ra. Hai đường đầu có bằng chứng tính toán theo ca; đường cuối chưa xác nhận lỗi không làm đổi thời lượng. Một ca có thể có nhiều đường.
+ - Đường (i) có ở cả ca đúng (đối chứng `dev-9b9397a4dc`): cùng quy tắc gắn span cho dịch vụ sở hữu nó giúp root khi root là bên gọi và hại root khi root là bên được gọi.
+-- Với lỗi trễ mạng ở Nezha-OB, không phép đổi nào trên điểm của nút cứu được root; chỉ thông tin trên cạnh mới mang tín hiệu.
++- Với một phần ca trễ mạng ở Nezha-OB, các phép đổi đã thử chưa đưa root hạng 1 và cờ phía gọi rõ hơn cờ root. Đây là căn cứ đề xuất dùng cạnh; không bác bỏ mọi phép chấm theo nút hoặc mọi tín hiệu của root.
+ - Ca đúng và ca sai cùng ô ở RE2-TT khác nhau về **tải** (có hay không có span của dịch vụ gọi trong cửa sổ), không khác về loại lỗi.
+ 
+ ## 2. MicroRank (biến thể RCAEval sửa đầu vào) — 11 nhóm, 20 đơn vị đọc
+@@ -140,7 +142,7 @@
+ 
+ ### 2.5 Nhóm `Nezha-OB|microrank_full|k=1|M0` (2 đơn vị) và `k=1|M6`, `k=5|M6` (1 đơn vị)
+ 
+-- **`dev-1ac905bc95` (frontend|return), hạng 3.** Root là điểm vào; hai thực thể trên root là dịch vụ root gọi. A′ cho hạng [1, 3]; chia theo luật của bài lên hạng 1, luật của code giữ hạng 3. Lỗi `return` không để lại tín hiệu thời lượng (mục 1.5); kết quả không ổn định giữa hai luật.
++- **dev-1ac905bc95 (frontend|return), hạng 3.** Root ở điểm vào; hai thực thể trên root là dịch vụ root gọi. A′ cho hạng[1,3]; luật bài lên hạng 1, luật code giữ hạng 3. Kết quả không ổn định giữa luật; đáp ứng thời lượng do return còn OPEN (mục 1.5).
+ - **`dev-7b7c973198` (emailservice|network_delay), hạng [8, 9].** Root không tự mang cờ ở trace A nào (0/332); đây là nghĩa của cờ M6. Lời gọi tới root chậm ở 100% lời gọi, tín hiệu chỉ ở span phía gọi. Chia theo bài gốc cho hạng [1, 4]: root hòa với ba dịch vụ khác. Cùng ca với mục 1.7.
+ 
+ ### 2.6 Điều rút ra từ phần đọc MicroRank
+@@ -185,7 +187,7 @@
+ Metric của Nezha-OB chỉ có 5 mẫu mỗi phía, nên median và IQR ước lượng từ 5 điểm. Đối chứng dùng chung là `dev-14701a3bbb` (shippingservice|cpu_contention; khác ô): root hạng 1 với cột mức dùng CPU z = 342, lệch/median 2.869%.
+ 
+ - **`dev-7b7c973198` (emailservice|network_delay), hạng 4** (2 đơn vị). Root: cột độ trễ phía gọi P90, z = 10,4 dù lệch/median 878%, vì IQR/median của nó là 85%. Trên root là ba dịch vụ không liên hệ với z 13–24 và lệch/median 18–451%. B-2 lên hạng 3.
+-- **`dev-5ada15752d` (frontend|return), hạng 8** (2 đơn vị) và **`dev-1ac905bc95` (frontend|return), hạng 10 trên 10** (3 đơn vị). Root z = 3,9 và z = 1,2. Mọi thực thể trên root là dịch vụ root gọi; lưu lượng qua nhiều dịch vụ trong số đó có đổi. B-2 không đổi hạng. **Đọc:** lỗi `return` ở điểm vào làm đổi lưu lượng xuống các dịch vụ phía dưới, còn metric của chính root không đổi. Đây là hướng lan **xuôi** theo lưu lượng, ngược với giả thuyết "lan lên dịch vụ gọi".
++- **dev-5ada15752d (frontend|return), hạng 8** (2 đơn vị) và **dev-1ac905bc95, hạng 10/10** (3 đơn vị). Root z=3,9 và 1,2; mọi thực thể trên root là dịch vụ root gọi, lưu lượng một số dịch vụ đó đổi. B-2 không đổi hạng. Quan sát là khác biệt giữa lưu lượng phía dưới và điểm metric của root; chưa quy thay đổi ấy cho lỗi return hoặc khẳng định metric root không đổi từ hạng thấp.
+ 
+ ### 3.4 Nhóm `Nezha-OB|baro|k=1|M5` (7 đơn vị, năm đường đi) và `k=5|M5` (3 đơn vị)
+ 
+@@ -226,7 +228,7 @@
+ 
+ - **`dev-515c5f2190` (recommendationservice|cpu_consumed), hạng 2** (3 đơn vị): root 2 + 1 = 3; `adservice` (không liên hệ) 4 phiếu. Chênh 1 phiếu. Trace có tín hiệu rõ (root đứng đầu ở cả năm vị trí của bảng A, lời gọi tới root chậm 95%), nhưng kênh trace chỉ góp 1 phiếu.
+ - **`dev-8ecd9880ed` (checkoutservice|return), hạng [4, 5]** (1 đơn vị): root 3 + 0 + 1 = 4; ba thực thể trên root có 8–15 phiếu, cột nhiều phiếu nhất là bộ nhớ.
+-- **`dev-1ac905bc95` và `dev-5ada15752d` (frontend|return), hạng [5, 6] và 6**: root **không có phiếu metric nào** (0/21 cột), chỉ 1 phiếu log. Mọi thực thể trên root là dịch vụ root gọi. Như mục 3.3: lỗi `return` ở điểm vào không để lại tín hiệu metric ở root.
++- **dev-1ac905bc95 và dev-5ada15752d (frontend|return), hạng[5,6] và 6:** root 0 phiếu metric ở 0/21 cột, 1 phiếu log; các thực thể trên root là dịch vụ root gọi. Không có phiếu theo ngưỡng này không đồng nghĩa metric không đổi do lỗi; đáp ứng return chưa phân xử.
+ 
+ ### 4.3 Nhóm `Nezha-OB|simplerca|k=1|M5` (9 đơn vị, sáu đường đi), `k=5|M5`, `k=1|M6`, `k=5|M6`
+ 
+@@ -336,7 +338,7 @@
+ 3. **Cùng một quy tắc "span thuộc dịch vụ nào tính cho dịch vụ đó" giúp root khi root là bên gọi và hại root khi root là bên được gọi** (mục 1.4, đối chứng `dev-9b9397a4dc`).
+ 4. **Ba ca CIRCA đúng là đúng nhờ giá trị cực lớn** (mục 5.1), và **ba ca DA hại không dính giá trị cực lớn đều do một nút không liên quan có điểm lớn kéo các nút cha của nó vượt root** (5.3; cách đọc ban đầu "root không có cạnh" đã được sửa sau phép kiểm KT-15).
+ 5. **Bộ chia trace theo bài MicroRank gốc có phản ví dụ** (mục 2.3 điểm 2; 2.4 điểm 5).
+-6. **Lỗi `return` ở điểm vào làm đổi lưu lượng các dịch vụ phía dưới** trong khi root không có tín hiệu (mục 3.3, 4.2): hướng ngược với giả thuyết lan lên dịch vụ gọi.
++6. **Ở return tại điểm vào, lưu lượng dịch vụ phía dưới có đổi trong khi root có điểm thấp hoặc không có phiếu metric** (mục 3.3,4.2). Quan sát hướng phía dưới khác giả thuyết chờ ở phía trên; chưa xác nhận thay đổi do return hay thiếu tín hiệu trong dữ liệu.
+ 
+ ### 7.3 Giới hạn của phần đọc tay
+ 
+@@ -356,11 +358,11 @@
+ 
+ ### 8.1 BARO — 7 đơn vị
+ 
+-1. **`dev-8ecd9880ed` (Nezha-OB, checkoutservice|return), hạng 8 trên 10.** Cột tốt nhất của root: độ trễ phía gọi P95, z = 4,2 (IQR/median 34%, lệch/median 143%). Trên root 7 thực thể: `adservice` cột độ trễ phía gọi P99 z = 523,3 (lệch/median 398%, IQR/median 0,76%); `paymentservice` cột bộ nhớ z = 144 với lệch/median chỉ 2% trên nền IQR/median 0,013%. B-2 lên hạng 7. Cờ M5 có vì một dịch vụ phía trên đứng trước root; 6/7 thực thể trên root không nằm phía trên. **Giống** đơn vị đại diện (`dev-27252dca60`): lỗi `return` không để lại tín hiệu metric ở root; hạng do nhiễu và nền phẳng quyết định.
++1. **dev-8ecd9880ed (Nezha-OB, checkoutservice|return), hạng 8/10.** Cột tốt nhất root: độ trễ phía gọi P95, z=4,2, IQR/median 34%, lệch/median 143%. adservice z=523,3 (398%, 0,76%); paymentservice z=144 (2%, 0,013%). B-2 hạng 7; 6/7 thực thể trên root không phía trên. Root có thay đổi và có điểm; chưa phân xử phần do lỗi với nền, không thể gọi dữ liệu không có tín hiệu chỉ vì root không hạng 1.
+ 2. **`dev-9b9397a4dc` (Nezha-OB, recommendationservice|cpu_consumed), hạng 2.** Root: độ trễ phía server P90, z = 115,3 với lệch/median 13.931% (gấp 139 lần mức nền) và IQR/median 121%. Trên root: `adservice` (không liên hệ) cột độ trễ phía gọi P99 z = 131,3, lệch/median 100%, IQR/median 0,76%. B-2 làm root **xuống hạng 4**. **Khác** cách đọc ở mục 3.5: đây là đường (ii) "root đổi nhiều nhưng thua cột nền phẳng", nhưng thang độ lệch chuẩn không gỡ được mà còn làm tệ hơn (5 mẫu).
+ 3. **`dev-607751ac0a` (Nezha-OB, checkoutservice|network_delay), hạng 8.** Cột tốt nhất của root là lưu lượng mạng nhận, z = 5,0. Trên root 7 thực thể, đứng đầu `shippingservice` cột độ trễ phía server P99 z = 2.426,2 với lệch/median 59% trên nền IQR/median 0,024%. B-2 xuống hạng 10. Lời gọi tới root chậm ở 9% lời gọi. Chuỗi cột độ trễ của root ở ca này đã in ở KT-12 (`ket-qua-phien-13.md` mục 3): không cột độ trễ nào của root vượt mức nền. **Giống** đơn vị đại diện: root không có tín hiệu metric.
+ 4. **`dev-2bfc97b01e` (Nezha-OB, checkoutservice|network_delay), hạng 2.** Root: độ trễ phía server P99 z = 94,0 (lệch/median 95%, IQR/median 1%). Trên root: `emailservice` (phía dưới root) cột lưu lượng mạng nhận z = 215,1, lệch/median 3.843%, lưu lượng qua nó có đổi. B-2 không đổi. **Điều KT-12 thêm vào:** z = 94 của root là do IQR của 5 mẫu nền gần bằng 0 (0,005); chuỗi sau mốc của cột đó (0,48; 0,49; 0,50; 0,25; 0,97) gần như lặp lại chuỗi nền (0,50; 0,50; 0,97; 0,24; 0,49). Tức root đứng hạng 2 ở ca này không phải vì cột độ trễ của nó phản ứng với sự cố.
+-5. **`dev-3b92690644` (Nezha-OB, checkoutservice|return), hạng 3.** Root: độ trễ phía gọi P99 z = 40 (lệch/median 211%). Trên root: `shippingservice` (phía dưới) cột lưu lượng mạng nhận z = 216, lệch/median 1.850%; `adservice` cột độ trễ phía server P95 z = 58,2. B-2 xuống hạng 4. **Giống** mục 3.3: lỗi ở dịch vụ phía trên làm đổi lưu lượng của dịch vụ phía dưới (hướng xuôi).
++5. **dev-3b92690644 (Nezha-OB, checkoutservice|return), hạng 3.** Root độ trễ phía gọi P99, z=40, lệch/median 211%. shippingservice mạng nhận z=216, lệch/median 1.850%; adservice độ trễ phía server P95, z=58,2. B-2 hạng 4. Root có cột đổi cùng lúc phía dưới có cột đổi; chưa quy riêng cho lỗi hay xác nhận hướng lan.
+ 6. **`dev-f81f88234e` (RE2-TT, auth|delay), hạng 11 trên 68.** Root: cột latency z = 4,9 (IQR/median 31%, lệch/median 152%). Trên root 10 thực thể (7 không liên hệ, 3 không có span): `ts-user-service` latency z = 33,6 (lệch/median 57%, IQR/median 2%); `ts-travel2-service` mem z = 14,2 với lệch/median 0,9%. B-2 lên hạng 10. **Khác** đơn vị đại diện `dev-57546fd87b` ở một điểm: ở đây cột latency của root **có đổi** (KT-12: trung vị 0,77 → 1,38; 158/300 mẫu sau mốc vượt mean + 3·std), nhưng nền của cột dao động rộng (IQR 0,24) nên z nhỏ. Vậy câu "root gần như không có tín hiệu metric" ở mục 3.1 điểm 1 chỉ đúng theo thang z; về mức đổi thì cả ba ca auth|delay đều có trung vị cột latency của root tăng 1,8–3,9 lần (`ket-qua-phien-13.md` mục 3).
+ 7. **`dev-16597725c1` (RE2-TT, auth|cpu), hạng 4.** Root: mem z = 47,5 (lệch/median 2%, IQR/median 0,04%). Trên root: `ts-food-service` latency z = 117,4 (lệch/median 315%), `ts-contacts-service` latency z = 100,6 (519%), `ts-ui-dashboard` latency z = 56,2 (188%, bậc tại mốc). B-2 đưa root lên hạng 1, cả 3 cặp mất. **Khác** câu ở mục 3.5: ba cột thắng ở đây là cột độ trễ đổi thật của dịch vụ không liên hệ (đường iii), vậy mà đổi thang chia vẫn gỡ được. Đường (ii) và (iii) không tách sạch bằng "B-2 gỡ được hay không".
+ 
+@@ -368,7 +370,7 @@
+ 
+ ### 8.2 SimpleRCA — 6 đơn vị
+ 
+-1. **`dev-7b7c973198` (Nezha-OB, emailservice|network_delay), hạng 3.** Root: 6 phiếu metric (4/16 cột) + 0 + 0. Trên root: `cartservice` và `currencyservice` (không liên hệ), mỗi bên 9 phiếu; chênh 3 phiếu. Lời gọi tới root chậm ở 100% lời gọi và root đứng đầu ở vị trí `in_u`, nhưng kênh trace cho root 0 phiếu. S-1 không đổi. **Giống** đơn vị đại diện (`dev-515c5f2190`): chênh vài phiếu; tín hiệu trên cạnh không được đếm.
++1. **`dev-7b7c973198` (Nezha-OB, emailservice|network_delay), hạng 3.** Root: 6 phiếu metric (4/16 cột) + 0 + 0. Trên root: `cartservice` và `currencyservice` (không liên hệ), mỗi bên 9 phiếu; chênh 3 phiếu. Lời gọi tới root chậm ở 100% lời gọi và root đứng đầu ở vị trí `in_u`, nhưng kênh trace cho root 0 phiếu. S-1 giữ hạng tốt nhất 3 nhưng tạo hòa [3,5], nên hạng bi quan là 5. **Giống** đơn vị đại diện (`dev-515c5f2190`): chênh vài phiếu; tín hiệu trên cạnh không được đếm.
+ 2. **`dev-9b9397a4dc` (Nezha-OB, recommendationservice|cpu_consumed), hạng [2, 3].** Root 6 phiếu (2/16 cột); `cartservice` 10 phiếu. S-1 làm root xuống [4, 5]. Giống trên.
+ 3. **`dev-55f99f3e0a` (Nezha-OB, checkoutservice|exception), hạng 2.** Root 10 + 0 + 1 = 11; `frontend` (gọi trực tiếp root) 17 + 0 + 1 = 18, cột nhiều phiếu nhất là độ trễ phía trước P99 (3/5 mẫu). S-1 không đổi. **Giống** `dev-3b92690644`.
+ 4. **`dev-9fd793feb7` (Nezha-OB, shippingservice|cpu_consumed), hạng 2.** Root 16 (9/16 cột) + 1 = 17; `checkoutservice` (gọi trực tiếp root) 19, cột độ trễ phía gọi P95 4/5 mẫu. Lời gọi tới root chậm ở 83% lời gọi. S-1 đưa root lên hạng 1. **Khác** đơn vị đại diện ở tác dụng của S-1 (đại diện: không đổi).
+@@ -383,14 +385,14 @@
+ 2. **`dev-7d3c2fe6d1` (Nezha-OB, shippingservice|cpu_contention), hạng 2.** Root 52/215 (24%); `frontend` 145/182 (80%), 100% là span chờ root. T-D không đổi; a/n xuống hạng 3; bước của bài gốc hạng 3. Cùng ô và **giống hệt** hình dạng của `dev-14701a3bbb` (41/171 so với 122/151).
+ 3. **`dev-55f99f3e0a` (Nezha-OB, checkoutservice|exception), hạng 3.** Root 19/208 (9%). Trên root: `frontend` 70/1.142 (6%), `currencyservice` 126/3.714 (3%); tỷ lệ span chờ root bằng 0. a/n đưa root lên hạng 1. **Giống** `dev-3b92690644`: thao tác đông span thắng nhờ số tuyệt đối.
+ 4. **`dev-b0f8b2e3ac` (Nezha-OB, checkoutservice|exception), hạng 5.** Root 20/212 (9%). Bốn thực thể trên root có 4–6% span mang cờ trên 726–3.552 span. a/n lên hạng 1; T-D lên hạng 3. Giống trên.
+-5. **`dev-5ada15752d` (Nezha-OB, frontend|return), hạng 3.** Root 35/2.201 (2%). Trên root là hai dịch vụ root gọi: `currencyservice` 94/2.447 (4%), `checkoutservice` 8/46 (17%). T-D và a/n đều làm root xuống hạng 6. **Giống** mục 1.5: lỗi `return` không để lại tín hiệu thời lượng.
++5. **dev-5ada15752d (Nezha-OB, frontend|return), hạng 3.** Root 35/2.201 (2%); currencyservice 94/2.447 (4%), checkoutservice 8/46 (17%). T-D và a/n làm root xuống hạng 6. Như mục 1.5, có cờ nhưng root không hạng 1; đáp ứng do lỗi chưa phân xử.
+ 6. **`dev-607751ac0a` (Nezha-OB, checkoutservice|network_delay), hạng 6.** Root 4/33 (12%); năm thực thể trên root có 3–6% trên 208–2.188 span. a/n lên hạng 1. Lời gọi tới root chậm ở 9% lời gọi. **Giống** `dev-2bfc97b01e`.
+ 7. **`dev-63c30faf34` (Nezha-OB, recommendationservice|network_delay), hạng 8.** Root 6/574 (1%); `frontend` 555/574 (97%), 99% là span chờ root; sáu thực thể khác 1–17%. a/n giữ hạng 8; bước của bài gốc đưa root lên hạng 2, `frontend` đứng đầu. **Giống** `dev-5467884de4`.
+ 8. **`dev-6c9afc9822` (Nezha-OB, emailservice|network_delay), hạng 9.** Root 1/27 (4%). Trên root có **hai** thực thể cùng a = 26, n = 27 (96%), cùng điểm 0,0908, cùng 88% span chờ root: `checkoutservice` (gọi trực tiếp root) và `frontend` (gọi `checkoutservice`). Sáu thực thể không liên hệ 1–4% cũng đứng trên root. Bước của bài gốc: root không có điểm dương, hạng 8–10. **Điều mới so với đơn vị đại diện:** thời gian chờ root hiện ở span phía gọi của dịch vụ gọi trực tiếp **và** của dịch vụ gọi dịch vụ đó, với cùng số span. Tức nếu chỉ "gỡ điểm của dịch vụ gọi" thì còn một tầng nữa; muốn gắn tín hiệu về đúng dịch vụ được gọi phải đi theo cạnh trực tiếp tới tận đầu dưới của chuỗi.
+ 9. **`dev-95e164235f` (Nezha-OB, paymentservice|cpu_contention), hạng 6.** Root 7/36 (19%). Trên root: `checkoutservice` (gọi trực tiếp) 10/36 (28%), 100% span chờ root; `frontend` 132/3.710 (4%); ba dịch vụ không liên hệ 2–6% trên 587–3.786 span. a/n đưa root lên hạng 2, chỉ còn `checkoutservice` đứng trên. Lời gọi tới root chậm ở 28% lời gọi. **Đọc:** ca dính cả hai đường: khối lượng (bốn thực thể, mất khi xếp theo tỷ lệ) và span phía gọi (một thực thể, không phép đổi nào trên nút gỡ được).
+ 10. **`dev-db293894ab` (RE2-TT, travel|disk), hạng 2.** Root 247/804 (31%), điểm 0,0947. Trên root: `ts-seat-service` (hai chiều với root) 545/3.921 (14%), điểm 0,1308; 86% span mang cờ là span chờ root. **T-D đưa root lên hạng 1**; a/n cũng lên hạng 1. **Khác** đơn vị đại diện `dev-12a1a88069`, nơi T-D không đổi hạng dù 98% span là span chờ root. Hai ca cùng loại lỗi (disk), cùng dịch vụ đứng trên (`ts-seat-service`), khác nhau ở tác dụng của T-D. Đã mở bảng lời gọi chậm theo cạnh của hai ca (EC2, `runs/call-slow-001/cases/RE2-TT-<mã>.json` → `/edges`, cạnh `ts-seat-service→<root>`): ở ca này 470 lời gọi chậm, 350 nằm trong span của root (74%); ở `dev-12a1a88069` 128 lời gọi chậm, 106 nằm trong span của root (83%). Vậy cách hiểu nêu ở mục 1.2 ("phần chậm nằm ngoài span của root nên T-D không gỡ được") **không được hỗ trợ**: ca mà T-D không gỡ được lại có tỷ lệ nằm trong span của root cao hơn. Lý do hai ca khác nhau **chưa phân xử**; bằng chứng cần: điểm theo thao tác của `ts-seat-service` và của root dưới T-D ở hai ca (có trong lượt `tracerca-core-td-001`, chưa lập bảng so).
+ 
+-**Điều phần đọc nốt thêm cho TraceRCA.** (a) Ba đường thất bại ở mục 1.8 đủ để xếp cả 10 đơn vị: đường (i) span phía gọi ở các đơn vị 1, 2, 7, 8, 9, 10; đường (ii) khối lượng ở 3, 4, 6, 9; đường (iii) không có tín hiệu thời lượng ở 5. (b) Trong 9 đơn vị Nezha-OB đọc nốt, thực thể đứng đầu là `frontend` ở 6 đơn vị (1, 2, 3, 7, 8, 9), còn lại là `currencyservice` (4, 5) và `recommendationservice` (6). (c) Điều mới: chờ lan qua hai tầng dịch vụ gọi với cùng số span (đơn vị 8); và T-D có tác dụng khác nhau trên hai ca cùng dạng ở RE2-TT (đơn vị 10).
++**Phần đọc nốt thêm cho TraceRCA.** Trong 10 đơn vị, quan sát span phía gọi ở 1,2,7,8,9,10; khối lượng ở 3,4,6,9; root ít cờ/không hạng 1 ở 5, chưa xác nhận thiếu đáp ứng do lỗi. Trong 9 đơn vị Nezha, frontend đứng đầu 6 (1,2,3,7,8,9), currencyservice ở 4,5, recommendationservice ở 6. Hai điều mới: chờ qua hai tầng với cùng số span (8), T-D khác nhau ở hai ca RE2-TT cùng dạng (10).
+ 
+ ### 8.4 MicroRank — 28 đơn vị OK (3 đơn vị ERROR xem mục 8.7)
+ 
+@@ -409,7 +411,7 @@
+ **B. Nezha-OB, bộ chia theo bài gốc cứu (2 đơn vị; đại diện `dev-3e27669440`).**
+ 
+ 6. `dev-515c5f2190` (recommendationservice|cpu_consumed), hạng 5: A = 322 (75%); root tự mang cờ ở 299. Bốn thực thể trên root đều có 94% trace A gắn với root (đi cùng trace). Đếm riêng lên hạng 2; chia theo bài gốc hạng 1. Ghép: 1 / 1. **Giống** đại diện.
+-7. `dev-5467884de4` (recommendationservice|network_delay), hạng 5: A = 484 (77%), nhưng root chỉ tự mang cờ ở **7** trace. Chia theo bài gốc đưa root lên hạng 1. **Ghép làm root xuống hạng 4 / 5**, `frontend` đứng đầu; thao tác cao nhất của `frontend` là span phía gọi của lời gọi tới root: 97–98% span mang cờ của nó có span con trực tiếp thuộc root và bao một lời gọi chậm tới root; root mang cờ ở 6–7 trên 67–199 trace đó. **Đọc:** với lỗi trễ mạng, span của root không mang cờ; đếm riêng vì vậy lấy điểm của root đi và trao cho span phía gọi. Đây đúng là hạn chế H4, H7, hiện ra khi ghép hai phép đổi.
++7. dev-5467884de4 (recommendationservice|network_delay), hạng 5: A=484 (77%); root tự mang cờ ở 7 trace. Chia theo bài đưa root hạng 1; ghép làm root hạng 4/5, frontend đứng đầu. 97–98% span mang cờ thao tác phía gọi có con trực tiếp root và bao lời gọi chậm; root mang cờ 6–7/67–199 trace ấy. Đếm riêng lấy điểm từ ít cờ root so với phía gọi, không phải root hoàn toàn không mang cờ. Đây là cơ chế tính toán gắn span cho dịch vụ sở hữu nó của ca này.
+ 
+ **C. Nezha-OB, root là điểm vào (1 đơn vị; đại diện `dev-1ac905bc95`).**
+ 
+@@ -449,10 +451,10 @@
+ 
+ **Điều phần đọc nốt thêm cho MicroRank.**
+ 
+-- Sau khi ghép hai phép đổi, các đơn vị còn sai chia thành ba dạng đọc được, khác nhau về việc quan hệ gọi có chạm tới hay không: (i) **span phía gọi của lời gọi tới root được tính cho dịch vụ gọi** (đơn vị 7, 11, 12, 15, 16, 26; cùng dạng với `dev-3e27669440`, `dev-12a1a88069`, `dev-3ae0a6c15a` đã đọc); (ii) **nhóm trace bất thường không chứa root** và thực thể đứng đầu là một dịch vụ không liên hệ chậm lên cùng lúc (đơn vị 17, 27, 28: `ts-auth-service`) hoặc là `frontend` gọi một dịch vụ đông lời gọi (đơn vị 1, 2 và các ca cùng dạng ở bảng nối); (iii) **quá ít trace bất thường** để xếp (đơn vị 3, 4, 8, 13).
++- Ba dạng quan sát sau ghép là span phía gọi được tính cho dịch vụ gọi; các trace tạo số đếm của thao tác đứng đầu vắng root; hoặc ít span. Chưa bao phủ mọi ca: dev-14701a3bbb chưa rõ dưới cả hai luật; dev-607751ac0a luật code không gắn theo cây con nhưng root có trong 2/6 trace xét. Nhãn root đã biết; chưa rõ cơ chế xếp sai và cách sửa có căn cứ. Nguồn cụ thể: KQ13 mục 5 và runs/microrank-merged-link-001/summary.json → /cases.
+ - Câu chưa giải thích ở mục 2.2 và 2.3 ("vì sao `ts-auth-service` lên đầu sau khi thay bộ chia") nay có một phần trả lời: nó chậm lên thật sau mốc (KT-2), và trace của nó không đi qua root. Vì sao nó chậm lên thì **không phân xử được bằng dữ liệu hiện có** (`kiem-tiep.md` mục KT-6).
+ - Dạng (i) là dạng mà cạnh gọi có thể chỉnh. Dạng (ii) với `ts-auth-service` thì cạnh gọi không chỉnh được: hai dịch vụ không có cạnh.
+-- Không có phản ví dụ nào trong 28 đơn vị cho ba dạng ở mục 2.6; hai điều chỉnh: bốn đơn vị nhóm A thuộc dạng "root vắng trong nhóm A" chứ không phải dạng của đơn vị đại diện, và M-D có một ca đưa root lên hạng 1 (đơn vị 5).
++- 28 đơn vị đọc nốt không chứng nhận ba dạng đã giải thích mọi ca. Bảng nối giữ nguyên ca chưa rõ và ca không gắn nhưng root hiện diện; bốn đơn vị nhóm A được mô tả theo tập trace tạo số đếm của thao tác đứng đầu. M-D có một ca đưa root hạng 1 (đơn vị 5), giữ nguyên phản ví dụ ấy.
+ 
+ ### 8.5 CIRCA — 8 đơn vị OK (21 đơn vị UNSUPPORTED xem mục 8.7)
+ 

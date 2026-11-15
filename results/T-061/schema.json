@@ -1,0 +1,1032 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "results/T-061/schema.json",
+ "title": "Kết quả RCA cho giao diện — định dạng 0.2 (T-061)",
+ "description": "Ý nghĩa từng trường và nguồn (trực tiếp từ M1 hay dẫn xuất) ở dinh-dang-ket-qua-rca.md. Trạng thái ERROR/UNSUPPORTED: cửa sổ, verdict rỗng, không nút/cạnh/hạng; mốc lấy từ request.json của bộ điều phối. Trường `phat_lai` chỉ có ở bản phát lại, do phat-lai.py thêm sau khi đầu ra đã băm.",
+ "type": "object",
+ "additionalProperties": false,
+ "required": [
+  "dinh_dang",
+  "phien_ban_dinh_dang",
+  "su_co",
+  "nguon",
+  "do_phu",
+  "nut",
+  "canh",
+  "xep_hang",
+  "vung",
+  "bang_chung",
+  "giai_thich_ke_thua",
+  "giai_thich"
+ ],
+ "properties": {
+  "dinh_dang": {
+   "const": "flashticket-rca-ket-qua"
+  },
+  "phien_ban_dinh_dang": {
+   "const": "0.2"
+  },
+  "su_co": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "ma",
+    "che_do",
+    "moc",
+    "cua_so_nen",
+    "cua_so_su_co",
+    "ket_luan",
+    "ket_luan_hien_thi",
+    "trang_thai",
+    "loi"
+   ],
+   "properties": {
+    "ma": {
+     "type": "string",
+     "minLength": 1,
+     "description": "Mã mờ của ca do bộ điều phối cấp; không mang nghĩa nhãn"
+    },
+    "che_do": {
+     "const": "a",
+     "description": "Bản 0.2 chỉ hỗ trợ chế độ a"
+    },
+    "moc": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "t_ns",
+      "t_utc",
+      "nguon",
+      "mo_ta"
+     ],
+     "properties": {
+      "t_ns": {
+       "type": "integer"
+      },
+      "t_utc": {
+       "type": "string"
+      },
+      "nguon": {
+       "const": "bo_dieu_phoi"
+      },
+      "mo_ta": {
+       "type": "string"
+      }
+     }
+    },
+    "cua_so_nen": {
+     "oneOf": [
+      {
+       "$ref": "#/$defs/khoang"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "cua_so_su_co": {
+     "oneOf": [
+      {
+       "$ref": "#/$defs/khoang"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "ket_luan": {
+     "enum": [
+      "CAUSE_FOUND",
+      "NO_INTRINSIC_ANOMALY",
+      "INSUFFICIENT_EVIDENCE",
+      null
+     ]
+    },
+    "ket_luan_hien_thi": {
+     "type": "string"
+    },
+    "trang_thai": {
+     "enum": [
+      "OK",
+      "NO_EVIDENCE",
+      "ERROR",
+      "UNSUPPORTED"
+     ]
+    },
+    "loi": {
+     "type": [
+      "string",
+      "null"
+     ]
+    }
+   },
+   "allOf": [
+    {
+     "if": {
+      "properties": {
+       "trang_thai": {
+        "enum": [
+         "OK",
+         "NO_EVIDENCE"
+        ]
+       }
+      }
+     },
+     "then": {
+      "properties": {
+       "cua_so_nen": {
+        "$ref": "#/$defs/khoang"
+       },
+       "cua_so_su_co": {
+        "$ref": "#/$defs/khoang"
+       },
+       "ket_luan": {
+        "enum": [
+         "CAUSE_FOUND",
+         "NO_INTRINSIC_ANOMALY",
+         "INSUFFICIENT_EVIDENCE"
+        ]
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "trang_thai": {
+        "enum": [
+         "ERROR",
+         "UNSUPPORTED"
+        ]
+       }
+      }
+     },
+     "then": {
+      "properties": {
+       "cua_so_nen": {
+        "type": "null"
+       },
+       "cua_so_su_co": {
+        "type": "null"
+       },
+       "ket_luan": {
+        "type": "null"
+       },
+       "loi": {
+        "type": "string"
+       }
+      }
+     }
+    }
+   ]
+  },
+  "nguon": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "file_m1",
+    "sha256_m1",
+    "bytes_m1",
+    "adapter",
+    "sha256_adapter",
+    "manifest",
+    "bo_chuyen_doi",
+    "sha256_bo_chuyen_doi",
+    "method",
+    "method_version",
+    "config_id",
+    "variant",
+    "why_ids",
+    "che_do_m1",
+    "request",
+    "sha256_request"
+   ],
+   "properties": {
+    "file_m1": {
+     "type": "string"
+    },
+    "sha256_m1": {
+     "$ref": "#/$defs/sha256"
+    },
+    "bytes_m1": {
+     "type": "integer",
+     "minimum": 1
+    },
+    "adapter": {
+     "type": "string"
+    },
+    "sha256_adapter": {
+     "$ref": "#/$defs/sha256"
+    },
+    "manifest": {
+     "type": "string"
+    },
+    "bo_chuyen_doi": {
+     "type": "string"
+    },
+    "sha256_bo_chuyen_doi": {
+     "$ref": "#/$defs/sha256"
+    },
+    "method": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "method_version": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "config_id": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "variant": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "why_ids": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "che_do_m1": {
+     "type": [
+      "object",
+      "null"
+     ]
+    },
+    "request": {
+     "type": "string"
+    },
+    "sha256_request": {
+     "$ref": "#/$defs/sha256"
+    }
+   }
+  },
+  "do_phu": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "so_quan_sat",
+    "so_tra_hang",
+    "do_phu_cham",
+    "thieu_kenh_hop_le",
+    "so_canh_quan_sat",
+    "so_canh_tinh",
+    "thuc_the_khong_co_canh",
+    "hang_doi_giua_the_gioi",
+    "don_vi_phu_thuoc_quan_sat",
+    "ghi_chu"
+   ],
+   "properties": {
+    "so_quan_sat": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "so_tra_hang": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "do_phu_cham": {
+     "type": [
+      "number",
+      "null"
+     ],
+     "minimum": 0,
+     "maximum": 1
+    },
+    "thieu_kenh_hop_le": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "so_canh_quan_sat": {
+     "type": [
+      "integer",
+      "null"
+     ],
+     "minimum": 0
+    },
+    "so_canh_tinh": {
+     "type": [
+      "integer",
+      "null"
+     ],
+     "minimum": 0
+    },
+    "thuc_the_khong_co_canh": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "hang_doi_giua_the_gioi": {
+     "type": [
+      "boolean",
+      "null"
+     ],
+     "description": "/RANK_CHANGED: thứ tự đổi giữa ba thế giới P, S_lo, S_hi"
+    },
+    "don_vi_phu_thuoc_quan_sat": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     },
+     "description": "/OBS_DEPENDENT"
+    },
+    "ghi_chu": {
+     "type": "string"
+    }
+   }
+  },
+  "nut": {
+   "type": "array",
+   "items": {
+    "$ref": "#/$defs/nut"
+   }
+  },
+  "canh": {
+   "type": "array",
+   "items": {
+    "$ref": "#/$defs/canh"
+   }
+  },
+  "xep_hang": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "hang",
+     "nhom_dong_hang",
+     "thuc_the",
+     "so_thuc_the",
+     "tang",
+     "khoa_m1"
+    ],
+    "properties": {
+     "hang": {
+      "type": "integer",
+      "minimum": 1
+     },
+     "nhom_dong_hang": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "thuc_the": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "minItems": 1
+     },
+     "so_thuc_the": {
+      "type": "integer",
+      "minimum": 1
+     },
+     "tang": {
+      "enum": [
+       1,
+       2,
+       3
+      ]
+     },
+     "khoa_m1": {
+      "type": "array",
+      "items": {
+       "type": "number"
+      }
+     }
+    }
+   }
+  },
+  "vung": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "ap_dung",
+    "ly_do",
+    "goc",
+    "hop_cach_1",
+    "hop_cach_2",
+    "cach_1",
+    "cach_2",
+    "T_m1"
+   ],
+   "properties": {
+    "ap_dung": {
+     "type": "boolean"
+    },
+    "ly_do": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "goc": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "hop_cach_1": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "hop_cach_2": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "cach_1": {
+     "type": "object",
+     "additionalProperties": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    },
+    "cach_2": {
+     "type": "object",
+     "additionalProperties": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    },
+    "T_m1": {
+     "type": [
+      "array",
+      "null"
+     ],
+     "items": {
+      "type": "string"
+     }
+    }
+   },
+   "if": {
+    "properties": {
+     "ap_dung": {
+      "const": false
+     }
+    }
+   },
+   "then": {
+    "properties": {
+     "goc": {
+      "maxItems": 0
+     },
+     "hop_cach_1": {
+      "maxItems": 0
+     },
+     "hop_cach_2": {
+      "maxItems": 0
+     },
+     "ly_do": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  "bang_chung": {
+   "type": "array",
+   "items": {
+    "$ref": "#/$defs/bang_chung"
+   }
+  },
+  "giai_thich_ke_thua": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "thuc_the",
+     "kenh_ma",
+     "duong",
+     "giai_thich_boi",
+     "quy_tac",
+     "trang_thai"
+    ],
+    "properties": {
+     "thuc_the": {
+      "type": "string"
+     },
+     "kenh_ma": {
+      "type": "string"
+     },
+     "duong": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "giai_thich_boi": {
+      "type": "string"
+     },
+     "quy_tac": {
+      "type": "string"
+     },
+     "trang_thai": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  "giai_thich": {
+   "type": [
+    "string",
+    "null"
+   ],
+   "description": "Lời giải thích LLM (G4); null tới khi có"
+  },
+  "phat_lai": {
+   "$ref": "#/$defs/phat_lai"
+  }
+ },
+ "$defs": {
+  "sha256": {
+   "type": "string",
+   "pattern": "^[0-9a-f]{64}$"
+  },
+  "khoang": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "tu_ns",
+    "den_ns",
+    "tu_ms",
+    "den_ms",
+    "tu_utc",
+    "den_utc"
+   ],
+   "properties": {
+    "tu_ns": {
+     "type": "integer"
+    },
+    "den_ns": {
+     "type": "integer"
+    },
+    "tu_ms": {
+     "type": "integer"
+    },
+    "den_ms": {
+     "type": "integer"
+    },
+    "tu_utc": {
+     "type": "string"
+    },
+    "den_utc": {
+     "type": "string"
+    }
+   }
+  },
+  "hien_thi_nut": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "mau",
+    "nhan_trong",
+    "nhan_phu"
+   ],
+   "properties": {
+    "mau": {
+     "type": "string",
+     "pattern": "^#[0-9A-Fa-f]{6}$"
+    },
+    "nhan_trong": {
+     "type": "string"
+    },
+    "nhan_phu": {
+     "type": "string"
+    }
+   }
+  },
+  "nut": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "id",
+    "ten",
+    "lop_m1",
+    "vai_tro",
+    "tang_m1",
+    "hang",
+    "nhom_dong_hang",
+    "so_dong_hang",
+    "khoa_m1",
+    "noi_bat",
+    "goc_vung",
+    "trong_vung_cach_1",
+    "trong_vung_cach_2",
+    "co_canh",
+    "bang_chung",
+    "hien_thi"
+   ],
+   "properties": {
+    "id": {
+     "type": "string",
+     "minLength": 1
+    },
+    "ten": {
+     "type": "string"
+    },
+    "lop_m1": {
+     "enum": [
+      "tu_sinh",
+      "ke_thua",
+      "binh_thuong",
+      "thieu_du_lieu",
+      null
+     ]
+    },
+    "vai_tro": {
+     "enum": [
+      "nghi_nguon",
+      "bi_keo_theo",
+      "binh_thuong",
+      "thieu_du_lieu",
+      "khong_ro"
+     ]
+    },
+    "tang_m1": {
+     "enum": [
+      1,
+      2,
+      3,
+      null
+     ]
+    },
+    "hang": {
+     "type": [
+      "integer",
+      "null"
+     ],
+     "minimum": 1
+    },
+    "nhom_dong_hang": {
+     "type": [
+      "integer",
+      "null"
+     ],
+     "minimum": 0
+    },
+    "so_dong_hang": {
+     "type": [
+      "integer",
+      "null"
+     ],
+     "minimum": 1
+    },
+    "khoa_m1": {
+     "type": [
+      "array",
+      "null"
+     ],
+     "items": {
+      "type": "number"
+     }
+    },
+    "noi_bat": {
+     "type": "boolean"
+    },
+    "goc_vung": {
+     "type": "boolean"
+    },
+    "trong_vung_cach_1": {
+     "type": "boolean"
+    },
+    "trong_vung_cach_2": {
+     "type": "boolean"
+    },
+    "co_canh": {
+     "type": "boolean"
+    },
+    "bang_chung": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "hien_thi": {
+     "$ref": "#/$defs/hien_thi_nut"
+    }
+   },
+   "allOf": [
+    {
+     "if": {
+      "properties": {
+       "vai_tro": {
+        "const": "thieu_du_lieu"
+       }
+      }
+     },
+     "then": {
+      "properties": {
+       "hang": {
+        "type": "null"
+       },
+       "nhom_dong_hang": {
+        "type": "null"
+       },
+       "noi_bat": {
+        "const": false
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "noi_bat": {
+        "const": true
+       }
+      }
+     },
+     "then": {
+      "properties": {
+       "vai_tro": {
+        "const": "nghi_nguon"
+       },
+       "hang": {
+        "const": 1
+       }
+      }
+     }
+    }
+   ]
+  },
+  "canh": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "id",
+    "nguon",
+    "dich",
+    "chieu",
+    "nguon_goc",
+    "bang_chung",
+    "hien_thi"
+   ],
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "nguon": {
+     "type": "string",
+     "description": "Bên gọi (chủ span cha)"
+    },
+    "dich": {
+     "type": "string",
+     "description": "Bên được gọi (chủ span con)"
+    },
+    "chieu": {
+     "const": "ben_goi->ben_duoc_goi"
+    },
+    "nguon_goc": {
+     "enum": [
+      "quan_sat",
+      "quan_sat_hoac_tinh"
+     ]
+    },
+    "bang_chung": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "hien_thi": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "mau",
+      "nhan"
+     ],
+     "properties": {
+      "mau": {
+       "type": "string",
+       "pattern": "^#[0-9A-Fa-f]{6}$"
+      },
+      "nhan": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  },
+  "lien_ket": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "loai",
+    "kho",
+    "truy_van",
+    "cua_so_ms",
+    "cach_lay",
+    "ghi_chu"
+   ],
+   "properties": {
+    "loai": {
+     "enum": [
+      "metric",
+      "trace_tim_kiem",
+      "log"
+     ]
+    },
+    "kho": {
+     "enum": [
+      "prometheus",
+      "tempo",
+      "loki"
+     ]
+    },
+    "truy_van": {
+     "type": "string",
+     "minLength": 1
+    },
+    "bo_loc_chuoi": {
+     "type": "object",
+     "additionalProperties": {
+      "type": "string"
+     }
+    },
+    "cua_so_ms": {
+     "type": "array",
+     "items": {
+      "type": "integer"
+     },
+     "minItems": 2,
+     "maxItems": 2
+    },
+    "cach_lay": {
+     "enum": [
+      "truc_tiep",
+      "dan_xuat"
+     ]
+    },
+    "ghi_chu": {
+     "type": "string"
+    }
+   }
+  },
+  "bang_chung": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "id",
+    "don_vi",
+    "thuc_the",
+    "kenh",
+    "huong",
+    "lop",
+    "s",
+    "F_I",
+    "khoi_phat_ns",
+    "khoi_phat_utc",
+    "lien_ket",
+    "ly_do_khong_lien_ket"
+   ],
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "don_vi": {
+     "type": "string"
+    },
+    "thuc_the": {
+     "type": "string"
+    },
+    "kenh": {
+     "type": "string"
+    },
+    "huong": {
+     "enum": [
+      "len",
+      "xuong"
+     ]
+    },
+    "lop": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "s": {
+     "type": "number"
+    },
+    "F_I": {
+     "enum": [
+      0,
+      1
+     ]
+    },
+    "khoi_phat_ns": {
+     "type": [
+      "integer",
+      "null"
+     ]
+    },
+    "khoi_phat_utc": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "lien_ket": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/lien_ket"
+     }
+    },
+    "ly_do_khong_lien_ket": {
+     "type": [
+      "string",
+      "null"
+     ]
+    }
+   },
+   "if": {
+    "properties": {
+     "lien_ket": {
+      "maxItems": 0
+     }
+    }
+   },
+   "then": {
+    "properties": {
+     "ly_do_khong_lien_ket": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  "phat_lai": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "canh_bao",
+    "nguon_dap_an",
+    "sha256_dap_an",
+    "sha256_ket_qua_truoc_ghep",
+    "thanh_phan_tiem",
+    "ho_loi",
+    "moc_xac_nhan_utc",
+    "nhan_xet"
+   ],
+   "properties": {
+    "canh_bao": {
+     "type": "string"
+    },
+    "nguon_dap_an": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "sha256_dap_an": {
+     "type": "object",
+     "additionalProperties": {
+      "$ref": "#/$defs/sha256"
+     }
+    },
+    "sha256_ket_qua_truoc_ghep": {
+     "$ref": "#/$defs/sha256"
+    },
+    "thanh_phan_tiem": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "ho_loi": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "moc_xac_nhan_utc": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "nhan_xet": {
+     "type": "string"
+    }
+   }
+  }
+ }
+}

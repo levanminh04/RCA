@@ -1,0 +1,34 @@
+{
+  "global": {
+    "scrape_interval": "10s"
+  },
+  "storage": {
+    "tsdb": {
+      "out_of_order_time_window": "30m"
+    }
+  },
+  "otlp": {
+    "promote_resource_attributes": [
+      "service.name",
+      "service.instance.id",
+      "host.id",
+      "deployment.environment",
+      "container.name",
+      "container.id",
+      "db.namespace",
+      "postgresql.database.name"
+    ]
+  },
+  "scrape_configs": [
+    {
+      "job_name": "prometheus",
+      "static_configs": [
+        {
+          "targets": [
+            "127.0.0.1:9090"
+          ]
+        }
+      ]
+    }
+  ]
+}

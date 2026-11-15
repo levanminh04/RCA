@@ -1,0 +1,108 @@
+{
+  "utc": "2026-11-14T07:57:30.013Z",
+  "ban": "V041-R1-H1c+H5b+H8s1",
+  "ca": "4af494a5",
+  "service": "payment-service",
+  "op": "oe819fc37fe58d0462c15",
+  "ten": "Channel.waitForConfirms",
+  "loai": "message",
+  "co_m1": true,
+  "expected": {
+    "id": "oe819fc37fe58d0462c15",
+    "ten": "Channel.waitForConfirms",
+    "loai": "message",
+    "co_m1": true,
+    "lien_ket": [
+      {
+        "kho": "tempo",
+        "loai": "trace_tim_kiem",
+        "cach_lay": "dan_xuat",
+        "truy_van": "{ resource.service.name = \"payment-service\" && name = \"Channel.waitForConfirms\" }",
+        "cua_so_ms": [
+          1794556238000,
+          1794556838000
+        ],
+        "pham_vi": "tim_span_thao_tac",
+        "ghi_chu": "Truy vấn từ owner/tên thao tác đã quan sát trong đầu vào; không phải trace do M1 chọn.",
+        "url": "/explore?schemaVersion=1&orgId=1&panes=%7B%22a%22%3A%7B%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22refId%22%3A%22A%22%2C%22datasource%22%3A%7B%22type%22%3A%22tempo%22%2C%22uid%22%3A%22tempo%22%7D%2C%22queryType%22%3A%22traceql%22%2C%22query%22%3A%22%7B%20resource.service.name%20%3D%20%5C%22payment-service%5C%22%20%26%26%20name%20%3D%20%5C%22Channel.waitForConfirms%5C%22%20%7D%22%2C%22limit%22%3A50%2C%22tableType%22%3A%22traces%22%7D%5D%2C%22range%22%3A%7B%22from%22%3A%221794556238000%22%2C%22to%22%3A%221794556837999%22%7D%7D%7D"
+      },
+      {
+        "kho": "loki",
+        "loai": "log",
+        "cach_lay": "dan_xuat",
+        "truy_van": "{service_name=\"payment-service\"}",
+        "cua_so_ms": [
+          1794556238000,
+          1794556838000
+        ],
+        "pham_vi": "ngu_canh_service",
+        "ghi_chu": "Log ngữ cảnh service đã có đầu vào; không khẳng định log do thao tác phát.",
+        "url": "/explore?schemaVersion=1&orgId=1&panes=%7B%22a%22%3A%7B%22datasource%22%3A%22loki%22%2C%22queries%22%3A%5B%7B%22refId%22%3A%22A%22%2C%22datasource%22%3A%7B%22type%22%3A%22loki%22%2C%22uid%22%3A%22loki%22%7D%2C%22expr%22%3A%22%7Bservice_name%3D%5C%22payment-service%5C%22%7D%22%2C%22queryType%22%3A%22range%22%2C%22maxLines%22%3A200%7D%5D%2C%22range%22%3A%7B%22from%22%3A%221794556238000%22%2C%22to%22%3A%221794556837999%22%7D%7D%7D"
+      }
+    ],
+    "ly_do_khong_prometheus": "Không có cặp http.route/method trong raw span của thao tác; không dựng metric SQL/job/message từ tên."
+  },
+  "observed_links": [
+    {
+      "href": "/explore?schemaVersion=1&orgId=1&panes=%7B%22a%22%3A%7B%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22refId%22%3A%22A%22%2C%22datasource%22%3A%7B%22type%22%3A%22tempo%22%2C%22uid%22%3A%22tempo%22%7D%2C%22queryType%22%3A%22traceql%22%2C%22query%22%3A%22%7B%20resource.service.name%20%3D%20%5C%22event-service%5C%22%20%26%26%20name%20%3D%20%5C%22GET%20%2Fapi%2Fv1%2Fevents%2F%7Bid%7D%5C%22%20%7D%22%2C%22limit%22%3A50%2C%22tableType%22%3A%22traces%22%7D%5D%2C%22range%22%3A%7B%22from%22%3A%221794556238000%22%2C%22to%22%3A%221794556837999%22%7D%7D%7D",
+      "text": "tempo ↗"
+    },
+    {
+      "href": "/explore?schemaVersion=1&orgId=1&panes=%7B%22a%22%3A%7B%22datasource%22%3A%22prometheus%22%2C%22queries%22%3A%5B%7B%22refId%22%3A%22A%22%2C%22datasource%22%3A%7B%22type%22%3A%22prometheus%22%2C%22uid%22%3A%22prometheus%22%7D%2C%22expr%22%3A%22sum%20by%20(http_request_method%2Chttp_route)%20(rate(http_server_request_duration_seconds_count%7Bservice_name%3D%5C%22event-service%5C%22%2Chttp_request_method%3D%5C%22GET%5C%22%2Chttp_route%3D%5C%22%2Fapi%2Fv1%2Fevents%2F%7Bid%7D%5C%22%7D%5B1m%5D))%22%2C%22range%22%3Atrue%7D%5D%2C%22range%22%3A%7B%22from%22%3A%221794556238000%22%2C%22to%22%3A%221794556837999%22%7D%7D%7D",
+      "text": "prometheus ↗"
+    }
+  ],
+  "detail": {
+    "headers": [
+      "Trường",
+      "Giá trị"
+    ],
+    "rows": [
+      [
+        "Thao tác",
+        "Channel.waitForConfirms"
+      ],
+      [
+        "Trạng thái",
+        "OK"
+      ],
+      [
+        "e tăng",
+        "21.22463284379172"
+      ],
+      [
+        "e giảm",
+        "0"
+      ],
+      [
+        "Kênh có cờ",
+        "payment-service|op|payment-service|Channel.waitForConfirms|Channel.waitForConfirms|len"
+      ],
+      [
+        "Span gốc",
+        "0"
+      ],
+      [
+        "Span mồ côi",
+        "0"
+      ],
+      [
+        "Đích quan sát",
+        "Chưa có giá trị cho trường này."
+      ],
+      [
+        "Giới hạn metric",
+        "Không có cặp http.route/method trong raw span của thao tác; không dựng metric SQL/job/message từ tên."
+      ]
+    ]
+  },
+  "checks": {
+    "op": true,
+    "ca": true,
+    "ban": true,
+    "service": true,
+    "window": true,
+    "links": false
+  },
+  "url": "http://127.0.0.1:13000/d/t065-l4-rca/t-065-l4-e28094-chon-ban-m1-cung-ca?var-ban=V041-R1-H1c%2BH5b%2BH8s1&var-ca=4af494a5&var-dv=payment-service&var-op=oe819fc37fe58d0462c15&from=2026-11-13T07:50:38.000Z&to=2026-11-13T08:00:37.999Z&timezone=utc&var-dv_svc=payment-service"
+}

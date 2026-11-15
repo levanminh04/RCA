@@ -1,0 +1,7 @@
+# L1: pilot sau bảo trì có lỗi cần điều phối đọc
+
+2026-11-13T03:00Z. Máy D2 đã kết thúc tự nhiên 02:53:27Z, exit0; L1 không dừng/sửa D2. Giao dịch đơn sau bảo trì hoàn tất lúc02:55:42Z, 1 véVALID, mock00/302. Tuyến remote forward mới app->AWS19091 hoạt động; mock/tunnel phục hồi đã kiểm.
+
+Pilot l1maint20261113a đang chạy đủ300s. Theo log tiến độ, nhiều create_payment nhận503/504 từgateway; chưa quy nguyên nhân. Bằng chứng: loi-pilot-chan-doan.jsonl, trace-loi-payment.jsonl, payment-discovery-trong-pilot.jsonl. Trace504 mẫu b3d9fc69c85d9e3b2bc7bd449f6407a5: gatewayCLIENT tới127.0.0.1:8083 kéo25s rồi cancelled, chưa thấy spanpayment cùngtrace trong kết quả truy vấn. Trace503 mẫu7ac27fe8ee682ae8a03897a39b90fba1 cógatewaySERVER+Redis, khôngCLIENT. Containerpayment/booking/gateway đềuRunning, restart0. Kiểm03:00:06Z: EurekapaymentUP, payment8083 nghe, /actuator/health trả401 ngay. Không suy health401 là readiness nghiệp vụ.
+
+L1 không đổi Collector/Toxiproxy/iptables/bộtiêm hoặc config/nghiệp vụ. Chưa đủ bằng chứng để phân biệt gateway/circuit/connectionpool, listener/worker của payment, áp lực tài nguyên/đường mạng hoặc mất telemetry. Cần điều phối đối chiếu các thao tác trênexp-app trong cửa sổ và kiểm trạng thái HTTP/circuit/worker khi lỗi; L1 chỉ giữ bằng chứng và làm tiếp lượt bậc tải theo quyền, báo đủlỗi/dropped. Không coi singlepurchase thành công là pilot khỏe. Không chạy lại pilot trước khi biết phần thay đổi/bằng chứng mới phân xử gì.

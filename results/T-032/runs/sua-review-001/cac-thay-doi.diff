@@ -1,0 +1,584 @@
+--- before/results/T-032/nguyen-nhan-xep-hang.md
++++ after/results/T-032/nguyen-nhan-xep-hang.md
+@@ -1,6 +1,6 @@
+ # T-032 — Vì sao các phương pháp RCA xếp sai dịch vụ gốc: bản đồ hạn chế trên tập dev
+ 
+-Người làm: Claude. Bản tổng hợp phiên 12, ngày 11/10/2026; cập nhật cùng ngày sau ba phép kiểm chạy trên laptop (KQ12) và, ở phiên 13, sau sáu phép kiểm còn lại cùng phần đọc tay nốt (`ket-qua-phien-13.md`, viết tắt KQ13). Trạng thái: chờ phản biện. Bản này thay bản "kết quả nghiên cứu ban đầu" (lưu ở `runs/tong-hop-phien-12-001/ban-truoc/`); bản trước lượt cập nhật phiên 13 lưu ở `runs/tong-hop-phien-13-001/ban-truoc/`.
++Người làm lịch sử: Claude. Bản tổng hợp phiên 12–13 ngày 11/10/2026; Codex sửa sau REVIEW theo lời Minh duyệt ngày 11/10; hoàn thiện ngày 12/10/2026. Trạng thái: chờ phiên Codex mới kiểm lại. Bản trước phiên 12–13 ở các thư mục tong-hop-phien-12-001/ban-truoc/ và tong-hop-phien-13-001/ban-truoc/; bản trước lượt sửa này ở runs/sua-review-001/ban-truoc/. Không đổi kết quả đóng băng.
+ 
+ Task này phục vụ câu hỏi nghiên cứu RQ2 và gói P4 của kế hoạch nghiên cứu: các phương pháp RCA đã có thất bại ở ca nào và **vì bước tính nào**. Nó ứng với yêu cầu của cô "chỉ ra vấn đề còn tồn đọng, hạn chế của các phương pháp đã có" trước khi tiếp cận phương pháp đồ thị. Task xong không có nghĩa RQ2 hay cổng G2 đã đóng.
+ 
+@@ -10,9 +10,9 @@
+ 
+ 1. **Chỗ hỏng lớn nhất tìm được ở mỗi phương pháp là một bước khác nhau; không có một nguyên nhân chung.** MicroRank: bước chia trace thành "bất thường" và "bình thường". TraceRCA: bước gắn cờ theo thời lượng cả span và công thức điểm. BARO: thang chuẩn hóa. SimpleRCA: cách đếm phiếu. CIRCA: một lỗi số học lan qua đồ thị. TORAI: nguồn log. Ở phương pháp nào cũng còn một phần ca sai chưa bước nào giải thích (mục 7).
+ 2. **Ba trong các chỗ hỏng lớn nhất thuộc bản cài trong thư viện hoặc đầu vào do chúng tôi dựng, không thuộc bài báo gốc:** bước chia trace của MicroRank, cả hai hạn chế của TraceRCA, và nguồn log của TORAI. Phải nói rõ điều này trước khi gọi đó là "hạn chế của phương pháp".
+-3. **Giả thuyết "nhầm triệu chứng với nguyên nhân" (dịch vụ gọi bị chấm cao vì phải chờ dịch vụ gốc) có thật, nhưng chỉ ở một phần.** Nó được xác nhận ở mức tính toán cho TraceRCA (4/4 và 9/15 cặp xét được), không được hỗ trợ ở MicroRank (0/10 và 4/16), và chỉ chạm một phần nhỏ các cặp sai của hai phương pháp metric (5/103 cặp của BARO ở RE2-TT). Hiện tượng "chờ" có cả ở ca đúng, nên tự nó không phân biệt ca sai.
++3. **Dịch vụ gọi bị chấm cao vì phải chờ root có bằng chứng ở một phần ca, tùy phương pháp.** Với TraceRCA, chuỗi tính toán được xác nhận ở 4/4 và 9/15 cặp xét được. Với MicroRank, tiêu chí liên kết hiện tại không hỗ trợ cách giải thích này ở đa số cặp (0/10 và 4/16); phép đổi thời lượng chưa đủ bác bỏ đường cờ → nhóm trace → điểm. Với BARO ở RE2-TT, chỉ 5/103 cặp vừa trên chuỗi gọi vừa có cột đổi tại mốc. Chờ cũng có ở ca đúng, nên riêng hiện tượng này không phân biệt ca sai.
+ 4. **Thông tin để định vị root có trong trace nhưng nằm ở chỗ các phương pháp không nhìn:** ở phần của span không do span con phủ (tách được root ở 26/26 ca RE2-TT có bảng span), và ở span phía gọi của lời gọi tới root (với lỗi trễ mạng ở Nezha-OB: 5/6 ca). Đây là căn cứ để **đề xuất ứng viên** dùng cạnh gọi; chưa phải bằng chứng đồ thị giúp.
+-5. **Có những ca nằm ngoài tầm của các kênh đang dùng và của quan hệ gọi tới root:** lỗi không để lại tín hiệu ở kênh được dùng (lỗi `return` ở Nezha-OB: 3/4 ca), root không được dịch vụ nào gọi (8/52 ca), dịch vụ không liên hệ có metric đổi đúng lúc sự cố mà dữ liệu không cho biết vì sao.
++5. **Có những ca chưa định vị được root bằng cách chấm hiện tại.** Ở 3/4 ca return của Nezha-OB, root không đứng hạng 1 dưới các cách chấm trong bảng kiểm; điều này chưa chứng minh dữ liệu không có dấu hiệu do lỗi. Ở 8/52 ca không có cạnh gọi đi vào root, nên cách dựa riêng vào cạnh đi vào không áp dụng. Một số dịch vụ không liên hệ có metric đổi tại mốc mà dữ liệu chưa cho biết vì sao.
+ 6. **Việc "dịch vụ gọi chờ root" chỉ đo được chắc ở 16 ca Nezha-OB;** ở 21 ca RE2-TT chỉ đo được một phần vì dataset không công bố công cụ ghi span; 15 ca không đo được.
+ 7. **Bổ sung ở phiên 13, từ phép thử mốc giả (không có lỗi trong đoạn xét):** luật chia trace của bản thư viện xếp 37% trace là bất thường ngay cả khi không có sự cố; còn sự cố thì làm tăng tỷ lệ span mang cờ **có chọn lọc ở thao tác phía trên root** (0,8% lên 6,2%) trong khi thao tác không liên hệ gần như không đổi (1,1% lên 1,2%). Điều thứ nhất củng cố điểm 2; điều thứ hai là bằng chứng mô tả, có đối chứng, rằng dịch vụ gọi dài ra theo root (KQ13 mục 1, 2).
+ 
+@@ -33,6 +33,8 @@
+ **Kiểm nguồn và phát lại.** Mọi phép đổi chạy trên bản phát lại đã khớp bản đóng băng **từng bit**: BARO 52/52, SimpleRCA 52/52, MicroRank 52/52 (48 chạy được, 4 lỗi tái lập đúng lỗi), TraceRCA 52/52, CIRCA 30/30, TORAI 90/90 (`ket-qua-phien-9.md` mục 1; `ket-qua-phien-10.md` mục 1.1, 5). Bảng tự động của phiên 12 nối lại các kết quả đó cho đủ 372 đơn vị và đạt 13/13 phép tự kiểm (`runs/tong-hop-phien-12-001/tu-kiem.json`). 372 bản ghi đóng băng trùng mã băm trong danh mục.
+ 
+ **Nơi có số.** Ba file kết quả theo phiên: `ket-qua-phien-9.md` (viết tắt KQ9), `ket-qua-phien-10.md` (KQ10), `ket-qua-phien-11.md` (KQ11), `ket-qua-phien-12.md` (KQ12) cho ba phép kiểm chạy sau, và `ket-qua-phien-13.md` (KQ13) cho sáu phép kiểm còn lại; mỗi số ở ba file đầu có đường dẫn và con trỏ JSON, đã soát bằng script (187 và 762 con số, 0 lệch). Bảng theo ca: `doi-chieu-dung-sai.json`. Phần đọc từng ca: `doc-tay.md`.
++
++**Lưu ý sau REVIEW.** Các bản theo phiên và khóa no_signal trong JSON cũ được giữ để bảo toàn lịch sử. Khóa ấy chỉ đếm root không hạng 1 theo các cách chấm; không chứng minh không có đáp ứng do lỗi. Đọc kết luận hiện tại ở bản này và phần đính chính sau REVIEW của KQ13. Bằng chứng, bản trước và manifest mới ở runs/sua-review-001/.
+ 
+ ## 2. Kết quả gốc cần giải thích
+ 
+@@ -59,7 +61,9 @@
+ | H2 | Nhiều trace bất thường → bước đếm phủ của spectrum tính một thao tác cho mọi trace bất thường chứa nó → mất thông tin "thao tác nào tự chậm" | Đếm riêng thay đếm phủ: 115/252 cặp mất (RE2-TT 89/132, Nezha-OB 26/120); số ca hạng 1 từ 2 lên 19 trên 48. KQ9 mục 2 | Xác nhận tính toán | Không nêu | M |
+ | H3 | Trọng số PageRank theo nhóm trace nhân vào spectrum → tạo ưu thế cho một phần thực thể | Trọng số bằng 1: 28/252 cặp mất (RE2-TT 25/132, Nezha-OB 3/120); số ca hạng 1 từ 2 lên 11. KQ9 mục 2 | Xác nhận tính toán | Không nêu | M |
+ 
+-Giả thuyết bị bác ở MicroRank: "dịch vụ gọi đứng trên root vì span của nó dài theo span con". Đổi cờ sang phần span chưa được span con phủ giữ nguyên 248/252 cặp và 19/20 cặp dịch vụ gọi (KQ10 mục 2).
++Phép đổi cờ sang phần span chưa được span con phủ giữ nguyên 248/252 cặp và 19/20 cặp dịch vụ gọi (KQ10 mục 2). Kết quả cho thấy đổi riêng đại lượng thời lượng chưa gỡ được đa số cặp; chưa đủ kết luận dịch vụ gọi không bị ảnh hưởng bởi chờ. Mã MicroRank chia một trace vào nhóm bất thường khi bất kỳ span nào mang cờ, rồi dùng mọi span của trace đó để dựng đồ thị và đếm phủ. Nếu cờ của dịch vụ gọi mất nhưng cờ của root hoặc dịch vụ khác còn, trace vẫn ở nhóm cũ; riêng thay đổi cờ ấy không đổi đồ thị/đếm phủ. Phần cờ giữ nhóm và chuyển nhóm đã thu bổ sung; tác dụng trọng số/điểm khi nhóm đổi còn OPEN.
++
++**Bằng chứng M-D bổ sung sau REVIEW.** Bảng cờ theo trace khớp nguồn ở 48 ca chạy được, 4 ca ERROR giữ N/A; không chạy PageRank. Cả 20 ca có caller trực tiếp trên root ở native đều có trace mất toàn bộ cờ của một caller nhưng vẫn A do root/dịch vụ khác; 19 ca còn caller trên root dưới M-D. Ví dụ dev-5467884de4 có 7 trace như vậy, root hạng 5 → 5; tổng A cùng 484 nhưng có 1 A → N và 1 N → A. Do đó tổng nhóm/hạng gần giữ chưa bác bỏ chờ. Nhóm A/N là nhóm yêu cầu/trace, không gộp các dịch vụ thành một nguyên nhân. Thiếu đối chứng native đúng cùng dataset/fault cho 20 ca; chưa tách tác dụng trọng số khi nhóm đổi. Nguồn: runs/sua-review-001/md-partition/attempt-003/summary.json → /cases (postanalysis, transitions); kiểm độc lập kiem-md-doc-lap.json. Chi phí cả ba lượt 4 phút 47 giây, giữ cả hai lượt lỗi.
+ 
+ ### 3.2 TraceRCA (bản trong thư viện)
+ 
+@@ -73,8 +77,8 @@
+ 
+ | Mã | Điều kiện → bước → thông tin | Số ca | Mức | Tác giả | Loại |
+ |---|---|---|---|---|---|
+-| H7 | Lỗi nằm trên đường tới root (trễ mạng) → tín hiệu chỉ có ở span phía gọi → cách chấm theo span của từng dịch vụ gán tín hiệu cho dịch vụ gọi; span của root không có gì | Nezha-OB, 6 ca trễ mạng: root đứng đầu theo span của mình ở 1/6 ca, theo span phía gọi ở 5/6. BARO, SimpleRCA, TraceRCA xếp root hạng 1 ở 0, 1, 0 trên 6 ca. KQ10 mục 3; KQ11 mục 7 | Quan sát; đọc tay cho thấy không phép đổi nào trên điểm của nút cứu được (`doc-tay.md` mục 1.4, 1.7) | Nêu một phần | M + D |
+-| H8 | Lỗi không làm đổi thời lượng và không làm đổi metric của root (`return`) → mọi kênh đang dùng đều không thấy | Nezha-OB: 3/4 ca `return` không kênh nào thấy root. KQ11 mục 7 | Quan sát | Có nêu (MicroRank: không định vị được lỗi không làm lệch độ trễ) | D + M |
++| H7 | Trễ mạng → bất thường có thể hiện ở span phía gọi rõ hơn span của root → cách tính theo dịch vụ sở hữu span có thể chấm dịch vụ gọi cao hơn root | Nezha-OB, 6 ca: root đứng đầu theo span của mình ở 1/6, theo span phía gọi ở 5/6; BARO, SimpleRCA, TraceRCA xếp root hạng 1 ở 0 / 1 / 0 trên 6. KQ10 mục 3; KQ11 mục 7 | Quan sát; không suy ra span của root luôn không có tín hiệu hoặc mọi phép chấm theo nút đều thất bại | Nêu một phần | M + D |
++| H8 | Return ở Nezha-OB → các cách chấm hiện tại chưa tách được root ở phần lớn ca; đáp ứng do lỗi còn chưa phân xử | 3/4 ca root không hạng 1 dưới các cách chấm trong bảng root-signal-by-fault, KQ11 mục 7. Root vẫn có span mang cờ ở các ca này; đó cũng chưa chứng minh cờ do lỗi | Quan sát về thứ hạng; không phải xác nhận thiếu tín hiệu trong dữ liệu | Bài MicroRank nêu giới hạn khi lỗi không đổi độ trễ; chưa xác nhận điều kiện ấy cho từng ca này | OPEN giữa dữ liệu và cách tính |
+ 
+ ### 3.4 SimpleRCA và BARO
+ 
+@@ -93,7 +97,7 @@
+ |---|---|---|---|---|---|
+ | H13 | Một cột đứng yên ở 111 điểm train rồi đổi ở 10 điểm chấm → hồi quy theo nút cha rồi chia phần dư cho độ lệch chuẩn phần dư train (cỡ 1e-17) → điểm cỡ 1e16, mất thang | 11/30 ca, luôn cùng một nút; 0/11 khi bỏ cạnh. KQ10 mục 1.2 | Xác nhận tính toán | Không nêu | M |
+ | H14 | Một nút có điểm cực lớn → bước DA cộng điểm hậu duệ vào tổ tiên → thứ hạng của các dịch vụ kề bị ghi đè | 41 nút nhận giá trị qua DA. Cả 8 ca sai mang cờ lỗi số học có đúng 3 thực thể trên root và cả 3 đều mang giá trị cực lớn; bỏ cạnh thì root hạng 1 ở 8/8. Ba ca **đúng** còn lại có nút cực lớn là đúng vì chính root nhận giá trị đó (hạng trước DA: 8, 7, 2). KQ10 mục 1.3; `doc-tay.md` mục 5.1 | Xác nhận tính toán | Nêu một phần (DA cần kiểm thêm trên dữ liệu thật) | M |
+-| H15 | Hồi quy trên 111 điểm, chấm 10 điểm cuối → phần dư train nhỏ đi mà phần dư chấm không nhỏ theo → hồi quy làm **tăng** điểm thay vì giảm | 3.285/4.526 nút; tỷ số tăng theo số nút cha. KQ10 mục 1.4. Nhánh chẩn đoán đổi cửa sổ: trung vị tỷ số ở nút từ 8 cha 7,54 → 3,40 (học 291 điểm) và 3,64 (chấm ngay sau mốc); tỷ lệ nút tăng 72,6% → 67,3% và 73,1%. KQ13 mục 6 | Xác nhận tính toán; cửa sổ giải thích khoảng một nửa ở nút nhiều cha, phần còn lại chưa tách | Có nêu ở dạng tổng quát | M + G |
++| H15 | Hồi quy trên 111 điểm, chấm 10 điểm cuối → phần dư train nhỏ mà phần dư chấm không nhỏ theo → điểm có cạnh cao hơn điểm không cạnh | 3.285/4.526 nút; tỷ số tăng theo số cha (KQ10 mục 1.4). Đổi cửa sổ: trung vị nhóm từ 8 cha 7,54 → 3,40 (học 291 điểm), 3,64 (chấm ngay sau mốc); tỷ lệ nút tăng 72,6% → 67,3%, 73,1% (KQ13 mục 6) | Xác nhận phép tính; quan sát độ nhạy cửa sổ. Chưa tách riêng số điểm học, phân phối, vị trí chấm và tập nút | Có nêu dạng tổng quát | M + G |
+ 
+ Hệ quả phải nói rõ: **không đọc số của CIRCA thành "cấu trúc gọi giúp" hay "hại"** khi chưa loại 11 ca dính giá trị cực lớn. Ở 19 ca còn lại, bỏ cạnh không đổi số ca hạng 1 (12 → 12). Đọc tay thấy cả hai chiều: bỏ cạnh làm root tụt từ hạng 3 xuống 29 ở một ca; bước DA đẩy root từ hạng 2 xuống 15 ở một ca không dính lỗi số học, vì điểm lớn (2.027,36) của một nút thuộc dịch vụ không liên quan được cộng nguyên cho 13 thực thể khác (`doc-tay.md` mục 5.2, 5.3; `kiem-tiep.md` mục KT-15). Điểm lớn đó phụ thuộc độ dài đoạn học: trong nhánh chẩn đoán học trên 291 điểm, root của chính ca này về hạng 1 (KQ13 mục 6).
+ 
+@@ -139,10 +143,10 @@
+ 
+ ### 5.1 Các hạn chế loại M và giải thích cạnh tranh còn lại
+ 
+-- **H2, H3 (MicroRank, đếm phủ và trọng số).** Thuộc công thức của bài. Sau khi thay bước chia (H1), chúng không còn là chỗ hỏng lớn nhất. Còn 25–26/47 ca root chưa hạng 1 sau khi thay bước chia. Phép kiểm chạy thêm sau khi viết bản đầu của báo cáo (ghép bộ chia theo bài gốc với đếm riêng; `ket-qua-phien-12.md`, viết tắt KQ12, mục 1): số ca hạng 1 từ 21–22 lên 23–27 trên 47; ở RE2-TT lên 17–19/25 và không ca đang đúng nào hỏng; ở Nezha-OB không ổn định (6–8/22). Tức một phần của số ca còn lại là do bước đếm phủ (H2), rõ ở RE2-TT. Còn 20–24/47 ca. Ở Nezha-OB thực thể đứng đầu của phần này là `frontend` ở 14/16 và 11/14 ca; bản trước viết điều đó "khớp với H4, H7", nay đã kiểm và **không đúng cho phần lớn ca**: thao tác cao nhất của `frontend` là lời gọi tới root ở 3/14 và 3/11 ca theo tên thao tác, và bảng nối theo cây span cho cùng con số (KQ13 mục 5). Phần còn lại của hai dataset chia được thành ba dạng: (i) thao tác cao nhất của thực thể đứng đầu bao lời gọi chậm tới root, tức đúng H4, H7 (RE2-TT 5/8 và 3/6 ca còn sai; Nezha-OB 5/16 và 5/14); (ii) nhóm trace bất thường mới không chứa root (RE2-TT 3 ca với `ts-auth-service` đứng đầu, một dịch vụ không liên hệ chậm lên thật sau mốc; Nezha-OB 4–6 ca); (iii) dưới 5 span tạo ra điểm (Nezha-OB 3–4 ca). Đọc tay đủ 48 đơn vị MicroRank sai (`doc-tay.md` mục 2.6, 8.4) không thấy dạng thứ tư; có ba phản ví dụ mà bộ chia mới làm root kém đi.
++- **H2, H3 (MicroRank, đếm phủ và trọng số).** Sau khi thay bộ chia, còn 25–26/47 ca root chưa hạng 1. Ghép thêm đếm riêng (KQ12 mục 1) tăng số hạng 1 từ 21–22 lên 23–27/47; RE2-TT đạt 17–19/25, Nezha-OB 6–8/22. Còn 20–24 ca. Bảng nối (KQ13 mục 5) cho frontend gắn với root ở 3/14 và 3/11 ca frontend đứng đầu, nên không thể gán toàn bộ cho H4, H7. Ba dạng quan sát được là: thao tác đứng đầu bao lời gọi chậm tới root; các trace tạo số đếm cho thao tác đứng đầu không có root; hoặc dưới 5 span tạo điểm. Đây chưa phải phân loại đầy đủ nguyên nhân: dev-14701a3bbb chưa rõ dưới cả hai luật; dưới luật code, dev-607751ac0a bị xếp không gắn nhưng vẫn có root trong 2/6 trace xét. Không gọi toàn bộ nhóm trace bất thường là không chứa root. Trên 52 đơn vị native có 46 OK sai, 2 OK đúng, 4 ERROR; phần đọc tay có 48 đơn vị gồm 46 OK sai, 1 ERROR và 1 đối chứng đúng (bao-phu-nhom.json → /units, method=microrank_full). Ba phản ví dụ của bộ chia mới được giữ; cơ chế các ca chưa rõ còn OPEN.
+ - **H10 (BARO, thang IQR).** Xác nhận cho 43/103 cặp. So ca đúng với ca sai cùng dịch vụ gốc và loại lỗi: mức đổi tương đối của root gần bằng nhau, điểm khác nhau 2,5–4 lần theo độ phẳng của nền (`doc-tay.md` mục 3.1). Giải thích cạnh tranh cho 60 cặp còn lại: cột của dịch vụ khác đổi thật tại mốc; nguyên nhân vật lý **không phân xử được bằng dữ liệu hiện có** (KT-6). Phép kiểm chuỗi cột ở ba cặp ca cùng ô (KQ13 mục 3) thêm hai điều: ở auth, delay cột độ trễ của root tăng 1,8–3,9 lần ở cả ba ca, z khác nhau vì nền dao động khác nhau; ở Nezha-OB có ca mà z = 94 của chính root là do IQR tính trên 5 mẫu nền. Đọc nốt cũng cho hai phản ví dụ với cách phân loại "thang gỡ được hay không" (`doc-tay.md` mục 8.1).
+ - **H13, H14 (CIRCA, giá trị cực lớn).** Chuỗi bằng chứng đủ từ đầu vào tới hạng, không có phản ví dụ: không nút nào mang giá trị cực lớn mà thiếu nguồn.
+-- **H15 (CIRCA, hồi quy làm tăng điểm).** Đã tách một phần bằng nhánh chẩn đoán đổi cửa sổ (KQ13 mục 6; cửa sổ đã khóa và số đã chấm không đổi): học trên 291 điểm hoặc chấm ngay sau mốc đều giảm khoảng một nửa mức phóng đại ở nút từ 8 cha (7,54 xuống 3,40 và 3,64), nhưng hồi quy vẫn làm tăng điểm ở 67–73% nút và tỷ số vẫn tăng theo số nút cha. Hai mốc khai trước đều không đạt trọn. Phần còn lại chưa có phép đổi riêng.
++- **H15 (CIRCA, hồi quy làm tăng điểm).** Hai nhánh đổi cửa sổ cho trung vị tỷ số nhóm từ 8 cha thấp hơn: 7,54 xuống 3,40 và 3,64; vẫn có 67–73% nút tăng điểm (KQ13 mục 6). Cửa sổ có giá trị chẩn đoán vì thứ hạng cũng thay đổi, nhưng chưa xác định riêng nguyên nhân là số điểm học hay khoảng cách đến đoạn chấm: phân phối nền và tập nút đổi cùng. Cả hai mốc khai trước không đạt trọn. Cửa sổ đã khóa và số đã chấm giữ nguyên.
+ - **H9 (SimpleRCA).** Đếm theo mẫu vừa là thứ gây sai vừa là thứ cho phương pháp khả năng phân biệt; đổi cách đếm không chữa được.
+ 
+ ### 5.2 Câu trọng tâm: khi dịch vụ gọi đứng trên root, đó là do chấm thời gian chờ, hay do cách chấm ưu tiên dịch vụ gọi?
+@@ -150,7 +154,7 @@
+ Trả lời theo từng phương pháp, ở mức tính toán và chỉ trên dev:
+ 
+ - **TraceRCA: chấm thời gian chờ.** Chuỗi bằng chứng đủ bốn khâu: (1) trong mã nguồn, mọi lời gọi giữa hai dịch vụ quan sát được là lời gọi chặn (63/63 loại lời gọi ở Train Ticket trên cả bảy phiên bản ứng viên; 18/18 ở Online Boutique); (2) lời gọi tới root chậm đi sau mốc ở 19/21 và 10/16 ca đo được, trong khi các cạnh không dính root giữ mức nền; (3) span mang cờ của dịch vụ gọi chính là các span bao lời gọi chậm đó (4/4 và 9/15 cặp); (4) đổi cờ sang phần không được span con phủ làm 3/5 cặp dịch vụ gọi của RE2-TT biến mất. (KQ10 mục 6.2, 6.4; KQ11 mục 2.1; KQ9 mục 3.)
+-- **MicroRank: không phải chờ, cũng không phải ưu tiên dịch vụ gọi.** Dịch vụ phía trên hiếm khi đứng trên root (4/132 cặp ở RE2-TT, thấp hơn mức ngẫu nhiên 18,5); 0/10 và 4/16 cặp phía trên có từ nửa số trace bất thường gắn với root. Thứ đứng trên root là thao tác có mặt ở rất nhiều trace bất thường không liên quan tới root; `ts-station-service` đứng đầu ở 21/24 ca sai (KQ11 mục 1, 2.2).
++- **MicroRank: chưa phân xử đầy đủ đường chờ → cờ → nhóm trace → điểm.** Các tiêu chí hiện có không hỗ trợ chờ ở đa số cặp: dịch vụ phía trên chỉ 4/132 cặp RE2-TT (kỳ vọng ngẫu nhiên 18,5), và từ nửa trace bất thường gắn root ở 0/10,4/16 cặp. Quan sát nổi bật là thao tác có mặt trong nhiều trace bất thường không gắn root; ts-station-service đứng đầu 21/24 ca sai (KQ11 mục 1,2.2). Những số này không bác bỏ việc cờ do chờ góp phần giữ trace trong nhóm. Bổ sung theo trace được lưu riêng sau REVIEW; không lấy hạng gần như giữ nguyên để kết luận không có chờ.
+ - **SimpleRCA, BARO (kênh metric): một phần nhỏ.** Cột độ trễ của dịch vụ gọi có đổi theo (khớp với chờ), nhưng trong 103 cặp của BARO ở RE2-TT chỉ 5 cặp vừa nằm trên chuỗi gọi vừa có cột đổi tại mốc. BARO không nhận quan hệ gọi nào trong đầu vào, nên không thể "ưu tiên" dịch vụ gọi.
+ - **CIRCA:** dịch vụ gọi đứng trên root tập trung rõ (25 cặp so với kỳ vọng 3,5), nhưng cơ chế là giá trị cực lớn đi qua bước DA (H14), không phải chờ.
+ - **TORAI B:** một ca có dịch vụ gọi trên root; log, metric và độ trễ trace đều nghiêng về chúng.
+@@ -212,30 +216,32 @@
+ 2. "Span chờ root" có cả ở ca đúng (83/96), nên tự nó không phân biệt ca sai.
+ 3. Với kênh metric ở RE2-TT, quan hệ gọi chỉ chạm 5/103 cặp của BARO; 82/103 nằm ngoài chuỗi gọi hoặc không có span.
+ 4. Bước xét hướng lan có sẵn trong tài liệu không tách được root (H6).
+-5. 15/52 ca không có đủ lời gọi tới root; ở 8 ca quan hệ gọi tới root không tồn tại. Lỗi `return` không để lại tín hiệu ở kênh nào.
++5. 15/52 ca không đủ lời gọi tới root; trong 8 ca không có cạnh gọi đi vào root. Các quan hệ đi ra, cha–con, máy–dịch vụ hoặc log/metric chưa được phép này đánh giá. Với return, root không đứng đầu dưới cách chấm hiện tại; đáp ứng do lỗi vẫn OPEN.
+ 6. Một bước dùng cấu trúc (DA của CIRCA) đã làm hỏng thứ hạng khi gặp một giá trị lỗi.
+ 
+ **Hai điều thuận:** với TraceRCA chuỗi bằng chứng "dịch vụ gọi chờ root rồi bị chấm bất thường" đủ bốn khâu; với MicroRank, chỗ hỏng lớn nhất là bước chia của bản thư viện, không phải phần dùng đồ thị của bài gốc.
+ 
+-**Thêm ở phiên 13, một thuận và một bất lợi.** Thuận: dưới mốc giả và mốc thật cùng độ dài cửa sổ, tỷ lệ span mang cờ của thao tác phía trên root tăng từ 0,8% lên 6,2% trong khi thao tác không liên hệ giữ 1,1–1,2% (KQ13 mục 2); và với TraceRCA, thời gian chờ hiện ở cả dịch vụ gọi trực tiếp lẫn dịch vụ gọi nó với cùng số span (`doc-tay.md` mục 8.3 điểm 8), tức muốn gắn về đúng dịch vụ được gọi phải đi theo từng cạnh. Bất lợi: ở phần MicroRank còn sai sau hai phép đổi, chỉ 8–10 trên 20–24 ca có thực thể đứng đầu gắn với root qua lời gọi; phần còn lại nằm ngoài tầm của cạnh gọi tới root (KQ13 mục 5).
++**Thêm ở phiên 13, một thuận và một giới hạn.** Tỷ lệ cờ thao tác phía trên root tăng 0,8% → 6,2% giữa mốc giả/thật cùng độ dài cửa sổ, còn thao tác không liên hệ giữ 1,1–1,2% (KQ13 mục 2); với TraceRCA có chờ qua hai tầng gọi với cùng số span (doc-tay mục 8.3 điểm 8). Đây là căn cứ đề xuất thử gắn theo từng cạnh. Trong phần MicroRank còn sai, 8–10/20–24 ca có thao tác đứng đầu gắn root theo tiêu chí bảng nối; các ca khác gồm không gắn, ít span và chưa rõ, không tự chứng minh mọi quan hệ đồ thị đều không giúp.
+ 
+ **Nối với các ứng viên trong kế hoạch nghiên cứu (P6):**
+ 
+ - Ứng viên "tách bất thường tự sinh và kế thừa theo đồ thị" (tầng 2): có căn cứ ở dạng mục 1 và 2 ở trên, cho kênh trace. Kế hoạch ghi "chỉ giữ nếu P4 xác nhận hạn chế đó trên dev": P4 xác nhận nó cho TraceRCA và cho lỗi trễ mạng, **không** xác nhận nó là cơ chế chiếm đa số. Giữ hay không là quyết định của Minh.
+ - Cách "quy tắc phân rã theo cây lời gọi": có căn cứ (mục 2), kèm điều kiện thất bại về chồng lấn.
+ - Cách "hồi quy có điều kiện trên nút cha, giống CIRCA": bằng chứng trên dev **bất lợi** (H13–H15), trừ khi xử lý được giá trị cực lớn và cửa sổ.
+-- Cách xếp hạng "kiểu MicroRank": sau khi thay bước chia và đếm riêng, root hạng 1 ở 17–19/25 ca RE2-TT nhưng chỉ 6–8/22 ca Nezha-OB (KQ12 mục 1). Phần còn lại nay đọc được (KQ13 mục 5): một phần là H4, H7 (cạnh gọi chạm tới), một phần là trace bất thường không chứa root hoặc quá ít trace (cạnh gọi không chạm tới). Chưa đủ căn cứ để chọn hay loại; điều rút ra chắc hơn là tiêu chí chia trace phải theo cả yêu cầu, vì luật theo từng span xếp 37% trace là bất thường khi không có lỗi (KQ13 mục 1).
++- Cách xếp hạng "kiểu MicroRank": ghép bộ chia và đếm riêng cho 17–19/25 ca RE2-TT, 6–8/22 ca Nezha-OB hạng 1 (KQ12 mục 1). Phần còn lại có ba dạng quan sát cùng ca chưa rõ và một ca không gắn nhưng vẫn có root trong trace xét (KQ13 mục 5). Chưa đủ chọn hay loại thiết kế. Luật theo từng span xếp 37% trace bất thường ở mốc giả (KQ13 mục 1), là căn cứ thử tiêu chí cả yêu cầu, chưa xác nhận lợi ích trên test.
+ 
+ ## 7. Câu chưa trả lời
+ 
+ Đây là đầu ra số 5 của P4. Chi tiết từng câu (giải thích cạnh tranh, phép kiểm, thứ giữ cố định, dự đoán, chi phí, quyết định phụ thuộc) ở `kiem-tiep.md`, 16 mục. Xếp theo loại:
+ 
+ - **Chưa chạy, rẻ, dữ liệu có sẵn:** TORAI với bảng của tác giả (KT-7, 15 phút; không ảnh hưởng P5–P6).
+-- **Đã chạy sau bản đầu của báo cáo (Minh duyệt; KQ12 và KQ13):** phần còn lại của MicroRank (KT-3 và bảng nối; chia được ba dạng); bước DA của CIRCA (KT-15; sửa một cách đọc sai của tôi); bốn ca lỗi, cả hai nửa (KT-8); mốc giả cho trace và thao tác (KT-1, KT-2); chuỗi cột độ trễ của root (KT-12); cửa sổ của CIRCA (KT-9). Phần còn mở sau các phép này: Nezha-OB không làm được mốc giả; phần tăng điểm còn lại của hồi quy; vì sao một mẫu P99 nhảy ở một ca trễ mạng.
++- **Đã chạy ở phiên 12–13:** KT-3 và bảng nối MicroRank; KT-15 về DA; KT-8 cả hai nửa; KT-1, KT-2 mốc giả; KT-12 chuỗi độ trễ; KT-9 cửa sổ; đọc tay nốt. Bảng nối có ba dạng quan sát và ca chưa rõ. Nezha-OB có phép thử giả giữa nền ở runs/root-signal-placebo-003/ (22/22 ca), nhưng nền ngắn và cửa sổ không tương đương mốc thật; không thay phép KT-1 lùi 150 giây. BARO/SimpleRCA trong bảng placebo là số mốc thật được nối vào, không phải đo lại ở mốc giả. Đáp ứng return còn OPEN; phần tăng điểm CIRCA và một mẫu P99 cũng còn mở.
+ - **Thiếu dữ kiện:** mã của tác giả TraceRCA (KT-11; phải dựng định dạng dữ liệu riêng, 0,5–1 phiên).
+ - **Không phân xử được bằng dữ liệu hiện có:** vì sao metric và thời lượng span của dịch vụ không liên hệ đổi tại mốc (KT-6; ví dụ mới: đăng nhập của `ts-auth-service` ở các ca order, loss); phần chậm ngoài span của root là gì (KT-13).
+ - **Thuộc gói sau:** ứng viên dùng cạnh có tách được root không (KT-5, thuộc P5–P6); "lan có đáng kể" không (KT-10, thuộc tổng hợp G2); kết quả trên test (KT-16, sau G3).
+ - **Mức đọc tay:** đã đọc 144/192 đơn vị sai hoặc không OK; 48 đơn vị không chạy được ghi theo lý do (KT-14; `doc-tay.md` mục 8).
++
++- **Bổ sung sau REVIEW được Minh duyệt:** đã thu cờ/nhóm trace MicroRank M-D và kiểm số đọc tay từ đầu vào/kết quả cũ, không chạy lại PageRank (gói runs/sua-review-001/). Ca dev-14701a3bbb chưa phân xử vì sao thao tác đứng đầu được chấm cao; dev-607751ac0a dưới luật code không gắn theo cây con dù root có trong một phần trace xét. Nhãn dịch vụ gây lỗi đã biết; điều chưa rõ là bước nào làm xếp sai và cách sửa nào có căn cứ.
+ 
+ ## 8. Yêu cầu quan sát rút ra cho hệ bán vé FlashTicket
+ 
+@@ -259,11 +265,11 @@
+ | Train Ticket không công bố phiên bản mã và công cụ ghi span; không hỏi tác giả | Dữ liệu | Việc "chờ" chỉ đo được một phần ở 21 ca |
+ | Mỗi lời gọi chỉ có hai span | Dữ liệu | Không tách đường truyền, hàng đợi, xử lý bên gọi |
+ | Online Boutique: nền trace 41–97 giây, metric 5 mẫu mỗi phía | Dữ liệu | Thống kê nền kém ổn định; bảng xu hướng và phép đổi thang không kết luận được |
+-| 15/52 ca không có đủ lời gọi tới root | Dữ liệu | Kết luận về chờ chỉ trên 37 ca; ở 8 ca đồ thị quan hệ gọi không thể giúp |
++| 15/52 ca không đủ lời gọi tới root | Dữ liệu | Kết luận về chờ trên 37 ca; ở 8 ca cách dựa riêng vào cạnh đi vào root không áp dụng. Chưa kết luận về mọi loại quan hệ đồ thị |
+ | Cửa sổ dev không có span mang mã lỗi | Dữ liệu | Nguồn lỗi trace của TORAI rỗng ở 30/30 ca |
+ | Chỉ 52 ca dev, mỗi ô vài ca, chưa mở test | Giao thức | Không rút mẫu hình theo ô; mọi số là bằng chứng trên dev |
+ | CIRCA: giá trị cực lớn; ảnh hưởng của cửa sổ chỉ tách được một phần, trong nhánh chẩn đoán (KQ13 mục 6) | Thuật toán | Giữ bản gốc; nêu là hạn chế của cách tính |
+-| MicroRank: phần cặp còn lại sau mọi phép đổi | Thuật toán | Ghi đúng số còn lại (25–26/47 ca sau khi thay bộ chia; 20–24/47 ca sau khi ghép thêm đếm riêng); phần còn lại đã chia được ba dạng (KQ13 mục 5), không ép một nguyên nhân chung |
++| MicroRank: phần cặp còn lại sau các phép đổi | Thuật toán | Còn 25–26/47 ca sau thay bộ chia, 20–24/47 sau ghép đếm riêng; có ba dạng quan sát, ca chưa rõ và ca không gắn nhưng root vẫn hiện diện (KQ13 mục 5). Không ép thành ba nguyên nhân bao trùm |
+ | SimpleRCA: đếm theo mẫu vừa gây sai vừa là nguồn phân biệt | Thuật toán | Không sửa được bằng đổi cách đếm |
+ | TORAI: bước nhân quả không tham gia xếp root | Cài đặt của thư viện | Không rút kết luận về đồ thị nhân quả từ TORAI |
+ 
+@@ -275,10 +281,10 @@
+ |---|---|---|
+ | 1. Kiểm nguồn đạt, phát lại khớp, không thay kết quả đóng băng | Đạt | Mục 1 |
+ | 2. Danh mục nhóm được phủ bởi bảng toàn bộ và đơn vị đọc tay; mọi đơn vị M5 có trạng thái theo ca | Đạt | Bảng phủ 372/372; đọc tay 52/52 nhóm, 168 đơn vị (144 sai hoặc không OK, 24 đối chứng); 48 đơn vị không chạy được ghi theo lý do; 82/82 đơn vị M5 |
+-| 3. Chỉ nhận cơ chế khi có chuỗi đầu vào → xử lý → trung gian → đầu ra | Đạt | Mỗi dòng ở mục 3 ghi mức; nguyên nhân vật lý để mở |
++| 3. Chỉ nhận cơ chế khi có chuỗi đầu vào → xử lý → trung gian → đầu ra | Đạt một phần | Một số chuỗi tính toán đã xác nhận; đáp ứng return, tác dụng trọng số/điểm khi nhóm MicroRank đổi, ca ghép chưa rõ và nguyên nhân độ nhạy cửa sổ chưa phân xử hết |
+ | 4. Đủ năm đầu ra P4; mức đo chờ theo dataset; bảng theo ca cho tổng hợp G2 | Đạt | Mục 3–7; `kha-nang-do-trace.json`; `phan-xu-caller-root.json` |
+ | 5. Phép đổi trọng số A′: thiết kế, quyền chạy, trạng thái | Đạt | Đã chọn (Q-92), duyệt chạy (Q-93), chạy ở phiên 9 trên 48 ca đủ điều kiện, 4 ca không đủ; chi tiết theo ca ở `can-thiep-tinh-toan.json`. A′ chỉ so toàn gói trọng số, không phân xử câu dịch vụ gọi |
+-| 6. Nhật ký và bàn giao | Đạt | LOG phiên 12, 13 |
++| 6. Nhật ký và bàn giao | Đạt | LOG phiên 12–13 và mục sửa sau REVIEW; bản sửa chờ kiểm lại độc lập |
+ 
+ **Phần mục tiêu nguồn mà task này chưa phủ:** (a) chưa có số trên test; (b) chưa trả lời "lan có đáng kể" (để tổng hợp G2 quyết); (c) chưa đánh giá ứng viên đồ thị nào; (d) nguyên nhân vật lý của các thay đổi ở dịch vụ không liên hệ; (e) TraceRCA và MicroRank đúng bản của tác giả chưa chạy được.
+ 
+--- before/results/T-032/ket-qua-phien-13.md
++++ after/results/T-032/ket-qua-phien-13.md
+@@ -148,13 +148,13 @@
+ 
+ **Đối chiếu với dự đoán khai trước** (mốc: từ 2/3 số ca `frontend` đứng đầu là "gắn với root" thì đọc "cùng cơ chế H4, H7"; không quá 1/3 thì đọc "cơ chế khác, chưa giải thích"). 3/14 và 3/11 đều không quá 1/3. **Dự đoán "cùng cơ chế H4, H7" không đạt.** Câu tôi viết ở KQ12 mục 1 ("khớp với hạn chế H4, H7") sai cho phần lớn ca; đã sửa ở ba file (mục 8).
+ 
+-**Đọc, ở mức mô tả.** Phần MicroRank còn sai sau khi ghép hai phép đổi không phải một khối:
++**Đọc, ở mức mô tả.** Có ba dạng quan sát trong phần MicroRank còn sai sau ghép hai phép đổi; chúng không bao phủ mọi ca và chưa là ba nguyên nhân đã xác nhận:
+ 
+ 1. **Thao tác cao nhất của thực thể đứng đầu bao lời gọi chậm tới root** (thực thể là dịch vụ gọi root, trực tiếp hoặc gián tiếp; thời gian của lời gọi được tính cho nó): 5/8 và 3/6 ca RE2-TT; 5/16 và 5/14 ca Nezha-OB. Đây là phần mà thông tin cạnh gọi chạm tới được.
+-2. **Nhóm trace bất thường mới không chứa root:** 3 ca RE2-TT (một dịch vụ không liên hệ chậm lên cùng lúc, xem mục 2) và 4–6 ca Nezha-OB (vài trace chậm vì lời gọi tới dịch vụ khác). Cạnh gọi tới root không chạm tới phần này.
++2. **Các trace tạo số đếm cho thao tác đứng đầu không chứa root:**3 ca RE2-TT và 6 ca Nezha-OB theo luật bài, 4 ca theo luật code. Đây là tập trace gắn với thao tác cao nhất có cờ, không phải toàn bộ nhóm trace bất thường. Một ca không gắn theo luật code vẫn có root trong trace xét; xem phần chưa rõ dưới đây.
+ 3. **Quá ít trace bất thường để xếp:** 3–4 ca Nezha-OB có dưới 5 span tạo ra điểm của thực thể đứng đầu.
+ 
+-**Giới hạn.** Nhánh ghép là nhánh chẩn đoán, không phải MicroRank gốc. Mốc 50% và 20% do người làm đặt. Ở Nezha-OB số trace bất thường dưới bộ chia mới rất ít. Dự đoán viết sau khi đã biết kết quả kiểm theo tên thao tác.
++**Phần chưa rõ và giới hạn.** dev-14701a3bbb (shippingservice, cpu_contention) là cùng một ca chưa rõ dưới cả hai luật: tỷ lệ gắn root 2/5 và 8/15, thấp hơn tỷ lệ gắn currencyservice 4/5 và 13/15. Với dev-607751ac0a (checkoutservice, network_delay), luật code cho 0/6 span gắn root theo cây con nhưng 2/6 trace vẫn chứa root, một trace có root mang cờ. Vì vậy không đồng nhất không gắn với root vắng mặt. Cả 14 ca Nezha theo luật code gồm 5 gắn, 5 không gắn, 1 chưa rõ, 3 ít span; trong 5 không gắn chỉ 4 ca vắng root ở tập trace xét. Cần lần theo đồ thị, trọng số và số đếm của các ca chưa rõ để phân xử; không gọi là dạng cơ chế thứ tư đã xác nhận. Nhánh ghép là chẩn đoán, mốc 50%/20% do người làm đặt; dự đoán viết sau kết quả kiểm tên thao tác. Nguồn: runs/microrank-merged-link-001/summary.json → /cases (case_id và từng nhánh); derived-013.json → /merged_link/by_dataset/Nezha-OB.
+ 
+ ## 6. KT-9 — CIRCA: đổi độ dài đoạn học và vị trí đoạn chấm
+ 
+@@ -184,7 +184,7 @@
+ 
+ - (a) quá khớp vì ít điểm học, nhánh `tf`: vế đầu **đạt** (3,40, dưới cả 4,2 lẫn 3,77); vế sau **không đạt** (72,6% xuống 67,3%, giảm 5,3 điểm). Mốc (a) **không đạt**.
+ - (b) đoạn chấm xa đoạn học, nhánh `t0`: vế đầu **đạt** (3,64); vế sau **không đạt** (73,1%, không giảm). Mốc (b) **không đạt**.
+-- Theo thiết kế: "nếu không nhánh nào đạt: việc hồi quy làm tăng điểm không do hai lựa chọn cửa sổ này". Ghi đúng mức đã thấy: hai lựa chọn cửa sổ **giải thích khoảng một nửa mức phóng đại ở nút nhiều cha**, không giải thích việc hồi quy làm tăng điểm ở đa số nút. Ở cả ba cấu hình, tỷ số vẫn tăng đều theo số nút cha (1,03 tới 3,40 ở `tf`).
++- Theo mốc đã khai, cả hai nhánh không đạt trọn. Quan sát: trung vị tỷ số ở nút nhiều cha giảm từ 7,54 xuống 3,40 và 3,64; hồi quy vẫn làm tăng điểm ở đa số nút. Không dùng điều này để bác bỏ mọi ảnh hưởng của cửa sổ hoặc tách riêng nguyên nhân: tập nút, phân phối nền và giai đoạn lỗi cùng đổi. Ở tf, tỷ số vẫn tăng từ 1,03 tới 3,40 theo số cha.
+ 
+ **Quan sát thêm, không có mốc** (`→ /cases`).
+ 
+@@ -192,7 +192,7 @@
+ - Ba ca root `ts-auth-service` mà DA làm tụt hạng (KQ12 mục 3): hạng sau DA ở native → `tf` là 15 → **1** (`dev-16597725c1`), 22 → 6 (`dev-f81f88234e`), 46 → 37 (`dev-57546fd87b`). Tức điểm lớn của nút không liên quan (`ts-preserve-service_latency`) mà KT-15 thấy **phụ thuộc độ dài đoạn học**: học trên 291 điểm thì hiện tượng mất ở ca rõ nhất. Câu "điểm nguồn là thay đổi thật ở dịch vụ không liên quan" ở KQ12 mục 3 và `kiem-tiep.md` mục KT-15 viết quá tay; đúng hơn: điểm đó lớn dưới đoạn học 111 điểm. Đã sửa (mục 8).
+ - Số ca hạng 1 theo RHT + DA: 16 (native), 18 (`tf`), 13 (`t0`). Đây là mô tả của nhánh chẩn đoán trên dev, không phải số chấm.
+ 
+-**Đọc, ở mức tính toán.** Việc hồi quy theo nút cha làm tăng điểm có ba phần tách được: (1) phần do ít điểm học so với số nút cha, giảm khoảng một nửa khi học trên 291 điểm; (2) phần do đoạn chấm xa đoạn học, giảm cỡ tương tự ở nút nhiều cha khi chấm ngay sau mốc; (3) phần còn lại, có ở mọi cấu hình và tăng theo số nút cha, chưa có phép đổi nào trong T-032 gỡ được. Phần (3) khớp với phân rã ở KQ10 mục 1.4 (hồi quy làm độ lệch chuẩn phần dư ở đoạn học nhỏ đi, phần dư ở đoạn chấm không nhỏ theo), nhưng tôi chưa có phép đổi riêng cho nó nên giữ ở mức quan sát.
++**Đọc, ở mức tính toán.** Hai phép đổi xác nhận điểm và thứ hạng nhạy với cửa sổ. Chúng chưa tách được ba nguyên nhân độc lập: học 291 điểm đổi cả độ dài và dữ liệu nền; chấm ngay sau mốc đổi cả giai đoạn lỗi, có ca lỗi chưa hiện rõ; bước lọc cột làm tập nút khác nhau. Bởi vậy 7,54 → 3,40/3,64 là kết quả của hai cấu hình chẩn đoán, không phải tỷ lệ phần nguyên nhân do ít điểm học hay chấm xa. Phần dư còn cao và tăng theo số cha phù hợp với quan sát KQ10 mục 1.4, nhưng chưa có phép đổi riêng phân xử phần còn lại.
+ 
+ **Giới hạn.** Chỉ RE2-TT. Hai nhánh đổi cửa sổ đã khóa nên chỉ là chẩn đoán. Tập nút sau bước bỏ cột hằng đổi theo cửa sổ (8.605, 8.655 và 8.353 nút qua 30 ca), nên ba cột không so trên cùng tập nút tuyệt đối. Nghĩ ra sau khi xem kết quả dev.
+ 
+@@ -200,13 +200,13 @@
+ 
+ - Đã đọc 68 đơn vị OK xếp sai còn lại: BARO 7, SimpleRCA 6, TraceRCA 10, MicroRank 28, CIRCA 8, TORAI B 9. 48 đơn vị không chạy được ghi theo lý do, đã soát dòng lý do của cả 48 phiếu (42 UNSUPPORTED theo hai lý do của Q-85; 6 ERROR cùng một thao tác thiếu nền). Nội dung: `doc-tay.md` mục 8. Phiếu: `runs/tong-hop-phien-13-001/phieu-gon-chua-doc/` (script `scripts/phieu_gon_v2.py`; không tính gì mới so với bảng của phiên 12).
+ - Sau phiên 13: 168 đơn vị đọc tay không trùng (144 đơn vị sai hoặc không OK và 24 đối chứng đúng); 48 đơn vị không chạy được ghi theo lý do; 156 đơn vị đúng ở hạng 1 không thuộc diện đọc.
+-- Không thấy đường thất bại mới ở phương pháp nào. Các điều chỉnh so với phần đọc của phiên 12, ghi ở cuối từng mục con của `doc-tay.md` mục 8: hai phản ví dụ cho cách chia đường ở BARO theo tác dụng của B-2; ở auth|delay cột của root có đổi, khác nhau là ở nền; chờ lan qua hai tầng dịch vụ gọi với cùng số span (TraceRCA, `dev-6c9afc9822`); cách hiểu "phần chậm nằm ngoài span của root nên T-D không gỡ được" không được hỗ trợ khi mở bảng theo cạnh; phép "bỏ cột log nền không đổi" của TORAI B cho hạng 1 ở một ca và hạng 6 ở ca cùng ô; bốn đơn vị MicroRank ở Nezha-OB thuộc dạng "root vắng trong nhóm trace bất thường" chứ không phải dạng span phía gọi.
++- Phần đọc nốt thêm các điều chỉnh về thang BARO, độ dao động nền auth|delay, chờ qua hai tầng, T-D theo cạnh và TORAI nguồn log (doc-tay mục 8). Với MicroRank, ba dạng chỉ là dạng quan sát; bảng nối còn ca chưa rõ và một ca không gắn nhưng root có trong trace. Không nhận là đã xác định hết đường thất bại.
+ 
+ ## 8. Những câu đã viết ở các file trước bị kết quả phiên 13 sửa
+ 
+ | Câu cũ | Ở đâu | Sửa thành | Căn cứ |
+ |---|---|---|---|
+-| "`frontend` đứng đầu … khớp với hạn chế H4, H7" | KQ12 mục 1; `kiem-tiep.md` mục KT-3; báo cáo chính mục 5.1 | Chỉ 3/14 và 3/11 ca là span phía gọi của lời gọi tới root; phần còn lại là trace bất thường không chứa root hoặc quá ít span | Mục 5 |
++| "frontend đứng đầu … khớp với H4, H7" | KQ12 mục 1; KT-3; báo cáo mục 5.1 | Chỉ 3/14 và 3/11 gắn theo bảng nối; các ca khác gồm không gắn, ít span và chưa rõ. Không gắn không luôn là root vắng mặt | Mục 5 và đính chính sau REVIEW |
+ | "DA … điểm nguồn là thay đổi thật ở dịch vụ không liên quan" | KQ12 mục 3; `kiem-tiep.md` mục KT-15; `doc-tay.md` mục 5.3 | Điểm đó lớn dưới đoạn học 111 điểm; học trên 291 điểm thì root của ca rõ nhất về hạng 1 | Mục 6 |
+ | "Chưa phân xử: vì sao thao tác không liên hệ có 3–6% span vượt ngưỡng" | `doc-tay.md` mục 1.3; `kiem-tiep.md` mục KT-2, KT-4 | Mức tự nhiên trung vị 1,0%, tới 8%; 4/9 cặp đã đọc giữ mức tự nhiên, 5/9 tăng sau mốc | Mục 2 |
+ | "Root gần như không có tín hiệu metric" (auth, delay) | `doc-tay.md` mục 3.1 | Cột latency của root tăng 1,8–3,9 lần ở cả ba ca; z nhỏ vì nền dao động rộng | Mục 3 |
+@@ -216,9 +216,17 @@
+ 
+ Các file cũ `ket-qua-phien-9.md` tới `ket-qua-phien-12.md` là bản ghi theo thời điểm; tôi chỉ sửa câu "H4, H7" ở KQ12 theo đúng chỉ đạo của Minh và thêm dòng trỏ tới file này. Những câu còn lại được sửa ở báo cáo chính, `kiem-tiep.md` và `doc-tay.md`.
+ 
++**Đính chính sau REVIEW, Minh duyệt 11/10.** Không suy từ root không hạng 1 sang không có tín hiệu do lỗi; không bác bỏ chờ trong MicroRank chỉ vì M-D gần giữ hạng; giữ ca chưa rõ và ca không gắn nhưng root hiện diện; không tách ba nguyên nhân của CIRCA từ hai phép đổi cửa sổ. Bản trước và bằng chứng sửa ở runs/sua-review-001/. Self-check E cũ kiểm mục 1–6; mục 7 và doc-tay mục 8 được đối chiếu riêng trong kiem-so/ của lượt sửa này. Bản lịch sử ở mục 9 mô tả chi phí và cách chạy của phiên 13, không phải lượt sửa này.
++
+ ## 9. Chi phí và điều kiện dừng
+ 
+ - Lượt máy dài nhất: 985 giây (KT-9, laptop). EC2: 172, 494, 83 và 315 giây. Không lượt nào chạm mốc 1 giờ.
+ - RAM laptop đỉnh 76,5%. Không nhánh giữ nguyên nào lệch bản đóng băng. Không chỗ nào hỏng 3 lần.
+ - Ca thử trước mỗi lượt đủ, chạy sau khi file thiết kế đã ghi (pins ở các thư mục `*-launch/`): `runs/circa-kt9-test-001`, `runs/fake-marker-test-001`, `runs/tracerca-dropnew-test-001`, `-002`, `runs/root-latency-test-001`, `runs/microrank-merged-link-test-001`, `-002`. File thiết kế không đổi sau khi chạy.
+ - Không mở test, không đụng `data/locked/`, không sửa `src/`, không commit, không subagent.
++
++## Bổ sung sau REVIEW: cờ và nhóm trace MicroRank
++
++**Bằng chứng M-D bổ sung sau REVIEW.** Bảng cờ theo trace khớp nguồn ở 48 ca chạy được, 4 ca ERROR giữ N/A; không chạy PageRank. Cả 20 ca có caller trực tiếp trên root ở native đều có trace mất toàn bộ cờ của một caller nhưng vẫn A do root/dịch vụ khác; 19 ca còn caller trên root dưới M-D. Ví dụ dev-5467884de4 có 7 trace như vậy, root hạng 5 → 5; tổng A cùng 484 nhưng có 1 A → N và 1 N → A. Do đó tổng nhóm/hạng gần giữ chưa bác bỏ chờ. Nhóm A/N là nhóm yêu cầu/trace, không gộp các dịch vụ thành một nguyên nhân. Thiếu đối chứng native đúng cùng dataset/fault cho 20 ca; chưa tách tác dụng trọng số khi nhóm đổi. Nguồn: runs/sua-review-001/md-partition/attempt-003/summary.json → /cases (postanalysis, transitions); kiểm độc lập kiem-md-doc-lap.json. Chi phí cả ba lượt 4 phút 47 giây, giữ cả hai lượt lỗi.
++
++Bằng chứng đầy đủ, giới hạn đối chứng và các lượt chạy được giữ ở runs/sua-review-001/bo-sung-sau-review.md. Đây là bổ sung sau phiên 13, không đổi số hay nhận xét lịch sử về chi phí/môi trường của chính phiên 13.
+--- before/results/T-032/doc-tay.md
++++ after/results/T-032/doc-tay.md
+@@ -11,6 +11,8 @@
+ - **Từ dùng.** "Root": dịch vụ gốc theo nhãn. "Trên root": được phương pháp xếp hạng tốt hơn root. "Phía trên root": dịch vụ gọi root trực tiếp hoặc gián tiếp. a, n, H của TraceRCA: số span mang cờ của thao tác, số span sau mốc của thao tác, tổng số span mang cờ của cả ca. Hạng ghi [nhỏ nhất, lớn nhất]; hai số khác nhau là có hòa.
+ - **Mức kết luận của mỗi mục:** *xác nhận ở mức tính toán* (đã có phép đổi đúng một bước làm đổi hạng, hoặc đẳng thức đã kiểm), *quan sát* (thấy trên trung gian, chưa có phép đổi), *chưa phân xử*.
+ 
++**Đính chính sau REVIEW (Minh duyệt 11/10).** Cờ, phiếu và hạng là đầu ra của cách chấm; chúng không tự xác nhận có/không có đáp ứng do lỗi. Bảng no_signal cũ thực chất đếm không hạng 1. Nezha-OB có mốc giả giữa nền (22/22 ca), nhưng cửa sổ ngắn/không tương đương; BARO/SimpleRCA trong bảng đó được nối từ mốc thật. Không dùng chúng làm đối chứng metric/log ở mốc giả. Đọc tay MicroRank gồm 48 đơn vị: 46 OK sai, 1 ERROR, 1 đối chứng đúng; ngoài phần đọc có 3 ERROR và 1 OK đúng. Bằng chứng kiểm số của mục 8 lưu ở runs/sua-review-001/kiem-so/.
++
+ ## 1. TraceRCA (bản trong thư viện RCAEval) — 14 nhóm, 20 đơn vị đọc
+ 
+ Phiếu gọn: `runs/tong-hop-phien-12-001/phieu-gon/tracerca.txt`. Chuỗi tính: mỗi thao tác có mean, std ở đoạn nền; span sau mốc vượt mean + 3·std mang cờ; điểm thao tác = 2a/(n + H); điểm dịch vụ là điểm lớn nhất trong các thao tác của nó.
+@@ -67,33 +69,33 @@
+ 1. **"Chờ root", tỷ lệ không cứu — `dev-14701a3bbb` (shippingservice|cpu_contention), hạng 2** (3 đơn vị cùng đường đi). Root: a = 41, n = 171 (24%). Trên root: `frontend`, thao tác là span phía gọi của lời gọi tới root, a = 122, n = 151 (81%), 100% là span chờ root. Root đứng đầu ở ba vị trí "phía gọi" của bảng A nhưng không ở span của chính nó. T-D không đổi; a/n xuống hạng 3; bước của bài gốc: `frontend` đứng đầu, root hạng 4. **Đọc:** tín hiệu của sự cố nằm ở span phía gọi của lời gọi tới root (81% vượt ngưỡng) nhiều hơn ở span của root (24%); phương pháp gắn span phía gọi cho `frontend`.
+ 2. **"Chờ root", tỷ lệ cứu — `dev-3e27669440` (adservice|cpu_contention), hạng 2** (1 đơn vị). Root 328/489 (67%), `frontend` 379/489 (78%), 100% span chờ root. Xếp theo a/n đưa root lên hạng 1, dù thao tác cao nhất của root có tỷ lệ thấp hơn của `frontend`; suy luận, chưa mở bảng theo thao tác: dưới cách xếp theo tỷ lệ, điểm của root lấy từ một thao tác khác của nó. Hai thao tác ở trên có cùng n = 489: đó là hai đầu của cùng một loại lời gọi.
+ 3. **"Không xét được", tỷ lệ không cứu — `dev-70629373f9` (paymentservice|cpu_contention), hạng 9** (1 đơn vị). Root 2/42 (5%). `checkoutservice` gọi trực tiếp root: 36/42 (86%), nhưng cạnh chỉ có 42 lời gọi sau mốc và dưới 20 ở một phía nên không tính được "lời gọi chậm". Sáu thực thể khác trên root có tỷ lệ 2–4% trên 874–2.996 span. **Đọc:** cùng hình dạng với đường đi 1 (span phía gọi 86%, span của root 5%), thêm phần khối lượng. Không gọi là "chờ root" vì thiếu điều kiện đo.
+-4. **"Không xét được", tỷ lệ cứu — `dev-3b92690644` (checkoutservice|return), hạng 7** (3 đơn vị). Root 4/132 (3%). Trên root là các thao tác đông span có tỷ lệ 1–4% (`currencyservice` 101/2.981, `frontend` 133/4.254…). a/n đưa root lên hạng 1 (cả khi chỉ xét thao tác từ 20 span); file kết quả không lưu thao tác nào của root thắng dưới cách xếp này. Lỗi `return` gần như không làm đổi thời lượng; hạng do nhiễu nền quyết định.
+-5. **Không chờ, tỷ lệ không cứu — `dev-27252dca60` (productcatalogservice|exception), hạng 8** (2 đơn vị). Root 3/1.089 (0,3%); root không đứng đầu ở vị trí trace nào. Không phép đổi nào đưa root lên: a/n hạng 8, a/n từ 20 span hạng 5, a hạng 4–5. **Đọc:** lỗi không để lại tín hiệu thời lượng; đây là giới hạn của kênh, không phải của bước tính.
++4. **"Không xét được", tỷ lệ cứu — dev-3b92690644 (checkoutservice|return), hạng 7** (3 đơn vị). Root 4/132 (3%). Các thao tác trên root có 1–4% cờ (currencyservice 101/2.981, frontend 133/4.254). a/n đưa root lên hạng 1; chưa lưu thao tác thắng của root trong nhánh ấy. Tỷ lệ cờ native nhỏ không chứng minh thời lượng không phản ứng với lỗi hoặc thứ hạng chỉ do nhiễu nền.
++5. **Không chờ, tỷ lệ không cứu — dev-27252dca60 (productcatalogservice|exception), hạng 8** (2 đơn vị). Root 3/1.089 (0,3%); không đứng đầu ở vị trí trace nào. a/n hạng 8, a/n từ 20 span hạng 5, a hạng 4–5. Đây là quan sát về cờ và cách chấm; đáp ứng thời lượng do lỗi chưa phân xử, chưa quy riêng cho thiếu dữ liệu.
+ 6. **Không chờ, tỷ lệ cứu — `dev-2bfc97b01e` (checkoutservice|network_delay), hạng 6** (2 đơn vị). Root 5/31 (16%). `frontend` 30/828 (4%), chỉ 13% span mang cờ là span chờ root; bốn thực thể khác 2–4% trên 489–3.869 span. a/n đưa root lên hạng 1. Cùng cơ chế với mục 1.3.
+-7. **"Chờ root" một phần — `dev-5467884de4` (recommendationservice|network_delay), hạng 7** (4 đơn vị). Root 7/450 (2%). `frontend`, span phía gọi của lời gọi tới root: 439/450 (98%), 99% là span chờ root. Năm thực thể khác 2–9% cũng đứng trên root. Không phép đổi nào cứu: a/n hạng 9, T-D không đổi. Bước của bài gốc đưa root lên hạng 2, `frontend` đứng đầu. **Đọc:** với lỗi trễ mạng, span của root không dài ra (2%), toàn bộ tín hiệu nằm ở span phía gọi (98%). Gỡ điểm của `frontend` cũng chưa đủ: root vẫn thua các thao tác đông span. Muốn xếp đúng phải **gắn tín hiệu của span phía gọi cho dịch vụ được gọi**, tức dùng cạnh gọi.
++7. **"Chờ root" một phần — dev-5467884de4 (recommendationservice|network_delay), hạng 7** (4 đơn vị). Root 7/450 (2%), span phía gọi của frontend 439/450 (98%), 99% là span chờ root. Năm thực thể khác 2–9% cũng đứng trên root. a/n hạng 9, T-D không đổi; bước theo bài đưa root hạng 2. Cờ hiện rõ hơn ở phía gọi; không có nghĩa span của root không đổi. Gắn bằng chứng phía gọi về dịch vụ được gọi là ứng viên cần đánh giá, chưa chứng minh phải dùng cách ấy mới xếp đúng.
+ 
+ Nhóm `k=5|M5` gồm năm trong bảy đường đi trên (các đơn vị 3–7); đối chứng ở k = 5 là `dev-14701a3bbb`, ca có root hạng 2 (đúng trong 5 hạng đầu). So hai bên: ở đối chứng root có 24% span mang cờ; ở năm đơn vị sai root có 0,3–16%.
+ 
+ ### 1.5 Nhóm `Nezha-OB|tracerca|k=1|M0` (2 đơn vị, một đường đi)
+ 
+ - **Đơn vị đọc:** `dev-1ac905bc95` (frontend|return), hạng 3. Root là điểm vào của hệ, không có dịch vụ nào phía trên (0/8 ứng viên). Root 11/409 (3%). Trên root: `checkoutservice` 10/38, `currencyservice` 66/2.178, đều là dịch vụ root gọi.
+-- **Đọc:** lỗi `return` không để lại tín hiệu thời lượng; thứ hạng là thứ hạng của nhiễu nền. Quan hệ gọi tới root không tồn tại ở ca này.
++- **Đọc:** root có 11 span mang cờ nhưng không hạng 1. Chưa tách cờ do lỗi khỏi nhiễu nền; không kết luận return không làm đổi thời lượng. Ca này không có cạnh đi vào root, còn cạnh root gọi dịch vụ khác vẫn có.
+ 
+ ### 1.6 Nhóm `k=1|M3` và `k=5|M3` (hòa)
+ 
+ - **`dev-396c8dbf7d` (emailservice|cpu_consumed), hạng [1, 3].** Root 38/38 (100%), điểm 0,0808, không thực thể nào có điểm cao hơn nhưng có hai thực thể bằng điểm. Lời gọi tới root chậm ở 100% lời gọi. T-D đưa root về hạng [1, 1]. **Đọc:** mỗi lời gọi tới root có hai span (phía gọi và phía được gọi) cùng số lượng và cùng vượt ngưỡng, nên hai thao tác có cùng a, n và cùng điểm. Bước tính điểm không phân biệt được hai đầu của một lời gọi; bỏ phần được span con phủ thì phân biệt được.
+-- **`dev-8ecd9880ed` (checkoutservice|return), hạng [5, 6] ở k = 5.** Root 2/28; root không đứng đầu ở vị trí trace nào. Hòa ở biên hạng 5 giữa các điểm rất nhỏ. Không có tín hiệu để phân xử.
++- **dev-8ecd9880ed (checkoutservice|return), hạng[5,6] ở k=5.** Root 2/28; không đứng đầu ở vị trí trace nào, hòa ở biên hạng 5 giữa điểm nhỏ. Chưa có bằng chứng phân xử đáp ứng do lỗi và cờ nền; không suy từ hạng ra dữ liệu không có dấu hiệu.
+ 
+ ### 1.7 Nhóm `k=1|M2`, `k=1|M6`, `k=5|M2`, `k=5|M6` (cùng một đơn vị)
+ 
+ - **`dev-7b7c973198` (emailservice|network_delay): root không được xếp.** Không thao tác nào của root có span mang cờ, nên root không có điểm hữu hạn và bị bộ lọc của adapter loại. Trong khi đó lời gọi tới root chậm ở 100% lời gọi, và root đứng đầu ở vị trí `in_u` (span phía gọi, phần chưa được span con phủ).
+-- **Đọc:** đây là dạng tận cùng của đường đi 7 ở mục 1.4: tín hiệu chỉ có trên cạnh, span của root không có gì, nên root rơi khỏi bảng. Bước của bài gốc cũng không cứu (root không có điểm dương).
++- **Đọc:** ca này không thao tác nào của root mang cờ theo ngưỡng đang dùng; adapter loại root vì không có điểm hữu hạn. Span phía gọi mang bằng chứng chậm. Đây là chuỗi tính toán cụ thể của ca này, không suy rộng rằng span của root luôn không có tín hiệu ở mọi ca trễ mạng.
+ 
+ ### 1.8 Điều rút ra từ phần đọc TraceRCA
+ 
+-- Có **ba đường thất bại khác nhau**, không phải một: (i) span phía gọi của lời gọi tới root được tính cho dịch vụ gọi (mục 1.2, 1.4 đường 1, 2, 3, 7; 1.6; 1.7); (ii) thao tác đông span thắng nhờ số tuyệt đối (1.2 ca thứ ba, 1.3, 1.4 đường 4, 6); (iii) lỗi không để lại tín hiệu thời lượng (1.4 đường 5; 1.5; 1.6 ca thứ hai). Một ca có thể dính hai đường.
++- Có ba đường quan sát: gắn span phía gọi cho dịch vụ gọi; thao tác đông span thắng nhờ số tuyệt đối; root ít cờ và không được cách chấm hiện tại tách ra. Hai đường đầu có bằng chứng tính toán theo ca; đường cuối chưa xác nhận lỗi không làm đổi thời lượng. Một ca có thể có nhiều đường.
+ - Đường (i) có ở cả ca đúng (đối chứng `dev-9b9397a4dc`): cùng quy tắc gắn span cho dịch vụ sở hữu nó giúp root khi root là bên gọi và hại root khi root là bên được gọi.
+-- Với lỗi trễ mạng ở Nezha-OB, không phép đổi nào trên điểm của nút cứu được root; chỉ thông tin trên cạnh mới mang tín hiệu.
++- Với một phần ca trễ mạng ở Nezha-OB, các phép đổi đã thử chưa đưa root hạng 1 và cờ phía gọi rõ hơn cờ root. Đây là căn cứ đề xuất dùng cạnh; không bác bỏ mọi phép chấm theo nút hoặc mọi tín hiệu của root.
+ - Ca đúng và ca sai cùng ô ở RE2-TT khác nhau về **tải** (có hay không có span của dịch vụ gọi trong cửa sổ), không khác về loại lỗi.
+ 
+ ## 2. MicroRank (biến thể RCAEval sửa đầu vào) — 11 nhóm, 20 đơn vị đọc
+@@ -140,7 +142,7 @@
+ 
+ ### 2.5 Nhóm `Nezha-OB|microrank_full|k=1|M0` (2 đơn vị) và `k=1|M6`, `k=5|M6` (1 đơn vị)
+ 
+-- **`dev-1ac905bc95` (frontend|return), hạng 3.** Root là điểm vào; hai thực thể trên root là dịch vụ root gọi. A′ cho hạng [1, 3]; chia theo luật của bài lên hạng 1, luật của code giữ hạng 3. Lỗi `return` không để lại tín hiệu thời lượng (mục 1.5); kết quả không ổn định giữa hai luật.
++- **dev-1ac905bc95 (frontend|return), hạng 3.** Root ở điểm vào; hai thực thể trên root là dịch vụ root gọi. A′ cho hạng[1,3]; luật bài lên hạng 1, luật code giữ hạng 3. Kết quả không ổn định giữa luật; đáp ứng thời lượng do return còn OPEN (mục 1.5).
+ - **`dev-7b7c973198` (emailservice|network_delay), hạng [8, 9].** Root không tự mang cờ ở trace A nào (0/332); đây là nghĩa của cờ M6. Lời gọi tới root chậm ở 100% lời gọi, tín hiệu chỉ ở span phía gọi. Chia theo bài gốc cho hạng [1, 4]: root hòa với ba dịch vụ khác. Cùng ca với mục 1.7.
+ 
+ ### 2.6 Điều rút ra từ phần đọc MicroRank
+@@ -185,7 +187,7 @@
+ Metric của Nezha-OB chỉ có 5 mẫu mỗi phía, nên median và IQR ước lượng từ 5 điểm. Đối chứng dùng chung là `dev-14701a3bbb` (shippingservice|cpu_contention; khác ô): root hạng 1 với cột mức dùng CPU z = 342, lệch/median 2.869%.
+ 
+ - **`dev-7b7c973198` (emailservice|network_delay), hạng 4** (2 đơn vị). Root: cột độ trễ phía gọi P90, z = 10,4 dù lệch/median 878%, vì IQR/median của nó là 85%. Trên root là ba dịch vụ không liên hệ với z 13–24 và lệch/median 18–451%. B-2 lên hạng 3.
+-- **`dev-5ada15752d` (frontend|return), hạng 8** (2 đơn vị) và **`dev-1ac905bc95` (frontend|return), hạng 10 trên 10** (3 đơn vị). Root z = 3,9 và z = 1,2. Mọi thực thể trên root là dịch vụ root gọi; lưu lượng qua nhiều dịch vụ trong số đó có đổi. B-2 không đổi hạng. **Đọc:** lỗi `return` ở điểm vào làm đổi lưu lượng xuống các dịch vụ phía dưới, còn metric của chính root không đổi. Đây là hướng lan **xuôi** theo lưu lượng, ngược với giả thuyết "lan lên dịch vụ gọi".
++- **dev-5ada15752d (frontend|return), hạng 8** (2 đơn vị) và **dev-1ac905bc95, hạng 10/10** (3 đơn vị). Root z=3,9 và 1,2; mọi thực thể trên root là dịch vụ root gọi, lưu lượng một số dịch vụ đó đổi. B-2 không đổi hạng. Quan sát là khác biệt giữa lưu lượng phía dưới và điểm metric của root; chưa quy thay đổi ấy cho lỗi return hoặc khẳng định metric root không đổi từ hạng thấp.
+ 
+ ### 3.4 Nhóm `Nezha-OB|baro|k=1|M5` (7 đơn vị, năm đường đi) và `k=5|M5` (3 đơn vị)
+ 
+@@ -226,7 +228,7 @@
+ 
+ - **`dev-515c5f2190` (recommendationservice|cpu_consumed), hạng 2** (3 đơn vị): root 2 + 1 = 3; `adservice` (không liên hệ) 4 phiếu. Chênh 1 phiếu. Trace có tín hiệu rõ (root đứng đầu ở cả năm vị trí của bảng A, lời gọi tới root chậm 95%), nhưng kênh trace chỉ góp 1 phiếu.
+ - **`dev-8ecd9880ed` (checkoutservice|return), hạng [4, 5]** (1 đơn vị): root 3 + 0 + 1 = 4; ba thực thể trên root có 8–15 phiếu, cột nhiều phiếu nhất là bộ nhớ.
+-- **`dev-1ac905bc95` và `dev-5ada15752d` (frontend|return), hạng [5, 6] và 6**: root **không có phiếu metric nào** (0/21 cột), chỉ 1 phiếu log. Mọi thực thể trên root là dịch vụ root gọi. Như mục 3.3: lỗi `return` ở điểm vào không để lại tín hiệu metric ở root.
++- **dev-1ac905bc95 và dev-5ada15752d (frontend|return), hạng[5,6] và 6:** root 0 phiếu metric ở 0/21 cột, 1 phiếu log; các thực thể trên root là dịch vụ root gọi. Không có phiếu theo ngưỡng này không đồng nghĩa metric không đổi do lỗi; đáp ứng return chưa phân xử.
+ 
+ ### 4.3 Nhóm `Nezha-OB|simplerca|k=1|M5` (9 đơn vị, sáu đường đi), `k=5|M5`, `k=1|M6`, `k=5|M6`
+ 
+@@ -336,7 +338,7 @@
+ 3. **Cùng một quy tắc "span thuộc dịch vụ nào tính cho dịch vụ đó" giúp root khi root là bên gọi và hại root khi root là bên được gọi** (mục 1.4, đối chứng `dev-9b9397a4dc`).
+ 4. **Ba ca CIRCA đúng là đúng nhờ giá trị cực lớn** (mục 5.1), và **ba ca DA hại không dính giá trị cực lớn đều do một nút không liên quan có điểm lớn kéo các nút cha của nó vượt root** (5.3; cách đọc ban đầu "root không có cạnh" đã được sửa sau phép kiểm KT-15).
+ 5. **Bộ chia trace theo bài MicroRank gốc có phản ví dụ** (mục 2.3 điểm 2; 2.4 điểm 5).
+-6. **Lỗi `return` ở điểm vào làm đổi lưu lượng các dịch vụ phía dưới** trong khi root không có tín hiệu (mục 3.3, 4.2): hướng ngược với giả thuyết lan lên dịch vụ gọi.
++6. **Ở return tại điểm vào, lưu lượng dịch vụ phía dưới có đổi trong khi root có điểm thấp hoặc không có phiếu metric** (mục 3.3,4.2). Quan sát hướng phía dưới khác giả thuyết chờ ở phía trên; chưa xác nhận thay đổi do return hay thiếu tín hiệu trong dữ liệu.
+ 
+ ### 7.3 Giới hạn của phần đọc tay
+ 
+@@ -356,11 +358,11 @@
+ 
+ ### 8.1 BARO — 7 đơn vị
+ 
+-1. **`dev-8ecd9880ed` (Nezha-OB, checkoutservice|return), hạng 8 trên 10.** Cột tốt nhất của root: độ trễ phía gọi P95, z = 4,2 (IQR/median 34%, lệch/median 143%). Trên root 7 thực thể: `adservice` cột độ trễ phía gọi P99 z = 523,3 (lệch/median 398%, IQR/median 0,76%); `paymentservice` cột bộ nhớ z = 144 với lệch/median chỉ 2% trên nền IQR/median 0,013%. B-2 lên hạng 7. Cờ M5 có vì một dịch vụ phía trên đứng trước root; 6/7 thực thể trên root không nằm phía trên. **Giống** đơn vị đại diện (`dev-27252dca60`): lỗi `return` không để lại tín hiệu metric ở root; hạng do nhiễu và nền phẳng quyết định.
++1. **dev-8ecd9880ed (Nezha-OB, checkoutservice|return), hạng 8/10.** Cột tốt nhất root: độ trễ phía gọi P95, z=4,2, IQR/median 34%, lệch/median 143%. adservice z=523,3 (398%, 0,76%); paymentservice z=144 (2%, 0,013%). B-2 hạng 7; 6/7 thực thể trên root không phía trên. Root có thay đổi và có điểm; chưa phân xử phần do lỗi với nền, không thể gọi dữ liệu không có tín hiệu chỉ vì root không hạng 1.
+ 2. **`dev-9b9397a4dc` (Nezha-OB, recommendationservice|cpu_consumed), hạng 2.** Root: độ trễ phía server P90, z = 115,3 với lệch/median 13.931% (gấp 139 lần mức nền) và IQR/median 121%. Trên root: `adservice` (không liên hệ) cột độ trễ phía gọi P99 z = 131,3, lệch/median 100%, IQR/median 0,76%. B-2 làm root **xuống hạng 4**. **Khác** cách đọc ở mục 3.5: đây là đường (ii) "root đổi nhiều nhưng thua cột nền phẳng", nhưng thang độ lệch chuẩn không gỡ được mà còn làm tệ hơn (5 mẫu).
+ 3. **`dev-607751ac0a` (Nezha-OB, checkoutservice|network_delay), hạng 8.** Cột tốt nhất của root là lưu lượng mạng nhận, z = 5,0. Trên root 7 thực thể, đứng đầu `shippingservice` cột độ trễ phía server P99 z = 2.426,2 với lệch/median 59% trên nền IQR/median 0,024%. B-2 xuống hạng 10. Lời gọi tới root chậm ở 9% lời gọi. Chuỗi cột độ trễ của root ở ca này đã in ở KT-12 (`ket-qua-phien-13.md` mục 3): không cột độ trễ nào của root vượt mức nền. **Giống** đơn vị đại diện: root không có tín hiệu metric.
+ 4. **`dev-2bfc97b01e` (Nezha-OB, checkoutservice|network_delay), hạng 2.** Root: độ trễ phía server P99 z = 94,0 (lệch/median 95%, IQR/median 1%). Trên root: `emailservice` (phía dưới root) cột lưu lượng mạng nhận z = 215,1, lệch/median 3.843%, lưu lượng qua nó có đổi. B-2 không đổi. **Điều KT-12 thêm vào:** z = 94 của root là do IQR của 5 mẫu nền gần bằng 0 (0,005); chuỗi sau mốc của cột đó (0,48; 0,49; 0,50; 0,25; 0,97) gần như lặp lại chuỗi nền (0,50; 0,50; 0,97; 0,24; 0,49). Tức root đứng hạng 2 ở ca này không phải vì cột độ trễ của nó phản ứng với sự cố.
+-5. **`dev-3b92690644` (Nezha-OB, checkoutservice|return), hạng 3.** Root: độ trễ phía gọi P99 z = 40 (lệch/median 211%). Trên root: `shippingservice` (phía dưới) cột lưu lượng mạng nhận z = 216, lệch/median 1.850%; `adservice` cột độ trễ phía server P95 z = 58,2. B-2 xuống hạng 4. **Giống** mục 3.3: lỗi ở dịch vụ phía trên làm đổi lưu lượng của dịch vụ phía dưới (hướng xuôi).
++5. **dev-3b92690644 (Nezha-OB, checkoutservice|return), hạng 3.** Root độ trễ phía gọi P99, z=40, lệch/median 211%. shippingservice mạng nhận z=216, lệch/median 1.850%; adservice độ trễ phía server P95, z=58,2. B-2 hạng 4. Root có cột đổi cùng lúc phía dưới có cột đổi; chưa quy riêng cho lỗi hay xác nhận hướng lan.
+ 6. **`dev-f81f88234e` (RE2-TT, auth|delay), hạng 11 trên 68.** Root: cột latency z = 4,9 (IQR/median 31%, lệch/median 152%). Trên root 10 thực thể (7 không liên hệ, 3 không có span): `ts-user-service` latency z = 33,6 (lệch/median 57%, IQR/median 2%); `ts-travel2-service` mem z = 14,2 với lệch/median 0,9%. B-2 lên hạng 10. **Khác** đơn vị đại diện `dev-57546fd87b` ở một điểm: ở đây cột latency của root **có đổi** (KT-12: trung vị 0,77 → 1,38; 158/300 mẫu sau mốc vượt mean + 3·std), nhưng nền của cột dao động rộng (IQR 0,24) nên z nhỏ. Vậy câu "root gần như không có tín hiệu metric" ở mục 3.1 điểm 1 chỉ đúng theo thang z; về mức đổi thì cả ba ca auth|delay đều có trung vị cột latency của root tăng 1,8–3,9 lần (`ket-qua-phien-13.md` mục 3).
+ 7. **`dev-16597725c1` (RE2-TT, auth|cpu), hạng 4.** Root: mem z = 47,5 (lệch/median 2%, IQR/median 0,04%). Trên root: `ts-food-service` latency z = 117,4 (lệch/median 315%), `ts-contacts-service` latency z = 100,6 (519%), `ts-ui-dashboard` latency z = 56,2 (188%, bậc tại mốc). B-2 đưa root lên hạng 1, cả 3 cặp mất. **Khác** câu ở mục 3.5: ba cột thắng ở đây là cột độ trễ đổi thật của dịch vụ không liên hệ (đường iii), vậy mà đổi thang chia vẫn gỡ được. Đường (ii) và (iii) không tách sạch bằng "B-2 gỡ được hay không".
+ 
+@@ -368,7 +370,7 @@
+ 
+ ### 8.2 SimpleRCA — 6 đơn vị
+ 
+-1. **`dev-7b7c973198` (Nezha-OB, emailservice|network_delay), hạng 3.** Root: 6 phiếu metric (4/16 cột) + 0 + 0. Trên root: `cartservice` và `currencyservice` (không liên hệ), mỗi bên 9 phiếu; chênh 3 phiếu. Lời gọi tới root chậm ở 100% lời gọi và root đứng đầu ở vị trí `in_u`, nhưng kênh trace cho root 0 phiếu. S-1 không đổi. **Giống** đơn vị đại diện (`dev-515c5f2190`): chênh vài phiếu; tín hiệu trên cạnh không được đếm.
++1. **`dev-7b7c973198` (Nezha-OB, emailservice|network_delay), hạng 3.** Root: 6 phiếu metric (4/16 cột) + 0 + 0. Trên root: `cartservice` và `currencyservice` (không liên hệ), mỗi bên 9 phiếu; chênh 3 phiếu. Lời gọi tới root chậm ở 100% lời gọi và root đứng đầu ở vị trí `in_u`, nhưng kênh trace cho root 0 phiếu. S-1 giữ hạng tốt nhất 3 nhưng tạo hòa [3,5], nên hạng bi quan là 5. **Giống** đơn vị đại diện (`dev-515c5f2190`): chênh vài phiếu; tín hiệu trên cạnh không được đếm.
+ 2. **`dev-9b9397a4dc` (Nezha-OB, recommendationservice|cpu_consumed), hạng [2, 3].** Root 6 phiếu (2/16 cột); `cartservice` 10 phiếu. S-1 làm root xuống [4, 5]. Giống trên.
+ 3. **`dev-55f99f3e0a` (Nezha-OB, checkoutservice|exception), hạng 2.** Root 10 + 0 + 1 = 11; `frontend` (gọi trực tiếp root) 17 + 0 + 1 = 18, cột nhiều phiếu nhất là độ trễ phía trước P99 (3/5 mẫu). S-1 không đổi. **Giống** `dev-3b92690644`.
+ 4. **`dev-9fd793feb7` (Nezha-OB, shippingservice|cpu_consumed), hạng 2.** Root 16 (9/16 cột) + 1 = 17; `checkoutservice` (gọi trực tiếp root) 19, cột độ trễ phía gọi P95 4/5 mẫu. Lời gọi tới root chậm ở 83% lời gọi. S-1 đưa root lên hạng 1. **Khác** đơn vị đại diện ở tác dụng của S-1 (đại diện: không đổi).
+@@ -383,14 +385,14 @@
+ 2. **`dev-7d3c2fe6d1` (Nezha-OB, shippingservice|cpu_contention), hạng 2.** Root 52/215 (24%); `frontend` 145/182 (80%), 100% là span chờ root. T-D không đổi; a/n xuống hạng 3; bước của bài gốc hạng 3. Cùng ô và **giống hệt** hình dạng của `dev-14701a3bbb` (41/171 so với 122/151).
+ 3. **`dev-55f99f3e0a` (Nezha-OB, checkoutservice|exception), hạng 3.** Root 19/208 (9%). Trên root: `frontend` 70/1.142 (6%), `currencyservice` 126/3.714 (3%); tỷ lệ span chờ root bằng 0. a/n đưa root lên hạng 1. **Giống** `dev-3b92690644`: thao tác đông span thắng nhờ số tuyệt đối.
+ 4. **`dev-b0f8b2e3ac` (Nezha-OB, checkoutservice|exception), hạng 5.** Root 20/212 (9%). Bốn thực thể trên root có 4–6% span mang cờ trên 726–3.552 span. a/n lên hạng 1; T-D lên hạng 3. Giống trên.
+-5. **`dev-5ada15752d` (Nezha-OB, frontend|return), hạng 3.** Root 35/2.201 (2%). Trên root là hai dịch vụ root gọi: `currencyservice` 94/2.447 (4%), `checkoutservice` 8/46 (17%). T-D và a/n đều làm root xuống hạng 6. **Giống** mục 1.5: lỗi `return` không để lại tín hiệu thời lượng.
++5. **dev-5ada15752d (Nezha-OB, frontend|return), hạng 3.** Root 35/2.201 (2%); currencyservice 94/2.447 (4%), checkoutservice 8/46 (17%). T-D và a/n làm root xuống hạng 6. Như mục 1.5, có cờ nhưng root không hạng 1; đáp ứng do lỗi chưa phân xử.
+ 6. **`dev-607751ac0a` (Nezha-OB, checkoutservice|network_delay), hạng 6.** Root 4/33 (12%); năm thực thể trên root có 3–6% trên 208–2.188 span. a/n lên hạng 1. Lời gọi tới root chậm ở 9% lời gọi. **Giống** `dev-2bfc97b01e`.
+ 7. **`dev-63c30faf34` (Nezha-OB, recommendationservice|network_delay), hạng 8.** Root 6/574 (1%); `frontend` 555/574 (97%), 99% là span chờ root; sáu thực thể khác 1–17%. a/n giữ hạng 8; bước của bài gốc đưa root lên hạng 2, `frontend` đứng đầu. **Giống** `dev-5467884de4`.
+ 8. **`dev-6c9afc9822` (Nezha-OB, emailservice|network_delay), hạng 9.** Root 1/27 (4%). Trên root có **hai** thực thể cùng a = 26, n = 27 (96%), cùng điểm 0,0908, cùng 88% span chờ root: `checkoutservice` (gọi trực tiếp root) và `frontend` (gọi `checkoutservice`). Sáu thực thể không liên hệ 1–4% cũng đứng trên root. Bước của bài gốc: root không có điểm dương, hạng 8–10. **Điều mới so với đơn vị đại diện:** thời gian chờ root hiện ở span phía gọi của dịch vụ gọi trực tiếp **và** của dịch vụ gọi dịch vụ đó, với cùng số span. Tức nếu chỉ "gỡ điểm của dịch vụ gọi" thì còn một tầng nữa; muốn gắn tín hiệu về đúng dịch vụ được gọi phải đi theo cạnh trực tiếp tới tận đầu dưới của chuỗi.
+ 9. **`dev-95e164235f` (Nezha-OB, paymentservice|cpu_contention), hạng 6.** Root 7/36 (19%). Trên root: `checkoutservice` (gọi trực tiếp) 10/36 (28%), 100% span chờ root; `frontend` 132/3.710 (4%); ba dịch vụ không liên hệ 2–6% trên 587–3.786 span. a/n đưa root lên hạng 2, chỉ còn `checkoutservice` đứng trên. Lời gọi tới root chậm ở 28% lời gọi. **Đọc:** ca dính cả hai đường: khối lượng (bốn thực thể, mất khi xếp theo tỷ lệ) và span phía gọi (một thực thể, không phép đổi nào trên nút gỡ được).
+ 10. **`dev-db293894ab` (RE2-TT, travel|disk), hạng 2.** Root 247/804 (31%), điểm 0,0947. Trên root: `ts-seat-service` (hai chiều với root) 545/3.921 (14%), điểm 0,1308; 86% span mang cờ là span chờ root. **T-D đưa root lên hạng 1**; a/n cũng lên hạng 1. **Khác** đơn vị đại diện `dev-12a1a88069`, nơi T-D không đổi hạng dù 98% span là span chờ root. Hai ca cùng loại lỗi (disk), cùng dịch vụ đứng trên (`ts-seat-service`), khác nhau ở tác dụng của T-D. Đã mở bảng lời gọi chậm theo cạnh của hai ca (EC2, `runs/call-slow-001/cases/RE2-TT-<mã>.json` → `/edges`, cạnh `ts-seat-service→<root>`): ở ca này 470 lời gọi chậm, 350 nằm trong span của root (74%); ở `dev-12a1a88069` 128 lời gọi chậm, 106 nằm trong span của root (83%). Vậy cách hiểu nêu ở mục 1.2 ("phần chậm nằm ngoài span của root nên T-D không gỡ được") **không được hỗ trợ**: ca mà T-D không gỡ được lại có tỷ lệ nằm trong span của root cao hơn. Lý do hai ca khác nhau **chưa phân xử**; bằng chứng cần: điểm theo thao tác của `ts-seat-service` và của root dưới T-D ở hai ca (có trong lượt `tracerca-core-td-001`, chưa lập bảng so).
+ 
+-**Điều phần đọc nốt thêm cho TraceRCA.** (a) Ba đường thất bại ở mục 1.8 đủ để xếp cả 10 đơn vị: đường (i) span phía gọi ở các đơn vị 1, 2, 7, 8, 9, 10; đường (ii) khối lượng ở 3, 4, 6, 9; đường (iii) không có tín hiệu thời lượng ở 5. (b) Trong 9 đơn vị Nezha-OB đọc nốt, thực thể đứng đầu là `frontend` ở 6 đơn vị (1, 2, 3, 7, 8, 9), còn lại là `currencyservice` (4, 5) và `recommendationservice` (6). (c) Điều mới: chờ lan qua hai tầng dịch vụ gọi với cùng số span (đơn vị 8); và T-D có tác dụng khác nhau trên hai ca cùng dạng ở RE2-TT (đơn vị 10).
++**Phần đọc nốt thêm cho TraceRCA.** Trong 10 đơn vị, quan sát span phía gọi ở 1,2,7,8,9,10; khối lượng ở 3,4,6,9; root ít cờ/không hạng 1 ở 5, chưa xác nhận thiếu đáp ứng do lỗi. Trong 9 đơn vị Nezha, frontend đứng đầu 6 (1,2,3,7,8,9), currencyservice ở 4,5, recommendationservice ở 6. Hai điều mới: chờ qua hai tầng với cùng số span (8), T-D khác nhau ở hai ca RE2-TT cùng dạng (10).
+ 
+ ### 8.4 MicroRank — 28 đơn vị OK (3 đơn vị ERROR xem mục 8.7)
+ 
+@@ -409,7 +411,7 @@
+ **B. Nezha-OB, bộ chia theo bài gốc cứu (2 đơn vị; đại diện `dev-3e27669440`).**
+ 
+ 6. `dev-515c5f2190` (recommendationservice|cpu_consumed), hạng 5: A = 322 (75%); root tự mang cờ ở 299. Bốn thực thể trên root đều có 94% trace A gắn với root (đi cùng trace). Đếm riêng lên hạng 2; chia theo bài gốc hạng 1. Ghép: 1 / 1. **Giống** đại diện.
+-7. `dev-5467884de4` (recommendationservice|network_delay), hạng 5: A = 484 (77%), nhưng root chỉ tự mang cờ ở **7** trace. Chia theo bài gốc đưa root lên hạng 1. **Ghép làm root xuống hạng 4 / 5**, `frontend` đứng đầu; thao tác cao nhất của `frontend` là span phía gọi của lời gọi tới root: 97–98% span mang cờ của nó có span con trực tiếp thuộc root và bao một lời gọi chậm tới root; root mang cờ ở 6–7 trên 67–199 trace đó. **Đọc:** với lỗi trễ mạng, span của root không mang cờ; đếm riêng vì vậy lấy điểm của root đi và trao cho span phía gọi. Đây đúng là hạn chế H4, H7, hiện ra khi ghép hai phép đổi.
++7. dev-5467884de4 (recommendationservice|network_delay), hạng 5: A=484 (77%); root tự mang cờ ở 7 trace. Chia theo bài đưa root hạng 1; ghép làm root hạng 4/5, frontend đứng đầu. 97–98% span mang cờ thao tác phía gọi có con trực tiếp root và bao lời gọi chậm; root mang cờ 6–7/67–199 trace ấy. Đếm riêng lấy điểm từ ít cờ root so với phía gọi, không phải root hoàn toàn không mang cờ. Đây là cơ chế tính toán gắn span cho dịch vụ sở hữu nó của ca này.
+ 
+ **C. Nezha-OB, root là điểm vào (1 đơn vị; đại diện `dev-1ac905bc95`).**
+ 
+@@ -449,10 +451,10 @@
+ 
+ **Điều phần đọc nốt thêm cho MicroRank.**
+ 
+-- Sau khi ghép hai phép đổi, các đơn vị còn sai chia thành ba dạng đọc được, khác nhau về việc quan hệ gọi có chạm tới hay không: (i) **span phía gọi của lời gọi tới root được tính cho dịch vụ gọi** (đơn vị 7, 11, 12, 15, 16, 26; cùng dạng với `dev-3e27669440`, `dev-12a1a88069`, `dev-3ae0a6c15a` đã đọc); (ii) **nhóm trace bất thường không chứa root** và thực thể đứng đầu là một dịch vụ không liên hệ chậm lên cùng lúc (đơn vị 17, 27, 28: `ts-auth-service`) hoặc là `frontend` gọi một dịch vụ đông lời gọi (đơn vị 1, 2 và các ca cùng dạng ở bảng nối); (iii) **quá ít trace bất thường** để xếp (đơn vị 3, 4, 8, 13).
++- Ba dạng quan sát sau ghép là span phía gọi được tính cho dịch vụ gọi; các trace tạo số đếm của thao tác đứng đầu vắng root; hoặc ít span. Chưa bao phủ mọi ca: dev-14701a3bbb chưa rõ dưới cả hai luật; dev-607751ac0a luật code không gắn theo cây con nhưng root có trong 2/6 trace xét. Nhãn root đã biết; chưa rõ cơ chế xếp sai và cách sửa có căn cứ. Nguồn cụ thể: KQ13 mục 5 và runs/microrank-merged-link-001/summary.json → /cases.
+ - Câu chưa giải thích ở mục 2.2 và 2.3 ("vì sao `ts-auth-service` lên đầu sau khi thay bộ chia") nay có một phần trả lời: nó chậm lên thật sau mốc (KT-2), và trace của nó không đi qua root. Vì sao nó chậm lên thì **không phân xử được bằng dữ liệu hiện có** (`kiem-tiep.md` mục KT-6).
+ - Dạng (i) là dạng mà cạnh gọi có thể chỉnh. Dạng (ii) với `ts-auth-service` thì cạnh gọi không chỉnh được: hai dịch vụ không có cạnh.
+-- Không có phản ví dụ nào trong 28 đơn vị cho ba dạng ở mục 2.6; hai điều chỉnh: bốn đơn vị nhóm A thuộc dạng "root vắng trong nhóm A" chứ không phải dạng của đơn vị đại diện, và M-D có một ca đưa root lên hạng 1 (đơn vị 5).
++- 28 đơn vị đọc nốt không chứng nhận ba dạng đã giải thích mọi ca. Bảng nối giữ nguyên ca chưa rõ và ca không gắn nhưng root hiện diện; bốn đơn vị nhóm A được mô tả theo tập trace tạo số đếm của thao tác đứng đầu. M-D có một ca đưa root hạng 1 (đơn vị 5), giữ nguyên phản ví dụ ấy.
+ 
+ ### 8.5 CIRCA — 8 đơn vị OK (21 đơn vị UNSUPPORTED xem mục 8.7)
+ 
+--- before/results/T-032/kiem-tiep.md
++++ after/results/T-032/kiem-tiep.md
+@@ -16,13 +16,13 @@
+ |---|---|---|---|---|
+ | KT-1 | Vì sao khoảng nửa trace sau mốc mang cờ dù không gắn với root | **Đã chạy ở phiên 13**; phần lớn là mức tự nhiên của luật chia | — | Tiêu chí "trace bất thường" ở P6 |
+ | KT-2 | Thao tác đông span có 2–9% span mang cờ: nền tự nhiên hay do sự cố | **Đã chạy ở phiên 13**; cả hai, tách được theo vị trí so với root | — | Có cần hiệu chỉnh ngưỡng theo thao tác ở P6 |
+-| KT-3 | 25–26/47 ca MicroRank chưa hạng 1 sau khi thay bộ chia | **Đã chạy ở phiên 12 và 13**; phần còn lại chia được thành ba dạng | — | Có lấy kiểu xếp hạng của MicroRank làm ứng viên tầng 4 |
++| KT-3 | 25–26/47 ca MicroRank chưa hạng 1 sau thay bộ chia | Đã chạy phiên 12–13; ba dạng quan sát, còn ca chưa rõ và ca không gắn nhưng có root | — | Có lấy kiểu xếp hạng MicroRank làm ứng viên |
+ | KT-4 | 40 cặp "chung phía trên" của TraceRCA ở Nezha-OB | **Đã trả lời phần lớn trong phiên 12** | — | — |
+ | KT-5 | Gắn tín hiệu của span phía gọi cho dịch vụ được gọi có tách được root không | Chưa chạy; thuộc P5–P6 | 0,5–1 phiên | Chọn cơ chế tầng 1–2 của P6 |
+ | KT-6 | Vì sao cột metric của dịch vụ không liên hệ đổi tại mốc | Không phân xử được | — | Yêu cầu quan sát FlashTicket |
+ | KT-7 | TORAI với bảng của tác giả: vì sao nguồn độ trễ trace nghiêng về dịch vụ khác | Chưa chạy | 15 phút EC2 | Không ảnh hưởng P5–P6 |
+ | KT-8 | Bốn ca ERROR: bỏ thao tác thiếu nền thì root xếp thứ mấy | **Đã chạy cả hai nửa** (phiên 12, 13) | — | Cách ghi 4 ca này ở bảng G2 |
+-| KT-9 | CIRCA: hồi quy làm tăng điểm là do cửa sổ hay do số nút cha | **Đã chạy ở phiên 13** (nhánh chẩn đoán); cửa sổ giải thích khoảng một nửa ở nút nhiều cha | — | Có dùng hồi quy theo cấu trúc ở P6 |
++| KT-9 | CIRCA nhạy với cửa sổ hay số cha | Đã chạy phiên 13; trung vị tỷ số thấp hơn trong hai nhánh, chưa tách riêng nguyên nhân | — | Có dùng hồi quy theo cấu trúc ở P6 |
+ | KT-10 | "Lan có đáng kể" không; điều kiện để định nghĩa nhãn lan | Thuộc tổng hợp G2 | — | Có tách nhãn lan ở G3 |
+ | KT-11 | Mã của tác giả TraceRCA cho kết quả gì trên dev | Thiếu dữ kiện (phải dựng định dạng) | 0,5–1 phiên | Mức chắc của câu "phương án có sẵn không đủ" |
+ | KT-12 | Cột độ trễ của root phản ứng ở ca này, không ở ca kia cùng ô | **Đã chạy ở phiên 13**; ba cặp, ba lý do | — | Phân loại "lỗi không hiện ở metric" |
+@@ -31,6 +31,14 @@
+ | KT-15 | DA có bất lợi cho dịch vụ không có cạnh không | **Đã chạy trong phiên 12**; cách đọc ban đầu bị sửa; KT-9 thêm một điều chỉnh | — | Thiết kế bước lan điểm ở P6 |
+ | KT-16 | Các kết luận có giữ trên test không | Chờ G3 | — | Mọi khẳng định hiệu quả |
+ 
++
++## Bổ sung sau REVIEW được Minh duyệt 11/10
++
++- **Return và vị trí tín hiệu: OPEN.** Root không hạng 1 khác với dữ liệu không có đáp ứng. Đã có mốc giả giữa nền Nezha ở runs/root-signal-placebo-003/; nền ngắn, cửa sổ/baseline khác mốc thật và BARO/SimpleRCA được nối từ số thật. Cần đối chứng đáp ứng cùng đại lượng và cửa sổ đủ tương đương để tách lỗi khỏi nền; hiện chưa đủ kết luận không có tín hiệu. Ảnh hưởng: không quy H8 hoàn toàn cho dataset, không loại thiết kế quan sát chỉ từ hạng. FlashTicket cần log mã lỗi và nền phù hợp; collector không khôi phục dữ liệu chưa ghi.
++- **MicroRank M-D, cờ → nhóm → điểm: đã thu bổ sung** tại runs/sua-review-001/md-partition/. Dựng lại cờ duration/uncovered và OR theo trace từ đầu vào cũ; lưu dịch vụ giữ nhóm, trace đổi A/N và coverage/count theo thao tác; không chạy lại PageRank. Nhãn chỉ nối sau để diễn giải. Chi phí đề xuất 20–30 phút là ước lượng; thực tính cả ba lượt 4 phút 47 giây. Khi nhóm bất thường/bình thường và đồ thị đầu vào không đổi, xóa cờ riêng caller không làm đổi đếm phủ; khi nhóm đổi, chưa suy được hạng nếu chưa lần theo trọng số/điểm. Bảng khớp 48 ca chạy được, 4 ERROR giữ N/A; 20/20 ca caller trực tiếp trên root có trace caller mất cờ nhưng vẫn A do root/other, 19 ca còn caller trên root dưới M-D. Không có đối chứng native đúng cùng dataset/fault cho 20 ca. Nguồn: md-partition/attempt-003/summary.json và kiem-md-doc-lap.json trong gói; không tách tác dụng trọng số khi nhóm đổi. Ảnh hưởng: kết luận bước OR/đếm đã kiểm, không bác chờ vật lý.
++- **Ca ghép chưa rõ: OPEN.** dev-14701a3bbb dưới cả hai luật, dev-607751ac0a luật code có root nhưng không gắn theo cây con. Thiếu chuỗi đồ thị → trọng số → số đếm → điểm theo thao tác cho đúng các ca này và đối chứng tương ứng; đọc trung gian cũ trước khi đề xuất lượt mới. Chưa có chi phí đáng tin cho phần thu thêm (nếu thiếu), không tự chạy ngoài quyền. Ảnh hưởng: chưa chọn thành phần để chữa phần còn lại chỉ từ ba dạng quan sát.
++- **CIRCA: OPEN về nguyên nhân độ nhạy cửa sổ.** Giữ số và hai mốc không đạt trọn. Muốn tách nguyên nhân cần giữ tập nút và tách thay đổi độ dài khỏi phân phối/giai đoạn lỗi; chưa có thiết kế hay chi phí cho phép mới, không dùng như căn cứ đã xác nhận.
++
+ ## KT-1. Vì sao khoảng một nửa trace sau mốc mang cờ dù không gắn với root
+ 
+ **Kết quả phiên 13 (KQ13 mục 1; `runs/fake-marker-001/summary.json`; `runs/tong-hop-phien-13-001/derived-013.json → /kt1`).** Tự kiểm với H_native và lượt `chain-spanpass-001` đạt 26/26.
+@@ -77,7 +85,7 @@
+ - Ghép bộ chia theo bài gốc với đếm riêng: số ca hạng 1 từ 21 lên 23 (luật của bài) và từ 22 lên 27 (luật của code) trên 47 ca. Mốc khai trước (hơn từ 4 ca ở ít nhất một luật, số ca tụt ít hơn số ca tăng) đạt ở luật của code, không đạt ở luật của bài.
+ - RE2-TT: 14 → 17 và 15 → 19 trên 25 ca, không ca đang đúng nào hỏng. Nezha-OB: 7 → 6 và 7 → 8 trên 22 ca, 5–7 ca tụt hạng.
+ - **Trả lời:** giải thích (a) được hỗ trợ một phần, rõ ở RE2-TT. Còn 20–24/47 ca chưa giải thích.
+-- **Bảng nối theo cây span, chạy ở phiên 13 (KQ13 mục 5; `runs/microrank-merged-link-001/summary.json`).** Tập trace dựng lại trên EC2 trùng lượt laptop 47/47 ca ở cả hai luật. Ở Nezha-OB, `frontend` đứng đầu ở 14/16 và 11/14 ca còn sai; thao tác cao nhất của nó "gắn với root" chỉ ở **3/14 và 3/11** ca (trùng kết quả kiểm theo tên thao tác). Dự đoán "cùng cơ chế với H4, H7" **không đạt**. Phần còn lại của cả hai dataset chia ba dạng: thao tác cao nhất bao lời gọi chậm tới root (RE2-TT 5/8 và 3/6; Nezha-OB 5/16 và 5/14); nhóm trace bất thường mới không chứa root (RE2-TT 3 ca, `ts-auth-service` đứng đầu; Nezha-OB 4–6 ca); dưới 5 span (Nezha-OB 3–4 ca). Giải thích (b), (c) ở dưới chưa kiểm riêng; đọc tay 28 đơn vị nốt (`doc-tay.md` mục 8.4) không thấy dạng thứ tư.
++- **Bảng nối phiên 13** (KQ13 mục 5; runs/microrank-merged-link-001/summary.json). Hai tập trace khớp 47/47 ca theo hai luật. frontend đứng đầu 14/16 và 11/14 ca Nezha còn sai, gắn root ở 3/14 và 3/11; dự đoán H4, H7 không đạt. Có 5/8,3/6 ca RE2 và 5/16,5/14 ca Nezha gắn root; 3 ca RE2,6/4 ca Nezha vắng root trong tập trace tạo số đếm của thao tác đứng đầu; 4/3 ca Nezha ít span. dev-14701a3bbb chưa rõ dưới cả hai luật. dev-607751ac0a luật code không gắn nhưng root có trong 2/6 trace xét. Các dạng này chưa là phân loại nguyên nhân đầy đủ; giữ giải thích(b),(c) chưa kiểm riêng.
+ 
+ Phần dưới đây là mục như đã viết trước khi chạy, giữ để đối chiếu.
+ 
+@@ -100,7 +108,7 @@
+ - **Vì sao nêu.** Bảng A: root đứng đầu theo span phía gọi của lời gọi tới nó ở 18–19/20 ca RE2-TT và 11–13/20 ca Nezha-OB, trong khi theo cờ thời lượng mà hai phương pháp trace dùng chỉ 8/26 và 9/22 (`ket-qua-phien-10.md` mục 3). Đọc tay: với lỗi trễ mạng, không phép đổi nào trên điểm của nút cứu được root (`doc-tay.md` mục 1.4 đường 7, 1.7). Bước xét hướng lan có sẵn trong bài TraceRCA, cài theo lời văn, không tách được vì lấy trị tuyệt đối (`ket-qua-phien-11.md` mục 9).
+ - **Đây là ứng viên cho P5–P6, chưa kiểm.** T-032 không đánh giá phương pháp mới (mục "Không làm" của SPEC). Con số 18–19/20 là mô tả nơi có thông tin, không phải độ chính xác dự kiến.
+ - **Phép kiểm khi sang P6.** Trên dev: điểm của dịch vụ X = hàm của (tỷ lệ lời gọi **đi vào** X có span phía gọi vượt nền) và (tỷ lệ lời gọi **đi ra** từ X vượt nền), giữ dấu. So với ba đối chứng: cùng điểm nhưng gắn theo dịch vụ sở hữu span (như hiện nay); đồ thị bỏ cạnh; đồ thị ngẫu nhiên giữ bậc.
+-- **Điều kiện thất bại biết trước.** 15/52 ca không có đủ lời gọi tới root (8 ca root không được ai gọi); lỗi `return`, `exception` không để lại tín hiệu thời lượng; lời gọi song song hoặc bất đồng bộ (không thấy ở dev, có thể có ở FlashTicket).
++- **Điều kiện thất bại biết trước.** 15/52 ca thiếu lời gọi tới root, 8 ca không có cạnh đi vào; không đồng nghĩa mọi quan hệ đồ thị đều vô ích. Return/exception có root không hạng 1 và ít cờ ở một số ca; đáp ứng thời lượng do lỗi còn OPEN. Lời gọi song song hoặc bất đồng bộ có thể khác điều kiện dev (chưa thấy ở dev, có thể có ở FlashTicket).
+ - **Chi phí.** Khoảng 0,5–1 phiên, thuộc task P5–P6.
+ - **Quyết định phụ thuộc.** Cơ chế chấm điểm ở tầng 1–2 của P6; kiểu cạnh cần có trong mô hình đồ thị P5.
+ 
+@@ -139,7 +147,7 @@
+ **Kết quả phiên 13 (KQ13 mục 6; `runs/circa-kt9-001/collect-001/summary.json`).** Nhánh chẩn đoán; cửa sổ đã khóa và số đã chấm không đổi. Nhánh giữ nguyên khớp bản đóng băng từng bit 30/30.
+ 
+ - Trung vị tỷ số điểm (có cạnh / không cạnh) ở nút từ 8 cha: 7,54 (native) → 3,40 (học 291 điểm) và 3,64 (chấm 10 điểm ngay sau mốc). Tỷ lệ nút tăng: 72,6% → 67,3% và 73,1%.
+-- Mốc khai trước cần cả hai vế; vế tỷ số đạt ở cả hai nhánh, vế tỷ lệ nút tăng không đạt ở nhánh nào. **Cả (a) và (b) không đạt theo mốc.** Đọc: hai lựa chọn cửa sổ giải thích khoảng một nửa mức phóng đại ở nút nhiều cha; việc hồi quy làm tăng điểm ở đa số nút còn nguyên.
++- Hai vế mốc khai trước cần cùng đạt; vế tỷ số đạt, vế tỷ lệ nút tăng không đạt ở cả hai nhánh. Cả (a),(b) không đạt trọn. Hai nhánh cho trung vị nhóm nhiều cha thấp hơn, còn đa số nút tăng điểm; chưa tách riêng ảnh hưởng số điểm học, phân phối, thời điểm chấm và tập nút.
+ - Ghi thêm: học trên 291 điểm chỉ bỏ được giá trị cực lớn ở 2/11 ca; ba ca root `ts-auth-service` có hạng sau DA 15 → 1, 22 → 6, 46 → 37.
+ - **Còn mở:** phần tăng còn lại, có ở mọi cấu hình cửa sổ và tăng theo số nút cha; chưa có phép đổi riêng.
+ 
+--- before/tasks/T-032-g2-nguyen-nhan-xep-hang/REVIEW.md
++++ after/tasks/T-032-g2-nguyen-nhan-xep-hang/REVIEW.md
+@@ -168,8 +168,13 @@
+ 
+ | Điểm | Ý kiến người làm: đúng / đúng một phần / sai / chưa kiểm được; mức | Lý do, bằng chứng, hậu quả và phần còn thiếu | Minh quyết |
+ |---|---|---|---|
+-| R1 | | | |
+-| R2 | | | |
+-| R3 | | | |
+-| R4 | | | |
+-| R5 | | | |
++| R1 | Đúng; CHẶN câu kết luận không có tín hiệu | Codex điền theo yêu cầu sửa mới của Minh (LOG mục Sửa sau REVIEW). Sửa bốn báo cáo, tách không hạng 1 khỏi đáp ứng do lỗi. Giữ số và khóa JSON cũ với định nghĩa đúng; return OPEN. Có mốc giả giữa nền Nezha nhưng chưa là đối chứng tương đương; metric/log trong bảng placebo là số thật nối vào. Bằng chứng: gói sua-review-001/bo-sung-sau-review.md và bản trước. | |
++| R2 | Đúng; CHẶN bác bỏ chờ ở MicroRank | Bỏ bác bỏ tuyệt đối; lần theo OR cờ → nhóm trace → đồ thị/đếm phủ. Thu bảng M-D riêng theo quyền Minh duyệt, giữ cả lượt lỗi; không chạy PageRank. Kết quả 48 PASS+4 N/A ở sua-review-001/md-partition/attempt-003/summary.json; 20/20 ca caller trên root có trace caller mất cờ vẫn giữ A, 19 ca caller còn trên root. Không có native đúng cùng dataset/fault cho 20 ca; chưa quy mọi hạng giữ cho OR. Kiểm độc lập kiem-md-doc-lap.json. Cơ chế chờ vật lý chưa được phép này xác nhận hoặc bác bỏ. | |
++| R3 | Đúng; CHẶN phân loại ba dạng bao trùm | Giữ ca chưa rõ dev-14701a3bbb cả hai luật và dev-607751ac0a luật code không gắn nhưng root có trong 2/6 trace xét. Không gọi toàn bộ nhóm A là vắng root. Giữ 14 ca theo luật code: 5 gắn, 5 không gắn, 1 chưa rõ, 3 ít span; chỉ 4/5 không gắn vắng root ở tập xét. Chuỗi trọng số/điểm của ca chưa rõ còn OPEN. | |
++| R4 | Đúng; KHÔNG CHẶN số nhánh chẩn đoán | Sửa thành độ nhạy cửa sổ, không tách ba nguyên nhân từ hai phép đổi. Giữ mốc khai trước không đạt trọn, 7,54 → 3,40/3,64 và số hạng 1. Phân phối, giai đoạn lỗi và tập nút cùng thay; nguyên nhân riêng còn OPEN. | |
++| R5 | Đúng; KHÔNG CHẶN số không có cạnh đi vào | Thu hẹp câu kết luận về 8 ca vào cách dựa riêng cạnh gọi đi vào root. Không kết luận mọi đồ thị đều vô ích; không thêm tuyên bố đồ thị đã có lợi. | |
++| N1 | Đúng; KHÔNG CHẶN baseline | Tách 46 OK sai/2 OK đúng/4 ERROR; 48 đọc=46 OK sai+1 ERROR+1 đối chứng. Sửa câu đếm, giữ số đóng băng; nguồn bao-phu-nhom.json → /units và kiem-so/. | |
++| N2 | Đúng một phần; KHÔNG CHẶN số đã khớp | E không bao phủ đọc tay là thiếu phạm vi tự kiểm, không tự chứng minh số sai. Đã kiểm riêng mục 7 KQ13 và mục 8 doc-tay từ JSON/phiếu; kết quả và giới hạn ở sua-review-001/kiem-so/. | |
++| N3 | Đúng; KHÔNG CHẶN quan sát | Giữ hai mốc KT-1 không đạt, so cùng loại là hậu kiểm. Không nhận đã tách được nguyên nhân. | |
++| N4 | Chưa kiểm được lời duyệt cũ; KHÔNG CHẶN quyền sửa hiện tại | Không có nguyên văn đề xuất “1 2 3”/Q142 cũ trong nguồn phiên này; không tái dựng. Q142 hiện tại ghi lời Minh duyệt bản sửa này, đủ quyền trong phạm vi đã trình; truy lời cũ vẫn OPEN. | |
++| N5 | Đúng một phần; KHÔNG CHẶN Hit@1 | S1 giữ rank_min 3 nhưng rank_max 3 → 5. Minh duyệt riêng câu thay; doc-tay 8.2 điểm 1 nêu hòa [3,5] và hạng bi quan 5. Nguồn simplerca-s1-001/summary.json → /cases/15; chỉ sửa câu, giữ JSON. | |
+--- before/tasks/T-032-g2-nguyen-nhan-xep-hang/LOG.md
++++ after/tasks/T-032-g2-nguyen-nhan-xep-hang/LOG.md
+@@ -2792,3 +2792,110 @@
+ Đầu ra có nêu: hạn chế đã xác nhận và điều kiện; lỗi cài đặt/thiếu đầu vào; hạn chế giả định/phép tính; quan hệ có thể bổ sung thông tin gì; câu chưa trả lời và bằng chứng còn thiếu? Căn cứ nào đủ đề xuất ứng viên, căn cứ nào đủ lựa chọn thiết kế?
+ Không bắt mọi task P4 làm xong đối chứng của phương pháp mới. Đối chứng bỏ quan hệ và đồ thị ngẫu nhiên dùng khi đánh giá tác dụng cấu trúc; không là điều kiện trì hoãn mọi phân tích hạn chế baseline.
+ ```
++
++
++## Sửa sau REVIEW — 11/10/2026, Codex, laptop Windows
++
++### Mở lượt và quyền sửa
++
++Minh duyệt toàn bộ đề xuất và yêu cầu Codex sửa, rồi soạn prompt cho phiên Codex mới kiểm lại. Lời duyệt và phạm vi ở Q-142. Codex thực hiện riêng bản sửa được duyệt; không đổi vai trò lịch sử Claude/Codex trong SPEC. Phiên Codex mới do Minh mở, không do phiên này tự mở hay gửi. Yêu cầu mới của Minh là ngoại lệ riêng về tên agent kiểm bản sửa; không coi bản sửa hay việc hai phiên đồng ý là bằng chứng khoa học.
++
++Bản tự soát chỉ đọc trước lời duyệt đã đối chiếu đầu ra gốc trước REVIEW: N1 đếm MicroRank cần tách OK sai/ERROR/ca đúng; N2 self-check E chỉ bao phủ KQ13 mục1–6, không kiểm mục7 hoặc doc-tay mục8; N3 mốc giả so nhóm khác loại nên không tách được cơ chế; N4 nội dung lời duyệt “1 2 3”/Q-142 cũ không có trong nguồn đọc được, không tự tái dựng. Phản hồi chỉ đọc của Claude được Minh dán; lượt này kiểm và thực hiện bản sửa theo quyền mới, không ghi thay một phiên Claude đã chạy.
++
++Ảnh hưởng: bốn báo cáo sửa phạm vi kết luận và tổng đếm; REVIEW chỉ bảng phản hồi; LOG nối thêm; STATE chỉ dòng T-032; DECISIONS ghi đúng lời duyệt hiện tại. Phần bổ sung lưu trong results/T-032/runs/sua-review-001/: bản trước và hash, bảng M-D theo trace, kiểm số, kiểm diff, manifest, prompt. Dùng lại trung gian để giảm chi phí; không đổi phương pháp, cửa sổ, điểm đóng băng hoặc dữ liệu. Bản manifest phiên13 trước sửa khớp 28/28 file; giữ nguyên manifest cũ cùng bản trước để đọc đúng lịch sử.
++
++### Duyệt bổ sung ngày12/10/2026
++
++Trong kiểm số đọc tay phát hiện nhãn tác dụng S-1 dùng hạng tốt nhất, trong khi báo cáo dùng hạng bi quan. Minh duyệt riêng một câu (Q-143). Sửa đúng câu đã trình; nguồn không đổi.
++
++
++### Tiếp tục và kết thúc lượt sửa — 12/10/2026, Codex, laptop Windows
++
++**Quyền và phục hồi.** Minh yêu cầu tiếp tục phần dở sau usage limit, chỉ làm phần có căn cứ và đã được cho phép. Quyền sửa Q-142/Q-143 giữ nguyên. Đã đọc lại AGENTS, SPEC, STATE, mục LOG cuối, file hiện có; so nguồn với snapshot/manifest, không suy tiến độ từ tin nhắn trợ lý. Phần trích M-D và kiểm số đã lưu hợp lệ, không chạy lại phương pháp. Hai trợ lý nội bộ trước đó chỉ hỗ trợ thu/kiểm bằng chứng, không mở vòng phản biện chính thức; không còn trợ lý chạy.
++
++**1. Đã làm.** Sửa R1–R5 trong bốn báo cáo; tách thứ hạng khỏi đáp ứng do lỗi, bỏ bác bỏ chờ tuyệt đối ở MicroRank, giữ ca chưa rõ và ca không gắn nhưng có root, giới hạn kết luận CIRCA theo cửa sổ và kết luận đồ thị theo cạnh đi vào. Sửa N1 về48 đơn vị đọc; kiểm N2 độc lập từ JSON/phiếu; giữ mốc N3 không đạt, không tái dựng lời duyệt cũ N4. N5 phát hiện thêm về hòa S-1, đã được Minh duyệt riêng. Thu bảng cờ/nhóm M-D từ capture cũ; có bằng chứng caller mất cờ nhưng trace vẫn A trong 20/20ca caller trên root native,19 ca còn caller trên root M-D. Đây là bước OR/đếm, không quy toàn bộ hạng giữ cho cùng nguyên nhân.
++
++**2. File đổi.** Bốn báo cáo results/T-032/nguyen-nhan-xep-hang.md,ket-qua-phien-13.md,doc-tay.md,kiem-tiep.md; REVIEW.md chỉ bảng Phản hồi của người làm; LOG.md chỉ nối; docs/STATE.md chỉ dòng T-032; docs/DECISIONS.md nối làm rõ quyền Q-142 và Q-143. Gói mới results/T-032/runs/sua-review-001/ có snapshot, script và mọi kết quả thu/kiểm, diff,manifest,bo-sung-sau-review.md,prompt. Không sửa SPEC,src,data,code/môi trường/cửa sổ/điểm đóng băng hay task khác. Không mở test,không commit/push.
++
++**3. Kiểm và kết quả.** Manifest phiên13 trước sửa28/28 khớp. M-D: 48 ca PASS, 4 ERROR ghi N/A;7 kiểm/ca khớp native/M-D,8 fixtures đạt; kiểm độc lập bảng trace vàhash nguồn đạt (kiem-md-doc-lap.json). Native đúng2 ca RE2-TT|delay không có caller trực tiếp trong tập; không có native đúng cùng dataset/fault cho 20ca caller trên root, nên không tự gán nguyên nhân riêng. Runtime ba lượt 287,300giây, giữ hai failure(thiếu liên kết capture), lượt003 truy đúng binding có hash. Kiểm số results/T-032/runs/sua-review-001/kiem-so/result-after-008.json:412/412; thêm 17đối chiếu slow-call/CIRCA ở kiểm bổ sung đạt. A46/D15/E61 đạt; các lần E bị lệch chuỗi do định dạng đều giữ, câu không thuộc sửa đã trả đúng bản trước. B/C là rà chuỗi, còn mục chưa ánh xạ; không lấy tổngcheck để xác nhận mọi lời giải thích. Diff toàn bộ so với snapshot, prefixLOG/DECISIONS, phần REVIEW ngoài bảng, dòng STATE ngoài T-032vàhash đầu vào được kiểm cuối. Manifest/diff cuối trong gói.
++
++**4. Phần đạt và phần còn mở.** Gói sửa được duyệt đã hoàn tất; bốn báo cáo ghi mức kết luận đúng hơn và có trung gian M-D mới. Câu hỏi nguồn RQ2 trả lời thêm được đường cờ giữ trace trongA; chưa phân xử vật lý chờ, tác dụng trọng số khi nhóm đổi hay cơ chế mọi ca sai. Return chưa tách đáp ứng do lỗi khỏi nền; dev-14701a3bbb còn chưa rõ cả hai luật,dev-607751ac0a luật code có root trong trace nhưng không gắn; cầntrọng số/điểm theo thao tác và đối chứng phù hợp. CIRCA chưa cô lập độ dài học,phân phối/giai đoạn lỗi,tập nút; cần phép đổi riêng trước khẳng định nguyên nhân. Lời duyệt cũ “1 2 3”/Q142cũ chưa truy được nguyên văn, không ảnh hưởng quyền sửa hiện tại nhưng không tái dựng. Cách ghi 4 ERROR,dòng độ nhạy,lan đáng kể và chọn ứng viên P5–P6 vẫn thuộc Minh/tổng hợp G2. Không nghiệm thu task hay đóng G2 trong lượt này. Các câu phù hợp báo cáo đồ án hiện ở báo cáo chính/bo-sung; không lấy câu cũ về không có tín hiệu làm kết luận cuối.
++
++**Bước tiếp theo chính xác.** Minh mở phiên Codex mới và copy prompt đầy đủ dướiđây. Phiên mới đọc AGENTS,STATE,SPEC,LOG và đầu ra gốc; kiểm manifest mới và snapshot trước khi đọc REVIEW/phản hồi. Chỉ đọc và trả lời chat theo quyền hiện có; quyền tạo REVIEW-2 cần Minh duyệt riêng. Không tự chạy baseline/PageRank/EC2 hay test. Kiểm hash/parse JSON/tính trongbộ nhớ từ kết quả đãlưu được phép. Đề xuất tiếp tục lượt kiểm theo yêu cầu Minh; sau kiểm Minh quyết nghiệm thu/chấp nhận giới hạn hay bổ sung.
++
++**Lệnh kiểm đã chạy cuối.** py -3 -B -X utf8 results/T-032/runs/sua-review-001/kiem-so/validate_handwritten.py after; py -3 -B -X utf8 results/T-032/runs/sua-review-001/verify_extra_numbers.py; py -3 -B -X utf8 results/T-032/scripts/self_check_phien13_v1.py results/T-032 results/T-032/runs/sua-review-001/self-check-phien13-005.json. Kiểm cuối bảo toàn/phạm vi/manifest: script trong gói được ghi rõ trong kiem-cuoi.json.
++
++**Đề xuất commit, chưa làm.** docs(T-032): sửa kết luận sau phản biện và bổ sung bằng chứng M-D. Chỉ commit/push nếu Minh duyệt riêng.
++
++### Prompt mới để Minh chuyển sang phiên Codex mới — kiểm lại bản sửa
++
++Bản thuần: results/T-032/runs/sua-review-001/prompt-codex-kiem-lai.txt. Dựng từ đúng Prompt chung, Khối Kiểm lại phản hồi và sửa, Khối G2; không gợi finding. Phiên này không tự gửi.
++
++```text
++Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
++Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
++
++Thông tin lượt này:
++- Task hoặc đề xuất: T-032; tasks/T-032-g2-nguyen-nhan-xep-hang/SPEC.md và LOG.md.
++- Công đoạn: kiểm lại phản hồi và sửa.
++- Gói/cổng: P4; cổng G2.
++- Người làm và người phản biện chính thức: theo SPEC, Claude làm và Codex phản biện. Minh trực tiếp yêu cầu Codex thực hiện lượt sửa sau REVIEW, rồi mở phiên Codex mới này để kiểm lại; ngoại lệ chỉ áp dụng lượt sửa và lượt kiểm này, không đổi SPEC hay luật chung. Phiên này giữ vai trò người kiểm, không sửa thay người làm.
++- Tài liệu gốc: tasks/T-032-g2-nguyen-nhan-xep-hang/SPEC.md; phần đầu ra gốc tại results/T-032/: nguyen-nhan-xep-hang.md, ket-qua-phien-13.md, doc-tay.md, kiem-tiep.md, doi-chieu-dung-sai.json, chuoi-bang-chung.json, bao-phu-nhom.json, phan-xu-caller-root.json, kha-nang-do-trace.json, coverage-trace.json, can-thiep-tinh-toan.json, các ket-qua-phien-*.md, doi-chieu-tai-lieu-goc-phien-10.md, goi-bo-sung-007.md và thiet-ke-*.md. Bản trước sửa và diff ở results/T-032/runs/sua-review-001/ban-truoc/ và cac-thay-doi.diff; các bản trước theo phiên tại runs/tong-hop-phien-12-001/ban-truoc/ và runs/tong-hop-phien-13-001/ban-truoc/. T-032 chưa nằm trong commit, nên đối chiếu bằng các snapshot này.
++- Phản biện và phản hồi trước: tasks/T-032-g2-nguyen-nhan-xep-hang/REVIEW.md (gồm bảng phản hồi cuối file); sau đó mục Sửa sau REVIEW trong LOG.md và results/T-032/runs/sua-review-001/bo-sung-sau-review.md. Chỉ đọc các kết luận này sau khi tự soát nguồn và đầu ra gốc.
++- Code và kết quả liên quan: results/T-032/scripts/ và runs/; gói sửa results/T-032/runs/sua-review-001/ (manifest.json, truoc-sua.json, kiem-so/, md-partition/ với thiết kế, script và các lượt chạy được giữ); nguồn đóng băng results/T-024/, results/T-026/, results/T-028/runs/phan-hoi-review-001/manifest.json, results/T-031/moi-truong.json; mã và adapter src/ chỉ đọc. Manifest phiên13 ở results/T-032/runs/tong-hop-phien-13-001/sha256-dau-ra-phien-13.txt; đối chiếu file đã sửa bằng snapshot ban-truoc trong gói sửa, không dùng manifest cũ cho bản mới. Môi trường Windows; kiểm rẻ được phép: kiểm hash, parse JSON, đối chiếu số bằng tính trong bộ nhớ từ kết quả đã lưu; không chạy lại baseline, PageRank, lượt EC2 hay thực nghiệm mới. Chạy script có ghi file chỉ khi được Minh cho phép đầu ra riêng.
++- Phạm vi ghi được Minh cho phép trong lượt này: chỉ đọc và trả lời trong chat. Không tạo REVIEW-2.md hay sửa file nào khi Minh chưa duyệt riêng quyền ghi; liệt kê thư mục task để xác nhận các bản đã có. Không ghi LOG hoặc STATE.
++
++Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
++
++Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
++Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
++Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
++
++Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
++hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
++Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
++số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
++có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
++
++Bổ sung yêu cầu phản biện:
++1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
++2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
++3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
++4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
++5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
++6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
++7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
++8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
++9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
++10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
++
++Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
++Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
++
++Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
++bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
++Tiếng Việt, câu ngắn.
++
++Cuối lượt báo:
++1. Đã làm gì.
++2. File đã thay đổi, hoặc không sửa file nào.
++3. Kiểm đã chạy và kết quả.
++4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
++
++Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
++
++Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
++
++Công đoạn: người phản biện kiểm lại phản hồi và sửa.
++Tự soát yêu cầu và đầu ra gốc trước; sau đó đọc phản biện, phản hồi và các thay đổi được duyệt. Kiểm cả ý kiến phản bác reviewer; không mặc định phản hồi hoặc bản sửa đúng.
++Đối chiếu từng điểm với bằng chứng hiện tại, quyền sửa và hậu quả. Có điểm đúng nhưng chưa được Minh duyệt sửa thì ghi đúng trạng thái; không tự coi đã xử lý hoặc ép người làm sửa.
++Chỉ ghi bản phản biện lượt mới được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ lịch sử, không ghi LOG/STATE hay sửa thay người làm. Nêu bất đồng còn lại và soạn prompt để người làm đáp.
++
++Kiểm chuỗi đầu vào → xử lý → trung gian → đầu ra ở các nhóm quan trọng. Đọc code và trung gian đã lưu trước, đối chiếu ca sai với ca đúng có điều kiện tương ứng. Thiếu trung gian thì nêu đúng phần cần chạy/thu thêm, chi phí và quyết định phụ thuộc; không tự chạy ngoài quyền hoặc bỏ câu hỏi bằng “ngoài SPEC”.
++Kết luận cơ chế phải chỉ được: trong điều kiện X, bước Y làm mất hoặc đánh giá sai thông tin Z. Nếu chưa xác định Y, giữ đúng quan sát, giải thích khác và bằng chứng thiếu.
++Phân biệt dữ liệu/thiếu đầu vào, giao thức, adapter/cài đặt và giả định/cách tính; không cộng cờ chồng lấn thành tỷ lệ nguyên nhân. Hạn chế dữ liệu xác nhận có hệ quả đánh giá và yêu cầu quan sát FlashTicket có thể rút ra không?
++Đầu ra có nêu: hạn chế đã xác nhận và điều kiện; lỗi cài đặt/thiếu đầu vào; hạn chế giả định/phép tính; quan hệ có thể bổ sung thông tin gì; câu chưa trả lời và bằng chứng còn thiếu? Căn cứ nào đủ đề xuất ứng viên, căn cứ nào đủ lựa chọn thiết kế?
++Không bắt mọi task P4 làm xong đối chứng của phương pháp mới. Đối chứng bỏ quan hệ và đồ thị ngẫu nhiên dùng khi đánh giá tác dụng cấu trúc; không là điều kiện trì hoãn mọi phân tích hạn chế baseline.
++```
++
++Kiểm cuối lần đầu được giữ ở kiem-cuoi-001.json: các kiểm nguồn/phạm vi đều đạt, kiểm whitespace bị gắn FAIL vì Git cảnh báo LF→CRLF. Đã giữ scriptv1, điều chỉnh riêng lệnh kiểm dùng core.autocrlf=false cho lần gọi (không đổi cấu hình repo), không bỏ kiểm whitespace. Lệnh chốt sau đó: py -3 -B -X utf8 results/T-032/runs/sua-review-001/verify_and_manifest.py.
+--- before/docs/DECISIONS.md
++++ after/docs/DECISIONS.md
+@@ -163,3 +163,6 @@
+ | Q-139 | 11/10/2026 | T-033: Minh duyệt gói bổ sung năm file đã trình: doi-chieu-review.json, bo-sung-bao-cao.md và manifest.json trong results/T-033/runs/phan-hoi-review-001/; nối LOG T-033; chỉ dòng T-033 của STATE. Tính Python trên EC2 từ trung gian đã lưu; không chạy lại detector, không thêm điểm/cửa sổ hoặc mở dữ liệu khóa. Lời Minh: “vậy tiến hành luôn đi, ec2 vẫn đang mở”. | Chat11/10/2026; LOG T-033 phiên10 |
+ | Q-140 | 11/10/2026 | T-033: Minh duyệt năm mục bổ sung cuối: tái tính trên EC2 hai thống kê đầu vào BOCPD từ trung gian đã lưu, có ledger, giữ bản trước; tác động của đầu vào bậc thang ghi “chưa kiểm” cho P6, không chạy phép kiểm tác động. Chấp nhận dừng câu hỏi4, giữ OPEN do RE2-TT không có nền sạch và thời điểm lỗi có tác động được xác nhận độc lập. Không so cửa sổ trong T-033; ghi khả năng và giới hạn của phép này ở K1/K5, chuyển nhu cầu nền sạch và thời điểm lỗi có tác động thành yêu cầu quan sát FlashTicket ở K1. Ghi bốn dòng DECISIONS sau Minh duyệt chữ. Dừng phản biện, không thêm lượt Claude nếu số khớp; lệch thì dừng và báo Minh. Nghiệm thu chỉ sau hoàn tất mục1–3. Đã xác nhận: chuỗi tính toán N-Sigma/BOCPD, hướng tác động tiền xử lý nhìn trước, thời điểm cờ khác bắt đầu đoạn MAP, mẫu số freeze19/60. Còn OPEN: câu hỏi4, onset thật, báo giả vận hành, prior riêng, tác động đầu vào bậc thang, lợi ích đồ thị và D. T-034 dùng câu thay ở mục6 bản bổ sung, không lấy câu cũ report002. Nghiệm thu không đóng RQ2/G2 hoặc chọn P6. Chỉ ghi ba file hiện có của gói, LOG nối thêm, dòng T-033 STATE và DECISIONS sau duyệt chữ; EC2 chỉ ~/rca/T-033/. Không sửa SPEC/WHY/code/report002, không mở test, commit hoặc push. | Nguyên văn lời duyệt năm mục của Minh trong chat11/10/2026; LOG T-033 phiên11; gói phan-hoi-review-001 |
+ | Q-141 | 11/10/2026 | T-032: ba lời duyệt của Minh cho các phép kiểm trong `results/T-032/kiem-tiep.md` và việc đọc tay. (1) Sau báo cáo cuối lượt của phiên 12: "DUYỆT TOÀN BỘ NHỮNG PHÉP KIỂM CẦN CHẠY TRÊN LAPTOP, ĐÃ ĐÓNG BỚT ỨNG DỤNG, SAU ĐÓ CHO TÔI BÁO CÁO TIẾN ĐỘ NGẮN GỌN DỄ HIỂU, CÁC PHẦN CẦN TÔI QUYẾT, TÍCH CỰC HAY TIÊU CỰC, CÒN GÌ TỒN ĐỌNG". Claude đã chạy theo lời này: KT-3, KT-8 (nửa MicroRank), KT-15 (thiết kế `thiet-ke-phep-doi-012.md`, kết quả `ket-qua-phien-12.md`); Claude đã không chạy KT-9 vì hiểu hẹp lời duyệt và ước sai chi phí. (2) Sau khi Claude trả lời các câu hỏi về KT-3, đọc tay, ứng viên P5–P6, phép kiểm EC2 và KT-9: "MỨC ĐỌC TAY ĐỌC HẾT THÌ SAO MÀ PHẢI GIỮ NỬA CHỪNG NHƯ VẬY ? KHÓ HAY MẤT THỜI GIAN". (3) Tin kế tiếp: "DUYỆT TOÀN BỘ PHÉP THỬ TRÊN EC2 / DUYỆT KT-9 CHẠY TRÊN LAPTOP / DUYỆT CHẠY HẾT / "bằng kết quả kiểm theo tên (3/14 và 3/11). Ghi sổ: Q-141 và WHY-48." / DUYỆT ĐỌC TAY HẾT / TẠO 1 PROMPT CHO PHIÊN MỚI, ĐẦY ĐỦ NGỮ CẢNH, CHẠY TOÀN BỘ TRONG MỘT PHIÊN, NẾU CÓ CÁI NÀO PHỤ THUỘC LẪN NHAU THÌ CHẠY TUẦN TỰ, TUÂN THỦ RULE , ĐỒ ÁN , ĐỊNH HƯỚNG GIẢNG VIÊN, CÁI NÀO LÀM ĐƯỢC THÌ TUYỆT ĐỐI KHÔNG DỪNG CHỜ DUYỆT MÀ CHẠY LUÔN, TRÁNH VIỆC DUYỆT NHƯ HIỆN TẠI". Phạm vi theo danh sách Claude trình ngay trước lời (3), phiên 13 thực hiện: trên EC2 3.26.62.217 (chỉ ghi `~/rca/T-032/`): KT-1, KT-2, KT-12, nửa TraceRCA của KT-8, bảng nối theo cây span cho nhánh ghép của MicroRank; trên laptop: KT-9 với nhánh giữ nguyên và hai biến thể cửa sổ (nhánh chẩn đoán, không đổi cửa sổ đã khóa ở Q-80, Q-82 và không đổi số đã chấm); đọc tay hết các đơn vị sai còn lại; sửa câu "khớp với H4, H7" bằng kết quả kiểm theo tên thao tác (3/14 và 3/11) rồi bằng kết quả bảng nối; ghi Q-141 và WHY-48 không cần trình lại chữ; cập nhật file đầu ra trong `results/T-032/`, LOG của task và dòng T-032 của STATE. Không gồm: sửa `src/`, dữ liệu, môi trường, số đã chấm, SPEC; mở test; commit; subagent; định nghĩa nhãn lan; đánh giá phương pháp đồ thị mới. Thiết kế viết trước khi chạy: `results/T-032/thiet-ke-phep-doi-013.md`. | LOG T-032, mục "Phiên 12 (tiếp, sau mục kết thúc) — Minh duyệt các phép kiểm chạy trên laptop" và mục "Phiên 12 (tiếp) — Minh duyệt chạy hết; prompt cho phiên 13"; chat 11/10/2026 |
++
++| Q-142 | 11/10/2026 | T-032: Minh duyệt sửa các đề xuất đã trình sau REVIEW.md và phản hồi chỉ đọc: “DUYỆT TOÀN BỘ CÁC ĐỀ XUẤT, SỬA GIÚP TÔI SAU ĐÓ SOẠN PROMPT MỚI CHO PHIÊN CODEX MỚI RÀ SOÁT LẠI VÀ PHẢN BIỆN MỘT LẦN NỮA”. Phạm vi: sửa nguyen-nhan-xep-hang.md, ket-qua-phien-13.md, doc-tay.md, kiem-tiep.md trong results/T-032/ theo R1–R5 và các điểm tự soát đã trình; thu bảng cờ → nhóm trace cho M-D từ đầu vào dev đã dùng, không chạy lại PageRank; kiểm số đọc tay; điền riêng bảng phản hồi REVIEW.md, nối LOG, cập nhật riêng dòng T-032 của STATE; lưu bản trước, bằng chứng, manifest và prompt trong results/T-032/runs/sua-review-001/. Codex thực hiện bản sửa theo yêu cầu trực tiếp này; Claude vẫn là người làm lịch sử trong SPEC. Minh yêu cầu phiên Codex mới kiểm lại, là ngoại lệ riêng cho lượt sửa này đối với yêu cầu hai tên agent khác nhau; không sửa SPEC hay luật chung. Không đổi src, dữ liệu, môi trường, cửa sổ/số đóng băng, không mở test, không commit/push. Đây là lời duyệt hiện tại, không tái dựng nội dung đề xuất Q-142/“DUYỆT 1 2 3” cũ chưa có trong nguồn của phiên này. | Lời Minh trong chat 11/10/2026; đề xuất và phản hồi chỉ đọc trước lời duyệt; LOG T-032 mục sửa sau REVIEW; results/T-032/runs/sua-review-001/ |
++| Q-143 | 12/10/2026 | T-032: Minh duyệt thêm đúng một câu doc-tay.md, mục8.2 điểm1, từ “S-1 không đổi” thành “S-1 giữ hạng tốt nhất 3 nhưng tạo hòa [3,5], nên hạng bi quan là 5”. Lời Minh: “Duyệt sửa câu này”. Chỉ làm rõ cách đọc hạng; không đổi JSON nguồn, baseline hay Hit@1. | Câu hỏi và trả lời trực tiếp của Minh trong chat12/10/2026; nguồn simplerca-s1-001/summary.json, cases/15; kiểm số ở runs/sua-review-001/kiem-so/ |
+--- before/docs/STATE.md
++++ after/docs/STATE.md
+@@ -40,7 +40,7 @@
+ | T-026 | Adapter và chấm tầng 1 chế độ (a) trên Nezha-OB dev (22 ca) | P3 | Codex | Claude | Xong (07/10, Minh duyệt đóng). R1/R2 đã sửa và kiểm đạt; 248 nguồn/số chấm giữ nguyên. Giữ 1 ERROR MicroRank cắt N; CIRCA/TORAI B UNSUPPORTED. Các OPEN nguyên nhân/nền/clock/test/license giữ trong báo cáo và LOG phiên7–8. Chưa commit | `tasks/T-026-nezha-ob-che-do-a/` |
+ | T-028 | P4: hạn chế xếp hạng chế độ (a) | P4 | Codex | Claude | Xong (08/10/2026), Minh duyệt đóng. Đã sửa R1–R4 và bổ sung R5; kết quả runs/phan-hoi-review-001, phép đo gốc buoc3-005. Nơi xử lý "lan có đáng kể" còn OPEN; chưa phân xử nhân quả. Chưa commit | `tasks/T-028-p4-han-che-xep-hang/` |
+ | T-029 | P4: hạn chế phát hiện chế độ (b) | P4 | Codex | Claude | Xong (09/10, Minh duyệt đóng theo Q-87). Đã sửa REVIEW-4 và P1/P2; REVIEW-5 không có lỗi đáng kể. Giữ các giới hạn đã khai; chưa commit | `tasks/T-029-p4-han-che-phat-hien/` |
+-| T-032 | Lần theo nguyên nhân thất bại xếp hạng | P4 | Claude | Codex | Chờ phản biện (11/10, Claude, phiên 13). Đủ file đầu ra của SPEC; báo cáo chính `results/T-032/nguyen-nhan-xep-hang.md` theo năm đầu ra P4. Phiên 13 chạy hết các phép kiểm Minh duyệt (Q-141; thiết kế 013, WHY-48): KT-1, KT-2, KT-12, KT-8 nửa TraceRCA, bảng nối nhánh ghép MicroRank (EC2), KT-9 (laptop); kết quả ở `ket-qua-phien-13.md`. Đọc tay đủ: 144 đơn vị sai đã đọc, 48 đơn vị không chạy được ghi theo lý do. Bảy câu của các file trước bị kết quả mới sửa (KQ13 mục 8), gồm câu 'khớp với H4, H7'. Tự soát: A 46, D 15, E 61 nhóm số, 0 lệch. RQ2/G2 chưa đóng; 'lan có đáng kể' để tổng hợp G2 quyết. Chờ Minh: các điểm ở mục 11 của báo cáo (cách ghi bốn ca lỗi, dòng độ nhạy, ứng viên P5–P6); chuyển prompt cuối mục 'Kết thúc phiên 13' của LOG cho Codex. Còn mở có bằng chứng cần: LOG phiên 13 mục 7. Không lượt nào đang chạy; EC2 để bật. Chưa commit. Quyết định: Q-130, Q-131, Q-133, Q-134, Q-135, Q-136, Q-141 | `tasks/T-032-g2-nguyen-nhan-xep-hang/` |
++| T-032 | Lần theo nguyên nhân thất bại xếp hạng | P4 | Claude | Codex | Chờ kiểm lại bản sửa (12/10/2026). Minh duyệt Codex sửa sau REVIEW và yêu cầu phiên Codex mới kiểm (Q-142), thêm câu S-1 (Q-143); giữ vai trò lịch sử trong SPEC. Bốn báo cáo đã sửa; tiêu chí3 đạt một phần, không đóng RQ2/G2. Gói results/T-032/runs/sua-review-001/: M-D48PASS+4N/A, kiểm số412/412 và17bổ sung, A46/D15/E61đạt; giữ cả lượt lỗi. REVIEW chỉ bảng phản hồi, LOG nối thêm. Còn OPEN: đáp ứng return, trọng số khi nhóm đổi, ca ghép chưa rõ, nguyên nhân độ nhạy cửa sổ; quyết định G2/P5–P6 chưa chốt. Prompt mới đầy đủ ở cuối LOG và prompt-codex-kiem-lai.txt; phiên mới mặc định chỉ đọc. Không sửa baseline/test; chưa commit. EC2 chưa thao tác trong lượt sửa. | `tasks/T-032-g2-nguyen-nhan-xep-hang/` |
+ | T-033 | Lần theo cơ chế báo động trước mốc | P4 | Codex | Claude | Xong (11/10/2026, Minh nghiệm thu; Q-137–Q-140). Mục1–3 hoàn tất; số bổ sung EC2 khớp Claude, phản biện dừng. Xác nhận chuỗi N-Sigma/BOCPD, hướng tiền xử lý nhìn trước, cờ khác bắt đầu đoạn MAP, freeze19/60. OPEN: câu4/onset thật/báo giả vận hành/prior riêng/tác động bậc thang/lợi ích đồ thị/D; không so cửa sổ trong T033. T034 dùng câu thay mục6 bo-sung-bao-cao.md, không câu cũ report002. Không đóng RQ2/G2 hoặc chọn P6; chưa commit | `tasks/T-033-g2-nguyen-nhan-phat-hien/` |
+ 
+ 

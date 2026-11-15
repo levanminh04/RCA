@@ -1,0 +1,77 @@
+diff --git a/services/event-service/src/rca-test/java/com/flashticket/event_service/testing/RcaFaults.java b/services/event-service/src/rca-test/java/com/flashticket/event_service/testing/RcaFaults.java
+index c5b3347..091fa68 100644
+--- a/services/event-service/src/rca-test/java/com/flashticket/event_service/testing/RcaFaults.java
++++ b/services/event-service/src/rca-test/java/com/flashticket/event_service/testing/RcaFaults.java
+@@ -66,7 +66,7 @@ public final class RcaFaults implements AutoCloseable {
+ 
+   @PostConstruct
+   public void start() {
+-    if (enabled && "event_service".equals("booking_service"))
++    if (enabled)
+       watchdog.scheduleWithFixedDelay(this::pollSafely, 0, 100, TimeUnit.MILLISECONDS);
+   }
+ 
+@@ -160,7 +160,7 @@ public final class RcaFaults implements AutoCloseable {
+ 
+   /** Separate watchdog ensures blocked acquisition cannot postpone lease cleanup. */
+   public void poll() {
+-    if (!enabled || !"event_service".equals("booking_service")) return;
++    if (!enabled) return;
+     Lease lease = lease();
+     if (lease == null || !lease.action().equals("pool.hold")) {
+       release();
+diff --git a/services/event-service/src/rca-test/test-java/com/flashticket/event_service/RcaFaultsTests.java b/services/event-service/src/rca-test/test-java/com/flashticket/event_service/RcaFaultsTests.java
+index fd350bf..5120d04 100644
+--- a/services/event-service/src/rca-test/test-java/com/flashticket/event_service/RcaFaultsTests.java
++++ b/services/event-service/src/rca-test/test-java/com/flashticket/event_service/RcaFaultsTests.java
+@@ -5,11 +5,15 @@ import static org.assertj.core.api.Assertions.*;
+ 
+ import com.flashticket.event_service.testing.RcaFaults;
+ import java.nio.file.*;
++import java.sql.Connection;
+ import java.time.Instant;
+ import java.util.*;
++import java.util.concurrent.CountDownLatch;
++import java.util.concurrent.TimeUnit;
+ import javax.sql.DataSource;
+ import org.junit.jupiter.api.Test;
+ import org.junit.jupiter.api.io.TempDir;
++import org.mockito.Mockito;
+ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+ import org.springframework.mock.env.MockEnvironment;
+ import org.springframework.web.server.ResponseStatusException;
+@@ -140,4 +144,34 @@ class RcaFaultsTests {
+           .contains("http.delay.finished");
+     }
+   }
++
++  @Test
++  void blockedPoolAcquisitionCannotOutliveRevocation() throws Exception {
++    var datasource = Mockito.mock(DataSource.class);
++    var connection = Mockito.mock(Connection.class);
++    var started = new CountDownLatch(1);
++    var release = new CountDownLatch(1);
++    Mockito.when(datasource.getConnection())
++        .thenAnswer(
++            invocation -> {
++              started.countDown();
++              release.await(3, TimeUnit.SECONDS);
++              return connection;
++            });
++    var factory = new DefaultListableBeanFactory();
++    factory.registerSingleton("dataSource", datasource);
++    control("pool.hold", UUID.randomUUID(), "", 1, 30);
++    try (var faults =
++        new RcaFaults(environment(true), json, factory.getBeanProvider(DataSource.class))) {
++      faults.start();
++      assertThat(started.await(2, TimeUnit.SECONDS)).isTrue();
++      assertThat(Files.readString(directory.resolve("audit.jsonl"))).contains("pool.hold.started");
++      control("off", UUID.randomUUID(), "", 0, 30);
++      faults.poll();
++      release.countDown();
++      Mockito.verify(connection, Mockito.timeout(2000)).close();
++    } finally {
++      release.countDown();
++    }
++  }
+ }

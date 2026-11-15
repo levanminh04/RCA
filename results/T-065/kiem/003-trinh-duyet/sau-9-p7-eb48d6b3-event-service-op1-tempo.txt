@@ -1,0 +1,353 @@
+- link "Skip to main content":
+  - /url: "#pageContent"
+  - generic: Skip to main content
+- link "Grafana":
+  - /url: /
+  - img "Grafana"
+- link "Grafana":
+  - /url: /
+- button "Close menu":
+- navigation "Navigation":
+  - list "Navigation":
+    - link "Bookmarks":
+      - /url: /bookmarks
+      - paragraph: Bookmarks
+    - 'button "Expand section: Bookmarks"':
+    - link "Starred":
+      - /url: /dashboards?starred
+      - paragraph: Starred
+    - 'button "Expand section: Starred"':
+    - link "Dashboards":
+      - /url: /dashboards
+      - paragraph: Dashboards
+    - 'button "Collapse section: Dashboards" [expanded]':
+    - list:
+      - link "Playlists":
+        - /url: /playlists
+        - paragraph: Playlists
+      - link "Snapshots":
+        - /url: /dashboard/snapshots
+        - paragraph: Snapshots
+      - link "Library panels":
+        - /url: /library-panels
+        - paragraph: Library panels
+      - link "Shared dashboards":
+        - /url: /dashboard/public
+        - paragraph: Shared dashboards
+      - link "Recently deleted":
+        - /url: /dashboard/recently-deleted
+        - paragraph: Recently deleted
+    - link "Explore":
+      - /url: /explore
+      - paragraph: Explore
+    - link "Drilldown":
+      - /url: /drilldown
+      - paragraph: Drilldown
+    - 'button "Expand section: Drilldown"':
+    - link "Alerting":
+      - /url: /alerting
+      - paragraph: Alerting
+    - 'button "Expand section: Alerting"':
+    - link "Connections":
+      - /url: /connections
+      - paragraph: Connections
+    - 'button "Collapse section: Connections" [expanded]':
+    - list:
+      - link "Add new connection":
+        - /url: /connections/add-new-connection
+        - paragraph: Add new connection
+      - link "Data sources":
+        - /url: /connections/datasources
+        - paragraph: Data sources
+    - link "Administration":
+      - /url: /admin
+      - paragraph: Administration
+    - 'button "Expand section: Administration"':
+  - separator
+  - button "Undock menu":
+- banner:
+  - navigation "Breadcrumbs":
+    - list:
+      - link "Explore":
+        - /url: /explore
+      - generic: Tempo
+  - button "Search..."
+  - generic: ctrl+k
+  - button "New":
+  - button "Help":
+  - button "Profile":
+    - img "User avatar"
+- main:
+  - heading "Explore" [level=1]
+  - navigation "Explore toolbar":
+    - navigation "Search links":
+      - button "Content outline" [expanded]:
+        - generic: Outline
+      - img "Tempo logo"
+      - combobox "Select a data source"
+      - button "Go queryless":
+        - generic: Go queryless
+    - button "Split the pane":
+      - generic: Split
+    - button "Add":
+      - generic: Add
+    - button "Move time range backwards":
+    - 'button "Time range selected: 2026-11-13 14:19:20 to 2026-11-13 14:29:19"':
+    - button "Move time range forwards":
+    - button "Zoom out time range":
+    - button "Run query":
+    - button "Auto refresh turned off. Choose refresh time interval":
+    - button "Copy shortened URL":
+    - button "Open copy link options":
+  - button "Collapse outline" [expanded]:
+    - img "arrow-from-right"
+  - button "Queries":
+    - img "arrow"
+    - generic: Queries
+  - button "Table":
+    - img "table"
+    - generic: Table
+  - button "Collapse query row" [expanded]:
+  - button "A":
+    - generic: A
+  - emphasis: (Tempo)
+  - button "Show data source help":
+  - button "Duplicate query":
+  - button "Hide response":
+  - button "Remove query":
+  - button "Drag and drop to reorder":
+    - img "Drag and drop to reorder"
+  - generic: Query type
+  - radiogroup:
+    - radio "Search"
+    - generic "Search":
+      - generic: Search
+    - radio "TraceQL" [checked]
+    - generic "TraceQL":
+      - generic: TraceQL
+    - radio "Trace ID"
+    - generic "Trace ID":
+      - generic: Trace ID
+    - radio "Service Graph"
+    - generic "Service Graph":
+      - generic: Service Graph
+  - button "Import trace":
+    - generic: Import trace
+  - text: Build complex queries using TraceQL to select a list of traces.
+  - link "Documentation":
+    - /url: https://grafana.com/docs/tempo/latest/traceql/
+    - text: Documentation
+  - code:
+    - generic: "{ resource.service.name = \"event-service\" && name = \"GET /api/v1/events\" }"
+    - textbox "Editor content;Press Alt+F1 for Accessibility Options.": "{ resource.service.name = \"event-service\" && name = \"GET /api/v1/events\" }"
+  - 'button "Search Options Limit: 50 Spans Limit: 3 Table Format: Traces | Streaming: Disabled"':
+  - heading "Search Options" [level=6]
+  - generic: "Limit: 50"
+  - generic: "Spans Limit: 3"
+  - generic: "Table Format: Traces"
+  - generic: "|"
+  - generic: "Streaming: Disabled"
+  - 'button "Metrics Options Step: auto Type: Range | Streaming: Disabled"':
+  - heading "Metrics Options" [level=6]
+  - generic: "Step: auto"
+  - generic: "Type: Range"
+  - generic: "|"
+  - generic: "Streaming: Disabled"
+  - button "Add query":
+    - generic: Add query
+  - button "Query history":
+    - generic: Query history
+  - button "Query inspector":
+    - generic: Query inspector
+  - main:
+    - region "Table - Traces":
+      - heading "Table - Traces" [level=2]
+      - treegrid:
+        - row "Expand nested rows Trace ID Start time Service Name Duration":
+          - columnheader "Expand nested rows":
+            - generic: Expand nested rows
+          - columnheader "Trace ID":
+            - button "Trace ID"
+          - columnheader "Start time":
+            - button "Start time"
+          - columnheader "Service":
+            - button "Service"
+          - columnheader "Name":
+            - button "Name"
+          - columnheader "Duration":
+            - button "Duration"
+        - row "Expand row 1206314ae00ed2ecdad42f957b896f0 2026-11-13 14:29:16 api-gateway GET event 14 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "1206314ae00ed2ecdad42f957b896f0":
+            - link "1206314ae00ed2ecdad42f957b896f0":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%221206314ae00ed2ecdad42f957b896f0%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:29:16"
+          - gridcell "api-gateway"
+          - gridcell "GET event"
+          - gridcell "14 ms"
+        - row "Expand row ac5ecdf3f205b29ee31164f4d191e0b 2026-11-13 14:28:43 api-gateway GET event 8 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "ac5ecdf3f205b29ee31164f4d191e0b":
+            - link "ac5ecdf3f205b29ee31164f4d191e0b":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22ac5ecdf3f205b29ee31164f4d191e0b%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:28:43"
+          - gridcell "api-gateway"
+          - gridcell "GET event"
+          - gridcell "8 ms"
+        - row "Expand row 611cca88b9bd04386e12749a7171084 2026-11-13 14:28:40 api-gateway GET event 13 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "611cca88b9bd04386e12749a7171084":
+            - link "611cca88b9bd04386e12749a7171084":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22611cca88b9bd04386e12749a7171084%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:28:40"
+          - gridcell "api-gateway"
+          - gridcell "GET event"
+          - gridcell "13 ms"
+        - row "Expand row 2e5f7261b4c44fb042cf56dee60f298 2026-11-13 14:28:27 api-gateway GET event 33 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "2e5f7261b4c44fb042cf56dee60f298":
+            - link "2e5f7261b4c44fb042cf56dee60f298":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%222e5f7261b4c44fb042cf56dee60f298%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:28:27"
+          - gridcell "api-gateway"
+          - gridcell "GET event"
+          - gridcell "33 ms"
+        - row "Expand row db4bf92d71c8d46b54ae62ed95aac3e 2026-11-13 14:28:22 api-gateway GET event 15 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "db4bf92d71c8d46b54ae62ed95aac3e":
+            - link "db4bf92d71c8d46b54ae62ed95aac3e":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22db4bf92d71c8d46b54ae62ed95aac3e%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:28:22"
+          - gridcell "api-gateway"
+          - gridcell "GET event"
+          - gridcell "15 ms"
+        - row "Expand row 219f2bcb56658a4e743fd0500a7b4cb 2026-11-13 14:27:59 api-gateway GET event 8 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "219f2bcb56658a4e743fd0500a7b4cb":
+            - link "219f2bcb56658a4e743fd0500a7b4cb":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22219f2bcb56658a4e743fd0500a7b4cb%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:27:59"
+          - gridcell "api-gateway"
+          - gridcell "GET event"
+          - gridcell "8 ms"
+        - row "Expand row 6f43654e31bd75859e27f66476e70b7 2026-11-13 14:27:40 api-gateway GET event 16 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "6f43654e31bd75859e27f66476e70b7":
+            - link "6f43654e31bd75859e27f66476e70b7":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%226f43654e31bd75859e27f66476e70b7%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:27:40"
+          - gridcell "api-gateway"
+          - gridcell "GET event"
+          - gridcell "16 ms"
+        - row "Expand row bdba8776dd3349a96d779d79377b2d6 2026-11-13 14:27:37 api-gateway GET event 12 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "bdba8776dd3349a96d779d79377b2d6":
+            - link "bdba8776dd3349a96d779d79377b2d6":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22bdba8776dd3349a96d779d79377b2d6%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:27:37"
+          - gridcell "api-gateway"
+          - gridcell "GET event"
+          - gridcell "12 ms"
+        - row "Expand row 3ce4acdf985d25f691c6037f8ca38fd 2026-11-13 14:27:23 api-gateway GET event 12 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "3ce4acdf985d25f691c6037f8ca38fd":
+            - link "3ce4acdf985d25f691c6037f8ca38fd":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%223ce4acdf985d25f691c6037f8ca38fd%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:27:23"
+          - gridcell "api-gateway"
+          - gridcell "GET event"
+          - gridcell "12 ms"
+        - row "Expand row b3c1a4c6a28bdeea9a9f466771de8ec 2026-11-13 14:27:22 api-gateway GET event 8 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "b3c1a4c6a28bdeea9a9f466771de8ec":
+            - link "b3c1a4c6a28bdeea9a9f466771de8ec":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22b3c1a4c6a28bdeea9a9f466771de8ec%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:27:22"
+          - gridcell "api-gateway"
+          - gridcell "GET event"
+          - gridcell "8 ms"
+        - row "Expand row 8f5e3775be77a60959521cb746048bf 2026-11-13 14:27:10 api-gateway GET event 9 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "8f5e3775be77a60959521cb746048bf":
+            - link "8f5e3775be77a60959521cb746048bf":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%228f5e3775be77a60959521cb746048bf%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:27:10"
+          - gridcell "api-gateway"
+          - gridcell "GET event"
+          - gridcell "9 ms"
+        - row "Expand row cdebcff0de191423f9bafd0fb02c52 2026-11-13 14:27:05 api-gateway GET event 8 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "cdebcff0de191423f9bafd0fb02c52":
+            - link "cdebcff0de191423f9bafd0fb02c52":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22cdebcff0de191423f9bafd0fb02c52%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:27:05"
+          - gridcell "api-gateway"
+          - gridcell "GET event"
+          - gridcell "8 ms"
+        - row "Expand row ab5c9dda561db66e72cc3ffc487df04 2026-11-13 14:27:02 api-gateway GET event 8 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "ab5c9dda561db66e72cc3ffc487df04":
+            - link "ab5c9dda561db66e72cc3ffc487df04":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22ab5c9dda561db66e72cc3ffc487df04%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:27:02"
+          - gridcell "api-gateway"
+          - gridcell "GET event"
+          - gridcell "8 ms"
+        - row "Expand row dd94ed47daeb1453501effcd5afa9f9 2026-11-13 14:26:55 api-gateway GET event 12 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "dd94ed47daeb1453501effcd5afa9f9":
+            - link "dd94ed47daeb1453501effcd5afa9f9":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22dd94ed47daeb1453501effcd5afa9f9%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:26:55"
+          - gridcell "api-gateway"
+          - gridcell "GET event"
+          - gridcell "12 ms"
+        - row "Expand row 798624172069daac32d82d59d2fe15b 2026-11-13 14:26:55 api-gateway GET event 8 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "798624172069daac32d82d59d2fe15b":
+            - link "798624172069daac32d82d59d2fe15b":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22798624172069daac32d82d59d2fe15b%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:26:55"
+          - gridcell "api-gateway"
+          - gridcell "GET event"
+          - gridcell "8 ms"
+        - row "Expand row 301471e9f77de5006f89647ef10c23c 2026-11-13 14:26:39 api-gateway GET event 8 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "301471e9f77de5006f89647ef10c23c":
+            - link "301471e9f77de5006f89647ef10c23c":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22301471e9f77de5006f89647ef10c23c%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:26:39"
+          - gridcell "api-gateway"
+          - gridcell "GET event"
+          - gridcell "8 ms"
+        - row "Expand row 2e4dc18ef7a50a9b05deccc9e2db118 2026-11-13 14:26:38 api-gateway GET event 9 ms":
+          - gridcell "Expand row":
+            - button "Expand row":
+          - gridcell "2e4dc18ef7a50a9b05deccc9e2db118":
+            - link "2e4dc18ef7a50a9b05deccc9e2db118":
+              - /url: /explore?left=%7B%22range%22%3A%7B%22from%22%3A%221794554360000%22%2C%22to%22%3A%221794554959999%22%7D%2C%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%222e4dc18ef7a50a9b05deccc9e2db118%22%2C%22queryType%22%3A%22traceql%22%2C%22datasource%22%3A%7B%22uid%22%3A%22tempo%22%7D%7D%5D%7D
+          - gridcell "2026-11-13 14:26:38"
+          - gridcell "api-gateway"
+          - gridcell "GET event"
+          - gridcell "9 ms"
+- log
+- alert
+- alert
+- complementary
+- complementary

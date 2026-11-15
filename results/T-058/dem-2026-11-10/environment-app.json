@@ -1,0 +1,512 @@
+{
+  "role": "app",
+  "utc": "2026-11-10T22:30:05.928136+00:00",
+  "commands": [
+    {
+      "command": [
+        "uname",
+        "-a"
+      ],
+      "exit_code": 0,
+      "output": "Linux instance-20261111-0142 7.0.0-1013-oracle #13~24.04.1-Ubuntu SMP PREEMPT Fri Sep 25 09:43:58 UTC 2026 aarch64 aarch64 aarch64 GNU/Linux"
+    },
+    {
+      "command": [
+        "cat",
+        "/etc/os-release"
+      ],
+      "exit_code": 0,
+      "output": "PRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.5 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo"
+    },
+    {
+      "command": [
+        "nproc"
+      ],
+      "exit_code": 0,
+      "output": "2"
+    },
+    {
+      "command": [
+        "free",
+        "-m"
+      ],
+      "exit_code": 0,
+      "output": "total        used        free      shared  buff/cache   available\nMem:           11925        4836         283          81        7109        7088\nSwap:              0           0           0"
+    },
+    {
+      "command": [
+        "df",
+        "-h",
+        "/"
+      ],
+      "exit_code": 0,
+      "output": "Filesystem      Size  Used Avail Use% Mounted on\n/dev/sda1        48G   13G   35G  27% /"
+    },
+    {
+      "command": [
+        "docker",
+        "version"
+      ],
+      "exit_code": 0,
+      "output": "Client: Docker Engine - Community\n Version:           29.9.3\n API version:       1.56\n Go version:        go1.26.10\n Git commit:        5457199\n Built:             Tue Nov  3 21:41:21 2026\n OS/Arch:           linux/arm64\n Context:           default\n\nServer: Docker Engine - Community\n Engine:\n  Version:          29.9.3\n  API version:      1.56 (minimum version 1.40)\n  Go version:       go1.26.10\n  Git commit:       70efc0e\n  Built:            Tue Nov  3 21:41:21 2026\n  OS/Arch:          linux/arm64\n  Experimental:     false\n containerd:\n  Version:          v2.4.2\n  GitCommit:        b7a25261e029d68978bbf290df0a62fc819b3c51\n runc:\n  Version:          1.5.2\n  GitCommit:        v1.5.2-0-g29dd3dc2\n docker-init:\n  Version:          0.19.0\n  GitCommit:        de40ad0"
+    },
+    {
+      "command": [
+        "docker",
+        "compose",
+        "version"
+      ],
+      "exit_code": 0,
+      "output": "Docker Compose version v5.7.0"
+    },
+    {
+      "command": [
+        "chronyc",
+        "tracking"
+      ],
+      "exit_code": 0,
+      "output": "Reference ID    : 8E5B671A (26.103.91.142.hosted.by.hostdzire.com)\nStratum         : 3\nRef time (UTC)  : Tue Nov 10 21:57:50 2026\nSystem time     : 0.000000000 seconds slow of NTP time\nLast offset     : -0.000031430 seconds\nRMS offset      : 0.000045481 seconds\nFrequency       : 1.572 ppm slow\nResidual freq   : -0.001 ppm\nSkew            : 0.027 ppm\nRoot delay      : 0.005377349 seconds\nRoot dispersion : 0.002322634 seconds\nUpdate interval : 1040.2 seconds\nLeap status     : Normal"
+    },
+    {
+      "command": [
+        "sudo",
+        "iptables",
+        "-S",
+        "INPUT"
+      ],
+      "exit_code": 0,
+      "output": "-P INPUT ACCEPT\n-A INPUT -s 10.0.0.0/24 -j ACCEPT\n-A INPUT -s 172.18.0.0/16 -d 10.0.0.158/32 -p tcp -m tcp --dport 4318 -j ACCEPT\n-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT\n-A INPUT -p icmp -j ACCEPT\n-A INPUT -i lo -j ACCEPT\n-A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT\n-A INPUT -j REJECT --reject-with icmp-host-prohibited"
+    },
+    {
+      "command": [
+        "sudo",
+        "iptables",
+        "-S",
+        "DOCKER-USER"
+      ],
+      "exit_code": 0,
+      "output": "-N DOCKER-USER"
+    },
+    {
+      "command": [
+        "sudo",
+        "ss",
+        "-ltnp"
+      ],
+      "exit_code": 0,
+      "output": "State  Recv-Q Send-Q       Local Address:Port  Peer Address:PortProcess                                                   \nLISTEN 0      4096             127.0.0.1:27017      0.0.0.0:*    users:((\"docker-proxy\",pid=15065,fd=8))                  \nLISTEN 0      4096             127.0.0.1:8888       0.0.0.0:*    users:((\"otelcol-contrib\",pid=167295,fd=4))              \nLISTEN 0      4096               0.0.0.0:111        0.0.0.0:*    users:((\"rpcbind\",pid=656,fd=4),(\"systemd\",pid=1,fd=207))\nLISTEN 0      4096               0.0.0.0:22         0.0.0.0:*    users:((\"sshd\",pid=6823,fd=3),(\"systemd\",pid=1,fd=124))  \nLISTEN 0      4096            10.0.0.158:8080       0.0.0.0:*    users:((\"docker-proxy\",pid=166356,fd=8))                 \nLISTEN 0      4096             127.0.0.1:6379       0.0.0.0:*    users:((\"docker-proxy\",pid=14536,fd=8))                  \nLISTEN 0      4096            127.0.0.54:53         0.0.0.0:*    users:((\"systemd-resolve\",pid=6819,fd=17))               \nLISTEN 0      4096             127.0.0.1:15672      0.0.0.0:*    users:((\"docker-proxy\",pid=14368,fd=8))                  \nLISTEN 0      4096             127.0.0.1:13133      0.0.0.0:*    users:((\"otelcol-contrib\",pid=167295,fd=7))              \nLISTEN 0      4096             127.0.0.1:4318       0.0.0.0:*    users:((\"otelcol-contrib\",pid=167295,fd=19))             \nLISTEN 0      4096             127.0.0.1:4317       0.0.0.0:*    users:((\"otelcol-contrib\",pid=167295,fd=18))             \nLISTEN 0      4096             127.0.0.1:5672       0.0.0.0:*    users:((\"docker-proxy\",pid=14353,fd=8))                  \nLISTEN 0      4096         127.0.0.53%lo:53         0.0.0.0:*    users:((\"systemd-resolve\",pid=6819,fd=15))               \nLISTEN 0      4096             127.0.0.1:5432       0.0.0.0:*    users:((\"docker-proxy\",pid=30590,fd=8))                  \nLISTEN 0      4096            10.0.0.158:4318       0.0.0.0:*    users:((\"otelcol-contrib\",pid=167295,fd=22))             \nLISTEN 0      100     [::ffff:127.0.0.1]:8761             *:*    users:((\"java\",pid=166118,fd=12))                        \nLISTEN 0      4096                  [::]:111           [::]:*    users:((\"rpcbind\",pid=656,fd=6),(\"systemd\",pid=1,fd=209))\nLISTEN 0      4096                  [::]:22            [::]:*    users:((\"sshd\",pid=6823,fd=4),(\"systemd\",pid=1,fd=125))  \nLISTEN 0      4096   [::ffff:10.0.0.158]:8081             *:*    users:((\"java\",pid=69112,fd=21))                         \nLISTEN 0      100     [::ffff:127.0.0.1]:8082             *:*    users:((\"java\",pid=166832,fd=17))                        \nLISTEN 0      100     [::ffff:127.0.0.1]:8083             *:*    users:((\"java\",pid=167113,fd=20))                        \nLISTEN 0      100     [::ffff:127.0.0.1]:8086             *:*    users:((\"java\",pid=166643,fd=21))                        \nLISTEN 0      100     [::ffff:127.0.0.1]:8084             *:*    users:((\"java\",pid=44614,fd=17))                         \nLISTEN 0      100     [::ffff:127.0.0.1]:8085             *:*    users:((\"java\",pid=42972,fd=20))"
+    },
+    {
+      "command": [
+        "docker",
+        "ps",
+        "--format",
+        "{{.Names}} {{.Status}} {{.Ports}}"
+      ],
+      "exit_code": 0,
+      "output": "flash-ticket-collector Up 42 minutes \nflash-ticket-payment-service-payment-service-1 Up 42 minutes \nflash-ticket-booking-service-booking-service-1 Up 42 minutes \nflash-ticket-event-service-event-service-1 Up 42 minutes \nflash-ticket-keycloak-keycloak-1 Up 42 minutes 8443/tcp, 10.0.0.158:8080->8080/tcp, 9000/tcp\nflash-ticket-discovery-server-discovery-server-1 Up 42 minutes \nflash-ticket-api-gateway-api-gateway-1 Up 2 hours \nflash-ticket-ticket-service-ticket-service-1 Up 2 hours \nflash-ticket-user-service-user-service-1 Up 2 hours \nflash-ticket-infra-postgres-1 Up 2 hours (healthy) 127.0.0.1:5432->5432/tcp\nflash-ticket-infra-user-db-1 Up 2 hours (healthy) 127.0.0.1:27017->27017/tcp\nflash-ticket-infra-redis-1 Up 2 hours (healthy) 127.0.0.1:6379->6379/tcp\nflash-ticket-infra-rabbitmq-1 Up 2 hours (healthy) 4369/tcp, 5671/tcp, 127.0.0.1:5672->5672/tcp, 15671/tcp, 15691-15692/tcp, 25672/tcp, 127.0.0.1:15672->15672/tcp"
+    },
+    {
+      "command": [
+        "systemctl",
+        "is-enabled",
+        "docker",
+        "chrony",
+        "netfilter-persistent"
+      ],
+      "exit_code": 0,
+      "output": "enabled\nenabled\nenabled"
+    }
+  ],
+  "containers": [
+    {
+      "name": "/flash-ticket-collector",
+      "image_id": "sha256:e40d61f10c9a617cca1ffd1be4d7e2b3a4b0f0001798ff07e58cabe82e618cea",
+      "image_name": "otel/opentelemetry-collector-contrib@sha256:e40d61f10c9a617cca1ffd1be4d7e2b3a4b0f0001798ff07e58cabe82e618cea",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "OOMKilled": false,
+        "Restarting": false,
+        "StartedAt": "2026-11-10T21:47:58.65597222Z",
+        "Health": null
+      },
+      "restart_count": 0,
+      "memory_limit": 536870912,
+      "ports": {}
+    },
+    {
+      "name": "/flash-ticket-payment-service-payment-service-1",
+      "image_id": "sha256:a88fdba5c8e4c271e550a6e42b750499055371405dc41a0b14d5d0637862f339",
+      "image_name": "ft-local/payment-service:arm64-5c6d1c13",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "OOMKilled": false,
+        "Restarting": false,
+        "StartedAt": "2026-11-10T21:47:56.769361741Z",
+        "Health": null
+      },
+      "restart_count": 0,
+      "memory_limit": 1073741824,
+      "ports": {}
+    },
+    {
+      "name": "/flash-ticket-booking-service-booking-service-1",
+      "image_id": "sha256:87911e6dba95d6c99e657a692e1a8d4fb1e3d2e45f06d594e318b71a6c901c09",
+      "image_name": "ft-local/booking-service:arm64-e4304048",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "OOMKilled": false,
+        "Restarting": false,
+        "StartedAt": "2026-11-10T21:47:51.335315498Z",
+        "Health": null
+      },
+      "restart_count": 0,
+      "memory_limit": 1073741824,
+      "ports": {}
+    },
+    {
+      "name": "/flash-ticket-event-service-event-service-1",
+      "image_id": "sha256:b5fb8c96ed138fddc8e5d102c4c78909b7f2de692efbe4ef148df0d9776a3ce0",
+      "image_name": "ft-local/event-service:arm64-9eea593a",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "OOMKilled": false,
+        "Restarting": false,
+        "StartedAt": "2026-11-10T21:47:46.188978825Z",
+        "Health": null
+      },
+      "restart_count": 0,
+      "memory_limit": 1073741824,
+      "ports": {}
+    },
+    {
+      "name": "/flash-ticket-keycloak-keycloak-1",
+      "image_id": "sha256:16cff9e9fe2bbf3a224912c2147c794612ea0e7361a3877e1ee62c525ee008eb",
+      "image_name": "ft-local/keycloak:arm64-776d9c9e",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "OOMKilled": false,
+        "Restarting": false,
+        "StartedAt": "2026-11-10T21:47:41.374718594Z",
+        "Health": null
+      },
+      "restart_count": 0,
+      "memory_limit": 1610612736,
+      "ports": {
+        "8080/tcp": [
+          {
+            "HostIp": "10.0.0.158",
+            "HostPort": "8080"
+          }
+        ]
+      }
+    },
+    {
+      "name": "/flash-ticket-discovery-server-discovery-server-1",
+      "image_id": "sha256:ee1f1e3e895eaa570b1e0f668489a81c8846dcefc51c4943376cfd130d8acdcd",
+      "image_name": "ft-local/discovery-server:arm64-5c6d1c13",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "OOMKilled": false,
+        "Restarting": false,
+        "StartedAt": "2026-11-10T21:47:39.409384912Z",
+        "Health": null
+      },
+      "restart_count": 0,
+      "memory_limit": 805306368,
+      "ports": {}
+    },
+    {
+      "name": "/flash-ticket-api-gateway-api-gateway-1",
+      "image_id": "sha256:3058e6775fa4eb62f262c9dc46104907ad8629fe999cb0b29a8ddb6231f9ded4",
+      "image_name": "ft-local/api-gateway:arm64-9eea593a",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "OOMKilled": false,
+        "Restarting": false,
+        "StartedAt": "2026-11-10T20:33:49.77036331Z",
+        "Health": null
+      },
+      "restart_count": 0,
+      "memory_limit": 805306368,
+      "ports": {}
+    },
+    {
+      "name": "/flash-ticket-ticket-service-ticket-service-1",
+      "image_id": "sha256:4caf3aef945237e9b5c356a67025c23f63b0e35e2d56dd75fca0da6f273f1f2d",
+      "image_name": "ft-local/ticket-service:arm64-5c6d1c13",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "OOMKilled": false,
+        "Restarting": false,
+        "StartedAt": "2026-11-10T20:17:26.785927293Z",
+        "Health": null
+      },
+      "restart_count": 0,
+      "memory_limit": 805306368,
+      "ports": {}
+    },
+    {
+      "name": "/flash-ticket-user-service-user-service-1",
+      "image_id": "sha256:9378302374e9728c7c8dccf1cd2e90e75a616881e8342617e0f1612a21564fee",
+      "image_name": "ft-local/user-service:arm64-22067803",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "OOMKilled": false,
+        "Restarting": false,
+        "StartedAt": "2026-11-10T20:16:30.281797034Z",
+        "Health": null
+      },
+      "restart_count": 0,
+      "memory_limit": 805306368,
+      "ports": {}
+    },
+    {
+      "name": "/flash-ticket-infra-postgres-1",
+      "image_id": "sha256:f9a7b9ebf6f56201f949db745e47bc423c0f0f8294bafe991cc10bf74b029657",
+      "image_name": "postgres:16.15",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "OOMKilled": false,
+        "Restarting": false,
+        "StartedAt": "2026-11-10T20:09:04.405789773Z",
+        "Health": {
+          "Status": "healthy",
+          "FailingStreak": 0,
+          "Log": [
+            {
+              "Start": "2026-11-10T22:29:21.296782076Z",
+              "End": "2026-11-10T22:29:21.358834174Z",
+              "ExitCode": 0,
+              "Output": "/var/run/postgresql:5432 - accepting connections\n"
+            },
+            {
+              "Start": "2026-11-10T22:29:31.360537051Z",
+              "End": "2026-11-10T22:29:31.419008183Z",
+              "ExitCode": 0,
+              "Output": "/var/run/postgresql:5432 - accepting connections\n"
+            },
+            {
+              "Start": "2026-11-10T22:29:41.42017154Z",
+              "End": "2026-11-10T22:29:41.479429233Z",
+              "ExitCode": 0,
+              "Output": "/var/run/postgresql:5432 - accepting connections\n"
+            },
+            {
+              "Start": "2026-11-10T22:29:51.482637033Z",
+              "End": "2026-11-10T22:29:51.554541026Z",
+              "ExitCode": 0,
+              "Output": "/var/run/postgresql:5432 - accepting connections\n"
+            },
+            {
+              "Start": "2026-11-10T22:30:01.556021143Z",
+              "End": "2026-11-10T22:30:01.733476582Z",
+              "ExitCode": 0,
+              "Output": "/var/run/postgresql:5432 - accepting connections\n"
+            }
+          ]
+        }
+      },
+      "restart_count": 0,
+      "memory_limit": 1610612736,
+      "ports": {
+        "5432/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "5432"
+          }
+        ]
+      }
+    },
+    {
+      "name": "/flash-ticket-infra-user-db-1",
+      "image_id": "sha256:8bb4442761a63a8dda452744082cdac9644b429807eb977b42324a63cef59ca4",
+      "image_name": "mongo:7.0",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "OOMKilled": false,
+        "Restarting": false,
+        "StartedAt": "2026-11-10T20:00:47.678277365Z",
+        "Health": {
+          "Status": "healthy",
+          "FailingStreak": 0,
+          "Log": [
+            {
+              "Start": "2026-11-10T22:29:40.367443526Z",
+              "End": "2026-11-10T22:29:40.971725155Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-10T22:29:45.972781254Z",
+              "End": "2026-11-10T22:29:46.476053045Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-10T22:29:51.477010984Z",
+              "End": "2026-11-10T22:29:52.006875257Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-10T22:29:57.008057356Z",
+              "End": "2026-11-10T22:29:57.543114637Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-10T22:30:02.544434017Z",
+              "End": "2026-11-10T22:30:03.254880493Z",
+              "ExitCode": 0,
+              "Output": ""
+            }
+          ]
+        }
+      },
+      "restart_count": 1,
+      "memory_limit": 0,
+      "ports": {
+        "27017/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "27017"
+          }
+        ]
+      }
+    },
+    {
+      "name": "/flash-ticket-infra-redis-1",
+      "image_id": "sha256:d9436322172a5b482c187bf1f363d3c4fea086fcca6b9c8a94de8f0f39ed3193",
+      "image_name": "redis:7.4.11-alpine",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "OOMKilled": false,
+        "Restarting": false,
+        "StartedAt": "2026-11-10T20:00:41.329548518Z",
+        "Health": {
+          "Status": "healthy",
+          "FailingStreak": 0,
+          "Log": [
+            {
+              "Start": "2026-11-10T22:29:42.337059821Z",
+              "End": "2026-11-10T22:29:42.365967026Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-10T22:29:47.367227366Z",
+              "End": "2026-11-10T22:29:47.396773172Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-10T22:29:52.397849951Z",
+              "End": "2026-11-10T22:29:52.430719323Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-10T22:29:57.431313581Z",
+              "End": "2026-11-10T22:29:57.479703898Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-10T22:30:02.480543316Z",
+              "End": "2026-11-10T22:30:02.521798061Z",
+              "ExitCode": 0,
+              "Output": ""
+            }
+          ]
+        }
+      },
+      "restart_count": 0,
+      "memory_limit": 0,
+      "ports": {
+        "6379/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "6379"
+          }
+        ]
+      }
+    },
+    {
+      "name": "/flash-ticket-infra-rabbitmq-1",
+      "image_id": "sha256:54cb013d76cd1fd6c0a0708f34062ad61c452bb6f016b434c6c33f1a765d2b58",
+      "image_name": "rabbitmq:4.3.6-management",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "OOMKilled": false,
+        "Restarting": false,
+        "StartedAt": "2026-11-10T20:00:41.040179753Z",
+        "Health": {
+          "Status": "healthy",
+          "FailingStreak": 0,
+          "Log": [
+            {
+              "Start": "2026-11-10T22:29:14.678844356Z",
+              "End": "2026-11-10T22:29:15.990421497Z",
+              "ExitCode": 0,
+              "Output": "RabbitMQ on node rabbit@rabbitmq is fully booted and running\nWill connect to rabbitmq:15672\nWill connect to rabbitmq:15692\nWill connect to rabbitmq:25672\nWill connect to rabbitmq:5672\nSuccessfully connected to ports 5672, 15672, 15692, 25672 on node rabbit@rabbitmq (using node hostname resolution)\n"
+            },
+            {
+              "Start": "2026-11-10T22:29:25.991666414Z",
+              "End": "2026-11-10T22:29:27.292057738Z",
+              "ExitCode": 0,
+              "Output": "RabbitMQ on node rabbit@rabbitmq is fully booted and running\nWill connect to rabbitmq:15672\nWill connect to rabbitmq:15692\nWill connect to rabbitmq:25672\nWill connect to rabbitmq:5672\nSuccessfully connected to ports 5672, 15672, 15692, 25672 on node rabbit@rabbitmq (using node hostname resolution)\n"
+            },
+            {
+              "Start": "2026-11-10T22:29:37.292782454Z",
+              "End": "2026-11-10T22:29:38.571721904Z",
+              "ExitCode": 0,
+              "Output": "RabbitMQ on node rabbit@rabbitmq is fully booted and running\nWill connect to rabbitmq:15672\nWill connect to rabbitmq:15692\nWill connect to rabbitmq:25672\nWill connect to rabbitmq:5672\nSuccessfully connected to ports 5672, 15672, 15692, 25672 on node rabbit@rabbitmq (using node hostname resolution)\n"
+            },
+            {
+              "Start": "2026-11-10T22:29:48.57270034Z",
+              "End": "2026-11-10T22:29:49.849644867Z",
+              "ExitCode": 0,
+              "Output": "RabbitMQ on node rabbit@rabbitmq is fully booted and running\nWill connect to rabbitmq:15672\nWill connect to rabbitmq:15692\nWill connect to rabbitmq:25672\nWill connect to rabbitmq:5672\nSuccessfully connected to ports 5672, 15672, 15692, 25672 on node rabbit@rabbitmq (using node hostname resolution)\n"
+            },
+            {
+              "Start": "2026-11-10T22:29:59.850490743Z",
+              "End": "2026-11-10T22:30:01.704659457Z",
+              "ExitCode": 0,
+              "Output": "RabbitMQ on node rabbit@rabbitmq is fully booted and running\nWill connect to rabbitmq:15672\nWill connect to rabbitmq:15692\nWill connect to rabbitmq:25672\nWill connect to rabbitmq:5672\nSuccessfully connected to ports 5672, 15672, 15692, 25672 on node rabbit@rabbitmq (using node hostname resolution)\n"
+            }
+          ]
+        }
+      },
+      "restart_count": 0,
+      "memory_limit": 1073741824,
+      "ports": {
+        "15672/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "15672"
+          }
+        ],
+        "5672/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "5672"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+ "$schema":"https://json-schema.org/draft/2020-12/schema",
+ "title":"T-065 dữ liệu bản × ca 0.4",
+ "type":"object",
+ "required":["phien_ban_dinh_dang","ban","ca","nguon_ca","cua_so_ms","entity_ranking","ranking_rows","canh_xep_hang","trang_thai_canh","co_m1","don_vi_m1","thao_tac","canh_thao_tac","bang_chung","gioi_han"],
+ "properties":{
+  "phien_ban_dinh_dang":{"const":"0.4"},
+  "ban":{"type":"object","required":["ban","trang_thai","cau_hinh_sha256","ma_nguon_sha256","nguon_output","sha256_output"],"properties":{
+   "ban":{"enum":["p7","V032-H5b","V041-R1-H1c+H5b+H8s1"]},
+   "trang_thai":{"enum":["khoa_P7","de_xuat","thay_the"]},
+   "cau_hinh_sha256":{"type":["string","null"],"pattern":"^[a-f0-9]{64}$"},
+   "ma_nguon_sha256":{"type":["string","null"],"pattern":"^[a-f0-9]{64}$"},
+   "nguon_output":{"type":"string","minLength":1},"sha256_output":{"type":"string","pattern":"^[a-f0-9]{64}$"}
+  }},
+  "ca":{"type":"string","pattern":"^[a-f0-9]{8}$"},"nguon_ca":{"enum":["dev2","t062"]},
+  "cua_so_ms":{"type":"array","minItems":2,"maxItems":2,"items":{"type":"integer"}},
+  "entity_ranking":{"type":"array","items":{"type":"object","required":["entity","key","tie_group"],"properties":{"entity":{"type":"string"},"key":{"type":"array","items":{"type":"number"}},"tie_group":{"type":"integer","minimum":0}}}},
+  "ranking_rows":{"type":"array","items":{"type":"object","required":["entity","key","tie_group","hang","lop","so_kenh_co"]}},
+  "canh_xep_hang":{"type":"array","items":{"type":"object","required":["nguon","dich","loai","hang","tie_group","diem","co","trang_thai","nguon_xac_minh"]}},
+  "trang_thai_canh":{"type":"string"},
+  "co_m1":{"type":"array","items":{"type":"object","required":["ma","don_vi","thuc_the","huong","F_I"]}},
+  "don_vi_m1":{"type":"array"},
+  "thao_tac":{"type":"array","items":{"type":"object","required":["id","chu","ten","loai","trang_thai_m1","co_m1","co_len","co_xuong","mau_N","mau_A","kenh_co","don_vi_m1","lien_ket"],"properties":{"id":{"type":"string"},"chu":{"type":"string"},"ten":{"type":"string"},"co_m1":{"type":"boolean"},"lien_ket":{"type":"array","items":{"$ref":"#/$defs/link"}}}}},
+  "canh_thao_tac":{"type":"array"},"bang_chung":{"type":"array"},"gioi_han":{"type":"string"}
+ },
+ "$defs":{"link":{"type":"object","required":["kho","url","truy_van","cua_so_ms","pham_vi","ghi_chu"],"properties":{"kho":{"enum":["tempo","loki","prometheus"]},"url":{"type":"string","pattern":"^/explore\\?"},"truy_van":{"type":"string"},"cua_so_ms":{"type":"array","minItems":2,"maxItems":2,"items":{"type":"integer"}}}}}
+}

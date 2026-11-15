@@ -1,0 +1,45 @@
+diff --git "a/D:\\RCA-flashticket\\results\\T-062\\tai-2/linux/tai_linux-v1.py" "b/D:\\RCA-flashticket\\results\\T-062\\tai-2/tai_linux.py"
+index 9e9306e3..db97fd05 100644
+--- "a/D:\\RCA-flashticket\\results\\T-062\\tai-2/linux/tai_linux-v1.py"
++++ "b/D:\\RCA-flashticket\\results\\T-062\\tai-2/tai_linux.py"
+@@ -45,7 +45,8 @@ def event(kind, detail):
+ def run(args, data=None, timeout=60, label='subprocess'):
+     try:
+         p = subprocess.run(args, input=data, stdout=subprocess.PIPE,
+-                           stderr=subprocess.PIPE, timeout=timeout, check=False)
++                           stderr=subprocess.PIPE, timeout=timeout, check=False,
++                           **({'stdin': subprocess.DEVNULL} if data is None else {}))
+     except subprocess.TimeoutExpired:
+         raise Failure(label + ' timed out; retain existing outputs') from None
+     except OSError:
+@@ -69,7 +70,9 @@ def options(machine):
+             '-o', 'ServerAliveInterval=20', '-o', 'ServerAliveCountMax=3']
+ 
+ 
+-def ssh(machine, command, data=None, timeout=120, mutation=None):
++def ssh(machine, command, data=None, timeout=120, mutation=None, ignore_stop=False):
++    if not ignore_stop and (ROOT / 'STOP').exists():
++        raise Failure('STOP exists on exp-obs; remote command refused')
+     if mutation:
+         event('mutation_begin', {'machine': machine, 'command': mutation,
+                                 'commandSha256': hashlib.sha256(command.encode()).hexdigest()})
+@@ -237,7 +240,8 @@ def stop(tag):
+     selector = 'name=^rca-tai-' + (tag + '$' if tag else '')
+     command = ('ids=$(sudo -n docker ps -q --filter ' + shlex.quote(selector) + '); '
+                'if [ -n "$ids" ]; then sudo -n docker stop --time 90 $ids; fi')
+-    return {'tag': tag, 'stopped': ssh('tai', command, timeout=150, mutation=command).decode().splitlines()}
++    return {'tag': tag, 'stopped': ssh('tai', command, timeout=150, mutation=command,
++                                     ignore_stop=True).decode().splitlines()}
+ 
+ 
+ def receive(tag):
+@@ -251,7 +255,8 @@ if [ ! -f outputs.sha256 ]; then
+  sudo -n docker logs rca-tai-{tag} > container.log 2>&1
+  sudo -n docker inspect rca-tai-{tag} --format '{{{{json .State}}}}' > state.json
+  date -u --iso-8601=seconds > received-utc.txt
+- sha256sum *.json *.js *.log *.txt *.csv inputs.sha256 > outputs.sha256
++ sha256sum *.json *.js *.log *.txt *.csv inputs.sha256 > outputs.sha256.partial
++ mv outputs.sha256.partial outputs.sha256
+ fi
+ sha256sum --status -c outputs.sha256
+ '''

@@ -1,0 +1,642 @@
+{
+ "extensions": {
+  "file_storage": {
+   "directory": "/data/queue",
+   "create_directory": true
+  },
+  "health_check": {
+   "endpoint": "127.0.0.1:13133"
+  }
+ },
+ "receivers": {
+  "otlp": {
+   "protocols": {
+    "grpc": {
+     "endpoint": "127.0.0.1:4317"
+    },
+    "http": {
+     "endpoint": "127.0.0.1:4318"
+    }
+   }
+  },
+  "otlp/keycloak": {
+   "protocols": {
+    "http": {
+     "endpoint": "10.0.0.158:4318"
+    }
+   }
+  },
+  "docker_stats": {
+   "endpoint": "unix:///var/run/docker.sock",
+   "collection_interval": "10s",
+   "excluded_images": [
+    "*pumba*",
+    "*toxiproxy*",
+    "*k6*",
+    "otel/opentelemetry-collector-contrib*"
+   ],
+   "container_labels_to_metric_labels": {
+    "com.docker.compose.service": "service.name"
+   },
+   "metrics": {
+    "container.cpu.throttling_data.periods": {
+     "enabled": true
+    },
+    "container.cpu.throttling_data.throttled_periods": {
+     "enabled": true
+    },
+    "container.cpu.throttling_data.throttled_time": {
+     "enabled": true
+    },
+    "container.cpu.limit": {
+     "enabled": true
+    },
+    "container.restarts": {
+     "enabled": true
+    },
+    "container.uptime": {
+     "enabled": true
+    },
+    "container.pids.count": {
+     "enabled": true
+    }
+   }
+  },
+  "hostmetrics": {
+   "root_path": "/hostfs",
+   "collection_interval": "10s",
+   "scrapers": {
+    "cpu": {},
+    "memory": {},
+    "load": {},
+    "disk": {},
+    "network": {},
+    "filesystem": {}
+   }
+  },
+  "postgresql": {
+   "endpoint": "127.0.0.1:5432",
+   "username": "otel_monitor",
+   "password": "<da-che>",
+   "databases": [
+    "keycloak_db",
+    "event_db",
+    "booking_db",
+    "payment_db",
+    "ticket_db"
+   ],
+   "collection_interval": "10s",
+   "tls": {
+    "insecure": true
+   }
+  },
+  "mongodb": {
+   "hosts": [
+    {
+     "endpoint": "127.0.0.1:27017"
+    }
+   ],
+   "username": "otel_monitor",
+   "password": "<da-che>",
+   "collection_interval": "10s",
+   "tls": {
+    "insecure": true
+   }
+  },
+  "redis": {
+   "endpoint": "127.0.0.1:6379",
+   "password": "<da-che>",
+   "collection_interval": "10s"
+  },
+  "rabbitmq": {
+   "endpoint": "http://127.0.0.1:15672",
+   "username": "otel_monitor",
+   "password": "<da-che>",
+   "collection_interval": "10s"
+  },
+  "prometheus/self": {
+   "config": {
+    "scrape_configs": [
+     {
+      "job_name": "local-collector",
+      "scrape_interval": "10s",
+      "static_configs": [
+       {
+        "targets": [
+         "127.0.0.1:8888"
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "filelog/payment-service": {
+   "include": [
+    "/var/lib/docker/containers/ff01b3a98d9f6b872e16e4e7665e6fc0ca83b4e284de2667d69a721606dc2c0d/ff01b3a98d9f6b872e16e4e7665e6fc0ca83b4e284de2667d69a721606dc2c0d-json.log"
+   ],
+   "start_at": "beginning",
+   "storage": "file_storage",
+   "include_file_path": true,
+   "operators": [
+    {
+     "type": "json_parser",
+     "id": "docker",
+     "parse_to": "attributes.docker",
+     "timestamp": {
+      "parse_from": "attributes.docker.time",
+      "layout_type": "gotime",
+      "layout": "2006-01-02T15:04:05.999999999Z07:00"
+     }
+    },
+    {
+     "type": "move",
+     "from": "attributes.docker.log",
+     "to": "body"
+    },
+    {
+     "type": "add",
+     "field": "resource[\"service.name\"]",
+     "value": "payment-service"
+    },
+    {
+     "type": "add",
+     "field": "resource[\"service.instance.id\"]",
+     "value": "payment-service-1"
+    },
+    {
+     "type": "json_parser",
+     "id": "spring",
+     "parse_from": "body",
+     "parse_to": "attributes.app",
+     "if": "body matches \"^\\\\s*\\\\{\"",
+     "on_error": "send"
+    }
+   ]
+  },
+  "filelog/booking-service": {
+   "include": [
+    "/var/lib/docker/containers/caf5f9639b1484945d27ddf129aa6d518ba28d05c0e57bec267a28d903c4470c/caf5f9639b1484945d27ddf129aa6d518ba28d05c0e57bec267a28d903c4470c-json.log"
+   ],
+   "start_at": "beginning",
+   "storage": "file_storage",
+   "include_file_path": true,
+   "operators": [
+    {
+     "type": "json_parser",
+     "id": "docker",
+     "parse_to": "attributes.docker",
+     "timestamp": {
+      "parse_from": "attributes.docker.time",
+      "layout_type": "gotime",
+      "layout": "2006-01-02T15:04:05.999999999Z07:00"
+     }
+    },
+    {
+     "type": "move",
+     "from": "attributes.docker.log",
+     "to": "body"
+    },
+    {
+     "type": "add",
+     "field": "resource[\"service.name\"]",
+     "value": "booking-service"
+    },
+    {
+     "type": "add",
+     "field": "resource[\"service.instance.id\"]",
+     "value": "booking-service-1"
+    },
+    {
+     "type": "json_parser",
+     "id": "spring",
+     "parse_from": "body",
+     "parse_to": "attributes.app",
+     "if": "body matches \"^\\\\s*\\\\{\"",
+     "on_error": "send"
+    }
+   ]
+  },
+  "filelog/event-service": {
+   "include": [
+    "/var/lib/docker/containers/d032f01f077bcb3c25e2b09581e03a43909b4790b065744c265b0dd2cede6397/d032f01f077bcb3c25e2b09581e03a43909b4790b065744c265b0dd2cede6397-json.log"
+   ],
+   "start_at": "beginning",
+   "storage": "file_storage",
+   "include_file_path": true,
+   "operators": [
+    {
+     "type": "json_parser",
+     "id": "docker",
+     "parse_to": "attributes.docker",
+     "timestamp": {
+      "parse_from": "attributes.docker.time",
+      "layout_type": "gotime",
+      "layout": "2006-01-02T15:04:05.999999999Z07:00"
+     }
+    },
+    {
+     "type": "move",
+     "from": "attributes.docker.log",
+     "to": "body"
+    },
+    {
+     "type": "add",
+     "field": "resource[\"service.name\"]",
+     "value": "event-service"
+    },
+    {
+     "type": "add",
+     "field": "resource[\"service.instance.id\"]",
+     "value": "event-service-1"
+    },
+    {
+     "type": "json_parser",
+     "id": "spring",
+     "parse_from": "body",
+     "parse_to": "attributes.app",
+     "if": "body matches \"^\\\\s*\\\\{\"",
+     "on_error": "send"
+    }
+   ]
+  },
+  "filelog/keycloak": {
+   "include": [
+    "/var/lib/docker/containers/c89f238e413478245870c7dd8d4beba937ae69ff2c9d7fd1648a651d70100777/c89f238e413478245870c7dd8d4beba937ae69ff2c9d7fd1648a651d70100777-json.log"
+   ],
+   "start_at": "beginning",
+   "storage": "file_storage",
+   "include_file_path": true,
+   "operators": [
+    {
+     "type": "json_parser",
+     "id": "docker",
+     "parse_to": "attributes.docker",
+     "timestamp": {
+      "parse_from": "attributes.docker.time",
+      "layout_type": "gotime",
+      "layout": "2006-01-02T15:04:05.999999999Z07:00"
+     }
+    },
+    {
+     "type": "move",
+     "from": "attributes.docker.log",
+     "to": "body"
+    },
+    {
+     "type": "add",
+     "field": "resource[\"service.name\"]",
+     "value": "keycloak"
+    },
+    {
+     "type": "add",
+     "field": "resource[\"service.instance.id\"]",
+     "value": "keycloak-1"
+    },
+    {
+     "type": "json_parser",
+     "id": "spring",
+     "parse_from": "body",
+     "parse_to": "attributes.app",
+     "if": "body matches \"^\\\\s*\\\\{\"",
+     "on_error": "send"
+    }
+   ]
+  },
+  "filelog/discovery-server": {
+   "include": [
+    "/var/lib/docker/containers/eb116dd357208cee5e7e362584c2075006b81d74e41700e3bfb0ad688f122cdb/eb116dd357208cee5e7e362584c2075006b81d74e41700e3bfb0ad688f122cdb-json.log"
+   ],
+   "start_at": "beginning",
+   "storage": "file_storage",
+   "include_file_path": true,
+   "operators": [
+    {
+     "type": "json_parser",
+     "id": "docker",
+     "parse_to": "attributes.docker",
+     "timestamp": {
+      "parse_from": "attributes.docker.time",
+      "layout_type": "gotime",
+      "layout": "2006-01-02T15:04:05.999999999Z07:00"
+     }
+    },
+    {
+     "type": "move",
+     "from": "attributes.docker.log",
+     "to": "body"
+    },
+    {
+     "type": "add",
+     "field": "resource[\"service.name\"]",
+     "value": "discovery-server"
+    },
+    {
+     "type": "add",
+     "field": "resource[\"service.instance.id\"]",
+     "value": "discovery-server-1"
+    },
+    {
+     "type": "json_parser",
+     "id": "spring",
+     "parse_from": "body",
+     "parse_to": "attributes.app",
+     "if": "body matches \"^\\\\s*\\\\{\"",
+     "on_error": "send"
+    }
+   ]
+  },
+  "filelog/api-gateway": {
+   "include": [
+    "/var/lib/docker/containers/6b57936d7db6d78b70e91b4fadfa3e5556d2c20a1313eb4816bf30be3fd59186/6b57936d7db6d78b70e91b4fadfa3e5556d2c20a1313eb4816bf30be3fd59186-json.log"
+   ],
+   "start_at": "beginning",
+   "storage": "file_storage",
+   "include_file_path": true,
+   "operators": [
+    {
+     "type": "json_parser",
+     "id": "docker",
+     "parse_to": "attributes.docker",
+     "timestamp": {
+      "parse_from": "attributes.docker.time",
+      "layout_type": "gotime",
+      "layout": "2006-01-02T15:04:05.999999999Z07:00"
+     }
+    },
+    {
+     "type": "move",
+     "from": "attributes.docker.log",
+     "to": "body"
+    },
+    {
+     "type": "add",
+     "field": "resource[\"service.name\"]",
+     "value": "api-gateway"
+    },
+    {
+     "type": "add",
+     "field": "resource[\"service.instance.id\"]",
+     "value": "api-gateway-1"
+    },
+    {
+     "type": "json_parser",
+     "id": "spring",
+     "parse_from": "body",
+     "parse_to": "attributes.app",
+     "if": "body matches \"^\\\\s*\\\\{\"",
+     "on_error": "send"
+    }
+   ]
+  },
+  "filelog/ticket-service": {
+   "include": [
+    "/var/lib/docker/containers/1117dffe5ddf196a56b3235ba9c003c89aa243e67f5ff55078bcc8f28cebe594/1117dffe5ddf196a56b3235ba9c003c89aa243e67f5ff55078bcc8f28cebe594-json.log"
+   ],
+   "start_at": "beginning",
+   "storage": "file_storage",
+   "include_file_path": true,
+   "operators": [
+    {
+     "type": "json_parser",
+     "id": "docker",
+     "parse_to": "attributes.docker",
+     "timestamp": {
+      "parse_from": "attributes.docker.time",
+      "layout_type": "gotime",
+      "layout": "2006-01-02T15:04:05.999999999Z07:00"
+     }
+    },
+    {
+     "type": "move",
+     "from": "attributes.docker.log",
+     "to": "body"
+    },
+    {
+     "type": "add",
+     "field": "resource[\"service.name\"]",
+     "value": "ticket-service"
+    },
+    {
+     "type": "add",
+     "field": "resource[\"service.instance.id\"]",
+     "value": "ticket-service-1"
+    },
+    {
+     "type": "json_parser",
+     "id": "spring",
+     "parse_from": "body",
+     "parse_to": "attributes.app",
+     "if": "body matches \"^\\\\s*\\\\{\"",
+     "on_error": "send"
+    }
+   ]
+  },
+  "filelog/user-service": {
+   "include": [
+    "/var/lib/docker/containers/3520f0e60fb5370f60b98dcbb5c8f997816bebd9eafb504e10eb93b6f32595aa/3520f0e60fb5370f60b98dcbb5c8f997816bebd9eafb504e10eb93b6f32595aa-json.log"
+   ],
+   "start_at": "beginning",
+   "storage": "file_storage",
+   "include_file_path": true,
+   "operators": [
+    {
+     "type": "json_parser",
+     "id": "docker",
+     "parse_to": "attributes.docker",
+     "timestamp": {
+      "parse_from": "attributes.docker.time",
+      "layout_type": "gotime",
+      "layout": "2006-01-02T15:04:05.999999999Z07:00"
+     }
+    },
+    {
+     "type": "move",
+     "from": "attributes.docker.log",
+     "to": "body"
+    },
+    {
+     "type": "add",
+     "field": "resource[\"service.name\"]",
+     "value": "user-service"
+    },
+    {
+     "type": "add",
+     "field": "resource[\"service.instance.id\"]",
+     "value": "user-service-1"
+    },
+    {
+     "type": "json_parser",
+     "id": "spring",
+     "parse_from": "body",
+     "parse_to": "attributes.app",
+     "if": "body matches \"^\\\\s*\\\\{\"",
+     "on_error": "send"
+    }
+   ]
+  }
+ },
+ "processors": {
+  "memory_limiter": {
+   "check_interval": "1s",
+   "limit_mib": 384,
+   "spike_limit_mib": 64
+  },
+  "resource/host": {
+   "attributes": [
+    {
+     "key": "host.id",
+     "value": "exp-app",
+     "action": "upsert"
+    },
+    {
+     "key": "deployment.environment",
+     "value": "exp",
+     "action": "upsert"
+    }
+   ]
+  },
+  "batch": {
+   "timeout": "1s",
+   "send_batch_size": 1024
+  },
+  "filter/health": {
+   "error_mode": "ignore",
+   "traces": {
+    "span": [
+     "attributes[\"http.route\"] == \"/actuator/health\""
+    ]
+   }
+  },
+  "transform/sanitize": {
+   "error_mode": "ignore",
+   "trace_statements": [
+    {
+     "context": "span",
+     "statements": [
+      "delete_key(attributes, \"url.query\")",
+      "replace_pattern(attributes[\"url.full\"], \"[?].*\", \"\") where attributes[\"url.full\"] != nil",
+      "replace_pattern(attributes[\"http.url\"], \"[?].*\", \"\") where attributes[\"http.url\"] != nil",
+      "replace_pattern(attributes[\"http.target\"], \"[?].*\", \"\") where attributes[\"http.target\"] != nil"
+     ]
+    }
+   ]
+  }
+ },
+ "exporters": {
+  "otlp": {
+   "endpoint": "10.0.0.215:4317",
+   "tls": {
+    "insecure": true
+   },
+   "retry_on_failure": {
+    "enabled": true,
+    "initial_interval": "1s",
+    "max_interval": "30s",
+    "max_elapsed_time": "0s"
+   },
+   "sending_queue": {
+    "enabled": true,
+    "queue_size": 1000,
+    "storage": "file_storage"
+   }
+  },
+  "file/traces": {
+   "path": "/data/traces.jsonl",
+   "rotation": {
+    "max_megabytes": 100,
+    "max_backups": 10
+   }
+  },
+  "file/logs": {
+   "path": "/data/logs.jsonl",
+   "rotation": {
+    "max_megabytes": 50,
+    "max_backups": 5
+   }
+  }
+ },
+ "service": {
+  "extensions": [
+   "file_storage",
+   "health_check"
+  ],
+  "telemetry": {
+   "metrics": {
+    "readers": [
+     {
+      "pull": {
+       "exporter": {
+        "prometheus": {
+         "host": "127.0.0.1",
+         "port": 8888
+        }
+       }
+      }
+     }
+    ]
+   }
+  },
+  "pipelines": {
+   "traces": {
+    "receivers": [
+     "otlp",
+     "otlp/keycloak"
+    ],
+    "processors": [
+     "memory_limiter",
+     "filter/health",
+     "transform/sanitize",
+     "resource/host",
+     "batch"
+    ],
+    "exporters": [
+     "otlp",
+     "file/traces"
+    ]
+   },
+   "metrics": {
+    "receivers": [
+     "otlp",
+     "otlp/keycloak",
+     "docker_stats",
+     "hostmetrics",
+     "postgresql",
+     "mongodb",
+     "redis",
+     "rabbitmq",
+     "prometheus/self"
+    ],
+    "processors": [
+     "memory_limiter",
+     "resource/host",
+     "batch"
+    ],
+    "exporters": [
+     "otlp"
+    ]
+   },
+   "logs": {
+    "receivers": [
+     "filelog/payment-service",
+     "filelog/booking-service",
+     "filelog/event-service",
+     "filelog/keycloak",
+     "filelog/discovery-server",
+     "filelog/api-gateway",
+     "filelog/ticket-service",
+     "filelog/user-service"
+    ],
+    "processors": [
+     "memory_limiter",
+     "resource/host",
+     "batch"
+    ],
+    "exporters": [
+     "otlp",
+     "file/logs"
+    ]
+   }
+  }
+ }
+}

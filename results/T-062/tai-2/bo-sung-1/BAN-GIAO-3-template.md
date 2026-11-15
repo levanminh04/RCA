@@ -1,0 +1,30 @@
+# Bàn giao 3 — tích hợp sau bảo trì exp-app
+
+@UTC@. Codex L1 → Claude điều phối/phản biện. Đã tiếp tục đúng ba việc trong `results/T-062/codex/L1-tiep-1-brief.md`. D2 `d2b-2a7f481a` được giữ nguyên; chỉ bắt đầu kiểm tải sau khi máy tải không còn container `rca-tai-` đang chạy. Marker bảo trì hoàn tất: `EXP-APP-BAO-TRI-1-XONG`, 12/11 23:41:18Z; ứng dụng vẫn image hiện hành, không redeploy trong L1.
+
+Bàn giao này thay mô tả tunnel phụ thuộc laptop trong bàn giao 1–2. Các kết quả/lượt cũ và manifest cũ giữ làm lịch sử; nguồn hiện hành được băm ở manifest bổ sung, không kiểm hash source mới bằng manifest phát hành cũ. `tunnel-state.json` hiện là mode remote; bộ chạy dùng `Test-L1Duong`, không lấy PID Windows cũ làm điều kiện sống/chết.
+
+**Giao dịch mới:** @PURCHASE@. Chuỗi trạng thái API quan sát @STATES@. IPN/return/checkout @CALLBACK@. Chỉ gọi API hợp lệ, không sửa DB/code nghiệp vụ, không tự phát traceparent. Đường dẫn bằng chứng: `bo-sung-1/giao-dich-sau-bao-tri.json`; log/trace bổ sung theo file tại cùng thư mục.
+
+**Pilot 5 phút:** `@PILOT_TAG@`: @PILOT@. Không dùng pilot cũ trước bảo trì thay phép kiểm này. Source/config và JSON/CSV giữ trong thư mục lượt; đổi bậc tải là nhánh tùy chọn, pilot chuẩn vẫn một scenario.
+
+@INITIAL_PILOT@
+
+**Bậc tải:** `Start-Tai` có `-BuocTai`; kết quả lượt 240 s, bậc 120 s, ×3 ở `bo-sung-1/buoc-tai.md`. Báo request/s theo 30 s ở cả k6 và gateway; không tự đặt ngưỡng chênh lệch. @STEP@
+
+**Độ bền:** `Test-L1Duong` kiểm PID/health mock, health từ AWS và token count/hạn/quyền file. Tunnel đã chuyển sang reverse SSH trực tiếp exp-app → AWS, supervisor chạy riêng trên exp-app; không còn phụ thuộc process Codex/laptop. Khóa mới chỉ forward AWS loopback 19091 tới mock exp-app 19090, không cấp shell, private key chỉ ở exp-app. @DURABILITY@. Giữ state/audit/log cũ và sự kiện khôi phục, không mở firewall. Script từ chối đổi đường/token khi có workload đang chạy hoặc marker bảo trì chưa hoàn tất.
+
+```powershell
+. ./results/T-062/tai-2/chay-tai.ps1
+Test-L1Duong
+Start-Tai -Scenario hanh-trinh -Seconds 1800 -Tag <ma-moi> -May tai
+# Một lượt tăng bậc:
+Start-Tai -Scenario hanh-trinh -Seconds 1800 -BuocTai 600 -Multiplier 3 -Tag <ma-moi-khac> -May tai
+Get-Tai -Tag <ma> -May tai
+Receive-Tai -Scenario hanh-trinh -Tag <ma> -May tai
+Stop-Tai -Tag <ma> -May tai
+```
+
+Không gọi hai Start đồng thời. Start tự gọi Test và cấp phiên mới ngoài cửa sổ; không dùng `-Rate 5` cũ vì nhánh hành trình đếm trên 10 s. Mốc bậc phải còn trong hạn seed refresh của scenario chờ; Start kiểm và báo trước khi phát. Trong chu kỳ, VU tự refresh ở tuổi 200 s. R-04/R-09 toàn gói và các quyết định cấu hình thu vẫn thuộc T-063/điều phối; các lượt khỏe không bảo đảm 20 VU đủ khi mọi request bị chậm 35 s.
+
+**Phạm vi và kiểm:** chỉ file trong tai-2, codex/L1-* và nối ha-tang/thay-doi.md. Không sửa tasks/docs/src, C1 cũ, repo FlashTicket, không commit/push. Các snapshot và manifest cũ được giữ. Hash/script/đầu ra bổ sung nằm ở `bo-sung-1/manifest-bo-sung-1.json`. Prompt phản biện trung tính: `PROMPT-CLAUDE-bo-sung-1.md`. Những điểm chưa chắc và hạn chế cụ thể ghi trong báo cáo bổ sung; không tự đóng câu hỏi nghiên cứu hoặc nghiệm thu T-063.

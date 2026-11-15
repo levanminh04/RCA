@@ -1,0 +1,135 @@
+{
+ "ghi_utc": "2026-11-13T07:46:20.735558+00:00",
+ "muc_dich": "đáp án tập chọn dev bản 2 cho bộ chấm T-064, khai TRƯỚC khi chấm; chỉ phía chấm, không vào phương pháp",
+ "nguon": {
+  "results/T-059/danh-muc-loi.json": "3d11fafd8afa2d26270cf12eb06fc62aa6965f066aaff202e95890e665a364e1",
+  "results/T-063/o-dev-bo-sung.md": "f21d0c286f74168ccfc686b7046278205769ad906ab9f503013364ab346109df"
+ },
+ "o_loi": [
+  {
+   "o": "EVENT-DB-LAT",
+   "nguon_o_T059": "EVENT-DB-LAT",
+   "split_T059": "phát triển",
+   "root": {
+    "type": "edge",
+    "caller": "event-service",
+    "callee": "event_db",
+    "kind": "data"
+   },
+   "tap_chap_nhan": [
+    "event-service",
+    "event_db"
+   ],
+   "ghi_chu": ""
+  },
+  {
+   "o": "REDIS-BOOK",
+   "nguon_o_T059": "REDIS-BOOK",
+   "split_T059": "phát triển",
+   "root": {
+    "type": "edge",
+    "caller": "booking-service",
+    "callee": "cache",
+    "kind": "data"
+   },
+   "tap_chap_nhan": [
+    "booking-service",
+    "cache"
+   ],
+   "ghi_chu": ""
+  },
+  {
+   "o": "NET-GW-BOOK",
+   "nguon_o_T059": "NET-GW-BOOK",
+   "split_T059": "phát triển",
+   "root": {
+    "type": "edge",
+    "caller": "api-gateway",
+    "callee": "booking-service",
+    "kind": "http"
+   },
+   "tap_chap_nhan": [
+    "api-gateway",
+    "booking-service"
+   ],
+   "ghi_chu": ""
+  },
+  {
+   "o": "HTTP5-EVENT",
+   "nguon_o_T059": "HTTP5-EVENT",
+   "split_T059": "phát triển",
+   "root": {
+    "type": "node",
+    "id": "event-service"
+   },
+   "tap_chap_nhan": [
+    "event-service"
+   ],
+   "ghi_chu": ""
+  },
+  {
+   "o": "HTTP5-EVENT-FLASH",
+   "nguon_o_T059": "HTTP5-EVENT",
+   "split_T059": "phát triển",
+   "root": {
+    "type": "node",
+    "id": "event-service"
+   },
+   "tap_chap_nhan": [
+    "event-service"
+   ],
+   "ghi_chu": "cùng hook/đích với HTTP5-EVENT dưới tải ×3 từ t (WHY-83 thay SLOW-BOOK-FLASH)"
+  },
+  {
+   "o": "CPU-BOOK-1",
+   "nguon_o_T059": "CPU-BOOK",
+   "split_T059": "phát triển",
+   "root": {
+    "type": "node",
+    "id": "booking-service"
+   },
+   "tap_chap_nhan": [
+    "booking-service"
+   ],
+   "ghi_chu": "1 luồng đốt (o-dev-bo-sung.md)"
+  },
+  {
+   "o": "CPU-BOOK-2",
+   "nguon_o_T059": "CPU-BOOK",
+   "split_T059": "phát triển",
+   "root": {
+    "type": "node",
+    "id": "booking-service"
+   },
+   "tap_chap_nhan": [
+    "booking-service"
+   ],
+   "ghi_chu": "2 luồng = CPU-BOOK T-062"
+  },
+  {
+   "o": "PAUSE-PAYMENT",
+   "nguon_o_T059": null,
+   "split_T059": "dev bổ sung T-063",
+   "root": {
+    "type": "node",
+    "id": "payment-service"
+   },
+   "tap_chap_nhan": [
+    "payment-service"
+   ],
+   "ghi_chu": "results/T-063/o-dev-bo-sung.md dòng PAUSE-PAYMENT"
+  }
+ ],
+ "o_khong_loi": [
+  {
+   "o": "BINH-THUONG",
+   "vai_tro": "ca không tiêm lỗi (K)"
+  },
+  {
+   "o": "FLASH-HEALTHY",
+   "vai_tro": "ca không tiêm lỗi (K), nhóm riêng FLASH",
+   "nguon_o_T059": "FLASH-HEALTHY"
+  }
+ ],
+ "quy_uoc": "tập chấp nhận rỗng ở T-059 với gốc nút → tập = {nút gốc}; ô gốc cạnh: bảng cạnh chấm đúng cạnh có hướng+loại (tieu-chi-chon §2)"
+}

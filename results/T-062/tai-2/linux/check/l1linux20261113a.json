@@ -1,0 +1,88 @@
+{
+  "tag": "l1linux20261113a",
+  "run": {
+    "scenario": "hanh-trinh",
+    "seconds": 150,
+    "rate": 12,
+    "timeUnit": "10s",
+    "multiplier": 1,
+    "stepSeconds": 0,
+    "mockTransport": "http://127.0.0.1:19091"
+  },
+  "totals": {
+    "journey_started": 180,
+    "http_reqs": 809,
+    "route_responses": 773,
+    "journey_finished": 180,
+    "iterations": 180
+  },
+  "journeys": {
+    "journey_started": {
+      "browse": 126,
+      "purchase": 36,
+      "abandon": 9,
+      "cancel": 9
+    },
+    "journey_finished": {
+      "browse": 126,
+      "purchase": 36,
+      "abandon": 9,
+      "cancel": 9
+    },
+    "journey_failed": {}
+  },
+  "mixMeasuredPercent": {
+    "browse": 70.0,
+    "purchase": 20.0,
+    "abandon": 5.0,
+    "cancel": 5.0
+  },
+  "gateway": {
+    "total": 789,
+    "routeIds": {
+      "unmatched": 16,
+      "event": 360,
+      "booking": 341,
+      "payment": 36,
+      "ticket": 36
+    },
+    "matchedRoutes": {
+      "GET /api/v1/events": 180,
+      "GET /api/v1/events/{id}": 180,
+      "GET /api/v1/events/{id}/availability": 180,
+      "POST /api/v1/orders": 54,
+      "POST /api/v1/payments": 36,
+      "GET /api/v1/orders/{id}": 98,
+      "GET /api/v1/orders/{id}/tickets": 36,
+      "POST /api/v1/orders/{id}/cancel": 9
+    },
+    "missing": [],
+    "mismatches": []
+  },
+  "outsideWorkload": 16,
+  "checks": [
+    {
+      "run": "l1linux20261113a",
+      "checks": {
+        "csvEqualsJson": true,
+        "manifestAllMatched": true,
+        "httpSummaryEqual": true,
+        "allJourneyStartsFinishedOrFailed": true,
+        "requestLogEqualsCounter": true,
+        "uniqueIdentityPerRequest": true
+      },
+      "counts": {
+        "journey_started": 180,
+        "http_reqs": 809,
+        "route_responses": 773,
+        "journey_finished": 180
+      },
+      "stateCounts": {
+        "purchase|COMPLETED": 36,
+        "abandon|PENDING_PAYMENT": 9,
+        "cancel|CANCELLED": 9
+      },
+      "manifestFiles": 12
+    }
+  ]
+}

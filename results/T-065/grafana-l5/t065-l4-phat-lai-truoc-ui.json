@@ -1,0 +1,908 @@
+{
+ "uid": "t065-l4-phat-lai",
+ "id": null,
+ "version": 1,
+ "title": "T-065 L4 — phát lại CÓ ĐÁP ÁN",
+ "tags": [
+  "RCA",
+  "T-065",
+  "L4"
+ ],
+ "timezone": "utc",
+ "editable": false,
+ "schemaVersion": 42,
+ "refresh": "",
+ "timepicker": {
+  "hidden": true
+ },
+ "time": {
+  "from": "1794444870000",
+  "to": "1794445469999"
+ },
+ "templating": {
+  "list": [
+   {
+    "name": "ban",
+    "label": "ban",
+    "type": "query",
+    "datasource": {
+     "type": "yesoreyeram-infinity-datasource",
+     "uid": "infinity-rca"
+    },
+    "query": {
+     "queryType": "infinity",
+     "infinityQuery": {
+      "refId": "v",
+      "datasource": {
+       "type": "yesoreyeram-infinity-datasource",
+       "uid": "infinity-rca"
+      },
+      "type": "json",
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+      "url": "http://localhost:3000/public/rca/t065-l4-001/chi-muc-ban.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+      },
+      "root_selector": "$$.([ban.{\"__text\":ban & \" — \" & trang_thai,\"__value\":ban}])",
+      "columns": [
+       {
+        "selector": "__text",
+        "text": "__text",
+        "type": "string"
+       },
+       {
+        "selector": "__value",
+        "text": "__value",
+        "type": "string"
+       }
+      ]
+     },
+     "query": "",
+     "refId": "variable"
+    },
+    "refresh": 1,
+    "hide": 0,
+    "includeAll": false,
+    "multi": false,
+    "current": {
+     "text": "p7",
+     "value": "p7"
+    },
+    "options": []
+   },
+   {
+    "name": "ca",
+    "label": "ca",
+    "type": "query",
+    "datasource": {
+     "type": "yesoreyeram-infinity-datasource",
+     "uid": "infinity-rca"
+    },
+    "query": {
+     "queryType": "infinity",
+     "infinityQuery": {
+      "refId": "v",
+      "datasource": {
+       "type": "yesoreyeram-infinity-datasource",
+       "uid": "infinity-rca"
+      },
+      "type": "json",
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+      "url": "http://localhost:3000/public/rca/t065-l4-001/${ban}/chi-muc.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+      },
+      "root_selector": "$$.([su_co.{\"__text\":ma & \" (\" & nguon & \")\",\"__value\":ma}])",
+      "columns": [
+       {
+        "selector": "__text",
+        "text": "__text",
+        "type": "string"
+       },
+       {
+        "selector": "__value",
+        "text": "__value",
+        "type": "string"
+       }
+      ]
+     },
+     "query": "",
+     "refId": "variable"
+    },
+    "refresh": 1,
+    "hide": 2,
+    "includeAll": false,
+    "multi": false,
+    "current": {
+     "text": "00eaea92",
+     "value": "00eaea92"
+    },
+    "options": []
+   },
+   {
+    "name": "dv",
+    "label": "dv",
+    "type": "query",
+    "datasource": {
+     "type": "yesoreyeram-infinity-datasource",
+     "uid": "infinity-rca"
+    },
+    "query": {
+     "queryType": "infinity",
+     "infinityQuery": {
+      "refId": "v",
+      "datasource": {
+       "type": "yesoreyeram-infinity-datasource",
+       "uid": "infinity-rca"
+      },
+      "type": "json",
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+      "url": "http://localhost:3000/public/rca/t065-l4-001/${ban}/vue/${ca}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+      },
+      "root_selector": "$$.([ranking_rows.{\"__text\":entity,\"__value\":entity}])",
+      "columns": [
+       {
+        "selector": "__text",
+        "text": "__text",
+        "type": "string"
+       },
+       {
+        "selector": "__value",
+        "text": "__value",
+        "type": "string"
+       }
+      ]
+     },
+     "query": "",
+     "refId": "variable"
+    },
+    "refresh": 1,
+    "hide": 0,
+    "includeAll": false,
+    "multi": false,
+    "current": {
+     "text": "payment-service",
+     "value": "payment-service"
+    },
+    "options": []
+   },
+   {
+    "name": "dv_svc",
+    "label": "dv_svc",
+    "type": "query",
+    "datasource": {
+     "type": "yesoreyeram-infinity-datasource",
+     "uid": "infinity-rca"
+    },
+    "query": {
+     "queryType": "infinity",
+     "infinityQuery": {
+      "refId": "v",
+      "datasource": {
+       "type": "yesoreyeram-infinity-datasource",
+       "uid": "infinity-rca"
+      },
+      "type": "json",
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+      "url": "http://localhost:3000/public/rca/t065-l4-001/${ban}/vue/${ca}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+      },
+      "root_selector": "$$.([{\"v\":\"${dv}\"=\"config-discovery\"?\"discovery-server\":\"${dv}\"}])",
+      "columns": [
+       {
+        "selector": "v",
+        "text": "v",
+        "type": "string"
+       }
+      ]
+     },
+     "query": "",
+     "refId": "variable"
+    },
+    "refresh": 1,
+    "hide": 2,
+    "includeAll": false,
+    "multi": false,
+    "current": {},
+    "options": []
+   },
+   {
+    "name": "t_tu",
+    "label": "t_tu",
+    "type": "query",
+    "datasource": {
+     "type": "yesoreyeram-infinity-datasource",
+     "uid": "infinity-rca"
+    },
+    "query": {
+     "queryType": "infinity",
+     "infinityQuery": {
+      "refId": "v",
+      "datasource": {
+       "type": "yesoreyeram-infinity-datasource",
+       "uid": "infinity-rca"
+      },
+      "type": "json",
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+      "url": "http://localhost:3000/public/rca/t065-l4-001/${ban}/vue/${ca}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+      },
+      "root_selector": "$$.([{\"v\":cua_so_ms[0]}])",
+      "columns": [
+       {
+        "selector": "v",
+        "text": "v",
+        "type": "number"
+       }
+      ]
+     },
+     "query": "",
+     "refId": "variable"
+    },
+    "refresh": 1,
+    "hide": 2,
+    "includeAll": false,
+    "multi": false,
+    "current": {},
+    "options": []
+   },
+   {
+    "name": "t_den",
+    "label": "t_den",
+    "type": "query",
+    "datasource": {
+     "type": "yesoreyeram-infinity-datasource",
+     "uid": "infinity-rca"
+    },
+    "query": {
+     "queryType": "infinity",
+     "infinityQuery": {
+      "refId": "v",
+      "datasource": {
+       "type": "yesoreyeram-infinity-datasource",
+       "uid": "infinity-rca"
+      },
+      "type": "json",
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+      "url": "http://localhost:3000/public/rca/t065-l4-001/${ban}/vue/${ca}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+      },
+      "root_selector": "$$.([{\"v\":cua_so_ms[1]-1}])",
+      "columns": [
+       {
+        "selector": "v",
+        "text": "v",
+        "type": "number"
+       }
+      ]
+     },
+     "query": "",
+     "refId": "variable"
+    },
+    "refresh": 1,
+    "hide": 2,
+    "includeAll": false,
+    "multi": false,
+    "current": {},
+    "options": []
+   },
+   {
+    "name": "op",
+    "label": "op",
+    "type": "query",
+    "datasource": {
+     "type": "yesoreyeram-infinity-datasource",
+     "uid": "infinity-rca"
+    },
+    "query": {
+     "queryType": "infinity",
+     "infinityQuery": {
+      "refId": "v",
+      "datasource": {
+       "type": "yesoreyeram-infinity-datasource",
+       "uid": "infinity-rca"
+      },
+      "type": "json",
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+      "url": "http://localhost:3000/public/rca/t065-l4-001/${ban}/thao-tac-vue/${ca}/${dv}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+      },
+      "root_selector": "$$.([thao_tac.{\"__text\":ten,\"__value\":id}])",
+      "columns": [
+       {
+        "selector": "__text",
+        "text": "__text",
+        "type": "string"
+       },
+       {
+        "selector": "__value",
+        "text": "__value",
+        "type": "string"
+       }
+      ]
+     },
+     "query": "",
+     "refId": "variable"
+    },
+    "refresh": 1,
+    "hide": 0,
+    "includeAll": false,
+    "multi": false,
+    "current": {},
+    "options": []
+   }
+  ]
+ },
+ "links": [],
+ "panels": [
+  {
+   "id": 1,
+   "type": "text",
+   "title": "Kết quả theo bản và ca",
+   "gridPos": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 5
+   },
+   "options": {
+    "mode": "markdown",
+    "content": "Bản **${ban}**, ca **${ca}**. Đổi bản giữ cùng ca; chọn ca bằng bảng bên dưới để đặt đúng khung giờ. Hạng/cờ lấy nguyên từ đầu ra phương pháp; nhóm nút là tie_group + 1, không chấm lại. Điểm e chỉ ở chi tiết thao tác. Cửa sổ **[t−300,t+300)**. Trạng thái truy vấn là snapshot tại giờ ghi, có thể khác dữ liệu sống sau đó. LLM chưa triển khai.\n\n[Về trang chính](/d/t065-l4-rca?var-ban=${ban:percentencode}&var-ca=${ca}&var-dv=${dv}&var-op=${op}&from=${t_tu}&to=${t_den})"
+   }
+  },
+  {
+   "id": 2,
+   "type": "table",
+   "title": "Danh sách ca — bấm mã để mở đúng cửa sổ",
+   "gridPos": {
+    "x": 0,
+    "y": 5,
+    "w": 24,
+    "h": 8
+   },
+   "datasource": {
+    "type": "yesoreyeram-infinity-datasource",
+    "uid": "infinity-rca"
+   },
+   "targets": [
+    {
+     "refId": "list",
+     "datasource": {
+      "type": "yesoreyeram-infinity-datasource",
+      "uid": "infinity-rca"
+     },
+     "type": "json",
+     "source": "url",
+     "parser": "backend",
+     "format": "table",
+     "url": "http://localhost:3000/public/rca/t065-l4-001/${ban}/chi-muc.json",
+     "url_options": {
+      "method": "GET",
+      "data": ""
+     },
+     "root_selector": "su_co",
+     "columns": [
+      {
+       "selector": "ma",
+       "text": "ma",
+       "type": "string"
+      },
+      {
+       "selector": "nguon",
+       "text": "nguon",
+       "type": "string"
+      },
+      {
+       "selector": "ket_luan",
+       "text": "ket_luan",
+       "type": "string"
+      },
+      {
+       "selector": "tu",
+       "text": "tu",
+       "type": "number"
+      },
+      {
+       "selector": "den",
+       "text": "den",
+       "type": "number"
+      }
+     ]
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "custom": {
+      "cellOptions": {
+       "type": "auto"
+      }
+     },
+     "noValue": "—"
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "ma"
+      },
+      "properties": [
+       {
+        "id": "links",
+        "value": [
+         {
+          "title": "Mở ca",
+          "url": "/d/t065-l4-phat-lai?var-ban=${ban:percentencode}&var-ca=${__data.fields.ma}&var-dv=${dv}&var-op=&from=${__data.fields.tu}&to=${__data.fields.den}"
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm",
+    "footer": {
+     "show": false
+    }
+   }
+  },
+  {
+   "id": 3,
+   "type": "table",
+   "title": "Bản, hash, trạng thái và cửa sổ",
+   "gridPos": {
+    "x": 0,
+    "y": 13,
+    "w": 24,
+    "h": 7
+   },
+   "datasource": {
+    "type": "yesoreyeram-infinity-datasource",
+    "uid": "infinity-rca"
+   },
+   "targets": [
+    {
+     "refId": "meta",
+     "datasource": {
+      "type": "yesoreyeram-infinity-datasource",
+      "uid": "infinity-rca"
+     },
+     "type": "json",
+     "source": "url",
+     "parser": "backend",
+     "format": "table",
+     "url": "http://localhost:3000/public/rca/t065-l4-001/${ban}/vue/${ca}.json",
+     "url_options": {
+      "method": "GET",
+      "data": ""
+     },
+     "root_selector": "$$.([{\"ban\":ban.ban,\"trang_thai\":ban.trang_thai,\"cau_hinh_sha256\":ban.cau_hinh_sha256,\"ma_nguon_sha256\":ban.ma_nguon_sha256,\"ghi_chu_hash\":ban.ghi_chu_hash,\"tu\":tu_utc,\"den_loai_tru\":den_loai_tru,\"ket_luan\":su_co.ket_luan,\"nguon\":ban.nguon_output,\"gioi_han\":gioi_han}])",
+     "columns": [
+      {
+       "selector": "ban",
+       "text": "ban",
+       "type": "string"
+      },
+      {
+       "selector": "trang_thai",
+       "text": "trang_thai",
+       "type": "string"
+      },
+      {
+       "selector": "cau_hinh_sha256",
+       "text": "cau_hinh_sha256",
+       "type": "string"
+      },
+      {
+       "selector": "ma_nguon_sha256",
+       "text": "ma_nguon_sha256",
+       "type": "string"
+      },
+      {
+       "selector": "ghi_chu_hash",
+       "text": "ghi_chu_hash",
+       "type": "string"
+      },
+      {
+       "selector": "tu",
+       "text": "tu",
+       "type": "string"
+      },
+      {
+       "selector": "den_loai_tru",
+       "text": "den_loai_tru",
+       "type": "string"
+      },
+      {
+       "selector": "ket_luan",
+       "text": "ket_luan",
+       "type": "string"
+      },
+      {
+       "selector": "nguon",
+       "text": "nguon",
+       "type": "string"
+      },
+      {
+       "selector": "gioi_han",
+       "text": "gioi_han",
+       "type": "string"
+      }
+     ]
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "custom": {
+      "cellOptions": {
+       "type": "auto"
+      }
+     },
+     "noValue": "—"
+    },
+    "overrides": []
+   },
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm",
+    "footer": {
+     "show": false
+    }
+   }
+  },
+  {
+   "id": 4,
+   "type": "table",
+   "title": "Thực thể theo entity_ranking — giữ thứ tự nguồn",
+   "gridPos": {
+    "x": 0,
+    "y": 20,
+    "w": 24,
+    "h": 10
+   },
+   "datasource": {
+    "type": "yesoreyeram-infinity-datasource",
+    "uid": "infinity-rca"
+   },
+   "targets": [
+    {
+     "refId": "rank",
+     "datasource": {
+      "type": "yesoreyeram-infinity-datasource",
+      "uid": "infinity-rca"
+     },
+     "type": "json",
+     "source": "url",
+     "parser": "backend",
+     "format": "table",
+     "url": "http://localhost:3000/public/rca/t065-l4-001/${ban}/phat-lai/${ca}.json",
+     "url_options": {
+      "method": "GET",
+      "data": ""
+     },
+     "root_selector": "ranking_rows",
+     "columns": [
+      {
+       "selector": "entity",
+       "text": "entity",
+       "type": "string"
+      },
+      {
+       "selector": "hang",
+       "text": "hang",
+       "type": "number"
+      },
+      {
+       "selector": "tie_group",
+       "text": "tie_group",
+       "type": "number"
+      },
+      {
+       "selector": "lop",
+       "text": "lop",
+       "type": "string"
+      },
+      {
+       "selector": "so_kenh_co",
+       "text": "so_kenh_co",
+       "type": "number"
+      }
+     ]
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "custom": {
+      "cellOptions": {
+       "type": "auto"
+      }
+     },
+     "noValue": "—"
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "hang"
+      },
+      "properties": [
+       {
+        "id": "displayName",
+        "value": "Nhóm (tie_group + 1)"
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "entity"
+      },
+      "properties": [
+       {
+        "id": "links",
+        "value": [
+         {
+          "title": "Mở service và thao tác",
+          "url": "/d/t065-l4-rca?var-ban=${ban:percentencode}&var-ca=${ca}&var-dv=${__data.fields.entity}&var-op=&from=${t_tu}&to=${t_den}"
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm",
+    "footer": {
+     "show": false
+    }
+   }
+  },
+  {
+   "id": 5,
+   "type": "table",
+   "title": "Trạng thái đầu ra cạnh",
+   "gridPos": {
+    "x": 0,
+    "y": 30,
+    "w": 24,
+    "h": 3
+   },
+   "datasource": {
+    "type": "yesoreyeram-infinity-datasource",
+    "uid": "infinity-rca"
+   },
+   "targets": [
+    {
+     "refId": "edge_state",
+     "datasource": {
+      "type": "yesoreyeram-infinity-datasource",
+      "uid": "infinity-rca"
+     },
+     "type": "json",
+     "source": "url",
+     "parser": "backend",
+     "format": "table",
+     "url": "http://localhost:3000/public/rca/t065-l4-001/${ban}/vue/${ca}.json",
+     "url_options": {
+      "method": "GET",
+      "data": ""
+     },
+     "root_selector": "$$.([{\"ket_qua\":trang_thai_canh}])",
+     "columns": [
+      {
+       "selector": "ket_qua",
+       "text": "ket_qua",
+       "type": "string"
+      }
+     ]
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "custom": {
+      "cellOptions": {
+       "type": "auto"
+      }
+     },
+     "noValue": "—"
+    },
+    "overrides": []
+   },
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm",
+    "footer": {
+     "show": false
+    }
+   }
+  },
+  {
+   "id": 6,
+   "type": "table",
+   "title": "Cạnh xếp hạng M1-FT — nguyên thứ tự và hạng nguồn",
+   "gridPos": {
+    "x": 0,
+    "y": 33,
+    "w": 24,
+    "h": 10
+   },
+   "datasource": {
+    "type": "yesoreyeram-infinity-datasource",
+    "uid": "infinity-rca"
+   },
+   "targets": [
+    {
+     "refId": "edge_rank",
+     "datasource": {
+      "type": "yesoreyeram-infinity-datasource",
+      "uid": "infinity-rca"
+     },
+     "type": "json",
+     "source": "url",
+     "parser": "backend",
+     "format": "table",
+     "url": "http://localhost:3000/public/rca/t065-l4-001/${ban}/phat-lai/${ca}.json",
+     "url_options": {
+      "method": "GET",
+      "data": ""
+     },
+     "root_selector": "canh_xep_hang",
+     "columns": [
+      {
+       "selector": "nguon",
+       "text": "nguon",
+       "type": "string"
+      },
+      {
+       "selector": "dich",
+       "text": "dich",
+       "type": "string"
+      },
+      {
+       "selector": "loai",
+       "text": "loai",
+       "type": "string"
+      },
+      {
+       "selector": "hang",
+       "text": "hang",
+       "type": "number"
+      },
+      {
+       "selector": "tie_group",
+       "text": "tie_group",
+       "type": "number"
+      },
+      {
+       "selector": "co",
+       "text": "co",
+       "type": "number"
+      },
+      {
+       "selector": "trang_thai",
+       "text": "trang_thai",
+       "type": "string"
+      },
+      {
+       "selector": "nguon_xac_minh",
+       "text": "nguon_xac_minh",
+       "type": "string"
+      }
+     ]
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "custom": {
+      "cellOptions": {
+       "type": "auto"
+      }
+     },
+     "noValue": "—"
+    },
+    "overrides": []
+   },
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm",
+    "footer": {
+     "show": false
+    }
+   }
+  },
+  {
+   "id": 7,
+   "type": "table",
+   "title": "Phát lại — lớp dữ liệu tách riêng",
+   "gridPos": {
+    "x": 0,
+    "y": 43,
+    "w": 24,
+    "h": 10
+   },
+   "datasource": {
+    "type": "yesoreyeram-infinity-datasource",
+    "uid": "infinity-rca"
+   },
+   "targets": [
+    {
+     "refId": "replay",
+     "datasource": {
+      "type": "yesoreyeram-infinity-datasource",
+      "uid": "infinity-rca"
+     },
+     "type": "json",
+     "source": "url",
+     "parser": "backend",
+     "format": "table",
+     "url": "http://localhost:3000/public/rca/t065-l4-001/${ban}/phat-lai/${ca}.json",
+     "url_options": {
+      "method": "GET",
+      "data": ""
+     },
+     "root_selector": "$$.([{\"phat_lai\":$string(phat_lai),\"gioi_han\":gioi_han}])",
+     "columns": [
+      {
+       "selector": "phat_lai",
+       "text": "phat_lai",
+       "type": "string"
+      },
+      {
+       "selector": "gioi_han",
+       "text": "gioi_han",
+       "type": "string"
+      }
+     ]
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "custom": {
+      "cellOptions": {
+       "type": "auto"
+      }
+     },
+     "noValue": "—"
+    },
+    "overrides": []
+   },
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm",
+    "footer": {
+     "show": false
+    }
+   }
+  }
+ ]
+}

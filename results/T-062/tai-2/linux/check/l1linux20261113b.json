@@ -1,0 +1,90 @@
+{
+  "tag": "l1linux20261113b",
+  "run": {
+    "scenario": "hanh-trinh",
+    "seconds": 180,
+    "rate": 12,
+    "timeUnit": "10s",
+    "multiplier": 3,
+    "stepSeconds": 90,
+    "mockTransport": "http://127.0.0.1:19091"
+  },
+  "totals": {
+    "journey_started": 433,
+    "http_reqs": 1962,
+    "route_responses": 1869,
+    "journey_finished": 433,
+    "iterations": 433,
+    "token_refresh_success": 5
+  },
+  "journeys": {
+    "journey_started": {
+      "browse": 303,
+      "purchase": 88,
+      "abandon": 21,
+      "cancel": 21
+    },
+    "journey_finished": {
+      "browse": 303,
+      "purchase": 88,
+      "abandon": 21,
+      "cancel": 21
+    },
+    "journey_failed": {}
+  },
+  "mixMeasuredPercent": {
+    "browse": 69.9769053117783,
+    "purchase": 20.323325635103927,
+    "abandon": 4.849884526558891,
+    "cancel": 4.849884526558891
+  },
+  "gateway": {
+    "total": 1888,
+    "routeIds": {
+      "event": 866,
+      "booking": 827,
+      "payment": 88,
+      "unmatched": 19,
+      "ticket": 88
+    },
+    "matchedRoutes": {
+      "GET /api/v1/events": 433,
+      "GET /api/v1/events/{id}": 433,
+      "GET /api/v1/events/{id}/availability": 433,
+      "POST /api/v1/orders": 130,
+      "POST /api/v1/payments": 88,
+      "GET /api/v1/orders/{id}": 243,
+      "GET /api/v1/orders/{id}/tickets": 88,
+      "POST /api/v1/orders/{id}/cancel": 21
+    },
+    "missing": [],
+    "mismatches": []
+  },
+  "outsideWorkload": 19,
+  "checks": [
+    {
+      "run": "l1linux20261113b",
+      "checks": {
+        "csvEqualsJson": true,
+        "manifestAllMatched": true,
+        "httpSummaryEqual": true,
+        "allJourneyStartsFinishedOrFailed": true,
+        "requestLogEqualsCounter": true,
+        "uniqueIdentityPerRequest": true
+      },
+      "counts": {
+        "journey_started": 433,
+        "http_reqs": 1962,
+        "route_responses": 1869,
+        "journey_finished": 433,
+        "token_refresh_success": 5
+      },
+      "stateCounts": {
+        "purchase|COMPLETED": 88,
+        "abandon|PENDING_PAYMENT": 21,
+        "cancel|CANCELLED": 21
+      },
+      "manifestFiles": 12
+    }
+  ]
+}

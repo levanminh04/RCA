@@ -1,0 +1,45 @@
+{
+  "frozen_utc": "2026-11-10T21:15:00.770701+00:00",
+  "scope": "C4 feasibility only; one reversible probe plus one normal window under STEER #3; not SPEC 3+1",
+  "mode": "a",
+  "method": "unchanged P7; seven arguments only; locked configuration from T054 main013-v2",
+  "planned_cases": [
+    {
+      "opaque_id": "8d31bc06",
+      "operator_only_role": "normal",
+      "t": 1794346500
+    },
+    {
+      "opaque_id": "a7c92f1e",
+      "operator_only_role": "one reversible process pause",
+      "t_rule": "floor confirmed intervention epoch_ns / 1e9, from operator ledger; only t crosses into request.json",
+      "planned_not_before_utc": "2026-11-10T21:50:00Z",
+      "component": "booking-service",
+      "duration_seconds": 300
+    }
+  ],
+  "method_window_rule": "[t-300s,t+300s); spans must start >= lower and end < upper",
+  "raw_pack_window_rule": "[t-600s,t+600s); stage only after upper bound plus export flush",
+  "load": "fixed arrival 1 request/s, equal alternating catalog/detail/availability, 21:15-22:15Z",
+  "resource_windows": "20:45-21:15 idle; 21:15-21:45 load; no intervention during these windows",
+  "repeat": "two runs per identical frozen input with fresh in-memory cache; compare canonical output SHA256",
+  "checks": [
+    "39 source pins",
+    "manifest hashes",
+    "forbidden fields recursively",
+    "opaque IDs and ledger paths excluded",
+    "rca user cannot read operator ledger",
+    "inspect nonempty intermediate spans/nodes/edges and fallback counts"
+  ],
+  "interpretation": "Record ERROR/UNSUPPORTED/NO_TARGET without inventing data; diagnose adapter or orchestration errors separately. No efficacy or RQ5 claim.",
+  "files_sha256": {
+    "src/m1/adapter_flashticket.py": "392026616108b5a97bb5f57df26be774f8469ff46d786526ea1dc05b8fdcdd20",
+    "stage-m1.py": "d3a97d4db5fef6397f210ee9d21dfc25a659d55e0c02871cdcc005d268abb430",
+    "run-m1.py": "7c8f731f0e8bba3bcae84cd5d7dabf14315ea92f4ca59bd94ff64d1614e9ab77",
+    "m1-p7-config.json": "eb7dddd705d50b7b184ad222950d18aec0b91b6b4d7607ba2ee61b8a1fdb4c68",
+    "m1-source-pins.json": "8aebdf2a74e07b60aaadc27d380b97d6d43cbedfcdc4526775a40295415290bd",
+    "flashticket-inventory-source.json": "7e09059caee66ed834454460f14ae442513a7597fe083b0e21075a5b148e6fb8",
+    "pause-probe.py": "4cb163f0beaa427d09435934244706aaf9e6c68290229aaef0fa0fe957fc0694",
+    "light-load.py": "fe9e82d554c48ef0216fd85841051632ee3d4bc855b8b4371a8f627a6abade09"
+  }
+}

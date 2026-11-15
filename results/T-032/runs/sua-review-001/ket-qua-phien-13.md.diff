@@ -1,0 +1,71 @@
+--- before/results/T-032/ket-qua-phien-13.md
++++ after/results/T-032/ket-qua-phien-13.md
+@@ -148,13 +148,13 @@
+ 
+ **Đối chiếu với dự đoán khai trước** (mốc: từ 2/3 số ca `frontend` đứng đầu là "gắn với root" thì đọc "cùng cơ chế H4, H7"; không quá 1/3 thì đọc "cơ chế khác, chưa giải thích"). 3/14 và 3/11 đều không quá 1/3. **Dự đoán "cùng cơ chế H4, H7" không đạt.** Câu tôi viết ở KQ12 mục 1 ("khớp với hạn chế H4, H7") sai cho phần lớn ca; đã sửa ở ba file (mục 8).
+ 
+-**Đọc, ở mức mô tả.** Phần MicroRank còn sai sau khi ghép hai phép đổi không phải một khối:
++**Đọc, ở mức mô tả.** Có ba dạng quan sát trong phần MicroRank còn sai sau ghép hai phép đổi; chúng không bao phủ mọi ca và chưa là ba nguyên nhân đã xác nhận:
+ 
+ 1. **Thao tác cao nhất của thực thể đứng đầu bao lời gọi chậm tới root** (thực thể là dịch vụ gọi root, trực tiếp hoặc gián tiếp; thời gian của lời gọi được tính cho nó): 5/8 và 3/6 ca RE2-TT; 5/16 và 5/14 ca Nezha-OB. Đây là phần mà thông tin cạnh gọi chạm tới được.
+-2. **Nhóm trace bất thường mới không chứa root:** 3 ca RE2-TT (một dịch vụ không liên hệ chậm lên cùng lúc, xem mục 2) và 4–6 ca Nezha-OB (vài trace chậm vì lời gọi tới dịch vụ khác). Cạnh gọi tới root không chạm tới phần này.
++2. **Các trace tạo số đếm cho thao tác đứng đầu không chứa root:**3 ca RE2-TT và 6 ca Nezha-OB theo luật bài, 4 ca theo luật code. Đây là tập trace gắn với thao tác cao nhất có cờ, không phải toàn bộ nhóm trace bất thường. Một ca không gắn theo luật code vẫn có root trong trace xét; xem phần chưa rõ dưới đây.
+ 3. **Quá ít trace bất thường để xếp:** 3–4 ca Nezha-OB có dưới 5 span tạo ra điểm của thực thể đứng đầu.
+ 
+-**Giới hạn.** Nhánh ghép là nhánh chẩn đoán, không phải MicroRank gốc. Mốc 50% và 20% do người làm đặt. Ở Nezha-OB số trace bất thường dưới bộ chia mới rất ít. Dự đoán viết sau khi đã biết kết quả kiểm theo tên thao tác.
++**Phần chưa rõ và giới hạn.** dev-14701a3bbb (shippingservice, cpu_contention) là cùng một ca chưa rõ dưới cả hai luật: tỷ lệ gắn root 2/5 và 8/15, thấp hơn tỷ lệ gắn currencyservice 4/5 và 13/15. Với dev-607751ac0a (checkoutservice, network_delay), luật code cho 0/6 span gắn root theo cây con nhưng 2/6 trace vẫn chứa root, một trace có root mang cờ. Vì vậy không đồng nhất không gắn với root vắng mặt. Cả 14 ca Nezha theo luật code gồm 5 gắn, 5 không gắn, 1 chưa rõ, 3 ít span; trong 5 không gắn chỉ 4 ca vắng root ở tập trace xét. Cần lần theo đồ thị, trọng số và số đếm của các ca chưa rõ để phân xử; không gọi là dạng cơ chế thứ tư đã xác nhận. Nhánh ghép là chẩn đoán, mốc 50%/20% do người làm đặt; dự đoán viết sau kết quả kiểm tên thao tác. Nguồn: runs/microrank-merged-link-001/summary.json → /cases (case_id và từng nhánh); derived-013.json → /merged_link/by_dataset/Nezha-OB.
+ 
+ ## 6. KT-9 — CIRCA: đổi độ dài đoạn học và vị trí đoạn chấm
+ 
+@@ -184,7 +184,7 @@
+ 
+ - (a) quá khớp vì ít điểm học, nhánh `tf`: vế đầu **đạt** (3,40, dưới cả 4,2 lẫn 3,77); vế sau **không đạt** (72,6% xuống 67,3%, giảm 5,3 điểm). Mốc (a) **không đạt**.
+ - (b) đoạn chấm xa đoạn học, nhánh `t0`: vế đầu **đạt** (3,64); vế sau **không đạt** (73,1%, không giảm). Mốc (b) **không đạt**.
+-- Theo thiết kế: "nếu không nhánh nào đạt: việc hồi quy làm tăng điểm không do hai lựa chọn cửa sổ này". Ghi đúng mức đã thấy: hai lựa chọn cửa sổ **giải thích khoảng một nửa mức phóng đại ở nút nhiều cha**, không giải thích việc hồi quy làm tăng điểm ở đa số nút. Ở cả ba cấu hình, tỷ số vẫn tăng đều theo số nút cha (1,03 tới 3,40 ở `tf`).
++- Theo mốc đã khai, cả hai nhánh không đạt trọn. Quan sát: trung vị tỷ số ở nút nhiều cha giảm từ 7,54 xuống 3,40 và 3,64; hồi quy vẫn làm tăng điểm ở đa số nút. Không dùng điều này để bác bỏ mọi ảnh hưởng của cửa sổ hoặc tách riêng nguyên nhân: tập nút, phân phối nền và giai đoạn lỗi cùng đổi. Ở tf, tỷ số vẫn tăng từ 1,03 tới 3,40 theo số cha.
+ 
+ **Quan sát thêm, không có mốc** (`→ /cases`).
+ 
+@@ -192,7 +192,7 @@
+ - Ba ca root `ts-auth-service` mà DA làm tụt hạng (KQ12 mục 3): hạng sau DA ở native → `tf` là 15 → **1** (`dev-16597725c1`), 22 → 6 (`dev-f81f88234e`), 46 → 37 (`dev-57546fd87b`). Tức điểm lớn của nút không liên quan (`ts-preserve-service_latency`) mà KT-15 thấy **phụ thuộc độ dài đoạn học**: học trên 291 điểm thì hiện tượng mất ở ca rõ nhất. Câu "điểm nguồn là thay đổi thật ở dịch vụ không liên quan" ở KQ12 mục 3 và `kiem-tiep.md` mục KT-15 viết quá tay; đúng hơn: điểm đó lớn dưới đoạn học 111 điểm. Đã sửa (mục 8).
+ - Số ca hạng 1 theo RHT + DA: 16 (native), 18 (`tf`), 13 (`t0`). Đây là mô tả của nhánh chẩn đoán trên dev, không phải số chấm.
+ 
+-**Đọc, ở mức tính toán.** Việc hồi quy theo nút cha làm tăng điểm có ba phần tách được: (1) phần do ít điểm học so với số nút cha, giảm khoảng một nửa khi học trên 291 điểm; (2) phần do đoạn chấm xa đoạn học, giảm cỡ tương tự ở nút nhiều cha khi chấm ngay sau mốc; (3) phần còn lại, có ở mọi cấu hình và tăng theo số nút cha, chưa có phép đổi nào trong T-032 gỡ được. Phần (3) khớp với phân rã ở KQ10 mục 1.4 (hồi quy làm độ lệch chuẩn phần dư ở đoạn học nhỏ đi, phần dư ở đoạn chấm không nhỏ theo), nhưng tôi chưa có phép đổi riêng cho nó nên giữ ở mức quan sát.
++**Đọc, ở mức tính toán.** Hai phép đổi xác nhận điểm và thứ hạng nhạy với cửa sổ. Chúng chưa tách được ba nguyên nhân độc lập: học 291 điểm đổi cả độ dài và dữ liệu nền; chấm ngay sau mốc đổi cả giai đoạn lỗi, có ca lỗi chưa hiện rõ; bước lọc cột làm tập nút khác nhau. Bởi vậy 7,54 → 3,40/3,64 là kết quả của hai cấu hình chẩn đoán, không phải tỷ lệ phần nguyên nhân do ít điểm học hay chấm xa. Phần dư còn cao và tăng theo số cha phù hợp với quan sát KQ10 mục 1.4, nhưng chưa có phép đổi riêng phân xử phần còn lại.
+ 
+ **Giới hạn.** Chỉ RE2-TT. Hai nhánh đổi cửa sổ đã khóa nên chỉ là chẩn đoán. Tập nút sau bước bỏ cột hằng đổi theo cửa sổ (8.605, 8.655 và 8.353 nút qua 30 ca), nên ba cột không so trên cùng tập nút tuyệt đối. Nghĩ ra sau khi xem kết quả dev.
+ 
+@@ -200,13 +200,13 @@
+ 
+ - Đã đọc 68 đơn vị OK xếp sai còn lại: BARO 7, SimpleRCA 6, TraceRCA 10, MicroRank 28, CIRCA 8, TORAI B 9. 48 đơn vị không chạy được ghi theo lý do, đã soát dòng lý do của cả 48 phiếu (42 UNSUPPORTED theo hai lý do của Q-85; 6 ERROR cùng một thao tác thiếu nền). Nội dung: `doc-tay.md` mục 8. Phiếu: `runs/tong-hop-phien-13-001/phieu-gon-chua-doc/` (script `scripts/phieu_gon_v2.py`; không tính gì mới so với bảng của phiên 12).
+ - Sau phiên 13: 168 đơn vị đọc tay không trùng (144 đơn vị sai hoặc không OK và 24 đối chứng đúng); 48 đơn vị không chạy được ghi theo lý do; 156 đơn vị đúng ở hạng 1 không thuộc diện đọc.
+-- Không thấy đường thất bại mới ở phương pháp nào. Các điều chỉnh so với phần đọc của phiên 12, ghi ở cuối từng mục con của `doc-tay.md` mục 8: hai phản ví dụ cho cách chia đường ở BARO theo tác dụng của B-2; ở auth|delay cột của root có đổi, khác nhau là ở nền; chờ lan qua hai tầng dịch vụ gọi với cùng số span (TraceRCA, `dev-6c9afc9822`); cách hiểu "phần chậm nằm ngoài span của root nên T-D không gỡ được" không được hỗ trợ khi mở bảng theo cạnh; phép "bỏ cột log nền không đổi" của TORAI B cho hạng 1 ở một ca và hạng 6 ở ca cùng ô; bốn đơn vị MicroRank ở Nezha-OB thuộc dạng "root vắng trong nhóm trace bất thường" chứ không phải dạng span phía gọi.
++- Phần đọc nốt thêm các điều chỉnh về thang BARO, độ dao động nền auth|delay, chờ qua hai tầng, T-D theo cạnh và TORAI nguồn log (doc-tay mục 8). Với MicroRank, ba dạng chỉ là dạng quan sát; bảng nối còn ca chưa rõ và một ca không gắn nhưng root có trong trace. Không nhận là đã xác định hết đường thất bại.
+ 
+ ## 8. Những câu đã viết ở các file trước bị kết quả phiên 13 sửa
+ 
+ | Câu cũ | Ở đâu | Sửa thành | Căn cứ |
+ |---|---|---|---|
+-| "`frontend` đứng đầu … khớp với hạn chế H4, H7" | KQ12 mục 1; `kiem-tiep.md` mục KT-3; báo cáo chính mục 5.1 | Chỉ 3/14 và 3/11 ca là span phía gọi của lời gọi tới root; phần còn lại là trace bất thường không chứa root hoặc quá ít span | Mục 5 |
++| "frontend đứng đầu … khớp với H4, H7" | KQ12 mục 1; KT-3; báo cáo mục 5.1 | Chỉ 3/14 và 3/11 gắn theo bảng nối; các ca khác gồm không gắn, ít span và chưa rõ. Không gắn không luôn là root vắng mặt | Mục 5 và đính chính sau REVIEW |
+ | "DA … điểm nguồn là thay đổi thật ở dịch vụ không liên quan" | KQ12 mục 3; `kiem-tiep.md` mục KT-15; `doc-tay.md` mục 5.3 | Điểm đó lớn dưới đoạn học 111 điểm; học trên 291 điểm thì root của ca rõ nhất về hạng 1 | Mục 6 |
+ | "Chưa phân xử: vì sao thao tác không liên hệ có 3–6% span vượt ngưỡng" | `doc-tay.md` mục 1.3; `kiem-tiep.md` mục KT-2, KT-4 | Mức tự nhiên trung vị 1,0%, tới 8%; 4/9 cặp đã đọc giữ mức tự nhiên, 5/9 tăng sau mốc | Mục 2 |
+ | "Root gần như không có tín hiệu metric" (auth, delay) | `doc-tay.md` mục 3.1 | Cột latency của root tăng 1,8–3,9 lần ở cả ba ca; z nhỏ vì nền dao động rộng | Mục 3 |
+@@ -216,9 +216,17 @@
+ 
+ Các file cũ `ket-qua-phien-9.md` tới `ket-qua-phien-12.md` là bản ghi theo thời điểm; tôi chỉ sửa câu "H4, H7" ở KQ12 theo đúng chỉ đạo của Minh và thêm dòng trỏ tới file này. Những câu còn lại được sửa ở báo cáo chính, `kiem-tiep.md` và `doc-tay.md`.
+ 
++**Đính chính sau REVIEW, Minh duyệt 11/10.** Không suy từ root không hạng 1 sang không có tín hiệu do lỗi; không bác bỏ chờ trong MicroRank chỉ vì M-D gần giữ hạng; giữ ca chưa rõ và ca không gắn nhưng root hiện diện; không tách ba nguyên nhân của CIRCA từ hai phép đổi cửa sổ. Bản trước và bằng chứng sửa ở runs/sua-review-001/. Self-check E cũ kiểm mục 1–6; mục 7 và doc-tay mục 8 được đối chiếu riêng trong kiem-so/ của lượt sửa này. Bản lịch sử ở mục 9 mô tả chi phí và cách chạy của phiên 13, không phải lượt sửa này.
++
+ ## 9. Chi phí và điều kiện dừng
+ 
+ - Lượt máy dài nhất: 985 giây (KT-9, laptop). EC2: 172, 494, 83 và 315 giây. Không lượt nào chạm mốc 1 giờ.
+ - RAM laptop đỉnh 76,5%. Không nhánh giữ nguyên nào lệch bản đóng băng. Không chỗ nào hỏng 3 lần.
+ - Ca thử trước mỗi lượt đủ, chạy sau khi file thiết kế đã ghi (pins ở các thư mục `*-launch/`): `runs/circa-kt9-test-001`, `runs/fake-marker-test-001`, `runs/tracerca-dropnew-test-001`, `-002`, `runs/root-latency-test-001`, `runs/microrank-merged-link-test-001`, `-002`. File thiết kế không đổi sau khi chạy.
+ - Không mở test, không đụng `data/locked/`, không sửa `src/`, không commit, không subagent.
++
++## Bổ sung sau REVIEW: cờ và nhóm trace MicroRank
++
++**Bằng chứng M-D bổ sung sau REVIEW.** Bảng cờ theo trace khớp nguồn ở 48 ca chạy được, 4 ca ERROR giữ N/A; không chạy PageRank. Cả 20 ca có caller trực tiếp trên root ở native đều có trace mất toàn bộ cờ của một caller nhưng vẫn A do root/dịch vụ khác; 19 ca còn caller trên root dưới M-D. Ví dụ dev-5467884de4 có 7 trace như vậy, root hạng 5 → 5; tổng A cùng 484 nhưng có 1 A → N và 1 N → A. Do đó tổng nhóm/hạng gần giữ chưa bác bỏ chờ. Nhóm A/N là nhóm yêu cầu/trace, không gộp các dịch vụ thành một nguyên nhân. Thiếu đối chứng native đúng cùng dataset/fault cho 20 ca; chưa tách tác dụng trọng số khi nhóm đổi. Nguồn: runs/sua-review-001/md-partition/attempt-003/summary.json → /cases (postanalysis, transitions); kiểm độc lập kiem-md-doc-lap.json. Chi phí cả ba lượt 4 phút 47 giây, giữ cả hai lượt lỗi.
++
++Bằng chứng đầy đủ, giới hạn đối chứng và các lượt chạy được giữ ở runs/sua-review-001/bo-sung-sau-review.md. Đây là bổ sung sau phiên 13, không đổi số hay nhận xét lịch sử về chi phí/môi trường của chính phiên 13.

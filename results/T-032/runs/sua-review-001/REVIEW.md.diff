@@ -1,0 +1,21 @@
+--- before/tasks/T-032-g2-nguyen-nhan-xep-hang/REVIEW.md
++++ after/tasks/T-032-g2-nguyen-nhan-xep-hang/REVIEW.md
+@@ -168,8 +168,13 @@
+ 
+ | Điểm | Ý kiến người làm: đúng / đúng một phần / sai / chưa kiểm được; mức | Lý do, bằng chứng, hậu quả và phần còn thiếu | Minh quyết |
+ |---|---|---|---|
+-| R1 | | | |
+-| R2 | | | |
+-| R3 | | | |
+-| R4 | | | |
+-| R5 | | | |
++| R1 | Đúng; CHẶN câu kết luận không có tín hiệu | Codex điền theo yêu cầu sửa mới của Minh (LOG mục Sửa sau REVIEW). Sửa bốn báo cáo, tách không hạng 1 khỏi đáp ứng do lỗi. Giữ số và khóa JSON cũ với định nghĩa đúng; return OPEN. Có mốc giả giữa nền Nezha nhưng chưa là đối chứng tương đương; metric/log trong bảng placebo là số thật nối vào. Bằng chứng: gói sua-review-001/bo-sung-sau-review.md và bản trước. | |
++| R2 | Đúng; CHẶN bác bỏ chờ ở MicroRank | Bỏ bác bỏ tuyệt đối; lần theo OR cờ → nhóm trace → đồ thị/đếm phủ. Thu bảng M-D riêng theo quyền Minh duyệt, giữ cả lượt lỗi; không chạy PageRank. Kết quả 48 PASS+4 N/A ở sua-review-001/md-partition/attempt-003/summary.json; 20/20 ca caller trên root có trace caller mất cờ vẫn giữ A, 19 ca caller còn trên root. Không có native đúng cùng dataset/fault cho 20 ca; chưa quy mọi hạng giữ cho OR. Kiểm độc lập kiem-md-doc-lap.json. Cơ chế chờ vật lý chưa được phép này xác nhận hoặc bác bỏ. | |
++| R3 | Đúng; CHẶN phân loại ba dạng bao trùm | Giữ ca chưa rõ dev-14701a3bbb cả hai luật và dev-607751ac0a luật code không gắn nhưng root có trong 2/6 trace xét. Không gọi toàn bộ nhóm A là vắng root. Giữ 14 ca theo luật code: 5 gắn, 5 không gắn, 1 chưa rõ, 3 ít span; chỉ 4/5 không gắn vắng root ở tập xét. Chuỗi trọng số/điểm của ca chưa rõ còn OPEN. | |
++| R4 | Đúng; KHÔNG CHẶN số nhánh chẩn đoán | Sửa thành độ nhạy cửa sổ, không tách ba nguyên nhân từ hai phép đổi. Giữ mốc khai trước không đạt trọn, 7,54 → 3,40/3,64 và số hạng 1. Phân phối, giai đoạn lỗi và tập nút cùng thay; nguyên nhân riêng còn OPEN. | |
++| R5 | Đúng; KHÔNG CHẶN số không có cạnh đi vào | Thu hẹp câu kết luận về 8 ca vào cách dựa riêng cạnh gọi đi vào root. Không kết luận mọi đồ thị đều vô ích; không thêm tuyên bố đồ thị đã có lợi. | |
++| N1 | Đúng; KHÔNG CHẶN baseline | Tách 46 OK sai/2 OK đúng/4 ERROR; 48 đọc=46 OK sai+1 ERROR+1 đối chứng. Sửa câu đếm, giữ số đóng băng; nguồn bao-phu-nhom.json → /units và kiem-so/. | |
++| N2 | Đúng một phần; KHÔNG CHẶN số đã khớp | E không bao phủ đọc tay là thiếu phạm vi tự kiểm, không tự chứng minh số sai. Đã kiểm riêng mục 7 KQ13 và mục 8 doc-tay từ JSON/phiếu; kết quả và giới hạn ở sua-review-001/kiem-so/. | |
++| N3 | Đúng; KHÔNG CHẶN quan sát | Giữ hai mốc KT-1 không đạt, so cùng loại là hậu kiểm. Không nhận đã tách được nguyên nhân. | |
++| N4 | Chưa kiểm được lời duyệt cũ; KHÔNG CHẶN quyền sửa hiện tại | Không có nguyên văn đề xuất “1 2 3”/Q142 cũ trong nguồn phiên này; không tái dựng. Q142 hiện tại ghi lời Minh duyệt bản sửa này, đủ quyền trong phạm vi đã trình; truy lời cũ vẫn OPEN. | |
++| N5 | Đúng một phần; KHÔNG CHẶN Hit@1 | S1 giữ rank_min 3 nhưng rank_max 3 → 5. Minh duyệt riêng câu thay; doc-tay 8.2 điểm 1 nêu hòa [3,5] và hạng bi quan 5. Nguồn simplerca-s1-001/summary.json → /cases/15; chỉ sửa câu, giữ JSON. | |

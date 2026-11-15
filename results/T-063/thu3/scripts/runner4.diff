@@ -1,0 +1,85 @@
+2,3c2,3
+< """T-063 bộ chạy bản 3 — chạy TRÊN exp-obs (Minh quyết 13/11, DECISIONS "Chạy bộ điều phối đợt thu trên exp-obs").
+< Dùng (trên exp-obs, thư mục ~/rca-dieu-phoi): nohup setsid python3 -B runner3.py thu --lich lich-2.json > chay/runner3.out 2>&1 &
+---
+> """T-063 bộ chạy bản 4 (thu bù 3; sinh bằng results/T-063/thu3/scripts/tao_runner4.py từ runner3.py) — chạy TRÊN exp-obs (Minh quyết 13/11, DECISIONS "Chạy bộ điều phối đợt thu trên exp-obs").
+> Dùng (trên exp-obs): RCA_DP_OUT=~/rca-dieu-phoi/thu3 setsid -f nohup python3 -B runner4.py thu --lich lich-3.json > thu3-runner4.out 2>&1 < /dev/null
+12c12
+< - Tiêm: ~/inj2.py trên exp-app (results/T-063/tiem-loi/inj2.py). Đầu dò không gọi HTTP của app; đối xứng t−240 và t+60;
+---
+> - Tiêm: ~/inj3.py trên exp-app (results/T-063/thu3/scripts/inj3.py). Đầu dò không gọi HTTP của app; đối xứng t−240 và t+60;
+24c24
+< CHAY = OUTR / 'chay'; SO = OUTR / 'tiem-loi/so-thu2.jsonl'; CA = OUTR / 'ca'
+---
+> CHAY = OUTR / 'chay'; SO = OUTR / 'tiem-loi/so-thu3.jsonl'; CA = OUTR / 'ca'
+31c31
+< PHASE = 600
+---
+> PHASE = int(os.environ.get('RCA_PHASE', '600'))  # chỉ chạy thử ngắn mới đặt; lượt chính = 600
+42c42
+<         with open(CHAY / 'nhat-ky-2.jsonl', 'a', encoding='utf-8') as f: f.write(line + '\n')
+---
+>         with open(CHAY / 'nhat-ky-3.jsonl', 'a', encoding='utf-8') as f: f.write(line + '\n')
+60c60
+<     p = CHAY / 'trang-thai-2.json'
+---
+>     p = CHAY / 'trang-thai-3.json'
+99,100c99,100
+<     """Lỗi từ inj2 (ssh rc ≠ 0, dòng cleanup-error) được ném lên — không nuốt (REVIEW T-063 R1)."""
+<     cmd = f'python3 ~/inj2.py {op} {cell}' + (f' --seconds {seconds}' if seconds else '')
+---
+>     """Lỗi từ inj3 (ssh rc ≠ 0, dòng cleanup-error) được ném lên — không nuốt (REVIEW T-063 R1)."""
+>     cmd = f'python3 ~/inj3.py {op} {cell}' + (f' --seconds {seconds}' if seconds else '')
+102c102
+<     if any(r.get('op') == 'cleanup-error' for r in recs): raise RuntimeError(f'inj2 {op}: ' + json.dumps(recs)[-400:])
+---
+>     if any(r.get('op') == 'cleanup-error' for r in recs): raise RuntimeError(f'inj3 {op}: ' + json.dumps(recs)[-400:])
+131,132c131,133
+< def start_load(tag, flash=False, seconds=1800):
+<     extra = ['--buoc-tai', 600, '--multiplier', 3] if flash else []
+---
+> def start_load(tag, flash=False, seconds=None, mult=1):
+>     seconds = seconds or 3 * PHASE
+>     extra = ['--buoc-tai', PHASE, '--multiplier', 3] if flash else (['--multiplier', mult] if mult > 1 else [])
+135c136
+<     log('load started', tag=tag, flash=flash, out=json.dumps(out)[-300:])
+---
+>     log('load started', tag=tag, flash=flash, mult=mult, out=json.dumps(out)[-300:])
+197,198c198,199
+<     ledger('thu2-begin', lich=str(lich), lich_sha256=hashlib.sha256(Path(lich).read_bytes()).hexdigest(), n=len(items))
+<     ssh('app', 'python3 ~/inj2.py ensure', timeout=60)
+---
+>     ledger('thu3-begin', phase_s=PHASE, lich=str(lich), lich_sha256=hashlib.sha256(Path(lich).read_bytes()).hexdigest(), n=len(items))
+>     ssh('app', 'python3 ~/inj3.py ensure', timeout=60)
+206c207
+<         cell = it['o']; oid = secrets.token_hex(4); tag = 't2-' + oid; flash = cell in ('FLASH-HEALTHY', 'HTTP5-EVENT-FLASH')
+---
+>         cell = it['o']; mult = int(it.get('multiplier', 1)); oid = secrets.token_hex(4); tag = 't3-' + oid; flash = cell in ('FLASH-HEALTHY', 'HTTP5-EVENT-FLASH')
+208c209
+<         ledger('cycle-begin', i=i, opaque_id=oid, cell=cell, load_tag=tag)
+---
+>         ledger('cycle-begin', i=i, opaque_id=oid, cell=cell, load_tag=tag, multiplier=mult)
+210c211
+<             S = start_load(tag, flash=flash)
+---
+>             S = start_load(tag, flash=flash, mult=mult)
+213c214
+<             try: S = start_load(tag, flash=flash)
+---
+>             try: S = start_load(tag, flash=flash, mult=mult)
+221c222
+<             if cell in ('BINH-THUONG', 'FLASH-HEALTHY'):
+---
+>             if cell in ('BINH-THUONG', 'FLASH-HEALTHY', 'BINH-THUONG-X3'):
+256c257
+<     ledger('thu2-end'); state(phase='XONG'); log('Lượt thu xong')
+---
+>     ledger('thu3-end'); state(phase='XONG'); log('Lượt thu xong')
+267c268
+<     ssh('app', 'python3 ~/inj2.py ensure', timeout=60)
+---
+>     ssh('app', 'python3 ~/inj3.py ensure', timeout=60)
+292c293
+<     lich = sys.argv[3] if len(sys.argv) > 3 and sys.argv[2] == '--lich' else BASE / 'lich-2.json'
+---
+>     lich = sys.argv[3] if len(sys.argv) > 3 and sys.argv[2] == '--lich' else BASE / 'lich-3.json'

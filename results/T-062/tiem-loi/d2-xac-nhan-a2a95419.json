@@ -1,0 +1,421 @@
+{
+ "tag": "d2-a2a95419",
+ "ket_qua": [
+  {
+   "cell": "EVENT-DB-LAT",
+   "xac_nhan": true,
+   "bang_chung": [
+    "RTT PG qua proxy [202.54, 208.38] ms, trực tiếp [0.97, 11.94] ms",
+    "p50 event +6304 ms; order +-1 ms (đối chứng)",
+    "lượt k6 bị rơi trong lỗi: 197"
+   ],
+   "k6_truoc": {
+    "GET /api/v1/events/{id}": {
+     "n": 150,
+     "p50_ms": 266.6,
+     "p95_ms": 286.7,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}": {
+     "n": 85,
+     "p50_ms": 267.7,
+     "p95_ms": 283.1,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/payment": {
+     "n": 60,
+     "p50_ms": 274.9,
+     "p95_ms": 394.2,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/tickets": {
+     "n": 30,
+     "p50_ms": 265.9,
+     "p95_ms": 283.4,
+     "err5xx": 30,
+     "non2xx": 30
+    }
+   },
+   "k6_trong": {
+    "GET /api/v1/events/{id}": {
+     "n": 241,
+     "p50_ms": 6571.1,
+     "p95_ms": 7822.5,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}": {
+     "n": 108,
+     "p50_ms": 266.8,
+     "p95_ms": 278.8,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/payment": {
+     "n": 75,
+     "p50_ms": 273.8,
+     "p95_ms": 289.7,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/tickets": {
+     "n": 50,
+     "p50_ms": 266.3,
+     "p95_ms": 281.0,
+     "err5xx": 50,
+     "non2xx": 50
+    }
+   }
+  },
+  {
+   "cell": "REDIS-BOOK",
+   "xac_nhan": false,
+   "bang_chung": [
+    "Redis PING qua proxy [204.01, 202.38] ms, trực tiếp [1.98, 1.86] ms",
+    "p50 order +-2, payment +-5, event +-3 ms",
+    "toxic có trên tuyến nhưng các route trong hỗn hợp tải không đổi → tải không đi qua Redis của Booking",
+    "lượt k6 bị rơi trong lỗi: 0"
+   ],
+   "k6_truoc": {
+    "GET /api/v1/events/{id}": {
+     "n": 156,
+     "p50_ms": 264.1,
+     "p95_ms": 275.1,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}": {
+     "n": 75,
+     "p50_ms": 263.3,
+     "p95_ms": 279.8,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/payment": {
+     "n": 54,
+     "p50_ms": 268.6,
+     "p95_ms": 288.6,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/tickets": {
+     "n": 40,
+     "p50_ms": 264.5,
+     "p95_ms": 285.5,
+     "err5xx": 40,
+     "non2xx": 40
+    }
+   },
+   "k6_trong": {
+    "GET /api/v1/events/{id}": {
+     "n": 344,
+     "p50_ms": 261.1,
+     "p95_ms": 273.3,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}": {
+     "n": 175,
+     "p50_ms": 260.9,
+     "p95_ms": 272.3,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/payment": {
+     "n": 100,
+     "p50_ms": 264.0,
+     "p95_ms": 276.6,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/tickets": {
+     "n": 60,
+     "p50_ms": 262.7,
+     "p95_ms": 283.3,
+     "err5xx": 60,
+     "non2xx": 60
+    }
+   }
+  },
+  {
+   "cell": "NET-GW-BOOK",
+   "xac_nhan": true,
+   "bang_chung": [
+    "health Booking qua proxy [310.1, 311.4] ms, trực tiếp [8.7, 9.3] ms",
+    "p50 order +297, payment +-4, event +-2 ms (đối chứng)",
+    "lượt k6 bị rơi trong lỗi: 0"
+   ],
+   "k6_truoc": {
+    "GET /api/v1/events/{id}": {
+     "n": 175,
+     "p50_ms": 260.4,
+     "p95_ms": 272.7,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}": {
+     "n": 75,
+     "p50_ms": 260.6,
+     "p95_ms": 272.1,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/payment": {
+     "n": 45,
+     "p50_ms": 266.4,
+     "p95_ms": 275.5,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/tickets": {
+     "n": 30,
+     "p50_ms": 262.2,
+     "p95_ms": 272.5,
+     "err5xx": 30,
+     "non2xx": 30
+    }
+   },
+   "k6_trong": {
+    "GET /api/v1/events/{id}": {
+     "n": 329,
+     "p50_ms": 258.1,
+     "p95_ms": 272.2,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}": {
+     "n": 175,
+     "p50_ms": 557.9,
+     "p95_ms": 571.5,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/payment": {
+     "n": 105,
+     "p50_ms": 262.7,
+     "p95_ms": 281.9,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/tickets": {
+     "n": 70,
+     "p50_ms": 259.3,
+     "p95_ms": 272.4,
+     "err5xx": 70,
+     "non2xx": 70
+    }
+   }
+  },
+  {
+   "cell": "HTTP5-EVENT",
+   "xac_nhan": true,
+   "bang_chung": [
+    "audit Event: {'http.error.executed': 392}",
+    "event 5xx 350/350; order 5xx 0/157 (đối chứng)",
+    "lượt k6 bị rơi trong lỗi: 0"
+   ],
+   "k6_truoc": {
+    "GET /api/v1/events/{id}": {
+     "n": 150,
+     "p50_ms": 257.7,
+     "p95_ms": 271.7,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}": {
+     "n": 97,
+     "p50_ms": 258.4,
+     "p95_ms": 271.2,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/payment": {
+     "n": 48,
+     "p50_ms": 260.4,
+     "p95_ms": 271.5,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/tickets": {
+     "n": 30,
+     "p50_ms": 257.3,
+     "p95_ms": 271.2,
+     "err5xx": 30,
+     "non2xx": 30
+    }
+   },
+   "k6_trong": {
+    "GET /api/v1/events/{id}": {
+     "n": 350,
+     "p50_ms": 255.1,
+     "p95_ms": 269.6,
+     "err5xx": 350,
+     "non2xx": 350
+    },
+    "GET /api/v1/orders/{id}": {
+     "n": 157,
+     "p50_ms": 257.7,
+     "p95_ms": 271.6,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/payment": {
+     "n": 102,
+     "p50_ms": 260.2,
+     "p95_ms": 272.7,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/tickets": {
+     "n": 70,
+     "p50_ms": 259.0,
+     "p95_ms": 271.2,
+     "err5xx": 70,
+     "non2xx": 70
+    }
+   }
+  },
+  {
+   "cell": "SLOW-BOOK",
+   "xac_nhan": true,
+   "bang_chung": [
+    "audit Booking: {'http.delay.finished': 200, 'http.delay.started': 200}",
+    "p50 order +1002, payment +1, event +0 ms",
+    "lượt k6 bị rơi trong lỗi: 0"
+   ],
+   "k6_truoc": {
+    "GET /api/v1/events/{id}": {
+     "n": 164,
+     "p50_ms": 258.3,
+     "p95_ms": 271.1,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}": {
+     "n": 75,
+     "p50_ms": 257.8,
+     "p95_ms": 270.6,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/payment": {
+     "n": 46,
+     "p50_ms": 259.0,
+     "p95_ms": 272.6,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/tickets": {
+     "n": 40,
+     "p50_ms": 261.3,
+     "p95_ms": 272.8,
+     "err5xx": 40,
+     "non2xx": 40
+    }
+   },
+   "k6_trong": {
+    "GET /api/v1/events/{id}": {
+     "n": 336,
+     "p50_ms": 258.6,
+     "p95_ms": 272.4,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}": {
+     "n": 175,
+     "p50_ms": 1259.6,
+     "p95_ms": 1275.5,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/payment": {
+     "n": 105,
+     "p50_ms": 260.4,
+     "p95_ms": 274.6,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/tickets": {
+     "n": 62,
+     "p50_ms": 258.4,
+     "p95_ms": 276.2,
+     "err5xx": 62,
+     "non2xx": 62
+    }
+   }
+  },
+  {
+   "cell": "CPU-BOOK",
+   "xac_nhan": true,
+   "bang_chung": [
+    "burn_procs 2,2,0; nr_throttled 1850→3116→3192",
+    "pressure lúc lỗi: some avg10=52.27 avg60=46.88 avg300=19.98 total=196281606",
+    "p50 order +43, event +-2 ms",
+    "lượt k6 bị rơi trong lỗi: 0"
+   ],
+   "k6_truoc": {
+    "GET /api/v1/events/{id}": {
+     "n": 175,
+     "p50_ms": 261.2,
+     "p95_ms": 291.0,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}": {
+     "n": 75,
+     "p50_ms": 258.3,
+     "p95_ms": 290.5,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/payment": {
+     "n": 45,
+     "p50_ms": 263.0,
+     "p95_ms": 286.1,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/tickets": {
+     "n": 30,
+     "p50_ms": 267.4,
+     "p95_ms": 294.1,
+     "err5xx": 30,
+     "non2xx": 30
+    }
+   },
+   "k6_trong": {
+    "GET /api/v1/events/{id}": {
+     "n": 330,
+     "p50_ms": 258.7,
+     "p95_ms": 284.9,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}": {
+     "n": 175,
+     "p50_ms": 301.1,
+     "p95_ms": 319.0,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/payment": {
+     "n": 105,
+     "p50_ms": 262.3,
+     "p95_ms": 282.1,
+     "err5xx": 0,
+     "non2xx": 0
+    },
+    "GET /api/v1/orders/{id}/tickets": {
+     "n": 70,
+     "p50_ms": 260.9,
+     "p95_ms": 277.5,
+     "err5xx": 70,
+     "non2xx": 70
+    }
+   }
+  }
+ ]
+}

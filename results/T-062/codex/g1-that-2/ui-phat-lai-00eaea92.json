@@ -1,0 +1,81 @@
+{
+  "id": "00eaea92",
+  "url": "http://127.0.0.1:13000/d/rca-g2-phat-lai/rca-e28094-phat-lai-co-dap-an-g2?var-thu_muc=rca%2Fphat-lai&var-ca=00eaea92&var-dv=payment-service&from=2026-11-12T00:13:19.000Z&to=2026-11-12T00:43:19.000Z&timezone=browser&var-dv_svc=payment-service&var-t_tu=1794442999000&var-t_den=1794443599000",
+  "panels": {
+    "3": "Sự cố đang xem: 00eaea92\nMã sự cố\n00eaea92\nKết luận của M1\nM1 thấy thành phần có bất thường tự sinh\nTrạng thái lượt M1\nchạy xong (OK)\nMốc sự cố\n2026-11-12 00:28:19 UTC (do bộ điều phối cấp)\nCửa sổ nền / sự cố\n00:23:19 → 00:28:19 UTC | 00:28:19 → 00:33:19 UTC\nM1 nghi là nguồn\n#1 payment-service, #2 booking-service, #3 event-service, #4 ticket-service\nBị kéo theo\n#5 api-gateway\nThiếu dữ liệu\nkhông có\nVùng nghi ngờ\ngốc: payment-service · cách 1: api-gateway, payment-service · cách 2: api-gateway, booking-service, event-service, payment-service, ticket-service\nĐộ phủ\nM1 trả hạng cho 17/17 thành phần (kể cả nhóm bình thường xếp chung hạng); 14 cạnh gọi quan sát; 9 thành phần không có cạnh (DB, broker… M1 không thấy cạnh)\n◆ ĐÁP ÁN: root khai trước\nroot = null (tải tăng khỏe)\nHọ lỗi\nD9-11 — root = null (tải tăng khỏe)\nTập chấp nhận mức nút (◆ trên đồ thị)\nrỗng: không đánh dấu nút nào\nHạng tốt nhất trong tập (theo e2, mức nút; không phải kết luận M1 định vị đúng cạnh)\n—\nNhận xét phát lại\nĐáp án: root = null (tải tăng khỏe) (ô FLASH-HEALTHY). Kết luận M1: CAUSE_FOUND; hạng 1: payment-service.\nCảnh báo\nBản phát lại: đáp án ghép SAU khi kết quả cả đợt đã băm; không dùng để chẩn đoán trực tuyến.",
+    "4": "Đồ thị dịch vụ — sự cố 00eaea92 (phát lại)\n#5\nbị kéo theo\napi-gateway\n\n#2\nnghi là nguồn\nbooking-service\n\n\nbình thường\nbooking_db\n\n\nbình thường\nbroker\n\n\nbình thường\ncache\n\n\nbình thường\nconfig-discovery\n\n#3\nnghi là nguồn\nevent-service\n\n\nbình thường\nevent_db\n\n\nbình thường\nkeycloak\n\n\nbình thường\nkeycloak_db\n\n\nbình thường\nmongodb-instance\n\n#1\nnghi là nguồn\npayment-service\n\n\nbình thường\npayment_db\n\n\nbình thường\npostgresql-shared-instance\n\n#4\nnghi là nguồn\nticket-service\n\n\nbình thường\nticket_db\n\n\nbình thường\nuser-service\n\nHạng (chữ trên nút)\nVai trò (chữ dưới nút)\nMàu theo vai trò",
+    "5": "Bảng hạng thành phần — sự cố 00eaea92\nHạng\nThành phần (bấm để xem bằng chứng)\nVai trò\nĐồng hạng\nSố kênh có cờ\nVùng nghi ngờ\n#1\npayment-service\nnghi là nguồn\n4\ngốc vùng nghi ngờ\n#2\nbooking-service\nnghi là nguồn\n1\ntrong vùng (cách 2)\n#3\nevent-service\nnghi là nguồn\n1\ntrong vùng (cách 2)\n#4\nticket-service\nnghi là nguồn\n3\ntrong vùng (cách 2)\n#5\napi-gateway\nbị kéo theo\n3\ntrong vùng (cách 1)\nbooking_db\nbình thường\n0\nbroker\nbình thường\n0\ncache\nbình thường\n0\nconfig-discovery\nbình thường\n0\nevent_db\nbình thường\n0\nkeycloak\nbình thường\n0\nkeycloak_db\nbình thường\n0\nmongodb-instance\nbình thường\n0\npayment_db\nbình thường\n0\npostgresql-shared-instance\nbình thường\n0\nticket_db\nbình thường\n0",
+    "6": "Bằng chứng của payment-service — các kênh M1 gắn cờ\nKênh có cờ\nLoại\nHướng\nKiểu lan (E5)\nKhởi phát\nĐiểm s\nMở dữ liệu gốc\nĐơn vị M1\nPaymentWorker.selectEventRefundOrders\nthao tác (span)\ntăng ↑\nkhông lan\n00:28:19 UTC\n3.962\nTempo ↗\nop|payment-service|PaymentWorker.selectEventRefundOrders\nOutboxMessageRepository.findDueForUpdate\nthao tác (span)\ntăng ↑\nkhông lan\n00:28:29 UTC\n143.822\nTempo ↗\nop|payment-service|OutboxMessageRepository.findDueForUpdate\nSELECT payment_schema.tbl_outbox_messages\nthao tác (span)\ntăng ↑\nkhông lan\n00:28:29 UTC\n46.314\nTempo ↗\nop|payment-service|SELECT payment_schema.tbl_outbox_messages\nworkload\nchỉ số (metric)\ntăng ↑\nlan ngược\n00:28:49 UTC\n5.500\nPrometheus ↗\nmetric|payment-service_workload",
+    "7": "Vì sao payment-service bị coi là kéo theo (giải thích E5 của M1)\nKhông có: M1 không coi thành phần này là bị kéo theo."
+  },
+  "markers": [
+    {
+      "label": "Node: api-gateway",
+      "text": "#5bị kéo theoapi-gateway"
+    },
+    {
+      "label": "Node: booking-service",
+      "text": "#2nghi là nguồnbooking-service"
+    },
+    {
+      "label": "Node: booking_db",
+      "text": "bình thườngbooking_db"
+    },
+    {
+      "label": "Node: broker",
+      "text": "bình thườngbroker"
+    },
+    {
+      "label": "Node: cache",
+      "text": "bình thườngcache"
+    },
+    {
+      "label": "Node: config-discovery",
+      "text": "bình thườngconfig-discovery"
+    },
+    {
+      "label": "Node: event-service",
+      "text": "#3nghi là nguồnevent-service"
+    },
+    {
+      "label": "Node: event_db",
+      "text": "bình thườngevent_db"
+    },
+    {
+      "label": "Node: keycloak",
+      "text": "bình thườngkeycloak"
+    },
+    {
+      "label": "Node: keycloak_db",
+      "text": "bình thườngkeycloak_db"
+    },
+    {
+      "label": "Node: mongodb-instance",
+      "text": "bình thườngmongodb-instance"
+    },
+    {
+      "label": "Node: payment-service",
+      "text": "#1nghi là nguồnpayment-service"
+    },
+    {
+      "label": "Node: payment_db",
+      "text": "bình thườngpayment_db"
+    },
+    {
+      "label": "Node: postgresql-shared-instance",
+      "text": "bình thườngpostgresql-shared-instance"
+    },
+    {
+      "label": "Node: ticket-service",
+      "text": "#4nghi là nguồnticket-service"
+    },
+    {
+      "label": "Node: ticket_db",
+      "text": "bình thườngticket_db"
+    },
+    {
+      "label": "Node: user-service",
+      "text": "bình thườnguser-service"
+    }
+  ]
+}
