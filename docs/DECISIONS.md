@@ -676,3 +676,14 @@ Minh (chat phiên điều phối `local_feddcc0c`, 15/11/2026 khoảng 06:09Z), 
 - (7) FLASH-HEALTHY: giữ đếm thô trong K, báo nhóm riêng.
 - (8) Biến thể chịu được khởi phát muộn và phân xử H3/H4: để ngoài chiến dịch, mở task sau nếu cần.
 - (9) Dữ liệu lớn lưu ngoài git; đường dẫn Minh chưa ghi cụ thể (lời Minh còn "[đường dẫn]") — chờ Minh cho đường dẫn. Trình danh sách file trước khi commit/push.
+
+## Tái cơ cấu hạ tầng RCA: Oracle, repo vận hành, Compose trước K8s, 16/11/2026
+
+Minh (chat 15–16/11/2026, sau báo cáo đề xuất dọn và tái cơ cấu):
+- Nền tảng: "giờ tôi chọn oracle". Máy tải giữ ở AWS.
+- Repo mới: "duyệt tạo repo mới." Repo `flashticket-rca-lab`, để public: "không cần chuyển repo private, đây là đồ án, không phải dự án thương mại cần bảo mật. trừ khi các rủi ro có thể tác động lên dữ liệu hoặc xóa server (phần này thì cần dấu key là được)". Repo RCA giữ public.
+- Luật repo mới: "sang repo mới tôi muốn nới lỏng phòng hash, vân tay, tôi không sửa là được, nhiều khi thấy over engenering quá". Phiên bản là commit git; không manifest từng file; dữ liệu mỗi đợt có `SHA256SUMS`.
+- K8s: "nhóm tôi đã quyết định sử dụng k8s rồi, chắc chắn"; "trước tiên tôi muốn thử ở dạng gốc trước, chưa dùng k8s, demo chuẩn rồi thì có thể phát triển phiên bản cho k8s"; "không đấu nối tạm được vì nhóm hệ thống vẫn đang làm ... đồng bộ main và tự chạy trước rồi sau nối sau (ưu tiên cách nối clean nhất)".
+- Kéo dữ liệu: "duyệt kéo 3 mục trung bình, cao và rất cao" — 12 gói ca chưa có trên laptop, đầu ra k6, cấu hình đang chạy; về `D:/RCA-archive/`. Không kéo bộ đệm `l5-dem`, `pc-doi-moc-dem`, đầu ra M1 (đã có phần lớn), image. Không sao lưu đĩa máy, không chụp riêng kho Prometheus/Loki/Tempo (giữ volume khi dựng lại).
+- Việc thực hiện: "điều phối và làm từ p1 đến p4" — P1 khung repo mới và chép cấu hình; P2 kéo dữ liệu; P3 xóa `deploy/rca-test` khỏi nhánh `rca/quan-sat-log` (PR #17); P4 sửa AGENTS, DECISIONS, STATE.
+- Hệ quả với Q-13 (10/11): cấu hình kho quan sát, script tiêm lỗi, k6 nằm ở `flashticket-rca-lab`, không ở repo FlashTicket hay repo RCA.

@@ -82,6 +82,8 @@ Không có cơ chế nào trong công cụ cưỡng chế Luật 0. Minh đã qu
 
 Lịch sử chat và bộ nhớ riêng của agent **không** được coi là nguồn. Nếu Minh quyết điều gì trong chat, agent ghi vào `docs/DECISIONS.md` (theo Luật 0: đề xuất dòng ghi, Minh duyệt) trước khi kết thúc phiên.
 
+**Repo vận hành `flashticket-rca-lab`** (`github.com/levanminh04/flashticket-rca-lab`, trên laptop `D:/Project/flashticket-rca-lab`; Minh duyệt 16/11/2026) chứa phần chạy được: cấu hình quan sát, Grafana, k6, tiêm lỗi, điều phối đợt thu, dịch vụ RCA trực tuyến. Repo đó chỉ chứa code và cấu hình; quyết định, trạng thái, kết quả vẫn ghi ở repo này. Phiên bản của repo đó là commit git, không lập manifest từng file (luật riêng ở `AGENTS.md` của repo đó); hồ sơ lượt chạy ở repo này ghi commit của nó. Luật 0 áp dụng cho cả hai repo.
+
 | Nơi | Chứa gì | Ai được ghi |
 |---|---|---|
 | `AGENTS.md` | Luật | Chỉ khi Minh duyệt |
@@ -247,6 +249,9 @@ Mục LOG phải đủ để **một agent khác, trên một máy khác, không
 - Windows 11. Có PowerShell và Git Bash. Python 3.12 gọi bằng `py -3`. Codex CLI 0.130.0.
 - Laptop i5-1240P, RAM 16 GB, không có GPU NVIDIA. Ổ D còn khoảng 65 GB (kiểm ngày 02/10/2026).
 - Repo hệ thống FlashTicket: `D:/Project/flash-ticket-platform`. Chỉ đọc. Chuẩn quan sát ở `docs/architecture/B16-observability-baseline.md`.
+- Repo vận hành RCA: `D:/Project/flashticket-rca-lab` (xem §4). Địa chỉ máy nằm ở `inventory/` của repo đó.
+- Nền tảng chính: Oracle (exp-app, exp-obs); máy tải ở AWS (Minh chọn 16/11/2026). Khóa máy ở `D:/RCA-ext/keys/`, không vào repo nào.
+- Dữ liệu lớn ngoài git: `D:/RCA-archive/` (danh sách sha256 kèm theo từng nhóm).
 - **Máy mới:**
   1. Clone repo từ remote.
   2. Dựng dữ liệu theo `data/README.md`.
