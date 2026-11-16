@@ -687,3 +687,13 @@ Minh (chat 15–16/11/2026, sau báo cáo đề xuất dọn và tái cơ cấu)
 - Kéo dữ liệu: "duyệt kéo 3 mục trung bình, cao và rất cao" — 12 gói ca chưa có trên laptop, đầu ra k6, cấu hình đang chạy; về `D:/RCA-archive/`. Không kéo bộ đệm `l5-dem`, `pc-doi-moc-dem`, đầu ra M1 (đã có phần lớn), image. Không sao lưu đĩa máy, không chụp riêng kho Prometheus/Loki/Tempo (giữ volume khi dựng lại).
 - Việc thực hiện: "điều phối và làm từ p1 đến p4" — P1 khung repo mới và chép cấu hình; P2 kéo dữ liệu; P3 xóa `deploy/rca-test` khỏi nhánh `rca/quan-sat-log` (PR #17); P4 sửa AGENTS, DECISIONS, STATE.
 - Hệ quả với Q-13 (10/11): cấu hình kho quan sát, script tiêm lỗi, k6 nằm ở `flashticket-rca-lab`, không ở repo FlashTicket hay repo RCA.
+
+## Hoãn D16; chế độ (b) trên FlashTicket; nén T-032; kế hoạch bản 3, 17/11/2026
+
+Minh (chat 17/11/2026), sau hai lượt Codex phản biện kế hoạch và hai bản đáp của Claude: "hoãn d16, vẫn chạy grafana luật cảnh báo chế độ b) trên flash ticket, nén t32"; sau đó: "duyệt theo đề xuất , ghi kế hoạch".
+
+- **D16 hoãn.** Sửa Q-245: D16 (RCA tại t̂ trên RE2-TT dev) không còn là điều kiện trước khi khóa bản FlashTicket và trước khi chạy chế độ (b) trên FlashTicket. Mọi kết quả chế độ (b) ghi giới hạn "chưa kiểm RCA tại t̂ trên dữ liệu công khai". D16 vẫn OPEN.
+- **Chế độ (b) trên FlashTicket:** chạy luật cảnh báo Grafana và RCA tại thời điểm báo động trên FlashTicket (nhánh demo của kế hoạch bản 3).
+- **T-032:** thay Q-181. Phần chưa track của `results/T-032/runs/` nén tại chỗ, mỗi thư mục lượt chạy một `payload-2026-11-17.tar.gz` kèm danh sách sha256; đọc lại từng file trong gói và so hash, khớp mới xóa file rời; không đụng file đã track; chỉ mục `results/T-032/NEN-2026-11-17.jsonl`. Giữ trên laptop.
+- **Bản FlashTicket cho thử nghiệm (W2):** phương án B — `main` của nhóm cộng các commit quan sát của PR #17, tự build, bật agent bằng `OTEL_AGENT_ENABLED=true`. Chuyển sang digest của nhóm khi PR #17 được merge và xác nhận tương đương. Gỡ xung đột trên nhánh của repo nhóm làm trong W2, theo SPEC của W2.
+- **Kế hoạch bản 3** (nhánh demo trước, nhánh đánh giá sau; giữ M7 chia theo ô, D14, độ đo theo đầu ra): ghi ở `docs/techstack/KE-HOACH-GIAI-DOAN-2.md` §8. Duyệt kế hoạch không thay duyệt SPEC từng gói, lượt chạy dài hay mở dữ liệu khóa.

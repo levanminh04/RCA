@@ -10,18 +10,17 @@ Cập nhật: 15/11/2026. Quyết định ở [DECISIONS.md](DECISIONS.md); chi 
 ## Chiến dịch M1-FlashTicket (13–15/11): đã đóng
 
 - T-063 (thu dev bản 2–3), T-064 (chọn **V082** = H5b + H8s1 + H8a; dev bản 3: AC@1 9/11, AC@3 11/11, K 4/6), T-065 (giao diện Grafana): Minh nghiệm thu 15/11 (DECISIONS "M4 chiến dịch…"). OPEN: H3/H4; CPU Payment ở ca không lỗi bản 3; S3 của T-065. [Hồ sơ chọn](../results/T-064/ho-so-chon.md).
-- Mục 9: commit/push file nhẹ xong (`25550d2a`, 15/11). Còn: `manifest-3` T-063; kéo về `exp-obs:/opt/rca-m1ft/out` (9 GB, gồm `l5-dem`, `pc-doi-moc-dem`) và `~/rca-dieu-phoi` (2,3 GB) — chưa đối chiếu hash với bản local.
+- Mục 9: commit/push file nhẹ xong (`25550d2a`, 15/11). Kéo về theo quyết định 16/11 đã xong, cùng gói đầu vào lịch sử của M1 (gói bổ sung, R9, bản chụp mã `goc-*`; Minh duyệt 17/11): `D:/RCA-archive/` (README, danh sách sha256 khớp). Còn: `manifest-3` T-063.
 - Dọn đĩa 15/11: nén gzip file nặng chưa track của T-045, T-047, T-048, T-049, T-053 (manifest `results/T-0xx/NEN-2026-11-15.jsonl`, chưa commit); xóa env `py38-gdn`, `py38-rcd`.
 
 ## Việc kế tiếp
 
 1. **Tái cơ cấu (Minh 16/11, DECISIONS "Tái cơ cấu hạ tầng RCA…"):** Oracle làm chính; repo vận hành mới [`flashticket-rca-lab`](https://github.com/levanminh04/flashticket-rca-lab) (`D:/Project/flashticket-rca-lab`, commit đầu `a46c009`: cấu hình đang chạy, Grafana, k6, tiêm lỗi; chưa dùng để dựng lại máy); `deploy/rca-test` đã bỏ khỏi PR #17 (`bb84d64`); dữ liệu kéo về `D:/RCA-archive/`. Còn: dựng lại exp-obs và máy tải từ repo mới theo `/opt|/etc|/srv/rca-lab`, rồi dọn máy; chạy dạng Compose trước, bản K8s sau demo.
-2. Chặng 3 phần còn thiếu: luật cảnh báo Grafana (ngưỡng từ dữ liệu bình thường), nguồn quan sát độc lập cho "service chết im"; rồi G3 (dịch vụ RCA trực tuyến chạy V082).
-3. Chặng 5 (khóa bản, dựng lại từ máy trống) → chặng 6 (demo, đánh giá, viết; 5–30/12). G4 (LLM, P8) làm cuối.
+2. **Kế hoạch bản 3 (Minh duyệt 17/11):** [giai đoạn 2 §8](techstack/KE-HOACH-GIAI-DOAN-2.md). Nhánh demo W0–W5, W8, W9a (chế độ (b) trên FlashTicket); nhánh đánh giá W6–W7 (D14, M7 theo ô), lịch chờ dự toán. D16 hoãn (DECISIONS 17/11). Codex rà 3 lượt; gói sửa S1–S7 Minh duyệt 17/11. Kế tiếp: soạn SPEC W1 và W2.
 
 ## Chờ Minh
 
-- Cách chia máy cho FlashTicket; nơi đặt cấu hình triển khai; M7 (chia đợt phát triển/đánh giá); PR FlashTicket #17 (xung đột `main` ở `RefundServiceImpl`); đóng T-062, T-057.
+- P8 (mức LLM), người phụ trách NV1, phạm vi R-07 (kế hoạch §8.5); PR FlashTicket #17 (xung đột với `main`); đóng T-062, T-057.
 - Ghi sổ tồn đọng: DECISIONS cho T-044 (phiên 1, lượt 1–4), T-047 (C1/Q-233), Q-224, T-057, M6; WHY cho D-55 và ba đề xuất WHY T-044; QĐ-3–QĐ-6, QĐ-8 (T-045); E-MRP-1…3.
 - Code M1 ở nhánh `claude/sweet-hawking-dy078d` (đã push), chưa merge `master`.
 

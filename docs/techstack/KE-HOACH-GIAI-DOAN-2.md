@@ -111,3 +111,57 @@ Thêm: Keycloak bật log JSON (chưa kiểm tên tùy chọn của bản 26.8.0
 | G5 | Kịch bản demo có script, chế độ phát lại offline, video, diễn tập | Claude, Minh | Chặng 6 | G2, G3 |
 
 Cả hai phương án dùng chung định dạng G1, nên chuyển sang B không mất việc đã làm ở G1, G3.
+
+## 8. Cập nhật 17/11/2026: kế hoạch bản 3 (nhánh demo trước, nhánh đánh giá sau)
+
+- **Trạng thái:** Minh duyệt ghi (chat 17/11/2026: "duyệt theo đề xuất , ghi kế hoạch"; DECISIONS mục "Hoãn D16; chế độ (b) trên FlashTicket; nén T-032; kế hoạch bản 3"). Bản này qua hai lượt Codex phản biện và hai bản đáp của Claude trong chat. Duyệt kế hoạch không thay duyệt SPEC từng gói, lượt chạy dài, sửa repo nhóm hay mở dữ liệu khóa.
+- **Thay cho** các ngày của §3 chặng 3–6 và §7 G3–G5. Phần §0–§7 giữ làm lịch sử.
+
+### 8.1 Đã chốt
+
+| Việc | Chốt | Nguồn |
+|---|---|---|
+| Nền tảng | Oracle cho exp-app, exp-obs; máy tải ở AWS | DECISIONS 16/11 |
+| Repo vận hành | `flashticket-rca-lab`; phiên bản là commit; dữ liệu ngoài git | DECISIONS 16/11 |
+| Triển khai | Docker Compose trước; bản K8s sau demo, ghi là giới hạn của quyển | DECISIONS 16/11 |
+| D16 | Hoãn; không chặn khóa bản và chế độ (b) trên FlashTicket; kết quả (b) ghi giới hạn | DECISIONS 17/11 |
+| Bản FlashTicket thử nghiệm | `main` của nhóm + commit quan sát của PR #17, tự build, `OTEL_AGENT_ENABLED=true`; ghim một bản dùng xuyên W3–W7 | DECISIONS 17/11 |
+| M7 | Giữ chia theo ô (vị trí × họ lỗi); ngoại lệ phải trình riêng | DECISIONS 11/11 (T-059) |
+
+### 8.2 Nhánh demo (ưu tiên)
+
+| Gói | Việc | Xong khi |
+|---|---|---|
+| W0 | Nén T-032 tại chỗ; ghi kế hoạch này; viết `docs/READING-GUIDE.md` | — |
+| W1 | Repo lab chạy được: chép đủ phụ thuộc runner (stage/run M1, safe-export, inj3, venv dựng lại); script đọc `inventory/`; code và cấu hình ở git, JSON và chỉ mục ca ở `/srv/rca-lab` (chuyển trên máy). Dựng lại exp-obs, máy tải từ repo, dùng lại volume cũ. Kiểm từ đầu tới cuối: tải → xuất gói → RCA → mở được ca phát lại; xong mới trình danh sách xóa. Đầu ra trên máy chỉ kéo khi cần giữ và chưa có bản tương đương hoặc không dựng lại được. Trước khi trình danh sách xóa, đối chiếu từng đầu vào lịch sử (gói bổ sung, gói R9, bản chụp mã) với bản trên laptop: có bản tương đương, chứng minh dựng lại được, hoặc kéo về (gói đầu vào M1 đã kéo 17/11, `D:/RCA-archive/exp-obs/m1ft-inputs`). Thời hạn giữ Tempo: đo tốc độ tăng rồi chọn | Luồng chạy trọn từ repo lab |
+| W2 | Dựng bản thử nghiệm ghim (8.1): ghim revision `main` khi soạn SPEC (17/11 là `640dbaf`; danh sách xung đột kiểm lại trên đúng revision đó); gỡ xung đột trên nhánh riêng; build image arm64 và biến thể `-P rca-test` cho Booking, Event; file phủ lên `deploy/app/*.yml`; kiểm arm64 từng digest; chuỗi commit → digest → container. Nghiệm thu bằng danh sách tín hiệu bắt buộc theo luồng mua vé: span HTTP, DB, Redis, producer và consumer RabbitMQ có tên queue; log nối span bằng khóa `(traceId, spanId)` với độ phủ tối thiểu khai trước. Bộ kiểm R cũ (`results/T-062/kiem-du-lieu/kiem-r.py`) chỉ dùng chẩn đoán (R-03 không đòi Redis; R-04, R-06 có thể đạt khi thiếu) | Mua vé chạy trọn; đủ tín hiệu bắt buộc; không OOM sau 1 giờ tải |
+| W3 | Phụ thuộc: cách tính "lần dò mới nhất" (WHY-99) đã tích hợp vào bộ xuất chung, dùng cùng ngữ nghĩa ở phía cũ và phía mới. V082 không hồi quy trên bản mới: khai trước cặp ca cũ–mới (ô, digest, tải, can thiệp, đầu dò, cửa sổ) và tiêu chí theo ô (hạng nút gốc, lỗi chạy, kết luận ca khỏe); chỉ kết luận cho ô ghép được; dùng lại đầu ra cũ khớp điều kiện | Bảng so theo ô; V082 tụt thì dừng, trình Minh |
+| W4 | Luật cảnh báo Grafana bằng file (`provisioning/alerting/`): lỗi, p95 theo route ở gateway; liveness theo "lần dò mới nhất". Ngưỡng chọn trên đêm nền 1, đo báo động giả trên đêm nền 2. Khai trước quy tắc gom cảnh báo | Báo động giả dưới ngưỡng khai trước; webhook chạy |
+| W5 | Dịch vụ RCA trực tuyến chế độ (b): bộ xuất chung tích hợp cách tính "lần dò mới nhất" (WHY-99) cho ca và cửa sổ bất kỳ; hợp đồng G1 bản 0.3 mang nguồn t̂; bộ điều phối ghi t̂, phép kiểm `t` lõi nhận = t̂; không sửa lõi M1 đã ghim; không đọc sổ tiêm; mốc theo D3, giữ riêng giờ nhận webhook; đo thời gian trên dev rồi mới khai N phút; kiểm dashboard hiện hành, lưu trữ và phát lại khi đổi nguồn JSON. Nghiệm thu theo D3: lưu riêng bản ghi cảnh báo và giờ nhận; xuất dữ liệu theo t̂ đủ cửa sổ tới t̂+300 (gói cũ quanh mốc tiêm không dùng được); kiểm dữ liệu thực sự vào lõi (cửa sổ, tín hiệu), không chỉ `t = t̂`; ghi riêng thiếu dữ liệu phủ, lỗi xử lý, ca bỏ sót. Nếu demo dùng stage đọc file ghi vòng của Collector, ghi giới hạn cửa sổ; đọc qua API Tempo/Loki/Prometheus (P9b) để OPEN | Tiêm một lỗi, Grafana tự hiện kết quả trong N phút đã khai |
+| W8 | LLM tối thiểu: giải thích dẫn bằng chứng, gợi ý bước xử lý, được trả lời "không đủ bằng chứng". Mức đánh giá do Minh chọn | Chạy được trong demo |
+| W9a | Kịch bản demo, video, phát lại offline, diễn tập 2 lần | Diễn tập không lỗi |
+
+### 8.3 Nhánh đánh giá (lịch chờ dự toán)
+
+- **W6 — khóa bản và thiết kế đánh giá.** Khóa digest FlashTicket, commit repo lab, sha256 bản M1, kịch bản và mức tải. D14 bắt buộc: P7 khóa chạy thẳng, V082 đầy đủ, V082 che từng nhóm thông tin kể cả phần dẫn xuất; cả hai chế độ. Ma trận ô chạy được trên bản mới. Dự toán giờ máy và quy tắc gói hợp lệ. R-07: mặc định chấm theo sự cố tiêm đã xác nhận trong cửa sổ khai trước và gọi là "độ trễ theo mốc tiêm"; chỉ khi Minh chọn kết luận theo thời điểm bắt đầu tác động mới thêm đầu dò dòng thời gian (chi phí tính trong W6). Baseline: SimpleRCA (M4, quy ước T-017), BARO RobustScorer là ứng viên; khóa danh sách và nhánh dự phòng của từng phép che trước khi thu; ở chế độ (b) BARO dùng cùng t̂. Runner cho W7: chụp và kiểm đầu vào từng ca lúc thu, đóng gói đầu vào không phụ thuộc đầu ra M1 (bỏ điều kiện `summary.json` của `safe-export.py`), chạy batch RCA và baseline sau khi cả đợt đã đóng; tuyến trực tuyến W5 tách riêng. Ghi WHY trước khi thu.
+- **Độ đo theo đầu ra:**
+
+| Đầu ra | Độ đo |
+|---|---|
+| Phát hiện | Precision, Recall, F1 theo cửa sổ; quy tắc ghép sự cố với cảnh báo, gộp báo trùng; ca bỏ sót; báo động giả mỗi giờ khỏe; độ trễ theo mốc đã chọn |
+| Xếp hạng | MRR, NDCG@5, Hit@k, AC@k theo B1.9 (T-043 SPEC) và quy tắc nhãn T-059; khóa riêng ba bảng: điểm theo nhãn thật, điểm theo tập nút chấp nhận, bảng định vị cạnh (có hướng, có loại; `UNSUPPORTED` cho V082); giữ ca không có cảnh báo trong mẫu số của chế độ (b), báo thêm điểm trên nhóm có cảnh báo |
+| Vùng ảnh hưởng | Precision, Recall, F1 khi có nhãn độc lập cùng cấp (đường đo mức endpoint của T-059); chưa đối chiếu được thì báo đồ thị con nghi ngờ, độ đúng OPEN |
+
+- **W7 — đợt đánh giá.** Chỉ chốt lịch khi có dự toán và phương án lỗi ở 10%, 50%, 99% (luật 21). Thu trước, chạy RCA và baseline sau trên gói đã đóng; chấm sau khi đã băm đầu ra.
+- **W9b — hồ sơ G6** (phản biện chéo bắt buộc) và quyển. Chương P1–P7 viết ngay, song song.
+
+### 8.4 Thứ tự, song song, khi trễ
+
+- W0 và W1 làm trước; chuẩn bị W2 song song W1. Trên exp-app, lượt kiểm đầu–cuối của W1 và lần dựng lại container của W2 ở hai khung giờ riêng. W3 sau W2 và sau khi tích hợp cách tính R9 vào bộ xuất chung. W4 sau W2; đêm nền W4 tách khỏi ca tiêm W3. W5 viết song song W4 trên dữ liệu đã có. W6 thiết kế song song W4–W5. Quyển viết song song từ 18/11.
+- Sửa S1–S7 sau ba lượt Codex rà bản 3: Minh duyệt 17/11 ("Duyệt cả hai").
+- Ngày cụ thể chờ ngày demo và bảo vệ (Minh chưa cho). Chưa có căn cứ đặt lịch W7.
+- Khi trễ, cắt theo thứ tự: LLM về mức chỉ demo → số baseline → số lần lặp. Không cắt W3, D14.
+
+### 8.5 Còn mở
+
+- D16 (hoãn); R-07 cho độ trễ phát hiện; NV1 (đánh giá hiệu năng hệ thống) chưa có người phụ trách; ngày demo và bảo vệ; mức đánh giá LLM; K8s là giới hạn của quyển.
