@@ -1,0 +1,133 @@
+{
+ "time": "2026-11-17T12:28:00Z",
+ "app_rps": {
+  "query": "sum by(service_name)(rate(http_server_request_duration_seconds_count[1m]))",
+  "n_series": 7,
+  "series": {
+   "{\"service_name\": \"ticket-service\"}": "0.04",
+   "{\"service_name\": \"discovery-server\"}": "0.58",
+   "{\"service_name\": \"booking-service\"}": "1.66",
+   "{\"service_name\": \"event-service\"}": "2.4399512009759805",
+   "{\"service_name\": \"keycloak\"}": "0.04",
+   "{\"service_name\": \"api-gateway\"}": "4.32",
+   "{\"service_name\": \"user-service\"}": "0.04"
+  }
+ },
+ "app_p90": {
+  "query": "histogram_quantile(0.9, sum by(le,service_name)(rate(http_server_request_duration_seconds_bucket[1m])))",
+  "n_series": 7,
+  "series": {
+   "{\"service_name\": \"keycloak\"}": "0.0045000000000000005",
+   "{\"service_name\": \"api-gateway\"}": "0.024175000000000002",
+   "{\"service_name\": \"user-service\"}": "0.0045000000000000005",
+   "{\"service_name\": \"ticket-service\"}": "0.0045000000000000005",
+   "{\"service_name\": \"discovery-server\"}": "0.0045000000000000005",
+   "{\"service_name\": \"booking-service\"}": "0.020022727272727275",
+   "{\"service_name\": \"event-service\"}": "0.0208"
+  }
+ },
+ "app_5xx": {
+  "query": "sum by(service_name)(rate(http_server_request_duration_seconds_count{http_response_status_code=~\"5..\"}[1m]))",
+  "n_series": 1,
+  "series": {
+   "{\"service_name\": \"api-gateway\"}": "0.26"
+  }
+ },
+ "span_calls": {
+  "query": "sum by(service_name)(rate(traces_span_metrics_calls_total[1m]))",
+  "n_series": 8,
+  "series": {
+   "{\"service_name\": \"ticket-service\"}": "94.14",
+   "{\"service_name\": \"discovery-server\"}": "0.72",
+   "{\"service_name\": \"booking-service\"}": "34",
+   "{\"service_name\": \"payment-service\"}": "0",
+   "{\"service_name\": \"event-service\"}": "34.1",
+   "{\"service_name\": \"keycloak\"}": "6.7",
+   "{\"service_name\": \"api-gateway\"}": "11.540000000000001",
+   "{\"service_name\": \"user-service\"}": "0.28"
+  }
+ },
+ "span_err": {
+  "query": "sum by(service_name)(rate(traces_span_metrics_calls_total{status_code=\"STATUS_CODE_ERROR\"}[1m]))",
+  "n_series": 1,
+  "series": {
+   "{\"service_name\": \"api-gateway\"}": "0.26"
+  }
+ },
+ "span_p90": {
+  "query": "histogram_quantile(0.9, sum by(le,service_name)(rate(traces_span_metrics_duration_seconds_bucket[1m])))",
+  "n_series": 8,
+  "series": {
+   "{\"service_name\": \"user-service\"}": "0.007200000000000003",
+   "{\"service_name\": \"ticket-service\"}": "0.025547486033519563",
+   "{\"service_name\": \"discovery-server\"}": "0.0019058823529411767",
+   "{\"service_name\": \"booking-service\"}": "0.0035068493150684937",
+   "{\"service_name\": \"payment-service\"}": "NaN",
+   "{\"service_name\": \"event-service\"}": "0.002508771929824567",
+   "{\"service_name\": \"keycloak\"}": "0.0018496932515337423",
+   "{\"service_name\": \"api-gateway\"}": "0.03923756906077348"
+  }
+ },
+ "sg_req": {
+  "query": "sum by(client,server)(rate(traces_service_graph_request_total[1m]))",
+  "n_series": 35,
+  "series": {
+   "{\"client\": \"api-gateway\", \"server\": \"redis\"}": "4.339913201735965",
+   "{\"client\": \"api-gateway\", \"server\": \"unknown\"}": "0.0999980000399992",
+   "{\"client\": \"api-gateway\", \"server\": \"booking-service\"}": "1.5999680006399872",
+   "{\"client\": \"api-gateway\", \"server\": \"discovery-server\"}": "0.059998800023999516",
+   "{\"client\": \"api-gateway\", \"server\": \"event-service\"}": "2.259954800903982",
+   "{\"client\": \"api-gateway\", \"server\": \"payment-service\"}": "0",
+   "{\"client\": \"api-gateway\", \"server\": \"ticket-service\"}": "0",
+   "{\"client\": \"booking-service\", \"server\": \"payment-service\"}": "0",
+   "{\"client\": \"booking-service\", \"server\": \"unknown\"}": "0",
+   "{\"client\": \"booking-service\", \"server\": \"booking_db\"}": "11.059778804423912",
+   "{\"client\": \"booking-service\", \"server\": \"redis\"}": "3.619927601447971",
+   "{\"client\": \"booking-service\", \"server\": \"discovery-server\"}": "0.07999840003199936",
+   "{\"client\": \"booking-service\", \"server\": \"keycloak\"}": "0",
+   "{\"client\": \"discovery-server\", \"server\": \"discovery-server\"}": "0.17999640007199855",
+   "{\"client\": \"event-service\", \"server\": \"event_db\"}": "27.21945561088778",
+   "{\"client\": \"event-service\", \"server\": \"discovery-server\"}": "0.07999840003199936",
+   "{\"client\": \"event-service\", \"server\": \"keycloak\"}": "0",
+   "{\"client\": \"keycloak\", \"server\": \"keycloak_db\"}": "2.45995080098398",
+   "{\"client\": \"payment-service\", \"server\": \"booking-service\"}": "0",
+   "{\"client\": \"payment-service\", \"server\": \"ticket-service\"}": "0",
+   "{\"client\": \"payment-service\", \"server\": \"unknown\"}": "0",
+   "{\"client\": \"payment-service\", \"server\": \"payment_db\"}": "0",
+   "{\"client\": \"payment-service\", \"server\": \"discovery-server\"}": "0",
+   "{\"client\": \"payment-service\", \"server\": \"keycloak\"}": "0",
+   "{\"client\": \"ticket-service\", \"server\": \"payment-service\"}": "0",
+   "{\"client\": \"ticket-service\", \"server\": \"unknown\"}": "0",
+   "{\"client\": \"ticket-service\", \"server\": \"ticket_db\"}": "91.47817043659127",
+   "{\"client\": \"ticket-service\", \"server\": \"discovery-server\"}": "0.059998800023999516",
+   "{\"client\": \"ticket-service\", \"server\": \"keycloak\"}": "0",
+   "{\"client\": \"user\", \"server\": \"api-gateway\"}": "4.279914401711966",
+   "{\"client\": \"user\", \"server\": \"keycloak\"}": "0.01999960000799984",
+   "{\"client\": \"user\", \"server\": \"payment-service\"}": "0",
+   "{\"client\": \"user-service\", \"server\": \"admin\"}": "0.03999920001599968",
+   "{\"client\": \"user-service\", \"server\": \"user_db\"}": "0.11999760004799903",
+   "{\"client\": \"user-service\", \"server\": \"discovery-server\"}": "0.07999840003199936"
+  }
+ },
+ "sg_fail": {
+  "query": "sum by(client,server)(rate(traces_service_graph_request_failed_total[1m]))",
+  "n_series": 1,
+  "series": {
+   "{\"client\": \"user\", \"server\": \"api-gateway\"}": "0.21999560008799823"
+  }
+ },
+ "jvm": {
+  "query": "sum by(service_name)(jvm_memory_used_bytes)",
+  "n_series": 8,
+  "series": {
+   "{\"service_name\": \"ticket-service\"}": "325519000",
+   "{\"service_name\": \"discovery-server\"}": "251146176",
+   "{\"service_name\": \"booking-service\"}": "454336104",
+   "{\"service_name\": \"payment-service\"}": "388629896",
+   "{\"service_name\": \"event-service\"}": "294643992",
+   "{\"service_name\": \"keycloak\"}": "415909104",
+   "{\"service_name\": \"api-gateway\"}": "317933560",
+   "{\"service_name\": \"user-service\"}": "270492184"
+  }
+ }
+}
