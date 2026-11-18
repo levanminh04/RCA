@@ -173,3 +173,190 @@ Chỉ ghi bản phản biện lượt mới được Minh cho phép theo tasks/_
 - 18/11 — Quyết định của Minh trong phiên (chat): nhóm 2 "cái nào không có giá trị sử dụng lại nhiều, không mang lại giá trị mới thì xóa đi, dùng lại được thì kéo"; Q2 T-067 "cứ lấy theo như tuấn, phần nào từ PR hiện tại mà cần thì merge làm vào", "vnpay không cho test luồng hoàn nên phải làm db như thế" (ghi lại vào LOG T-067 khi mở task).
 - 18/11 — Bước 11 nhóm 2 xong: so hash 1.297 file; kéo 65 file + volume LGTM về `D:/RCA-archive/exp-obs/t066-nhom2/` (hash khớp); xóa 2.1–2.5 trên exp-obs, gỡ 2 dòng known_hosts (2.8); giữ 2.6, 2.7 tới sau T-067. Lần kéo volume đầu bị lệch hash do dòng `du` lọt vào đầu tar; kéo lại, khớp `68ffdef5…`. Chi tiết `danh-sach-xoa.md` (Kết quả), `thay-doi-may.md`.
 - 18/11 — Tìm hiểu Grafana (chỉ đọc): 9 dashboard nạp lại nguyên theo SPEC (3 hiện hành, 6 lưu trữ T-065); 2 dashboard tạo tay ngoài repo (`t058-flashticket` 10/11, `t061-infinity` 11/11); nguồn `loki-1` trùng `Loki`. Dashboard V082 (`t065-l8b-rca`) không có đồ thị mức dịch vụ vì V082 không xuất xếp hạng cạnh, T-065 chỉ giữ đồ thị thao tác; P7 (`t065-rca`) và G2 có. Đề xuất dọn Grafana trình Minh trong chat (ngoài SPEC T-066); chưa sửa.
+
+---
+
+## Prompt soát kết quả T-066 (bổ sung 18/11/2026, Claude)
+
+LOG trước chỉ có prompt soát SPEC dùng chung cho T-066 và T-067; thiếu prompt soát kết quả của T-066. Bổ sung theo AGENTS mục 7. Bước 10 (đo Tempo) dừng sớm theo quyết định của Minh; nhóm 1–2 danh sách xóa đã xử lý (mục 2.6, 2.7 giữ làm đường hoàn tác T-067).
+
+```text
+Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
+Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
+
+Thông tin lượt này:
+- Task hoặc đề xuất: T-066 — tasks/T-066-repo-lab-dung-lai-may/ (SPEC.md bản 2, LOG.md).
+- Công đoạn: soát kết quả.
+- Gói/cổng: P9, P10; chuẩn bị G6.
+- Người làm và người phản biện chính thức: người làm Claude; người phản biện Codex.
+- Tài liệu gốc: tasks/T-066-repo-lab-dung-lai-may/SPEC.md; repo lab D:/Project/flashticket-rca-lab, các commit T-066 tới ab1c52c (git log ab1c52c); repo RCA commit 84f44ee67.
+- Phản biện và phản hồi trước: Codex soát SPEC bản 1 (trong chat 17/11; tóm tắt ở đầu SPEC.md); chưa có lượt soát kết quả.
+- Code và kết quả liên quan: results/T-066/ (bao-ve.tsv, phu-thuoc.md, hoi-quy-v082.json, hoi-quy/, r9-tong-quat.json, r9-xuat/, cach-ly-nhan.md, e2e-001/ kèm SHA256SUMS và hash-tren-may.sha256, danh-sach-xoa.md, tempo-tang-truong.md, tempo-do-dung.tsv, thay-doi-may.md); results/T-064/manifest-3.json; D:/RCA-archive/exp-obs/m1ft-inputs và t066-nhom2 (SHA256SUMS); máy exp-obs, exp-app, máy tải theo inventory/ của repo lab (chỉ đọc).
+- Phạm vi ghi được Minh cho phép trong lượt này: chỉ trả lời trong chat.
+
+Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
+
+Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
+Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
+Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
+
+Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
+hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
+Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
+số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
+có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
+
+Bổ sung yêu cầu phản biện:
+1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
+2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
+3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
+4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
+5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
+6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
+7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
+8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
+9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
+10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
+11. Rà cả phần không được nêu trong LOG, báo cáo hay phản biện trước. Với mỗi bước dữ liệu đi qua (đọc → chuyển đổi → tính → chấm), hỏi quy ước của dữ liệu nguồn (giá trị đặc biệt, đơn vị, gốc, alias, rỗng) có được xử lý đúng không. Không coi phần không ai nêu là đã đúng.
+12. Một trạng thái xảy ra đồng loạt (100% lỗi, 100% không hỗ trợ, toàn hòa, toàn rỗng) là dấu hiệu cần lần tới đầu vào, không phải kết quả để diễn giải. Không dùng nó làm căn cứ thiết kế trước khi lần.
+13. Điểm cuối khớp số công bố, hay "chạy không lỗi", chưa chứng minh thành phần chạy đúng. Kiểm trung gian và phép kiểm không cần nhãn.
+14. Câu có "mọi", "đều", "không đổi", "trùng" phải nói rõ đại lượng và có lệnh đếm trên đủ đối tượng.
+15. Trước khi đề xuất sửa hoặc ghi vào một file dùng chung (code, script, tài liệu), kiểm file đó có bị ghim trong manifest, plan hoặc vân tay job nào không. Nêu rõ thao tác nào làm đổi hash và ảnh hưởng tới đâu.
+16. Kiểm tiêu chí so sánh hoặc chấp nhận được khai trước khi xem kết quả. Đổi tiêu chí sau khi xem phải khai là sửa sau.
+17. Với lượt chạy, tách lỗi hạ tầng và điều phối (tiến trình, nguồn điện, kết nối, giới hạn thời gian) khỏi lỗi phương pháp; lỗi hạ tầng không được ghi thành kết quả khoa học.
+18. Phản biện một kế hoạch thì kiểm cả đường thực thi thật: code có cho phép làm đúng như kế hoạch nói không (guard, thư mục, trạng thái đã khóa). Không chỉ kiểm lập luận trên giấy.
+19. Mỗi phần ghi "chưa xác định", "chưa phân xử", "chưa biết" hoặc OPEN phải kèm giải thích: vì sao chưa xác định được (thiếu dữ kiện gì, hay dữ liệu đã lưu không tách được các giải thích); các giải thích khả thi còn lại; bằng chứng hoặc phép phân tích nào phân xử được, trên dữ liệu nào, chi phí; kết luận nào phụ thuộc. Không dừng ở một câu "chưa xác định".
+20. Mỗi phần chờ Minh quyết phải kèm đề xuất của agent trong chính lượt đó: chọn gì, vì sao, mặt trái, phương án khác đã xét. Prompt bàn giao yêu cầu agent đối phương phản biện các đề xuất ấy. Đề xuất không thay quyết định của Minh.
+
+Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
+Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
+
+Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
+bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
+Tiếng Việt, câu ngắn.
+
+Cuối lượt báo:
+1. Đã làm gì.
+2. File đã thay đổi, hoặc không sửa file nào.
+3. Kiểm đã chạy và kết quả.
+4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
+
+Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
+
+Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
+
+Công đoạn: soát kết quả.
+Kiểm trên đầu ra thật, code và dữ liệu được phép; không tin tóm tắt LOG. Đối chiếu tiêu chí xong với phần mục tiêu nguồn và mức căn cứ cho bước tiếp theo; chạy lại phần rẻ khi trong quyền được duyệt.
+Phân biệt hoàn thành task mô tả, xác nhận cơ chế và đủ căn cứ chọn/đánh giá thiết kế. Giới hạn đã khai không tự miễn phép kiểm cần thiết còn làm được.
+Chỉ ghi bản phản biện lượt được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ bản cũ; không sửa kết quả thay người làm.
+```
+
+---
+
+## Phiên 3 — 18/11/2026 — Claude — laptop — vai trò: người làm (đáp phản biện soát kết quả của Codex, trong chat)
+
+**Tự soát trước khi đọc kết luận** (đã tìm trước, trong các lượt T-068): việc thiếu prompt soát kết quả T-066 (đã bổ sung cuối LOG); dòng STATE T-066 ghi cũ (đã sửa). Không có điểm mới khác.
+
+**Đánh giá lượt soát kết quả của Codex (18/11):**
+
+| Điểm | Kết luận | Bằng chứng người làm chạy lại |
+|---|---|---|
+| R1 CHẶN — `results/T-064/manifest-3.json` không có trong git dù `bao-ve.tsv` dòng 171 ghi "git (repo RCA, đã commit)" | **Đúng** | `git ls-files --error-unmatch` báo không có; file không bị ignore, chỉ chưa track; kích thước 1.055.393 byte; commit T-064 `25550d2a5` chỉ gồm "kết quả nhẹ". Phép so hồi quy vẫn đúng (file trên laptop khớp hash ghi trong T-066). |
+| R2 CHẶN — README tải chỉ `STOP` cũ; thiếu phụ thuộc `yaml` | **Đúng** | `load/controller/README.md:22` ghi `~/rca-dieu-phoi/STOP`; code đọc `STATE/STOP` với `STATE=/srv/rca-lab/load-controller` (`tai_linux.py:30,86`); runner dùng `/srv/rca-lab/runs/STOP` (`runner4.py:26,41`), nhưng docstring dòng 17 còn ghi đường cũ; `campaigns/lib/inventory.py:18` `import yaml`. |
+| R3 CHẶN — căn cứ xóa 2.6/2.7 và mục 1.2 | **Đúng** | 2.6: `load/fixtures/fixture.py:13,21` vẫn đọc `/opt/rca-tai/secret/tokens.json` → giữ 2.6. 2.7: `deploy-t062.sh` cũ phục hồi được từ lab `a46c009` (`git ls-tree` có `app-host/scripts/deploy-t062.sh`). 1.2: đếm lại trên laptop (35 tgz trong `results/T-058|T-062|T-063` + thư mục `outputs/` đã giải nén) được **32 mã `outputs/` khác nhau**, không phải 38; 12 ca trong `D:/RCA-archive/exp-obs/cases/` chỉ có `cases/`, không có `outputs/`. 6 thư mục `outputs/` không xác định được tên vì không còn danh sách trước khi xóa; khả năng là đầu ra của các ca thử trong archive (`gia*`, `kte*`, `thuong01`…) — **chưa kiểm**. Câu "tgz chứa cả cases/outputs cho 33 ca" của hàng 1.2 nói quá. |
+| R4 CHẶN — "đã kiểm phát lại trước khi trình xóa" | **Đúng** | LOG: trình danh sách xóa 12:52Z, Minh duyệt và xóa nhóm 1 lúc 12:53Z; lần xem Grafana 15:30Z là trang **sự cố** của ca mới, không phải ca cũ trên trang **phát lại**. Thứ tự ghi trong LOG trước đây không sai, nhưng tiêu chí W1 "mở được ca phát lại trước khi trình danh sách xóa" chưa đạt đúng thời điểm. Sau đó (T-068, 02:3xZ 18/11) trang phát lại trả 200. |
+| R5 KHÔNG CHẶN — trạng thái `XONG` của runner | **Đúng** | Đồng ý; với ca sau, nghiệm thu theo trạng thái xuất, hai hash và đầu ra G1 của chính ca. `campaigns/runner/*.py` đang nằm trong danh sách bảo vệ của T-067 nên không sửa lúc này. |
+| Đính chính khác (Codex nêu) | **Đúng** | "Không bước nào đọc sổ" cần thu hẹp: `ledger_append.py` (chạy bằng user `ledger`) đọc dòng trước để nối hash; không có đường đưa sổ vào P7/V082. Hai ví dụ IP trong docstring `inventory.py` không cấp địa chỉ cho tiến trình. |
+
+**Đề xuất sửa gom theo file (chờ Minh duyệt):**
+1. Repo RCA: commit `results/T-064/manifest-3.json` nguyên byte (kiểm sha256 `faa7d292…` trước khi add). Ghi `results/T-066/dinh-chinh.md`: (a) dòng 171 `bao-ve.tsv` — nguồn đúng là "file trên laptop, commit ở <hash mới>"; không sửa `bao-ve.tsv` vì T-067 đang dùng làm mốc; (b) hàng 1.2 danh sách xóa: 32/38 `outputs/` có bản, 6 không xác định; (c) R4: thứ tự thật và giới hạn; (d) câu cách ly sổ thu hẹp như trên.
+2. Repo lab: `load/controller/README.md` ghi đúng hai đường STOP (`/srv/rca-lab/load-controller/STOP` cho bộ điều khiển tải, `/srv/rca-lab/runs/STOP` cho runner), nơi nhận kết quả, và yêu cầu Python hệ thống có `python3-yaml` (venv M1 không cần). Không sửa docstring `runner4.py` lúc này (đang được T-067 bảo vệ); ghi vào README thay thế.
+3. `danh-sach-xoa.md` mục 2.6: giữ tới khi Minh quyết dừng hay tiếp tục dùng CLI `fixture.py`; mục 2.7: ghi phục hồi `deploy-t062.sh` từ lab `a46c009`.
+4. R4: đề xuất Minh chấp nhận giới hạn lịch sử, và cho mở thử một ca cũ (ví dụ `46aab4be`) trên trang phát lại để xác nhận hành vi hiện tại (vài phút, cần Minh đăng nhập Grafana).
+5. DECISIONS: ghi Q1(b) và "dừng đo, giữ Tempo 14 ngày" (Minh duyệt nội dung dòng ghi).
+
+Không còn bất đồng có bằng chứng với Codex.
+
+**Prompt cho Codex — kiểm lại phản hồi phiên 3:**
+
+```text
+Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
+Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
+
+Thông tin lượt này:
+- Task hoặc đề xuất: T-066 — tasks/T-066-repo-lab-dung-lai-may/ (SPEC.md, LOG.md); phản hồi của người làm ở mục "Phiên 3" cuối LOG.md.
+- Công đoạn: kiểm lại phản hồi và sửa.
+- Gói/cổng: P9, P10; chuẩn bị G6.
+- Người làm và người phản biện chính thức: người làm Claude; người phản biện Codex.
+- Tài liệu gốc: tasks/T-066-repo-lab-dung-lai-may/SPEC.md; repo lab D:/Project/flashticket-rca-lab, git diff a46c009..ab1c52c; repo RCA commit 84f44ee67.
+- Phản biện và phản hồi trước: Codex soát SPEC bản 1 (chat 17/11); Codex soát kết quả (chat 18/11); phản hồi của người làm ở mục "Phiên 3" cuối LOG.md.
+- Code và kết quả liên quan: results/T-066/; results/T-064/manifest-3.json; D:/RCA-archive/exp-obs/ (cases/, m1ft-inputs/, t066-nhom2/) và D:/RCA-archive/hash-lists/; các tgz trong results/T-058, results/T-062, results/T-063; repo lab load/controller/, load/fixtures/, campaigns/lib/inventory.py, campaigns/runner/runner4.py.
+- Phạm vi ghi được Minh cho phép trong lượt này: chỉ trả lời trong chat.
+
+Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
+
+Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
+Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
+Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
+
+Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
+hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
+Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
+số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
+có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
+
+Bổ sung yêu cầu phản biện:
+1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
+2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
+3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
+4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
+5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
+6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
+7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
+8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
+9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
+10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
+11. Rà cả phần không được nêu trong LOG, báo cáo hay phản biện trước. Với mỗi bước dữ liệu đi qua (đọc → chuyển đổi → tính → chấm), hỏi quy ước của dữ liệu nguồn (giá trị đặc biệt, đơn vị, gốc, alias, rỗng) có được xử lý đúng không. Không coi phần không ai nêu là đã đúng.
+12. Một trạng thái xảy ra đồng loạt (100% lỗi, 100% không hỗ trợ, toàn hòa, toàn rỗng) là dấu hiệu cần lần tới đầu vào, không phải kết quả để diễn giải. Không dùng nó làm căn cứ thiết kế trước khi lần.
+13. Điểm cuối khớp số công bố, hay "chạy không lỗi", chưa chứng minh thành phần chạy đúng. Kiểm trung gian và phép kiểm không cần nhãn.
+14. Câu có "mọi", "đều", "không đổi", "trùng" phải nói rõ đại lượng và có lệnh đếm trên đủ đối tượng.
+15. Trước khi đề xuất sửa hoặc ghi vào một file dùng chung (code, script, tài liệu), kiểm file đó có bị ghim trong manifest, plan hoặc vân tay job nào không. Nêu rõ thao tác nào làm đổi hash và ảnh hưởng tới đâu.
+16. Kiểm tiêu chí so sánh hoặc chấp nhận được khai trước khi xem kết quả. Đổi tiêu chí sau khi xem phải khai là sửa sau.
+17. Với lượt chạy, tách lỗi hạ tầng và điều phối (tiến trình, nguồn điện, kết nối, giới hạn thời gian) khỏi lỗi phương pháp; lỗi hạ tầng không được ghi thành kết quả khoa học.
+18. Phản biện một kế hoạch thì kiểm cả đường thực thi thật: code có cho phép làm đúng như kế hoạch nói không (guard, thư mục, trạng thái đã khóa). Không chỉ kiểm lập luận trên giấy.
+19. Mỗi phần ghi "chưa xác định", "chưa phân xử", "chưa biết" hoặc OPEN phải kèm giải thích: vì sao chưa xác định được (thiếu dữ kiện gì, hay dữ liệu đã lưu không tách được các giải thích); các giải thích khả thi còn lại; bằng chứng hoặc phép phân tích nào phân xử được, trên dữ liệu nào, chi phí; kết luận nào phụ thuộc. Không dừng ở một câu "chưa xác định".
+20. Mỗi phần chờ Minh quyết phải kèm đề xuất của agent trong chính lượt đó: chọn gì, vì sao, mặt trái, phương án khác đã xét. Prompt bàn giao yêu cầu agent đối phương phản biện các đề xuất ấy. Đề xuất không thay quyết định của Minh.
+
+Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
+Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
+
+Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
+bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
+Tiếng Việt, câu ngắn.
+
+Cuối lượt báo:
+1. Đã làm gì.
+2. File đã thay đổi, hoặc không sửa file nào.
+3. Kiểm đã chạy và kết quả.
+4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
+
+Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
+
+Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
+
+Công đoạn: người phản biện kiểm lại phản hồi và sửa.
+Tự soát yêu cầu và đầu ra gốc trước; sau đó đọc phản biện, phản hồi và các thay đổi được duyệt. Kiểm cả ý kiến phản bác reviewer; không mặc định phản hồi hoặc bản sửa đúng.
+Đối chiếu từng điểm với bằng chứng hiện tại, quyền sửa và hậu quả. Có điểm đúng nhưng chưa được Minh duyệt sửa thì ghi đúng trạng thái; không tự coi đã xử lý hoặc ép người làm sửa.
+Chỉ ghi bản phản biện lượt mới được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ lịch sử, không ghi LOG/STATE hay sửa thay người làm. Nêu bất đồng còn lại và soạn prompt để người làm đáp.
+```
+
+**Quyết định của Minh** (nguyên lời, 18/11): "Duyệt 5 nhóm sửa" (5 nhóm ở mục "Đề xuất sửa gom theo file" phiên 3).
+
+**Diễn biến sửa (18/11):**
+- Nhóm 1: sha256 `results/T-064/manifest-3.json` = `faa7d292…` (khớp `bao-ve.tsv` dòng 171), commit nguyên byte. Ghi `results/T-066/dinh-chinh.md`: nguồn ghi ở dòng 171 (không sửa `bao-ve.tsv`); hàng 1.2 (đếm lại: 45 mã `cases/` khác nhau, bằng số đã xóa, không còn danh sách tên để so từng mã; `outputs/` 32/38, 6 không xác định); R4 thứ tự thật; thu hẹp câu cách ly sổ; ví dụ IP trong docstring `inventory.py`.
+- Nhóm 2: lab `load/controller/README.md` — bảng đường dẫn hiện hành (mã `/opt/rca-lab`, khóa `/etc/rca-lab/controller`, trạng thái `/srv/rca-lab/load-controller`, STOP bộ tải `/srv/rca-lab/load-controller/STOP`, STOP runner `/srv/rca-lab/runs/STOP`), phụ thuộc PyYAML hệ thống, lệnh chạy từ `/opt/rca-lab`. Không sửa `runner4.py` (đang được T-067 bảo vệ).
+- Nhóm 3: `danh-sach-xoa.md` mục Kết quả: 2.6 giữ (CLI `fixture.py` vẫn dùng `/opt/rca-tai`); 2.7 so hash `~/deploy-t062.sh` trên exp-app = lab `a46c009` = `e9305304…` (HEAD lab khác, `acee82e6…`); 1.2 trỏ tới đính chính.
+- Nhóm 4: Minh chấp nhận giới hạn lịch sử R4. Xác nhận hiện tại: mở `t065-l8b-phat-lai` với ca cũ `46aab4be`, bản V082 (Grafana, phiên Minh đăng nhập, tunnel mới): trang tải đủ bảng "Bản, hash, trạng thái và cửa sổ" (hash cấu hình `451a8437…`, mã nguồn `b0f79a4d…`, đầu ra `573df32d…`, cửa sổ 13:04:02–13:14:02Z 13/11) và panel "Phát lại — lớp dữ liệu tách riêng".
+- Nhóm 5: `docs/DECISIONS.md` thêm mục "T-066/T-067: bộ điều khiển tải trên exp-obs; giữ Tempo 14 ngày, 17/11/2026" (Q1(b), giữ Tempo 14 ngày).
+
+**Kết thúc lượt:** T-066 đã xử lý xong R1–R5 theo duyệt của Minh. Còn mở: mục 2.6, 2.7 (xóa sau T-067 theo quyết định của Minh); 6/38 `outputs/` không xác định tên. Prompt cho Codex kiểm lại: mục "Prompt cho Codex — kiểm lại phản hồi phiên 3" ở trên vẫn dùng được (các sửa nằm ở mục này).

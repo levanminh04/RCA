@@ -697,3 +697,10 @@ Minh (chat 17/11/2026), sau hai lượt Codex phản biện kế hoạch và hai
 - **T-032:** thay Q-181. Phần chưa track của `results/T-032/runs/` nén tại chỗ, mỗi thư mục lượt chạy một `payload-2026-11-17.tar.gz` kèm danh sách sha256; đọc lại từng file trong gói và so hash, khớp mới xóa file rời; không đụng file đã track; chỉ mục `results/T-032/NEN-2026-11-17.jsonl`. Giữ trên laptop.
 - **Bản FlashTicket cho thử nghiệm (W2):** phương án B — `main` của nhóm cộng các commit quan sát của PR #17, tự build, bật agent bằng `OTEL_AGENT_ENABLED=true`. Chuyển sang digest của nhóm khi PR #17 được merge và xác nhận tương đương. Gỡ xung đột trên nhánh của repo nhóm làm trong W2, theo SPEC của W2.
 - **Kế hoạch bản 3** (nhánh demo trước, nhánh đánh giá sau; giữ M7 chia theo ô, D14, độ đo theo đầu ra): ghi ở `docs/techstack/KE-HOACH-GIAI-DOAN-2.md` §8. Duyệt kế hoạch không thay duyệt SPEC từng gói, lượt chạy dài hay mở dữ liệu khóa.
+
+## T-066/T-067: bộ điều khiển tải trên exp-obs; giữ Tempo 14 ngày, 17/11/2026
+
+Minh duyệt ghi mục này ngày 18/11/2026 ("Duyệt 5 nhóm sửa", nhóm 5, theo phản biện T-066 của Codex).
+
+- **Q1(b)** (chat 17/11, khi duyệt SPEC T-066/T-067): "duyệt Q1 b)". Bộ điều khiển tải chạy trên exp-obs bằng khóa riêng tại `/etc/rca-lab/controller/`; khóa riêng của bộ điều khiển không rời exp-obs; mỗi máy đích (exp-app, máy tải) thêm đúng một dòng `authorized_keys` ghi chú `rca-lab-controller`. Căn cứ và kiểm: SPEC, LOG T-066.
+- **Thời hạn giữ Tempo** (chat 17/11): "dừng đo, giữ 14 ngày". Bước 10 của T-066 dừng sớm; `block_retention` giữ 336h. Lượt đo 2 giờ 45 phút chưa cho tốc độ tăng ổn định (`results/T-066/tempo-tang-truong.md`). Đo lại khi cần đổi thời hạn.
