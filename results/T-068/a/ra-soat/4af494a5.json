@@ -1,0 +1,337 @@
+{
+ "ca": "4af494a5",
+ "cua_so_ms": [
+  1794556238000,
+  1794556838000
+ ],
+ "hash": {
+  "tgz": {
+   "mong_doi": "cefd7697c80283dbdab413de46af706aeeb8887b670855826e7ebef793cab14b",
+   "thuc": "cefd7697c80283dbdab413de46af706aeeb8887b670855826e7ebef793cab14b",
+   "khop": true
+  },
+  "manifest_trong_goi_cua_so_s": [
+   1794556238,
+   1794556838
+  ],
+  "raw_traces": {
+   "mong_doi": "21cdc2fded236f2f0a8781d931a35802d67764b1fd063d9a6bc574819106c5b8",
+   "thuc": "21cdc2fded236f2f0a8781d931a35802d67764b1fd063d9a6bc574819106c5b8",
+   "khop": true
+  }
+ },
+ "so_span_goi": 375788,
+ "so_span_cua_so": 187419,
+ "so_trung": 0,
+ "kiem_cheo_canh": {
+  "so_cap_trace": 18,
+  "so_cap_file_ca": 18,
+  "tong_trace": 4349,
+  "tong_file_ca": 4349,
+  "cung_chu_trace": {
+   "N": 86556,
+   "A": 87413
+  },
+  "cung_chu_file_ca": {
+   "N": 86556,
+   "A": 87413
+  },
+  "lech": [],
+  "so_lech": 0
+ },
+ "kiem_cheo_span_theo_chu": {
+  "lech": []
+ },
+ "kind": {
+  "1": 58409,
+  "2": 7107,
+  "3": 120179,
+  "4": 862,
+  "5": 862
+ },
+ "loi_theo_chu_kind": [],
+ "so_span_co_khoa": {
+  "db.name": 108759,
+  "db.system": 114848,
+  "messaging.destination.name": 1724,
+  "messaging.operation": 1724,
+  "messaging.rabbitmq.destination.routing_key": 862,
+  "messaging.system": 3448,
+  "server.address": 125562
+ },
+ "db": [
+  [
+   "ticket-service",
+   3,
+   "postgresql",
+   "ticket_db",
+   "127.0.0.1",
+   55052
+  ],
+  [
+   "payment-service",
+   3,
+   "postgresql",
+   "payment_db",
+   "127.0.0.1",
+   17633
+  ],
+  [
+   "booking-service",
+   3,
+   "postgresql",
+   "booking_db",
+   "127.0.0.1",
+   16162
+  ],
+  [
+   "event-service",
+   3,
+   "postgresql",
+   "event_db",
+   "127.0.0.1",
+   16035
+  ],
+  [
+   "keycloak",
+   3,
+   "postgresql",
+   "keycloak_db",
+   "postgres",
+   3777
+  ],
+  [
+   "api-gateway",
+   3,
+   "redis",
+   null,
+   "127.0.0.1",
+   3113
+  ],
+  [
+   "booking-service",
+   3,
+   "redis",
+   null,
+   "127.0.0.1",
+   2976
+  ],
+  [
+   "user-service",
+   3,
+   "mongodb",
+   "user_db",
+   "127.0.0.1",
+   60
+  ],
+  [
+   "user-service",
+   3,
+   "mongodb",
+   "admin",
+   "127.0.0.1",
+   40
+  ]
+ ],
+ "rabbitmq": [
+  [
+   "payment-service",
+   3,
+   "rabbitmq",
+   null,
+   null,
+   null,
+   "Channel.waitForConfirms",
+   431
+  ],
+  [
+   "payment-service",
+   3,
+   "rabbitmq",
+   null,
+   null,
+   null,
+   "basic.ack",
+   431
+  ],
+  [
+   "booking-service",
+   3,
+   "rabbitmq",
+   null,
+   null,
+   null,
+   "basic.ack",
+   287
+  ],
+  [
+   "booking-service",
+   3,
+   "rabbitmq",
+   null,
+   null,
+   null,
+   "Channel.waitForConfirms",
+   287
+  ],
+  [
+   "booking-service",
+   4,
+   "rabbitmq",
+   "business.ex",
+   "publish",
+   "booking.payment-decision.v1",
+   "business.ex publish",
+   144
+  ],
+  [
+   "booking-service",
+   5,
+   "rabbitmq",
+   "booking.accept-payment.q",
+   "process",
+   null,
+   "booking.accept-payment.v1 process",
+   144
+  ],
+  [
+   "payment-service",
+   4,
+   "rabbitmq",
+   "business.ex",
+   "publish",
+   "booking.accept-payment.v1",
+   "business.ex publish",
+   144
+  ],
+  [
+   "payment-service",
+   4,
+   "rabbitmq",
+   "business.ex",
+   "publish",
+   "ticket.issue.v1",
+   "business.ex publish",
+   144
+  ],
+  [
+   "payment-service",
+   5,
+   "rabbitmq",
+   "payment.decision.q",
+   "process",
+   null,
+   "booking.payment-decision.v1 process",
+   144
+  ],
+  [
+   "payment-service",
+   5,
+   "rabbitmq",
+   "payment.ticket-issuance-failed.q",
+   "process",
+   null,
+   "ticket.issuance-result.v1 process",
+   144
+  ],
+  [
+   "ticket-service",
+   3,
+   "rabbitmq",
+   null,
+   null,
+   null,
+   "basic.ack",
+   144
+  ],
+  [
+   "ticket-service",
+   3,
+   "rabbitmq",
+   null,
+   null,
+   null,
+   "Channel.waitForConfirms",
+   144
+  ],
+  [
+   "ticket-service",
+   4,
+   "rabbitmq",
+   "business.ex",
+   "publish",
+   "ticket.issuance-result.v1",
+   "business.ex publish",
+   144
+  ],
+  [
+   "ticket-service",
+   5,
+   "rabbitmq",
+   "ticket.issuance.q",
+   "process",
+   null,
+   "ticket.issue.v1 process",
+   144
+  ],
+  [
+   "payment-service",
+   4,
+   "rabbitmq",
+   "business.ex",
+   "publish",
+   "ticket.issued.v1",
+   "business.ex publish",
+   143
+  ],
+  [
+   "payment-service",
+   5,
+   "rabbitmq",
+   "payment.order-completed.q",
+   "process",
+   null,
+   "booking.order-completed.v1 process",
+   143
+  ],
+  [
+   "booking-service",
+   4,
+   "rabbitmq",
+   "business.ex",
+   "publish",
+   "booking.order-completed.v1",
+   "business.ex publish",
+   143
+  ],
+  [
+   "booking-service",
+   5,
+   "rabbitmq",
+   "booking.tickets-issued.q",
+   "process",
+   null,
+   "ticket.issued.v1 process",
+   143
+  ]
+ ],
+ "classes": [
+  "api-gateway",
+  "booking-service",
+  "booking_db",
+  "broker",
+  "cache",
+  "config-discovery",
+  "event-service",
+  "event_db",
+  "keycloak",
+  "keycloak_db",
+  "mongodb-instance",
+  "payment-service",
+  "payment_db",
+  "postgresql-shared-instance",
+  "ticket-service",
+  "ticket_db",
+  "user-service"
+ ]
+}

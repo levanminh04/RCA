@@ -704,3 +704,12 @@ Minh duyệt ghi mục này ngày 18/11/2026 ("Duyệt 5 nhóm sửa", nhóm 5, 
 
 - **Q1(b)** (chat 17/11, khi duyệt SPEC T-066/T-067): "duyệt Q1 b)". Bộ điều khiển tải chạy trên exp-obs bằng khóa riêng tại `/etc/rca-lab/controller/`; khóa riêng của bộ điều khiển không rời exp-obs; mỗi máy đích (exp-app, máy tải) thêm đúng một dòng `authorized_keys` ghi chú `rca-lab-controller`. Căn cứ và kiểm: SPEC, LOG T-066.
 - **Thời hạn giữ Tempo** (chat 17/11): "dừng đo, giữ 14 ngày". Bước 10 của T-066 dừng sớm; `block_retention` giữ 336h. Lượt đo 2 giờ 45 phút chưa cho tốc độ tăng ổn định (`results/T-066/tempo-tang-truong.md`). Đo lại khi cần đổi thời hạn.
+
+## T-068: đồ thị dịch vụ từ trace gốc (phương án A) và link nút chú thích, 18–19/11/2026
+
+Minh duyệt ghi mục này ngày 19/11/2026 ("Duyệt cả hai", sau phản biện Codex lượt phương án A).
+
+- **Phương án A** (chat 18/11): "DUYỆT TRIỂN KHAI PHƯƠNG ÁN A LUÔN, KHÔNG CẦN TASK MỚI … RÀ SOÁT TRƯỚC XEM CÒN LỖI NÀO KHÔNG THÌ TRÌNH, TÔI MUỐN ĐỒ THỊ VẼ CHI TIẾT NHẤT CÓ THỂ". Ghi ở SPEC T-068 mục "Bổ sung đã duyệt 18/11 — phương án A". Lý do: WHY-100.
+- **Giữ link nút chú thích** (chat 18/11, R1): "Gộp vào prompt" — giữ hai link của nút chú thích tới bảng trạng thái, ghi nhận khác đề xuất trước. Lý do: WHY-101.
+- **Sửa theo phản biện Codex** (chat 19/11): "Duyệt cả 8 bước" — gồm `service-graph-5`, bộ kiểm và đối chứng âm bản 2, chép 26 gói trace lên exp-obs `/srv/rca-lab/trace-goi/` (Minh chọn thư mục).
+- **Điểm 4** (chat 19/11): "Giữ link" — giữ link nút DB/broker/cache tới trang thao tác; không đổi code. Căn cứ: LOG T-068 phiên 3, `results/T-068/kiem/BAO-CAO.md`.

@@ -109,3 +109,30 @@ Khoảng một phiên (chưa kiểm). Không chạy M1, không tải. Grafana gi
 ## Prompt bàn giao
 
 Theo `docs/review-prompt.md`; người làm ghi trong mục LOG cuối phiên.
+
+## Bổ sung đã duyệt 18/11 — phương án A
+
+Minh duyệt 18/11 (nguyên văn): "DUYỆT TRIỂN KHAI PHƯƠNG ÁN A LUÔN, KHÔNG CẦN TASK MỚI … RÀ SOÁT TRƯỚC XEM CÒN LỖI NÀO KHÔNG THÌ TRÌNH, TÔI MUỐN ĐỒ THỊ VẼ CHI TIẾT NHẤT CÓ THỂ". Mục này bổ sung; các phần trên giữ nguyên. Chỗ mục này khác phần trên (nguồn cạnh hạ tầng, có ghi số lời gọi DB) thì theo mục này. Rà soát bước 0: LOG phiên 2.
+
+**Thiết kế (`campaigns/g1/service_graph.py`, phiên bản `service-graph-4`; script hiển thị, không phải V082):**
+- Nguồn: trace gốc của ca. Cửa sổ và chia nền/sự cố theo đúng `l8b-xuat.py` (chỉ đọc). Hạng và màu nút: `ranking_rows` của đúng bản + ca (như cũ).
+- Cạnh dịch vụ → dịch vụ: span cha–con khác chủ (chủ đã qua alias). Ghi số N/A, số lỗi N/A (status ERROR của span con), p50/p95 thời lượng span con N/A. Kiểm chéo: số N/A phải bằng tổng `canh_thao_tac` trong file ca; lệch là lỗi cắt cửa sổ: dừng.
+- Cạnh tới DB: dịch vụ → thực thể `db.name` nếu thuộc `classes`, nếu không thì → instance theo `db.system` (ghi "gộp về instance"). Redis → `cache`. MongoDB → `mongodb-instance`. Ghi số span N/A, lỗi, p95.
+- Cạnh RabbitMQ: PRODUCER: dịch vụ → `broker`, chi tiết exchange và routing key; CONSUMER: `broker` → dịch vụ, chi tiết queue; số bản tin N/A, lỗi. Ca không có span RabbitMQ ghi rõ "trace của ca không có span RabbitMQ".
+- Đích phải thuộc `classes`; không vẽ được thì ghi số. Không vẽ cạnh DB logic → instance (không có trong dữ liệu).
+- Đơn vị ghi rõ: "span phía client", không gọi là request.
+- Chú giải trên panel: cạnh là quan sát trace, không phải đầu ra phương pháp.
+- Link: giữ cơ chế `detail__url` (nút dịch vụ → lớp thao tác; nút chú thích → bảng trạng thái; cạnh không link).
+- Ca mới: `sau_v082.py` truyền đường trace (`<goc>/cases/<ca>/raw-traces.jsonl`). Lỗi ở bước đồ thị không làm hỏng ca (giữ cơ chế status).
+
+**Toàn vẹn:** không chạy lại M1/V082; không sửa code M1, cấu hình V082, goc-12, `campaigns/g1/l8b-xuat.py`, file ca, chỉ mục, đầu ra M1, gói trace. Băm sha256 danh sách `results/T-066/bao-ve.tsv` cộng cây `/srv/rca-lab/rca-results/t065-l11-001/du-lieu` trước và sau (`results/T-068/a-truoc.sha256`, `a-sau.sha256`); lệch ngoài phần đã khai thì dừng, báo Minh. Gói trace: kiểm hash theo manifest trước khi dùng (`results/T-062/manifest.json`, `results/T-063/manifest-2.json` → `SHA256SUMS`, `D:/RCA-archive/hash-lists/exp-obs-cases.sha256`, `results/T-066/e2e-001/ca-manifest.json`); đọc `.tgz` bằng `tarfile`, không giải nén vào chỗ gốc. Chép file nhị phân, băm hai đầu; file sinh trên Windows ghi byte LF.
+
+**Kiểm:** viết lại `results/T-068/kiem/dem_doc_lap.py` thành bản đọc thẳng trace gốc, viết khác bộ dựng; so nút, cạnh, số, lỗi, p95, link trên 85 cặp. Đối chứng âm: cài sai số, cạnh ngoài `classes`, link trên cạnh, sai cửa sổ. Chạy 28 ca trên laptop, 1 ca (7ffb2305) trên exp-obs; chuyển file dẫn xuất lên máy, băm hai đầu. Bấm thật trên Grafana (Minh đăng nhập): 7ffb2305 V082 (cạnh tới booking_db, payment_db…, cạnh broker, số lỗi); ebd5ef38 ba bản; 1ad3afeb (không có cạnh broker, có ghi chú lý do). Ghi thời gian sinh 85 file; Grafana vẫn tải panel trong thời gian hợp lý.
+
+**Sửa kèm (R1, R4–R6):** giữ hai link của nút chú thích tới bảng trạng thái (khác đề xuất trước, Minh ghi nhận); chú giải panel 40, 41 viết lại theo nguồn mới; `BAO-CAO.md`: "84 đồ thị có bộ đếm = 0; p7/ebd5ef38 không có đầu ra nên dem rỗng"; `thay-doi-may.md`: "chỉ hoàn tác nhãn khi không có runner ghi chỉ mục; sau đó kiểm lại danh sách ca".
+
+**Phạm vi ghi (bổ sung):**
+- Repo RCA: mục này của SPEC, `LOG.md`, dòng T-068 trong STATE, `results/T-068/`.
+- Repo lab: `campaigns/g1/service_graph.py`, `campaigns/runner/sau_v082.py`, `observability/grafana/**`; commit và push.
+- exp-obs: `/opt/rca-lab` chỉ `git fetch` + `git checkout <commit>` (detached HEAD, không `git pull`); ghi `rca-results/t065-l11-001/service-graph/`; thư mục tạm chỉ trong `/srv/rca-lab/runs/t068-a/` (gồm bản sao lưu `service-graph/` trước khi ghi, để hoàn tác).
+- Không đụng: exp-app, máy tải, Prometheus/Loki/Tempo/Collector.
