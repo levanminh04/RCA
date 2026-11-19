@@ -62,3 +62,7 @@ Xóa dòng `rca-lab-controller` ở `authorized_keys` của exp-app và máy t�
 |---|---|---|---|
 | 23:09:46–23:09:50 | exp-obs | `/opt/rca-m1ft` (còn `chon-dev2-1*`), `~/rca-dieu-phoi`, `~/{t058,l5,phien-c,t062-day}`, file lẻ trong `~` (log, sh, txt, json, tgz), `/opt/rca-tai`, `/opt/flash-ticket-obs` (compose cũ, `rca-ket-qua`, `grafana.env` cũ, `compose-lgtm.yml`); container `flash-ticket-lgtm`, `rca-tai-validate-01`, `rca-tai-version-01`; volume `flash-ticket-obs_lgtm-data`; image `grafana/otel-lgtm:0.40.0` | Đã xóa, không hoàn tác trên máy; bản cần giữ ở `D:/RCA-archive/exp-obs/t066-nhom2/` hoặc đã có trên laptop. Trước khi xóa: container đang chạy chỉ gắn `/opt/rca-lab`, `/srv/rca-lab` và 4 volume `flash-ticket-obs-pinned_*`. Đĩa `/` 30 → 25 GB. Đường hoàn tác compose cũ (bước 7) không còn |
 | — | laptop | `D:/RCA-ext/keys/known_hosts`: gỡ 2 dòng 213.35.116.128, 129.221.208.47 (S0-15) | còn 2 dòng như trước phiên |
+
+## Đính chính (18/11/2026, Minh duyệt; ghi trong T-067)
+
+Dòng "12:13–12:15 | exp-obs, máy tải, exp-app | `/opt/rca-lab` checkout `f78ed52` rồi `ab1c52c`" ở bảng Bổ sung **ghi sai**. `git reflog` của `/opt/rca-lab` (đọc 18/11 ~06:35Z): exp-app và máy tải clone ở `5a39028` lúc 17/11 12:05:29Z / 12:05:32Z và chưa từng đổi; chỉ exp-obs chuyển `5a39028 → f78ed52` (12:13:29Z) `→ ab1c52c` (12:13:53Z). Hai commit đó chỉ thêm bộ chuyển G1 (`campaigns/g1`, `sau_v082.py`, `runner4.py`) và lịch (`campaigns/schedules`), đều chạy trên exp-obs; `inj3.py` dùng trên exp-app cùng hash ở `5a39028`. Lượt `e2e-001` không bị ảnh hưởng; đây là lỗi ghi chép.

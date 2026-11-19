@@ -1,0 +1,121 @@
+{
+ "cua_so": [
+  1794986482,
+  1794987084
+ ],
+ "ghi_chu": "kiểm bổ sung sau khi xem kết quả (phản biện R1, R2); không thay tiêu chí đã khai",
+ "ticket_server_http_route": {
+  "so_trace": 50,
+  "route": {
+   "/api/v1/orders/{orderId}/tickets": 50
+  }
+ },
+ "canh_gateway_ticket": {
+  "truy_van": "{ resource.service.name = \"api-gateway\" && kind = client } > { resource.service.name = \"ticket-service\" && kind = server && span.http.route =~ \".*tickets.*\" }",
+  "so_trace": 20,
+  "mau": [
+   {
+    "trace": "53f73d3f1d15d276b65316eac5fef45",
+    "route": "/api/v1/orders/{orderId}/tickets",
+    "cha_service": "api-gateway",
+    "cha_kind": "SPAN_KIND_CLIENT"
+   },
+   {
+    "trace": "95b8e470c8e017e18dc4a6bd3149130",
+    "route": "/api/v1/orders/{orderId}/tickets",
+    "cha_service": "api-gateway",
+    "cha_kind": "SPAN_KIND_CLIENT"
+   },
+   {
+    "trace": "10783df73786e146ee87fb507002f27a",
+    "route": "/api/v1/orders/{orderId}/tickets",
+    "cha_service": "api-gateway",
+    "cha_kind": "SPAN_KIND_CLIENT"
+   },
+   {
+    "trace": "b833738ee19749cef8a254208a5bc43",
+    "route": "/api/v1/orders/{orderId}/tickets",
+    "cha_service": "api-gateway",
+    "cha_kind": "SPAN_KIND_CLIENT"
+   },
+   {
+    "trace": "bf035365b2ff7adaea1ca41b13e3b28",
+    "route": "/api/v1/orders/{orderId}/tickets",
+    "cha_service": "api-gateway",
+    "cha_kind": "SPAN_KIND_CLIENT"
+   }
+  ]
+ },
+ "me_mongo": [
+  {
+   "trace": "bc1d10afa53f9429e7f049174ffab1bc",
+   "so_span": 6,
+   "user_server": [
+    "/api/v1/me"
+   ],
+   "mongo": [
+    {
+     "service": "user-service",
+     "kind": "SPAN_KIND_CLIENT",
+     "name": "update user_db.tbl_users",
+     "db_system": "mongodb"
+    },
+    {
+     "service": "user-service",
+     "kind": "SPAN_KIND_CLIENT",
+     "name": "find user_db.tbl_users",
+     "db_system": "mongodb"
+    }
+   ]
+  },
+  {
+   "trace": "4cb8880331e55e8ed14f4638e72b5a8a",
+   "so_span": 6,
+   "user_server": [
+    "/api/v1/me"
+   ],
+   "mongo": [
+    {
+     "service": "user-service",
+     "kind": "SPAN_KIND_CLIENT",
+     "name": "update user_db.tbl_users",
+     "db_system": "mongodb"
+    },
+    {
+     "service": "user-service",
+     "kind": "SPAN_KIND_CLIENT",
+     "name": "find user_db.tbl_users",
+     "db_system": "mongodb"
+    }
+   ]
+  },
+  {
+   "trace": "aa7170abf7cec3ce26799b59e89621f4",
+   "so_span": 8,
+   "user_server": [
+    "/api/v1/me"
+   ],
+   "mongo": [
+    {
+     "service": "user-service",
+     "kind": "SPAN_KIND_CLIENT",
+     "name": "update user_db.tbl_users",
+     "db_system": "mongodb"
+    },
+    {
+     "service": "user-service",
+     "kind": "SPAN_KIND_CLIENT",
+     "name": "find user_db.tbl_users",
+     "db_system": "mongodb"
+    }
+   ]
+  }
+ ],
+ "booking_cancel_release": {
+  "so_dong": 36,
+  "thieu_id": 0,
+  "khop_dung_mot_span_booking": 36,
+  "ty_le": 1.0
+ },
+ "so_trace_da_doc": 89
+}

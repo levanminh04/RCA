@@ -713,3 +713,14 @@ Minh duyệt ghi mục này ngày 19/11/2026 ("Duyệt cả hai", sau phản bi�
 - **Giữ link nút chú thích** (chat 18/11, R1): "Gộp vào prompt" — giữ hai link của nút chú thích tới bảng trạng thái, ghi nhận khác đề xuất trước. Lý do: WHY-101.
 - **Sửa theo phản biện Codex** (chat 19/11): "Duyệt cả 8 bước" — gồm `service-graph-5`, bộ kiểm và đối chứng âm bản 2, chép 26 gói trace lên exp-obs `/srv/rca-lab/trace-goi/` (Minh chọn thư mục).
 - **Điểm 4** (chat 19/11): "Giữ link" — giữ link nút DB/broker/cache tới trang thao tác; không đổi code. Căn cứ: LOG T-068 phiên 3, `results/T-068/kiem/BAO-CAO.md`.
+
+## T-067: bản FlashTicket ghim `rca/exp-2026-11`, 17–19/11/2026
+
+Minh duyệt ghi mục này ngày 19/11/2026 ("duyệt DECISIONS và commit").
+
+- **Gỡ xung đột theo "main là chuẩn"; Q3; Q4** (chat 17/11): "duyệt gỡ xung đột, giữ main nhé, main là chuẩn. duyetj Q3 q4." Q4: ngưỡng log nối span 95% theo từng service. Căn cứ: LOG T-067 phiên 1.
+- **RefundServiceImpl** (chat 17–18/11): "cứ lấy theo như tuấn, phần nào từ PR hiện tại mà cần thì merge làm vào", "vnpay không cho test luồng hoàn nên phải làm db như thế". Giữ nguyên `main` (`782e557`), chỉ thêm telemetry `refund-result`. Chi tiết: `results/T-067/go-xung-dot.md`.
+- **Bước 6 phương án A** (18/11, trả lời câu hỏi của agent): áp tại chỗ 2 migration còn thiếu của `main`, giữ dữ liệu, Keycloak và sự kiện của tải chuẩn; hoàn tác bằng dump. Thay cách "dựng lại DB" của SPEC bước 6.
+- **Tiêu chí 2** (chat 18/11): "chọn (a)" — 3 nhóm lỗi test có sẵn ở commit cha được chấp nhận làm giới hạn đã biết, không sửa test.
+- **`docker_stats` 12/14** (chat 19/11, "DUYỆT ĐỀ XUẤT"): chấp nhận; hai ngoại lệ có chủ đích là `flash-ticket-collector` và `rca-toxiproxy`.
+- **Tiêu chí 8** (chat 19/11): "Bỏ tiêu chí 8" — không chờ Tuấn xem đoạn `RefundServiceImpl` trước khi nghiệm thu nhánh. SPEC giữ nguyên (đã khóa).
