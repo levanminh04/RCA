@@ -1,0 +1,3 @@
+Đã tạo duy nhất [results/T-070/nhap-dinh-chinh-g1.md](D:/RCA-flashticket/results/T-070/nhap-dinh-chinh-g1.md). SHA-256 sau khi ghi khớp giá trị tính trước khi ghi `388fc5a1fe405c766a5efb6d265ca8d161a50407ffba4ff49cb4fabd52c0984a`.
+
+Đã kiểm nguyên văn cả 4 vị trí. Bản nháp đề xuất đổi 3 chỗ sang `G1 0.5 + che_do_b b-1` và giữ nguyên đường dẫn lịch sử `results/T-073/g1-0.3.md`. Chưa áp đính chính vào tài liệu gốc. Chờ Minh duyệt chữ.

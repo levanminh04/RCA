@@ -1446,3 +1446,125 @@ Chọn chạy lại toàn bộ dưới v2 vì vân tay job gồm mọi pin code 
 - **Phương án đã xét:** nút chú thích không link (đề xuất đã duyệt trước đó, R1) — Minh chọn giữ link ngày 18/11. Đặt `var-dv=__khong_co__` — loại: `__khong_co__` là giá trị rỗng của `op`, không phải của `dv`; vẫn gọi file không tồn tại.
 - **Bằng chứng:** bấm thật 19/11 sau khi sinh lại: link mở panel 3, mọi truy vấn 200, không còn 400 (LOG T-068 phiên 3); bộ kiểm độc lập buộc nút chú thích có link panel 3 và không có `var-dv`/`var-op`; đối chứng âm 11, 12.
 - **Kết luận phụ thuộc:** chỉ cách hiển thị.
+
+## WHY-102. T-069 Hai tầng tiêu chí của W3: ngưỡng tụt theo ô và điều kiện dừng theo tổng D1–D5 — ghi 20/11/2026 sau khi dùng (đính chính thiếu WHY, phản biện Codex R1)
+
+- **Chọn gì:** (1) một ô lỗi **tụt** khi `hang_cat` của V082 mới > hạng cũ + 1 (SPEC T-069 dòng 58, làm rõ ở phiên 2); (2) điều kiện dừng kết luận theo tổng trên các ô ghép được: D1 AC@3 giảm, D2 AC@1 giảm ≥ 2, D3 V082 kém P7 mới, D4 V082 lỗi chạy không do hạ tầng, D5 K tăng ≥ 2. Kế hoạch §8.2 W3: "V082 tụt thì dừng, trình Minh". **Quan hệ:** ô tụt (1) là điều phải trình Minh dù D1–D5 không kích hoạt; D1–D5 chỉ quyết việc dừng kết luận tổng. Không bù ô tụt bằng ô tốt lên.
+- **Vì sao:** mỗi ô chỉ một lần thu (cộng lặp), không ước lượng được phương sai; ngưỡng +1 bậc cho dời mốc 15 s (T-064 §16 đổi AC@1 một ca). Tổng D1–D5 bắt suy giảm diện rộng; ngưỡng theo ô bắt hỏng cục bộ mà tổng che (như CPU-BOOK-1 1 → 3 trong khi AC@1 tổng 9 = 9).
+- **Phương án đã xét:** chỉ dùng tổng — loại: ô tốt lên bù ô tụt (đã xảy ra ở lượt chính). Chỉ dùng theo ô với ngưỡng 0 bậc — loại: dời mốc 15 s đã đổi một ca.
+- **Bằng chứng:** `results/T-069/bang-theo-o.json#/dieu_kien_dung`, `#/hang`; `results/T-069/dinh-chinh-1.md` §1. Người làm đã áp tầng (2) mà bỏ tầng (1) khi đề xuất chuyển W4/W5 (sai, đính chính).
+- **Kết luận phụ thuộc:** kết luận W3 và quyết định cho V082 vào demo (W4/W5).
+
+## WHY-103. T-072 "p95 theo route ở gateway" = theo mã route Spring Cloud Gateway — ghi 20/11/2026 trước khi dùng (Minh duyệt D4, LOG T-070 lượt 6)
+
+- **Chọn gì:** p95 và tỷ lệ 5xx tính trên histogram `http_server_request_duration_seconds` của `service_name="api-gateway"`, gom theo nhãn `http_route` = id route của gateway (`booking`, `event`, `payment`, `ticket`, …), không phải từng đường dẫn API. Một route gộp nhiều API và method.
+- **Vì sao:** đây là mức chi tiết duy nhất của histogram ở gateway; giá trị `http_route` quan sát ở 5 thời điểm 18–20/11 chỉ gồm 5 id route có tải, `user`, `/actuator/health/{*path}` và chuỗi không nhãn (401) (`results/T-072/khao-sat/khao-sat-1.out`); id route khớp `application.yaml` gateway FlashTicket `36a3725d`.
+- **Phương án đã xét:** theo đường dẫn API (không có trong metric gateway; phải lấy từ span hoặc phía service); tách theo method trong route (ít request mỗi ô, p95 dao động); một p95 chung toàn gateway (route đông che route ít).
+- **Giới hạn:** API chậm trong một route đông có thể không đẩy p95 của cả route vượt ngưỡng; chưa đo độ lớn che lấp.
+- **Kết luận phụ thuộc:** mọi số báo động giả và phát hiện của W4; t̂ của chế độ (b) (W5). Nguồn: `results/T-072/de-xuat-why.md` WHY-a, `bieu-thuc.json` `T072-bieu-thuc-1`.
+
+## WHY-104. T-072 Tập route có luật: `booking`, `event`, `payment`, `ticket` — ghi 20/11/2026 trước khi dùng (Minh duyệt D4)
+
+- **Chọn gì:** luật p95 và luật lỗi chỉ cho bốn route này.
+- **Vì sao:** bộ tải `purchase-journey.js` (lab `407b4f5`) chỉ gọi bốn route này; ngưỡng chọn từ E2 nên route không có tải thì không có căn cứ; `user` 0 request/5 phút ở cả 5 thời điểm khảo sát.
+- **Không phủ:** `user`, `event-images`, `payment-vnpay-callbacks`, request không khớp route (liveness của `user-service` vẫn có).
+- **Kết luận phụ thuộc:** phạm vi phát hiện của W4. Nguồn: `de-xuat-why.md` WHY-b.
+
+## WHY-105. T-072 Cửa sổ 5 phút và chặn khi < 30 request — ghi 20/11/2026 trước khi dùng (Minh duyệt D4)
+
+- **Chọn gì:** `rate`/`increase` trên `[5m]`; luật p95 và lỗi chỉ có giá trị khi route có ≥ 30 request trong 5 phút.
+- **Vì sao:** `payment`, `ticket` ≈ 70 request/5 phút ở ×1 (`khao-sat/kiem-xuat-1.jsonl`); cửa sổ 1 phút chỉ ≈ 14 mẫu, p95 gần max, dễ báo giả; giữa hai lượt tổng = 0 thì không tính p95 (NoData → OK).
+- **Phương án đã xét:** 1m (quá ồn ở route ít request); 10m (trễ phát hiện dài).
+- **Đánh đổi:** tín hiệu còn chứa lỗi tới 5 phút sau khi lỗi dừng (khoảng cháy dài; gom 300 s); lỗi làm lưu lượng route tụt dưới 30/5 phút làm luật route đó im (quan sát: `ticket` về 0 ở PAUSE-PAYMENT).
+- **Kết luận phụ thuộc:** độ nhạy và độ trễ phát hiện W4. Nguồn: `de-xuat-why.md` WHY-c.
+
+## WHY-106. T-072 Lỗi = 5xx, cần ≥ 3 lỗi 5xx trong 5 phút — ghi 20/11/2026 trước khi dùng (Minh duyệt D4)
+
+- **Chọn gì:** tỷ lệ lỗi = request 5xx / tổng request của route trong 5 phút; luật chỉ kích hoạt khi ≥ 3 lỗi 5xx; không tính 401, 409, 429.
+- **Vì sao:** 5xx là lỗi phía máy chủ (gồm 503 circuit breaker, 504 timeout gateway), quan sát ở HTTP5-EVENT, PAUSE-PAYMENT; 409/401 là nghiệp vụ/xác thực; 429 do giới hạn tốc độ theo địa chỉ nguồn, phụ thuộc mức tải (T-071 theo dõi riêng). Ba lỗi tránh mở sự cố vì một request hỏng (một lỗi trên 70 request đã là 1,4%).
+- **Phương án đã xét:** tính cả 429 (loại); không đặt số lỗi tối thiểu (ngưỡng từ E2 có thể là sàn, một lỗi đủ mở sự cố).
+- **Giới hạn:** tổ hợp (route, mã 5xx) xuất hiện lần đầu: `increase` không thấy phần trước mẫu đầu; lỗi kéo dài vẫn thấy từ mẫu thứ hai. Luật `loi-booking`, `loi-ticket` chưa có dương thật (`results/T-072/ke-hoach-e3-duong.md`).
+- **Kết luận phụ thuộc:** báo động giả và phát hiện lỗi 5xx của W4. Nguồn: `de-xuat-why.md` WHY-d.
+
+## WHY-107. T-072 Liveness ba trạng thái theo lần dò mới nhất, tuổi tối đa 60 s — ghi 20/11/2026 trước khi dùng (Minh duyệt D4)
+
+- **Chọn gì:** mỗi đích dò, lần dò mới nhất trong 5 phút là mẫu mới nhất của `httpcheck_error` (lỗi) hoặc `httpcheck_status{http_status_code!=""}` (có phản hồi); dò tốt / dò lỗi nếu tuổi ≤ 60 s; thiếu lần dò nếu không có lần nào tuổi ≤ 60 s. `t072-live` cháy khi dò lỗi liên tục 20 s; thiếu lần dò thuộc luật mất quan sát `t072-mat-do`, không thuộc lớp hệ thống.
+- **Vì sao:** cùng ngữ nghĩa "lần dò mới nhất" với WHY-99; quan sát PAUSE-PAYMENT 19/11: khi lỗi, receiver vẫn ghi `httpcheck_status` giá trị 0 không có `http_status_code`, lỗi ghi mỗi 30 s; 60 s ≥ hai nhịp.
+- **Khác WHY-99:** thêm tuổi tối đa 60 s (trạng thái "thiếu"); kênh `live-down` của M1 không đổi.
+- **Phương án đã xét:** `max_over_time(httpcheck_error[15s])` (WHY-99 đã loại); `for` 0 (lần dò lẻ mở sự cố); `for` 60 s (có thể lỡ RECREATE-PAY ≈ 50 s).
+- **Chưa kiểm:** độ trễ nạp mẫu lúc Grafana đánh giá; phân xử ở E3.
+- **Kết luận phụ thuộc:** phát hiện liveness W4; phân lớp hệ thống/quan sát. Nguồn: `de-xuat-why.md` WHY-e.
+
+## WHY-108. T-072 Nhịp đánh giá 10 s; `for` 60 s (p95, lỗi), 20 s (liveness) — ghi 20/11/2026 trước khi dùng (Minh duyệt D4)
+
+- **Chọn gì:** một nhóm luật, `interval` 10 s; `for` như trên; `keep_firing_for` 0.
+- **Vì sao:** Grafana nhận khoảng đánh giá là bội của 10 s [theo tài liệu Grafana, chưa kiểm trên bản đang chạy]; 10 s bằng nhịp mẫu histogram và nhịp dò; mỗi truy vấn luật ≤ 0,03 s trên Prometheus (`kiem-xuat-1.jsonl` trường `dt`). `for` 60 s: bước nhảy p95 dưới 1 phút không mở sự cố.
+- **Kết luận phụ thuộc:** độ trễ phát hiện (W6–W7), số báo động giả. Nguồn: `de-xuat-why.md` WHY-f.
+
+## WHY-109. T-072 Gom sự cố: ghép khi cách ≤ 300 s; quy về phút chứa t̂ — ghi 20/11/2026 trước khi dùng (Minh duyệt D4)
+
+- **Chọn gì:** khoảng cháy lớp hệ thống ghép thành một sự cố khi t̂ mới ≤ max t_hết + 300 s; lớp quan sát gom riêng; quy về phút chứa t̂; vắt qua biên đếm một lần theo phút bắt đầu; bắt đầu trong biên không vào tử số; đang cháy lúc bắt đầu khoảng không đếm (`results/T-072/quy-tac-gom.json`, `T072-gom-2`).
+- **Vì sao:** 300 s bằng cửa sổ rate (WHY-105) và nửa cửa sổ dữ liệu RCA.
+- **Tiêu chí dùng:** R5 (Minh duyệt 20/11): ≤ 1 sự cố / 6 giờ khỏe ×1 trên E4; E4 9 lượt (D1).
+- **Kết luận phụ thuộc:** tử số báo động giả W4. Nguồn: `de-xuat-why.md` WHY-g.
+
+## WHY-110. T-072 Quy tắc chọn ngưỡng từ E2: biên k và sàn — ghi 20/11/2026 trước khi dùng (Minh duyệt D4)
+
+- **Chọn gì:** chỉ dữ liệu E2, chỉ bước thuộc phút khỏe ×1 (phân loại T-071 bản khóa `b63f2e09`); S(t) = min trong [t − for, t]; M = max S theo route; θ_p95 = làm tròn lên 0,001 của max(1,5·M, M + 0,05 s); θ_lỗi = làm tròn lên max(2·M, 0,05); cần ≥ 120 bước/route, thiếu thì dừng trình (`results/T-072/quy-tac-chon-nguong.json`, `T072-chon-nguong-2`).
+- **Vì sao:** θ ≥ max S thì luật không cháy trên E2 (khớp ngữ nghĩa `for`); biên k và sàn cho trôi giữa E2 và E4 và cho bucket thô (p95 ~0,03–0,15 s nằm trong bucket 0,025–0,25 s); sàn lỗi 5% ≈ 3,5 lỗi trên 70 request, khớp WHY-106.
+- **Giới hạn:** k và sàn là **biên vận hành khai trước**, không phải ước lượng từ dữ liệu; số trôi của một truy vấn DB trong T-069 (`troi-trong-luot.txt`) không xác nhận hệ số cho từng route (Codex CX-06). Không chỉnh θ bằng tay; đổi sau E4 → ghi "sửa sau", giữ kết quả đầu.
+- **Phương án đã xét** (T-072 `de-xuat-why.md` bản 2, WHY-h): phân vị cao (ví dụ 99%) của tín hiệu E2 — loại: chấp nhận trước một số cảnh báo trong mẫu và phụ thuộc số bước; chọn θ theo R5 trên E2 — loại: R5 là tiêu chí kết luận E4, dùng nó để chọn θ làm E4 mất tính độc lập về mục tiêu; ngưỡng cố định theo kinh nghiệm — loại: không có căn cứ trên hệ này.
+- **Bằng chứng (chỉ kiểm code, không chọn):** ngưỡng thử trên T-067 + ca khỏe `1e5debb6` (`results/T-072/kiem-code/nguong-thu.json`): θ thử booking 0,098, event 0,097, payment 0,235, ticket 0,095 s; 0 sự cố trên 88 phút khỏe tạm; bước nhảy giả 0,5 s trong 120 s bị bắt.
+- **Điều kiện thất bại:** E4 trôi vượt biên → báo động giả tăng (không sửa θ bằng E4); pha lưới đánh giá Grafana khác lưới xuất có thể cho S(t) nhỉnh hơn M [chưa kiểm]; p95 duy trì gần mốc bucket nhạy với vài request chậm.
+- **Kết luận phụ thuộc:** ngưỡng luật W4, kết quả R5 trên E4, t̂ của chế độ (b). *(Sửa 21/11 ~02:50Z: thay hai phương án điều phối tự nêu ở bản ghi đầu bằng nội dung WHY-h của T-072.)*
+
+## WHY-111. T-073 Ngưỡng phủ cửa sổ khi nghiệm thu W5: trace lỗ ≤ 30 s, metric lỗ ≤ 4 × bước, log không bắt buộc — đặt 20/11/2026, khóa 22/11/2026 trước E5; mục WHY ghi bổ sung **sau** E5 (23/11)
+
+**Thời điểm.**
+- Quy tắc được thêm vào `check_core_input.py` ngày **20/11/2026 22:03Z**, LOG T-073 lượt 7, khi sửa theo Codex CX-06 điểm 5–6.
+- Quy tắc được đưa vào `khai-truoc-e5.json` nháp 2 cùng lúc. Ngày **22/11/2026**, file khóa ở bản `T073-khai-e5-khoa-1` (sha256 ghi LOG T-073 lượt 11).
+- E5 chạy **23/11/2026 02:07–02:38Z**.
+- Mục WHY này được viết **sau** khi đã thấy kết quả E5, trong đó 6 nguồn Payment trượt ngưỡng. Hai ngưỡng **không đổi** sau E5. Mục này chỉ bổ sung lý do còn thiếu theo luật cứng 3. Đây không phải lần chọn lại.
+
+**Chọn gì.**
+- Với mỗi nguồn, lấy mốc thời gian của các mẫu thực nằm trong [t̂−300, t̂+300).
+- Lỗ lớn nhất = max(mẫu đầu − (t̂−300), khoảng giữa hai mẫu liền nhau, (t̂+300) − mẫu cuối).
+- **Trace** (toàn bộ span, theo mốc kết thúc): bắt buộc; thiếu phủ khi lỗ > 30 s.
+- **Mỗi nguồn metric có trong gói:** bắt buộc; thiếu phủ khi lỗ > 4 × bước của nguồn (bước 15 s → 60 s; bước 10 s → 40 s), hoặc khi không có mẫu nào.
+- **Log:** không bắt buộc, chỉ báo.
+- `du_cua_so` chỉ đúng khi mọi nguồn bắt buộc đều đủ. Khi đúng, được viết "lõi nhận đủ cửa sổ"; khi không, viết "đã hiển thị nhưng thiếu phủ".
+
+**Vai trò.** Đây là **quy ước nghiệm thu** cho câu chữ của W5: "dữ liệu thực sự vào lõi quanh t̂" (kế hoạch §8.2, CX-06). Ngưỡng này **không** đo được thiếu bao nhiêu thì kết quả xếp hạng thay đổi. Nó không đánh giá phương pháp và không thuộc tiêu chí `ket_qua_chuc_nang`.
+
+**Vì sao chọn như vậy.** LOG lượt 7 không ghi căn cứ cho riêng hai con số 30 s và hệ số 4. Phần dưới là căn cứ dựng lại lúc viết mục này. Ghi rõ như vậy để không trình bày như lý do đã có từ lúc đặt.
+- **Tính theo mẫu thực thay cho biên min/max.** Quy tắc biên cũ (`nguon_khong_phu_tron`, như `m1_ft.doi_moc._phu`) chỉ xét mẫu đầu và mẫu cuối, nên không bắt được lỗ ở giữa. Phép thử tổng hợp ở lượt 7 cho thấy điều này: bỏ 8 mẫu giữa của chuỗi 15 s thì lỗ là 135 s, quy tắc biên không báo (LOG T-073 lượt 7, mục 22:03Z kiểm).
+- **Metric 4 × bước.** Ngưỡng này cho phép tối đa 3 lần lấy mẫu liên tiếp bị hụt trước khi gọi là thiếu, nhằm không báo thiếu vì một vài lần scrape trễ. Cùng quy ước "4 bước" như ngưỡng 60 s = 4 bước dò 15 s của H5 trong V082. Quan sát nền: ở các nguồn không bị can thiệp của E5 và lượt dưới tải E3 (`t073-dev-008`), lỗ lớn nhất là 15 s với nguồn bước 15 s và 20,001–20,088 s với nguồn bước 10 s (E3: `results/T-073/kiem/dev/t073-dev-008/su-co/b08d6da4d1.json` `#/…/phu/nguon`, 32 nguồn 15 s, 29 nguồn 10 s). Cả hai đều dưới ngưỡng với khoảng cách lớn.
+- **Trace 30 s.** Dưới tải ×1, span đến liên tục. Lỗ lớn nhất quan sát được là 0,35–0,395 s ở dev, E3 và E5. Lỗ 30 s lớn hơn mức bình thường khoảng 75 lần, nên chỉ một lần mất dữ liệu thật mới vượt ngưỡng. Ngưỡng tính trên trace gộp toàn hệ thống, không theo từng dịch vụ.
+- **Log không bắt buộc.** Dịch vụ có thể không ghi log trong khoảng khỏe, nên thiếu log không có nghĩa là mất dữ liệu.
+
+**Phương án đã xét.**
+- (1) Quy tắc biên min/max: bỏ, vì không bắt được lỗ giữa (vẫn ghi để đối chiếu).
+- (2) Tỷ lệ số mẫu so với số kỳ vọng: không chọn, vì một lỗ liền lớn có thể bị che bởi tỷ lệ mẫu còn cao.
+- (3) Ngưỡng chặt hơn, ví dụ 2 × bước: chưa xét bằng dữ liệu; sẽ dễ báo thiếu vì scrape trễ.
+- (4) Ngưỡng theo từng dịch vụ cho trace: không làm ở W5.
+
+**Điều kiện thất bại.**
+- (a) Lỗ dưới ngưỡng vẫn có thể rơi đúng đoạn khởi phát lỗi và đổi kết quả. Ngưỡng không đo ảnh hưởng lên xếp hạng.
+- (b) Nguồn dẫn xuất (`rate[1m]`, phân vị) làm mịn mất mẫu thô khoảng 1 phút. Vì vậy ngưỡng 60 s của nhóm HTTP có thể không thấy một lỗ thô ngắn hơn khoảng 2 phút.
+- (c) Trace gộp có thể đủ trong khi một dịch vụ mất hết span. Đó là trường hợp Payment ở E5, chỉ có span ở N.
+- (d) `check_core_input.py` bản E5 chỉ áp quy tắc lên 61 nguồn metric cơ sở của đầu vào P7. Hai kênh `live-down` và `live-ms` mà V082 thêm sau đó không nằm trong phép kiểm tự động (CX-21 điểm 1). Với ca E5, 16 nguồn `live-*` đã được kiểm tay sau Q1 và đủ phủ (`results/T-073/dap-cx21/dinh-chinh-e5-2.md` §1). Các lượt sau vẫn cần thêm phép kiểm cho hai kênh này.
+- (e) Đổi bước scrape thì ngưỡng metric đổi theo.
+
+**Bằng chứng.**
+- `campaigns/online/check_core_input.py` (bản E5 `81a9273`), docstring và hàm `lo_lon_nhat`.
+- LOG T-073 lượt 7 (mục 22:03Z) và lượt 10 (E3, `t073-dev-008`).
+- `results/T-073/khai-truoc-e5.json` `#/tieu_chi/ket_qua_phu_cua_so`.
+- `results/T-073/e5/su-co/bbc0a6d44f.json` `#/du_lieu_loi/phu`.
+
+**Kết luận phụ thuộc.**
+- Chỉ phụ thuộc: câu "lõi nhận đủ cửa sổ" hoặc "đã hiển thị nhưng thiếu phủ" trong kết quả W5 (E5, và các lượt sau nếu dùng lại quy tắc).
+- Không phụ thuộc: kết quả chức năng E5 (đạt), độ chính xác hay đối chứng của W6–W7.
+- Nếu W6–W7 cần biết thiếu phủ có làm đổi hạng hay không, đó là phép đo riêng, không suy ra từ ngưỡng này.
+
+*Minh duyệt chữ ngày 23/11/2026 ("Approve WHY-111"). Nguồn nháp: `results/T-073/dap-cx21/nhap-why-nguong-phu.md` (sha256 `91fb63f2…`), ghi bởi điều phối T-070.*
+*Sửa 23/11/2026 (Minh duyệt "Approve update"): điều kiện (d) thay theo nháp T-073 đã cập nhật sau Q1 (16 nguồn `live-*` kiểm tay, đủ phủ; `results/T-073/dap-cx21/dinh-chinh-e5-2.md`).*

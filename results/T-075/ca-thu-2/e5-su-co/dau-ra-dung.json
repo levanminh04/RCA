@@ -1,0 +1,150 @@
+{
+ "khuon": "T075-ra-2",
+ "trang_thai": "KHONG_DU_BANG_CHUNG",
+ "xep_hang_nhac_lai": [
+  [
+   "booking-service"
+  ]
+ ],
+ "khang_dinh": [
+  {
+   "id": "k1",
+   "loai": "quan_sat",
+   "cau": "Lõi RCA (V082-V066+H8a) kết luận CAUSE_FOUND, nhóm hạng 1 là booking-service.",
+   "trich_dan": [
+    {
+     "con_tro": "/ket_qua_rca/ket_luan",
+     "gia_tri": "CAUSE_FOUND"
+    },
+    {
+     "con_tro": "/ket_qua_rca/nhom_hang_1"
+    },
+    {
+     "con_tro": "/ket_qua_rca/ban_phuong_phap"
+    }
+   ]
+  },
+  {
+   "id": "k2",
+   "loai": "quan_sat",
+   "cau": "Cảnh báo đầu tiên là t072-live (tín hiệu live) tại t̂; t072-p95-payment bắt đầu sau 50 s và t072-loi-payment sau 60 s.",
+   "trich_dan": [
+    {
+     "con_tro": "/canh_bao/0"
+    },
+    {
+     "con_tro": "/canh_bao/1"
+    },
+    {
+     "con_tro": "/canh_bao/2"
+    }
+   ]
+  },
+  {
+   "id": "k3",
+   "loai": "quan_sat",
+   "cau": "Trong đầu vào P7 cơ sở, payment-service có 17502 span và 584 dòng log ở nửa nền, và không có khóa A ở cả hai, tức không có mẫu nào ở nửa sự cố.",
+   "trich_dan": [
+    {
+     "con_tro": "/so_mau_theo_thuc_the/span/payment-service"
+    },
+    {
+     "con_tro": "/so_mau_theo_thuc_the/log/payment-service"
+    },
+    {
+     "con_tro": "/so_mau_theo_thuc_the/ghi_chu"
+    },
+    {
+     "con_tro": "/so_mau_theo_thuc_the/pham_vi"
+    }
+   ]
+  },
+  {
+   "id": "k4",
+   "loai": "quan_sat",
+   "cau": "Sáu nguồn metric cơ sở của payment-service thiếu phủ cửa sổ, lỗ lớn nhất khoảng 365 s; phép phủ này không gồm kênh liveness bổ sung.",
+   "trich_dan": [
+    {
+     "con_tro": "/do_phu/thieu_bat_buoc"
+    },
+    {
+     "con_tro": "/do_phu/lo_lon_nhat_s"
+    },
+    {
+     "con_tro": "/do_phu/pham_vi"
+    }
+   ]
+  }
+ ],
+ "goi_y_xu_ly": [
+  {
+   "id": "g1",
+   "loai": "kiem_tra",
+   "cau": "Kiểm tra trạng thái payment-service: trong đầu vào P7 cơ sở nó không có span và log ở nửa sự cố, và sáu nguồn metric cơ sở thiếu phủ cửa sổ.",
+   "can_cu": [
+    {
+     "con_tro": "/so_mau_theo_thuc_the/span/payment-service"
+    },
+    {
+     "con_tro": "/so_mau_theo_thuc_the/log/payment-service"
+    },
+    {
+     "con_tro": "/so_mau_theo_thuc_the/ghi_chu"
+    },
+    {
+     "con_tro": "/do_phu/thieu_bat_buoc"
+    }
+   ]
+  },
+  {
+   "id": "g2",
+   "loai": "thu_them_du_lieu",
+   "cau": "Dùng file G1 đầy đủ của ca để có bảng bằng chứng theo kênh rồi giải thích lại.",
+   "can_cu": [
+    {
+     "con_tro": "/thieu_trong_goi/0"
+    }
+   ]
+  }
+ ],
+ "thieu_bang_chung": [
+  {
+   "cau": "Nguồn này không có bảng bằng chứng theo kênh của V082, nên không giải thích được vì sao booking-service đứng hạng 1.",
+   "trich_dan": [
+    {
+     "con_tro": "/thieu_trong_goi/0"
+    },
+    {
+     "con_tro": "/ket_qua_rca/nhom_hang_1"
+    }
+   ],
+   "vang": [
+    "/bang_chung",
+    "/ke_thua"
+   ]
+  },
+  {
+   "cau": "Nguồn này không có trạng thái chạy của V082, chỉ có trạng thái bước P7.",
+   "trich_dan": [
+    {
+     "con_tro": "/ket_qua_rca/nguon_trang_thai"
+    }
+   ],
+   "vang": [
+    "/ket_qua_rca/trang_thai_chay"
+   ]
+  },
+  {
+   "cau": "Độ phủ cửa sổ không đủ ở sáu nguồn metric cơ sở của payment-service.",
+   "trich_dan": [
+    {
+     "con_tro": "/do_phu/du_cua_so",
+     "gia_tri": false
+    },
+    {
+     "con_tro": "/do_phu/thieu_bat_buoc"
+    }
+   ]
+  }
+ ]
+}

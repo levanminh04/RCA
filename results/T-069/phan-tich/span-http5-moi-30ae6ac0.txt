@@ -1,0 +1,27 @@
+SELECT booking_db | select clock_timestamp()
+    N: n=  822 p50=   0.28 p90=   1.10 max=    14.5
+    A: n=   89 p50=   0.21 p90=   0.97 max=     4.7
+SELECT booking_db | select set_config(?, ?, true)
+    N: n=  546 p50=   0.44 p90=   1.67 max=    40.1
+    A: n=   30 p50=   0.31 p90=   1.71 max=     4.6
+SELECT booking_schema.tbl_orders | select o1_0.id,o1_0.accepted_at,o1_0.accepted_charge_id,o1_0.buyer_subject,o1_0.created_at,o1_0.currency,o1_0.customer_email,o1_0.discount,o
+    N: n=  294 p50=   0.41 p90=   1.12 max=    16.4
+    A: n=   30 p50=   0.30 p90=   0.73 max=     2.2
+SELECT booking_schema.tbl_orders | select o1_0.event_id from booking_schema.tbl_orders o1_0 where o1_0.id=?
+    N: n=  204 p50=   0.38 p90=   1.33 max=    19.9
+    A: n=   30 p50=   0.30 p90=   0.73 max=     1.7
+SELECT booking_db | select distinct o1_0.id,o1_0.accepted_at,o1_0.accepted_charge_id,o1_0.buyer_subject,o1_0.created_at,o1_0.currency,o1_0.customer_email,o1_0.d
+    N: n=  203 p50=   0.69 p90=   2.36 max=     5.9
+    A:    -
+SELECT booking_schema.tbl_orders | select o1_0.id from booking_schema.tbl_orders o1_0 where o1_0.lifecycle_state=? and o1_0.expires_at<=? and (? is null or o1_0.id>?) order by
+    N: n=   60 p50=  34.77 p90=  82.17 max=   228.2
+    A: n=   59 p50=  31.65 p90=  82.68 max=   215.3
+SELECT booking_db | select o1_0.id from booking_schema.tbl_orders o1_0 join booking_schema.tbl_reservations r1_0 on r1_0.order_id=o1_0.id join booking_schema.tb
+    N: n=   59 p50=  42.60 p90=  97.53 max=   239.3
+    A: n=   60 p50=  39.90 p90= 102.81 max=   184.8
+SELECT booking_schema.tbl_orders | select o1_0.event_id from booking_schema.tbl_orders o1_0 where o1_0.id=? and o1_0.buyer_subject=?
+    N: n=   90 p50=   0.33 p90=   1.39 max=     4.6
+    A:    -
+TỔNG SELECT booking_db: N n= 1630 p50=   0.43 p90=   1.97 max=   239.3 | A n=  179 p50=   0.40 p90=  45.81 max=   184.8
+TỔNG SELECT booking_schema.tbl_orders: N n=  648 p50=   0.43 p90=   5.99 max=   228.2 | A n=  119 p50=   2.21 p90=  44.63 max=   215.3
+Số span của service theo tên (N, A) — 12 tên nhiều nhất: [('SELECT booking_db', 1630, 179), ('SELECT', 1630, 179), ('booking_db', 1039, 289), ('SELECT booking_schema.tbl_event_sales_snapshots', 1010, 30), ('Transaction.commit', 951, 30), ('SET', 862, 60), ('OrderRepository.currentDatabaseTime', 822, 89), ('SELECT booking_schema.tbl_orders', 648, 119), ('SELECT com.flashticket.booking_service.entity.Order', 648, 119), ('GET', 731, 10), ('SELECT booking_schema.tbl_outbox_messages', 437, 150), ('OrderRepository.configureTransactionLockTimeout', 546, 30)]

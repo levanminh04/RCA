@@ -1,0 +1,69 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "T072-i1-0",
+ "title": "Bản ghi cảnh báo I1 (bản 0, T-072 đề xuất; điều phối chốt)",
+ "description": "Một bản ghi cho mỗi lần một instance luật vào Alerting (khoảng cháy). Ba thời điểm tách riêng: t_hat (trạng thái luật), nhan_webhook_utc (bộ nhận), du_lieu_loi (T-073 điền). Không có trường nào lấy từ sổ tiêm hay nhãn ca (luật cứng 6).",
+ "type": "object",
+ "required": ["schema", "ma", "nguon_ban_ghi", "luat", "nhan", "fingerprint", "t_hat", "trang_thai"],
+ "properties": {
+  "schema": {"const": "T072-i1-0"},
+  "ma": {"type": "string", "description": "sha256(fingerprint + '|' + t_hat.epoch_s) cắt 16 ký tự hex; cùng (fingerprint, t_hat) = cùng bản ghi (bản lặp chỉ đếm)."},
+  "nguon_ban_ghi": {"enum": ["webhook", "lich-su-trang-thai", "offline"]},
+  "luat": {
+   "type": "object",
+   "required": ["uid", "t072_loai", "t072_tin_hieu"],
+   "properties": {
+    "uid": {"type": "string", "description": "uid luật trong bieu-thuc.json (vd t072-p95-booking). Webhook: nhãn t072_uid (T-072 gắn vào mọi luật); DatasourceError/DatasourceNoData: nhãn rulename/t072_uid nếu có."},
+    "tieu_de": {"type": "string"},
+    "t072_loai": {"enum": ["he-thong", "quan-sat"], "description": "Chỉ he-thong mở RCA. Thiếu nhãn, alertname DatasourceError hoặc DatasourceNoData → quan-sat."},
+    "t072_tin_hieu": {"enum": ["p95", "loi-5xx", "live", "mat-do", "mat-gw", "datasource-error", "datasource-nodata"]},
+    "eval_interval_s": {"type": "integer", "description": "từ annotation t072_eval_interval_s"},
+    "for_s": {"type": "integer", "description": "từ annotation t072_for_s"},
+    "nguong": {"type": ["number", "null"], "description": "từ annotation t072_nguong"},
+    "nguong_phien_ban": {"type": ["string", "null"], "description": "annotation t072_nguong_phien_ban (sha256 nguong.json, 12 ký tự)"},
+    "bieu_thuc_phien_ban": {"type": "string", "description": "annotation t072_bieu_thuc (T072-bieu-thuc-1)"}
+   }
+  },
+  "nhan": {"type": "object", "additionalProperties": {"type": "string"}, "description": "Toàn bộ nhãn của instance (gồm http_route hoặc http_url)."},
+  "fingerprint": {"type": "string", "description": "fingerprint của Grafana (webhook alerts[].fingerprint); offline: sha256 của nhãn đã sắp."},
+  "trang_thai": {"enum": ["firing", "resolved"]},
+  "t_hat": {
+   "type": "object",
+   "required": ["epoch_s", "utc", "nguon"],
+   "properties": {
+    "epoch_s": {"type": "number"},
+    "utc": {"type": "string", "format": "date-time"},
+    "nguon": {"enum": ["lich-su-trang-thai", "webhook-startsAt", "offline-luoi-xuat"], "description": "Chuẩn: lần đánh giá đầu ở Alerting theo lịch sử trạng thái Grafana. webhook-startsAt dùng tạm cho trực tuyến cho tới khi E3 xác nhận trùng."},
+    "da_doi_chieu_E3": {"type": "boolean", "description": "true khi E3 đã xác nhận startsAt = giờ chuyển Alerting trong lịch sử trạng thái (sai lệch ≤ 1 nhịp đánh giá)."}
+   }
+  },
+  "t_het": {
+   "type": ["object", "null"],
+   "properties": {
+    "epoch_s": {"type": "number"},
+    "utc": {"type": "string", "format": "date-time"},
+    "nguon": {"enum": ["lich-su-trang-thai", "webhook-endsAt", "offline-luoi-xuat"]}
+   },
+   "description": "null khi còn cháy."
+  },
+  "nhan_webhook_utc": {"type": ["string", "null"], "format": "date-time", "description": "Giờ bộ nhận ghi khi request tới, trước khi đọc thân. null cho offline/lịch sử trạng thái."},
+  "gia_tri": {"type": ["object", "null"], "description": "webhook alerts[].values (refId → số, vd {\"A\": 0.21, \"C\": 1}) và valueString nguyên văn ở khóa _valueString. A là giá trị tín hiệu lúc đánh giá."},
+  "su_co": {"type": ["string", "null"], "description": "mã sự cố do bộ gom gán theo quy-tac-gom.json."},
+  "du_lieu_loi": {"type": ["object", "null"], "description": "T-073 điền: khoảng dữ liệu lõi thực nhận và độ phủ tín hiệu."},
+  "goc": {"type": ["object", "null"], "description": "Thân alert nguyên văn (webhook) để kiểm lại."}
+ },
+ "doi_chieu_T073": {
+  "nguon": "results/T-073/thiet-ke.md §5 (đọc 20/11 13:23Z)",
+  "trung": [
+   "Ba thời điểm tách riêng; t̂ của lõi = floor(t_hat.epoch_s).",
+   "Gom theo T072-gom-1; DatasourceError, DatasourceNoData, thiếu nhãn t072_loai → quan-sat, chỉ ghi.",
+   "t_het lấy từ endsAt của webhook resolved khi chạy trực tuyến."
+  ],
+  "khac": [
+   "Nguồn t̂ chuẩn của T-072 là lịch sử trạng thái Grafana; T-073 dùng startsAt. Schema cho cả hai qua t_hat.nguon; kết quả chính E4 của T-072 đọc lịch sử trạng thái. Phân xử trùng nhau ở E3 (da_doi_chieu_E3).",
+   "Mã luật: T-072 gắn nhãn t072_uid vào mọi luật; T-073 có thể bỏ đường đọc __alert_rule_uid__/generatorURL (giữ làm dự phòng).",
+   "eval_interval, for, ngưỡng: T-072 đặt ở annotation t072_eval_interval_s, t072_for_s, t072_nguong, t072_nguong_phien_ban, t072_bieu_thuc (khớp tùy chọn annotation:<khóa> của T-073).",
+   "Webhook resolved có thể tới muộn so với endsAt do nhịp gửi của chính sách thông báo; T-072 đề xuất chính sách group_by theo mọi nhãn, group_wait 0 s, group_interval 10 s (file luật bước 4). Giờ tới muộn không đổi endsAt, chỉ đổi nhan_webhook_utc của bản resolved."
+  ]
+ }
+}

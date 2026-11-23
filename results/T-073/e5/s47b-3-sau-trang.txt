@@ -1,0 +1,13 @@
+S4-7b bước 3 — sáu trang lưu trữ khi /opt/rca-lab ở commit P (779f90c9…), Grafana restart 01:59:16Z (health 13.3.0/6f8ce3c693…, provisioning.dashboard/alerting không lỗi).
+02:00:13Z /api/search: 10 dashboard = 4 hiện hành + 6 lưu trữ (thư mục 2026-11-12-g2-v6, 2026-11-13-l3-p7, 2026-11-14-l4-temporary).
+  Hiện hành khi provider lưu trữ đang bật: t065-l8b-rca, t065-l8b-phat-lai, t065-l5-muc-luc chỉ có public/rca/t073-e5-001.
+  Lưu trữ: rca-g2, rca-g2-phat-lai (đọc qua biến thu_muc, không URL cố định); t065-rca, t065-phat-lai → public/rca/t065-l3-001; t065-l4-rca, t065-l4-phat-lai → public/rca/t065-l4-001.
+Cách kiểm mỗi trang: mở URL, chờ 6 s, cuộn hết trang (40×600 px, 250 ms) rồi chờ 3 s để panel lười nạp chạy; liệt kê panel ([data-viz-panel-key]): có chữ "No data" hay có dấu lỗi trạng thái panel; đếm dòng bảng danh sách. Giới hạn: phép kiểm dựa trên chữ hiển thị, không đọc từng phản hồi truy vấn; ảnh chụp phần đầu trang.
+| # | trang | thời điểm | nạp | danh sách | ca mở | panel | No data | lỗi | ảnh |
+| 1 | 2026-11-12-g2-v6/rca-g2, thu_muc=rca/mau | 02:00:49Z | có | 2 ca (f4a8c021, c12e47ab) | f4a8c021 | 12 | 0 | 0 | s47b-anh-1-rca-g2-mau.jpg |
+| 2 | 2026-11-12-g2-v6/rca-g2-phat-lai, thu_muc=rca/phat-lai | 02:01:20Z | có | có (e8661e0a, 00eaea92, bf17acbf, f728fce2, 6c1a9fd8…) | e8661e0a | 7 | 0 | 0 | s47b-anh-2-rca-g2-phat-lai.jpg |
+| 3 | 2026-11-13-l3-p7/t065-rca (bản p7) | 02:01:50Z | có | 10 dòng hiển thị (có cuộn) | e8661e0a | 20 | 0 | 0 | s47b-anh-3-t065-rca.jpg |
+| 4 | 2026-11-13-l3-p7/t065-phat-lai | 02:02:23Z | có | 10 dòng hiển thị | e8661e0a | 8 | 0 | 0 | s47b-anh-4-t065-phat-lai.jpg |
+| 5 | 2026-11-14-l4-temporary/t065-l4-rca (bản p7) | 02:03:20Z | có | 11 dòng hiển thị | 00eaea92 | 23 | 0 | 0 | s47b-anh-5-t065-l4-rca.jpg |
+| 6 | 2026-11-14-l4-temporary/t065-l4-phat-lai | 02:04:07Z | có | 11 dòng hiển thị | 00eaea92 | 7 | 0 | 0 | s47b-anh-6-t065-l4-phat-lai.jpg |
+Ghi chú: trang 5–6 mở với khung giờ lưu sẵn trong URL mặc định (from/to của ca khác với t_tu/t_den của 00eaea92) — hành vi có sẵn của dashboard lưu trữ, E5 không đổi định nghĩa các trang này. Trang phát lại hiển thị đáp án của ca CŨ (theo thiết kế); không đọc phần đáp án.

@@ -1,0 +1,52 @@
+2026-11-23T01:58:56.941818217Z
+hash_luu_tru_truoc=c94da63ce260e4194db617d08d63df5cac04191e624318782b11048a5a5077fe n=6700
+head_truoc=81a92736127680794d5f13421ec5cd74c7a156cc sach=[] job=[]
+HEAD is now at 779f90c T-073 E5 (commit P): bật tạm provider dashboard lưu trữ luu-tru-tam
+head_sau=779f90c9e3a91c345ce9d6cb6535ae86333eed7e sach=[] 2026-11-23T01:59:03.454620800Z
+# Nạp dashboard từ file (T-068): mỗi thư mục Grafana một provider; tên hiển thị tiếng Việt đặt ở `folder`.
+# dashboards/90-archive/ KHÔNG được provider nào quét (xem observability/grafana/README.md để nạp lại khi cần, ví dụ W5).
+apiVersion: 1
+providers:
+  - name: bat-dau
+    type: file
+    folder: Bắt đầu tại đây
+    folderUid: rca-bat-dau
+    disableDeletion: false
+    allowUiUpdates: false
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/dashboards/00-start-here
+  - name: he-thong
+    type: file
+    folder: Hệ thống FlashTicket
+    folderUid: rca-he-thong
+    disableDeletion: false
+    allowUiUpdates: false
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/dashboards/10-system
+  - name: su-co
+    type: file
+    folder: RCA — sự cố
+    folderUid: rca-su-co
+    disableDeletion: false
+    allowUiUpdates: false
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/dashboards/20-incidents
+  - name: phat-lai
+    type: file
+    folder: RCA — phát lại có đáp án
+    folderUid: rca-phat-lai
+    disableDeletion: false
+    allowUiUpdates: false
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/dashboards/30-replay
+  # T-073 E5 (commit P, tạm): nạp 6 dashboard lưu trữ để kiểm khi đổi nguồn JSON (W5); trả về commit E5 ngay sau kiểm.
+  # Cấu hình theo observability/grafana/README.md (không đặt folder/folderUid cùng foldersFromFilesStructure).
+  - name: luu-tru-tam
+    type: file
+    options:
+      path: /etc/grafana/dashboards/90-archive
+      foldersFromFilesStructure: true

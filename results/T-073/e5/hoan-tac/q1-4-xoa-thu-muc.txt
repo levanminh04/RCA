@@ -1,0 +1,8 @@
+Q1 bước 4 — xóa 3 thư mục Grafana rỗng. Minh xác nhận trực tiếp trong chat phiên rca-w5 ("Đồng ý xóa", 23/11 ~05:43Z), sau duyệt Q1 (DECISIONS 23/11).
+Cách làm: trình duyệt pane (phiên admin Minh), một lệnh JS: với từng UID kiểm lại ngay trước khi xóa (title đúng, /api/folders/<uid>/counts toàn 0, 0 thư mục con, 0 mục /api/search) rồi DELETE /api/folders/<uid>; thư mục không rỗng thì bỏ qua (không có).
+05:43:14.766Z kiểm lại: cả 3 rỗng (alertrules, dashboards, folders, library_elements, librarypanels, recordingrules, variables = 0; sub 0; search 0).
+05:43:15.191Z DELETE ag54hoqtv2vpcf (2026-11-12-g2-v6) → 200 "Folder deleted"
+05:43:15.599Z DELETE dg54hor4c5jwgb (2026-11-13-l3-p7) → 200 "Folder deleted"
+05:43:15.997Z DELETE ag54hore1rcaob (2026-11-14-l4-temporary) → 200 "Folder deleted"
+05:43:16.084Z sau: GET /api/folders/<uid> → 404 cả ba; /api/folders còn 6: rca-bat-dau, rca-he-thong, rca-phat-lai, rca-su-co, ag51evv3jtxxcf "T-072 E3 thử (gỡ trước E4)", cg51evuk4md4wb "T-072 W4 cảnh báo"; dashboard vẫn 4 (t065-l5-muc-luc, flashticket-he-thong, t065-l8b-phat-lai, t065-l8b-rca).
+Ngoài phạm vi, không đụng: thư mục "T-072 E3 thử (gỡ trước E4)" (của T-072).

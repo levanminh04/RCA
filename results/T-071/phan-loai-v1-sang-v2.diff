@@ -1,0 +1,103 @@
+--- phan_loai_phut.v1.py	2026-11-21 05:00:10.730836400 +0700
++++ phan_loai_phut.py	2026-11-21 05:01:38.637190400 +0700
+@@ -14,8 +14,11 @@
+     nhịp của job giao phút; job không có chuỗi nào trong cửa sổ → mọi phút mat_quan_sat.
+   - tăng của bộ đếm trong phút = giá trị mẫu cuối ≤ m+60 trừ giá trị mẫu cuối ≤ m (chuỗi mới xuất hiện trong phút:
+     trừ 0); giảm = reset (Collector) / khởi động lại.
+-  - B2 xét container có `container_name` bắt đầu bằng `flash-ticket-`; OOM không có chuỗi Prometheus riêng nên B2 chỉ
+-    đo restart (OOM của container k6 ở state.json kiểm riêng mỗi lượt).
++  - B2 xét container có `container_name` bắt đầu bằng `flash-ticket-`; danh sách áp dụng = mọi tên như vậy có chuỗi ở
++    bất kỳ đâu trong khoảng xuất; tên áp dụng không có mẫu trong phút (gồm container đã mất) → cờ thieu_b2; selector
++    rỗng → mọi phút cờ thieu_b2. OOM không có chuỗi Prometheus riêng nên B2 chỉ đo restart (OOM của container k6 ở
++    state.json kiểm riêng mỗi lượt). B2 thiếu chỉ gắn cờ, không đổi nhãn.
++  - L1 ghi kèm theo từng đích http_url (đếm bước trạng thái 0/1/2 và bước không có giá trị), không gộp.
+   - cảnh báo trong phút (`canh_bao`) để trống: T-072 điền bằng chấm offline trên chuỗi đã xuất.
+ """
+ import collections
+@@ -28,6 +31,7 @@
+ import statistics
+ import sys
+ 
++sys.stdout.reconfigure(encoding="utf-8", errors="backslashreplace")
+ KHAI, H, E2, RA = sys.argv[1:5]
+ raw = pathlib.Path(KHAI).read_bytes()
+ if hashlib.sha256(raw).hexdigest() != H:
+@@ -106,6 +110,25 @@
+ nhip = {j: statistics.median([b[0] - a[0] for a, b in zip(v, v[1:])]) for j, v in up.items() if len(v) > 2}
+ cai_dat_note.append({'up_jobs_co_chuoi': sorted(up), 'nhip_trung_vi_s': nhip})
+ 
++# B2: danh sách container áp dụng = mọi container_name `flash-ticket-*` có chuỗi restarts ở bất kỳ đâu trong khoảng
++# xuất (gộp các container_id của cùng tên). Phút nào một tên áp dụng không có mẫu → cờ thieu_b2 (kể cả khi container
++# mất hẳn trước phút đó). Selector rỗng → mọi phút cờ thieu_b2. Chỉ gắn cờ, không đổi nhãn (bản khóa B2).
++b2 = collections.defaultdict(list)  # container_name -> [danh sách mẫu đã sắp của từng chuỗi]
++for kn, vals in dl.get('doc-lap/restarts', {}).items():
++    ten = json.loads(kn).get('container_name', '')
++    if ten.startswith('flash-ticket-'):
++        b2[ten].append(sorted(vals.items()))
++B2_AP_DUNG = sorted(b2)
++cai_dat_note.append({'b2_container_ap_dung': B2_AP_DUNG,
++                     'b2_selector_rong': not dl.get('doc-lap/restarts')})
++
++# L1 (chỉ ghi kèm): đếm theo từng đích http_url; tập đích = mọi http_url thấy trong live-3-trang-thai hoặc mẫu thô
++# httpcheck_status có mã. Bước không có giá trị của một đích trong phút → 'khong_co_buoc' (bieu-thuc coi như trạng thái 2).
++L1_DICH = sorted({json.loads(kn).get('http_url') for ten in ('tin-hieu/live-3-trang-thai', 'tho/httpcheck-status-co-ma')
++                  for kn in luat.get(ten, {})} - {None})
++BUOC_PHUT = 6  # bước 10 s mỗi phút (bieu-thuc step_s = 10)
++cai_dat_note.append({'l1_dich': L1_DICH})
++
+ ket = []
+ for m in phut:
+     a, b = m, m + 60
+@@ -176,22 +199,17 @@
+                                                'dropped_iterations', 'http_429', 'http_req_failed', 'http_reqs', 'diem')}
+     rs = []
+     thieu_b2 = []
+-    for kn, vals in dl.get('doc-lap/restarts', {}).items():
+-        lab = json.loads(kn)
+-        if not lab.get('container_name', '').startswith('flash-ticket-'):
+-            continue
+-        v = sorted(vals.items())
+-        if not v or v[0][0] > b or v[-1][0] < a:
+-            continue  # container không tồn tại quanh phút
+-        if not [t for t, _ in v if a <= t < b]:
+-            thieu_b2.append(lab['container_name'])
+-        d_ = tang(v, a, b)
+-        if d_ and d_ > 0:
+-            rs.append(lab['container_name'])
++    if not B2_AP_DUNG:
++        thieu_b2.append('(selector container_restarts_total rỗng: không có container flash-ticket-* nào)')
++    for ten in B2_AP_DUNG:
++        if not any(a <= t < b for v in b2[ten] for t, _ in v):
++            thieu_b2.append(ten)  # không quan sát được trong phút (gồm container đã mất trước phút)
++        if any((tang(v, a, b) or 0) > 0 for v in b2[ten]):
++            rs.append(ten)
+     if rs:
+         vi.append('B2')
+     gia_tri['b2_restart'] = rs
+-    co['thieu_b2'] = sorted(set(thieu_b2))
++    co['thieu_b2'] = thieu_b2
+     th = {json.loads(kn).get('__name__'): sorted(vals.items()) for kn, vals in dl.get('doc-lap/throttle-booking', {}).items()}
+     dt_ = tang(th.get('container_cpu_throttling_data_throttled_periods_total', []), a, b)
+     dp_ = tang(th.get('container_cpu_throttling_data_periods_total', []), a, b)
+@@ -213,16 +231,18 @@
+     else:
+         nhan = 'khoe_x1'
+     # --- ghi kèm: L1 và số điểm chuỗi luật ---
+-    l1 = collections.Counter()
++    l1 = {u: collections.Counter() for u in L1_DICH}
+     for kn, vals in luat.get('tin-hieu/live-3-trang-thai', {}).items():
++        u = json.loads(kn).get('http_url')
+         for t, v in vals.items():
+             if a <= t < b:
+-                l1[str(int(v))] += 1
++                l1.setdefault(u, collections.Counter())[str(int(v))] += 1
++    l1 = {u: dict(c, khong_co_buoc=max(0, BUOC_PHUT - sum(c.values()))) for u, c in l1.items()}
+     diem_luat = {ten: sum(1 for kn, vals in s.items() for t in vals if a <= t < b)
+                  for ten, s in luat.items() if ten.startswith('tin-hieu/')}
+     ket.append({'phut': iso(m), 'luot': l['tag'] if l else None, 'muc': muc, 'nhan': nhan,
+                 'ly_do': {k: v for k, v in ly.items() if v}, 'vi_pham': vi, 'gia_tri': gia_tri, 'co': co,
+-                'ghi_kem': {'L1_so_buoc_theo_trang_thai': dict(l1), 'diem_chuoi_luat': diem_luat},
++                'ghi_kem': {'L1_theo_dich': l1, 'diem_chuoi_luat': diem_luat},
+                 'canh_bao': None})
+ 
+ # cờ lan_cua_so: phút không phải biên mà cửa sổ 300 s của một bước trong phút giao phút lớp khác (m−5 … m−1)

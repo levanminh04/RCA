@@ -1,0 +1,453 @@
+diff --git a/observability/grafana/dashboards/00-start-here/t065-l5-muc-luc.json b/observability/grafana/dashboards/00-start-here/t065-l5-muc-luc.json
+index b2836a4..8a39ecd 100644
+--- a/observability/grafana/dashboards/00-start-here/t065-l5-muc-luc.json
++++ b/observability/grafana/dashboards/00-start-here/t065-l5-muc-luc.json
+@@ -31,7 +31,7 @@
+    },
+    "options": {
+     "mode": "markdown",
+-    "content": "## Bắt đầu tại đây\n\n- **[Hệ thống FlashTicket](/d/flashticket-he-thong)** — lưu lượng, độ trễ p90, lỗi 5xx theo service; bộ nhớ JVM; bản đồ dịch vụ trực tiếp; log ứng dụng. Mặc định 1 giờ gần nhất.\n- **[RCA — sự cố](/d/t065-l8b-rca)** — chọn bản (V082 đề xuất cuối, V071 thay thế có xếp hạng cạnh, P7 khóa) → ca → đồ thị dịch vụ → service → thao tác → bằng chứng. Mở ca từ bảng dưới đây để có đúng cửa sổ thời gian.\n- **[RCA — phát lại có đáp án](/d/t065-l8b-phat-lai)** — lớp đáp án tách riêng; trang sự cố và mục lục không chứa đáp án.\n\nNguồn dữ liệu RCA: chỉ mục bản 3 `t073-e5-001`. Cửa sổ ca: [t−300 s, t+300 s). Đồ thị dịch vụ chỉ để hiển thị; cạnh là quan sát trace, không phải đầu ra phương pháp. Dashboard lưu trữ của các lượt thử không còn hiện trên giao diện (repo lab, `observability/grafana/README.md`)."
++    "content": "## Bắt đầu tại đây\n\n- **[Hệ thống FlashTicket](/d/flashticket-he-thong)** — lưu lượng, độ trễ p90, lỗi 5xx theo service; bộ nhớ JVM; bản đồ dịch vụ trực tiếp; log ứng dụng. Mặc định 1 giờ gần nhất.\n- **[RCA — sự cố](/d/t065-l8b-rca)** — chọn bản (V082 đề xuất cuối, V071 thay thế có xếp hạng cạnh, P7 khóa) → ca → đồ thị dịch vụ → service → thao tác → bằng chứng. Mở ca từ bảng dưới đây để có đúng cửa sổ thời gian.\n- **[RCA — phát lại có đáp án](/d/t065-l8b-phat-lai)** — lớp đáp án tách riêng; trang sự cố và mục lục không chứa đáp án.\n\nNguồn dữ liệu RCA: chỉ mục bản 3 `t065-l11-001`. Cửa sổ ca: [t−300 s, t+300 s). Đồ thị dịch vụ chỉ để hiển thị; cạnh là quan sát trace, không phải đầu ra phương pháp. Dashboard lưu trữ của các lượt thử không còn hiện trên giao diện (repo lab, `observability/grafana/README.md`)."
+    }
+   },
+   {
+@@ -59,7 +59,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/V082-V066+H8a/chi-muc.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/V082-V066+H8a/chi-muc.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+diff --git a/observability/grafana/dashboards/20-incidents/t065-l8b-rca.json b/observability/grafana/dashboards/20-incidents/t065-l8b-rca.json
+index 7f27eaa..4de923e 100644
+--- a/observability/grafana/dashboards/20-incidents/t065-l8b-rca.json
++++ b/observability/grafana/dashboards/20-incidents/t065-l8b-rca.json
+@@ -41,7 +41,7 @@
+       "source": "url",
+       "parser": "backend",
+       "format": "table",
+-      "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/chi-muc-ban.json",
++      "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/chi-muc-ban.json",
+       "url_options": {
+        "method": "GET",
+        "data": ""
+@@ -93,7 +93,7 @@
+       "source": "url",
+       "parser": "backend",
+       "format": "table",
+-      "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/chi-muc.json",
++      "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/chi-muc.json",
+       "url_options": {
+        "method": "GET",
+        "data": ""
+@@ -145,7 +145,7 @@
+       "source": "url",
+       "parser": "backend",
+       "format": "table",
+-      "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/vue/${ca}.json",
++      "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/vue/${ca}.json",
+       "url_options": {
+        "method": "GET",
+        "data": ""
+@@ -197,7 +197,7 @@
+       "source": "url",
+       "parser": "backend",
+       "format": "table",
+-      "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/vue/${ca}.json",
++      "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/vue/${ca}.json",
+       "url_options": {
+        "method": "GET",
+        "data": ""
+@@ -241,7 +241,7 @@
+       "source": "url",
+       "parser": "backend",
+       "format": "table",
+-      "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/vue/${ca}.json",
++      "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/vue/${ca}.json",
+       "url_options": {
+        "method": "GET",
+        "data": ""
+@@ -285,7 +285,7 @@
+       "source": "url",
+       "parser": "backend",
+       "format": "table",
+-      "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/vue/${ca}.json",
++      "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/vue/${ca}.json",
+       "url_options": {
+        "method": "GET",
+        "data": ""
+@@ -329,7 +329,7 @@
+       "source": "url",
+       "parser": "backend",
+       "format": "table",
+-      "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/thao-tac-vue/${ca}/${dv}.json",
++      "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/thao-tac-vue/${ca}/${dv}.json",
+       "url_options": {
+        "method": "GET",
+        "data": ""
+@@ -402,7 +402,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/chi-muc.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/chi-muc.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -504,7 +504,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/vue/${ca}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/vue/${ca}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -602,7 +602,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/vue/${ca}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/vue/${ca}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -727,7 +727,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/service-graph/${ban}/${ca}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/service-graph/${ban}/${ca}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -806,7 +806,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/service-graph/${ban}/${ca}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/service-graph/${ban}/${ca}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -953,7 +953,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/service-graph/${ban}/${ca}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/service-graph/${ban}/${ca}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -1124,7 +1124,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/service-graph/${ban}/${ca}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/service-graph/${ban}/${ca}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -1205,7 +1205,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/vue/${ca}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/vue/${ca}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -1265,7 +1265,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/vue/${ca}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/vue/${ca}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -1359,7 +1359,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/vue/${ca}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/vue/${ca}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -1428,7 +1428,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/vue/${ca}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/vue/${ca}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -1517,7 +1517,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/vue/${ca}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/vue/${ca}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -1615,7 +1615,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/thao-tac-vue/${ca}/${dv}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/thao-tac-vue/${ca}/${dv}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -1683,7 +1683,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/thao-tac-vue/${ca}/${dv}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/thao-tac-vue/${ca}/${dv}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -1847,7 +1847,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/thao-tac-vue/${ca}/${dv}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/thao-tac-vue/${ca}/${dv}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -1916,7 +1916,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/thao-tac-vue/${ca}/${dv}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/thao-tac-vue/${ca}/${dv}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -2023,7 +2023,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/thao-tac-vue/${ca}/${dv}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/thao-tac-vue/${ca}/${dv}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -2124,7 +2124,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/thao-tac-vue/${ca}/${dv}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/thao-tac-vue/${ca}/${dv}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -2238,7 +2238,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/thao-tac-vue/${ca}/${dv}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/thao-tac-vue/${ca}/${dv}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -2321,7 +2321,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/trang-thai/${ca}/${dv}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/trang-thai/${ca}/${dv}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -2447,7 +2447,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/vue/${ca}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/vue/${ca}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+diff --git a/observability/grafana/dashboards/30-replay/t065-l8b-phat-lai.json b/observability/grafana/dashboards/30-replay/t065-l8b-phat-lai.json
+index 93b764d..1ca83f9 100644
+--- a/observability/grafana/dashboards/30-replay/t065-l8b-phat-lai.json
++++ b/observability/grafana/dashboards/30-replay/t065-l8b-phat-lai.json
+@@ -41,7 +41,7 @@
+       "source": "url",
+       "parser": "backend",
+       "format": "table",
+-      "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/chi-muc-ban.json",
++      "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/chi-muc-ban.json",
+       "url_options": {
+        "method": "GET",
+        "data": ""
+@@ -93,7 +93,7 @@
+       "source": "url",
+       "parser": "backend",
+       "format": "table",
+-      "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/chi-muc.json",
++      "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/chi-muc.json",
+       "url_options": {
+        "method": "GET",
+        "data": ""
+@@ -145,7 +145,7 @@
+       "source": "url",
+       "parser": "backend",
+       "format": "table",
+-      "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/vue/${ca}.json",
++      "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/vue/${ca}.json",
+       "url_options": {
+        "method": "GET",
+        "data": ""
+@@ -197,7 +197,7 @@
+       "source": "url",
+       "parser": "backend",
+       "format": "table",
+-      "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/vue/${ca}.json",
++      "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/vue/${ca}.json",
+       "url_options": {
+        "method": "GET",
+        "data": ""
+@@ -241,7 +241,7 @@
+       "source": "url",
+       "parser": "backend",
+       "format": "table",
+-      "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/vue/${ca}.json",
++      "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/vue/${ca}.json",
+       "url_options": {
+        "method": "GET",
+        "data": ""
+@@ -285,7 +285,7 @@
+       "source": "url",
+       "parser": "backend",
+       "format": "table",
+-      "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/vue/${ca}.json",
++      "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/vue/${ca}.json",
+       "url_options": {
+        "method": "GET",
+        "data": ""
+@@ -329,7 +329,7 @@
+       "source": "url",
+       "parser": "backend",
+       "format": "table",
+-      "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/thao-tac-vue/${ca}/${dv}.json",
++      "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/thao-tac-vue/${ca}/${dv}.json",
+       "url_options": {
+        "method": "GET",
+        "data": ""
+@@ -402,7 +402,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/chi-muc.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/chi-muc.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -504,7 +504,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/vue/${ca}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/vue/${ca}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -602,7 +602,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/phat-lai/${ca}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/phat-lai/${ca}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -711,7 +711,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/vue/${ca}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/vue/${ca}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -771,7 +771,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/phat-lai/${ca}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/phat-lai/${ca}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+@@ -865,7 +865,7 @@
+      "source": "url",
+      "parser": "backend",
+      "format": "table",
+-     "url": "http://localhost:3000/public/rca/t073-e5-001/du-lieu/${ban}/phat-lai/${ca}.json",
++     "url": "http://localhost:3000/public/rca/t065-l11-001/du-lieu/${ban}/phat-lai/${ca}.json",
+      "url_options": {
+       "method": "GET",
+       "data": ""
+diff --git b/observability/grafana/provisioning/alerting/t073-e5-go.yaml b/observability/grafana/provisioning/alerting/t073-e5-go.yaml
+new file mode 100644
+index 0000000..41596c6
+--- /dev/null
++++ b/observability/grafana/provisioning/alerting/t073-e5-go.yaml
+@@ -0,0 +1,7 @@
++# T-073: hoàn tác t073-e5.yaml. Grafana KHÔNG nạp file đuôi .mau.
++# Kích hoạt: đổi tên thành t073-e5-go.yaml và xóa t073-e5.yaml trong cùng commit, rồi restart Grafana.
++# Chỉ gỡ integration `t073-webhook-e5`; integration `t072-webhook` của contact point `t072-bo-nhan-nhe` giữ nguyên.
++apiVersion: 1
++deleteContactPoints:
++- orgId: 1
++  uid: t073-webhook-e5
+diff --git a/observability/grafana/provisioning/alerting/t073-e5-go.yaml.mau a/observability/grafana/provisioning/alerting/t073-e5-go.yaml.mau
+deleted file mode 100644
+index 41596c6..0000000
+--- a/observability/grafana/provisioning/alerting/t073-e5-go.yaml.mau
++++ /dev/null
+@@ -1,7 +0,0 @@
+-# T-073: hoàn tác t073-e5.yaml. Grafana KHÔNG nạp file đuôi .mau.
+-# Kích hoạt: đổi tên thành t073-e5-go.yaml và xóa t073-e5.yaml trong cùng commit, rồi restart Grafana.
+-# Chỉ gỡ integration `t073-webhook-e5`; integration `t072-webhook` của contact point `t072-bo-nhan-nhe` giữ nguyên.
+-apiVersion: 1
+-deleteContactPoints:
+-- orgId: 1
+-  uid: t073-webhook-e5
+diff --git a/observability/grafana/provisioning/alerting/t073-e5.yaml a/observability/grafana/provisioning/alerting/t073-e5.yaml
+deleted file mode 100644
+index b574c37..0000000
+--- a/observability/grafana/provisioning/alerting/t073-e5.yaml
++++ /dev/null
+@@ -1,22 +0,0 @@
+-# T-073 (W5, E5): gửi cảnh báo của 11 luật thật (t072-luat.yaml) tới bộ nhận chế độ (b), SONG SONG với bộ nhận T-072.
+-# Cách làm: thêm một integration webhook thứ hai vào CHÍNH contact point `t072-bo-nhan-nhe` (cùng `name`, `uid` riêng).
+-# Grafana gửi một thông báo tới mọi integration của contact point, nên:
+-#   - không sửa luật nào: truy vấn, ngưỡng, `for`, nhãn, `notification_settings` (receiver, group_by, group_wait 0s,
+-#     group_interval 10s, repeat_interval 4h) giữ nguyên → không đổi cách đánh giá luật, không tạo phiên bản luật mới;
+-#   - bộ nhận T-072 (`http://t072-bo-nhan:9172/t072`) vẫn nhận như cũ → bằng chứng giao nhận của T-072 giữ nguyên;
+-#   - không sửa `t072-luat.yaml` (file do results/T-072/sinh_luat_grafana.py sinh, "không sửa tay").
+-# Chưa kiểm: Grafana 13.3 gộp hai file provisioning cùng tên contact point thành một contact point hai integration
+-# (provisioning tạo/cập nhật theo `uid` của từng receiver, nhóm theo `name`). Kiểm ở S4 trước khi tiêm
+-# (results/T-073/trien-khai-e5.md bước S4-5). Không đạt → dùng phương án dự phòng ghi ở đó.
+-# Hoàn tác: đổi t073-e5-go.yaml.mau → t073-e5-go.yaml, xóa file này, restart Grafana (deleteContactPoints theo uid).
+-apiVersion: 1
+-contactPoints:
+-- orgId: 1
+-  name: t072-bo-nhan-nhe
+-  receivers:
+-  - uid: t073-webhook-e5
+-    type: webhook
+-    disableResolveMessage: false
+-    settings:
+-      url: http://t073-webhook:8080/t073/canh-bao
+-      httpMethod: POST

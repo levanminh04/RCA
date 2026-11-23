@@ -1,0 +1,28 @@
+SELECT booking_db | select clock_timestamp()
+    N: n=  780 p50=   0.23 p90=   0.82 max=    16.3
+    A: n=   74 p50=   0.19 p90=   0.31 max=     2.7
+SELECT booking_db | select set_config(?, ?, true)
+    N: n=  504 p50=   0.37 p90=   1.27 max=    95.8
+    A: n=   14 p50=   0.27 p90=   0.36 max=     0.7
+SELECT booking_schema.tbl_orders | select o1_0.id,o1_0.accepted_at,o1_0.accepted_charge_id,o1_0.buyer_subject,o1_0.created_at,o1_0.currency,o1_0.customer_email,o1_0.discount,o
+    N: n=  452 p50=   0.43 p90=   1.03 max=    28.5
+    A: n=   14 p50=   0.25 p90=   0.35 max=     1.2
+SELECT booking_schema.tbl_orders | select o1_0.event_id from booking_schema.tbl_orders o1_0 where o1_0.id=?
+    N: n=  162 p50=   0.45 p90=   1.07 max=     4.1
+    A: n=   14 p50=   0.21 p90=   0.39 max=     0.7
+SELECT booking_schema.tbl_orders | select o1_0.id from booking_schema.tbl_orders o1_0 where o1_0.lifecycle_state=? and o1_0.expires_at<=? and (? is null or o1_0.id>?) order by
+    N: n=   60 p50=   3.93 p90=   6.44 max=    17.1
+    A: n=   60 p50=   3.90 p90=   5.88 max=     9.4
+SELECT booking_db | select o1_0.id from booking_schema.tbl_orders o1_0 join booking_schema.tbl_reservations r1_0 on r1_0.order_id=o1_0.id join booking_schema.tb
+    N: n=   60 p50=   6.33 p90=   9.17 max=    13.5
+    A: n=   59 p50=   6.23 p90=   9.07 max=    15.8
+SELECT booking_schema.tbl_orders | select o1_0.event_id from booking_schema.tbl_orders o1_0 where o1_0.id=? and o1_0.buyer_subject=?
+    N: n=   90 p50=   0.30 p90=   0.83 max=     3.4
+    A:    -
+Traceback (most recent call last):
+  File "D:\RCA-flashticket\results\T-069\span_thong_ke.py", line 42, in <module>
+    print(f'T\u1ed4NG {nm}: N {tk([v for (n, q), x in d.items() if n == nm for v in x["N"]])} | A {tk([v for (n, q), x in d.items() if n == nm for v in x["A"]])}')
+  File "C:\Users\84583\AppData\Local\Programs\Python\Python312\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u1ed4' in position 1: character maps to <undefined>

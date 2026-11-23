@@ -1,0 +1,59 @@
+== utc 2026-11-19T18:31:38Z
+== booking_db: số dòng, tạo trước 13/11 07:14Z, trước 14/11 07:24Z, kích thước
+tbl_orders|37477|3713|15133|61 MB
+tbl_reservations|37477|3713|15133|22 MB
+ERROR:  syntax error at or near "<"
+LINE 1: ...l_order_items', count(*), count(*) filter (where  < '2026-11...
+                                                             ^
+tbl_outbox_messages|57693|4824|21685|25 MB
+tbl_inbox_messages|57696|4827|21688|20 MB
+orders theo trạng thái|CANCELLED|6154
+orders theo trạng thái|COMPLETED|24438
+orders theo trạng thái|EXPIRED|6842
+orders theo trạng thái|PENDING_PAYMENT|43
+== ticket_db
+tbl_ticket_deliveries|24438|2412|9875|10 MB
+tbl_issuances|24438|2412|9875|46 MB
+tbl_tickets|24438|||23 MB
+== event_db
+tbl_outbox_messages|5|5|5|40 kB
+== chỉ mục của tbl_orders, tbl_ticket_deliveries
+orders_pkey|CREATE UNIQUE INDEX orders_pkey ON booking_schema.tbl_orders USING btree (id)
+orders_accepted_charge_id_key|CREATE UNIQUE INDEX orders_accepted_charge_id_key ON booking_schema.tbl_orders USING btree (accepted_charge_id)
+orders_id_event_id_key|CREATE UNIQUE INDEX orders_id_event_id_key ON booking_schema.tbl_orders USING btree (id, event_id)
+orders_id_event_id_buyer_subject_key|CREATE UNIQUE INDEX orders_id_event_id_buyer_subject_key ON booking_schema.tbl_orders USING btree (id, event_id, buyer_subject)
+orders_id_event_id_sector_id_key|CREATE UNIQUE INDEX orders_id_event_id_sector_id_key ON booking_schema.tbl_orders USING btree (id, event_id, sector_id)
+orders_id_currency_key|CREATE UNIQUE INDEX orders_id_currency_key ON booking_schema.tbl_orders USING btree (id, currency)
+orders_id_sales_mode_key|CREATE UNIQUE INDEX orders_id_sales_mode_key ON booking_schema.tbl_orders USING btree (id, sales_mode)
+orders_id_expires_at_key|CREATE UNIQUE INDEX orders_id_expires_at_key ON booking_schema.tbl_orders USING btree (id, expires_at)
+orders_buyer_idx|CREATE INDEX orders_buyer_idx ON booking_schema.tbl_orders USING btree (buyer_subject, created_at)
+orders_event_idx|CREATE INDEX orders_event_idx ON booking_schema.tbl_orders USING btree (event_id, created_at)
+orders_expiry_idx|CREATE INDEX orders_expiry_idx ON booking_schema.tbl_orders USING btree (expires_at)
+reservations_pkey|CREATE UNIQUE INDEX reservations_pkey ON booking_schema.tbl_reservations USING btree (id)
+reservations_order_id_key|CREATE UNIQUE INDEX reservations_order_id_key ON booking_schema.tbl_reservations USING btree (order_id)
+reservations_id_event_id_key|CREATE UNIQUE INDEX reservations_id_event_id_key ON booking_schema.tbl_reservations USING btree (id, event_id)
+reservations_id_order_id_event_id_key|CREATE UNIQUE INDEX reservations_id_order_id_event_id_key ON booking_schema.tbl_reservations USING btree (id, order_id, event_id)
+reservations_id_event_id_buyer_subject_key|CREATE UNIQUE INDEX reservations_id_event_id_buyer_subject_key ON booking_schema.tbl_reservations USING btree (id, event_id, buyer_subject)
+reservations_id_expires_at_key|CREATE UNIQUE INDEX reservations_id_expires_at_key ON booking_schema.tbl_reservations USING btree (id, expires_at)
+reservations_expiry_idx|CREATE INDEX reservations_expiry_idx ON booking_schema.tbl_reservations USING btree (expires_at) WHERE (state = 'HELD'::text)
+issuances_pkey|CREATE UNIQUE INDEX issuances_pkey ON ticket_schema.tbl_issuances USING btree (id)
+issuances_order_id_key|CREATE UNIQUE INDEX issuances_order_id_key ON ticket_schema.tbl_issuances USING btree (order_id)
+issuances_id_event_id_key|CREATE UNIQUE INDEX issuances_id_event_id_key ON ticket_schema.tbl_issuances USING btree (id, event_id)
+issuances_id_order_id_key|CREATE UNIQUE INDEX issuances_id_order_id_key ON ticket_schema.tbl_issuances USING btree (id, order_id)
+ticket_deliveries_pkey|CREATE UNIQUE INDEX ticket_deliveries_pkey ON ticket_schema.tbl_ticket_deliveries USING btree (id)
+ticket_deliveries_issuance_id_requested_by_request_key_key|CREATE UNIQUE INDEX ticket_deliveries_issuance_id_requested_by_request_key_key ON ticket_schema.tbl_ticket_deliveries USING btree (issuance_id, requested_by, request_key)
+issuances_buyer_idx|CREATE INDEX issuances_buyer_idx ON ticket_schema.tbl_issuances USING btree (buyer_subject, created_at)
+issuances_event_idx|CREATE INDEX issuances_event_idx ON ticket_schema.tbl_issuances USING btree (event_id)
+deliveries_issuance_idx|CREATE INDEX deliveries_issuance_idx ON ticket_schema.tbl_ticket_deliveries USING btree (issuance_id, requested_at)
+== EXPLAIN (không chạy) truy vấn nền của worker hết hạn đơn
+Limit  (cost=5043.00..5043.13 rows=53 width=16)
+  ->  Sort  (cost=5043.00..5043.13 rows=53 width=16)
+        Sort Key: id
+        ->  Seq Scan on tbl_orders o1_0  (cost=0.00..5041.48 rows=53 width=16)
+              Filter: ((lifecycle_state = 'PENDING_PAYMENT'::text) AND (expires_at <= now()))
+== pg_stat: lượt quét tuần tự/chỉ mục
+tbl_orders|107525|450020502|817269|37477
+tbl_reservations|708|182225|340089|37477
+tbl_issuances|7141875|92992449315|35816951|24438
+tbl_tickets|203463|98328297|7829921|24357
+tbl_ticket_deliveries|7330618|93031378432|57034600|24438

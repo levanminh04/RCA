@@ -1,0 +1,41 @@
+# Lịch máy — chủ theo khung (T-070)
+
+Chỉ phiên điều phối sửa. Khung bắt đầu khi điều phối ghi "mở", kết thúc khi chủ báo xong và điều phối ghi "đóng". Không có giờ cố định: sắp theo phụ thuộc (Minh 19/11: ngày demo không phải điểm chặn).
+
+## Khung
+
+| Khung | Việc | exp-app | Máy tải AWS | exp-obs (Prometheus, capture, `/opt/rca-lab`) | Grafana | Điều kiện mở |
+|---|---|---|---|---|---|---|
+| S0 | E1: kiểm chỉ đọc trạng thái máy; đồng bộ ngày Ticket/Payment theo giá trị đích; kiểm sức chứa vé; chụp mốc DB | **T-071** | **T-071** (chỉ đọc: không còn `rca-tai-` chạy) | T-071 chỉ đọc; T-073 được truy vấn nhẹ theo khúc (I11) | Không ai đổi | Ngay (20/11) |
+| S1 | E2: khoảng 1 (chọn ngưỡng) | T-071 | T-071 | **T-071** độc quyền truy vấn (I11) | Không ai đổi | Cổng E2 (SPEC T-070) |
+| S2 | E3: nạp luật, xác nhận luật được đánh giá, kiểm webhook ngoài khoảng chấm; **ngoại lệ (a) Minh duyệt:** một lượt ×1 1800 s `t071-e3-duong-01` ngoài mẫu số E2/E4 (chủ tải T-071), trong lượt đó T-073 đo stage dưới tải một lần; ghi riêng số đơn tăng thêm | Chỉ lượt (a) của T-071; ngoài lượt đó nghỉ (không DB, không E6) | Chỉ lượt (a) của T-071 | T-072 (đổi checkout exp-obs theo I7 nếu luật vào repo lab) | **T-072** | E2 xong, ngưỡng chốt, commit luật được Minh duyệt |
+| S3 | E4: khoảng 2 (đo báo động giả, luật sống) | T-071 | T-071 | **T-071** độc quyền truy vấn | Không ai đổi (luật đã nạp) | S2 xong, giờ luật có hiệu lực đã ghi |
+| S4 | E5: nghiệm thu W5 trên ca khai trước | **T-073** | **T-073** | **T-073** | **T-073** (đổi nguồn hiển thị, I9) | S3 xong; R1 (V082 cho demo) có quyết; commit W5 được duyệt |
+| S5 | E6: W6 đo khôi phục DB | T-074 | — | T-074 nhẹ | Không | S4 xong; Minh duyệt phép đo |
+| S6 | E7: diễn tập W9a | theo SPEC W9a | theo SPEC W9a | theo SPEC W9a | theo SPEC W9a | W5, W8 sẵn |
+
+Trong mọi khung: T-072, T-073, T-074, T-075 làm việc không cần máy (viết code ở worktree riêng, phân tích file đã xuất, thiết kế).
+
+## Nhật ký giao/nhận (chỉ ghi thêm)
+
+| UTC | Sự kiện | Khung | Từ → tới | Ghi chú (commit `/opt/rca-lab` trước/sau, job đang chạy) |
+|---|---|---|---|---|
+| 2026-11-20 ~13:35Z | mở | S0 | — → T-071 (phiên `nen-w4`, local_0009633f) | Bằng chứng cũ: không job (README §2, 19/11 20:45Z); `/opt/rca-lab` `407b4f5` trên exp-app và exp-obs; T-071 kiểm lại chỉ đọc trước mọi thay đổi |
+| 2026-11-20 13:22Z | đính chính | S0 | — | Dòng mở S0 ở trên ghi "~13:35Z" là giờ ước sai; giờ thật mở S0 ~12:50Z (phiên T-071 chạy E1 12:5xZ–13:05Z). |
+| 2026-11-20 14:56:37Z | đổi checkout | S0 | T-071 | exp-obs `/opt/rca-lab` `407b4f5` → `e9a0857` (nhánh `t071-nen`; `observability/` không đổi, I7); điều phối kiểm 14:57:37Z: HEAD `e9a0857`, cây sạch, `chuoi_tai.py` `5ceb3ea1…`, không job, không STOP. exp-app vẫn `407b4f5`. |
+| 2026-11-20 15:03:22Z | mở | **S1 (E2)** | S0 → T-071 | Chuỗi `chuoi_tai.py` PID 906913 trên exp-obs (`/opt/rca-lab` `e9a0857`), kế hoạch khóa `b63f2e09…` (8 lượt `t071-e2-01-x1`…`08-x1`). **Từ giờ tới hết E2 chỉ T-071 truy vấn Prometheus (I11); không tiêm, không đổi Grafana/`/opt/rca-lab`.** Điều phối kiểm 15:05:49Z. |
+| 2026-11-20 22:15:40Z | đóng | S1 (E2) | T-071 → — | Chuỗi `xong_chuoi` 8/8 lượt, `tai-out` đủ 8 tag; PID 906913 thoát; không STOP; `/opt/rca-lab` exp-obs `e9a0857` sạch. Điều phối kiểm 21/11 02:42Z. Từ giờ tới S2: exp-app nghỉ (không tải, không DB); T-071 xuất E2 (truy vấn khúc), T-073 kiểm P7→V082 trên gói cũ (không truy vấn sống). |
+| 2026-11-21T03:17:05Z | mở | **S2 (E3)** | — → T-072 (Grafana, `/opt/rca-lab` exp-obs) + T-071 (lượt (a) `t071-e3-duong-01`) + T-073 (đo dưới tải trong lượt (a)) | Commit N = lab `d677244` (`t070-e3`, cha `e9a0857`). Thứ tự: T-072 bước 1–5 (checkout N, bật bộ nhận project riêng, restart Grafana, xác nhận nạp) → tạo mốc `/srv/rca-lab/runs/t072-e3-01/SAN-SANG-TAI` → T-071 phát lượt (a), tạo `/srv/rca-lab/runs/t071-e3/DA-PHAT` → T-073 đo một lần dưới tải → T-072 bước 7–10 (checkout G chỉ khi mọi job đã thoát). Đọc DB Grafana **chưa được phép** (chờ Minh). |
+| 2026-11-21T03:17:21Z | hoãn | S2 (E3) | — | **Chưa bắt đầu bước nào của E3.** Usage Claude 5 giờ 91% (đặt lại 07:40Z), tuần 83%: E3 đổi checkout/restart Grafana/nạp luật thử, bị cắt giữa chừng có thể để Grafana ở trạng thái dở (luật thử còn nạp) → hoãn tới sau 07:40Z. Máy: exp-obs `/opt/rca-lab` vẫn `e9a0857`, exp-app nghỉ, không job. |
+| 2026-11-22T05:14:06Z | bắt đầu | S2 (E3) | T-072 | Usage đã đặt lại (tuần 2%, 5 giờ 15%). Kiểm 05:13Z: exp-obs `e9a0857` sạch, không job, không STOP, Grafana Up. T-072 chạy bước 1–4 (checkout `d677244`, bộ nhận project riêng, restart Grafana); dừng trước bước 5 chờ quyết đọc DB Grafana. |
+| 2026-11-22T06:11:13Z | đóng | S2 (E3) | T-072 → — | E3 xong (`results/T-072/e3.md`): 4/4 luật thử firing+resolved, startsAt lệch 0 s, 11 luật thật 0 cảnh báo; commit G `ecdeed2` trên `/opt/rca-lab` exp-obs (sạch); **giờ hiệu lực E4 06:06:00Z**; bộ nhận nhẹ `t072-bo-nhan` chạy tiếp qua E4. |
+| 2026-11-22T06:11:13Z | mở | **S3 (E4)** | — → T-071 | Khóa `khai-truoc-e4.json` (9 lượt `t071-e4-01`…`09`) rồi phát `chuoi_tai.py` từ `ecdeed2`. Tới hết E4 chỉ T-071 truy vấn Prometheus (I11); không tiêm, không đổi Grafana/`/opt/rca-lab`. |
+| 2026-11-22T10:14:46Z | phát | S3 (E4) | T-071 | Chuỗi PID 949967 từ `ecdeed2`, kế hoạch khóa `463cf596…` (9 lượt), lượt 1 `t071-e4-01-x1` phát 10:13:37Z; dự kiến xong ~17:55Z. Điều phối kiểm 10:14Z. |
+| 2026-11-22T17:57:26Z | xong chuỗi | S3 (E4) | T-071 | `xong_chuoi` 9/9 lượt `xong`, `tag_chua_ket_thuc` rỗng; PID 949967 thoát. Điều phối kiểm 19:05Z: `/opt/rca-lab` exp-obs `ecdeed2` sạch, không job. S3 còn mở tới khi T-071 xuất xong (chỉ T-071 truy vấn Prometheus). |
+| 2026-11-22T19:20:49Z | đóng | S3 (E4) | T-071 → — | T-071 xuất + phân loại xong (`results/T-071/e4/`, manifest 14/14; điều phối đếm lại `phan-loai-phut.json`: 464 phút = `khoe_x1` 383 + `bien` 43 + `flash` 38). Kiểm 19:20:49Z: không job, `/opt/rca-lab` `ecdeed2` sạch. Hết độc quyền Prometheus của T-071. Từ giờ tới S4: không tiêm, không đổi Grafana/`/opt/rca-lab`; T-072 chấm R5 offline + đọc Grafana chỉ đọc. |
+| 2026-11-23T01:40:20Z | mở | **S4 (E5)** | — → T-073 | Minh: "đã ổn định triển khai tiếp" (sau duyệt gói E5/P/H). Kiểm 01:40Z: không job, không STOP, `/opt/rca-lab` exp-obs `ecdeed2` sạch; điều phối `git fetch` ba nhánh trên exp-obs (chỉ cập nhật ref, không đổi checkout): E5 `81a9273`, P `779f90c`, H `1bb40ca` lấy được; Grafana, Prometheus, `t072-bo-nhan` Up. T-073 chủ exp-app, máy tải, exp-obs, Grafana tới hết S4 theo `results/T-073/trien-khai-e5.md` `0befa4d0…`; mọi đổi checkout báo SHA trước/sau cho điều phối ghi. Không phiên khác truy vấn Prometheus/đổi máy trong S4. |
+| 2026-11-23T01:52:57Z | đổi checkout | S4 (E5) | T-073 | exp-obs `/opt/rca-lab` `ecdeed2` → **E5 `81a9273`** (detached). I7 trước: HEAD khớp, cây sạch, không job, không STOP; sau đổi cây sạch. Bằng chứng `results/T-073/e5/s44-checkout-e5.txt`. Minh đã đăng nhập Grafana. |
+| 2026-11-23T01:59:03Z | đổi checkout | S4 (E5) | T-073 | exp-obs `/opt/rca-lab` E5 `81a9273` → **P `779f90c`** (bật lưu trữ tạm, S4-7b). I7 trước đạt. Trước đó S4-5/6/7 đạt theo T-073: 2 integration, Test từng đích đúng 1 dòng mỗi bên, 11 luật trùng, dashboard đọc `t073-e5-001`. Sẽ trả về E5 sau khi mở 6 trang lưu trữ. |
+| 2026-11-23T02:04:37Z | đổi checkout | S4 (E5) | T-073 | exp-obs `/opt/rca-lab` P `779f90c` → **E5 `81a9273`**. I7 trước đạt. Theo T-073: 6 trang lưu trữ đã mở khi P (nạp được, có ca, 0 panel No data/lỗi); hash dữ liệu lưu trữ trước/sau trùng `c94da63c…`. |
+| 2026-11-23T05:34:30Z | đổi checkout | S4 (E5, Q1 hoàn tác) | T-073 | exp-obs `/opt/rca-lab` E5 `81a9273` → **H `1bb40ca`**; I7 trước đạt (HEAD E5, sạch, không job); sau sạch. Trước đó: STOP 05:31:52Z (không ca `dang_chay`), SIGTERM `orchestrator.py` PID 1001850 05:34:09Z, `pgrep` rỗng; chép 58 file ca `7577dd5b` về laptop, sha256 khớp 58/58. Tiếp: restart Grafana, kiểm, gỡ `t073-webhook`, xóa thư mục rỗng theo UID. |
+| 2026-11-23T05:44Z | đóng | S4 (E5) | T-073 → — | Q1 xong: xóa 3 thư mục Grafana rỗng 05:43:15Z (Minh xác nhận trực tiếp trong phiên rca-w5 "Đồng ý xóa"; counts 0 ngay trước; sau xóa 404). Trạng thái: `/opt/rca-lab` exp-obs H `1bb40ca` sạch, không job, không tiến trình/container T-073, `t072-bo-nhan` chạy, tunnel đóng. Còn thư mục Grafana "T-072 E3 thử (gỡ trước E4)" (ngoài Q1). Không khung nào mở. |

@@ -1,0 +1,113 @@
+{
+ "khuon": "T075-ra-1",
+ "trang_thai": "GIAI_THICH",
+ "xep_hang_nhac_lai": [
+  [
+   "payment-service"
+  ],
+  [
+   "ticket-service"
+  ]
+ ],
+ "khang_dinh": [
+  {
+   "id": "k1",
+   "loai": "quan_sat",
+   "cau": "Lõi RCA kết luận CAUSE_FOUND và xếp payment-service hạng 1.",
+   "trich_dan": [
+    {
+     "con_tro": "/ket_qua_rca/ket_luan",
+     "gia_tri": "CAUSE_FOUND"
+    },
+    {
+     "con_tro": "/ket_qua_rca/xep_hang/0"
+    }
+   ]
+  },
+  {
+   "id": "k2",
+   "loai": "quan_sat",
+   "cau": "payment-service có một kênh bất thường riêng: cpu tăng, điểm s 2,76, khởi phát khoảng 290 s sau mốc.",
+   "trich_dan": [
+    {
+     "con_tro": "/bang_chung/1"
+    },
+    {
+     "con_tro": "/bang_chung/1/diem_s",
+     "gia_tri": 2.76
+    }
+   ]
+  },
+  {
+   "id": "k3",
+   "loai": "quan_sat",
+   "cau": "ticket-service hạng 2 có kênh live-ms tăng với điểm s 5,04, khởi phát khoảng 30 s sau mốc, nhưng lõi xếp nó vào lớp kế thừa.",
+   "trich_dan": [
+    {
+     "con_tro": "/bang_chung/0"
+    },
+    {
+     "con_tro": "/ket_qua_rca/xep_hang/1"
+    }
+   ]
+  },
+  {
+   "id": "k4",
+   "loai": "suy_luan",
+   "cau": "Theo quy tắc nhom_vong, bất thường live-ms của ticket-service được giải thích bởi cpu của payment-service, nên payment-service đứng trước dù điểm s thấp hơn.",
+   "trich_dan": [
+    {
+     "con_tro": "/ke_thua/0"
+    },
+    {
+     "con_tro": "/bang_chung/0/diem_s"
+    },
+    {
+     "con_tro": "/bang_chung/1/diem_s"
+    }
+   ]
+  },
+  {
+   "id": "k5",
+   "loai": "quan_sat",
+   "cau": "booking-service cũng có cpu tăng.",
+   "trich_dan": [
+    {
+     "con_tro": "/bang_chung/1"
+    }
+   ]
+  }
+ ],
+ "goi_y_xu_ly": [
+  {
+   "id": "g1",
+   "loai": "kiem_tra",
+   "cau": "Mở metric cpu của payment-service quanh lúc khởi phát để xác nhận mức tăng.",
+   "can_cu": [
+    {
+     "con_tro": "/bang_chung/1"
+    }
+   ]
+  },
+  {
+   "id": "g2",
+   "loai": "giam_thieu",
+   "cau": "Nếu cpu của payment-service còn cao, cân nhắc giảm tải hoặc khởi động lại payment-service theo quy trình vận hành.",
+   "can_cu": [
+    {
+     "con_tro": "/bang_chung/1"
+    }
+   ]
+  }
+ ],
+ "thieu_bang_chung": [
+  {
+   "cau": "Chế độ a không có khối độ phủ cửa sổ; chưa biết dữ liệu có thiếu hay không.",
+   "trich_dan": [
+    {
+     "con_tro": "/thieu_trong_goi/0"
+    }
+   ]
+  }
+ ]
+}

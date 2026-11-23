@@ -1,0 +1,36 @@
+ĐẠT 01 bình thường: 3 lượt xong, 3 kiem_dat, 0 stop | rc=0 [('t-a', 'xong'), ('t-b', 'xong'), ('t-c', 'xong')]
+ĐẠT 01b kiểm theo khúc ≤ 600 s: lượt 3600 s (07:57:34–08:57:37) → 7 khúc | {"cua_so_ms": [1794988654017, 1794992256200], "cua_so": ["(2026-11-18T07:57:34Z", "2026-11-18T08:57:36Z]"], "so_khuc": 7, "mau_gateway": 700.0, "up_min": 1.0, "
+ĐẠT 02 prom lỗi → chua_kiem_duoc, dừng, không start t-b | rc=3 [('t-a', 'chua_kiem_duoc')]
+ĐẠT 02b chạy lại thiếu --tiep-sau-dung → từ chối, không ghi gì | rc=1
+ĐẠT 02c có cờ → kiểm lại t-a, không start lại t-a, đi hết | rc=0 [('t-a', 'xong'), ('t-b', 'xong'), ('t-c', 'xong')]
+ĐẠT 03 0 mẫu gateway → mat_telemetry, dừng | rc=3 [('t-a', 'mat_telemetry')]
+ĐẠT 04 chết sau xong → tiếp can_kiem, không start lại, kiểm lại=True, receive | rc=0 buoc=can_kiem
+ĐẠT 05 chết sau kiem_dat → tiếp can_nhan, không start lại, kiểm lại=False, receive | rc=0 buoc=can_nhan
+ĐẠT 06 get lỗi 20 lần → chua_xac_minh, dừng, không hong | rc=3 [('t-a', 'chua_xac_minh')]
+ĐẠT 06b chạy lại → tiếp can_cho, xong, không start lại | rc=0 [('t-a', 'xong'), ('t-b', 'xong'), ('t-c', 'xong')]
+ĐẠT 07 treo → stop --tag t-a một lần, can_can_thiep, dừng, không hong | rc=3 [('t-a', 'can_can_thiep')] ['stop --tag t-a']
+ĐẠT 08 STOP khi chờ → dung, dừng, tag giữ (không hong) | rc=3 [('t-a', 'dung')]
+ĐẠT 09 lỗi cục bộ đi tiếp; t-c chưa kết thúc được báo cuối | rc=1 [('t-a', 'hong_start'), ('t-b', 'xong'), ('t-c', 'nhan_chua_duoc')]
+ĐẠT 09b chạy lại (không cần cờ vì lần trước xong_chuoi) → chỉ receive t-c | rc=0 [('t-c', 'xong')]
+ĐẠT 10 exit 1 → xong_loi_container, vẫn kiểm + nhận, đi tiếp | rc=0 [('t-a', 'xong'), ('t-b', 'xong_loi_container'), ('t-c', 'xong')]
+ĐẠT 11 lỗi chung → dừng | rc=3 [('t-a', 'loi_chung')]
+ĐẠT 12 2 lượt liền lỗi start → dừng | rc=3 [('t-a', 'hong_start'), ('t-b', 'hong_start')]
+ĐẠT 13 I/O lỗi → loi_noi_bo, rc 4 | rc=4
+ĐẠT 14 kho đã dùng kế hoạch khác → từ chối | rc=1
+ĐẠT 15 sai sha256 → từ chối | rc=1
+ĐẠT 16 DUNG → dừng trước t-b | rc=2 [('t-a', 'xong')]
+ĐẠT 17 cây bẩn → dừng trước t-b | rc=2 [('t-a', 'xong')]
+ĐẠT 19 start + get cùng lỗi → chua_xac_minh, không hong, không start t-b | rc=3 [('t-a', 'chua_xac_minh')]
+ĐẠT 20 chết sau hong(loi_chung), chạy lại không cờ → dừng, không start t-b | rc=3 loi_chung (khôi phục từ nhật ký)
+ĐẠT 20b có cờ → bỏ qua t-a (hong), chạy t-b, t-c | rc=0 [('t-b', 'xong'), ('t-c', 'xong')]
+ĐẠT 21 chết sau hong thứ 2 liền, chạy lại không cờ → dừng, không start t-c | rc=3 2 lượt liền không start được (khôi phục từ nhật ký)
+ĐẠT 22a một mẫu ở +1 ms so với FinishedAt → mat_telemetry | rc=3 [('t-a', 'mat_telemetry')]
+ĐẠT 22b một mẫu ở +0 ms so với FinishedAt → xong | rc=0 [('t-a', 'xong')]
+ĐẠT 22c một mẫu ở +0 ms so với StartedAt → mat_telemetry | rc=3 [('t-a', 'mat_telemetry')]
+ĐẠT 22d một mẫu ở +1 ms so với StartedAt → xong | rc=0 [('t-a', 'xong')]
+ĐẠT 23 thiếu mốc lần đầu → get lại, xong_bo_sung_moc, kiem_dat, đi tiếp | rc=0 [('t-a', 'xong'), ('t-b', 'xong'), ('t-c', 'xong')]
+ĐẠT 23b thiếu mốc mãi → chua_kiem_duoc, vẫn receive t-a, không start t-b | rc=3 [('t-a', 'chua_kiem_duoc')]
+ĐẠT 23c chạy lại có cờ → kiểm lại t-a, không receive lại t-a | rc=0 [('t-a', 'xong'), ('t-b', 'xong'), ('t-c', 'xong')]
+ĐẠT 18 khóa bận → từ chối, không ghi nhật ký | rc=1
+prom_goi 588
+TONG ĐẠT

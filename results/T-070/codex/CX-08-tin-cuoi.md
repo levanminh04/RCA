@@ -1,0 +1,134 @@
+**Đề nghị tiếp tục phản biện T-074 trước khi khóa W7.** Bản 2 đã sửa đúng xung đột giữa W4 và chính sách DB, đã thống nhất cách đếm cảnh báo trùng, và đã mô tả đúng nhánh lọc cột chính của BARO. Ba chỗ vẫn có thể làm đổi kết quả dù người triển khai bám sát văn bản là cửa sổ phát hiện, định danh DB khi chấm baseline và phép che thông tin liveness của V082. Các điểm này xử lý được trong thiết kế, chưa cần chạy W7.
+
+## Đối chiếu phản hồi CX-06
+
+| Điểm | Kết luận kiểm lại | Bằng chứng và phạm vi |
+|---|---|---|
+| **7 — DB, proxy, quota, hạn bán** | **Đúng. Đã xử lý xung đột chính.** | §4.3 và §5.3 bản 2 đặt proxy/quota sau E5, giữ E2→E4 cho mô tả và bỏ việc lấy trôi p95 để chọn K. Khớp D2. Q-W6-08 đã chuyển việc sửa hạn bán và sức chứa sang E6 theo R9. Riêng mốc 28/11 được LOG lượt 3 ghi là **đề xuất của điều phối**. K0/K3 và số vé vẫn là đề xuất. [Quyết định điều phối](D:/RCA-flashticket/tasks/T-070-dieu-phoi-giai-doan-2/LOG.md:130) · [Thiết kế §5.3](D:/RCA-flashticket/results/T-074/thiet-ke-w6-2.md:200) |
+| **8 — cửa sổ, mẫu số, thay lượt** | **Đúng với bản 1. Bản 2 xử lý một phần.** | Với ví dụ `t+650` và `G=120`, bản 2 cho một TP nếu đây là sự cố ghép đầu tiên. Sự cố trùng được báo riêng. §8.4 cũng đã giữ ca im tiếng tại dịch vụ bị tiêm. Còn xung đột về giá trị G, cách xác định giờ khỏe và căn cứ thay lượt ở các điểm 1–2 dưới đây. [Quy tắc chấm](D:/RCA-flashticket/results/T-074/thiet-ke-w6-2.md:354) |
+| **9 — BARO** | **Đúng về nhánh tiền xử lý. Phản hồi chưa đủ để khóa baseline.** | Tại `259ea41`, BARO tách N/A, bỏ cột hằng riêng từng nửa, đổi đơn vị `_mem`, lấy giao cột, rồi lấy max của điểm RobustScaler. Adapter local còn bỏ `_latency-50`, đổi tên `_latency-90`, điền xuôi rồi điền 0. Việc tách inventory dùng chấm khỏi tập thực trả là đúng. Vẫn thiếu chiều ánh xạ ngược khi chấm và quy ước cho đầu vào nhiều chuỗi. [BARO tác giả](D:/RCA-ext/src/RCAEval/RCAEval/e2e/baro.py:22) · [Tiền xử lý](D:/RCA-ext/src/RCAEval/RCAEval/io/time_series.py:99) · [Adapter P3](D:/RCA-flashticket/src/p3/adapters/baro.py:12) |
+| **Nhận xét RQ3d ngoài điểm 7–9** | **Đúng về phạm vi kết luận. Claude đã ghi nhận, chưa được giao sửa.** | `DC-bo-quan-he` tắt E1/E2/E5 trên cùng đầu vào. C-d1 dùng cạnh gọi giữa các nút có cờ. C-d2 xếp theo khởi phát và khóa nút, không nhận danh sách cạnh. C-d3 dùng đường đi có hướng và có thể trả `NO_TARGET` hoặc `UNSUPPORTED_CYCLIC`. Nên báo tác dụng của các bước dùng quan hệ trong **xếp hạng**. Độ đúng vùng ảnh hưởng, vai trò đồ thị trong phát cảnh báo và ưu thế của topology thật là các câu khác. [Đối chứng](D:/RCA-flashticket/src/m1/doi_chung.py) · [LOG người làm](D:/RCA-flashticket/tasks/T-074-w6-thiet-ke-danh-gia/LOG.md:142) |
+
+## Các điểm cần xử lý
+
+**1. CHẶN khóa độ đo phát hiện và mẫu số chế độ (b).** §9.1 đồng thời đề xuất `G=120 s` và yêu cầu `G ≥ for + eval_interval + khoảng nhìn lùi`. Với luật route hiện có, ba số tương ứng là 60, 10 và 300 giây. Theo chính công thức của hồ sơ, G phải ít nhất **370 giây**. Một cảnh báo đầu tiên ở `t+800` vì vậy là bỏ sót theo lựa chọn 120 và là TP theo lựa chọn 370. Còn một hệ quả cho RCA. Với `t=S+600`, cảnh báo gần cuối cửa sổ ghép 370 giây cần dữ liệu lõi tới gần `S+1870`, trong khi chu kỳ kết thúc ở `S+1800`. §8.5 đã nhận diện nguy cơ vượt biên, nhưng chưa quyết cách chấm ca này. [Thiết kế §8.5–9.1](D:/RCA-flashticket/results/T-074/thiet-ke-w6-2.md:348) · [Thông số luật, `#/grafana/eval_interval_s`, `#/tham_so_co_dinh/cua_so_rate_s`, `#/luat/0/for_s`](D:/RCA-flashticket/results/T-072/bieu-thuc.json)
+
+**Đề xuất Minh:** nếu giữ căn cứ thời gian của luật, dùng G theo cấu hình đã khóa và khai cách thu đủ phần cuối cửa sổ. Giữ TP phát hiện riêng với trạng thái RCA thiếu phủ. Mặt trái là dung sai dài hơn, tăng khả năng ghép một cảnh báo không liên quan. Nếu mục tiêu vận hành là phát hiện trong 120 giây sau khi gỡ lỗi, có thể chọn 120 và ghi đó là giới hạn vận hành. Hai cách trả lời hai câu hỏi khác nhau.
+
+**2. CHẶN khóa quy tắc giữ ca, thay lượt và báo giả mỗi giờ khỏe.** §8.4 cho thay khi “gói chụp thiếu cả một nguồn … cho mọi thực thể”, còn §9.1 tính giờ khỏe bằng tổng độ dài các đoạn âm. Một nguồn rỗng tự nó chưa tách được lỗi xuất dữ liệu khỏi việc đường xử lý ngừng tạo sự kiện. Tương tự, không tiêm lỗi chưa đủ để mọi phút của ca đối chứng đều khỏe. Điều kiện 3 chỉ kiểm phần N. Đặc biệt, phân loại W4 có `khoe_x1`, còn ×3/flash chỉ mô tả. Dùng nguyên bộ phân loại này cho W7 sẽ không cho mẫu số “giờ khỏe ×3” như hồ sơ dự kiến. Ngoài ra, §8.4 ghi can thiệp chưa xác nhận không thay, nhưng §8.5 ghi tiêm không khởi động thì bù một chu kỳ. [Quy tắc hợp lệ](D:/RCA-flashticket/results/T-074/thiet-ke-w6-2.md:325) · [Cách tính giờ khỏe](D:/RCA-flashticket/results/T-074/thiet-ke-w6-2.md:383) · [Quy tắc phút T-071, `#/phan_loai_phut`](D:/RCA-flashticket/results/T-071/khai-truoc-e2.json)
+
+**Sửa tối thiểu:** với tín hiệu thiếu mà chưa có bằng chứng hạ tầng độc lập, giữ ca và ghi “chưa phân loại”. Chỉ gắn nguyên nhân do can thiệp khi có bằng chứng. Quy định một lần cách xử lý `fault-start-failed`. Tính FP và thời gian khỏe trên cùng các phút đủ điều kiện ở từng mức tải. Nếu Minh chọn giữ W4 nguyên trạng cho ×3, báo “sự cố trên giờ quan sát ×3” và giữ câu hỏi về báo giả mỗi giờ khỏe ×3 mở. Cách này dùng được ngay, đổi lại phạm vi kết luận hẹp hơn.
+
+**3. CHẶN khóa adapter và điểm baseline.** Có hai phản ví dụ trên đường thực thi.
+
+- **Tên cột và tên đáp án khác nhau.** `normalize_metrics` chuyển `booking_db` thành tiền tố `booking-db` để tạo cột, đồng thời trả bảng alias ngược. `thuc_the_metric` chỉ lấy phần trước `_`, vì vậy `booking-db_db-size` cho `booking-db`. Đầu ra P7 ca `03573b63`, `#/entity_ranking`, và nhãn T-059 của `DB-BOOK-LAT` đều dùng **`booking_db`**. Nếu thực hiện đúng đến bước 8 của §7.1 mà thiếu ánh xạ ngược, một DB còn cột vẫn có thể bị ghi vắng hoặc bị chấm trượt. Tôi kiểm được năm tên DB dạng `_db` trong xếp hạng ca này. [Adapter FlashTicket](D:/RCA-flashticket/src/m1/adapter_flashticket.py:123) · [Cách lấy tên P3](D:/RCA-flashticket/src/p3/ban_ghi.py:7) · [Đầu ra P7](D:/RCA-flashticket/results/T-069/dau-ra/dev3/d0/P7/03573b63/method-output-1.json) · [Nhãn T-059](D:/RCA-flashticket/results/T-059/danh-muc-loi.md)
+- **Lỗi có thể xảy ra trước khi BARO hoặc SimpleRCA nhận bảng.** §7 lấy metric từ `normalize_metrics`. Hàm này ném lỗi nếu nhiều định danh runtime cùng về một metric logic. Đã có ca dev thật `RECREATE-PAY`, với P7 `ERROR`, V082 `OK`, hạng 1. Còn với bảng tạo thành công, hàm trả hàng thưa theo nguồn với thời gian nano giây. SimpleRCA đòi epoch giây. BARO điền xuôi theo thứ tự hàng. Vì vậy phải khai cách dựng bảng theo thời gian, đổi đơn vị và xử lý trùng mốc trước khi quy mất cột cho BARO. [Hàm chuẩn hóa](D:/RCA-flashticket/src/m1/adapter_flashticket.py:155) · [SimpleRCA](D:/RCA-flashticket/src/simplerca/adapter.py:30) · [Ca dev, `#/hang/16/moi`](D:/RCA-flashticket/results/T-069/bang-theo-o-chinh.json)
+
+**Sửa tối thiểu:** dùng alias của inventory ở biên trả kết quả, đối chiếu theo tên chuẩn trước khi chấm. Khai quy ước thời gian và bảng rộng. Tôi đề xuất giữ lỗi adapter đa chuỗi thành trạng thái riêng trong mẫu số chính. Nếu Minh muốn cho các baseline dùng bước nối H8a thì ghi rõ đó là tiền xử lý chung bổ sung. Cả hai cách đều giữ được ca và cho phép phân biệt chất lượng xếp hạng với độ phủ của adapter. Chưa có lần chạy baseline W7, nên đây là lỗi trong hợp đồng thiết kế.
+
+Một đính chính cùng mục: câu “chia 1e6 không đổi điểm” chỉ đúng khi thang IQR cũng đổi tỷ lệ tương ứng. Cột không hằng vẫn có thể có IQR bằng 0. Ví dụ N = `[0,0,0,0,1]` qua được `drop_constant`; RobustScaler dùng thang thay thế 1. Chia `_mem` cho \(10^6\) lúc đó có thể đổi điểm và thứ tự giữa các kênh. Giữ phép chia của tác giả và bỏ khẳng định bất biến vô điều kiện. [Thiết kế §7.1](D:/RCA-flashticket/results/T-074/thiet-ke-w6-2.md:269)
+
+**4. CHẶN khóa D14. G-live bỏ sót một kênh thực sự đi vào điểm.** §3.3 liệt kê `live-down`, cờ `chet_im` và khóa ghi đè. Code H5 còn khai **`live-ms`**, ánh xạ thời gian dò qua cổng về service và chuyển nó thành kênh độ trễ. Tôi duyệt `#/extra/kenh_co` của V082 theo 17 `ma_moi` trong `bang-theo-o-2.json#/hang`. Có **3/17** đầu ra có cờ `live-ms`, ví dụ `metric|booking-service_live-ms` ở `c446b6ae`. Đây là dẫn xuất đã quan sát. Ngoài ra, khi cấu hình còn H5, `chay_ca.py` mở file `--bo-sung` bắt buộc. Xóa hẳn file như cách đọc trực tiếp của “chạy không có gói bổ sung” sẽ dừng trước khi xếp hạng. [Thiết kế G-live](D:/RCA-flashticket/results/T-074/thiet-ke-w6-2.md:104) · [Hai kênh H5](D:/RCA-flashticket/src/m1_ft/thanh_phan/h4_h5.py:93) · [Điểm đọc gói](D:/RCA-flashticket/src/m1_ft/chay_ca.py:109) · [Ca có cờ](D:/RCA-flashticket/results/T-069/dau-ra/dev3/d0/V082-V066+H8a/c446b6ae/method-output-1.json)
+
+**Sửa tối thiểu:** khai G-live là nhóm hai kênh, che cả cờ, đặc trưng và ghi đè sinh từ chúng. Giữ một gói đúng schema, đúng mốc, với dữ liệu thuộc nhóm che đã bỏ. So trung gian trước/sau trên cùng ca. §9.4 cũng cần bỏ quy tắc suy “bản che còn khác P7 ⇒ còn dẫn xuất chưa che”. H8s1 và nhóm chưa che vẫn có thể làm hai bản khác nhau hợp lệ. Một đầu ra giữ nguyên hạng cũng chưa chứng minh thành phần không kích hoạt.
+
+**5. CHẶN dùng dự toán hiện tại để duyệt sức chứa hoặc ngân sách khôi phục.** Số học của bốn phương án cơ sở đúng. Đầu vào và cách cộng phần tùy chọn đã lệch lịch hiện hành.
+
+- `du-toan.json#/nguon/W4_W5_toi_da` dùng 26.136 đơn. Nguồn E1 tính E2 và E4 cùng tám lượt, cộng E5. D1 đã thêm một lượt ×1 dài 1.800 giây ở E4. Điều phối còn duyệt một lượt dương E3. Theo đúng giả định 648 đơn/lượt ×1, riêng D1 làm phần dư giảm từ 47.698 xuống **47.050**. Nếu cộng cả lượt E3 ×1 thì còn **46.402** theo cùng mô hình. Đây là dự toán tại mốc E1. Số vé thật ở E6 phải đọc lại. Đã có số ×3 thật: ca khỏe `0bec9eca` có 1.944 đơn, ca lỗi `785bfd0c` có 1.765. Có căn cứ dùng 1.944 để lập dự toán, nhưng chưa có căn cứ nói mọi ô ×3 đạt số đó. [Nguồn sức chứa, `#/nhu_cau_uoc`](D:/RCA-flashticket/results/T-071/e1/suc-chua.json) · [D1](D:/RCA-flashticket/tasks/T-070-dieu-phoi-giai-doan-2/LOG.md:221) · [Số đơn theo mã ca](D:/RCA-flashticket/results/T-069/thu/t069-chinh/tai-create-order.json)
+- §5.2 định nghĩa mỗi khối có một lần cho từng cặp ô–tải và ba đối chứng. Với tám ô, mỗi khối có `8×2+3 = 19` chu kỳ, tổng cộng **ba khối**. §5.3 và JSON lại tính K2 theo khối 6–9 chu kỳ và 6–10 lần khôi phục. Hai lịch cho chi phí và phạm vi mất dữ liệu khi lỗi khác nhau. Trộn trong khối cũng chỉ cân bằng vị trí **theo kỳ vọng**. Một seed cụ thể không bảo đảm các ô có cùng vị trí trung bình. Với K0+K3, JSON ghi thêm ba chu kỳ mốc, còn Q-W6-02 trình 51–57 chu kỳ cơ sở. Nếu chọn thêm thay vì dùng lại ba đối chứng ×1, phương án tám ô là **60 chu kỳ, khoảng 31,4 giờ**, trước pilot và nhóm dev (b). [Thiết kế khối](D:/RCA-flashticket/results/T-074/thiet-ke-w6-2.md:182) · [Dự toán, `#/viec_them` và `#/loi_giua_chung`](D:/RCA-flashticket/results/T-074/du-toan.json)
+
+**Đề xuất Minh:** ưu tiên K0 và đặt trước vị trí ba đối chứng ×1 hiện có làm mốc nếu chúng đủ trả lời câu hỏi mô tả trôi. Cách này tiết kiệm ba chu kỳ, đổi lại thứ tự của các đối chứng ấy bị ràng buộc. Nếu chọn K2, cần xác định kích thước khối và mốc khôi phục có chứa hạn bán, sức chứa đã sửa ở E6. Dump E1 ghi sức chứa 100.000 và các DB nghiệp vụ trước lần sửa đó. Khôi phục lại E1 sau khi khóa có thể đưa hệ về giá trị cũ. [Mốc E1, `#/kho_ticket_type` và `#/dump`](D:/RCA-flashticket/results/T-071/e1/moc-db.json)
+
+**6. KHÔNG CHẶN soạn W6, nhưng CHẶN hai kết luận cơ chế trong §5.4 và §10.** So BARO với V082 thay đồng thời tín hiệu, tiền xử lý, đơn vị chấm và cách xếp hạng. Một bên dùng cực đại trên cột metric, bên kia có thể thắng bằng kênh thao tác SQL gộp từ span. Việc hai bản cùng đúng hoặc cùng sai không tách được “do lấy max” khỏi “do gộp thao tác”. Tương tự, hai lượt chạy riêng **sau** khi khôi phục chỉ có một trạng thái mới được đo theo thiết kế ấy. Mốc E1 có 40.069 đơn, trong khi file kiểm DB cuối lượt chính T-069 ghi 37.477. So với các ca T-069 đó, E1 chưa cung cấp đối chứng “DB nhỏ hơn”. [Giả thuyết §10](D:/RCA-flashticket/results/T-074/thiet-ke-w6-2.md:415) · [Mốc E1, `#/so_dong_bang_chinh`](D:/RCA-flashticket/results/T-071/e1/moc-db.json) · [Phép đếm cuối lượt T-069](D:/RCA-flashticket/results/T-069/phan-tich/kiem-db.txt)
+
+Tôi đề xuất giữ so BARO–V082 và các ô mốc làm **mô tả**. Chưa duyệt thêm hai chu kỳ E6 với lý do phân xử DB. Nếu quyết định thực sự phụ thuộc nguyên nhân, cần hai trạng thái DB có độ chênh đã ghi, cùng image, tải và cấu hình, cùng ô ở cả hai trạng thái. Chi phí phát lại khi cần thu đủ cả hai phía sẽ lớn hơn ước lượng hai chu kỳ hiện tại. WHY W6-A cũng nên dùng “truy vấn chậm dần trong khi DB tích lũy”. Dữ liệu hiện có chưa tách được ảnh hưởng DB, cache, CPU và thời điểm.
+
+**7. KHÔNG CHẶN R-07 mặc định. Có thể giải quyết một phần OPEN ngay bằng dữ liệu đã lưu.** `tai_linux.py` ở `407b4f5` xuất cả `raw.json` và `raw.csv`. Tôi đọc một `Point` của `http_req_duration` trong gói T-069 đã khớp hash. Bản ghi có thời gian, giá trị, `route`, `routeId`, `status`, `step`, ví dụ route `GET /api/v1/events/{id}`. Do đó đã có đầu vào theo request để khảo sát đầu dò endpoint trên dữ liệu cũ. Còn thiếu quy tắc onset, số request đủ cho từng route và cách đưa dự đoán vùng về cùng cấp endpoint. Tôi đề xuất giữ “độ trễ theo mốc tiêm” là số chính. Dùng mẫu cũ để thiết kế phần endpoint nếu Minh chọn câu hỏi này, chi phí phân tích offline, không cần thêm giờ tải để xác định định dạng. [Điều kiện R-07](D:/RCA-flashticket/results/T-074/thiet-ke-w6-2.md:232) · [Dữ liệu k6 đã kiểm](D:/RCA-flashticket/results/T-069/thu/t069-chinh/tai-out/t3-124242f0/raw.json)
+
+## Kết thúc lượt
+
+1. **Đã làm.** Tự soát nguồn và đầu ra, đọc code ghim, rồi đối chiếu CX-06 và LOG hai phiên. Hồ sơ đạt phần hình thức của SPEC gồm đủ nhóm đầu ra, có dự toán và bộ câu hỏi gom. Các điểm 1–5 ảnh hưởng trực tiếp đến việc dùng hồ sơ để khóa W7. RQ5, độ đúng vùng ảnh hưởng và lợi ích phương pháp trên FlashTicket vẫn chờ bằng chứng đánh giá. Tôi chưa thấy bằng chứng nhãn lọt vào đường xếp hạng đã đọc. Hợp đồng thiết kế tách sổ tiêm khỏi phương pháp ở (b). Runner W7 và adapter FlashTicket cho hai baseline chưa được triển khai để xác nhận điều này đầu cuối.
+2. **File thay đổi.** Không sửa file nào, không commit, không SSH, không mở dữ liệu khóa. Danh sách tệp của bản 2 và hai phiên LOG phù hợp phạm vi T-074. Do hồ sơ chưa commit và checkout dùng chung, không thể quy từng thay đổi trong file chung cho một phiên chỉ từ `git status`. Không có bằng chứng cụ thể để báo ghi vượt quyền.
+3. **Kiểm đã chạy.** Dùng `Get-FileHash` đối chiếu từng mục. T-074 khớp **5/5** và **3/3**, T-069 khớp **318/318** và **348/348**. Tính lại từ `nhat-ky-3.jsonl` được **31,3963 phút/chu kỳ** trên 17 chu kỳ, **49,921875 giây** trung bình cho hai lần V082 trên 16 bản ghi. Tính độc lập ra 27/33/51/57 chu kỳ và 14,1/17,3/26,7/29,8 giờ. Đếm `#/coverage` ca `03573b63` được 61 kênh metric trạng thái `OK`, 17 thực thể. Số cột còn lại **sau giao N/A** vẫn chưa đo trên FlashTicket. Không chạy thực nghiệm mới. [Nhật ký nguồn](D:/RCA-flashticket/results/T-069/thu/t069-chinh/chay/nhat-ky-3.jsonl) · [Dự toán cơ sở](D:/RCA-flashticket/results/T-074/du-toan.json)
+4. **Cần Minh quyết.** Đề nghị **tiếp tục một lượt đáp của Claude**, ưu tiên các điểm thay đổi mẫu số, xếp hạng hoặc ngân sách. Chưa cần duyệt chạy máy. Nếu Minh duyệt sửa hồ sơ, nên ghi phiên bản kế tiếp của thiết kế, WHY đề xuất, câu hỏi và phần dự toán chịu ảnh hưởng. `SHA256SUMS` đang ghim thiết kế/dự toán/script bản 1, `SHA256SUMS-2` ghim ba tài liệu bản 2. Sửa tại chỗ sẽ làm mất khả năng xác minh lượt cũ. Các mục WHY W6 hiện là đề xuất đúng phạm vi thiết kế. Việc ghi sổ chính cần Minh duyệt trước thu. [Phạm vi SPEC](D:/RCA-flashticket/tasks/T-074-w6-thiet-ke-danh-gia/SPEC.md) · [Manifest bản 2](D:/RCA-flashticket/results/T-074/SHA256SUMS-2)
+
+## Prompt bàn giao cho Claude
+
+```text
+Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
+Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
+
+Thông tin lượt này:
+- Task hoặc đề xuất: T-074 — W6 khóa bản và thiết kế đánh giá, `tasks/T-074-w6-thiet-ke-danh-gia/`.
+- Công đoạn: người làm đáp phản biện.
+- Gói/cổng: P9, P10 — chuẩn bị G6. `docs/review-prompt.md` chưa có khối cổng G6; dùng khối G3 hiện có.
+- Người làm và người phản biện chính thức: Claude (người làm), Codex (người phản biện).
+- Tài liệu gốc: `tasks/T-074-w6-thiet-ke-danh-gia/SPEC.md`, `LOG.md` (phiên 1 và 2), các đầu vào trong SPEC, `docs/techstack/KE-HOACH-GIAI-DOAN-2.md` §8, `tasks/T-070-dieu-phoi-giai-doan-2/LOG.md` lượt 3 và 6. Hồ sơ T-074 chưa commit, không có git diff gốc.
+- Phản biện và phản hồi trước: `results/T-070/codex/CX-06-tin-cuoi.md` (lượt điều phối), `tasks/T-074-w6-thiet-ke-danh-gia/LOG.md` phiên 2, lượt kiểm lại CX-08 do điều phối lưu ở `results/T-070/codex/CX-08.jsonl` (lời đáp cuối của Codex).
+- Code và kết quả liên quan: `results/T-074/` bản 1 và 2, `SHA256SUMS`, `SHA256SUMS-2`; `src/p3/`, `src/simplerca/`, `src/m1/`, `src/m1_ft/`; `results/T-069/` và hai manifest; các đầu vào T-071, T-072 nêu trong hồ sơ; RCAEval `D:/RCA-ext/src/RCAEval` revision `259ea41`, repo lab `407b4f5`, FlashTicket `36a3725` (chỉ đọc).
+- Phạm vi ghi được Minh cho phép trong lượt này: chỉ trả lời trong chat; chưa có quyền sửa thêm. Không SSH.
+
+Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
+
+Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
+Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
+Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
+
+Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
+hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
+Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
+số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
+có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
+
+Bổ sung yêu cầu phản biện:
+1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
+2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
+3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
+4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
+5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
+6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
+7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
+8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
+9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
+10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
+11. Rà cả phần không được nêu trong LOG, báo cáo hay phản biện trước. Với mỗi bước dữ liệu đi qua (đọc → chuyển đổi → tính → chấm), hỏi quy ước của dữ liệu nguồn (giá trị đặc biệt, đơn vị, gốc, alias, rỗng) có được xử lý đúng không. Không coi phần không ai nêu là đã đúng.
+12. Một trạng thái xảy ra đồng loạt (100% lỗi, 100% không hỗ trợ, toàn hòa, toàn rỗng) là dấu hiệu cần lần tới đầu vào, không phải kết quả để diễn giải. Không dùng nó làm căn cứ thiết kế trước khi lần.
+13. Điểm cuối khớp số công bố, hay "chạy không lỗi", chưa chứng minh thành phần chạy đúng. Kiểm trung gian và phép kiểm không cần nhãn.
+14. Câu có "mọi", "đều", "không đổi", "trùng" phải nói rõ đại lượng và có lệnh đếm trên đủ đối tượng.
+15. Trước khi đề xuất sửa hoặc ghi vào một file dùng chung (code, script, tài liệu), kiểm file đó có bị ghim trong manifest, plan hoặc vân tay job nào không. Nêu rõ thao tác nào làm đổi hash và ảnh hưởng tới đâu.
+16. Kiểm tiêu chí so sánh hoặc chấp nhận được khai trước khi xem kết quả. Đổi tiêu chí sau khi xem phải khai là sửa sau.
+17. Với lượt chạy, tách lỗi hạ tầng và điều phối (tiến trình, nguồn điện, kết nối, giới hạn thời gian) khỏi lỗi phương pháp; lỗi hạ tầng không được ghi thành kết quả khoa học.
+18. Phản biện một kế hoạch thì kiểm cả đường thực thi thật: code có cho phép làm đúng như kế hoạch nói không (guard, thư mục, trạng thái đã khóa). Không chỉ kiểm lập luận trên giấy.
+19. Mỗi phần ghi "chưa xác định", "chưa phân xử", "chưa biết" hoặc OPEN phải kèm giải thích: vì sao chưa xác định được (thiếu dữ kiện gì, hay dữ liệu đã lưu không tách được các giải thích); các giải thích khả thi còn lại; bằng chứng hoặc phép phân tích nào phân xử được, trên dữ liệu nào, chi phí; kết luận nào phụ thuộc. Không dừng ở một câu "chưa xác định".
+20. Mỗi phần chờ Minh quyết phải kèm đề xuất của agent trong chính lượt đó: chọn gì, vì sao, mặt trái, phương án khác đã xét. Prompt bàn giao yêu cầu agent đối phương phản biện các đề xuất ấy. Đề xuất không thay quyết định của Minh.
+
+Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
+Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
+
+Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
+bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
+Tiếng Việt, câu ngắn.
+
+Cuối lượt báo:
+1. Đã làm gì.
+2. File đã thay đổi, hoặc không sửa file nào.
+3. Kiểm đã chạy và kết quả.
+4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
+
+Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
+
+Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
+
+Công đoạn: người làm đáp phản biện. Giữ vai trò người làm, không là người phản biện chính thức của chính task.
+Tự soát yêu cầu và mọi file đầu ra gốc cần để trả lời các câu hỏi như một người chưa từng làm task, TRƯỚC khi mở kết luận các bản phản biện. Ghi danh sách điểm tự tìm được vào LOG trước khi mở các kết luận ấy nếu được phép ghi; phiên chỉ đọc ghi nhận xét trong chat.
+Sau đó kiểm từng điểm phản biện trên file/code/dữ liệu thật; chạy lại khi rẻ và được phép. Kết luận đúng / đúng một phần / sai / chưa kiểm được với bằng chứng riêng. Reviewer có thể sai, nói quá hoặc đề xuất sửa có mặt trái.
+Nếu được Minh cho phép: điền bảng Phản hồi của người làm ở cuối đúng bản phản biện; thêm N1, N2… cho điểm tự tìm được với CHẶN/KHÔNG CHẶN; để trống cột Minh quyết; nối LOG đủ mục 7 của AGENTS, gồm đề xuất sửa gom theo file; chỉ cập nhật dòng task trong STATE khi được phép. Không sửa nội dung hay prompt của reviewer hoặc tự sửa báo cáo/code.
+Nếu chưa có quyền ghi các phần này, trình phản hồi và đề xuất trong chat. Soạn prompt bàn giao cho người phản biện kiểm độc lập.
+
+Với từng thành phần, kiểm mục đích và căn cứ: sửa hạn chế P4, đáp ứng DT18 hay nhu cầu kỹ thuật. Có lý do kỹ thuật, phương án khác, bằng chứng dev và điều kiện thất bại không; có dùng mã hạn chế mô tả như bằng chứng cơ chế hoặc chọn theo mức chênh đồ thị trừ không đồ thị không?
+Nêu rõ nút/cạnh, ánh xạ log/trace/metric và phép tính thực sự sử dụng cạnh. Lần theo thông tin quan hệ và nhãn trong phương pháp lẫn đối chứng; gọi “không đồ thị” có đúng với thông tin còn giữ không?
+Kiểm baseline và đối chứng đủ mạnh, tương đương về tín hiệu/cửa sổ/tập ứng viên/coverage/tiền xử lý/quy tắc chấm/ngân sách chọn cấu hình ở phần không chủ ý thay; yếu tố thay cùng phải giới hạn kết luận.
+Phương pháp và đối chứng đã được cài và kiểm đầu vào, trung gian, hành vi trên dev chưa, hay chỉ chạy không lỗi? Không đòi đồ thị phải thắng để khóa.
+Code/revision, cấu hình, giả thuyết, độ đo, tập ca/tập ứng viên, cách xử lý ca lỗi/UNSUPPORTED/nhánh dự phòng và bảng diễn giải đã khóa trước test chưa? Có bỏ nhóm khó sau khi nhìn điểm hoặc dùng test để chọn thiết kế không?
+Với tự phát hiện, kiểm cả tiền xử lý và ngưỡng có dùng nhãn/mốc tiêm/thông tin tương lai không. Quyền mở test và commit phải có Minh duyệt riêng theo phạm vi; không suy từ đồng thuận review.
+```

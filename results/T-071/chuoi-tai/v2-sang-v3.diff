@@ -1,0 +1,198 @@
+--- chuoi-tai/chuoi_tai.v2-5ad71328.py	2026-11-20 21:08:31.746076000 +0700
++++ /d/Project/rca-lab-wt/T-071/load/controller/chuoi_tai.py	2026-11-20 21:09:54.941354300 +0700
+@@ -18,7 +18,9 @@
+ 
+ Trạng thái một tag, suy từ nhật ký (bước xa nhất đã ghi):
+   chưa có → sap_phat → (phat) → xong (có state, StartedAt/FinishedAt) → kiem_dat → nhan  = KẾT THÚC
+-  hong (start lỗi và không có container)                                                = KẾT THÚC
++  hong (start lỗi trước `docker run`, get không thấy container)                        = KẾT THÚC
++  start lỗi khác mà get cũng lỗi → chua_xac_minh (giữ tag, dừng chuỗi). Lượt đã xong mà chưa kiểm được
++  telemetry vẫn được receive, nhưng chuỗi dừng trước lượt kế.
+   Mọi trạng thái khác (chưa xác minh, cần can thiệp, kiểm chưa được, nhận chưa được) là CHƯA kết thúc:
+   lần chạy lại tiếp đúng bước còn thiếu của tag đó; không start lại tag đã có sap_phat (tag không tái dùng).
+ 
+@@ -27,11 +29,13 @@
+     STOP còn được kiểm trong lúc chờ lượt (khi có STOP, tai_linux từ chối cả `get`) — lượt đó giữ, chưa kết thúc;
+     `DUNG` không ngắt lượt đang chạy: lượt đó chạy hết, kiểm, nhận, rồi chuỗi dừng;
+   - commit `/opt/rca-lab` khác commit ghi ở lần chạy đầu của kho này, hoặc cây bẩn (I7);
+-  - lỗi start thuộc loại chung, hoặc 2 lượt liền không start được;
++  - lỗi start thuộc loại chung, hoặc 2 lượt liền không start được (cả hai khôi phục từ nhật ký khi chạy lại,
++    trừ khi đã có lần chạy với --tiep-sau-dung sau bản ghi `hong` đó);
+   - 20 lần `get` lỗi liền (chưa xác minh trạng thái container);
+   - quá hạn: sau `stop --tag`, chờ thêm 300 s mà vẫn Running (cần can thiệp);
+   - kiểm telemetry: 0 mẫu gateway (mất quan sát), hoặc truy vấn lỗi / thiếu mốc giờ (chưa kiểm được).
+-Lỗi cục bộ (start lỗi khác khi không có container; container thoát lỗi; receive lỗi 3 lần): ghi lại, sang lượt kế.
++Lỗi cục bộ (start lỗi trước docker run, không thuộc loại chung; container thoát lỗi; receive lỗi 3 lần):
++ghi lại, sang lượt kế.
+ Nhật ký có `dung_chuoi`/`loi_noi_bo` ở cuối thì lần chạy lại phải có `--tiep-sau-dung "<lý do>"` (ghi vào nhật ký).
+ """
+ import argparse
+@@ -63,6 +67,14 @@
+ TAG_RE = re.compile('[a-z0-9][a-z0-9-]{0,47}')
+ LOI_CHUNG = ('STOP exists', 'dirty', 'A rca-tai- container is running', 'Another L1 Linux mutation',
+              'Cannot read lab git commit', 'SSH key/known_hosts')
++# Lỗi `start` mà tai_linux.py @407b4f5 chỉ có thể trả TRƯỚC bước `docker run` (lượt chắc chắn chưa chạy).
++# Mọi lỗi khác (bước docker run, timeout của chuoi_tai, JSON hỏng, ngoại lệ chung) là chưa xác minh.
++TRUOC_DOCKER_RUN = LOI_CHUNG + (
++    'exp-app maintenance', 'Pinned PKCE adapter', 'PKCE pool', 'Load-to-mock health', 'Token pool validation failed',
++    'BuocTai must be earlier', 'Idle second-scenario seed', 'Invalid CLI arguments', 'Invalid tag',
++    '--tag is required', 'Unknown source name')
++SSH_TRUOC_RUN = re.compile(r'SSH (tai|app)( [^\n]*)? (failed \(exit \d+\); secret output omitted|'
++                           r'timed out; retain existing outputs|could not execute)')
+ # Các hằng thời gian; biến môi trường chỉ dùng khi chạy thử bằng tai_linux giả.
+ NHIP_GET_S = float(os.environ.get('CHUOI_TAI_NHIP_S', '30'))
+ GRACEFUL_S = 90
+@@ -195,25 +207,28 @@
+ 
+     def kiem_telemetry(self, bat_dau, ket_thuc):
+         """Theo khúc ≤ 600 s (I11): cộng số mẫu count của gateway, lấy min của `up` qua các khúc.
++        Chỉ đếm mẫu trong (StartedAt, FinishedAt]. Mẫu Prometheus có độ phân giải ms, nên với mẫu s (ms nguyên):
++        s > StartedAt ⟺ s > floor(StartedAt_ms) và s ≤ FinishedAt ⟺ s ≤ floor(FinishedAt_ms). Mỗi khúc là
++        truy vấn tức thời `[L ms]` tại mốc cuối khúc b, phủ đúng (b − L, b]; các khúc liền nhau không chồng.
+         Trả (ket_luan, chi_tiet): ket_luan ∈ {'dat', 'mat_telemetry', 'chua_kiem_duoc'}."""
+-        t0 = math.floor(bat_dau)
+-        t1 = math.ceil(ket_thuc)
++        t0 = math.floor(bat_dau * 1000)  # ms, biên dưới (mở)
++        t1 = math.floor(ket_thuc * 1000)  # ms, biên trên (đóng)
+         khuc = []
+         a = t0
+         while a < t1:
+-            b = min(a + KHUC_S, t1)
++            b = min(a + KHUC_S * 1000, t1)
+             khuc.append((a, b))
+             a = b
+         tong = 0.0
+         up_min = None
+         loi = []
+         for a, b in khuc:
+-            L = int(b - a)
++            L = b - a
+             for ten, expr in (('mau', f'sum(count_over_time(http_server_request_duration_seconds_count'
+-                                      f'{{service_name="api-gateway"}}[{L}s]))'),
+-                              ('up', f'min(min_over_time(up[{L}s]))')):
++                                      f'{{service_name="api-gateway"}}[{L}ms]))'),
++                              ('up', f'min(min_over_time(up[{L}ms]))')):
+                 try:
+-                    v = self.prom(expr, b)
++                    v = self.prom(expr, f'{b / 1000:.3f}')
+                 except Exception as e:
+                     loi.append({'khuc': [a, b], 'chuoi': ten, 'loi': type(e).__name__ + ': ' + str(e)[:200]})
+                     v = None
+@@ -224,8 +239,8 @@
+                 if ten == 'up' and v is not None:
+                     up_min = v if up_min is None else min(up_min, v)
+                 time.sleep(0.3)
+-        chi_tiet = {'cua_so': [iso(t0), iso(t1)], 'so_khuc': len(khuc), 'mau_gateway': tong, 'up_min': up_min,
+-                    'loi_khuc': loi}
++        chi_tiet = {'cua_so_ms': [t0, t1], 'cua_so': ['(' + iso(t0 / 1000), iso(t1 / 1000) + ']'],
++                    'so_khuc': len(khuc), 'mau_gateway': tong, 'up_min': up_min, 'loi_khuc': loi}
+         if any(x.get('bat_buoc') for x in loi):
+             return 'chua_kiem_duoc', chi_tiet
+         if tong == 0:
+@@ -254,8 +269,16 @@
+         if g.get('ok'):  # start báo lỗi nhưng container có: coi như đã phát, đi tiếp chờ
+             self.ghi('phat_co_container', tag=tag, state=g['result']['state'])
+             return None
++        # get lỗi không phân biệt "không có container" với lỗi SSH (tai_linux giấu stderr), nên chỉ ghi `hong`
++        # khi chính lỗi start chứng minh lượt chưa tới `docker run`.
++        o_buoc_run = 'docker run' in loi or 'set -euo pipefail' in loi
++        truoc_run = not o_buoc_run and (any(s in loi for s in TRUOC_DOCKER_RUN) or bool(SSH_TRUOC_RUN.fullmatch(loi)))
++        if not truoc_run:
++            self.ghi('chua_xac_minh', tag=tag, ly_do='start lỗi và get lỗi; không chứng minh được lượt chưa chạy',
++                     loi_start=loi, loi_get=g.get('error'))
++            return 'chua_xac_minh'
+         chung = any(s in loi for s in LOI_CHUNG)
+-        self.ghi('hong', tag=tag, ly_do='start lỗi, get không thấy container', loi_chung=chung)
++        self.ghi('hong', tag=tag, ly_do='start lỗi trước docker run', loi_chung=chung)
+         return 'loi_chung' if chung else 'hong_start'
+ 
+     def cho_xong(self, l):
+@@ -293,16 +316,30 @@
+                     return 'chua_xac_minh', f'{loi_lien} lần get lỗi liền'
+             time.sleep(NHIP_GET_S)
+ 
++    @staticmethod
++    def moc(st):
++        bd, kt = docker_ts(st['StartedAt']), docker_ts(st['FinishedAt'])
++        if kt <= bd:
++            raise ValueError('FinishedAt ≤ StartedAt')
++        return bd, kt
++
+     def kiem(self, tag):
+         xs = self.cua_tag(tag, 'xong')
+         try:
+-            st = xs[-1]['state']
+-            bd, kt = docker_ts(st['StartedAt']), docker_ts(st['FinishedAt'])
+-            if kt <= bd:
+-                raise ValueError('FinishedAt ≤ StartedAt')
+-        except (IndexError, KeyError, ValueError) as e:
+-            self.ghi('kiem_chua_duoc', tag=tag, ly_do='thiếu/sai mốc giờ: ' + str(e)[:200])
+-            return 'chua_kiem_duoc'
++            bd, kt = self.moc(xs[-1]['state'])
++        except (IndexError, KeyError, TypeError, ValueError) as e:
++            # bản ghi `xong` thiếu/sai mốc: get lại một lần (container đã dừng thì mốc không đổi)
++            g = self.tl('get', '--tag', tag, timeout=180)
++            try:
++                st = g['result']['state']
++                if st.get('Running'):
++                    raise ValueError('get lại thấy Running')
++                bd, kt = self.moc(st)
++                self.ghi('xong_bo_sung_moc', tag=tag, state=st, ly_do_cu=str(e)[:200])
++            except (KeyError, TypeError, ValueError) as e2:
++                self.ghi('kiem_chua_duoc', tag=tag, ly_do='thiếu/sai mốc giờ: ' + str(e)[:150],
++                         get_lai=(g.get('error') if not g.get('ok') else str(e2)[:150]))
++                return 'chua_kiem_duoc'
+         kl, ct = self.kiem_telemetry(bd, kt)
+         self.ghi('kiem_dat' if kl == 'dat' else ('kiem_chua_duoc' if kl == 'chua_kiem_duoc' else 'kiem_mat'),
+                  tag=tag, ket_qua=ct)
+@@ -340,16 +377,20 @@
+                 return kq
+             self.ghi('xong', tag=tag, state=x)
+             buoc = 'can_kiem'
++        kl = 'dat'
+         if buoc == 'can_kiem':
+             self.trang_thai(tag=tag, buoc='kiem_telemetry', thu_tu=l['thu_tu'])
+             kl = self.kiem(tag)
+-            if kl != 'dat':
+-                return kl
+-            buoc = 'can_nhan'
++            buoc = 'can_nhan'  # lượt đã xong: vẫn nhận dữ liệu kể cả khi chưa kiểm được; dừng chuỗi ở dưới
+         if buoc == 'can_nhan':
+-            self.trang_thai(tag=tag, buoc='receive', thu_tu=l['thu_tu'])
+-            if not self.nhan(tag):
+-                return 'nhan_chua_duoc'
++            if self.cua_tag(tag, 'nhan'):
++                self.ghi('bo_qua_nhan', tag=tag, ly_do='đã nhận ở lần chạy trước')
++            else:
++                self.trang_thai(tag=tag, buoc='receive', thu_tu=l['thu_tu'])
++                if not self.nhan(tag) and kl == 'dat':
++                    return 'nhan_chua_duoc'
++        if kl != 'dat':
++            return kl  # chua_kiem_duoc | mat_telemetry: không phát lượt kế
+         st = self.cua_tag(tag, 'xong')[-1]['state']
+         return 'xong_loi_container' if (st.get('ExitCode') != 0 or st.get('OOMKilled')) else 'xong'
+ 
+@@ -376,6 +417,23 @@
+         for l in ke_hoach:
+             tag = l['tag']
+             b = self.buoc_tag(tag)
++            if b == 'ket_thuc':
++                hong_lien = 0
++            if b == 'ket_thuc_hong':
++                # Khôi phục chốt dừng từ nhật ký (chết ngay sau `hong`, trước khi kịp ghi `dung_chuoi`):
++                # `hong` chưa được người xác nhận bằng một lần chạy có --tiep-sau-dung SAU nó thì vẫn tính.
++                ev = self.cua_tag(tag, 'hong')[-1]
++                i = max(k for k, d in enumerate(self.su_kien) if d is ev)
++                xac_nhan = any(d.get('loai') == 'bat_dau_chuoi' and d.get('tiep_sau_dung')
++                               for d in self.su_kien[i + 1:])
++                if xac_nhan:
++                    hong_lien = 0
++                else:
++                    if ev.get('loi_chung'):
++                        return self.dung('loi_chung (khôi phục từ nhật ký)', 3, sau_tag=tag)
++                    hong_lien += 1
++                    if hong_lien >= 2:
++                        return self.dung('2 lượt liền không start được (khôi phục từ nhật ký)', 3, sau_tag=tag)
+             if b in ('ket_thuc', 'ket_thuc_hong'):
+                 self.ghi('bo_qua', tag=tag, ly_do=b)
+                 continue

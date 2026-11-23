@@ -1,0 +1,483 @@
+{
+ "phien_ban": "T072-bieu-thuc-1",
+ "trang_thai": "đề xuất, chốt trước E2 (cổng E2 điều kiện 3); chưa có ngưỡng",
+ "sinh_boi": "results/T-072/sinh_bieu_thuc.py",
+ "nguon": {
+  "prometheus": "exp-obs, nhận OTLP (--web.enable-otlp-receiver), lookback-delta mặc định 5m (cờ không đặt trong observability/compose.yaml lab 407b4f5)",
+  "histogram": "http_server_request_duration_seconds_bucket/_count, service_name=\"api-gateway\", nhãn http_route = mã route Spring Cloud Gateway (infrastructure/api-gateway/src/main/resources/application.yaml của FlashTicket 36a3725d)",
+  "httpcheck": "receiver httpcheck của Collector agent exp-app, collection_interval 10s, 8 đích",
+  "khao_sat": "results/T-072/khao-sat/ (truy vấn instant chỉ đọc 20/11, LOG phiên 1)"
+ },
+ "grafana": {
+  "datasource_uid": "prometheus",
+  "eval_interval_s": 10,
+  "nhom_luat": "t072-w4",
+  "thu_muc": "T-072 W4 cảnh báo",
+  "truy_van": {
+   "instant": true,
+   "relativeTimeRange": {
+    "from": 600,
+    "to": 0
+   }
+  },
+  "dieu_kien": "A = PromQL (instant); C = Threshold trên A; condition = C",
+  "ghi_chu": "Grafana yêu cầu khoảng đánh giá là bội của 10 s; 10 s = nhịp mẫu histogram và nhịp dò."
+ },
+ "tham_so_co_dinh": {
+  "cua_so_rate": "5m",
+  "cua_so_rate_s": 300,
+  "so_yeu_cau_toi_thieu_5m": 30,
+  "so_5xx_toi_thieu_5m": 3,
+  "tuoi_lan_do_toi_da_s": 60,
+  "routes": [
+   "booking",
+   "event",
+   "payment",
+   "ticket"
+  ],
+  "loi": "http_response_status_code =~ 5..; không tính 4xx (401, 409, 429)",
+  "p95": "mọi mã trạng thái của route; histogram_quantile nội suy tuyến tính trong bucket; vượt bucket hữu hạn lớn nhất (10 s) trả 10",
+  "bucket_le_s": [
+   0.005,
+   0.01,
+   0.025,
+   0.05,
+   0.075,
+   0.1,
+   0.25,
+   0.5,
+   0.75,
+   1,
+   2.5,
+   5,
+   7.5,
+   10
+  ]
+ },
+ "liveness_ba_trang_thai": {
+  "dinh_nghia": "Tại thời điểm đánh giá t, với mỗi http_url: lần dò mới nhất = mẫu mới nhất trong (t−300, t] của httpcheck_error (dò lỗi) hoặc httpcheck_status có nhãn http_status_code (dò có phản hồi, mọi mã).",
+  "trang_thai": {
+   "0_do_tot": "lần dò mới nhất có phản hồi và tuổi ≤ 60 s",
+   "1_do_loi": "lần dò mới nhất là lỗi và tuổi ≤ 60 s",
+   "2_thieu_lan_do": "không có lần dò nào tuổi ≤ 60 s (gồm không có mẫu trong 5 phút)"
+  },
+  "promql_3_trang_thai": "((((max by (http_url) (timestamp(httpcheck_error)) > on (http_url) max by (http_url) (timestamp(httpcheck_status{http_status_code!=\"\"}))) or on (http_url) (max by (http_url) (timestamp(httpcheck_error)) unless on (http_url) max by (http_url) (timestamp(httpcheck_status{http_status_code!=\"\"})))) * 0 + 1 or on (http_url) max by (http_url) (timestamp(httpcheck_status{http_status_code!=\"\"})) * 0) unless on (http_url) ((time() - max by (http_url) (timestamp(httpcheck_error) or timestamp(httpcheck_status{http_status_code!=\"\"}))) > 60)) or on (http_url) (((time() - max by (http_url) (timestamp(httpcheck_error) or timestamp(httpcheck_status{http_status_code!=\"\"}))) > 60) * 0 + 2)",
+  "ghi_chu": [
+   "Khi đầu dò lỗi, receiver vẫn ghi httpcheck_status cho 5 lớp với giá trị 0 và KHÔNG có nhãn http_status_code (khảo sát PAUSE-PAYMENT 19/11); vì vậy \"phản hồi\" lọc theo http_status_code!=\"\".",
+   "Khi một đích treo, mọi đích chỉ được dò ~30 s một lần (scrape chờ timeout); 60 s ≥ 2 nhịp đó.",
+   "Cùng ngữ nghĩa \"lần dò mới nhất\" với WHY-99 (kênh live-down của M1); khác: thêm tuổi tối đa 60 s để tách \"thiếu lần dò\" khỏi \"dò tốt\".",
+   "promql_3_trang_thai trả 2 khi tuổi > 60 s (đích có mẫu trong 5 phút); đích không có mẫu nào trong 5 phút thì không có chuỗi → bộ chấm và luật t072-mat-do coi là 2."
+  ]
+ },
+ "luat": [
+  {
+   "uid": "t072-p95-booking",
+   "loai": "he-thong",
+   "tieu_de": "p95 gateway route booking",
+   "promql": "histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_seconds_bucket{service_name=\"api-gateway\",http_route=\"booking\"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"booking\"}[5m])) >= 30)",
+   "dieu_kien": {
+    "phep": ">",
+    "nguong": "theta_p95_booking",
+    "don_vi": "s"
+   },
+   "for_s": 60,
+   "no_data_state": "OK",
+   "exec_err_state": "Error",
+   "keep_firing_for_s": 0,
+   "nhan": {
+    "t072_loai": "he-thong",
+    "t072_tin_hieu": "p95",
+    "http_route": "booking",
+    "service_name": "api-gateway"
+   },
+   "tham_so_nguong": "theta_p95_booking"
+  },
+  {
+   "uid": "t072-p95-event",
+   "loai": "he-thong",
+   "tieu_de": "p95 gateway route event",
+   "promql": "histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_seconds_bucket{service_name=\"api-gateway\",http_route=\"event\"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"event\"}[5m])) >= 30)",
+   "dieu_kien": {
+    "phep": ">",
+    "nguong": "theta_p95_event",
+    "don_vi": "s"
+   },
+   "for_s": 60,
+   "no_data_state": "OK",
+   "exec_err_state": "Error",
+   "keep_firing_for_s": 0,
+   "nhan": {
+    "t072_loai": "he-thong",
+    "t072_tin_hieu": "p95",
+    "http_route": "event",
+    "service_name": "api-gateway"
+   },
+   "tham_so_nguong": "theta_p95_event"
+  },
+  {
+   "uid": "t072-p95-payment",
+   "loai": "he-thong",
+   "tieu_de": "p95 gateway route payment",
+   "promql": "histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_seconds_bucket{service_name=\"api-gateway\",http_route=\"payment\"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"payment\"}[5m])) >= 30)",
+   "dieu_kien": {
+    "phep": ">",
+    "nguong": "theta_p95_payment",
+    "don_vi": "s"
+   },
+   "for_s": 60,
+   "no_data_state": "OK",
+   "exec_err_state": "Error",
+   "keep_firing_for_s": 0,
+   "nhan": {
+    "t072_loai": "he-thong",
+    "t072_tin_hieu": "p95",
+    "http_route": "payment",
+    "service_name": "api-gateway"
+   },
+   "tham_so_nguong": "theta_p95_payment"
+  },
+  {
+   "uid": "t072-p95-ticket",
+   "loai": "he-thong",
+   "tieu_de": "p95 gateway route ticket",
+   "promql": "histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_seconds_bucket{service_name=\"api-gateway\",http_route=\"ticket\"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"ticket\"}[5m])) >= 30)",
+   "dieu_kien": {
+    "phep": ">",
+    "nguong": "theta_p95_ticket",
+    "don_vi": "s"
+   },
+   "for_s": 60,
+   "no_data_state": "OK",
+   "exec_err_state": "Error",
+   "keep_firing_for_s": 0,
+   "nhan": {
+    "t072_loai": "he-thong",
+    "t072_tin_hieu": "p95",
+    "http_route": "ticket",
+    "service_name": "api-gateway"
+   },
+   "tham_so_nguong": "theta_p95_ticket"
+  },
+  {
+   "uid": "t072-loi-booking",
+   "loai": "he-thong",
+   "tieu_de": "tỷ lệ 5xx gateway route booking",
+   "promql": "((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"booking\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"booking\"}[5m]))) / sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"booking\"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"booking\"}[5m])) >= 30) and on (http_route) ((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"booking\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"booking\"}[5m]))) >= 3)",
+   "dieu_kien": {
+    "phep": ">",
+    "nguong": "theta_loi_booking",
+    "don_vi": "tỷ lệ"
+   },
+   "for_s": 60,
+   "no_data_state": "OK",
+   "exec_err_state": "Error",
+   "keep_firing_for_s": 0,
+   "nhan": {
+    "t072_loai": "he-thong",
+    "t072_tin_hieu": "loi-5xx",
+    "http_route": "booking",
+    "service_name": "api-gateway"
+   },
+   "tham_so_nguong": "theta_loi_booking"
+  },
+  {
+   "uid": "t072-loi-event",
+   "loai": "he-thong",
+   "tieu_de": "tỷ lệ 5xx gateway route event",
+   "promql": "((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"event\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"event\"}[5m]))) / sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"event\"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"event\"}[5m])) >= 30) and on (http_route) ((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"event\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"event\"}[5m]))) >= 3)",
+   "dieu_kien": {
+    "phep": ">",
+    "nguong": "theta_loi_event",
+    "don_vi": "tỷ lệ"
+   },
+   "for_s": 60,
+   "no_data_state": "OK",
+   "exec_err_state": "Error",
+   "keep_firing_for_s": 0,
+   "nhan": {
+    "t072_loai": "he-thong",
+    "t072_tin_hieu": "loi-5xx",
+    "http_route": "event",
+    "service_name": "api-gateway"
+   },
+   "tham_so_nguong": "theta_loi_event"
+  },
+  {
+   "uid": "t072-loi-payment",
+   "loai": "he-thong",
+   "tieu_de": "tỷ lệ 5xx gateway route payment",
+   "promql": "((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"payment\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"payment\"}[5m]))) / sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"payment\"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"payment\"}[5m])) >= 30) and on (http_route) ((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"payment\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"payment\"}[5m]))) >= 3)",
+   "dieu_kien": {
+    "phep": ">",
+    "nguong": "theta_loi_payment",
+    "don_vi": "tỷ lệ"
+   },
+   "for_s": 60,
+   "no_data_state": "OK",
+   "exec_err_state": "Error",
+   "keep_firing_for_s": 0,
+   "nhan": {
+    "t072_loai": "he-thong",
+    "t072_tin_hieu": "loi-5xx",
+    "http_route": "payment",
+    "service_name": "api-gateway"
+   },
+   "tham_so_nguong": "theta_loi_payment"
+  },
+  {
+   "uid": "t072-loi-ticket",
+   "loai": "he-thong",
+   "tieu_de": "tỷ lệ 5xx gateway route ticket",
+   "promql": "((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"ticket\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"ticket\"}[5m]))) / sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"ticket\"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"ticket\"}[5m])) >= 30) and on (http_route) ((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"ticket\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"ticket\"}[5m]))) >= 3)",
+   "dieu_kien": {
+    "phep": ">",
+    "nguong": "theta_loi_ticket",
+    "don_vi": "tỷ lệ"
+   },
+   "for_s": 60,
+   "no_data_state": "OK",
+   "exec_err_state": "Error",
+   "keep_firing_for_s": 0,
+   "nhan": {
+    "t072_loai": "he-thong",
+    "t072_tin_hieu": "loi-5xx",
+    "http_route": "ticket",
+    "service_name": "api-gateway"
+   },
+   "tham_so_nguong": "theta_loi_ticket"
+  },
+  {
+   "uid": "t072-live",
+   "loai": "he-thong",
+   "tieu_de": "liveness: lần dò mới nhất là lỗi",
+   "promql": "(((max by (http_url) (timestamp(httpcheck_error)) > on (http_url) max by (http_url) (timestamp(httpcheck_status{http_status_code!=\"\"}))) or on (http_url) (max by (http_url) (timestamp(httpcheck_error)) unless on (http_url) max by (http_url) (timestamp(httpcheck_status{http_status_code!=\"\"})))) and on (http_url) ((time() - max by (http_url) (timestamp(httpcheck_error))) <= 60)) * 0 + 1 or on (http_url) (max by (http_url) (timestamp(httpcheck_status{http_status_code!=\"\"})) and on (http_url) ((time() - max by (http_url) (timestamp(httpcheck_status{http_status_code!=\"\"}))) <= 60)) * 0",
+   "dieu_kien": {
+    "phep": ">",
+    "nguong": 0.5,
+    "don_vi": "0 = dò tốt, 1 = dò lỗi"
+   },
+   "for_s": 20,
+   "no_data_state": "OK",
+   "exec_err_state": "Error",
+   "keep_firing_for_s": 0,
+   "nhan": {
+    "t072_loai": "he-thong",
+    "t072_tin_hieu": "live"
+   },
+   "ghi_chu": "Đa chiều: một instance mỗi http_url. Không ngưỡng chọn từ dữ liệu (trạng thái nhị phân)."
+  },
+  {
+   "uid": "t072-mat-do",
+   "loai": "quan-sat",
+   "tieu_de": "mất quan sát: thiếu lần dò liveness",
+   "promql": "count((time() - max by (http_url) (timestamp(httpcheck_error) or timestamp(httpcheck_status{http_status_code!=\"\"}))) <= 60)",
+   "dieu_kien": {
+    "phep": "<",
+    "nguong": 8,
+    "don_vi": "số đích có lần dò trong 60 s"
+   },
+   "for_s": 60,
+   "no_data_state": "Alerting",
+   "exec_err_state": "Error",
+   "keep_firing_for_s": 0,
+   "nhan": {
+    "t072_loai": "quan-sat",
+    "t072_tin_hieu": "mat-do"
+   }
+  },
+  {
+   "uid": "t072-mat-gw",
+   "loai": "quan-sat",
+   "tieu_de": "mất quan sát: histogram gateway không có mẫu mới",
+   "promql": "time() - max(timestamp(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=~\"booking|event|payment|ticket\"}))",
+   "dieu_kien": {
+    "phep": ">",
+    "nguong": 60,
+    "don_vi": "s tuổi mẫu mới nhất"
+   },
+   "for_s": 60,
+   "no_data_state": "Alerting",
+   "exec_err_state": "Error",
+   "keep_firing_for_s": 0,
+   "nhan": {
+    "t072_loai": "quan-sat",
+    "t072_tin_hieu": "mat-gw"
+   }
+  }
+ ],
+ "xuat_cho_T071": {
+  "bat_buoc": [
+   {
+    "ten": "tin-hieu/t072-p95-booking",
+    "promql": "histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_seconds_bucket{service_name=\"api-gateway\",http_route=\"booking\"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"booking\"}[5m])) >= 30)",
+    "kieu": "query_range",
+    "step_s": 10
+   },
+   {
+    "ten": "tin-hieu/t072-p95-event",
+    "promql": "histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_seconds_bucket{service_name=\"api-gateway\",http_route=\"event\"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"event\"}[5m])) >= 30)",
+    "kieu": "query_range",
+    "step_s": 10
+   },
+   {
+    "ten": "tin-hieu/t072-p95-payment",
+    "promql": "histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_seconds_bucket{service_name=\"api-gateway\",http_route=\"payment\"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"payment\"}[5m])) >= 30)",
+    "kieu": "query_range",
+    "step_s": 10
+   },
+   {
+    "ten": "tin-hieu/t072-p95-ticket",
+    "promql": "histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_seconds_bucket{service_name=\"api-gateway\",http_route=\"ticket\"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"ticket\"}[5m])) >= 30)",
+    "kieu": "query_range",
+    "step_s": 10
+   },
+   {
+    "ten": "tin-hieu/t072-loi-booking",
+    "promql": "((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"booking\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"booking\"}[5m]))) / sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"booking\"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"booking\"}[5m])) >= 30) and on (http_route) ((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"booking\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"booking\"}[5m]))) >= 3)",
+    "kieu": "query_range",
+    "step_s": 10
+   },
+   {
+    "ten": "tin-hieu/t072-loi-event",
+    "promql": "((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"event\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"event\"}[5m]))) / sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"event\"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"event\"}[5m])) >= 30) and on (http_route) ((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"event\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"event\"}[5m]))) >= 3)",
+    "kieu": "query_range",
+    "step_s": 10
+   },
+   {
+    "ten": "tin-hieu/t072-loi-payment",
+    "promql": "((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"payment\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"payment\"}[5m]))) / sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"payment\"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"payment\"}[5m])) >= 30) and on (http_route) ((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"payment\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"payment\"}[5m]))) >= 3)",
+    "kieu": "query_range",
+    "step_s": 10
+   },
+   {
+    "ten": "tin-hieu/t072-loi-ticket",
+    "promql": "((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"ticket\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"ticket\"}[5m]))) / sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"ticket\"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"ticket\"}[5m])) >= 30) and on (http_route) ((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"ticket\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"ticket\"}[5m]))) >= 3)",
+    "kieu": "query_range",
+    "step_s": 10
+   },
+   {
+    "ten": "tin-hieu/t072-live",
+    "promql": "(((max by (http_url) (timestamp(httpcheck_error)) > on (http_url) max by (http_url) (timestamp(httpcheck_status{http_status_code!=\"\"}))) or on (http_url) (max by (http_url) (timestamp(httpcheck_error)) unless on (http_url) max by (http_url) (timestamp(httpcheck_status{http_status_code!=\"\"})))) and on (http_url) ((time() - max by (http_url) (timestamp(httpcheck_error))) <= 60)) * 0 + 1 or on (http_url) (max by (http_url) (timestamp(httpcheck_status{http_status_code!=\"\"})) and on (http_url) ((time() - max by (http_url) (timestamp(httpcheck_status{http_status_code!=\"\"}))) <= 60)) * 0",
+    "kieu": "query_range",
+    "step_s": 10
+   },
+   {
+    "ten": "tin-hieu/t072-mat-do",
+    "promql": "count((time() - max by (http_url) (timestamp(httpcheck_error) or timestamp(httpcheck_status{http_status_code!=\"\"}))) <= 60)",
+    "kieu": "query_range",
+    "step_s": 10
+   },
+   {
+    "ten": "tin-hieu/t072-mat-gw",
+    "promql": "time() - max(timestamp(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=~\"booking|event|payment|ticket\"}))",
+    "kieu": "query_range",
+    "step_s": 10
+   },
+   {
+    "ten": "tin-hieu/live-3-trang-thai",
+    "promql": "((((max by (http_url) (timestamp(httpcheck_error)) > on (http_url) max by (http_url) (timestamp(httpcheck_status{http_status_code!=\"\"}))) or on (http_url) (max by (http_url) (timestamp(httpcheck_error)) unless on (http_url) max by (http_url) (timestamp(httpcheck_status{http_status_code!=\"\"})))) * 0 + 1 or on (http_url) max by (http_url) (timestamp(httpcheck_status{http_status_code!=\"\"})) * 0) unless on (http_url) ((time() - max by (http_url) (timestamp(httpcheck_error) or timestamp(httpcheck_status{http_status_code!=\"\"}))) > 60)) or on (http_url) (((time() - max by (http_url) (timestamp(httpcheck_error) or timestamp(httpcheck_status{http_status_code!=\"\"}))) > 60) * 0 + 2)",
+    "kieu": "query_range",
+    "step_s": 10
+   },
+   {
+    "ten": "phu/tong-booking",
+    "promql": "sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"booking\"}[5m]))",
+    "kieu": "query_range",
+    "step_s": 10
+   },
+   {
+    "ten": "phu/tong-event",
+    "promql": "sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"event\"}[5m]))",
+    "kieu": "query_range",
+    "step_s": 10
+   },
+   {
+    "ten": "phu/tong-payment",
+    "promql": "sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"payment\"}[5m]))",
+    "kieu": "query_range",
+    "step_s": 10
+   },
+   {
+    "ten": "phu/tong-ticket",
+    "promql": "sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"ticket\"}[5m]))",
+    "kieu": "query_range",
+    "step_s": 10
+   },
+   {
+    "ten": "phu/5xx-booking",
+    "promql": "sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"booking\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"booking\"}[5m]))",
+    "kieu": "query_range",
+    "step_s": 10
+   },
+   {
+    "ten": "phu/5xx-event",
+    "promql": "sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"event\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"event\"}[5m]))",
+    "kieu": "query_range",
+    "step_s": 10
+   },
+   {
+    "ten": "phu/5xx-payment",
+    "promql": "sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"payment\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"payment\"}[5m]))",
+    "kieu": "query_range",
+    "step_s": 10
+   },
+   {
+    "ten": "phu/5xx-ticket",
+    "promql": "sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"ticket\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"ticket\"}[5m]))",
+    "kieu": "query_range",
+    "step_s": 10
+   },
+   {
+    "ten": "phu/ty-le-loi-chua-chan-5xx-booking",
+    "promql": "((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"booking\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"booking\"}[5m]))) / sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"booking\"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"booking\"}[5m])) >= 30)",
+    "kieu": "query_range",
+    "step_s": 10
+   },
+   {
+    "ten": "phu/ty-le-loi-chua-chan-5xx-event",
+    "promql": "((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"event\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"event\"}[5m]))) / sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"event\"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"event\"}[5m])) >= 30)",
+    "kieu": "query_range",
+    "step_s": 10
+   },
+   {
+    "ten": "phu/ty-le-loi-chua-chan-5xx-payment",
+    "promql": "((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"payment\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"payment\"}[5m]))) / sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"payment\"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"payment\"}[5m])) >= 30)",
+    "kieu": "query_range",
+    "step_s": 10
+   },
+   {
+    "ten": "phu/ty-le-loi-chua-chan-5xx-ticket",
+    "promql": "((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"ticket\",http_response_status_code=~\"5..\"}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"ticket\"}[5m]))) / sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"ticket\"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name=\"api-gateway\",http_route=\"ticket\"}[5m])) >= 30)",
+    "kieu": "query_range",
+    "step_s": 10
+   }
+  ],
+  "vi_sao_phu": "Luật lỗi chỉ có chuỗi khi ≥ 3 lỗi 5xx trong 5 phút, nên ở giờ khỏe thường không có điểm. Quy tắc chọn ngưỡng và bộ chấm cần tỷ lệ, số 5xx và tổng request ở mọi bước; các chuỗi phu/* cho các giá trị đó.",
+  "khuyen_nghi_tho": [
+   {
+    "ten": "tho/gw-bucket",
+    "selector": "http_server_request_duration_seconds_bucket{service_name=\"api-gateway\",http_route=~\"booking|event|payment|ticket\"}"
+   },
+   {
+    "ten": "tho/gw-count",
+    "selector": "http_server_request_duration_seconds_count{service_name=\"api-gateway\"}"
+   },
+   {
+    "ten": "tho/httpcheck-error",
+    "selector": "httpcheck_error"
+   },
+   {
+    "ten": "tho/httpcheck-status-co-ma",
+    "selector": "httpcheck_status{http_status_code!=\"\"}"
+   }
+  ],
+  "cach_xuat": "query_range theo khúc ≤ 10 phút, nghỉ giữa khúc (I11); khoảng xuất phủ mỗi lượt từ 600 s trước load-start tới hết lượt + 300 s; mẫu thô xuất bằng instant query `selector[10m]` theo khúc liền nhau, giữ timestamp gốc. Mỗi khúc ghi số điểm, lỗi khúc; thiếu điểm ghi rõ, không nội suy.",
+  "kiem_xuat_duoc": "mỗi chuỗi tin-hieu/* của route có lưu lượng có điểm ở mọi bước 10 s trong lúc có tải (trừ khi guard loại)."
+ },
+ "khong_phu": [
+  "Route gateway không có lưu lượng của bộ tải (user, event-images, payment-vnpay-callbacks) và request không khớp route (nhãn http_route rỗng, ví dụ 401): không có luật, vì không có dữ liệu E2 để chọn ngưỡng.",
+  "Lỗi không đi qua gateway hoặc không thành 5xx/độ trễ ở gateway (ví dụ hàng đợi RabbitMQ chậm sau khi request đã trả).",
+  "Lần lỗi đầu tiên của một tổ hợp (route, mã 5xx) mới: chuỗi mới sinh ra với giá trị đã > 0, rate/increase không thấy phần tăng trước mẫu đầu (Prometheus không bật created-timestamp-zero-ingestion). Chỉ mất phần đầu, lỗi kéo dài vẫn thấy.",
+  "Gateway khởi động lại: chuỗi mới theo container_id; sum by bỏ qua, nhưng mất phần tăng trước mẫu đầu như trên."
+ ]
+}

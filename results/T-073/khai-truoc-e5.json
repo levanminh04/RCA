@@ -1,0 +1,87 @@
+{
+ "phien_ban": "T073-khai-e5-khoa-1",
+ "trang_thai": "ĐÃ KHÓA 22/11/2026 (điều phối T-070 giao; mục tiêu tạm Minh duyệt LOG T-070 'Lượt 4' (d)). sha256 ghi LOG T-073 lượt 11; không sửa sau khóa. N = 25 phút từ t̂, đích cuối = lúc dashboard hiện ca; số đo dưới tải E3: t̂ → chỉ mục G1 14,8 phút. Ba mốc giờ báo cáo: gây lỗi (sổ, người chấm đọc sau lượt) → t̂ và nhan_webhook_utc → dashboard hiện ca. Tiêu chí phủ: tieu_chi.ket_qua_phu_cua_so. Ô: bốc theo results/T-073/khoa-boc-e5.json khi Minh cấp hạt.",
+ "soan": "phiên rca-w5 (Claude), 20/11/2026",
+ "nguon_so": {
+  "duong_cu_t069": "results/T-073/kiem/thoi-gian-duong-cu-t069.json (22 ca, nhật ký runner T-069, không chạy lại)",
+  "dev_t073": "results/T-073/do-thoi-gian-dev.json (3 ca cũ chạy lại qua tuyến (b), capture giả + prometheus.json/bổ sung từ file)",
+  "bo_sung_song": "LOG T-073 lượt 1 tiếp: xuat_bo_sung.py sống 14,85 s (runs/t073-dev-005)",
+  "cx06": "results/T-070/codex/CX-06-tin-cuoi.md điểm 5–6",
+  "duoi_tai_e3": "results/T-073/kiem/dev/t073-dev-008/ (lượt tải ×1 t071-e3-duong-01, StartedAt 2026-11-22T05:25:26Z, t̂ = StartedAt+600; LOG T-073 lượt 10)"
+ },
+ "N": {
+  "goc_do": "t̂ (mốc của dịch vụ, không cần sổ tiêm). Minh duyệt mục tiêu tạm 25 phút từ t̂ (LOG T-070 'Lượt 4' (d)); khóa con số trước khi gây lỗi E5. Báo thêm ba giờ: gây lỗi (người chấm đọc sổ sau lượt) → phát cảnh báo (t̂ và nhan_webhook_utc) → kết quả hiện.",
+  "diem_ket_thuc": "Đích cuối = lúc dashboard HIỆN ca trên Grafana (người làm S4 mở dashboard theo nguồn rca-results/t073-<lượt>, xác nhận ca có trong danh sách sự cố và mở được; ghi giờ UTC lúc thấy ca, kèm ảnh chụp và phản hồi API truy vấn panel danh sách sự cố). Giờ ghi file chỉ mục G1 (bước g1 trong su-co/<mã>.json) chỉ là mốc phụ để tách thời gian xử lý với thời gian hiển thị.",
+  "thanh_phan_giay": {
+   "cho_goi_du_cua_so": 600,
+   "flush_F": 150,
+   "stage_p7_bo_sung_can_tren": 309.7,
+   "v082_can_tren": 96.8,
+   "kiem_dau_vao": 1.6,
+   "g1_can_tren": 49.1,
+   "vong_doc_spool": 5,
+   "lam_moi_dashboard_uoc": 60
+  },
+  "cach_tinh_can_tren": "stage_p7_bo_sung, v082, g1 lấy max của 22 ca T-069 (đường cũ đọc cả 21 file capture và còn safe_export + tar, nên là cận trên thận trọng cho đường mới khi tải tương tự); lam_moi_dashboard_uoc là ước, chưa kiểm khoảng làm mới của dashboard",
+  "tong_can_tren_giay": 1272.2,
+  "de_xuat_N_phut": 25,
+  "ly_do_N": "Mục tiêu tạm 25 phút Minh duyệt. Đo dưới tải ×1 (E3 lượt (a)): t̂ → chỉ mục G1 886 s (14,8 phút), xử lý 143 s; cận trên thận trọng (max T-069 cho các bước + 60 s làm mới dashboard) 1272 s (21,2 phút). Không thấp hơn ~12,5 phút + xử lý vì gói phải đủ [t̂−600, t̂+600). Chưa đo lúc dashboard hiện ca (S4).",
+  "chua_kiem": [
+   "stage và collect_metrics trên capture/Prometheus sống (cần điều phối cho phép, I11)",
+   "F đủ cho dữ liệu đến muộn",
+   "khoảng làm mới dashboard",
+   "tốc độ quay vòng capture dưới tải ×1"
+  ],
+  "do_duoi_tai_e3": {
+   "t_hat_utc": "2026-11-22T05:35:26Z",
+   "stage_bat_dau": "t̂ + 750 s (05:47:56Z), đúng mốc dịch vụ dùng",
+   "giay_buoc": {
+    "stage": 15.37,
+    "p7": 50.67,
+    "bo_sung_song": 14.69,
+    "v082": 42.7,
+    "kiem_dau_vao": 0.78,
+    "g1": 18.72
+   },
+   "tong_xu_ly_giay": 142.93,
+   "t_hat_toi_ghi_chi_muc_giay": 886,
+   "t_hat_toi_ket_thuc_g1_giay": 892.9,
+   "F_150_du": "stage lại cùng t̂ ở t̂+1199 s: 5/5 file dữ liệu trùng sha256 (traces 313.814.113 B, logs 84.694.155 B) → không còn dữ liệu của gói tới sau t̂+750 trong lượt này, dưới tải ×1",
+   "vong_capture": "traces ~6,6 phút/100 MB dưới tải ×1 (tên file quay vòng 05:28:11Z, 05:34:50Z) → vòng 21 file ≈ 2,3 giờ, cần ~27,5 phút; cờ vong_co_the_mat_dau = false cả hai lần stage",
+   "chua_do": "khoảng làm mới và lúc dashboard hiện ca: lượt này không đổi nguồn Grafana (khung S2 thuộc T-072); đo ở S4",
+   "gioi_han": "một lượt, tải ×1, không lỗi; tiến trình E5 có lỗi thật có thể chậm hơn (cận trên T-069 giữ)"
+  }
+ },
+ "ca_nghiem_thu": {
+  "o": "theo results/T-073/bang-o-e5.md (9 ô vào thăm theo thiết kế; trọng số, RECREATE-PAY, tiêu chí biên độ: chờ Minh); bốc bằng hạt Minh cấp sau khi khóa; chưa bốc",
+  "muc_tai": "×1, kịch bản hành trình mua vé (purchase-journey, như runner4/T-069), tải chạy ≥ 600 s trước mốc tiêm",
+  "cach_tiem": "inj3.py start <ô> --seconds 600 trên exp-app ở khung S4; ghi sổ tiêm bằng ledger_append.py (sudo -u ledger) bởi thao tác viên, không bởi dịch vụ; dịch vụ chạy độc lập, chỉ đọc spool webhook, capture, Prometheus",
+  "so_lan": "lần đầu là kết quả chính; lặp cùng ô chỉ khi lỗi hạ tầng có bằng chứng (bang-o-e5.md §5); tối đa 3 chu kỳ"
+ },
+ "tieu_chi": {
+  "ket_qua_chuc_nang": {
+   "dat": "có ≥ 1 sự cố lớp he-thong với t̂ ∈ [mốc tiêm, mốc tiêm + 600) VÀ dashboard hiện ca của sự cố đó trong N phút kể từ t̂ (đích cuối ở N.diem_ket_thuc) VÀ che_do_b.kiem_t.t_loi_bang_t_hat = true VÀ V082 trung_sha = true",
+   "bo_sot": "không có sự cố he-thong nào với t̂ trong [mốc tiêm, mốc tiêm + 600) — ghi bỏ sót, là kết quả (không lặp)",
+   "qua_N": "có sự cố trong cửa sổ nhưng dashboard hiện ca sau N phút hoặc không hiện — trượt; ghi giờ thực",
+   "loi_xu_ly": "một bước của tuyến lỗi (ok = false) không thuộc lỗi đã nhận diện — trượt; ghi loai_loi sơ bộ, người làm phân xử; P7 lỗi 'nhiều chuỗi runtime' là lỗi đã nhận diện: ghi riêng, tuyến vẫn chạy V082 (CX-06 điểm 5), không tính là lỗi xử lý nếu V082 và G1 chạy được"
+  },
+  "ket_qua_phu_cua_so": {
+   "mo_ta": "Kết luận RIÊNG, không gộp vào 'dat'. Dùng phép kiểm phủ theo mẫu thực của check_core_input.py trên ĐÚNG đầu vào V082 thực dùng (P7 method-input khi V082 đọc lại; đầu vào dựng lại bằng đường ghim, trùng input_sha256 của V082, khi V082 dựng lại).",
+   "nguon_bat_buoc": "trace (toàn bộ span theo mốc kết thúc; lỗ lớn nhất trong [t̂−300, t̂+300) ≤ 30 s) và mọi nguồn metric có mặt trong gói (lỗ lớn nhất ≤ 4 × bước của nguồn; có ≥ 1 mẫu trong cửa sổ)",
+   "nguon_khong_bat_buoc": "log: dịch vụ có thể không phát sinh log; chỉ báo số mẫu và lỗ, không ảnh hưởng kết luận phủ",
+   "cach_tinh_lo": "lỗ lớn nhất = max(mẫu đầu − (t̂−300), khoảng giữa hai mẫu liền nhau, (t̂+300) − mẫu cuối) trên mốc thời gian mẫu thực của từng nguồn; không dùng biên min/max (một lỗ ở giữa vẫn bị bắt)",
+   "loi_nhan_du_cua_so": "phu.du_cua_so = true: mọi nguồn bắt buộc đủ → được viết 'lõi nhận đủ cửa sổ'",
+   "hien_thi_nhung_thieu_phu": "ket_qua_chuc_nang = dat nhưng phu.du_cua_so = false → viết 'đã hiển thị nhưng thiếu phủ', liệt kê phu.thieu_bat_buoc và lỗ từng nguồn; KHÔNG viết 'lõi nhận đủ cửa sổ'. Nếu nguồn thiếu thuộc thành phần bị can thiệp theo thiết kế ô (ví dụ Payment ngừng phát khi PAUSE-PAYMENT), ghi thêm 'thiếu có thể do chính lỗi', chưa phân xử; không coi là lỗi hạ tầng, không lặp",
+   "van_ghi": "nguon_khong_phu_tron theo quy tắc biên cũ vẫn ghi để đối chiếu, không dùng để kết luận"
+  },
+  "giu_ket_qua_lan_dau": true,
+  "khong_danh_gia": "độ chính xác xếp hạng (W6–W7)"
+ },
+ "phu_thuoc_truoc_S4": [
+  "đường webhook Grafana → bộ nhận (thiet-ke.md §10)",
+  "luật T-072 nạp ở S2/E3, nguồn t̂ (startsAt) đã đối chiếu",
+  "R1: V082 cho nghiệm thu",
+  "commit W5 được Minh duyệt, /opt/rca-lab đổi theo I7",
+  "phép kiểm nhánh P7 lỗi đã nhận diện → V082 trên gói RECREATE-PAY cũ (c4d7999f hoặc gói T-069 của ô), sau E2 (I11)"
+ ]
+}

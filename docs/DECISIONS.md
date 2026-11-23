@@ -724,3 +724,61 @@ Minh duyệt ghi mục này ngày 19/11/2026 ("duyệt DECISIONS và commit").
 - **Tiêu chí 2** (chat 18/11): "chọn (a)" — 3 nhóm lỗi test có sẵn ở commit cha được chấp nhận làm giới hạn đã biết, không sửa test.
 - **`docker_stats` 12/14** (chat 19/11, "DUYỆT ĐỀ XUẤT"): chấp nhận; hai ngoại lệ có chủ đích là `flash-ticket-collector` và `rca-toxiproxy`.
 - **Tiêu chí 8** (chat 19/11): "Bỏ tiêu chí 8" — không chờ Tuấn xem đoạn `RefundServiceImpl` trước khi nghiệm thu nhánh. SPEC giữ nguyên (đã khóa).
+
+## T-069: V082 trên bản ghim — gia hạn sự kiện tải, thu lại ô thử, phạm vi ghi thực tế, 19–20/11/2026
+
+Minh duyệt ghi mục này ngày 20/11/2026 ("đuyệt đề xuất sửa", theo phản biện Codex soát kết quả T-069).
+
+- **Khôi phục tải mua vé** (chat 19/11): "A: gia hạn qua API" → API không cho sửa sự kiện `PUBLISHED` → "B: SQL dời mốc". Sự kiện tải `3e7c1df9` hết hạn bán 18/11 22:16Z; dời +14 ngày `sale_ends_at`, `starts_at`, `ends_at`, `checkin_*` ở `event_db` và `sale_ends_at` + JSON `saleEndsAt`/`eventStartsAt`/`eventEndsAt` ở `booking_db` (19/11 09:20Z), giữ `sale_starts_at`. Dump trước/sau `results/T-069/sua-su-kien/`. Bản sao mốc ở `ticket_db`, `payment_db` **chưa dời**.
+- **Thu lại 3 ô thử trong lượt chính** (19/11): lượt thử `t069-thu` chạy khi không mua được vé → không ghép; HTTP5-EVENT, POOL-EVENT, RECREATE-PAY thu lại ở cuối lượt chính 17 chu kỳ (`lich-t069-chinh.json`). Người làm suy từ phương án đã trình ("Sau khi sửa (mọi phương án)"), Minh chưa duyệt riêng lúc làm; ghi nhận ở đây theo lời duyệt 20/11.
+- **Phạm vi ghi thực tế** (ghi nhận sau, 20/11): ngoài SPEC, lượt thu đã ghi máy tải `/srv/rca-lab/load-runs/t3-<mã>` (SPEC ghi `t069-*`) và `t069-kiem-ban-001`, exp-obs `/srv/rca-lab/m1/export-audit/`, exp-app `/tmp/ctl-<uuid>.json` tạm của `inj3.py`. Do runner/bộ tiêm đặt sẵn; người làm không xin trước (vi phạm quy trình, `results/T-069/dinh-chinh-1.md` §6). Giữ dữ liệu.
+- **Sửa theo phản biện** (chat 20/11): "đuyệt đề xuất sửa" — `dinh-chinh-1.md`, phép bỏ từng thành phần V060/V061/V066 (bước 7.4), độ phủ 17 cặp, `bang_theo_o_2.py` (D4), mục WHY-102, mục này. Chấp nhận ô tụt CPU-BOOK-1 cho demo **chưa quyết**.
+
+## Điều phối giai đoạn 2 sau T-069 (chat Claude và tin gửi Codex, 19–20/11/2026)
+
+Minh duyệt ghi mục này ngày 20/11/2026 ("Duyệt theo đề xuất", trả lời R2(a) của LOG T-070 phiên 1: ghi khối đề xuất ở `docs/techstack/ban-giao-dieu-phoi-2026-11-20/mong-muon-minh.md` §4).
+
+- Minh (20/11/2026): "tận dụng thời gian tối đa có thể nhưng tính đúng đắn vẫn ưu tiên cao nhất"; "1 phiên điều phối, phần nào cần tuần tự thì tuần tự"; "tổng hợp thông tin thành 1 plan duy nhất để tránh 2 phiên mâu thuật"; "cần claude thiết kế phiên điều phối chuẩn chỉnh, các phiên không dẫm chân nhau".
+- Minh (20/11/2026): "không cần phải đợi đến đêm, tôi có thời gian, không tự giới hạn bản thân".
+- Minh (20/11/2026, gửi Codex 03:33:57Z): phiên điều phối Opus 5.5 high hoặc xhigh do Minh chọn; phiên làm việc Claude medium hoặc high theo độ khó, sai liên tục thì báo Minh xem xét tăng mức; Codex qua terminal làm việc phụ, model gpt 6.2 astra mức high, hết usage thì báo Minh đổi account; lịch đánh thức phù hợp, không làm lại sau tạm dừng nhưng "không ép phải hoàn hảo 100% để rồi lại giảm đi sự chính xác của toàn bộ luồng".
+- Minh (20/11/2026): chuyển sang phiên Claude điều phối mới, đổi account; bàn giao bằng `docs/techstack/ban-giao-dieu-phoi-2026-11-20/`; phiên mới tự rà soát toàn bộ plan, sửa ngay lỗi nhỏ hoặc xung đột giữa các phiên rồi triển khai, gặp lỗi chặn thì dừng trình.
+
+## Điều phối giai đoạn 2: quyết định R1, R5, R7, R9 (T-070, 20/11/2026)
+
+Minh duyệt các đề xuất ở LOG T-070 phiên 1 ("Duyệt theo đề xuất", chat 20/11/2026 13:25Z). Minh duyệt ghi mục này ngày 20/11/2026 ("duyệt ghi").
+
+- **R1 — V082 cho demo:** dùng V082 cho demo và nghiệm thu W5, công khai ô tụt CPU-BOOK-1 (hạng 1 → 3, tái lập; P7 và mọi biến thể cùng hạng). Nguyên nhân mẫu đuôi vẫn mở. Nghiệm thu T-069 làm riêng sau lượt Codex kiểm lại.
+- **R5 — ngưỡng báo động giả W4:** chấp nhận ≤ 1 sự cố / 6 giờ khỏe ×1, đo trên khoảng E4.
+- **R7 — tải nền W4:** phương án A, bộ chuỗi lượt trên server `chuoi_tai.py` (commit duyệt riêng). Duyệt lượt dài E2 và E4, mỗi khoảng 8 lượt (6 ×1 3600 s + 2 flash 1800 s bậc ×3 ở 600 s). Lượt bù chưa duyệt.
+- **R9 — hạn bán và sức chứa vé cho W7:** chưa sửa; sửa ở E6 sau E5. Nếu tới 28/11 E5 chưa xong, trình lại.
+
+## Điều phối giai đoạn 2: commit bộ chuỗi, (a)–(e) theo Codex, phát E2, D1–D5 (T-070, 20/11/2026)
+
+Minh duyệt trong chat 20/11/2026; nguồn chi tiết LOG T-070 lượt 4–6. Minh duyệt ghi mục này ("duyệt ghi").
+
+- **Commit bộ chuỗi tải** ("duyệt commit"): `chuoi_tai.py` bản 3, commit lab `e9a0857` trên nhánh `t071-nen` (không merge `main`); triển khai `/opt/rca-lab` exp-obs.
+- **(a)–(e) theo đánh giá Codex** ("duyệt theo codex"): (a) E3 thêm một lượt ×1 1800 s, luật thử ngưỡng thấp, gỡ trước E4, 7 luật chưa có dương thật giữ đúng trạng thái; (b) bộ nhận webhook trong container trên mạng Docker của Grafana, nghiệm thu bằng tin thật kể cả resolved; (c) bỏ mốc MongoDB/Redis chỉ cho W4/W5, mốc E1 chỉ bao phủ PostgreSQL; (d) 25 phút từ t̂ là mục tiêu tạm, khóa trước E5, báo ba mốc giờ; (e) danh sách ô xét theo thiết kế. Phút "khỏe" của E2 xếp độc lập với tín hiệu luật.
+- **Phát E2** ("phát luôn"): phát 20/11 15:03:22Z, kế hoạch khóa `b63f2e09…`, 8 lượt.
+- **D1:** E4 = 9 lượt (8 như E2 + 1 lượt ×1 1800 s), cùng quy tắc phân loại.
+- **D2:** giữ cấu hình hệ thống từ E2 qua hết E4; proxy/quota Event chuyển sang W6.
+- **D3:** ô E5 mỗi ô một phiếu (9 ô), giữ RECREATE-PAY, không lọc biên độ, Minh cấp hạt sau khi khóa danh sách.
+- **D4:** ghi WHY-103…WHY-110 (luật W4) trước khi dùng kết quả chọn ngưỡng.
+- **D5:** đính chính 2 cho T-069 theo CX-05, không đổi kết quả W3.
+
+## Điều phối giai đoạn 2: gói E5/P/H và Q1–Q11 (T-070, 23/11/2026)
+
+Nguồn: LOG T-070 ngày 23/11; đề xuất `results/T-070/de-xuat-quyet-2026-11-23-ban5.md` (chi tiết từng mục ở bản 4 §2), sau phản biện Codex CX-22, CX-22b, CX-23, CX-23b. Minh duyệt ghi khối này qua Q10.
+
+- **Gói E5/P/H** ("duyệt commit và push gói E5/P/H"): repo lab `t073-e5` `81a92736…` (cha `ecdeed2`), `t073-e5-p` `779f90c9…`, `t073-e5-h` `1bb40ca4…`, theo `results/T-073/trien-khai-e5.md` bản `0befa4d0…`, sau phản biện CX-16…CX-20. Không merge `main`.
+- **Q1–Q11** ("Approve Q1–Q11", chat 23/11/2026):
+  - **Q1:** T-073 (chủ S4) chép về laptop kèm sha256 các file ca `7577dd5b` cần cho phần đáp phản biện (gói bổ sung, `prometheus.json`, đầu ra V082 gồm chú thích H5, inventory ánh xạ); rồi hoàn tác E5 theo §5 (checkout H, giữ `t072-bo-nhan`); xóa 3 thư mục Grafana rỗng theo UID chỉ khi `counts` toàn 0 ngay trước khi xóa; điều phối đóng S4.
+  - **Q2:** nhận R5 trên E4 (0 sự cố / 383 phút khỏe ×1, cận trên Poisson 95% 3,47/6 giờ) và chức năng E5 một ô `PAUSE-PAYMENT` ×1 (ca hiện ≤ 898,8 s sau t̂, < 25 phút; thiếu phủ metric Payment). Hồ sơ W4/W5 chốt sau các lượt đáp phản biện.
+  - **Q3:** tên hợp đồng G1 chế độ (b) là `G1 0.5 + che_do_b b-1`; chữ đính chính các tham chiếu "0.3" trình Minh duyệt trước khi áp.
+  - **Q4:** nghiệm thu T-069 với ngoại lệ CPU-BOOK-1 (R1); nguồn mẫu đuôi còn mở.
+  - **Q5:** T-066 giữ mục 2.6, chưa xóa 2.7 (xét từng script); T-068 giữ nội dung bản hoàn tác `service-graph-4-bak` và hiện vật kiểm ca `7ffb2305`.
+  - **Q6:** W8 mức demo: chạy trên ca W5, dẫn trường bằng chứng, được trả lời "không đủ bằng chứng", gợi ý bước xử lý, giữ nguyên thứ hạng RCA; không dùng chú thích "Hash do chỉ mục T-064 cấp" trên ca `t073-b`.
+  - **Q7:** trước mắt T-075 soạn khuôn W8 và kiểm trích dẫn ngoại tuyến bằng ca giả, không gửi dữ liệu ra ngoài (R3 giữ nguyên). Nhà cung cấp, model, danh sách trường gửi đi: Minh chọn sau.
+  - **Q8:** duyệt thiết kế W6 bản 4 và phát E6 khi T-074 trình bản đã qua hai phiên Codex.
+  - **Q9:** nếu W5, W8 sẵn và S4 đã trả trước khi E6 được duyệt, diễn tập E7 được đi trước E6 khi máy rảnh; nếu không, giữ thứ tự E6 → E7.
+  - **Q10:** ghi khối này.
+  - **Q11:** commit + push phần R2(b) theo danh sách file Codex lập và điều phối kiểm; phần phát sinh ngoài R2(b) nằm trong danh sách đó và được commit cùng.

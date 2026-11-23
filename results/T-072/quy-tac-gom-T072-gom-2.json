@@ -1,0 +1,58 @@
+{
+ "phien_ban": "T072-gom-2",
+ "trang_thai": "đề xuất, khai trước E2 (cổng E2 điều kiện 3); dùng nguyên văn cho E2 (offline) và E4 (luật sống)",
+ "phu_thuoc": "results/T-072/bieu-thuc.json phien_ban T072-bieu-thuc-1 (uid luật, loai, for_s, eval_interval_s = 10)",
+ "don_vi": {
+  "canh_bao": "một instance của luật = (uid luật, tập nhãn của chuỗi). Luật một route có một instance; t072-live có một instance mỗi http_url.",
+  "trang_thai_grafana": "Normal → Pending (lần đánh giá đầu điều kiện đúng) → Alerting (khi điều kiện đúng liên tục ≥ for_s) → Normal (lần đánh giá đầu điều kiện sai hoặc NoData với no_data_state OK; keep_firing_for = 0).",
+  "t_hat": "thời điểm lần đánh giá đầu tiên instance ở trạng thái Alerting (lấy từ lịch sử trạng thái của Grafana, không lấy giờ webhook; I1).",
+  "t_het": "thời điểm lần đánh giá đầu tiên instance rời Alerting.",
+  "khoang_chay": "[t_hat, t_het)."
+ },
+ "mo_phong_offline": {
+  "luoi_danh_gia": "t_k = t_0 + 10·k s trên chuỗi tin-hieu/* xuất bằng query_range step 10 s. Pha t_0 của Grafana không biết trước: bộ chấm chạy pha lưới của dữ liệu xuất làm kết quả chính và báo độ nhạy theo pha bằng cách dịch lưới (chỉ khi có mẫu thô); E4 so với lịch sử trạng thái thật.",
+  "dieu_kien_dung": "chuỗi có điểm tại t_k và (giá trị phep nguong) theo bieu-thuc.json; không có điểm (guard loại) = sai (tương ứng no_data_state OK). Với t072-mat-do, t072-mat-gw: không có điểm = đúng (no_data_state Alerting).",
+  "pending_alerting": "Pending tại lần đúng đầu tiên t_p của một dãy đúng liên tiếp; Alerting tại t_k đầu tiên có t_k − t_p ≥ for_s; một lần sai bất kỳ đặt lại về Normal.",
+  "loi_truy_van": "Grafana: exec_err_state Error → trạng thái Error (cảnh báo DatasourceError). Offline: khúc xuất lỗi → không có điểm, đánh dấu 'thiếu dữ liệu xuất', không coi là Normal hay Alerting."
+ },
+ "gom_su_co": {
+  "lop_he_thong": "Gom mọi khoảng cháy của các instance có t072_loai = he-thong (p95, lỗi 5xx, liveness, mọi route và mọi http_url) thành sự cố.",
+  "quy_tac": "Sắp khoảng cháy theo t_hat. Khoảng cháy mới thuộc sự cố đang xét nếu t_hat của nó ≤ t_het lớn nhất của sự cố + 300 s; nếu không, mở sự cố mới.",
+  "khoang_ghep_s": 300,
+  "vi_sao_300": "Bằng cửa sổ rate 5m: sau khi một lỗi dừng, tín hiệu còn chứa nó tới 300 s, nên cảnh báo bật lại trong 300 s thường cùng một đợt; cũng bằng nửa cửa sổ dữ liệu [t_hat − 300, t_hat + 300) mà chế độ (b) gửi lõi RCA.",
+  "t_hat_su_co": "min t_hat của các khoảng cháy trong sự cố; t_het_su_co = max t_het.",
+  "lop_quan_sat": "Instance có t072_loai = quan-sat (t072-mat-do, t072-mat-gw) và mọi trạng thái Error của Grafana: gom riêng bằng cùng quy tắc thành 'sự cố quan sát'; không vào tử số báo động giả; báo số lượng và thời lượng riêng. Sự cố hệ thống chồng thời gian với sự cố quan sát được gắn cờ 'chong-quan-sat'."
+ },
+ "quy_ve_phut": {
+  "phut_cua_su_co": "phút UTC (floor) chứa t_hat_su_co.",
+  "lop_phut": "theo phân loại phút của T-071 (khỏe ×1, ×3/flash, biên, mất quan sát, quota/tải bị giới hạn, suy giảm thật, ...). Sự cố mang lớp của phút chứa t_hat_su_co.",
+  "vat_qua_bien": "Sự cố bắt đầu ở một phút rồi kéo sang biên hoặc lượt sau: đếm đúng một lần, ở lớp của phút bắt đầu. Sự cố bắt đầu trong phút biên: lớp 'biên', không vào tử số khỏe; vẫn liệt kê.",
+  "dang_chay_luc_bat_dau": "Sự cố có t_hat_su_co trước đầu khoảng chấm (với E4: trước giờ luật có hiệu lực ghi ở e3.md hoặc trước lượt đầu của khoảng) mà còn cháy ở đầu khoảng: lớp 'đang-cháy-lúc-bắt-đầu', không đếm, liệt kê.",
+  "dang_chay_luc_ket_thuc": "Sự cố có t_hat_su_co trong khoảng mà chưa hết khi khoảng kết thúc: đếm theo lớp phút bắt đầu; t_het ghi 'chưa hết', thời lượng bị cắt.",
+  "cua_so_lan": "Cờ 'cua-so-lan': cửa sổ [t_hat_su_co − 300, t_hat_su_co] có phút thuộc lớp khác lớp của phút bắt đầu (ví dụ 5 phút đầu một lượt ×1 sau lượt flash). Kết quả chính vẫn đếm; báo thêm số đếm khi bỏ các sự cố có cờ này (độ nhạy, không phải kết quả chính)."
+ },
+ "ty_le_bao_dong_gia": {
+  "tu_so": "số sự cố hệ thống có lớp 'khỏe ×1' trong khoảng chấm.",
+  "mau_so": "số phút lớp 'khỏe ×1' trong khoảng chấm (sau loại biên, mất quan sát, quota, suy giảm thật theo T-071).",
+  "ty_le": "tu_so / (mau_so / 360) = số sự cố mỗi 6 giờ khỏe ×1; kèm khoảng tin cậy Poisson chính xác 95% của tu_so.",
+  "du_gio": "mau_so < 360 → kết luận 'chưa đủ sáu giờ khỏe ×1' (I2), vẫn báo số đếm.",
+  "muc_tai_khac": "×3 và flash: chỉ mô tả (số sự cố, thời lượng, phút quan sát), không so ngưỡng.",
+  "nguon_dem_E4": "kết quả chính từ lịch sử trạng thái của Grafana (luật sống); bộ chấm offline chạy song song trên chuỗi T-071 xuất, khác biệt liệt kê từng sự cố.",
+  "nguon_dem_E2": "chỉ offline (luật chưa nạp); E2 dùng để chọn ngưỡng, số báo động giả trên E2 là số trong mẫu (in-sample), không phải kết quả đánh giá."
+ },
+ "gian_doan_grafana": "Grafana khởi động lại hoặc ngừng đánh giá trong khoảng chấm: ghi giờ; phút không có lần đánh giá xếp lớp 'không đánh giá', loại khỏi mẫu số của số đếm Grafana; trạng thái Pending bị đặt lại được ghi.",
+ "khong_lam": "Không dùng sổ tiêm, nhãn ca hay thời điểm tiêm để gom hoặc lọc cảnh báo (luật cứng 6). Không gom theo đồ thị phụ thuộc (MRP §2.3: đồ thị tham gia quyết định báo động đang hoãn).",
+ "thay_doi_tu_gom_1": "Chỉ thêm mục co_cau_phuong_an_A (R7). Quy tắc gom, t̂, ghép 300 s, quy về phút không đổi.",
+ "co_cau_phuong_an_A": {
+  "nguon": "R7 Minh duyệt 20/11/2026 13:25Z: mỗi khoảng (E2, E4) 8 lượt = 6 lượt ×1 3600 s + 2 lượt flash 1800 s, bậc ×3 ở 600 s; thứ tự do T-071 khai trước (khai-truoc-e2.json).",
+  "lop_cua_lot_flash": "600 s đầu lượt flash chạy ×1: T-071 phân loại như phút ×1 khác (khỏe ×1 nếu đạt tiêu chí độc lập), khớp con số 380 phút ×1 mỗi khoảng ở thong-nhat.md CHẶN 3 (6×60 + 2×10). Phút từ bậc ×3 tới hết lượt flash: lớp ×3/flash, chỉ mô tả.",
+  "bien": "Khoảng giữa hai lượt và phần quanh bậc ×3 theo định nghĩa biên của T-071; sự cố bắt đầu trong biên không vào tử số (gom_su_co, quy_ve_phut).",
+  "vat_qua_bien_theo_co_cau": [
+   "Sự cố bắt đầu ở 600 s ×1 đầu lượt flash rồi kéo sang phần ×3: đếm một lần, lớp khỏe ×1 (phút bắt đầu).",
+   "Sự cố bắt đầu ở phần ×3 rồi kéo sang lượt ×1 kế tiếp: lớp ×3/flash; không vào tử số khỏe ×1 dù kéo dài sang phút khỏe ×1.",
+   "Sự cố bắt đầu ở 5 phút đầu một lượt ×1 ngay sau lượt flash: lớp khỏe ×1, gắn cờ cua-so-lan (cửa sổ 5 phút chứa phút ×3/biên); kết quả chính vẫn đếm, báo thêm số khi bỏ cờ này.",
+   "Sự cố nối hai lượt (cách ≤ 300 s qua biên): một sự cố, lớp của phút bắt đầu."
+  ],
+  "mau_so_toi_da": "≤ 380 phút khỏe ×1 mỗi khoảng trước loại trừ; sau khi bỏ biên có thể dưới 360 → kết luận \"chưa đủ sáu giờ khỏe ×1\" (I2). Lượt bù không nằm trong R7."
+ }
+}

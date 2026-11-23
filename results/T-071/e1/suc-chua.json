@@ -1,0 +1,47 @@
+{
+  "nguon_do": {
+    "may": "exp-app",
+    "utc": "2026-11-20T12:58:20Z",
+    "bang": "booking_db.booking_schema.tbl_ticket_type_inventory",
+    "lenh": "select row_to_json(i) from booking_schema.tbl_ticket_type_inventory i where ticket_type_id='ffb36fc7-e30a-4efe-987f-ca5533520453'"
+  },
+  "ticket_type_id": "ffb36fc7-e30a-4efe-987f-ca5533520453",
+  "event_id": "3e7c1df9-ada4-4081-94a1-548b80a5da86",
+  "configured_capacity": 100000,
+  "held": 0,
+  "purchased": 26166,
+  "con_lai": 73834,
+  "doi_chieu": {
+    "event_db.tbl_ticket_types.configured_quantity": 100000,
+    "booking tbl_orders COMPLETED": 26166,
+    "booking tbl_reservations COMMITTED": 26166,
+    "don chua ket thuc (khac COMPLETED/CANCELLED/EXPIRED)": 0,
+    "ghi_chu": "purchased khớp số đơn COMPLETED và reservation COMMITTED; held 0 khớp 0 đơn dở"
+  },
+  "gioi_han_nguoi_mua": {
+    "bang": "booking_schema.tbl_purchase_limits",
+    "so_nguoi_mua": 22,
+    "configured_limit_su_kien_tai": 100000,
+    "purchased_max_mot_nguoi": 1493,
+    "ghi_chu": "bảng có 2 sự kiện; min configured_limit 10 thuộc sự kiện khác. Với sự kiện tải, mỗi người mua còn > 98.000, không ràng buộc"
+  },
+  "nhu_cau_uoc": {
+    "nguon": "results/T-069/thu/t069-chinh/tai-create-order.json; cau-hinh/run.json của t3-124242f0",
+    "don_moi_giay_x1": 0.36,
+    "can_cu_don_moi_giay": "ca ×1 1800 s: create_order 201 = 648 → 0,36/s; ca flash 124242f0 (600 s ×1 + 1200 s ×3): 1512 = 0,36·600 + 1,08·1200, khớp",
+    "ve_moi_don": 1,
+    "can_cu_ve_moi_don": "load/scenarios/purchase-journey.js dòng 99: quantity 1 (repo lab 407b4f5)",
+    "gia_dinh_bao_thu": "mọi đơn tạo ra đều tính là tiêu thụ vé (thực tế chỉ ~2/3 hoàn tất: create_payment 432/648; đơn hủy/hết hạn trả vé)",
+    "moi_khoang_E2_E4": {"x1_giay": 22800, "x3_giay": 2400, "don": 10800, "cong_thuc": "22800·0,36 + 2400·1,08"},
+    "E2_cong_E4": 21600,
+    "E5_3_chu_ky_truong_hop_xau": {"don": 4536, "cong_thuc": "3 × 1512 (giả định cả 3 chu kỳ là flash; nếu ×1: 3 × 648 = 1944)"},
+    "tong": 26136,
+    "tong_cong_bien_50": 39204
+  },
+  "ket_luan": "du",
+  "du_phong_sau_E5": 34630,
+  "ghi_chu": [
+    "E6 (W6) và E7 (W9a) không nằm trong phép tính; phần dư ~34.630 vé (sau biên 50%) còn cho chúng nếu tải tương tự.",
+    "Hạn bán 2026-12-02T22:16:31Z (event_db.sale_ends_at, booking sale_ends_at): E2–E5 phải xong trước mốc này."
+  ]
+}

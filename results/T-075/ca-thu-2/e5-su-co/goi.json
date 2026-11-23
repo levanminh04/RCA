@@ -1,0 +1,218 @@
+{
+ "gui_di": {
+  "khuon": "T075-vao-2",
+  "che_do": "b",
+  "cua_so": {
+   "nen_s": [
+    -300,
+    0
+   ],
+   "su_co_s": [
+    0,
+    300
+   ],
+   "moc": "t̂ = giờ bắt đầu của cảnh báo đầu tiên"
+  },
+  "ket_qua_rca": {
+   "ban_phuong_phap": "V082-V066+H8a",
+   "ket_luan": "CAUSE_FOUND",
+   "nguon_ket_luan": "#/ket_qua/verdict",
+   "trang_thai_chay": null,
+   "nguon_trang_thai": "không có: file sự cố chỉ có trạng thái bước P7 (`#/du_lieu_loi/p7_status`), không có trạng thái V082",
+   "nhom_hang_1": [
+    "booking-service"
+   ],
+   "xep_hang": [
+    {
+     "thuc_the": "booking-service",
+     "hang": 1,
+     "lop": null,
+     "so_kenh_co": null,
+     "nguon": "#/ket_qua/nhom_hang_1"
+    }
+   ],
+   "ghi_chu": "Chỉ có nhóm hạng 1 của V082 trong file sự cố; bảng hạng đầy đủ nằm ở file G1 của ca, chưa có trong gói này."
+  },
+  "bang_chung": [],
+  "bang_chung_bo_bot": 0,
+  "ke_thua": [],
+  "ke_thua_bo_bot": 0,
+  "vung": null,
+  "thao_tac_co_co": [],
+  "canh_xep_hang": null,
+  "thieu_trong_goi": [
+   "Bảng bằng chứng theo kênh, kế thừa, vùng và bảng hạng đầy đủ của V082 không có trong nguồn này (file sự cố của bộ điều phối; các khối đó nằm ở file G1 của ca)."
+  ],
+  "gioi_han": [],
+  "canh_bao": [
+   {
+    "ma_luat": "t072-live",
+    "tin_hieu": "live",
+    "bat_dau_tuong_doi_s": 0,
+    "ket_thuc_tuong_doi_s": 560.0,
+    "nguon": "#/canh_bao/0"
+   },
+   {
+    "ma_luat": "t072-p95-payment",
+    "tin_hieu": "p95",
+    "bat_dau_tuong_doi_s": 50,
+    "ket_thuc_tuong_doi_s": 450.0,
+    "nguon": "#/canh_bao/1"
+   },
+   {
+    "ma_luat": "t072-loi-payment",
+    "tin_hieu": "loi-5xx",
+    "bat_dau_tuong_doi_s": 60,
+    "ket_thuc_tuong_doi_s": 890.0,
+    "nguon": "#/canh_bao/2"
+   }
+  ],
+  "do_phu": {
+   "du_cua_so": false,
+   "thieu_bat_buoc": [
+    "metric:cpu:payment-service",
+    "metric:error:payment-service",
+    "metric:latency-50:payment-service",
+    "metric:latency-90:payment-service",
+    "metric:mem:payment-service",
+    "metric:workload:payment-service"
+   ],
+   "quy_tac": "lỗ lớn nhất theo mẫu thực trong [t−300, t+300); trace > 30 s, metric > 4×bước là thiếu; log không bắt buộc",
+   "lo_lon_nhat_s": {
+    "metric:cpu:payment-service": 364.999,
+    "metric:error:payment-service": 315.0,
+    "metric:latency-50:payment-service": 315.0,
+    "metric:latency-90:payment-service": 315.0,
+    "metric:mem:payment-service": 364.999,
+    "metric:workload:payment-service": 315.0
+   },
+   "pham_vi": "tính trên đầu vào P7 cơ sở (V082 đọc lại), trước gói bổ sung liveness; kênh bổ sung không nằm trong phép phủ này",
+   "nguon": "#/du_lieu_loi/phu"
+  },
+  "so_mau_dau_vao_p7_co_so": {
+   "pham_vi": "đầu vào P7 cơ sở (V082 đọc lại), chưa gồm gói bổ sung; N = [t−300, t), A = [t, t+300)",
+   "span": {
+    "N": 76054,
+    "A": 46726
+   },
+   "log": {
+    "N": 6166,
+    "A": 4948
+   },
+   "hang_metric_trong_cua_so": {
+    "N": 1212,
+    "A": 1100
+   },
+   "hang_metric_ngoai_cua_so": 2399,
+   "nguon": "#/du_lieu_loi"
+  },
+  "so_mau_theo_thuc_the": {
+   "span": {
+    "api-gateway": {
+     "N": 4593,
+     "A": 3821
+    },
+    "booking-service": {
+     "N": 21486,
+     "A": 10222
+    },
+    "discovery-server": {
+     "N": 216,
+     "A": 200
+    },
+    "event-service": {
+     "N": 10206,
+     "A": 10214
+    },
+    "keycloak": {
+     "N": 3805,
+     "A": 4790
+    },
+    "payment-service": {
+     "N": 17502
+    },
+    "ticket-service": {
+     "N": 18166,
+     "A": 17399
+    },
+    "user-service": {
+     "N": 80,
+     "A": 80
+    }
+   },
+   "log": {
+    "api-gateway": {
+     "N": 1546,
+     "A": 1320
+    },
+    "booking-service": {
+     "N": 418,
+     "A": 129
+    },
+    "broker": {
+     "N": 90,
+     "A": 92
+    },
+    "cache": {
+     "N": 5,
+     "A": 5
+    },
+    "discovery-server": {
+     "A": 1
+    },
+    "keycloak": {
+     "N": 40,
+     "A": 20
+    },
+    "mongodb-instance": {
+     "N": 1133,
+     "A": 1129
+    },
+    "payment-service": {
+     "N": 584
+    },
+    "postgresql-shared-instance": {
+     "N": 75,
+     "A": 52
+    },
+    "ticket-service": {
+     "N": 2275,
+     "A": 2200
+    }
+   },
+   "pham_vi": "đầu vào P7 cơ sở (bước kiem_dau_vao), chưa gồm gói bổ sung",
+   "ghi_chu": "N = nửa nền [t−300, t), A = nửa sự cố [t, t+300); thiếu khóa nghĩa là 0 mẫu.",
+   "nguon": "#/buoc/4/tom_tat"
+  }
+ },
+ "kiem_toan": {
+  "nguon_kieu": "su_co",
+  "nguon_ten": "e5-su-co",
+  "v082_output_sha256": {
+   "gia_tri": [
+    "23b873aeadbc78176a85448aa7afa00c45f7f121672bed438c99bcb8aa7d6c23",
+    "23b873aeadbc78176a85448aa7afa00c45f7f121672bed438c99bcb8aa7d6c23"
+   ],
+   "con_tro": "#/du_lieu_loi/v082/output_sha256"
+  },
+  "loai_khoi_gui_di": [
+   "ma",
+   "ma_ca_m1",
+   "buoc[*].tom_tat.directory/files/chon_file",
+   "chon_file",
+   "canh_bao[*].nhan.http_url",
+   "canh_bao[*].sha256_than",
+   "spool_seq",
+   "nhan_webhook_utc",
+   "mọi giờ tuyệt đối",
+   "buoc[p7] (bản P7, không phải V082)"
+  ],
+  "xep_hang_nguon": [
+   [
+    "booking-service",
+    1
+   ]
+  ],
+  "nguon_sha256": "5030c534a3833ee79362965935e40d58252aeafbad8613c20c66df49057f1da9"
+ }
+}

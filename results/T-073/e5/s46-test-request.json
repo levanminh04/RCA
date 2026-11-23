@@ -1,0 +1,20 @@
+{
+ "nguon": "bộ ghi fetch gắn trong trang Grafana (pane trình duyệt, phiên admin Minh đăng nhập) trước khi bấm; đối chiếu read_network_requests: 2 POST .../receivers/dDA3Mi1iby1uaGFuLW5oZQ/test → 200",
+ "trang": "http://127.0.0.1:3000/alerting/notifications/receivers/dDA3Mi1iby1uaGFuLW5oZQ/edit (contact point t072-bo-nhan-nhe, provisioned; mỗi integration một nút Test)",
+ "yeu_cau": [
+  {"t_trinh_duyet": "2026-11-23T01:56:12.631Z", "buoc": "S4-6 (i)", "method": "POST", "status": 200,
+   "url": "apis/notifications.alerting.grafana.app/v1beta1/namespaces/default/receivers/dDA3Mi1iby1uaGFuLW5oZQ/test",
+   "body": {"integration": {"uid": "t073-webhook-e5", "type": "webhook", "version": "v1", "settings": {"httpMethod": "POST", "url": "http://t073-webhook:8080/t073/canh-bao"}, "secureFields": {}, "disableResolveMessage": false}, "alert": {"labels": {"alertname": "TestAlert"}, "annotations": {}}},
+   "resp": {"status": "success", "duration": "6ms"}},
+  {"t_trinh_duyet": "2026-11-23T01:56:35.261Z", "buoc": "S4-6 (ii)", "method": "POST", "status": 200,
+   "url": "apis/notifications.alerting.grafana.app/v1beta1/namespaces/default/receivers/dDA3Mi1iby1uaGFuLW5oZQ/test",
+   "body": {"integration": {"uid": "t072-webhook", "type": "webhook", "version": "v1", "settings": {"httpMethod": "POST", "url": "http://t072-bo-nhan:9172/t072"}, "secureFields": {}, "disableResolveMessage": false}, "alert": {"labels": {"alertname": "TestAlert"}, "annotations": {}}},
+   "resp": {"status": "success", "duration": "6ms"}}
+ ],
+ "gio_bam_laptop_utc": {"i": "2026-11-23T01:56:12.752Z (sau click)", "ii": "2026-11-23T01:56:35.364Z (sau click)"},
+ "ket_qua": {
+  "i": "spool T-073 canh-bao-20261123.jsonl: đúng 1 dòng, seq 1, nhan_webhook_utc 2026-11-23T01:56:13.157456Z, alertname TestAlert, sha256_than bea465f2…; webhook.jsonl T-072 sha256 b6f0de26… (trùng mốc trước Test), 9 dòng",
+  "ii": "webhook.jsonl T-072: 10 dòng (+1), dòng mới nhan_webhook_utc 2026-11-23T01:56:35.788802Z TestAlert, sha256 f3f4436e…; spool T-073 vẫn 1 dòng",
+  "truong_hop": "(i)+(ii): nút Test theo từng integration (không gặp (iii))"
+ }
+}

@@ -1,0 +1,239 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "T072-i1-1",
+ "title": "Bản ghi cảnh báo I1 (bản 1, điều phối chốt 20/11/2026 ~14:05Z, HOP-DONG.md mục I1)",
+ "description": "Một bản ghi cho mỗi lần một instance luật vào Alerting (khoảng cháy). Ba thời điểm tách riêng: t_hat (trạng thái luật), nhan_webhook_utc (bộ nhận), du_lieu_loi (T-073 điền). Không có trường nào lấy từ sổ tiêm hay nhãn ca (luật cứng 6).",
+ "type": "object",
+ "required": [
+  "schema",
+  "ma",
+  "nguon_ban_ghi",
+  "luat",
+  "nhan",
+  "fingerprint",
+  "t_hat",
+  "trang_thai"
+ ],
+ "properties": {
+  "schema": {
+   "const": "T072-i1-1"
+  },
+  "ma": {
+   "type": "string",
+   "pattern": "^[0-9a-f]{16}$",
+   "description": "ma = sha256(utf-8 của chuỗi f\"{fingerprint}|{floor(t_hat.epoch_s)}\").hexdigest()[:16]; floor(t_hat.epoch_s) in dạng số nguyên thập phân, không dấu chấm, không số mũ (ví dụ \"a1b2c3|1795100409\"). Cùng (fingerprint, t_hat) = cùng bản ghi (bản lặp chỉ đếm)."
+  },
+  "nguon_ban_ghi": {
+   "enum": [
+    "webhook",
+    "lich-su-trang-thai",
+    "offline"
+   ]
+  },
+  "luat": {
+   "type": "object",
+   "required": [
+    "uid",
+    "t072_loai",
+    "t072_tin_hieu"
+   ],
+   "properties": {
+    "uid": {
+     "type": "string",
+     "description": "uid luật trong bieu-thuc.json (vd t072-p95-booking), đọc từ nhãn t072_uid. Thiếu nhãn: alertname hoặc chuỗi rỗng."
+    },
+    "tieu_de": {
+     "type": "string"
+    },
+    "t072_loai": {
+     "enum": [
+      "he-thong",
+      "quan-sat"
+     ],
+     "description": "Chỉ he-thong mở RCA. Thiếu nhãn, alertname DatasourceError hoặc DatasourceNoData → quan-sat."
+    },
+    "t072_tin_hieu": {
+     "enum": [
+      "p95",
+      "loi-5xx",
+      "live",
+      "mat-do",
+      "mat-gw",
+      "datasource-error",
+      "datasource-nodata",
+      "khong-ro"
+     ],
+     "description": "khong-ro: cảnh báo thiếu nhãn t072_* (luật lạ, DatasourceError/DatasourceNoData không mang nhãn luật); bản ghi đó luôn t072_loai = quan-sat, không chạy RCA."
+    },
+    "eval_interval_s": {
+     "type": "integer",
+     "description": "annotation t072_eval_interval_s (thông tin; không là nguồn t̂)"
+    },
+    "for_s": {
+     "type": "integer",
+     "description": "từ annotation t072_for_s"
+    },
+    "nguong": {
+     "type": [
+      "number",
+      "null"
+     ],
+     "description": "từ annotation t072_nguong"
+    },
+    "nguong_phien_ban": {
+     "type": [
+      "string",
+      "null"
+     ],
+     "description": "annotation t072_nguong_phien_ban (sha256 nguong.json, 12 ký tự)"
+    },
+    "bieu_thuc_phien_ban": {
+     "type": "string",
+     "description": "annotation t072_bieu_thuc (T072-bieu-thuc-1)"
+    }
+   }
+  },
+  "nhan": {
+   "type": "object",
+   "additionalProperties": {
+    "type": "string"
+   },
+   "description": "Toàn bộ nhãn của instance (gồm http_route hoặc http_url)."
+  },
+  "fingerprint": {
+   "type": "string",
+   "description": "fingerprint của Grafana (webhook alerts[].fingerprint); offline: sha256 của nhãn đã sắp."
+  },
+  "trang_thai": {
+   "enum": [
+    "firing",
+    "resolved"
+   ]
+  },
+  "t_hat": {
+   "type": "object",
+   "required": [
+    "epoch_s",
+    "utc",
+    "nguon"
+   ],
+   "properties": {
+    "epoch_s": {
+     "type": "number"
+    },
+    "utc": {
+     "type": "string",
+     "format": "date-time"
+    },
+    "nguon": {
+     "enum": [
+      "lich-su-trang-thai",
+      "webhook-startsAt",
+      "offline-luoi-xuat"
+     ],
+     "description": "Dịch vụ trực tuyến (T-073) chỉ dùng webhook-startsAt. Nguồn chuẩn để chấm (T-072) là lich-su-trang-thai. E3 đo lệch startsAt so với lịch sử trạng thái; lệch > 1 nhịp đánh giá thì điều phối mở việc mới (HOP-DONG I1 (d))."
+    },
+    "da_doi_chieu_E3": {
+     "type": "boolean",
+     "description": "true khi E3 đã xác nhận startsAt = giờ chuyển Alerting trong lịch sử trạng thái (sai lệch ≤ 1 nhịp đánh giá)."
+    }
+   }
+  },
+  "t_het": {
+   "type": [
+    "object",
+    "null"
+   ],
+   "properties": {
+    "epoch_s": {
+     "type": "number"
+    },
+    "utc": {
+     "type": "string",
+     "format": "date-time"
+    },
+    "nguon": {
+     "enum": [
+      "lich-su-trang-thai",
+      "webhook-endsAt",
+      "offline-luoi-xuat"
+     ]
+    }
+   },
+   "description": "null khi còn cháy."
+  },
+  "nhan_webhook_utc": {
+   "type": [
+    "string",
+    "null"
+   ],
+   "format": "date-time",
+   "description": "Giờ bộ nhận ghi khi request tới, trước khi đọc thân. null cho offline/lịch sử trạng thái."
+  },
+  "gia_tri": {
+   "type": [
+    "object",
+    "null"
+   ],
+   "description": "webhook alerts[].values (refId → số, vd {\"A\": 0.21, \"C\": 1}) và valueString nguyên văn ở khóa _valueString. A là giá trị tín hiệu lúc đánh giá."
+  },
+  "su_co": {
+   "type": [
+    "string",
+    "null"
+   ],
+   "description": "mã sự cố do bộ gom gán theo quy-tac-gom.json."
+  },
+  "du_lieu_loi": {
+   "type": [
+    "object",
+    "null"
+   ],
+   "description": "T-073 điền: khoảng dữ liệu lõi thực nhận và độ phủ tín hiệu."
+  },
+  "goc": {
+   "type": [
+    "object",
+    "null"
+   ],
+   "description": "Thân alert nguyên văn (webhook) để kiểm lại."
+  }
+ },
+ "allOf": [
+  {
+   "if": {
+    "properties": {
+     "luat": {
+      "properties": {
+       "t072_tin_hieu": {
+        "const": "khong-ro"
+       }
+      }
+     }
+    }
+   },
+   "then": {
+    "properties": {
+     "luat": {
+      "properties": {
+       "t072_loai": {
+        "const": "quan-sat"
+       }
+      }
+     }
+    }
+   }
+  }
+ ],
+ "chot": {
+  "nguon": "tasks/T-070-dieu-phoi-giai-doan-2/HOP-DONG.md mục I1, \"Chốt 20/11/2026 ~14:05Z\"; bản trước T072-i1-0 lưu ở results/T-072/i1-schema-T072-i1-0.json",
+  "thay_doi_tu_i1_0": [
+   "(a) luat.t072_tin_hieu thêm khong-ro; khong-ro buộc t072_loai = quan-sat (allOf).",
+   "(b) Nguồn t̂ của dịch vụ chỉ webhook-startsAt; không có nguồn webhook-annotation (enum t_hat.nguon không có giá trị này ở cả i1-0 và i1-1).",
+   "(c) ma: cách in ghi rõ, kèm pattern 16 hex.",
+   "(d) Nguồn t̂ chuẩn để chấm là lich-su-trang-thai; E3 đo lệch.",
+   "(e) Quy tắc gom: T072-gom-2 (nội dung gom như gom-1)."
+  ],
+  "van_giu": "Ba thời điểm tách riêng; nhãn t072_uid và annotation t072_* trên mọi luật T-072; webhook resolved có thể tới muộn hơn endsAt (chỉ đổi nhan_webhook_utc)."
+ }
+}

@@ -1,0 +1,58 @@
+{
+ "phien_ban": "T072-chon-nguong-2",
+ "trang_thai": "khai trước E2 (cổng E2 điều kiện 4 phần T-072). R5 Minh duyệt 20/11 13:25Z (LOG T-070 lượt 3). Hằng số k, sàn chưa duyệt riêng (thuộc WHY đề xuất); chỉ đổi được TRƯỚC khi có dữ liệu E2.",
+ "phu_thuoc": {
+  "bieu_thuc": "results/T-072/bieu-thuc.json (T072-bieu-thuc-1)",
+  "gom": "results/T-072/quy-tac-gom.json (T072-gom-1)",
+  "cai_dat": "results/T-072/cham_offline.py lệnh `chon-nguong` (cài đúng quy tắc này; sha256 ghi LOG trước E2)"
+ },
+ "du_lieu_vao": {
+  "chi_E2": "Chỉ chuỗi xuất của khoảng E2 (results/T-071/, bộ xuất theo bieu-thuc.json#/xuat_cho_T071). Không dùng E4, T-067, T-069 hay dữ liệu có tiêm lỗi.",
+  "phan_loai_phut": "phân loại phút của T-071 cho E2. Chỉ dùng bước đánh giá t có phút floor(t/60) thuộc lớp 'khỏe ×1'.",
+  "chuoi": {
+   "p95_route": "tin-hieu/t072-p95-<route>",
+   "ty_le_loi_route": "phu/ty-le-loi-chua-chan-5xx-<route>"
+  }
+ },
+ "thong_ke": {
+  "gia_tri_duy_tri": "S(t) = min các giá trị của chuỗi tại mọi bước trong [t − for_s, t] (for_s của luật, 60 s). Bước không có điểm trong đoạn → S(t) không xác định, bỏ. Lý do: luật chỉ chuyển Alerting khi điều kiện đúng liên tục for_s, nên ngưỡng θ không gây cảnh báo trên E2 khi và chỉ khi θ ≥ max S(t) (trên lưới xuất).",
+  "M": "M_r = max S(t) trên mọi bước t thuộc phút khỏe ×1 của E2, theo route r. Tính cả bước có cửa sổ 5 phút lấn sang phút lớp khác (khớp quy tắc đếm chính của quy-tac-gom.json); báo thêm M_r khi bỏ các bước đó, chỉ để tham khảo.",
+  "so_buoc_toi_thieu": 120,
+  "du_du_lieu": "Cần ≥ 120 bước có S(t) xác định cho mỗi route (≈ 20 phút). Thiếu → không tính θ cho route đó; báo 'không đủ dữ liệu E2' và dừng, trình điều phối/Minh; không bù bằng dữ liệu khác."
+ },
+ "cong_thuc": {
+  "p95": {
+   "theta": "theta_p95_r = lam_tron_len(max(k_p95 × M_r, M_r + san_p95_s), 0.001)",
+   "k_p95": 1.5,
+   "san_p95_s": 0.05,
+   "vi_sao": "Biên cho trôi giữa E2 và E4 (DB tích lũy; truy vấn nền chậm dần trong lượt T-069: p50 18,5 → 31,0 ms, results/T-069/phan-tich/troi-trong-luot.txt) và cho bucket thô: p95 ~0,03–0,15 s nằm trong bucket 0,025–0,25 s, một bước nhảy bucket đổi p95 hàng chục ms. Sàn 0,05 s cho route có p95 rất nhỏ."
+  },
+  "ty_le_loi": {
+   "theta": "theta_loi_r = lam_tron_len(max(k_loi × M_r, san_loi), 0.001)",
+   "k_loi": 2,
+   "san_loi": 0.05,
+   "vi_sao": "Giờ khỏe thường không có 5xx (M_r = 0), nên ngưỡng = sàn 5%. Với ≈ 70 request/5 phút (payment, ticket ở ×1), 5% ≈ 3,5 lỗi, khớp điều kiện ≥ 3 lỗi 5xx của luật."
+  },
+  "liveness_mat_quan_sat": "Không chọn từ dữ liệu: t072-live ngưỡng 0,5 (trạng thái nhị phân), t072-mat-do < 8 đích, t072-mat-gw > 60 s (bieu-thuc.json)."
+ },
+ "dau_ra": {
+  "file": "results/T-072/nguong.json",
+  "noi_dung": "theta_* từng route; M_r (gồm và bỏ bước cửa sổ lấn); số bước dùng; sha256 của mọi file đầu vào (chuỗi E2, phân loại phút, bieu-thuc, quy tắc này, cham_offline.py); số sự cố trong mẫu E2 khi áp θ (kỳ vọng 0 trên lưới xuất; khác 0 chỉ do pha lưới, ghi rõ).",
+  "khong_lam": "Không chỉnh θ bằng tay; không chọn lại sau khi xem E4. Đổi sau E4 → ghi 'sửa sau', giữ kết quả lần đầu, kiểm bản sửa trên khoảng mới (thong-nhat.md §1.3)."
+ },
+ "kiem_tra_sau_khi_tinh": [
+  "In-sample E2: chạy cham_offline.py với θ trên chuỗi E2 → báo số sự cố hệ thống theo lớp phút (số trong mẫu, không phải kết quả đánh giá).",
+  "So θ với khoảng giá trị đã thấy ở dữ liệu kiểm code (T-067/T-069): chỉ để soi vô lý (QT5), không dùng để chọn."
+ ],
+ "rui_ro_da_biet": [
+  "θ = max trong mẫu × biên: nếu E4 trôi hơn biên, báo động giả tăng; kết quả E4 cho biết, không sửa lại ngưỡng bằng E4.",
+  "Pha lưới đánh giá của Grafana khác lưới xuất: S(t) trên lưới khác có thể nhỉnh hơn M_r một chút; biên k che phần này [suy luận, chưa kiểm].",
+  "Route có p95 duy trì gần bằng một mốc bucket: θ có thể rơi ngay trên mốc, nhạy với một vài request chậm."
+ ],
+ "tieu_chi_E4_R5": {
+  "nguong_chap_nhan": "≤ 1 sự cố hệ thống / 6 giờ khỏe ×1 (R5, Minh duyệt 20/11/2026 13:25Z, \"Duyệt theo đề xuất\"; LOG T-070 lượt 3; DECISIONS mục \"Điều phối giai đoạn 2: quyết định R1, R5, R7, R9\").",
+  "ap_dung": "Chỉ để kết luận trên E4 (luật sống, sau giờ hiệu lực ở e3.md), theo quy-tac-gom.json#/ty_le_bao_dong_gia. Không đi vào công thức θ; không dùng để chọn hay chỉnh θ.",
+  "phep_so": "đạt nếu tu_so / (mau_so/360) ≤ 1 với mau_so ≥ 360; không đạt nếu > 1; mau_so < 360 → \"chưa đủ sáu giờ khỏe ×1\". Báo kèm khoảng tin cậy Poisson 95% (mẫu 6 giờ chỉ phân biệt 0/1/≥2 sự cố; độ tin thấp, đã nêu khi trình R5).",
+  "E2": "Số sự cố trong mẫu E2 không so với R5 (in-sample)."
+ }
+}

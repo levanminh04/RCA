@@ -1,0 +1,14 @@
+**CX-16 đã sửa đủ sáu điểm trong văn bản. S4 CHƯA ĐẠT để triển khai nguyên hướng dẫn**, vì bước thử hai webhook và bước bật dashboard lưu trữ còn thiếu chỉ dẫn thực thi.
+
+| Điểm | Kết luận | Đối chiếu |
+|---|---|---|
+| 1. Thứ tự K8 | **ĐẠT** | K8 nằm sau S4-8, trước tiêm. Tin Test gửi từ S4-6 có thể được đọc khi bộ điều phối khởi động. [S4-9](D:/RCA-flashticket/results/T-073/trien-khai-e5.md:58) · [Vòng đọc spool](D:/Project/rca-lab-wt/T-073-e5/campaigns/online/orchestrator.py:214) |
+| 2. Kiểm I7 | **ĐẠT** | Kiểm HEAD nguồn, cây sạch và đủ sáu nhóm job ngay trước mỗi lần đổi checkout, kể cả hoàn tác. [Quy tắc I7](D:/RCA-flashticket/results/T-073/trien-khai-e5.md:44) |
+| 3. Tách `inj3` | **ĐẠT** | S4-1a ghi rõ thao tác đổi trạng thái. Ô đã bốc chỉ cần `verify`. K10 đạt khi đầu ra có `sach: true`, vì lệnh vẫn có thể thoát bình thường khi còn can thiệp. [S4-1a](D:/RCA-flashticket/results/T-073/trien-khai-e5.md:48) · [Mã `verify`](D:/Project/rca-lab-wt/T-073-e5/faults/injectors/docker/inj3.py:309) |
+| 4. Mốc E4 | **ĐẠT** | S4-6 lưu SHA-256, dòng cuối của `webhook.jsonl` và giờ UTC trước khi bấm Test. [S4-6](D:/RCA-flashticket/results/T-073/trien-khai-e5.md:53) |
+| 5. Dashboard | **CHƯA ĐẠT khi triển khai** | Cách làm mới trang, ghi giờ thấy ca, mở ca và lưu bằng chứng đã đủ. S4-7 cũng nêu đúng sáu dashboard, nhưng chưa chỉ ra commit chứa provider tạm để bật chúng. Repo vận hành yêu cầu máy chủ dùng cấu hình từ commit. Cần chỉ rõ commit bật và commit trả về, áp dụng I7 ở cả hai lần đổi. [S4-7](D:/RCA-flashticket/results/T-073/trien-khai-e5.md:56) · [Luật repo vận hành](D:/Project/rca-lab-wt/T-073-e5/AGENTS.md:17) |
+| 6. Ô đã bốc | **ĐẠT** | `PAUSE-PAYMENT`, hạt `32323232`, khớp bản ghi bốc ô. [LOG T-073](D:/RCA-flashticket/tasks/T-073-w5-rca-truc-tuyen/LOG.md:167) |
+
+**Lỗi còn lại ở S4-6.** Hướng dẫn kỳ vọng một lần bấm Test tạo tin ở cả hai đích. Mã giao diện Grafana được đối chiếu truyền từng integration vào hộp Test. Chưa xác nhận hành vi trên bản Grafana ghim. Cách sửa tối thiểu là ghi rõ thử từng webhook, đối chiếu từng tin và dùng tin phía T-073 để kiểm K8. [S4-6](D:/RCA-flashticket/results/T-073/trien-khai-e5.md:53) · [Mã giao diện Grafana](https://github.com/grafana/grafana/blob/main/public/app/features/alerting/unified/components/receivers/form/GrafanaReceiverForm.tsx)
+
+**Nội dung khoa học ĐẠT.** Diff giữ nguyên N = 25 phút, tiêu chí và ô. SHA-256 của cả hai file khóa khớp LOG. Nhật ký thao tác CX-16 ghi đúng hai file được phép: bản sao trước sửa và tài liệu triển khai. Git hiện báo `results/T-073/` chưa được theo dõi, ngoài đó có sáu file đã theo dõi đang sửa và nhiều mục `??`; riêng `git status` không quy được các thay đổi ấy cho CX-16. Phiên kiểm này chỉ đọc, không sửa file và không chạy S4. [Nhật ký CX-16](D:/RCA-flashticket/results/T-070/codex/CX-16.jsonl:40)

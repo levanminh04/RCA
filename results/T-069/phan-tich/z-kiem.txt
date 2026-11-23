@@ -1,0 +1,32 @@
+#### MỚI 03573b63 (CPU-BOOK-1)
+ticket-service | SELECT ticket_db: nN=17843 nA=15647 med_N=0.285 ms IQR_N=0.272 ms max_A=257.5 ms z=944.8
+    mẫu max A: SELECT count(*) FROM ticket_schema.tbl_ticket_deliveries d JOIN ticket_schema.tbl_issuances i ON i.id=d.issuan
+booking-service | SELECT booking_db: nN=1544 nA=1540 med_N=0.392 ms IQR_N=0.561 ms max_A=252.4 ms z=449.2
+    mẫu max A: select o1_0.id from booking_schema.tbl_orders o1_0 join booking_schema.tbl_reservations r1_0 on r1_0.order_id=
+keycloak | SELECT keycloak_db.OUTBOX_ENTRY: nN=300 nA=300 med_N=0.331 ms IQR_N=0.115 ms max_A=80.6 ms z=698.3
+    mẫu max A: select oee1_0.ID,oee1_0.ATTEMPTS,oee1_0.CONTAINER_ID,oee1_0.CORRELATION_ID,oee1_0.CREATED_AT,oee1_0.DELIVERED_
+booking-service | SELECT booking_schema.tbl_ticket_type_inventory: nN=401 nA=395 med_N=0.285 ms IQR_N=0.262 ms max_A=15.2 ms z=56.9
+    mẫu max A: select tti1_0.ticket_type_id,tti1_0.configured_capacity,tti1_0.event_id,tti1_0.held,tti1_0.purchased,tti1_0.ro
+#### CŨ 19b17e22 (CPU-BOOK-1)
+ticket-service | SELECT ticket_db: nN=19756 nA=19622 med_N=0.286 ms IQR_N=0.355 ms max_A=71.3 ms z=199.8
+    mẫu max A: SELECT t.id,t.display_snapshot,t.state,t.qr_token_ciphertext,t.qr_key_version FROM ticket_schema.tbl_tickets t
+booking-service | SELECT booking_db: nN=1344 nA=1336 med_N=0.318 ms IQR_N=0.406 ms max_A=69.4 ms z=170.1
+    mẫu max A: select clock_timestamp()
+keycloak | SELECT keycloak_db.OUTBOX_ENTRY: nN=300 nA=300 med_N=0.331 ms IQR_N=0.049 ms max_A=10.0 ms z=195.1
+    mẫu max A: select oee1_0.ID,oee1_0.ATTEMPTS,oee1_0.CONTAINER_ID,oee1_0.CORRELATION_ID,oee1_0.CREATED_AT,oee1_0.DELIVERED_
+booking-service | SELECT booking_schema.tbl_ticket_type_inventory: nN=410 nA=401 med_N=0.240 ms IQR_N=0.194 ms max_A=262.6 ms z=1352.3
+    mẫu max A: select tti1_0.ticket_type_id,tti1_0.configured_capacity,tti1_0.event_id,tti1_0.held,tti1_0.purchased,tti1_0.ro
+#### MỚI 30ae6ac0 (HTTP5-EVENT)
+booking-service | SELECT booking_schema.tbl_orders: nN=648 nA=119 med_N=0.432 ms IQR_N=0.647 ms max_A=215.3 ms z=332.0
+    mẫu max A: select o1_0.id from booking_schema.tbl_orders o1_0 where o1_0.lifecycle_state=? and o1_0.expires_at<=? and (? 
+booking-service | SELECT booking_db: nN=1630 nA=179 med_N=0.433 ms IQR_N=0.630 ms max_A=184.8 ms z=292.5
+    mẫu max A: select o1_0.id from booking_schema.tbl_orders o1_0 join booking_schema.tbl_reservations r1_0 on r1_0.order_id=
+event-service | GET /api/v1/events/{id}: nN=360 nA=360 med_N=7.425 ms IQR_N=6.324 ms max_A=39.2 ms z=5.0
+    mẫu max A: ?
+#### CŨ e9c9679b (HTTP5-EVENT)
+booking-service | SELECT booking_schema.tbl_orders: nN=764 nA=88 med_N=0.443 ms IQR_N=0.453 ms max_A=9.4 ms z=19.8
+    mẫu max A: select o1_0.id from booking_schema.tbl_orders o1_0 where o1_0.lifecycle_state=? and o1_0.expires_at<=? and (? 
+booking-service | SELECT booking_db: nN=1344 nA=147 med_N=0.311 ms IQR_N=0.399 ms max_A=15.8 ms z=38.9
+    mẫu max A: select o1_0.id from booking_schema.tbl_orders o1_0 join booking_schema.tbl_reservations r1_0 on r1_0.order_id=
+event-service | GET /api/v1/events/{id}: nN=359 nA=361 med_N=5.983 ms IQR_N=3.965 ms max_A=21.9 ms z=4.0
+    mẫu max A: ?

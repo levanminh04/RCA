@@ -1,0 +1,301 @@
+{
+ "phien_ban": "khoa-1 (nháp-6)",
+ "trang_thai": "KHÓA trước khi phát E2, chưa xem dữ liệu E2. sha256 ghi ở tasks/T-071-w4a-nen/LOG.md (lượt 8). Sửa sau khi xem dữ liệu phải ghi là sửa sau và giữ kết quả theo bản này (mục sua_sau).",
+ "soan": {
+  "utc": "2026-11-20",
+  "boi": "T-071 phiên nen-w4 (Claude)",
+  "can_cu": [
+   "tasks/T-070-dieu-phoi-giai-doan-2/HOP-DONG.md#I2",
+   "tasks/T-071-w4a-nen/SPEC.md",
+   "results/T-067/tai-1-gio.md (tiêu chí khỏe 1 giờ ×1 đã dùng ở T-067)",
+   "results/T-069/thu/t069-chinh/tai-out/t3-124242f0/ (cấu hình flash khỏe)"
+  ]
+ },
+ "khoang": "E2 (khoảng nền 1: chọn ngưỡng)",
+ "dieu_kien_he_thong": {
+  "ban_flashticket": "36a3725 (image arm64-t067-36a3725d), compose t067-compose/hieu-luc",
+  "repo_lab": "exp-obs /opt/rca-lab = e9a0857 (e9a08574…, thêm load/controller/chuoi_tai.py bản 3 trên 407b4f5; tai_linux.py không đổi); exp-app /opt/rca-lab = 407b4f5",
+  "moc_db": "results/T-071/e1/moc-db.json (20261120T130107Z); không khôi phục, không sửa DB tới hết E5 (I13)",
+  "quota_cpu_booking": "1.0 vẫn bật (STATE); giữ nguyên suốt E2 và E4",
+  "su_kien_tai": {
+   "event_id": "3e7c1df9-ada4-4081-94a1-548b80a5da86",
+   "ticket_type_id": "ffb36fc7-e30a-4efe-987f-ca5533520453",
+   "han_ban_utc": "2026-12-02T22:16:31Z",
+   "suc_chua": "results/T-071/e1/suc-chua.json (đủ)"
+  },
+  "tai_chuan": "load/profiles/purchase-journey.json @407b4f5: constant-arrival-rate 12/10 s, mix 70/20/5/5, maxVUs 20, pollTimeout 60 s, gracefulStop 90 s",
+  "tiem_loi": "không; kiểm inj3.py verify sạch trước lượt đầu và sau lượt cuối"
+ },
+ "phuong_an_tai": {
+  "quyet": "A — Minh duyệt 20/11/2026 13:25Z ('Duyệt theo đề xuất', LOG T-070 lượt 3, R7): A + bộ chuỗi trên server chuoi_tai.py; duyệt lượt dài E2 và E4, mỗi khoảng ngân sách cố định 8 lượt (6 ×1 3600 s + 2 flash 1800 s bậc 600 s)",
+  "bo_chuoi": "load/controller/chuoi_tai.py bản 3 (sha256 5ceb3ea1…), commit e9a0857 nhánh t071-nen (Minh duyệt commit 14:49Z)",
+  "lenh_phat": "cd /opt/rca-lab && setsid nohup python3 load/controller/chuoi_tai.py --ke-hoach /srv/rca-lab/runs/t071-e2/khai-truoc-e2.json --sha256 <sha256 bản khóa này, ở LOG T-071 lượt 8> --kho /srv/rca-lab/runs/t071-e2 > /srv/rca-lab/runs/t071-e2.out 2>&1 < /dev/null &",
+  "theo_doi": "cat /srv/rca-lab/runs/t071-e2/trang-thai.json; tail /srv/rca-lab/runs/t071-e2/chuoi.jsonl",
+  "dung_giua_chung": "touch /srv/rca-lab/runs/t071-e2/DUNG (không phát lượt kế; lượt đang chạy chạy hết rồi receive). Dừng khẩn một lượt: tai_linux.py stop --tag <tag> (không bao giờ thiếu --tag, I8)",
+  "chay_kho": "Chạy khô 20/11 (13:34Z, 14:00Z, 14:23Z): `tai_linux.py get` của 8 tag đều lỗi — CHƯA XÁC MINH là tag chưa dùng (tai_linux giấu stderr nên không phân biệt 'không có container' với lỗi SSH); đối chứng get tag cũ trả ok và máy tải không có /srv/rca-lab/load-runs/t071-*. Khi phát, chốt chống tái dùng tag là `test ! -e /srv/rca-lab/load-runs/<tag>` trong tai_linux.py start."
+ },
+ "luot": [
+  {
+   "thu_tu": 1,
+   "tag": "t071-e2-01-x1",
+   "muc": "x1",
+   "seconds": 3600,
+   "buoc_tai": 0,
+   "multiplier": 1,
+   "lenh_A": "tai_linux.py start --tag t071-e2-01-x1 --seconds 3600"
+  },
+  {
+   "thu_tu": 2,
+   "tag": "t071-e2-02-x1",
+   "muc": "x1",
+   "seconds": 3600,
+   "buoc_tai": 0,
+   "multiplier": 1,
+   "lenh_A": "tai_linux.py start --tag t071-e2-02-x1 --seconds 3600"
+  },
+  {
+   "thu_tu": 3,
+   "tag": "t071-e2-03-x1",
+   "muc": "x1",
+   "seconds": 3600,
+   "buoc_tai": 0,
+   "multiplier": 1,
+   "lenh_A": "tai_linux.py start --tag t071-e2-03-x1 --seconds 3600"
+  },
+  {
+   "thu_tu": 4,
+   "tag": "t071-e2-04-fl",
+   "muc": "flash",
+   "seconds": 1800,
+   "buoc_tai": 600,
+   "multiplier": 3,
+   "lenh_A": "tai_linux.py start --tag t071-e2-04-fl --seconds 1800 --buoc-tai 600 --multiplier 3"
+  },
+  {
+   "thu_tu": 5,
+   "tag": "t071-e2-05-x1",
+   "muc": "x1",
+   "seconds": 3600,
+   "buoc_tai": 0,
+   "multiplier": 1,
+   "lenh_A": "tai_linux.py start --tag t071-e2-05-x1 --seconds 3600"
+  },
+  {
+   "thu_tu": 6,
+   "tag": "t071-e2-06-x1",
+   "muc": "x1",
+   "seconds": 3600,
+   "buoc_tai": 0,
+   "multiplier": 1,
+   "lenh_A": "tai_linux.py start --tag t071-e2-06-x1 --seconds 3600"
+  },
+  {
+   "thu_tu": 7,
+   "tag": "t071-e2-07-fl",
+   "muc": "flash",
+   "seconds": 1800,
+   "buoc_tai": 600,
+   "multiplier": 3,
+   "lenh_A": "tai_linux.py start --tag t071-e2-07-fl --seconds 1800 --buoc-tai 600 --multiplier 3"
+  },
+  {
+   "thu_tu": 8,
+   "tag": "t071-e2-08-x1",
+   "muc": "x1",
+   "seconds": 3600,
+   "buoc_tai": 0,
+   "multiplier": 1,
+   "lenh_A": "tai_linux.py start --tag t071-e2-08-x1 --seconds 3600"
+  }
+ ],
+ "ly_do_thu_tu": "Mở bằng 3 lượt ×1 để có nền trước flash; hai flash cách nhau 2 lượt ×1; kết bằng lượt ×1 để thấy hồi phục sau flash. Thứ tự cố định, không đổi theo kết quả. Không có lý do khoa học buộc thứ tự khác; nếu điều phối muốn đặt E4 cùng thứ tự để so độ trôi, dùng cùng danh sách.",
+ "tong_danh_nghia": {
+  "x1_phut": 380,
+  "x1_cach_tinh": "6 lượt × 60 + 2 lượt flash × 10 phút đầu (×1 trước bậc)",
+  "x3_phut": 40,
+  "x3_cach_tinh": "2 lượt flash × 20 phút sau bậc 600 s",
+  "tai_phut": 420,
+  "chuyen_luot": "đo ở lượt đầu, chỉ mô tả, không đổi phân loại"
+ },
+ "ngan_sach": {
+  "co_dinh": "8 lượt (Minh duyệt R7 13:25Z)",
+  "luot_bu": "không có lượt bù trong E2 (đề xuất bù không được duyệt; chuoi_tai.py không có cơ chế bù)",
+  "khong_bu_khi": "lỗi nguồn chung (sai biểu thức, mất telemetry kéo dài, Prometheus khởi động lại dài, sai tiêu chí): dừng, giữ phần hỏng, ghi loại, điều phối trình Minh"
+ },
+ "phut_khoe_can": {
+  "x1": 360,
+  "quy_tac": "Dưới 360 phút ×1 khỏe sau loại trừ thì báo đúng câu 'chưa đủ sáu giờ khỏe ×1' (I2); vẫn giao dữ liệu cho T-072, không tự kéo dài ngoài ngân sách.",
+  "x3": "không đặt; flash chỉ mô tả",
+  "nguong_chap_nhan_R5": "≤ 1 sự cố / 6 giờ khỏe ×1 (Minh duyệt R5 13:25Z; T-072 dùng). T-071 chỉ cung cấp mẫu số: số phút khoe_x1 theo phân loại ở đây"
+ },
+ "don_vi_phan_loai": "phút lịch UTC [hh:mm:00, hh:mm+1:00). Mỗi phút đúng một nhãn, theo thứ tự ưu tiên dưới (nhãn đầu tiên khớp thắng).",
+ "phan_loai_phut": [
+  {
+   "nhan": "mat_quan_sat",
+   "khi": [
+    "`up` = 0 hoặc thiếu mẫu (so với nhịp scrape) của một trong ba đích Prometheus hiện có: job `prometheus`, `central-collector`, `otelcol-contrib` (Collector agent exp-app) — truy vấn `up` 20/11 15:00:47Z trả đúng 3 đích này; không có đích `up` riêng cho từng dịch vụ FlashTicket",
+    "Prometheus khởi động lại trong phút (đổi `process_start_time_seconds{job=\"prometheus\"}`) hoặc truy vấn khúc chứa phút báo lỗi sau 3 lần thử",
+    "Collector agent hoặc gateway: `otelcol_process_uptime_total` reset, hoặc tăng của `otelcol_exporter_send_failed_*`/`enqueue_failed_*`/`receiver_refused_*` > 0 trong phút",
+    "k6 không ghi điểm nào trong phút đang có lượt (raw.json) hoặc mất phần raw.json"
+   ],
+   "ghi_chu": "Lỗi hạ tầng quan sát; không tính là khỏe hay suy giảm (SPEC Kiểm đúng đắn).",
+   "khong_dung": "Bỏ 'chuỗi luật thiếu mẫu trong phút' khỏi điều kiện (nháp-1..4 có): chuỗi luật là đại lượng được chấm; thiếu mẫu chuỗi luật chỉ ghi kèm (nguyen_tac_doc_lap)."
+  },
+  {
+   "nhan": "bien",
+   "khi": [
+    "phút nằm giữa FinishedAt của lượt trước và StartedAt của lượt sau (không có tải)",
+    "phút UTC giao StartedAt, FinishedAt (state.json của container) hoặc mốc bậc StartedAt + 600 s (lượt flash)",
+    "2 phút đầu mỗi lượt: phút UTC giao [StartedAt, StartedAt + 120 s) (khởi động k6, cấp token, ramp)",
+    "pha gracefulStop: phút UTC giao (StartedAt + seconds, FinishedAt]"
+   ],
+   "ghi_chu": "I2: biên giữa hai lượt loại khỏi mẫu số.",
+   "quan_sat_xuat_thu": "Xuất thử t067-tai-1gio-001: p95/tỷ lệ lỗi payment, ticket có điểm đầu 07:59:50Z (2 phút 16 giây sau StartedAt, do chặn ≥ 30 request/5 phút); phút 07:59 chứa mốc StartedAt+120 s nên là biên, phút 08:00 có đủ 6 điểm.",
+   "co_lan_cua_so": "Phút không phải biên mà tại ít nhất một bước 10 s t của phút, cửa sổ nhìn lùi 300 s của luật ([t − 300 s, t], bieu-thuc.json tham_so_co_dinh.cua_so_rate = 5m) giao một phút thuộc lớp khác (bien, flash, quota, suy_giam, mat_quan_sat, ngoài lượt): GIỮ nhãn của phút và GIỮ trong phép tính chính, gắn cờ `lan_cua_so`; báo thêm độ nhạy khi bỏ các phút/bước có cờ — đúng results/T-072/quy-tac-gom.json và quy-tac-chon-nguong.json (M_r tính cả bước cửa sổ lấn, báo thêm M_r khi bỏ). Lượt flash: phút chứa bậc 600 s là biên; phút ×3 sau đó là flash; phút ×1 trước bậc dùng cùng cờ."
+  },
+  {
+   "nhan": "quota",
+   "khi": [
+    "booking-service (`service_name=\"booking-service\"`): tăng trong phút của `container_cpu_throttling_data_throttled_periods_total` chia tăng của `container_cpu_throttling_data_periods_total` > 0,2",
+    "và phút đó không vi phạm K1–K5, B2 (nếu vi phạm thì nhãn suy_giam)"
+   ],
+   "trang_thai_duyet": "chốt 0,2 (Minh 'duyệt theo codex', CX-04, 20/11). Ngưỡng chưa kiểm trên phân bố throttling cũ; chốt trước, không đổi theo dữ liệu E2"
+  },
+  {
+   "nhan": "flash",
+   "khi": [
+    "phút thuộc lượt flash sau mốc bậc 600 s (×3), trừ phút đã là mất quan sát/biên"
+   ],
+   "ghi_chu": "Chỉ mô tả (I2). 10 phút ×1 đầu lượt flash (trừ biên) xét như lượt ×1."
+  },
+  {
+   "nhan": "suy_giam",
+   "khi": [
+    "phút có tải ×1 vi phạm ít nhất một tiêu chí K1–K5 hoặc B2 (không gồm L1, B1), không thuộc mat_quan_sat/bien"
+   ],
+   "ghi_chu": "Suy giảm thật của hệ thống dưới tải nền; giữ lại, ghi riêng, không xóa khỏi dữ liệu."
+  },
+  {
+   "nhan": "khoe_x1",
+   "khi": [
+    "phút có tải ×1, đạt mọi tiêu chí K1–K5 và B2, không thuộc mat_quan_sat/bien/quota/flash (L1, chuỗi luật, cờ lan_cua_so, thieu_b2 chỉ ghi kèm)"
+   ]
+  }
+ ],
+ "tieu_chi_khoe_moi_phut": {
+  "nguon_k6": "raw.json của lượt (điểm theo thời gian), nhận bằng tai_linux.py receive, kiểm hash",
+  "tieu_chi": [
+   {
+    "ma": "K1",
+    "mo_ta": "không có điểm journey_failed trong phút",
+    "can_cu": "T-067 bước 8: journey_failed ≤ 0,5% cả lượt; ở mức phút đặt 0 vì 1 phút ×1 chỉ ~72 hành trình"
+   },
+   {
+    "ma": "K2",
+    "mo_ta": "không có điểm dropped_iterations trong phút",
+    "can_cu": "T-067: 0"
+   },
+   {
+    "ma": "K3",
+    "mo_ta": "không có http_reqs status 429 trong phút",
+    "can_cu": "I2"
+   },
+   {
+    "ma": "K4",
+    "mo_ta": "không có http_req_failed = 1 trong phút (expected_response false)",
+    "can_cu": "I2 'lỗi HTTP'; T-067 0/19.824",
+    "ghi_chu_doc_lap": "Đo phía client k6 (http_req_failed trong raw.json), không dùng chuỗi Prometheus của luật. Cùng sự kiện (5xx ở gateway) có thể vừa làm K4 vi phạm vừa làm luật lỗi 5xx phát: khi đó phút là suy giảm thật người dùng thấy, cảnh báo là dương thật, không phải báo động giả; vẫn giữ phút và cảnh báo trong phan-loai-phut.json (giu_phut_bi_loai). Không dùng p95 k6 làm tiêu chí (trùng nghĩa luật p95)."
+   },
+   {
+    "ma": "K5",
+    "mo_ta": "journey_started trong phút ≥ 65 ở ×1 (90% của 72 = 12/10 s × 60); ở pha ×3 ≥ 195 (90% của 216). Áp cho phút không phải biên.",
+    "can_cu": "constant-arrival-rate; 90% chốt (Minh 'duyệt theo codex', CX-04). Kiểm một phần trên t3-124242f0: 0 phút < 65 ở ×1"
+   },
+   {
+    "ma": "B1",
+    "mo_ta": "Hạ tầng quan sát: `up` = 1 của ba đích `prometheus`, `central-collector`, `otelcol-contrib` suốt phút. Vi phạm → mat_quan_sat (không phải suy_giam). Không có `up` theo từng dịch vụ FlashTicket.",
+    "can_cu": "I2 'cộng kiểm backend'",
+    "ghi_chu_doc_lap": "`up` là kết quả scrape Prometheus của job dịch vụ, không phải chuỗi luật (luật mat-gw dùng timestamp của histogram gateway nhận qua OTLP, đường khác).",
+    "vai_tro": "tiêu chí hạ tầng (mat_quan_sat), không phải bằng chứng backend"
+   },
+   {
+    "ma": "B2",
+    "mo_ta": "Bằng chứng backend độc lập: không container FlashTicket nào trên exp-app restart/OOM trong phút (`container_restarts_total` theo `container_name` không tăng). Thiếu mẫu B2 trong phút → gắn cờ `thieu_b2`, KHÔNG tự loại phút.",
+    "can_cu": "T-067 bước 8"
+   },
+   {
+    "ma": "L1",
+    "mo_ta": "Ghi kèm mỗi phút: trạng thái liveness ba mức theo results/T-072/bieu-thuc.json#/liveness_ba_trang_thai (tin-hieu/live-3-trang-thai, 8 đích): số bước 0 (dò tốt) / 1 (dò lỗi) / 2 (thiếu lần dò) từng đích. Không dùng để xếp khoe_x1, mat_quan_sat hay suy_giam.",
+    "can_cu": "I2; nguồn dò là receiver httpcheck của Collector agent exp-app (httpcheck_status, httpcheck_error; 8 đích, nhịp 10 s) — T-072 chọn; xuất thử t071-xuat-thu-001: httpcheck_status có mã 8 bộ nhãn, 361 mẫu/bộ trong 60 phút; httpcheck_error 0 chuỗi trong cửa sổ đó",
+    "dinh_chinh": "Bản nháp-1..3 ghi 'Prometheus hiện không có chuỗi probe/liveness riêng' — SAI: lần tìm 20/11 12:5xZ chỉ dò regex tên chuỗi theo 12 mẫu (throttl, cpu, k6, http_server_request, up$, probe, liveness, health, restart, container_, process_uptime, scrape) trên /api/v1/label/__name__/values, không gồm 'httpcheck'. Đính chính 20/11 (điều phối T-070 phát hiện).",
+    "vai_tro": "CHỈ GHI KÈM — không loại phút, không đổi nhãn (nháp-5)"
+   }
+  ],
+  "khong_dung_lam_tieu_chi": "p95 route, tỷ lệ/số 5xx theo route ở gateway (http_server_request_duration_seconds_*), mọi kết quả httpcheck (httpcheck_error/status, liveness L1) — đây là tín hiệu của luật cảnh báo W4; dùng chúng để định nghĩa 'khỏe' thì mẫu số phụ thuộc chính đại lượng được chấm (báo động giả tự loại khỏi phép chấm).",
+  "co_ghi_kem": [
+   "lan_cua_so",
+   "thieu_b2",
+   "L1 (liveness ba trạng thái)",
+   "số điểm/phút chuỗi luật"
+  ]
+ },
+ "kiem_moi_luot": [
+  "hash hai đầu khớp khi receive (tai_linux.py receive)",
+  "summary.json: journey_finished/started, dropped_iterations, 429, http_req_failed",
+  "state.json: ExitCode, OOMKilled",
+  "Prometheus sống và số mẫu/phút của chuỗi luật (xuat_chuoi.py, khúc ≤ 10 phút, nghỉ 0,3 s, ở khoảng chuyển lượt) — phát hiện sớm mất telemetry (I11)",
+  "inj3.py verify sạch"
+ ],
+ "sua_sau": "Nếu sửa tiêu chí sau khi đã xem dữ liệu E2: ghi là sửa sau, giữ kết quả theo bản khóa đầu tiên (SPEC T-071 'Sửa tiêu chí sau khi xem dữ liệu').",
+ "xuat_chuoi": {
+  "script": "results/T-071/xuat_chuoi.py",
+  "bieu_thuc": "results/T-072/bieu-thuc.json (T072-bieu-thuc-1)",
+  "cach": "query_range bat_buoc step 10 s + mẫu thô khuyen_nghi_tho, khúc 600 s, nghỉ 0,3 s, khoảng mỗi lượt từ load-start − 600 s tới hết lượt + 300 s",
+  "thu": "results/T-071/xuat-thu/ (lượt t071-xuat-thu-001)"
+ },
+ "nguyen_tac_doc_lap": {
+  "quy_tac": "Phút được xếp (khoe_x1 / bien / quota / flash / suy_giam / mat_quan_sat) CHỈ bằng bằng chứng độc lập với tín hiệu luật cảnh báo W4: hành trình k6 (K1–K5), backend (B1–B2), quota CPU (throttling), cấu trúc thời gian lượt (biên), hạ tầng quan sát không phải chuỗi luật (Prometheus khởi động lại, Collector, k6 thiếu điểm). Mọi chuỗi luật W4 dùng và kết quả đầu dò liveness (L1) KHÔNG được loại phút khỏi mẫu số; chỉ ghi kèm từng phút.",
+  "chuoi_luat_w4": [
+   "http_server_request_duration_seconds_bucket",
+   "http_server_request_duration_seconds_count",
+   "httpcheck_error",
+   "httpcheck_status"
+  ],
+  "can_cu_chuoi_luat": "results/T-072/bieu-thuc.json (T072-bieu-thuc-1, sha256 1a4aee67…): tên chuỗi trong promql của 11 luật, đếm 20/11 ~15:0xZ bằng regex trên #/luat/*/promql: chỉ 4 tên trên; 0 luật dùng up, container_*, otelcol_*, process_start, throttling, restarts. Nếu T-072 đổi bieu-thuc.json thì phải rà lại danh sách này trước khi khóa.",
+  "giu_phut_bi_loai": "Mọi phút bị xếp khác khoe_x1 vẫn nằm trong phan-loai-phut.json kèm: nhãn, mã tiêu chí gây ra, giá trị đo, và danh sách cảnh báo (mã luật, t_hat) của chấm offline T-072 có khoảng firing giao với phút đó. Báo cáo E2/E4 ghi số cảnh báo theo từng nhãn phút, không chỉ trên khoe_x1.",
+  "ghi_kem_moi_phut": [
+   "L1: số bước 10 s ở trạng thái 0/1/2 của tin-hieu/live-3-trang-thai từng đích",
+   "số điểm/phút của từng chuỗi tin-hieu/* (thiếu mẫu chuỗi luật)",
+   "p95 và tỷ lệ 5xx gateway của phút (phu/*) — chỉ để đọc, không phân loại"
+  ]
+ },
+ "dinh_chinh": [
+  {
+   "ban": "nhap-5",
+   "ngay": "2026-11-20",
+   "nguon": "Codex nêu rủi ro (LOG T-070 lượt 4), Minh duyệt xử lý 14:49Z",
+   "sua": [
+    "L1 (liveness) từ tiêu chí loại phút (dò lỗi → suy_giam, thiếu lần dò → mat_quan_sat) thành chỉ ghi kèm",
+    "bỏ điều kiện mat_quan_sat 'chuỗi luật thiếu mẫu trong phút'",
+    "rà K1–K5, B1–B2, quota, biên, các điều kiện mat_quan_sat còn lại: không dùng chuỗi nào trong chuoi_luat_w4; K4 trùng sự kiện (không trùng chuỗi) với luật 5xx — giữ, ghi rõ cách đọc",
+    "thêm nguyen_tac_doc_lap.giu_phut_bi_loai: phút bị loại và cảnh báo phát sinh trong đó đều giữ và báo"
+   ],
+   "ly_do": "W4 cảnh báo trên chính đầu dò liveness và chuỗi gateway; nếu các tín hiệu đó cũng loại phút khỏi mẫu số khỏe thì mọi báo động giả do tín hiệu đó gây ra sẽ tự rơi khỏi phép chấm báo động giả (đánh giá vòng tròn)."
+  },
+  {
+   "ban": "nhap-6 = khoa-1",
+   "ngay": "2026-11-20",
+   "nguon": "Codex CX-04 (results/T-070/codex/CX-04.jsonl), Minh 'duyệt theo codex'; điều phối T-070 giao ~15:00Z",
+   "sua": [
+    "chốt mọi mục chờ: K5 ≥ 65/phút ×1 (195 ở ×3); quota > 0,2; biên theo mốc StartedAt/FinishedAt/bậc 600 s + 2 phút đầu + gracefulStop; cửa sổ nhìn lùi 300 s lấn lớp khác → giữ trong tính chính, cờ lan_cua_so, báo độ nhạy (đúng quy tắc T-072); chuyen_luot chỉ mô tả",
+    "B1: bỏ yêu cầu `up` từng job FlashTicket (không tồn tại); dùng `up` của 3 đích hạ tầng thật (prometheus, central-collector, otelcol-contrib — điều phối ghi 'local-collector', tên job thật là otelcol-contrib, kiểm 15:00:47Z); B1 → mat_quan_sat; backend = B2; thiếu B2 → cờ thieu_b2",
+    "repo_lab: exp-obs e9a0857, exp-app 407b4f5; lỗi get ở chạy khô ghi là chưa xác minh",
+    "bỏ con_cho; không còn mục chờ làm đổi phân loại"
+   ]
+  }
+ ],
+ "khong_anh_huong_phan_loai": [
+  "Mốc DB không gồm MongoDB/Redis (chỉ PostgreSQL); Minh (c): chỉ cho W4/W5",
+  "Lượt bù: không có"
+ ]
+}

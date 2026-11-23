@@ -1,0 +1,127 @@
+{
+ "khuon": "T075-ra-2",
+ "trang_thai": "GIAI_THICH",
+ "xep_hang_nhac_lai": [
+  [
+   "booking-service"
+  ],
+  [
+   "api-gateway"
+  ]
+ ],
+ "khang_dinh": [
+  {
+   "id": "k1",
+   "loai": "quan_sat",
+   "cau": "Lõi RCA kết luận CAUSE_FOUND và xếp booking-service hạng 1.",
+   "trich_dan": [
+    {
+     "con_tro": "/ket_qua_rca/ket_luan",
+     "gia_tri": "CAUSE_FOUND"
+    },
+    {
+     "con_tro": "/ket_qua_rca/xep_hang/0"
+    }
+   ]
+  },
+  {
+   "id": "k2",
+   "loai": "quan_sat",
+   "cau": "booking-service có kênh workload giảm.",
+   "trich_dan": [
+    {
+     "con_tro": "/bang_chung/3"
+    }
+   ]
+  },
+  {
+   "id": "k3",
+   "loai": "suy_luan",
+   "cau": "Bất thường log_loi và error ở api-gateway được lõi giải thích là lan ngược từ các thao tác SQL của booking-service.",
+   "trich_dan": [
+    {
+     "con_tro": "/ke_thua/0"
+    },
+    {
+     "con_tro": "/ke_thua/2"
+    }
+   ]
+  },
+  {
+   "id": "k4",
+   "loai": "quan_sat",
+   "cau": "api-gateway hạng 2 có kênh workload giảm với điểm s 17,25 và F_I = 1.",
+   "trich_dan": [
+    {
+     "con_tro": "/bang_chung/2"
+    },
+    {
+     "con_tro": "/ket_qua_rca/xep_hang/1"
+    }
+   ]
+  },
+  {
+   "id": "k5",
+   "loai": "quan_sat",
+   "cau": "Kênh workload của booking-service cũng giảm, nhưng lõi coi đó là lan xuôi từ api-gateway nên kênh này không tạo hạng.",
+   "trich_dan": [
+    {
+     "con_tro": "/bang_chung/5"
+    },
+    {
+     "con_tro": "/ke_thua/4"
+    }
+   ]
+  }
+ ],
+ "goi_y_xu_ly": [
+  {
+   "id": "g1",
+   "loai": "kiem_tra",
+   "cau": "Mở trace của hai thao tác SELECT booking_db và SELECT booking_schema.tbl_orders ở booking-service quanh t̂ để xem vì sao chúng bất thường.",
+   "can_cu": [
+    {
+     "con_tro": "/thao_tac_co_co/0"
+    },
+    {
+     "con_tro": "/thao_tac_co_co/1"
+    }
+   ]
+  },
+  {
+   "id": "g2",
+   "loai": "kiem_tra",
+   "cau": "Kiểm tra payment-service vì sáu nguồn metric cơ sở của nó thiếu phủ cửa sổ.",
+   "can_cu": [
+    {
+     "con_tro": "/do_phu/thieu_bat_buoc"
+    }
+   ]
+  }
+ ],
+ "thieu_bang_chung": [
+  {
+   "cau": "Sáu nguồn metric cơ sở của payment-service thiếu phủ cửa sổ, nên nhận định về payment-service yếu hơn các thực thể khác.",
+   "trich_dan": [
+    {
+     "con_tro": "/do_phu/du_cua_so",
+     "gia_tri": false
+    },
+    {
+     "con_tro": "/do_phu/thieu_bat_buoc"
+    },
+    {
+     "con_tro": "/do_phu/pham_vi"
+    }
+   ]
+  },
+  {
+   "cau": "Nửa nền trước t̂ có thể đã chứa phần đầu sự cố khi cảnh báo đến trễ.",
+   "trich_dan": [
+    {
+     "con_tro": "/gioi_han/1"
+    }
+   ]
+  }
+ ]
+}

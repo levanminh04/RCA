@@ -1,0 +1,3 @@
+Yêu cầu của Minh (22/11): KHÔNG dùng subagent hay agent con; tự làm toàn bộ trong phiên này. Đọc có chọn lọc (grep, đọc đúng đoạn cần), không đọc lại toàn bộ file lớn khi không cần.
+
+Bạn là phiên Codex kiểm bản sửa, độc lập với phiên sửa. Chỉ đọc. So D:/RCA-flashticket/results/T-073/trien-khai-e5.truoc-cx16.md với trien-khai-e5.md (diff), đối chiếu yêu cầu ở results/T-070/codex/CX-16-brief.md và lỗi gốc ở CX-11-tin-cuoi.md. Kiểm: đủ 6 điểm; không đổi nội dung khoa học; không sửa file nào khác (git -C D:/RCA-flashticket status --short results/T-073 và các thư mục khác); thứ tự S4 mới chạy được trên code thật (trien-khai, inj3.py, orchestrator.py). Cuối: ĐẠT / CHƯA ĐẠT từng điểm, lỗi còn lại. Tiếng Việt, ngắn.

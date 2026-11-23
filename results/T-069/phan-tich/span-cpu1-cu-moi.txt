@@ -1,0 +1,77 @@
+######## CŨ 19b17e22 ticket-service
+SELECT ticket_db | SELECT count(*) FROM ticket_schema.tbl_ticket_deliveries d JOIN ticket_schema.tbl_issuances i ON i.id=d.issuance_id JOIN ticket_schema.tbl_e
+    N: n= 7842 p50=   0.30 p90=   0.49 max=    55.8
+    A: n= 7802 p50=   0.31 p90=   0.95 max=    56.7
+SELECT ticket_db | SELECT d.id,d.recipient_email,d.attempts,i.order_id FROM ticket_schema.tbl_ticket_deliveries d JOIN ticket_schema.tbl_issuances i ON i.id=d.
+    N: n= 4000 p50=   2.66 p90=   3.37 max=    37.2
+    A: n= 3946 p50=   2.87 p90=   5.11 max=    46.3
+SELECT ticket_db | SELECT t.id,t.display_snapshot,t.state,t.qr_token_ciphertext,t.qr_key_version FROM ticket_schema.tbl_tickets t JOIN ticket_schema.tbl_ticket
+    N: n= 3921 p50=   0.22 p90=   0.37 max=     4.3
+    A: n= 3901 p50=   0.26 p90=   0.61 max=    71.3
+SELECT ticket_db | SELECT i.expected_ticket_count FROM ticket_schema.tbl_issuances i JOIN ticket_schema.tbl_ticket_deliveries d ON d.issuance_id=i.id WHERE d.i
+    N: n= 3921 p50=   0.18 p90=   0.31 max=     4.7
+    A: n= 3901 p50=   0.22 p90=   0.47 max=    23.4
+SELECT ticket_db | SELECT pg_advisory_xact_lock(hashtextextended(?,?))
+    N: n=   72 p50=   0.41 p90=   0.83 max=     4.8
+    A: n=   72 p50=   0.54 p90=   1.32 max=     3.7
+TỔNG SELECT ticket_db: N n=19756 p50=   0.29 p90=   2.66 max=    55.8 | A n=19622 p50=   0.30 p90=   2.92 max=    71.3
+######## MỚI 03573b63 ticket-service
+SELECT ticket_db | SELECT count(*) FROM ticket_schema.tbl_ticket_deliveries d JOIN ticket_schema.tbl_issuances i ON i.id=d.issuance_id JOIN ticket_schema.tbl_e
+    N: n= 7108 p50=   0.30 p90=   0.43 max=     6.6
+    A: n= 6230 p50=   0.30 p90=   0.88 max=   257.5
+SELECT ticket_db | SELECT d.id,d.recipient_email,d.attempts,i.order_id FROM ticket_schema.tbl_ticket_deliveries d JOIN ticket_schema.tbl_issuances i ON i.id=d.
+    N: n= 3555 p50=  19.17 p90=  23.79 max=   180.9
+    A: n= 3115 p50=  21.34 p90=  44.31 max=   252.5
+SELECT ticket_db | SELECT t.id,t.display_snapshot,t.state,t.qr_token_ciphertext,t.qr_key_version FROM ticket_schema.tbl_tickets t JOIN ticket_schema.tbl_ticket
+    N: n= 3554 p50=   0.23 p90=   0.34 max=    13.4
+    A: n= 3115 p50=   0.26 p90=   0.66 max=    13.3
+SELECT ticket_db | SELECT i.expected_ticket_count FROM ticket_schema.tbl_issuances i JOIN ticket_schema.tbl_ticket_deliveries d ON d.issuance_id=i.id WHERE d.i
+    N: n= 3554 p50=   0.19 p90=   0.29 max=     4.0
+    A: n= 3115 p50=   0.22 p90=   0.45 max=   103.1
+SELECT ticket_db | SELECT pg_advisory_xact_lock(hashtextextended(?,?))
+    N: n=   72 p50=   0.34 p90=   0.93 max=     5.1
+    A: n=   72 p50=   0.68 p90=   2.11 max=    19.4
+TỔNG SELECT ticket_db: N n=17843 p50=   0.28 p90=  19.16 max=   180.9 | A n=15647 p50=   0.30 p90=  21.34 max=   257.5
+######## CŨ 19b17e22 keycloak
+SELECT keycloak_db.OUTBOX_ENTRY | select oee1_0.ID,oee1_0.ATTEMPTS,oee1_0.CONTAINER_ID,oee1_0.CORRELATION_ID,oee1_0.CREATED_AT,oee1_0.DELIVERED_AT,oee1_0.ENTRY_KIND,oee1_0.EN
+    N: n=  300 p50=   0.33 p90=   0.70 max=     3.8
+    A: n=  300 p50=   0.35 p90=   1.48 max=    10.0
+TỔNG SELECT keycloak_db.OUTBOX_ENTRY: N n=  300 p50=   0.33 p90=   0.70 max=     3.8 | A n=  300 p50=   0.35 p90=   1.48 max=    10.0
+######## MỚI 03573b63 keycloak
+SELECT keycloak_db.OUTBOX_ENTRY | select oee1_0.ID,oee1_0.ATTEMPTS,oee1_0.CONTAINER_ID,oee1_0.CORRELATION_ID,oee1_0.CREATED_AT,oee1_0.DELIVERED_AT,oee1_0.ENTRY_KIND,oee1_0.EN
+    N: n=  300 p50=   0.33 p90=   1.04 max=     5.0
+    A: n=  300 p50=   0.38 p90=   2.01 max=    80.6
+TỔNG SELECT keycloak_db.OUTBOX_ENTRY: N n=  300 p50=   0.33 p90=   1.04 max=     5.0 | A n=  300 p50=   0.38 p90=   2.01 max=    80.6
+######## CŨ 19b17e22 booking-service
+SELECT booking_db | select clock_timestamp()
+    N: n=  780 p50=   0.23 p90=   0.87 max=     4.6
+    A: n=  776 p50=   0.42 p90=   2.11 max=    69.4
+SELECT booking_db | select set_config(?, ?, true)
+    N: n=  504 p50=   0.37 p90=   1.14 max=    18.3
+    A: n=  500 p50=   0.76 p90=   2.44 max=    21.4
+SELECT booking_schema.tbl_ticket_type_inventory | select tti1_0.ticket_type_id,tti1_0.configured_capacity,tti1_0.event_id,tti1_0.held,tti1_0.purchased,tti1_0.row_version,tti1_0.source_config
+    N: n=  410 p50=   0.24 p90=   0.85 max=    18.7
+    A: n=  401 p50=   0.48 p90=   1.75 max=   262.6
+SELECT booking_db | select o1_0.id from booking_schema.tbl_orders o1_0 join booking_schema.tbl_reservations r1_0 on r1_0.order_id=o1_0.id join booking_schema.tb
+    N: n=   60 p50=   5.69 p90=   9.59 max=    28.6
+    A: n=   60 p50=   6.82 p90=  13.91 max=    22.9
+TỔNG SELECT booking_db: N n= 1344 p50=   0.32 p90=   1.26 max=    28.6 | A n= 1336 p50=   0.64 p90=   3.02 max=    69.4
+TỔNG SELECT booking_schema.tbl_ticket_type_inventory: N n=  410 p50=   0.24 p90=   0.85 max=    18.7 | A n=  401 p50=   0.48 p90=   1.75 max=   262.6
+######## MỚI 03573b63 booking-service
+SELECT booking_db | select clock_timestamp()
+    N: n=  779 p50=   0.26 p90=   1.04 max=     6.9
+    A: n=  775 p50=   0.55 p90=   2.00 max=    58.7
+SELECT booking_db | select set_config(?, ?, true)
+    N: n=  504 p50=   0.38 p90=   1.37 max=     6.0
+    A: n=  499 p50=   0.87 p90=   2.86 max=    99.5
+SELECT booking_schema.tbl_ticket_type_inventory | select tti1_0.ticket_type_id,tti1_0.configured_capacity,tti1_0.event_id,tti1_0.held,tti1_0.purchased,tti1_0.row_version,tti1_0.source_config
+    N: n=  401 p50=   0.29 p90=   0.97 max=     3.8
+    A: n=  395 p50=   0.47 p90=   2.22 max=    15.2
+SELECT booking_db | select distinct o1_0.id,o1_0.accepted_at,o1_0.accepted_charge_id,o1_0.buyer_subject,o1_0.created_at,o1_0.currency,o1_0.customer_email,o1_0.d
+    N: n=  202 p50=   0.57 p90=   1.84 max=     4.5
+    A: n=  206 p50=   0.89 p90=   3.49 max=    18.7
+SELECT booking_db | select o1_0.id from booking_schema.tbl_orders o1_0 join booking_schema.tbl_reservations r1_0 on r1_0.order_id=o1_0.id join booking_schema.tb
+    N: n=   59 p50=  24.60 p90=  38.30 max=    88.6
+    A: n=   60 p50=  45.82 p90=  94.78 max=   252.4
+TỔNG SELECT booking_db: N n= 1544 p50=   0.39 p90=   1.67 max=    88.6 | A n= 1540 p50=   0.79 p90=   3.39 max=   252.4
+TỔNG SELECT booking_schema.tbl_ticket_type_inventory: N n=  401 p50=   0.29 p90=   0.97 max=     3.8 | A n=  395 p50=   0.47 p90=   2.22 max=    15.2

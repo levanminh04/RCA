@@ -1,0 +1,546 @@
+diff --git a/load/controller/chuoi_tai.py b/load/controller/chuoi_tai.py
+new file mode 100644
+index 0000000..ff38533
+--- /dev/null
++++ b/load/controller/chuoi_tai.py
+@@ -0,0 +1,540 @@
++#!/usr/bin/env python3
++"""Bộ chuỗi lượt tải trên exp-obs (T-071, phương án A của R7). Python 3 thư viện chuẩn.
++
++Chạy một danh sách lượt khai trước, lần lượt, bằng tai_linux.py. Mỗi lượt:
++  sap_phat (ghi trước) → start → get mỗi 30 s tới Running=false (xong) → kiểm telemetry → receive.
++Không sửa tai_linux.py; không phát gì ngoài danh sách; không có lượt bù; không bao giờ gọi `stop` thiếu --tag.
++
++Dùng (chạy nền trên server, không cần laptop giữ kết nối):
++  cd /opt/rca-lab && nohup python3 load/controller/chuoi_tai.py --ke-hoach KHAI.json --sha256 HASH \\
++        --kho /srv/rca-lab/runs/t071-e2 > /srv/rca-lab/runs/t071-e2.out 2>&1 &
++  python3 chuoi_tai.py ... --chay-kho      # chạy khô: kiểm kế hoạch, tag chưa dùng, in lệnh; không phát tải
++
++Kế hoạch: JSON có mảng `luot` (theo thứ tự), mỗi phần tử {thu_tu, tag, seconds, buoc_tai, multiplier}.
++`--sha256` phải bằng sha256 của file kế hoạch (bản đã khóa); lệch thì từ chối.
++
++Nhật ký `<kho>/chuoi.jsonl` (chỉ ghi thêm, fsync từng dòng) là nguồn trạng thái duy nhất; `<kho>/trang-thai.json`
++(ghi thay nguyên tử) cho người theo dõi. Khóa `<kho>/chuoi.lock` được lấy TRƯỚC khi đọc nhật ký.
++
++Trạng thái một tag, suy từ nhật ký (bước xa nhất đã ghi):
++  chưa có → sap_phat → (phat) → xong (có state, StartedAt/FinishedAt) → kiem_dat → nhan  = KẾT THÚC
++  hong (start lỗi trước `docker run`, get không thấy container)                        = KẾT THÚC
++  start lỗi khác mà get cũng lỗi → chua_xac_minh (giữ tag, dừng chuỗi). Lượt đã xong mà chưa kiểm được
++  telemetry vẫn được receive, nhưng chuỗi dừng trước lượt kế.
++  Mọi trạng thái khác (chưa xác minh, cần can thiệp, kiểm chưa được, nhận chưa được) là CHƯA kết thúc:
++  lần chạy lại tiếp đúng bước còn thiếu của tag đó; không start lại tag đã có sap_phat (tag không tái dùng).
++
++Dừng chuỗi (không phát lượt kế; ghi `dung_chuoi`, trạng thái cuối):
++  - có `/srv/rca-lab/runs/STOP`, `/srv/rca-lab/load-controller/STOP` (I8) hoặc `<kho>/DUNG`, kiểm trước mỗi lượt;
++    STOP còn được kiểm trong lúc chờ lượt (khi có STOP, tai_linux từ chối cả `get`) — lượt đó giữ, chưa kết thúc;
++    `DUNG` không ngắt lượt đang chạy: lượt đó chạy hết, kiểm, nhận, rồi chuỗi dừng;
++  - commit `/opt/rca-lab` khác commit ghi ở lần chạy đầu của kho này, hoặc cây bẩn (I7);
++  - lỗi start thuộc loại chung, hoặc 2 lượt liền không start được (cả hai khôi phục từ nhật ký khi chạy lại,
++    trừ khi đã có lần chạy với --tiep-sau-dung sau bản ghi `hong` đó);
++  - 20 lần `get` lỗi liền (chưa xác minh trạng thái container);
++  - quá hạn: sau `stop --tag`, chờ thêm 300 s mà vẫn Running (cần can thiệp);
++  - kiểm telemetry: 0 mẫu gateway (mất quan sát), hoặc truy vấn lỗi / thiếu mốc giờ (chưa kiểm được).
++Lỗi cục bộ (start lỗi trước docker run, không thuộc loại chung; container thoát lỗi; receive lỗi 3 lần):
++ghi lại, sang lượt kế.
++Nhật ký có `dung_chuoi`/`loi_noi_bo` ở cuối thì lần chạy lại phải có `--tiep-sau-dung "<lý do>"` (ghi vào nhật ký).
++"""
++import argparse
++import datetime as dt
++import hashlib
++import json
++import math
++import os
++from pathlib import Path
++import re
++import subprocess
++import sys
++import time
++import urllib.parse
++import urllib.request
++
++try:
++    import fcntl
++except ImportError:  # chỉ để chạy thử trên Windows; trên server luôn có fcntl
++    fcntl = None
++
++ROOT = Path(__file__).resolve().parent
++REPO = ROOT.parents[1]
++TAI_LINUX = ROOT / 'tai_linux.py'
++STOP_FILES = [Path(p) for p in os.environ.get(  # biến môi trường chỉ để chạy thử
++    'CHUOI_TAI_STOP', os.pathsep.join(['/srv/rca-lab/runs/STOP', '/srv/rca-lab/load-controller/STOP'])
++).split(os.pathsep) if p]
++PROM = os.environ.get('CHUOI_TAI_PROM', 'http://127.0.0.1:9090')
++TAG_RE = re.compile('[a-z0-9][a-z0-9-]{0,47}')
++LOI_CHUNG = ('STOP exists', 'dirty', 'A rca-tai- container is running', 'Another L1 Linux mutation',
++             'Cannot read lab git commit', 'SSH key/known_hosts')
++# Lỗi `start` mà tai_linux.py @407b4f5 chỉ có thể trả TRƯỚC bước `docker run` (lượt chắc chắn chưa chạy).
++# Mọi lỗi khác (bước docker run, timeout của chuoi_tai, JSON hỏng, ngoại lệ chung) là chưa xác minh.
++TRUOC_DOCKER_RUN = LOI_CHUNG + (
++    'exp-app maintenance', 'Pinned PKCE adapter', 'PKCE pool', 'Load-to-mock health', 'Token pool validation failed',
++    'BuocTai must be earlier', 'Idle second-scenario seed', 'Invalid CLI arguments', 'Invalid tag',
++    '--tag is required', 'Unknown source name')
++SSH_TRUOC_RUN = re.compile(r'SSH (tai|app)( [^\n]*)? (failed \(exit \d+\); secret output omitted|'
++                           r'timed out; retain existing outputs|could not execute)')
++# Các hằng thời gian; biến môi trường chỉ dùng khi chạy thử bằng tai_linux giả.
++NHIP_GET_S = float(os.environ.get('CHUOI_TAI_NHIP_S', '30'))
++GRACEFUL_S = 90
++QUA_HAN_S = float(os.environ.get('CHUOI_TAI_QUA_HAN_S', '900'))   # quá seconds+90+900 s vẫn chạy → stop --tag
++SAU_STOP_S = float(os.environ.get('CHUOI_TAI_SAU_STOP_S', '300'))  # sau stop chờ thêm tối đa 300 s
++GET_LOI_TOI_DA = 20
++KHUC_S = 600  # I11: mỗi truy vấn đọc ≤ 10 phút
++
++
++def utc():
++    return dt.datetime.now(dt.timezone.utc).isoformat()
++
++
++def docker_ts(s):
++    """'2026-11-18T07:57:34.123456789Z' → epoch giây."""
++    s = s.strip()
++    m = re.fullmatch(r'(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d)(\.\d+)?Z', s)
++    if not m:
++        raise ValueError('mốc giờ Docker sai dạng: ' + s)
++    t = dt.datetime.fromisoformat(m.group(1) + '+00:00').timestamp()
++    return t + (float('0' + m.group(2)) if m.group(2) else 0.0)
++
++
++class Chuoi:
++    def __init__(self, a):
++        self.a = a
++        self.kho = Path(a.kho)
++        self.kho.mkdir(parents=True, exist_ok=True)
++        self.log_path = self.kho / 'chuoi.jsonl'
++        self.tai_linux = Path(a.tai_linux)
++        self.su_kien = []  # chỉ đọc sau khi đã khóa (doc_nhat_ky)
++
++    # ---- nhật ký và trạng thái ---------------------------------------------------------------
++    def ghi(self, loai, **chi_tiet):
++        d = {'utc': utc(), 'loai': loai, **chi_tiet}
++        dong = json.dumps(d, ensure_ascii=False)
++        with open(self.log_path, 'a', encoding='utf-8') as f:
++            f.write(dong + '\n')
++            f.flush()
++            os.fsync(f.fileno())
++        self.su_kien.append(d)
++        print(dong, flush=True)
++
++    def trang_thai(self, **o):
++        tmp = self.kho / 'trang-thai.json.tmp'
++        tmp.write_text(json.dumps({'utc': utc(), 'pid': os.getpid(), **o}, ensure_ascii=False, indent=1),
++                       encoding='utf-8')
++        os.replace(tmp, self.kho / 'trang-thai.json')
++
++    def doc_nhat_ky(self):
++        self.su_kien = []
++        if self.log_path.exists():
++            for l in self.log_path.read_text(encoding='utf-8').splitlines():
++                try:
++                    self.su_kien.append(json.loads(l))
++                except ValueError:
++                    continue  # dòng dở do chết giữa lúc ghi: bỏ, không đoán
++
++    def cua_tag(self, tag, loai):
++        return [d for d in self.su_kien if d.get('tag') == tag and d.get('loai') == loai]
++
++    def buoc_tag(self, tag):
++        """Trạng thái hiện tại của tag theo nhật ký."""
++        if self.cua_tag(tag, 'hong'):
++            return 'ket_thuc_hong'
++        co_nhan = bool(self.cua_tag(tag, 'nhan'))
++        co_kiem = bool(self.cua_tag(tag, 'kiem_dat'))
++        if co_nhan and co_kiem:
++            return 'ket_thuc'
++        if self.cua_tag(tag, 'xong'):
++            return 'can_kiem' if not co_kiem else 'can_nhan'
++        if self.cua_tag(tag, 'sap_phat'):
++            return 'can_cho'
++        return 'chua_phat'
++
++    # ---- gọi tai_linux --------------------------------------------------------------------------
++    def tl(self, *args, timeout=900):
++        """Gọi tai_linux.py, trả JSON một dòng của nó (ok/result hoặc ok=false/error)."""
++        try:
++            p = subprocess.run([sys.executable, str(self.tai_linux), *args], stdout=subprocess.PIPE,
++                               stderr=subprocess.PIPE, timeout=timeout, check=False, cwd=str(REPO))
++        except subprocess.TimeoutExpired:
++            return {'ok': False, 'error': 'chuoi_tai: tai_linux timeout ' + args[0]}
++        except OSError as e:
++            return {'ok': False, 'error': 'chuoi_tai: không chạy được tai_linux: ' + type(e).__name__}
++        dong = [l for l in p.stdout.decode('utf-8', 'replace').splitlines() if l.strip()]
++        try:
++            return json.loads(dong[-1])
++        except (IndexError, ValueError):
++            return {'ok': False, 'error': f'chuoi_tai: không đọc được JSON (exit {p.returncode})'}
++
++    # ---- kiểm điều kiện -----------------------------------------------------------------------
++    def commit(self):
++        try:
++            c = subprocess.run(['git', '-C', str(REPO), 'rev-parse', 'HEAD'], stdout=subprocess.PIPE,
++                               stderr=subprocess.DEVNULL, timeout=30, check=True).stdout.decode().strip()
++            ban = subprocess.run(['git', '-C', str(REPO), 'status', '--porcelain', '--', 'load', 'campaigns',
++                                  'inventory'], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=30,
++                                 check=True).stdout.decode().strip()
++            return c, bool(ban)
++        except (OSError, subprocess.SubprocessError):
++            return None, True
++
++    def co_stop(self, ca_dung=True):
++        """STOP toàn cục (I8); `DUNG` của kho chỉ chặn lượt kế, không ngắt lượt đang chờ (ca_dung=False)."""
++        for p in STOP_FILES + ([self.kho / 'DUNG'] if ca_dung else []):
++            if p.exists():
++                return 'có file ' + str(p)
++        return None
++
++    def ly_do_dung(self, commit0):
++        s = self.co_stop(ca_dung=True)
++        if s:
++            return s
++        c, ban = self.commit()
++        if c != commit0:
++            return f'commit /opt/rca-lab khác commit đầu của kho: {commit0} → {c}'
++        if ban:
++            return 'cây repo lab bẩn ở load/campaigns/inventory'
++        return None
++
++    def prom(self, expr, t):
++        url = PROM + '/api/v1/query?' + urllib.parse.urlencode({'query': expr, 'time': t})
++        with urllib.request.urlopen(url, timeout=60) as r:
++            d = json.load(r)
++        if d.get('status') != 'success':
++            raise RuntimeError('prometheus status ' + str(d.get('status')))
++        res = d['data']['result']
++        return float(res[0]['value'][1]) if res else None
++
++    def kiem_telemetry(self, bat_dau, ket_thuc):
++        """Theo khúc ≤ 600 s (I11): cộng số mẫu count của gateway, lấy min của `up` qua các khúc.
++        Chỉ đếm mẫu trong (StartedAt, FinishedAt]. Mẫu Prometheus có độ phân giải ms, nên với mẫu s (ms nguyên):
++        s > StartedAt ⟺ s > floor(StartedAt_ms) và s ≤ FinishedAt ⟺ s ≤ floor(FinishedAt_ms). Mỗi khúc là
++        truy vấn tức thời `[L ms]` tại mốc cuối khúc b, phủ đúng (b − L, b]; các khúc liền nhau không chồng.
++        Trả (ket_luan, chi_tiet): ket_luan ∈ {'dat', 'mat_telemetry', 'chua_kiem_duoc'}."""
++        t0 = math.floor(bat_dau * 1000)  # ms, biên dưới (mở)
++        t1 = math.floor(ket_thuc * 1000)  # ms, biên trên (đóng)
++        khuc = []
++        a = t0
++        while a < t1:
++            b = min(a + KHUC_S * 1000, t1)
++            khuc.append((a, b))
++            a = b
++        tong = 0.0
++        up_min = None
++        loi = []
++        for a, b in khuc:
++            L = b - a
++            for ten, expr in (('mau', f'sum(count_over_time(http_server_request_duration_seconds_count'
++                                      f'{{service_name="api-gateway"}}[{L}ms]))'),
++                              ('up', f'min(min_over_time(up[{L}ms]))')):
++                try:
++                    v = self.prom(expr, f'{b / 1000:.3f}')
++                except Exception as e:
++                    loi.append({'khuc': [a, b], 'chuoi': ten, 'loi': type(e).__name__ + ': ' + str(e)[:200]})
++                    v = None
++                    if ten == 'mau':
++                        loi[-1]['bat_buoc'] = True
++                if ten == 'mau' and v is not None:
++                    tong += v
++                if ten == 'up' and v is not None:
++                    up_min = v if up_min is None else min(up_min, v)
++                time.sleep(0.3)
++        chi_tiet = {'cua_so_ms': [t0, t1], 'cua_so': ['(' + iso(t0 / 1000), iso(t1 / 1000) + ']'],
++                    'so_khuc': len(khuc), 'mau_gateway': tong, 'up_min': up_min, 'loi_khuc': loi}
++        if any(x.get('bat_buoc') for x in loi):
++            return 'chua_kiem_duoc', chi_tiet
++        if tong == 0:
++            return 'mat_telemetry', chi_tiet
++        return 'dat', chi_tiet
++
++    # ---- các bước của một lượt --------------------------------------------------------------------
++    def lenh_start(self, l):
++        args = ['start', '--tag', l['tag'], '--seconds', str(l['seconds'])]
++        if l.get('buoc_tai'):
++            args += ['--buoc-tai', str(l['buoc_tai']), '--multiplier', str(l['multiplier'])]
++        return args
++
++    def phat(self, l):
++        """Trả None nếu đã có container (đi tiếp chờ), hoặc mã kết quả lượt nếu không start được."""
++        tag = l['tag']
++        self.ghi('sap_phat', tag=tag, thu_tu=l['thu_tu'], lenh=['tai_linux.py', *self.lenh_start(l)])
++        self.trang_thai(tag=tag, buoc='start', thu_tu=l['thu_tu'])
++        r = self.tl(*self.lenh_start(l), timeout=900)
++        if r.get('ok'):
++            self.ghi('phat', tag=tag, ket_qua=r['result'])
++            return None
++        loi = str(r.get('error'))
++        self.ghi('phat_loi', tag=tag, loi=loi)
++        g = self.tl('get', '--tag', tag, timeout=180)
++        if g.get('ok'):  # start báo lỗi nhưng container có: coi như đã phát, đi tiếp chờ
++            self.ghi('phat_co_container', tag=tag, state=g['result']['state'])
++            return None
++        # get lỗi không phân biệt "không có container" với lỗi SSH (tai_linux giấu stderr), nên chỉ ghi `hong`
++        # khi chính lỗi start chứng minh lượt chưa tới `docker run`.
++        o_buoc_run = 'docker run' in loi or 'set -euo pipefail' in loi
++        truoc_run = not o_buoc_run and (any(s in loi for s in TRUOC_DOCKER_RUN) or bool(SSH_TRUOC_RUN.fullmatch(loi)))
++        if not truoc_run:
++            self.ghi('chua_xac_minh', tag=tag, ly_do='start lỗi và get lỗi; không chứng minh được lượt chưa chạy',
++                     loi_start=loi, loi_get=g.get('error'))
++            return 'chua_xac_minh'
++        chung = any(s in loi for s in LOI_CHUNG)
++        self.ghi('hong', tag=tag, ly_do='start lỗi trước docker run', loi_chung=chung)
++        return 'loi_chung' if chung else 'hong_start'
++
++    def cho_xong(self, l):
++        """Trả ('xong', state) | ('dung', lý do) | ('chua_xac_minh', lý do) | ('can_can_thiep', lý do)."""
++        tag = l['tag']
++        moc = self.cua_tag(tag, 'phat') or self.cua_tag(tag, 'sap_phat')
++        try:
++            t_phat = dt.datetime.fromisoformat(moc[-1]['utc']).timestamp()
++        except (IndexError, KeyError, ValueError):
++            t_phat = time.time()
++        han = t_phat + l['seconds'] + GRACEFUL_S + QUA_HAN_S
++        loi_lien = 0
++        t_stop = None
++        while True:
++            s = self.co_stop(ca_dung=False)
++            if s:
++                return 'dung', s + ' trong lúc chờ lượt (tai_linux từ chối get khi có STOP)'
++            g = self.tl('get', '--tag', tag, timeout=180)
++            if g.get('ok'):
++                loi_lien = 0
++                st = g['result']['state']
++                if not st.get('Running'):
++                    return 'xong', st
++                now = time.time()
++                if t_stop is None and now > han:
++                    r = self.tl('stop', '--tag', tag, timeout=300)  # luôn có --tag (I8)
++                    self.ghi('qua_han_stop', tag=tag, ket_qua=r)
++                    t_stop = time.time()
++                elif t_stop is not None and now > t_stop + SAU_STOP_S:
++                    return 'can_can_thiep', f'vẫn Running {int(now - t_stop)} s sau stop --tag'
++            else:
++                loi_lien += 1
++                self.ghi('get_loi', tag=tag, loi=g.get('error'), lan=loi_lien)
++                if loi_lien >= GET_LOI_TOI_DA:
++                    return 'chua_xac_minh', f'{loi_lien} lần get lỗi liền'
++            time.sleep(NHIP_GET_S)
++
++    @staticmethod
++    def moc(st):
++        bd, kt = docker_ts(st['StartedAt']), docker_ts(st['FinishedAt'])
++        if kt <= bd:
++            raise ValueError('FinishedAt ≤ StartedAt')
++        return bd, kt
++
++    def kiem(self, tag):
++        xs = self.cua_tag(tag, 'xong')
++        try:
++            bd, kt = self.moc(xs[-1]['state'])
++        except (IndexError, KeyError, TypeError, ValueError) as e:
++            # bản ghi `xong` thiếu/sai mốc: get lại một lần (container đã dừng thì mốc không đổi)
++            g = self.tl('get', '--tag', tag, timeout=180)
++            try:
++                st = g['result']['state']
++                if st.get('Running'):
++                    raise ValueError('get lại thấy Running')
++                bd, kt = self.moc(st)
++                self.ghi('xong_bo_sung_moc', tag=tag, state=st, ly_do_cu=str(e)[:200])
++            except (KeyError, TypeError, ValueError) as e2:
++                self.ghi('kiem_chua_duoc', tag=tag, ly_do='thiếu/sai mốc giờ: ' + str(e)[:150],
++                         get_lai=(g.get('error') if not g.get('ok') else str(e2)[:150]))
++                return 'chua_kiem_duoc'
++        kl, ct = self.kiem_telemetry(bd, kt)
++        self.ghi('kiem_dat' if kl == 'dat' else ('kiem_chua_duoc' if kl == 'chua_kiem_duoc' else 'kiem_mat'),
++                 tag=tag, ket_qua=ct)
++        return kl
++
++    def nhan(self, tag):
++        for lan in range(1, 4):
++            r = self.tl('receive', '--tag', tag, timeout=900)
++            if r.get('ok'):
++                self.ghi('nhan', tag=tag, ket_qua={k: r['result'].get(k) for k in
++                                                   ('destination', 'hashesMatched', 'outputsManifestSha256')})
++                return True
++            self.ghi('nhan_loi', tag=tag, loi=r.get('error'), lan=lan)
++            time.sleep(2 * NHIP_GET_S)
++        self.ghi('nhan_chua_duoc', tag=tag, ly_do='receive lỗi 3 lần; dữ liệu giữ trên máy tải; chạy lại sẽ thử tiếp')
++        return False
++
++    def chay_luot(self, l):
++        """Tiếp từ đúng bước còn thiếu của tag. Trả mã: xong | xong_loi_container | nhan_chua_duoc | hong_start
++        (đi tiếp) hoặc loi_chung | dung | chua_xac_minh | can_can_thiep | chua_kiem_duoc | mat_telemetry (dừng)."""
++        tag = l['tag']
++        buoc = self.buoc_tag(tag)
++        if buoc != 'chua_phat':
++            self.ghi('tiep_nhan', tag=tag, buoc=buoc)
++        if buoc == 'chua_phat':
++            kq = self.phat(l)
++            if kq:
++                return kq
++            buoc = 'can_cho'
++        if buoc == 'can_cho':
++            self.trang_thai(tag=tag, buoc='cho_xong', thu_tu=l['thu_tu'])
++            kq, x = self.cho_xong(l)
++            if kq != 'xong':
++                self.ghi(kq, tag=tag, ly_do=x)
++                return kq
++            self.ghi('xong', tag=tag, state=x)
++            buoc = 'can_kiem'
++        kl = 'dat'
++        if buoc == 'can_kiem':
++            self.trang_thai(tag=tag, buoc='kiem_telemetry', thu_tu=l['thu_tu'])
++            kl = self.kiem(tag)
++            buoc = 'can_nhan'  # lượt đã xong: vẫn nhận dữ liệu kể cả khi chưa kiểm được; dừng chuỗi ở dưới
++        if buoc == 'can_nhan':
++            if self.cua_tag(tag, 'nhan'):
++                self.ghi('bo_qua_nhan', tag=tag, ly_do='đã nhận ở lần chạy trước')
++            else:
++                self.trang_thai(tag=tag, buoc='receive', thu_tu=l['thu_tu'])
++                if not self.nhan(tag) and kl == 'dat':
++                    return 'nhan_chua_duoc'
++        if kl != 'dat':
++            return kl  # chua_kiem_duoc | mat_telemetry: không phát lượt kế
++        st = self.cua_tag(tag, 'xong')[-1]['state']
++        return 'xong_loi_container' if (st.get('ExitCode') != 0 or st.get('OOMKilled')) else 'xong'
++
++    # ---- chuỗi ------------------------------------------------------------------------------------
++    def dung(self, ly_do, ma, **o):
++        self.ghi('dung_chuoi', ly_do=ly_do, **o)
++        self.trang_thai(buoc='dung', ly_do=ly_do)
++        return ma
++
++    def chay(self, ke_hoach, h):
++        self.doc_nhat_ky()  # đã giữ khóa
++        cu = [d for d in self.su_kien if d.get('loai') in ('bat_dau_chuoi', 'dung_chuoi', 'loi_noi_bo', 'xong_chuoi')]
++        dau = [d for d in cu if d['loai'] == 'bat_dau_chuoi']
++        if dau and dau[0].get('sha256') != h:
++            raise SystemExit(f"kho này đã dùng kế hoạch {dau[0].get('sha256')}; từ chối kế hoạch khác")
++        commit_now, ban = self.commit()
++        commit0 = dau[0].get('lab_commit') if dau else commit_now
++        if cu and cu[-1]['loai'] in ('dung_chuoi', 'loi_noi_bo') and not self.a.tiep_sau_dung:
++            raise SystemExit(f"lần chạy trước dừng ({cu[-1].get('ly_do') or cu[-1].get('loi')}); "
++                             "chạy lại cần --tiep-sau-dung \"<lý do>\"")
++        self.ghi('bat_dau_chuoi', ke_hoach=self.a.ke_hoach, sha256=h, lab_commit=commit_now, lab_commit_dau=commit0,
++                 cay_ban=ban, so_luot=len(ke_hoach), pid=os.getpid(), tiep_sau_dung=self.a.tiep_sau_dung)
++        hong_lien = 0
++        for l in ke_hoach:
++            tag = l['tag']
++            b = self.buoc_tag(tag)
++            if b == 'ket_thuc':
++                hong_lien = 0
++            if b == 'ket_thuc_hong':
++                # Khôi phục chốt dừng từ nhật ký (chết ngay sau `hong`, trước khi kịp ghi `dung_chuoi`):
++                # `hong` chưa được người xác nhận bằng một lần chạy có --tiep-sau-dung SAU nó thì vẫn tính.
++                ev = self.cua_tag(tag, 'hong')[-1]
++                i = max(k for k, d in enumerate(self.su_kien) if d is ev)
++                xac_nhan = any(d.get('loai') == 'bat_dau_chuoi' and d.get('tiep_sau_dung')
++                               for d in self.su_kien[i + 1:])
++                if xac_nhan:
++                    hong_lien = 0
++                else:
++                    if ev.get('loi_chung'):
++                        return self.dung('loi_chung (khôi phục từ nhật ký)', 3, sau_tag=tag)
++                    hong_lien += 1
++                    if hong_lien >= 2:
++                        return self.dung('2 lượt liền không start được (khôi phục từ nhật ký)', 3, sau_tag=tag)
++            if b in ('ket_thuc', 'ket_thuc_hong'):
++                self.ghi('bo_qua', tag=tag, ly_do=b)
++                continue
++            ld = self.ly_do_dung(commit0)
++            if ld:
++                return self.dung(ld, 2, truoc_tag=tag)
++            kq = self.chay_luot(l)
++            self.ghi('ket_qua_luot', tag=tag, ket_qua=kq)
++            if kq in ('loi_chung', 'dung', 'chua_xac_minh', 'can_can_thiep', 'chua_kiem_duoc', 'mat_telemetry'):
++                return self.dung(kq, 3, sau_tag=tag)
++            hong_lien = hong_lien + 1 if kq == 'hong_start' else 0
++            if hong_lien >= 2:
++                return self.dung('2 lượt liền không start được', 3, sau_tag=tag)
++        con = [l['tag'] for l in ke_hoach if self.buoc_tag(l['tag']) not in ('ket_thuc', 'ket_thuc_hong')]
++        self.ghi('xong_chuoi', tag_chua_ket_thuc=con)
++        self.trang_thai(buoc='xong_chuoi', tag_chua_ket_thuc=con)
++        return 0 if not con else 1
++
++    def chay_kho(self, ke_hoach, h):
++        """Không phát tải: kiểm kế hoạch, điều kiện dừng, tag chưa dùng (get chỉ đọc), in đúng lệnh sẽ gọi.
++        Đọc nhật ký không khóa (chỉ để báo)."""
++        self.doc_nhat_ky()
++        commit0, ban = self.commit()
++        out = {'che_do': 'chay_kho', 'ke_hoach': self.a.ke_hoach, 'sha256': h, 'lab_commit': commit0,
++               'cay_ban': ban, 'ly_do_dung_neu_chay': self.ly_do_dung(commit0), 'luot': []}
++        for l in ke_hoach:
++            g = self.tl('get', '--tag', l['tag'], timeout=180)
++            out['luot'].append({'thu_tu': l['thu_tu'], 'tag': l['tag'],
++                                'lenh': ['python3', str(self.tai_linux), *self.lenh_start(l)],
++                                'tag_chua_dung_tren_may_tai': not g.get('ok'),
++                                'get': g.get('error') if not g.get('ok') else 'CONTAINER ĐÃ TỒN TẠI',
++                                'tai_out_ton_tai': (Path('/srv/rca-lab/load-controller/tai-out') / l['tag']).exists(),
++                                'buoc_theo_nhat_ky': self.buoc_tag(l['tag'])})
++            time.sleep(0.3)
++        out['tong_giay_tai'] = sum(l['seconds'] for l in ke_hoach)
++        print(json.dumps(out, ensure_ascii=False, indent=1))
++        (self.kho / ('chay-kho-' + dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%SZ') + '.json')
++         ).write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding='utf-8')
++        return 0
++
++
++def iso(t):
++    return dt.datetime.fromtimestamp(t, dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
++
++
++def doc_ke_hoach(path, h):
++    raw = Path(path).read_bytes()
++    thuc = hashlib.sha256(raw).hexdigest()
++    if thuc != h:
++        raise SystemExit(f'sha256 kế hoạch {thuc} khác --sha256 {h}; từ chối')
++    luot = json.loads(raw)['luot']
++    tags = [l['tag'] for l in luot]
++    if len(set(tags)) != len(tags):
++        raise SystemExit('tag trùng trong kế hoạch')
++    for l in luot:
++        if not TAG_RE.fullmatch(l['tag']):
++            raise SystemExit('tag sai dạng: ' + l['tag'])
++        if not (1 <= int(l['seconds']) <= 3600) or not (1 <= int(l.get('multiplier', 1)) <= 3):
++            raise SystemExit('seconds/multiplier ngoài giới hạn tai_linux: ' + l['tag'])
++        if l.get('buoc_tai') and not (1 <= int(l['buoc_tai']) < int(l['seconds'])):
++            raise SystemExit('buoc_tai phải nhỏ hơn seconds: ' + l['tag'])
++    if [l['thu_tu'] for l in luot] != sorted(l['thu_tu'] for l in luot):
++        raise SystemExit('luot không theo thứ tự thu_tu')
++    return luot, thuc
++
++
++def main():
++    # stdout có thể là file với locale C/ANSI (nohup): không để print tiếng Việt làm chết chuỗi giữa chừng
++    sys.stdout.reconfigure(encoding='utf-8', errors='backslashreplace')
++    ap = argparse.ArgumentParser()
++    ap.add_argument('--ke-hoach', required=True)
++    ap.add_argument('--sha256', required=True)
++    ap.add_argument('--kho', required=True)
++    ap.add_argument('--chay-kho', action='store_true')
++    ap.add_argument('--tiep-sau-dung', default='')
++    ap.add_argument('--tai-linux', default=str(TAI_LINUX))
++    a = ap.parse_args()
++    luot, h = doc_ke_hoach(a.ke_hoach, a.sha256)
++    c = Chuoi(a)
++    if a.chay_kho:
++        return c.chay_kho(luot, h)
++    lock = open(c.kho / 'chuoi.lock', 'a')
++    if fcntl:
++        try:
++            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
++        except BlockingIOError:
++            raise SystemExit('chuỗi khác đang chạy trên cùng thư mục kho')
++    try:
++        return c.chay(luot, h)
++    except SystemExit:
++        raise
++    except Exception as e:  # lỗi I/O hoặc lỗi nội bộ: ghi trạng thái cuối nếu kho còn ghi được
++        loi = type(e).__name__ + ': ' + str(e)[:300]
++        try:
++            c.ghi('loi_noi_bo', loi=loi)
++            c.trang_thai(buoc='loi_noi_bo', loi=loi)
++        except Exception:
++            pass
++        print(json.dumps({'loai': 'loi_noi_bo', 'loi': loi}, ensure_ascii=False), flush=True)
++        return 4
++
++
++if __name__ == '__main__':
++    sys.exit(main())

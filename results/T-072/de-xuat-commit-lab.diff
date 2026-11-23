@@ -1,0 +1,993 @@
+diff --git a/observability/grafana/provisioning/alerting/README.md b/observability/grafana/provisioning/alerting/README.md
+new file mode 100644
+index 0000000..05587e9
+--- /dev/null
++++ b/observability/grafana/provisioning/alerting/README.md
+@@ -0,0 +1,16 @@
++# Luật cảnh báo W4 (T-072)
++
++Grafana nạp mọi file `.yaml`/`.yml` ở thư mục này khi khởi động (compose gắn `./grafana/provisioning` vào Grafana).
++
++- `t072-luat.yaml`: 11 luật (p95 và tỷ lệ 5xx theo route gateway `booking`, `event`, `payment`, `ticket`;
++  liveness; 2 luật mất quan sát), nhóm `t072-w4`, nhịp 10 s, và contact point `t072-bo-nhan-nhe`
++  (`http://t072-bo-nhan:9172/t072`). Sinh bởi `results/T-072/sinh_luat_grafana.py` (repo RCA) từ `bieu-thuc.json`
++  (T072-bieu-thuc-1) và `nguong.json` (sha256 c8f448543c2f…, tính máy móc từ E2 theo T072-chon-nguong-2). Không sửa tay.
++- `t072-thu-e3.yaml` (commit N): 4 luật thử của E3 (bản sao p95, ngưỡng 0,005 s, nhãn `t072_loai = thu`); chỉ cháy khi có tải.
++  Commit G xóa file này và đổi `t072-thu-e3-go.yaml.mau` → `t072-thu-e3-go.yaml` (`deleteRules` 4 uid) trước giờ hiệu lực E4.
++- `*.yaml.mau`: Grafana KHÔNG nạp (đuôi khác). `t072-thu-e3-go.yaml.mau` = gỡ luật thử (kích hoạt ở G);
++  `t072-hoan-tac-n.yaml.mau` = gỡ mọi đối tượng của T-072 nếu N nạp lỗi (kích hoạt ở commit H, con của commit trước N).
++  Sinh bởi `results/T-072/sinh_luat_thu_e3.py`.
++- Định tuyến đặt ở từng luật (`notification_settings`), không đổi cây chính sách thông báo hiện có.
++- Nạp lên exp-obs chỉ ở khung S2, sau khi Minh duyệt commit (I5, I7); quy trình ở `results/T-072/ke-hoach-e3.md` (repo RCA).
++- Bộ nhận nhẹ để kiểm giao nhận ở E3: `../../t072-bo-nhan/bo_nhan.py` (dịch vụ compose `t072-bo-nhan` do T-073 thêm).
+diff --git a/observability/grafana/provisioning/alerting/t072-hoan-tac-n.yaml.mau b/observability/grafana/provisioning/alerting/t072-hoan-tac-n.yaml.mau
+new file mode 100644
+index 0000000..0335c8e
+--- /dev/null
++++ b/observability/grafana/provisioning/alerting/t072-hoan-tac-n.yaml.mau
+@@ -0,0 +1,38 @@
++# T-072 E3: HOÀN TÁC commit N (gỡ 11 luật thật, 4 luật thử, contact point t072-webhook). Chỉ dùng khi N nạp
++# lỗi hoặc một phần. Thư mục Grafana do provisioning tạo không bị xóa (ghi lại, gỡ bằng tay nếu Minh muốn).
++# Sinh bởi results/T-072/sinh_luat_thu_e3.py hoan-tac. Không sửa tay.
++apiVersion: 1
++deleteRules:
++- orgId: 1
++  uid: t072-p95-booking
++- orgId: 1
++  uid: t072-p95-event
++- orgId: 1
++  uid: t072-p95-payment
++- orgId: 1
++  uid: t072-p95-ticket
++- orgId: 1
++  uid: t072-loi-booking
++- orgId: 1
++  uid: t072-loi-event
++- orgId: 1
++  uid: t072-loi-payment
++- orgId: 1
++  uid: t072-loi-ticket
++- orgId: 1
++  uid: t072-live
++- orgId: 1
++  uid: t072-mat-do
++- orgId: 1
++  uid: t072-mat-gw
++- orgId: 1
++  uid: t072-thu-p95-booking
++- orgId: 1
++  uid: t072-thu-p95-event
++- orgId: 1
++  uid: t072-thu-p95-payment
++- orgId: 1
++  uid: t072-thu-p95-ticket
++deleteContactPoints:
++- orgId: 1
++  uid: t072-webhook
+diff --git a/observability/grafana/provisioning/alerting/t072-luat.yaml b/observability/grafana/provisioning/alerting/t072-luat.yaml
+new file mode 100644
+index 0000000..fce716c
+--- /dev/null
++++ b/observability/grafana/provisioning/alerting/t072-luat.yaml
+@@ -0,0 +1,619 @@
++# Sinh bởi results/T-072/sinh_luat_grafana.py (repo RCA) từ T072-bieu-thuc-1 và nguong.json c8f448543c2f. Không sửa tay.
++apiVersion: 1
++contactPoints:
++- orgId: 1
++  name: t072-bo-nhan-nhe
++  receivers:
++  - uid: t072-webhook
++    type: webhook
++    disableResolveMessage: false
++    settings:
++      url: http://t072-bo-nhan:9172/t072
++      httpMethod: POST
++groups:
++- orgId: 1
++  name: t072-w4
++  folder: T-072 W4 cảnh báo
++  interval: 10s
++  rules:
++  - uid: t072-p95-booking
++    title: t072-p95-booking
++    condition: C
++    data:
++    - refId: A
++      relativeTimeRange: &id001
++        from: 600
++        to: 0
++      datasourceUid: prometheus
++      model:
++        refId: A
++        expr: histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_seconds_bucket{service_name="api-gateway",http_route="booking"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="booking"}[5m])) >= 30)
++        instant: true
++        range: false
++        intervalMs: 10000
++        maxDataPoints: 43200
++    - refId: C
++      relativeTimeRange:
++        from: 0
++        to: 0
++      datasourceUid: __expr__
++      model:
++        refId: C
++        type: threshold
++        expression: A
++        datasource:
++          type: __expr__
++          uid: __expr__
++        conditions:
++        - evaluator:
++            type: gt
++            params:
++            - 0.098
++    noDataState: OK
++    execErrState: Error
++    for: 60s
++    isPaused: false
++    labels:
++      t072_loai: he-thong
++      t072_tin_hieu: p95
++      http_route: booking
++      service_name: api-gateway
++      t072_uid: t072-p95-booking
++    annotations:
++      summary: p95 gateway route booking
++      t072_eval_interval_s: '10'
++      t072_for_s: '60'
++      t072_nguong: '0.098'
++      t072_nguong_phien_ban: c8f448543c2f
++      t072_bieu_thuc: T072-bieu-thuc-1
++    notification_settings:
++      receiver: t072-bo-nhan-nhe
++      group_by:
++      - '...'
++      group_wait: 0s
++      group_interval: 10s
++      repeat_interval: 4h
++  - uid: t072-p95-event
++    title: t072-p95-event
++    condition: C
++    data:
++    - refId: A
++      relativeTimeRange: *id001
++      datasourceUid: prometheus
++      model:
++        refId: A
++        expr: histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_seconds_bucket{service_name="api-gateway",http_route="event"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="event"}[5m])) >= 30)
++        instant: true
++        range: false
++        intervalMs: 10000
++        maxDataPoints: 43200
++    - refId: C
++      relativeTimeRange:
++        from: 0
++        to: 0
++      datasourceUid: __expr__
++      model:
++        refId: C
++        type: threshold
++        expression: A
++        datasource:
++          type: __expr__
++          uid: __expr__
++        conditions:
++        - evaluator:
++            type: gt
++            params:
++            - 0.097
++    noDataState: OK
++    execErrState: Error
++    for: 60s
++    isPaused: false
++    labels:
++      t072_loai: he-thong
++      t072_tin_hieu: p95
++      http_route: event
++      service_name: api-gateway
++      t072_uid: t072-p95-event
++    annotations:
++      summary: p95 gateway route event
++      t072_eval_interval_s: '10'
++      t072_for_s: '60'
++      t072_nguong: '0.097'
++      t072_nguong_phien_ban: c8f448543c2f
++      t072_bieu_thuc: T072-bieu-thuc-1
++    notification_settings:
++      receiver: t072-bo-nhan-nhe
++      group_by:
++      - '...'
++      group_wait: 0s
++      group_interval: 10s
++      repeat_interval: 4h
++  - uid: t072-p95-payment
++    title: t072-p95-payment
++    condition: C
++    data:
++    - refId: A
++      relativeTimeRange: *id001
++      datasourceUid: prometheus
++      model:
++        refId: A
++        expr: histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_seconds_bucket{service_name="api-gateway",http_route="payment"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="payment"}[5m])) >= 30)
++        instant: true
++        range: false
++        intervalMs: 10000
++        maxDataPoints: 43200
++    - refId: C
++      relativeTimeRange:
++        from: 0
++        to: 0
++      datasourceUid: __expr__
++      model:
++        refId: C
++        type: threshold
++        expression: A
++        datasource:
++          type: __expr__
++          uid: __expr__
++        conditions:
++        - evaluator:
++            type: gt
++            params:
++            - 0.184
++    noDataState: OK
++    execErrState: Error
++    for: 60s
++    isPaused: false
++    labels:
++      t072_loai: he-thong
++      t072_tin_hieu: p95
++      http_route: payment
++      service_name: api-gateway
++      t072_uid: t072-p95-payment
++    annotations:
++      summary: p95 gateway route payment
++      t072_eval_interval_s: '10'
++      t072_for_s: '60'
++      t072_nguong: '0.184'
++      t072_nguong_phien_ban: c8f448543c2f
++      t072_bieu_thuc: T072-bieu-thuc-1
++    notification_settings:
++      receiver: t072-bo-nhan-nhe
++      group_by:
++      - '...'
++      group_wait: 0s
++      group_interval: 10s
++      repeat_interval: 4h
++  - uid: t072-p95-ticket
++    title: t072-p95-ticket
++    condition: C
++    data:
++    - refId: A
++      relativeTimeRange: *id001
++      datasourceUid: prometheus
++      model:
++        refId: A
++        expr: histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_seconds_bucket{service_name="api-gateway",http_route="ticket"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="ticket"}[5m])) >= 30)
++        instant: true
++        range: false
++        intervalMs: 10000
++        maxDataPoints: 43200
++    - refId: C
++      relativeTimeRange:
++        from: 0
++        to: 0
++      datasourceUid: __expr__
++      model:
++        refId: C
++        type: threshold
++        expression: A
++        datasource:
++          type: __expr__
++          uid: __expr__
++        conditions:
++        - evaluator:
++            type: gt
++            params:
++            - 0.112
++    noDataState: OK
++    execErrState: Error
++    for: 60s
++    isPaused: false
++    labels:
++      t072_loai: he-thong
++      t072_tin_hieu: p95
++      http_route: ticket
++      service_name: api-gateway
++      t072_uid: t072-p95-ticket
++    annotations:
++      summary: p95 gateway route ticket
++      t072_eval_interval_s: '10'
++      t072_for_s: '60'
++      t072_nguong: '0.112'
++      t072_nguong_phien_ban: c8f448543c2f
++      t072_bieu_thuc: T072-bieu-thuc-1
++    notification_settings:
++      receiver: t072-bo-nhan-nhe
++      group_by:
++      - '...'
++      group_wait: 0s
++      group_interval: 10s
++      repeat_interval: 4h
++  - uid: t072-loi-booking
++    title: t072-loi-booking
++    condition: C
++    data:
++    - refId: A
++      relativeTimeRange: *id001
++      datasourceUid: prometheus
++      model:
++        refId: A
++        expr: ((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="booking",http_response_status_code=~"5.."}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="booking"}[5m]))) / sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="booking"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="booking"}[5m])) >= 30) and on (http_route) ((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="booking",http_response_status_code=~"5.."}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="booking"}[5m]))) >= 3)
++        instant: true
++        range: false
++        intervalMs: 10000
++        maxDataPoints: 43200
++    - refId: C
++      relativeTimeRange:
++        from: 0
++        to: 0
++      datasourceUid: __expr__
++      model:
++        refId: C
++        type: threshold
++        expression: A
++        datasource:
++          type: __expr__
++          uid: __expr__
++        conditions:
++        - evaluator:
++            type: gt
++            params:
++            - 0.05
++    noDataState: OK
++    execErrState: Error
++    for: 60s
++    isPaused: false
++    labels:
++      t072_loai: he-thong
++      t072_tin_hieu: loi-5xx
++      http_route: booking
++      service_name: api-gateway
++      t072_uid: t072-loi-booking
++    annotations:
++      summary: tỷ lệ 5xx gateway route booking
++      t072_eval_interval_s: '10'
++      t072_for_s: '60'
++      t072_nguong: '0.05'
++      t072_nguong_phien_ban: c8f448543c2f
++      t072_bieu_thuc: T072-bieu-thuc-1
++    notification_settings:
++      receiver: t072-bo-nhan-nhe
++      group_by:
++      - '...'
++      group_wait: 0s
++      group_interval: 10s
++      repeat_interval: 4h
++  - uid: t072-loi-event
++    title: t072-loi-event
++    condition: C
++    data:
++    - refId: A
++      relativeTimeRange: *id001
++      datasourceUid: prometheus
++      model:
++        refId: A
++        expr: ((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="event",http_response_status_code=~"5.."}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="event"}[5m]))) / sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="event"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="event"}[5m])) >= 30) and on (http_route) ((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="event",http_response_status_code=~"5.."}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="event"}[5m]))) >= 3)
++        instant: true
++        range: false
++        intervalMs: 10000
++        maxDataPoints: 43200
++    - refId: C
++      relativeTimeRange:
++        from: 0
++        to: 0
++      datasourceUid: __expr__
++      model:
++        refId: C
++        type: threshold
++        expression: A
++        datasource:
++          type: __expr__
++          uid: __expr__
++        conditions:
++        - evaluator:
++            type: gt
++            params:
++            - 0.05
++    noDataState: OK
++    execErrState: Error
++    for: 60s
++    isPaused: false
++    labels:
++      t072_loai: he-thong
++      t072_tin_hieu: loi-5xx
++      http_route: event
++      service_name: api-gateway
++      t072_uid: t072-loi-event
++    annotations:
++      summary: tỷ lệ 5xx gateway route event
++      t072_eval_interval_s: '10'
++      t072_for_s: '60'
++      t072_nguong: '0.05'
++      t072_nguong_phien_ban: c8f448543c2f
++      t072_bieu_thuc: T072-bieu-thuc-1
++    notification_settings:
++      receiver: t072-bo-nhan-nhe
++      group_by:
++      - '...'
++      group_wait: 0s
++      group_interval: 10s
++      repeat_interval: 4h
++  - uid: t072-loi-payment
++    title: t072-loi-payment
++    condition: C
++    data:
++    - refId: A
++      relativeTimeRange: *id001
++      datasourceUid: prometheus
++      model:
++        refId: A
++        expr: ((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="payment",http_response_status_code=~"5.."}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="payment"}[5m]))) / sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="payment"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="payment"}[5m])) >= 30) and on (http_route) ((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="payment",http_response_status_code=~"5.."}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="payment"}[5m]))) >= 3)
++        instant: true
++        range: false
++        intervalMs: 10000
++        maxDataPoints: 43200
++    - refId: C
++      relativeTimeRange:
++        from: 0
++        to: 0
++      datasourceUid: __expr__
++      model:
++        refId: C
++        type: threshold
++        expression: A
++        datasource:
++          type: __expr__
++          uid: __expr__
++        conditions:
++        - evaluator:
++            type: gt
++            params:
++            - 0.05
++    noDataState: OK
++    execErrState: Error
++    for: 60s
++    isPaused: false
++    labels:
++      t072_loai: he-thong
++      t072_tin_hieu: loi-5xx
++      http_route: payment
++      service_name: api-gateway
++      t072_uid: t072-loi-payment
++    annotations:
++      summary: tỷ lệ 5xx gateway route payment
++      t072_eval_interval_s: '10'
++      t072_for_s: '60'
++      t072_nguong: '0.05'
++      t072_nguong_phien_ban: c8f448543c2f
++      t072_bieu_thuc: T072-bieu-thuc-1
++    notification_settings:
++      receiver: t072-bo-nhan-nhe
++      group_by:
++      - '...'
++      group_wait: 0s
++      group_interval: 10s
++      repeat_interval: 4h
++  - uid: t072-loi-ticket
++    title: t072-loi-ticket
++    condition: C
++    data:
++    - refId: A
++      relativeTimeRange: *id001
++      datasourceUid: prometheus
++      model:
++        refId: A
++        expr: ((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="ticket",http_response_status_code=~"5.."}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="ticket"}[5m]))) / sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="ticket"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="ticket"}[5m])) >= 30) and on (http_route) ((sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="ticket",http_response_status_code=~"5.."}[5m])) or on (http_route) 0 * sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="ticket"}[5m]))) >= 3)
++        instant: true
++        range: false
++        intervalMs: 10000
++        maxDataPoints: 43200
++    - refId: C
++      relativeTimeRange:
++        from: 0
++        to: 0
++      datasourceUid: __expr__
++      model:
++        refId: C
++        type: threshold
++        expression: A
++        datasource:
++          type: __expr__
++          uid: __expr__
++        conditions:
++        - evaluator:
++            type: gt
++            params:
++            - 0.05
++    noDataState: OK
++    execErrState: Error
++    for: 60s
++    isPaused: false
++    labels:
++      t072_loai: he-thong
++      t072_tin_hieu: loi-5xx
++      http_route: ticket
++      service_name: api-gateway
++      t072_uid: t072-loi-ticket
++    annotations:
++      summary: tỷ lệ 5xx gateway route ticket
++      t072_eval_interval_s: '10'
++      t072_for_s: '60'
++      t072_nguong: '0.05'
++      t072_nguong_phien_ban: c8f448543c2f
++      t072_bieu_thuc: T072-bieu-thuc-1
++    notification_settings:
++      receiver: t072-bo-nhan-nhe
++      group_by:
++      - '...'
++      group_wait: 0s
++      group_interval: 10s
++      repeat_interval: 4h
++  - uid: t072-live
++    title: t072-live
++    condition: C
++    data:
++    - refId: A
++      relativeTimeRange: *id001
++      datasourceUid: prometheus
++      model:
++        refId: A
++        expr: (((max by (http_url) (timestamp(httpcheck_error)) > on (http_url) max by (http_url) (timestamp(httpcheck_status{http_status_code!=""}))) or on (http_url) (max by (http_url) (timestamp(httpcheck_error)) unless on (http_url) max by (http_url) (timestamp(httpcheck_status{http_status_code!=""})))) and on (http_url) ((time() - max by (http_url) (timestamp(httpcheck_error))) <= 60)) * 0 + 1 or on (http_url) (max by (http_url) (timestamp(httpcheck_status{http_status_code!=""})) and on (http_url) ((time() - max by (http_url) (timestamp(httpcheck_status{http_status_code!=""}))) <= 60)) * 0
++        instant: true
++        range: false
++        intervalMs: 10000
++        maxDataPoints: 43200
++    - refId: C
++      relativeTimeRange:
++        from: 0
++        to: 0
++      datasourceUid: __expr__
++      model:
++        refId: C
++        type: threshold
++        expression: A
++        datasource:
++          type: __expr__
++          uid: __expr__
++        conditions:
++        - evaluator:
++            type: gt
++            params:
++            - 0.5
++    noDataState: OK
++    execErrState: Error
++    for: 20s
++    isPaused: false
++    labels:
++      t072_loai: he-thong
++      t072_tin_hieu: live
++      t072_uid: t072-live
++    annotations:
++      summary: 'liveness: lần dò mới nhất là lỗi'
++      t072_eval_interval_s: '10'
++      t072_for_s: '20'
++      t072_nguong: '0.5'
++      t072_nguong_phien_ban: c8f448543c2f
++      t072_bieu_thuc: T072-bieu-thuc-1
++    notification_settings:
++      receiver: t072-bo-nhan-nhe
++      group_by:
++      - '...'
++      group_wait: 0s
++      group_interval: 10s
++      repeat_interval: 4h
++  - uid: t072-mat-do
++    title: t072-mat-do
++    condition: C
++    data:
++    - refId: A
++      relativeTimeRange: *id001
++      datasourceUid: prometheus
++      model:
++        refId: A
++        expr: count((time() - max by (http_url) (timestamp(httpcheck_error) or timestamp(httpcheck_status{http_status_code!=""}))) <= 60)
++        instant: true
++        range: false
++        intervalMs: 10000
++        maxDataPoints: 43200
++    - refId: C
++      relativeTimeRange:
++        from: 0
++        to: 0
++      datasourceUid: __expr__
++      model:
++        refId: C
++        type: threshold
++        expression: A
++        datasource:
++          type: __expr__
++          uid: __expr__
++        conditions:
++        - evaluator:
++            type: lt
++            params:
++            - 8.0
++    noDataState: Alerting
++    execErrState: Error
++    for: 60s
++    isPaused: false
++    labels:
++      t072_loai: quan-sat
++      t072_tin_hieu: mat-do
++      t072_uid: t072-mat-do
++    annotations:
++      summary: 'mất quan sát: thiếu lần dò liveness'
++      t072_eval_interval_s: '10'
++      t072_for_s: '60'
++      t072_nguong: '8.0'
++      t072_nguong_phien_ban: c8f448543c2f
++      t072_bieu_thuc: T072-bieu-thuc-1
++    notification_settings:
++      receiver: t072-bo-nhan-nhe
++      group_by:
++      - '...'
++      group_wait: 0s
++      group_interval: 10s
++      repeat_interval: 4h
++  - uid: t072-mat-gw
++    title: t072-mat-gw
++    condition: C
++    data:
++    - refId: A
++      relativeTimeRange: *id001
++      datasourceUid: prometheus
++      model:
++        refId: A
++        expr: time() - max(timestamp(http_server_request_duration_seconds_count{service_name="api-gateway",http_route=~"booking|event|payment|ticket"}))
++        instant: true
++        range: false
++        intervalMs: 10000
++        maxDataPoints: 43200
++    - refId: C
++      relativeTimeRange:
++        from: 0
++        to: 0
++      datasourceUid: __expr__
++      model:
++        refId: C
++        type: threshold
++        expression: A
++        datasource:
++          type: __expr__
++          uid: __expr__
++        conditions:
++        - evaluator:
++            type: gt
++            params:
++            - 60.0
++    noDataState: Alerting
++    execErrState: Error
++    for: 60s
++    isPaused: false
++    labels:
++      t072_loai: quan-sat
++      t072_tin_hieu: mat-gw
++      t072_uid: t072-mat-gw
++    annotations:
++      summary: 'mất quan sát: histogram gateway không có mẫu mới'
++      t072_eval_interval_s: '10'
++      t072_for_s: '60'
++      t072_nguong: '60.0'
++      t072_nguong_phien_ban: c8f448543c2f
++      t072_bieu_thuc: T072-bieu-thuc-1
++    notification_settings:
++      receiver: t072-bo-nhan-nhe
++      group_by:
++      - '...'
++      group_wait: 0s
++      group_interval: 10s
++      repeat_interval: 4h
+diff --git a/observability/grafana/provisioning/alerting/t072-thu-e3-go.yaml.mau b/observability/grafana/provisioning/alerting/t072-thu-e3-go.yaml.mau
+new file mode 100644
+index 0000000..ff22bcf
+--- /dev/null
++++ b/observability/grafana/provisioning/alerting/t072-thu-e3-go.yaml.mau
+@@ -0,0 +1,11 @@
++# T-072 E3: gỡ luật thử (deleteRules). Sinh bởi results/T-072/sinh_luat_thu_e3.py go. Không sửa tay.
++apiVersion: 1
++deleteRules:
++- orgId: 1
++  uid: t072-thu-p95-booking
++- orgId: 1
++  uid: t072-thu-p95-event
++- orgId: 1
++  uid: t072-thu-p95-payment
++- orgId: 1
++  uid: t072-thu-p95-ticket
+diff --git a/observability/grafana/provisioning/alerting/t072-thu-e3.yaml b/observability/grafana/provisioning/alerting/t072-thu-e3.yaml
+new file mode 100644
+index 0000000..66af40b
+--- /dev/null
++++ b/observability/grafana/provisioning/alerting/t072-thu-e3.yaml
+@@ -0,0 +1,231 @@
++# T-072 E3: luật THỬ (bản sao p95, ngưỡng 0,005 s). Phải gỡ bằng t072-thu-e3-go.yaml (commit G) trước giờ hiệu lực E4.
++# Sinh bởi results/T-072/sinh_luat_thu_e3.py nap. Không sửa tay.
++apiVersion: 1
++groups:
++- orgId: 1
++  name: t072-e3-thu
++  folder: T-072 E3 thử (gỡ trước E4)
++  interval: 10s
++  rules:
++  - uid: t072-thu-p95-booking
++    title: t072-thu-p95-booking
++    condition: C
++    data:
++    - refId: A
++      relativeTimeRange: &id001
++        from: 600
++        to: 0
++      datasourceUid: prometheus
++      model:
++        refId: A
++        expr: histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_seconds_bucket{service_name="api-gateway",http_route="booking"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="booking"}[5m])) >= 30)
++        instant: true
++        range: false
++        intervalMs: 10000
++        maxDataPoints: 43200
++    - refId: C
++      relativeTimeRange:
++        from: 0
++        to: 0
++      datasourceUid: __expr__
++      model:
++        refId: C
++        type: threshold
++        expression: A
++        datasource:
++          type: __expr__
++          uid: __expr__
++        conditions:
++        - evaluator:
++            type: gt
++            params:
++            - 0.005
++    noDataState: OK
++    execErrState: Error
++    for: 60s
++    isPaused: false
++    labels:
++      t072_loai: thu
++      t072_tin_hieu: p95-thu
++      t072_uid: t072-thu-p95-booking
++      http_route: booking
++      service_name: api-gateway
++    annotations:
++      summary: THỬ E3 — bản sao t072-p95-booking, ngưỡng thử 0.005 s
++      t072_eval_interval_s: '10'
++      t072_for_s: '60'
++      t072_nguong: '0.005'
++      t072_nguong_phien_ban: thu-e3
++      t072_bieu_thuc: T072-bieu-thuc-1
++    notification_settings:
++      receiver: t072-bo-nhan-nhe
++      group_by:
++      - '...'
++      group_wait: 0s
++      group_interval: 10s
++      repeat_interval: 4h
++  - uid: t072-thu-p95-event
++    title: t072-thu-p95-event
++    condition: C
++    data:
++    - refId: A
++      relativeTimeRange: *id001
++      datasourceUid: prometheus
++      model:
++        refId: A
++        expr: histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_seconds_bucket{service_name="api-gateway",http_route="event"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="event"}[5m])) >= 30)
++        instant: true
++        range: false
++        intervalMs: 10000
++        maxDataPoints: 43200
++    - refId: C
++      relativeTimeRange:
++        from: 0
++        to: 0
++      datasourceUid: __expr__
++      model:
++        refId: C
++        type: threshold
++        expression: A
++        datasource:
++          type: __expr__
++          uid: __expr__
++        conditions:
++        - evaluator:
++            type: gt
++            params:
++            - 0.005
++    noDataState: OK
++    execErrState: Error
++    for: 60s
++    isPaused: false
++    labels:
++      t072_loai: thu
++      t072_tin_hieu: p95-thu
++      t072_uid: t072-thu-p95-event
++      http_route: event
++      service_name: api-gateway
++    annotations:
++      summary: THỬ E3 — bản sao t072-p95-event, ngưỡng thử 0.005 s
++      t072_eval_interval_s: '10'
++      t072_for_s: '60'
++      t072_nguong: '0.005'
++      t072_nguong_phien_ban: thu-e3
++      t072_bieu_thuc: T072-bieu-thuc-1
++    notification_settings:
++      receiver: t072-bo-nhan-nhe
++      group_by:
++      - '...'
++      group_wait: 0s
++      group_interval: 10s
++      repeat_interval: 4h
++  - uid: t072-thu-p95-payment
++    title: t072-thu-p95-payment
++    condition: C
++    data:
++    - refId: A
++      relativeTimeRange: *id001
++      datasourceUid: prometheus
++      model:
++        refId: A
++        expr: histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_seconds_bucket{service_name="api-gateway",http_route="payment"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="payment"}[5m])) >= 30)
++        instant: true
++        range: false
++        intervalMs: 10000
++        maxDataPoints: 43200
++    - refId: C
++      relativeTimeRange:
++        from: 0
++        to: 0
++      datasourceUid: __expr__
++      model:
++        refId: C
++        type: threshold
++        expression: A
++        datasource:
++          type: __expr__
++          uid: __expr__
++        conditions:
++        - evaluator:
++            type: gt
++            params:
++            - 0.005
++    noDataState: OK
++    execErrState: Error
++    for: 60s
++    isPaused: false
++    labels:
++      t072_loai: thu
++      t072_tin_hieu: p95-thu
++      t072_uid: t072-thu-p95-payment
++      http_route: payment
++      service_name: api-gateway
++    annotations:
++      summary: THỬ E3 — bản sao t072-p95-payment, ngưỡng thử 0.005 s
++      t072_eval_interval_s: '10'
++      t072_for_s: '60'
++      t072_nguong: '0.005'
++      t072_nguong_phien_ban: thu-e3
++      t072_bieu_thuc: T072-bieu-thuc-1
++    notification_settings:
++      receiver: t072-bo-nhan-nhe
++      group_by:
++      - '...'
++      group_wait: 0s
++      group_interval: 10s
++      repeat_interval: 4h
++  - uid: t072-thu-p95-ticket
++    title: t072-thu-p95-ticket
++    condition: C
++    data:
++    - refId: A
++      relativeTimeRange: *id001
++      datasourceUid: prometheus
++      model:
++        refId: A
++        expr: histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_seconds_bucket{service_name="api-gateway",http_route="ticket"}[5m]))) and on (http_route) (sum by (http_route) (increase(http_server_request_duration_seconds_count{service_name="api-gateway",http_route="ticket"}[5m])) >= 30)
++        instant: true
++        range: false
++        intervalMs: 10000
++        maxDataPoints: 43200
++    - refId: C
++      relativeTimeRange:
++        from: 0
++        to: 0
++      datasourceUid: __expr__
++      model:
++        refId: C
++        type: threshold
++        expression: A
++        datasource:
++          type: __expr__
++          uid: __expr__
++        conditions:
++        - evaluator:
++            type: gt
++            params:
++            - 0.005
++    noDataState: OK
++    execErrState: Error
++    for: 60s
++    isPaused: false
++    labels:
++      t072_loai: thu
++      t072_tin_hieu: p95-thu
++      t072_uid: t072-thu-p95-ticket
++      http_route: ticket
++      service_name: api-gateway
++    annotations:
++      summary: THỬ E3 — bản sao t072-p95-ticket, ngưỡng thử 0.005 s
++      t072_eval_interval_s: '10'
++      t072_for_s: '60'
++      t072_nguong: '0.005'
++      t072_nguong_phien_ban: thu-e3
++      t072_bieu_thuc: T072-bieu-thuc-1
++    notification_settings:
++      receiver: t072-bo-nhan-nhe
++      group_by:
++      - '...'
++      group_wait: 0s
++      group_interval: 10s
++      repeat_interval: 4h
+diff --git a/observability/t072-bo-nhan/bo_nhan.py b/observability/t072-bo-nhan/bo_nhan.py
+new file mode 100644
+index 0000000..ff98735
+--- /dev/null
++++ b/observability/t072-bo-nhan/bo_nhan.py
+@@ -0,0 +1,42 @@
++# -*- coding: utf-8 -*-
++"""T-072 — bộ nhận webhook nhẹ để kiểm giao nhận cảnh báo ở E3 (I12). Không phải bộ nhận của chế độ (b) (T-073).
++
++Chạy (exp-obs, khung S2): python3 bo_nhan.py --nghe <ip>:<cổng> --ra /srv/rca-lab/runs/t072-e3-<n>/webhook.jsonl
++Mỗi request POST: ghi một dòng {nhan_webhook_utc, nhan_epoch, duong_dan, do_dai, than}. Giờ nhận đo khi request tới,
++trước khi đọc thân (I1). Thân giữ nguyên văn (chuỗi) để kiểm lại; không phân tích, không lọc. Chỉ thư viện chuẩn.
++"""
++import argparse, datetime, json, os, time
++from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
++
++
++def main():
++    ap = argparse.ArgumentParser()
++    ap.add_argument('--nghe', required=True, help='ip:cổng')
++    ap.add_argument('--ra', required=True)
++    a = ap.parse_args()
++    ip, cong = a.nghe.rsplit(':', 1)
++    os.makedirs(os.path.dirname(os.path.abspath(a.ra)), exist_ok=True)
++
++    class H(BaseHTTPRequestHandler):
++        def do_POST(self):
++            t = time.time()
++            n = int(self.headers.get('Content-Length') or 0)
++            than = self.rfile.read(n).decode('utf-8', 'replace')
++            dong = {'nhan_webhook_utc': datetime.datetime.fromtimestamp(t, datetime.timezone.utc).isoformat(),
++                    'nhan_epoch': t, 'duong_dan': self.path, 'do_dai': n, 'than': than}
++            with open(a.ra, 'a', encoding='utf-8') as f:
++                f.write(json.dumps(dong, ensure_ascii=False) + '\n')
++                f.flush()
++                os.fsync(f.fileno())
++            self.send_response(200)
++            self.end_headers()
++            self.wfile.write(b'ok\n')
++
++        def log_message(self, *x):
++            pass
++
++    ThreadingHTTPServer((ip, int(cong)), H).serve_forever()
++
++
++if __name__ == '__main__':
++    main()

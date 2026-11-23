@@ -1,0 +1,28 @@
+Bản: V082-V066+H8a
+
+== Ca không lỗi: max s / số kênh có cờ theo thực thể (cũ | mới)
+ô                mã cũ        mã mới                  api-gateway              booking-serv              event-servic              payment-serv              ticket-servi                  keycloak              user-service
+BINH-THUONG      eb48d6b3     1e5debb6        0/0  |      0/0           0/0  |      0/0          83/1  |      0/0           0/0  |      3/1           0/0  |      0/0           0/0  |      0/0           0/0  |      0/0     verdict CAUSE_|CAUSE_
+BINH-THUONG      729604d2     f4b94c66        0/0  |      0/0           0/0  |      0/0           0/0  |      0/0           0/0  |      0/0           0/0  |      0/0           0/0  |      0/0           0/0  |      0/0     verdict NO_INT|NO_INT
+FLASH-HEALTHY    fb1cf0e9     124242f0      423/5  |    233/6         257/18 |    431/10        219/15 |    506/13         84/6  |    213/9         190/10 |    937/8         570/3  |      0/0           0/0  |      0/0     verdict CAUSE_|CAUSE_
+BINH-THUONG      83073ed1     a06231fd        0/0  |      0/0           0/0  |      0/0           0/0  |    241/3           0/0  |      0/0           0/0  |     13/1           0/0  |      0/0           0/0  |      0/0     verdict NO_INT|CAUSE_
+BINH-THUONG      f20b0ca5     b30c9581        0/0  |      0/0          53/1  |     14/1           0/0  |      0/0          44/1  |      0/0           0/0  |      0/0           0/0  |      0/0           0/0  |      0/0     verdict CAUSE_|CAUSE_
+BINH-THUONG-X3   1e5a3dc5     0bec9eca        0/0  |      0/0           0/0  |      0/0           0/0  |      0/0           3/1  |      0/0           5/1  |      0/0           0/0  |      0/0           0/0  |      0/0     verdict CAUSE_|NO_INT
+
+== s của kênh nghi ngờ trên mọi ca (cũ → mới; 0 = không có cờ)
+ô                        SELECT booking_schema.tbl_or              SELECT booking_db               SELECT ticket_db   SELECT keycloak_db.OUTBOX_EN
+BINH-THUONG                       0 → 0                         0 → 0                         0 → 0                         0 → 0             
+EVENT-DB-LAT                      0 → 0                         0 → 0                       262 → 0                         0 → 0             
+CPU-BOOK-1                      110 → 253                     170 → 450                     200 → 946                     192 → 696           
+HTTP5-EVENT                      20 → 332                      39 → 292                       0 → 0                         0 → 0             
+BINH-THUONG                       0 → 0                         0 → 0                         0 → 0                         0 → 0             
+REDIS-BOOK                        0 → 0                         0 → 0                         0 → 0                         0 → 0             
+FLASH-HEALTHY                     0 → 0                         0 → 0                       190 → 937                     158 → 0             
+NET-GW-BOOK                       0 → 0                         0 → 0                         0 → 0                         0 → 0             
+BINH-THUONG                       0 → 0                         0 → 0                         0 → 0                         0 → 0             
+CPU-BOOK-2                      123 → 463                     143 → 585                     318 → 706                     205 → 847           
+HTTP5-EVENT-FLASH               101 → 138                      72 → 410                       0 → 0                         0 → 0             
+PAUSE-PAYMENT                   433 → 312                     311 → 453                       0 → 0                         0 → 0             
+BINH-THUONG                       0 → 0                         0 → 0                         0 → 0                         0 → 0             
+CONSUMER-BOOK-SLOW-X3             0 → 0                         0 → 546                       0 → 0                         0 → 0             
+BINH-THUONG-X3                    0 → 0                         0 → 0                         0 → 0                         0 → 0             

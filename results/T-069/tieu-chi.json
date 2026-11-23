@@ -1,0 +1,816 @@
+{
+ "task": "T-069 (W3) — V082 không hồi quy trên bản ghim 36a3725",
+ "ghi_utc": "2026-11-19T06:49:50+00:00",
+ "trang_thai": "khai trước: chưa thu ca nào của T-069",
+ "nguon_sha256": {
+  "tasks/T-069-v082-ban-ghim/SPEC.md": "7a97d0172913f90c4dfc42f81d65e51d28e1d723e89d894be90ac8ff15dde6f6",
+  "results/T-064/tap-chon-dev3-17.json": "8d060ce933d1998d267e01e632a5569120cb180a17491a871383a76092526e0d",
+  "results/T-064/dap-an-dev3.json": "c0724c3c21566ac31136da02e286f93fba10c0e1017b7e194ead23248e8ff7f9",
+  "results/T-064/cham/cham_dev3.py": "ee0562d0c85b9cb17adc8e9e0a1eedc30db23ac17039ced2c35bf00ddb2b4ac6",
+  "src/m1_ft/cham.py": "37fd7b75e2580b4686e804da177cf39151f7a735302f82edcb6bd6586d2188fc",
+  "results/T-064/cham/spec-dev3-d0-v082-r9.json": "7daed78db9274d7472411314d31f916187178ca97b816e1bb779d6c4c10cb86a",
+  "results/T-064/cham/chon-dev3-d0-v082-r9-A.json": "771788911cf00a1aa0b30961d6e843439e9fec7b00532a8019f72f6722302c20",
+  "results/T-064/manifest-3.json": "faa7d29285892f880ddc186cb248382af93f36b4e0f12a99559567578ca2bfea",
+  "results/T-063/chay/dieu-kien-xac-nhan.md": "d9f2aa9dd4ddf8cd175ecda7883b2ca7c8e305dc96d4c7b9f61673969f79ec95",
+  "results/T-063/chay/xac_nhan_ca.py": "f4fea7da767a95eb02625af06cc66b7ad8f7c14c5fb989c0bb097526d5c1280d",
+  "results/T-063/thu3/dieu-kien-xac-nhan-3.md": "62b42bff2b92459e895a826542fe859bfe75d30729f220598182416fdb1f320b",
+  "results/T-063/thu3/scripts/xac_nhan_ca_3.py": "7b69a8ddf4472e66037de73ba563748222d527dc92ff94ce70c34089496413e3"
+ },
+ "repo_lab": {
+  "commit": "ddb22dcb7db4480dc968244f35604f37b940891c",
+  "inj3_sha256": "e9c503147c5d4703e271ec6fee09f7f2faf08c6a34b4a9e2db8ec72b15b03cdf",
+  "lich_t069_thu_sha256": "6d4c5a31b71a52b7f0c35bdb0ccbabd243cb239ce36e743109497dfc10ac6c70",
+  "lich_t069_sha256": "f25654bb4bbaf615bf4a28edc2bf2235c2088428c0675dea1e995a1ae8f5b7e9",
+  "runner4_sha256": "3ce130be5a420d453f434862302a0f739755311177fe20285f88f46217d796dd"
+ },
+ "phia_cu_tong": {
+  "V082": {
+   "AC@1": 9.0,
+   "AC@3": 11.0,
+   "tong_hang_cat": 13.0,
+   "K": 4,
+   "loi_chay": []
+  },
+  "P7": {
+   "AC@1": 7.0,
+   "AC@3": 9.0,
+   "tong_hang_cat": 23.0,
+   "K": 5,
+   "loi_chay": [
+    "ebd5ef38"
+   ]
+  }
+ },
+ "cap_ca": [
+  {
+   "o": "BINH-THUONG",
+   "loai": "khong_loi",
+   "tap_chap_nhan": null,
+   "cu": {
+    "ma": "eb48d6b3",
+    "nhom_thu": "thu2 (lich-2)",
+    "image": "arm64-t062-6b21ed55 cả 7 service",
+    "dong_bang": "results/T-063/dong-bang/dong-bang-2.json",
+    "xac_nhan": "results/T-063/chay/xac-nhan-ca-2.json",
+    "V082": {
+     "status": "OK",
+     "k": 1,
+     "verdict": "CAUSE_FOUND",
+     "sha256": "4459d4bf34db1a0a4bdc07e38e18415ea91bae49fe5e00f6c007bcead3b779f6",
+     "nguon": "results/T-064/kiem/nhan-luot5/l5/dev2/d0/V082-V066+H8a/eb48d6b3"
+    },
+    "P7": {
+     "status": "OK",
+     "k": 1,
+     "verdict": "CAUSE_FOUND",
+     "sha256": "9ef94f41287fd27b67fe3b570c40c76e08f8a0e6adac5b625161721d1e8fcd8b",
+     "nguon": "results/T-064/cham/dau-ra-dev2/P7/eb48d6b3"
+    }
+   },
+   "moi": {
+    "lich": "lich-t069",
+    "chu_ky": 0,
+    "multiplier": 1,
+    "flash_x3_tai_moc_t": false,
+    "image": "arm64-t067-36a3725d cả 7 service (results/T-067/trien-khai/chuoi-container.json)",
+    "can_thiep_inj3": {
+     "kind": "none"
+    }
+   },
+   "cua_so": "tải 1800 s; t = mốc tải + 600 (sổ load-start); lỗi [t, t+600]; M1 như runner4 (stage tại t+750); chế độ (a) t từ sổ"
+  },
+  {
+   "o": "EVENT-DB-LAT",
+   "loai": "loi",
+   "tap_chap_nhan": [
+    "event-service",
+    "event_db"
+   ],
+   "cu": {
+    "ma": "4af494a5",
+    "nhom_thu": "thu2 (lich-2)",
+    "image": "arm64-t062-6b21ed55 cả 7 service",
+    "dong_bang": "results/T-063/dong-bang/dong-bang-2.json",
+    "xac_nhan": "results/T-063/chay/xac-nhan-ca-2.json",
+    "V082": {
+     "status": "OK",
+     "hang_cat": 1.0,
+     "hang_ky_vong": 1.0,
+     "p1": 1.0,
+     "p3": 1.0,
+     "sha256": "8a3d8cb47af058ca4a4b226921827f7c110b07555ea17b45b220c32533a2c07f",
+     "nguon": "results/T-064/kiem/nhan-luot5/l5/dev2/d0/V082-V066+H8a/4af494a5"
+    },
+    "P7": {
+     "status": "OK",
+     "hang_cat": 2.0,
+     "hang_ky_vong": 2.0,
+     "p1": 0.0,
+     "p3": 1.0,
+     "sha256": "8051be15d1c9e23c0367dfe47b28f1fe326efeaa887a4025ea1485189b399fd0",
+     "nguon": "results/T-064/cham/dau-ra-dev2/P7/4af494a5"
+    }
+   },
+   "moi": {
+    "lich": "lich-t069",
+    "chu_ky": 1,
+    "multiplier": 1,
+    "flash_x3_tai_moc_t": false,
+    "image": "arm64-t067-36a3725d cả 7 service (results/T-067/trien-khai/chuoi-container.json)",
+    "can_thiep_inj3": {
+     "kind": "toxic",
+     "proxy": "event-jdbc",
+     "latency": 30
+    }
+   },
+   "cua_so": "tải 1800 s; t = mốc tải + 600 (sổ load-start); lỗi [t, t+600]; M1 như runner4 (stage tại t+750); chế độ (a) t từ sổ"
+  },
+  {
+   "o": "CPU-BOOK-1",
+   "loai": "loi",
+   "tap_chap_nhan": [
+    "booking-service"
+   ],
+   "cu": {
+    "ma": "19b17e22",
+    "nhom_thu": "thu2 (lich-2)",
+    "image": "arm64-t062-6b21ed55 cả 7 service",
+    "dong_bang": "results/T-063/dong-bang/dong-bang-2.json",
+    "xac_nhan": "results/T-063/chay/xac-nhan-ca-2.json",
+    "V082": {
+     "status": "OK",
+     "hang_cat": 1.0,
+     "hang_ky_vong": 1.0,
+     "p1": 1.0,
+     "p3": 1.0,
+     "sha256": "567eb867b8184a6f3cd4bdae03dd523a8a02352d56128890a391181ea8a403ab",
+     "nguon": "results/T-064/kiem/nhan-luot5/l5/dev2/d0/V082-V066+H8a/19b17e22"
+    },
+    "P7": {
+     "status": "OK",
+     "hang_cat": 1.0,
+     "hang_ky_vong": 1.0,
+     "p1": 1.0,
+     "p3": 1.0,
+     "sha256": "a3b82e17314bce787403910cb0820b499f6d03d3af58a30e0579502d79c7f33c",
+     "nguon": "results/T-064/cham/dau-ra-dev2/P7/19b17e22"
+    }
+   },
+   "moi": {
+    "lich": "lich-t069",
+    "chu_ky": 2,
+    "multiplier": 1,
+    "flash_x3_tai_moc_t": false,
+    "image": "arm64-t067-36a3725d cả 7 service (results/T-067/trien-khai/chuoi-container.json)",
+    "can_thiep_inj3": {
+     "kind": "cpu",
+     "workers": 1
+    }
+   },
+   "cua_so": "tải 1800 s; t = mốc tải + 600 (sổ load-start); lỗi [t, t+600]; M1 như runner4 (stage tại t+750); chế độ (a) t từ sổ"
+  },
+  {
+   "o": "HTTP5-EVENT",
+   "loai": "loi",
+   "tap_chap_nhan": [
+    "event-service"
+   ],
+   "cu": {
+    "ma": "e9c9679b",
+    "nhom_thu": "thu2 (lich-2)",
+    "image": "arm64-t062-6b21ed55 cả 7 service",
+    "dong_bang": "results/T-063/dong-bang/dong-bang-2.json",
+    "xac_nhan": "results/T-063/chay/xac-nhan-ca-2.json",
+    "V082": {
+     "status": "OK",
+     "hang_cat": 1.0,
+     "hang_ky_vong": 1.0,
+     "p1": 1.0,
+     "p3": 1.0,
+     "sha256": "ccbe72ae933befc0c55bc62e2460d06336241bd6c65bb105166d3a5a66ab5047",
+     "nguon": "results/T-064/kiem/nhan-luot5/l5/dev2/d0/V082-V066+H8a/e9c9679b"
+    },
+    "P7": {
+     "status": "OK",
+     "hang_cat": 1.0,
+     "hang_ky_vong": 1.0,
+     "p1": 1.0,
+     "p3": 1.0,
+     "sha256": "553b010652a4c4260597385ef7bf6573c0426d86098aee204829ebfbce7b44fd",
+     "nguon": "results/T-064/cham/dau-ra-dev2/P7/e9c9679b"
+    }
+   },
+   "moi": {
+    "lich": "lich-t069-thu",
+    "chu_ky": 0,
+    "multiplier": 1,
+    "flash_x3_tai_moc_t": false,
+    "image": "arm64-t067-36a3725d cả 7 service (results/T-067/trien-khai/chuoi-container.json)",
+    "can_thiep_inj3": {
+     "kind": "hook",
+     "service": "event-service",
+     "action": "http.error",
+     "target": "3e7c1df9-ada4-4081-94a1-548b80a5da86",
+     "value": 0
+    }
+   },
+   "cua_so": "tải 1800 s; t = mốc tải + 600 (sổ load-start); lỗi [t, t+600]; M1 như runner4 (stage tại t+750); chế độ (a) t từ sổ"
+  },
+  {
+   "o": "BINH-THUONG",
+   "loai": "khong_loi",
+   "tap_chap_nhan": null,
+   "cu": {
+    "ma": "729604d2",
+    "nhom_thu": "thu2 (lich-2)",
+    "image": "arm64-t062-6b21ed55 cả 7 service",
+    "dong_bang": "results/T-063/dong-bang/dong-bang-2.json",
+    "xac_nhan": "results/T-063/chay/xac-nhan-ca-2.json",
+    "V082": {
+     "status": "OK",
+     "k": 0,
+     "verdict": "NO_INTRINSIC_ANOMALY",
+     "sha256": "a381f3ff1282f02b7ccd54abd61c7190891a81adad5831634135dcd7539dd642",
+     "nguon": "results/T-064/kiem/nhan-luot5/l5/dev2/d0/V082-V066+H8a/729604d2"
+    },
+    "P7": {
+     "status": "OK",
+     "k": 1,
+     "verdict": "CAUSE_FOUND",
+     "sha256": "54347853ce44ab73012773b54cf7f7aa2d1b43b474d89b7dda7378432c19bda0",
+     "nguon": "results/T-064/cham/dau-ra-dev2/P7/729604d2"
+    }
+   },
+   "moi": {
+    "lich": "lich-t069",
+    "chu_ky": 3,
+    "multiplier": 1,
+    "flash_x3_tai_moc_t": false,
+    "image": "arm64-t067-36a3725d cả 7 service (results/T-067/trien-khai/chuoi-container.json)",
+    "can_thiep_inj3": {
+     "kind": "none"
+    }
+   },
+   "cua_so": "tải 1800 s; t = mốc tải + 600 (sổ load-start); lỗi [t, t+600]; M1 như runner4 (stage tại t+750); chế độ (a) t từ sổ"
+  },
+  {
+   "o": "REDIS-BOOK",
+   "loai": "loi",
+   "tap_chap_nhan": [
+    "booking-service",
+    "cache"
+   ],
+   "cu": {
+    "ma": "6949870c",
+    "nhom_thu": "thu2 (lich-2)",
+    "image": "arm64-t062-6b21ed55 cả 7 service",
+    "dong_bang": "results/T-063/dong-bang/dong-bang-2.json",
+    "xac_nhan": "results/T-063/chay/xac-nhan-ca-2.json",
+    "V082": {
+     "status": "OK",
+     "hang_cat": 1.0,
+     "hang_ky_vong": 1.0,
+     "p1": 1.0,
+     "p3": 1.0,
+     "sha256": "ef95d2dfdf6eac321d74c452510dc6dd761d1a23eeb159df9415b119e7782bf5",
+     "nguon": "results/T-064/kiem/nhan-luot5/l5/dev2/d0/V082-V066+H8a/6949870c"
+    },
+    "P7": {
+     "status": "OK",
+     "hang_cat": 1.0,
+     "hang_ky_vong": 1.0,
+     "p1": 1.0,
+     "p3": 1.0,
+     "sha256": "4807d0bfe6a2e6a94db2aaadf6069eb81fc7406fbe9d5777ecba3970d1686c9b",
+     "nguon": "results/T-064/cham/dau-ra-dev2/P7/6949870c"
+    }
+   },
+   "moi": {
+    "lich": "lich-t069",
+    "chu_ky": 4,
+    "multiplier": 1,
+    "flash_x3_tai_moc_t": false,
+    "image": "arm64-t067-36a3725d cả 7 service (results/T-067/trien-khai/chuoi-container.json)",
+    "can_thiep_inj3": {
+     "kind": "toxic",
+     "proxy": "booking-redis",
+     "latency": 200
+    }
+   },
+   "cua_so": "tải 1800 s; t = mốc tải + 600 (sổ load-start); lỗi [t, t+600]; M1 như runner4 (stage tại t+750); chế độ (a) t từ sổ"
+  },
+  {
+   "o": "FLASH-HEALTHY",
+   "loai": "khong_loi",
+   "tap_chap_nhan": null,
+   "cu": {
+    "ma": "fb1cf0e9",
+    "nhom_thu": "thu2 (lich-2)",
+    "image": "arm64-t062-6b21ed55 cả 7 service",
+    "dong_bang": "results/T-063/dong-bang/dong-bang-2.json",
+    "xac_nhan": "results/T-063/chay/xac-nhan-ca-2.json",
+    "V082": {
+     "status": "OK",
+     "k": 1,
+     "verdict": "CAUSE_FOUND",
+     "sha256": "823eb175fff60ee0b10c2a3a077b95170edcc1da24ce7e7dee2ee9755e24e3a5",
+     "nguon": "results/T-064/kiem/nhan-luot5/l5/dev2/d0/V082-V066+H8a/fb1cf0e9"
+    },
+    "P7": {
+     "status": "OK",
+     "k": 1,
+     "verdict": "CAUSE_FOUND",
+     "sha256": "d425967e541a78be7903cc47cde76de335da03d1cfa1eefc309490fa09ba8e0b",
+     "nguon": "results/T-064/cham/dau-ra-dev2/P7/fb1cf0e9"
+    }
+   },
+   "moi": {
+    "lich": "lich-t069",
+    "chu_ky": 5,
+    "multiplier": 1,
+    "flash_x3_tai_moc_t": true,
+    "image": "arm64-t067-36a3725d cả 7 service (results/T-067/trien-khai/chuoi-container.json)",
+    "can_thiep_inj3": {
+     "kind": "none"
+    }
+   },
+   "cua_so": "tải 1800 s; t = mốc tải + 600 (sổ load-start); lỗi [t, t+600]; M1 như runner4 (stage tại t+750); chế độ (a) t từ sổ"
+  },
+  {
+   "o": "NET-GW-BOOK",
+   "loai": "loi",
+   "tap_chap_nhan": [
+    "api-gateway",
+    "booking-service"
+   ],
+   "cu": {
+    "ma": "5fb8208f",
+    "nhom_thu": "thu2 (lich-2)",
+    "image": "arm64-t062-6b21ed55 cả 7 service",
+    "dong_bang": "results/T-063/dong-bang/dong-bang-2.json",
+    "xac_nhan": "results/T-063/chay/xac-nhan-ca-2.json",
+    "V082": {
+     "status": "OK",
+     "hang_cat": 1.0,
+     "hang_ky_vong": 1.0,
+     "p1": 1.0,
+     "p3": 1.0,
+     "sha256": "dcddaa5413f5217702743141e4b097bb91d2f13b7d45d267cbc1bee4087df91f",
+     "nguon": "results/T-064/kiem/nhan-luot5/l5/dev2/d0/V082-V066+H8a/5fb8208f"
+    },
+    "P7": {
+     "status": "OK",
+     "hang_cat": 1.0,
+     "hang_ky_vong": 1.0,
+     "p1": 1.0,
+     "p3": 1.0,
+     "sha256": "d4dd1d8ffe942da186212a6913489e9788ebd3da4352cca0824bc8c3555dd072",
+     "nguon": "results/T-064/cham/dau-ra-dev2/P7/5fb8208f"
+    }
+   },
+   "moi": {
+    "lich": "lich-t069",
+    "chu_ky": 6,
+    "multiplier": 1,
+    "flash_x3_tai_moc_t": false,
+    "image": "arm64-t067-36a3725d cả 7 service (results/T-067/trien-khai/chuoi-container.json)",
+    "can_thiep_inj3": {
+     "kind": "toxic",
+     "proxy": "gateway-booking-http",
+     "latency": 300
+    }
+   },
+   "cua_so": "tải 1800 s; t = mốc tải + 600 (sổ load-start); lỗi [t, t+600]; M1 như runner4 (stage tại t+750); chế độ (a) t từ sổ"
+  },
+  {
+   "o": "BINH-THUONG",
+   "loai": "khong_loi",
+   "tap_chap_nhan": null,
+   "cu": {
+    "ma": "83073ed1",
+    "nhom_thu": "thu2 (lich-2)",
+    "image": "arm64-t062-6b21ed55 cả 7 service",
+    "dong_bang": "results/T-063/dong-bang/dong-bang-2.json",
+    "xac_nhan": "results/T-063/chay/xac-nhan-ca-2.json",
+    "V082": {
+     "status": "OK",
+     "k": 0,
+     "verdict": "NO_INTRINSIC_ANOMALY",
+     "sha256": "262d5da016575105043347a5c296138ef0f12cd34acc487aee09edc00ae965e6",
+     "nguon": "results/T-064/kiem/nhan-luot5/l5/dev2/d0/V082-V066+H8a/83073ed1"
+    },
+    "P7": {
+     "status": "OK",
+     "k": 0,
+     "verdict": "NO_INTRINSIC_ANOMALY",
+     "sha256": "9cf115239e18aa49336f84f519e33779ea67cae4f172d0a3393fa2cb28727893",
+     "nguon": "results/T-064/cham/dau-ra-dev2/P7/83073ed1"
+    }
+   },
+   "moi": {
+    "lich": "lich-t069",
+    "chu_ky": 7,
+    "multiplier": 1,
+    "flash_x3_tai_moc_t": false,
+    "image": "arm64-t067-36a3725d cả 7 service (results/T-067/trien-khai/chuoi-container.json)",
+    "can_thiep_inj3": {
+     "kind": "none"
+    }
+   },
+   "cua_so": "tải 1800 s; t = mốc tải + 600 (sổ load-start); lỗi [t, t+600]; M1 như runner4 (stage tại t+750); chế độ (a) t từ sổ"
+  },
+  {
+   "o": "CPU-BOOK-2",
+   "loai": "loi",
+   "tap_chap_nhan": [
+    "booking-service"
+   ],
+   "cu": {
+    "ma": "60166807",
+    "nhom_thu": "thu2 (lich-2)",
+    "image": "arm64-t062-6b21ed55 cả 7 service",
+    "dong_bang": "results/T-063/dong-bang/dong-bang-2.json",
+    "xac_nhan": "results/T-063/chay/xac-nhan-ca-2.json",
+    "V082": {
+     "status": "OK",
+     "hang_cat": 2.0,
+     "hang_ky_vong": 2.0,
+     "p1": 0.0,
+     "p3": 1.0,
+     "sha256": "cae168254a7f481f66da1890b823a2d03a1ca4a9e1f60cf47797e39fabf2dc41",
+     "nguon": "results/T-064/kiem/nhan-luot5/l5/dev2/d0/V082-V066+H8a/60166807"
+    },
+    "P7": {
+     "status": "OK",
+     "hang_cat": 1.0,
+     "hang_ky_vong": 1.0,
+     "p1": 1.0,
+     "p3": 1.0,
+     "sha256": "106a6f2722f4350692172571dcacf46e89c4efd22158509897c117bfb381a576",
+     "nguon": "results/T-064/cham/dau-ra-dev2/P7/60166807"
+    }
+   },
+   "moi": {
+    "lich": "lich-t069",
+    "chu_ky": 8,
+    "multiplier": 1,
+    "flash_x3_tai_moc_t": false,
+    "image": "arm64-t067-36a3725d cả 7 service (results/T-067/trien-khai/chuoi-container.json)",
+    "can_thiep_inj3": {
+     "kind": "cpu",
+     "workers": 2
+    }
+   },
+   "cua_so": "tải 1800 s; t = mốc tải + 600 (sổ load-start); lỗi [t, t+600]; M1 như runner4 (stage tại t+750); chế độ (a) t từ sổ"
+  },
+  {
+   "o": "HTTP5-EVENT-FLASH",
+   "loai": "loi",
+   "tap_chap_nhan": [
+    "event-service"
+   ],
+   "cu": {
+    "ma": "98ea5ba4",
+    "nhom_thu": "thu2 (lich-2)",
+    "image": "arm64-t062-6b21ed55 cả 7 service",
+    "dong_bang": "results/T-063/dong-bang/dong-bang-2.json",
+    "xac_nhan": "results/T-063/chay/xac-nhan-ca-2.json",
+    "V082": {
+     "status": "OK",
+     "hang_cat": 2.0,
+     "hang_ky_vong": 2.0,
+     "p1": 0.0,
+     "p3": 1.0,
+     "sha256": "cdd892b918b4e117665332a76fee4ca2b3c70151ddf416c9467aa7f831e1e37d",
+     "nguon": "results/T-064/kiem/nhan-luot5/l5/dev2/d0/V082-V066+H8a/98ea5ba4"
+    },
+    "P7": {
+     "status": "OK",
+     "hang_cat": 2.0,
+     "hang_ky_vong": 2.0,
+     "p1": 0.0,
+     "p3": 1.0,
+     "sha256": "150a6c89a9086adeb4e3aba9860723759bb03ed837dfab22e8cfa3e60f0faf6f",
+     "nguon": "results/T-064/cham/dau-ra-dev2/P7/98ea5ba4"
+    }
+   },
+   "moi": {
+    "lich": "lich-t069",
+    "chu_ky": 9,
+    "multiplier": 1,
+    "flash_x3_tai_moc_t": true,
+    "image": "arm64-t067-36a3725d cả 7 service (results/T-067/trien-khai/chuoi-container.json)",
+    "can_thiep_inj3": {
+     "kind": "hook",
+     "service": "event-service",
+     "action": "http.error",
+     "target": "3e7c1df9-ada4-4081-94a1-548b80a5da86",
+     "value": 0
+    }
+   },
+   "cua_so": "tải 1800 s; t = mốc tải + 600 (sổ load-start); lỗi [t, t+600]; M1 như runner4 (stage tại t+750); chế độ (a) t từ sổ"
+  },
+  {
+   "o": "PAUSE-PAYMENT",
+   "loai": "loi",
+   "tap_chap_nhan": [
+    "payment-service"
+   ],
+   "cu": {
+    "ma": "46aab4be",
+    "nhom_thu": "thu2 (lich-2)",
+    "image": "arm64-t062-6b21ed55 cả 7 service",
+    "dong_bang": "results/T-063/dong-bang/dong-bang-2.json",
+    "xac_nhan": "results/T-063/chay/xac-nhan-ca-2.json",
+    "V082": {
+     "status": "OK",
+     "hang_cat": 1.0,
+     "hang_ky_vong": 1.0,
+     "p1": 1.0,
+     "p3": 1.0,
+     "sha256": "573df32d2de37c8e222f036d39344cbbe361a2ca1deed665c703acff47b184db",
+     "nguon": "results/T-064/kiem/nhan-luot5/l5/dev2/d0/V082-V066+H8a/46aab4be"
+    },
+    "P7": {
+     "status": "OK",
+     "hang_cat": 6.0,
+     "hang_ky_vong": null,
+     "p1": 0.0,
+     "p3": 0.0,
+     "sha256": "c61c4bc7d36b13ec9403e9b4e3d3dede790f72eb1d3e98b5cef24ae26fb5235c",
+     "nguon": "results/T-064/cham/dau-ra-dev2/P7/46aab4be"
+    }
+   },
+   "moi": {
+    "lich": "lich-t069",
+    "chu_ky": 10,
+    "multiplier": 1,
+    "flash_x3_tai_moc_t": false,
+    "image": "arm64-t067-36a3725d cả 7 service (results/T-067/trien-khai/chuoi-container.json)",
+    "can_thiep_inj3": {
+     "kind": "pause",
+     "container": "flash-ticket-payment-service-payment-service-1"
+    }
+   },
+   "cua_so": "tải 1800 s; t = mốc tải + 600 (sổ load-start); lỗi [t, t+600]; M1 như runner4 (stage tại t+750); chế độ (a) t từ sổ"
+  },
+  {
+   "o": "BINH-THUONG",
+   "loai": "khong_loi",
+   "tap_chap_nhan": null,
+   "cu": {
+    "ma": "f20b0ca5",
+    "nhom_thu": "thu2 (lich-2)",
+    "image": "arm64-t062-6b21ed55 cả 7 service",
+    "dong_bang": "results/T-063/dong-bang/dong-bang-2.json",
+    "xac_nhan": "results/T-063/chay/xac-nhan-ca-2.json",
+    "V082": {
+     "status": "OK",
+     "k": 1,
+     "verdict": "CAUSE_FOUND",
+     "sha256": "c3b492866b8b5dfd5654ba9f7af04a2543f0c4c89ac34f99a73787c17e7e9180",
+     "nguon": "results/T-064/kiem/nhan-luot5/l5/dev2/d0/V082-V066+H8a/f20b0ca5"
+    },
+    "P7": {
+     "status": "OK",
+     "k": 1,
+     "verdict": "CAUSE_FOUND",
+     "sha256": "f0be9fba68c80cc857d29430590f2d612989cef84928c72764dca396dc3f0340",
+     "nguon": "results/T-064/cham/dau-ra-dev2/P7/f20b0ca5"
+    }
+   },
+   "moi": {
+    "lich": "lich-t069",
+    "chu_ky": 11,
+    "multiplier": 1,
+    "flash_x3_tai_moc_t": false,
+    "image": "arm64-t067-36a3725d cả 7 service (results/T-067/trien-khai/chuoi-container.json)",
+    "can_thiep_inj3": {
+     "kind": "none"
+    }
+   },
+   "cua_so": "tải 1800 s; t = mốc tải + 600 (sổ load-start); lỗi [t, t+600]; M1 như runner4 (stage tại t+750); chế độ (a) t từ sổ"
+  },
+  {
+   "o": "POOL-EVENT",
+   "loai": "loi",
+   "tap_chap_nhan": [
+    "event-service"
+   ],
+   "cu": {
+    "ma": "86dea661",
+    "nhom_thu": "thu bù 3 (lich-3)",
+    "image": "arm64-t062-6b21ed55; Event arm64-t063h3-76b34d5e",
+    "dong_bang": "results/T-063/dong-bang/dong-bang-3.json",
+    "xac_nhan": "results/T-063/thu3/xac-nhan-ca-3-sua-sau.json",
+    "V082": {
+     "status": "OK",
+     "hang_cat": 1.0,
+     "hang_ky_vong": 1.0,
+     "p1": 1.0,
+     "p3": 1.0,
+     "sha256": "fef04529ab04e7a6f5de7a7ec593edfa6e606557fc13d979c05b04612bddb2f6",
+     "nguon": "results/T-064/kiem/nhan-luot5/l5/dev3/d0/V082-V066+H8a/86dea661"
+    },
+    "P7": {
+     "status": "OK",
+     "hang_cat": 1.0,
+     "hang_ky_vong": 1.0,
+     "p1": 1.0,
+     "p3": 1.0,
+     "sha256": "be5546fa0d5312fa2499e3d7c4a7a86225d4217d22d41eab087363fbd89c6495",
+     "nguon": "results/T-064/cham/dau-ra-dev3/P7/86dea661"
+    }
+   },
+   "moi": {
+    "lich": "lich-t069-thu",
+    "chu_ky": 1,
+    "multiplier": 1,
+    "flash_x3_tai_moc_t": false,
+    "image": "arm64-t067-36a3725d cả 7 service (results/T-067/trien-khai/chuoi-container.json)",
+    "can_thiep_inj3": {
+     "kind": "hook",
+     "service": "event-service",
+     "action": "pool.hold",
+     "target": null,
+     "value": 5
+    }
+   },
+   "cua_so": "tải 1800 s; t = mốc tải + 600 (sổ load-start); lỗi [t, t+600]; M1 như runner4 (stage tại t+750); chế độ (a) t từ sổ"
+  },
+  {
+   "o": "CONSUMER-BOOK-SLOW-X3",
+   "loai": "loi",
+   "tap_chap_nhan": [
+    "booking-service",
+    "broker"
+   ],
+   "cu": {
+    "ma": "659a9dfb1ab0",
+    "nhom_thu": "thu bù 3 (lich-3)",
+    "image": "arm64-t062-6b21ed55; Event arm64-t063h3-76b34d5e",
+    "dong_bang": "results/T-063/dong-bang/dong-bang-3.json",
+    "xac_nhan": "results/T-063/thu3/xac-nhan-ca-3-sua-sau.json",
+    "V082": {
+     "status": "OK",
+     "hang_cat": 1.0,
+     "hang_ky_vong": 1.0,
+     "p1": 1.0,
+     "p3": 1.0,
+     "sha256": "810e35533aa2b06cdd02fdfe1d4ee6fe04e8436474c394ea22dc0bd01939bb0b",
+     "nguon": "results/T-064/kiem/nhan-luot5/l5/dev3/d0/V082-V066+H8a/659a9dfb1ab0"
+    },
+    "P7": {
+     "status": "OK",
+     "hang_cat": 1.0,
+     "hang_ky_vong": 1.0,
+     "p1": 1.0,
+     "p3": 1.0,
+     "sha256": "fd4a03a5ad22bb7a20cedfbb05582b26f394c7c68d79d38721667cf6ae7d333c",
+     "nguon": "results/T-064/cham/dau-ra-dev3/P7/659a9dfb1ab0"
+    }
+   },
+   "moi": {
+    "lich": "lich-t069",
+    "chu_ky": 13,
+    "multiplier": 3,
+    "flash_x3_tai_moc_t": false,
+    "image": "arm64-t067-36a3725d cả 7 service (results/T-067/trien-khai/chuoi-container.json)",
+    "can_thiep_inj3": {
+     "kind": "toxic",
+     "proxy": "booking-amqp",
+     "toxic": "bandwidth",
+     "rate": 1
+    }
+   },
+   "cua_so": "tải 1800 s; t = mốc tải + 600 (sổ load-start); lỗi [t, t+600]; M1 như runner4 (stage tại t+750); chế độ (a) t từ sổ"
+  },
+  {
+   "o": "BINH-THUONG-X3",
+   "loai": "khong_loi",
+   "tap_chap_nhan": null,
+   "cu": {
+    "ma": "1e5a3dc5",
+    "nhom_thu": "thu bù 3 (lich-3)",
+    "image": "arm64-t062-6b21ed55; Event arm64-t063h3-76b34d5e",
+    "dong_bang": "results/T-063/dong-bang/dong-bang-3.json",
+    "xac_nhan": "results/T-063/thu3/xac-nhan-ca-3-sua-sau.json",
+    "V082": {
+     "status": "OK",
+     "k": 1,
+     "verdict": "CAUSE_FOUND",
+     "sha256": "3acc74a805a6002b999121f429e97d95925063f827a69468455c5b81a241b851",
+     "nguon": "results/T-064/kiem/nhan-luot5/l5/dev3/d0/V082-V066+H8a/1e5a3dc5"
+    },
+    "P7": {
+     "status": "OK",
+     "k": 1,
+     "verdict": "CAUSE_FOUND",
+     "sha256": "271e6a0219f980242d4adb86c75ce6105d5fff6d41d5f07574e33b81fc812127",
+     "nguon": "results/T-064/cham/dau-ra-dev3/P7/1e5a3dc5"
+    }
+   },
+   "moi": {
+    "lich": "lich-t069",
+    "chu_ky": 12,
+    "multiplier": 3,
+    "flash_x3_tai_moc_t": false,
+    "image": "arm64-t067-36a3725d cả 7 service (results/T-067/trien-khai/chuoi-container.json)",
+    "can_thiep_inj3": {
+     "kind": "none"
+    }
+   },
+   "cua_so": "tải 1800 s; t = mốc tải + 600 (sổ load-start); lỗi [t, t+600]; M1 như runner4 (stage tại t+750); chế độ (a) t từ sổ"
+  },
+  {
+   "o": "RECREATE-PAY",
+   "loai": "loi",
+   "tap_chap_nhan": [
+    "payment-service"
+   ],
+   "cu": {
+    "ma": "ebd5ef38",
+    "nhom_thu": "thu bù 3 (lich-3)",
+    "image": "arm64-t062-6b21ed55; Event arm64-t063h3-76b34d5e",
+    "dong_bang": "results/T-063/dong-bang/dong-bang-3.json",
+    "xac_nhan": "results/T-063/thu3/xac-nhan-ca-3-sua-sau.json",
+    "V082": {
+     "status": "OK",
+     "hang_cat": 1.0,
+     "hang_ky_vong": 1.0,
+     "p1": 1.0,
+     "p3": 1.0,
+     "sha256": "563f449dc54aee9be1bef22fca1d7bd876af12508c41f7cf4a87252f911bda74",
+     "nguon": "results/T-064/kiem/nhan-r9/r9/dev3/d0/V082-V066+H8a/ebd5ef38"
+    },
+    "P7": {
+     "status": "ERROR",
+     "hang_cat": 6.0,
+     "hang_ky_vong": null,
+     "p1": 0.0,
+     "p3": 0.0,
+     "sha256": null,
+     "nguon": "results/T-064/cham/dau-ra-dev3/P7/ebd5ef38"
+    }
+   },
+   "moi": {
+    "lich": "lich-t069-thu",
+    "chu_ky": 2,
+    "multiplier": 1,
+    "flash_x3_tai_moc_t": false,
+    "image": "arm64-t067-36a3725d cả 7 service (results/T-067/trien-khai/chuoi-container.json)",
+    "can_thiep_inj3": {
+     "kind": "recreate",
+     "container": "flash-ticket-payment-service-payment-service-1",
+     "project": "flash-ticket-payment-service",
+     "compose": "payment-service.yml"
+    }
+   },
+   "cua_so": "tải 1800 s; t = mốc tải + 600 (sổ load-start); lỗi [t, t+600]; M1 như runner4 (stage tại t+750); chế độ (a) t từ sổ"
+  }
+ ],
+ "dinh_nghia": {
+  "hang": "hang_cat của src/m1_ft/cham.py::cham_ca_loi trên đầu ra method-output-1.json (bộ chấm T-064 không sửa): hạng kỳ vọng của nút đáp án trong nhóm đồng hạng, cắt ở 6; vắng, lỗi chạy, thiếu đầu ra = 6. Đáp án A (dap-an-dev3.json).",
+  "tut": "ô lỗi ghép được có hang_cat(V082 mới) > hang_cat(V082 cũ) + 1",
+  "doi_hang": "hang_cat mới khác hang_cat cũ (V082 hoặc P7)",
+  "k": "ô không lỗi: k = 1 khi verdict CAUSE_FOUND (cham_ca_khong_loi)",
+  "ghep_duoc": [
+   "ca mới đạt đúng điều kiện xác nhận can thiệp mà ca cũ cùng ô đã đạt: ô lich-2 theo results/T-063/chay/dieu-kien-xac-nhan.md (kèm \"Sửa sau 1\" Minh đã nhận), script results/T-063/chay/xac_nhan_ca.py --sua-sau-1; ô lich-3 theo results/T-063/thu3/dieu-kien-xac-nhan-3.md (kèm \"Sửa sau 1\", \"Sửa sau 2\"), script xac_nhan_ca_3.py --sua-sau-1 --sua-sau-2. Script chép nhị phân sang results/T-069/xac-nhan/, chạy trên thư mục dựng từ sổ tiêm của lượt, đầu ra tải, audit Event đầy đủ.",
+   "khong_du_du_lieu (thiếu đầu dò, Prometheus mất mẫu, thiếu audit) hoặc không xác nhận → ô không ghép được, ghi lý do, không chấm.",
+   "mỗi ca có đầu ra P7 (hoặc lỗi chạy P7 ghi rõ) và V082; V082 phải trung_sha = true, P7 deterministic_repeat = true."
+  ],
+  "so_tong": "AC@1, AC@3, tổng hạng cắt, K tính bằng cham_dev3.py trên tập ca mới (spec results/T-069/cham/spec-moi.json, goc_uu_tien → results/T-069/dau-ra/); số cũ của D1–D5 tính lại trên đúng tập ô ghép được."
+ },
+ "dieu_kien_dung": {
+  "D1": "AC@3(V082 mới) < AC@3(V082 cũ) trên tập ô lỗi ghép được",
+  "D2": "AC@1(V082 cũ) − AC@1(V082 mới) ≥ 2",
+  "D3": "V082 mới kém P7 mới ở AC@1, hoặc AC@3, hoặc tổng hạng cắt (lớn hơn là kém) trên cùng tập",
+  "D4": "V082 lỗi chạy (status ≠ OK hoặc không ra đầu ra) mà không do hạ tầng (gói ca, đĩa, mạng, Prometheus)",
+  "D5": "K(V082 mới) − K(V082 cũ) ≥ 2 trên tập ô không lỗi ghép được",
+  "nghia": "dừng kết luận, không chuyển W4/W5; không ngắt lượt thu; làm bước 7 trên dữ liệu đã lưu rồi trình Minh"
+ },
+ "nhom_giai_thich": {
+  "a": "ô V082 đổi hạng xấu đi và P7 cũng xấu đi cùng ô (hệ thống đổi làm mọi phương pháp khó hơn)",
+  "b": "chỉ V082 xấu đi (P7 giữ hoặc tốt lên) → nghi thành phần riêng H5b/H8s1/H8a; xét ở bước 7",
+  "c": "lần thu lặp cho hạng V082 trở về trong [hạng cũ − 1, hạng cũ + 1] → nghiêng nhiễu một lần thu",
+  "ghi_chu": "nhóm là nghiêng về, không là kết luận cơ chế; cơ chế theo bước 7 (luật 15)"
+ },
+ "quy_tac_lap": {
+  "dieu_kien": "ô lỗi ghép được có hang_cat của V082 hoặc P7 khác phía cũ",
+  "toi_da": 4,
+  "uu_tien": [
+   "1. ô V082 tụt (theo hang_cat mới − cũ giảm dần)",
+   "2. ô V082 đổi hạng khác (|Δ| giảm dần)",
+   "3. ô chỉ P7 đổi hạng (|Δ| giảm dần)",
+   "4. nếu còn chỗ và D5 xảy ra: ô không lỗi có k V082 đổi 0 → 1",
+   "đồng hạng: theo thứ tự trong lịch"
+  ],
+  "lich": "lượt ngắn riêng campaigns/schedules/lich-t069-lap.json, sau khi chấm lượt chính; cùng hệ số tải và can thiệp",
+  "bao_cao": "báo cả hai lần thu; D1–D5 tính trên lần thu chính; lần lặp chỉ dùng để xếp nhóm (c); không chọn lần đẹp hơn"
+ },
+ "xu_ly_rieng": {
+  "RECREATE-PAY_P7_loi": "nếu run_m1 (P7) lỗi adapter như ca cũ ebd5ef38 thì runner không chạy gói bổ sung/V082 cho ca đó; khi đó sau chu kỳ chạy đúng các lệnh của runner4 (xuat_bo_sung.py --t <t>, cài vào m1/bo-sung/<mã>/, lệnh chay_v082, sau_v082.py) trên gói stage đầu tiên (mã gốc). P7 ghi loi-chay.json phía chấm (hạng 6).",
+  "stage_lai": "nếu runner stage lại mã mới (lần 2) thì dùng mã đã cho đầu ra; ghi cả hai mã.",
+  "tai_moi_lan": "ca thử (lich-t069-thu) tính là ca chính thức nếu sau đó không sửa code"
+ }
+}

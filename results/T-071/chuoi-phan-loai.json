@@ -1,0 +1,15 @@
+{
+ "phien_ban": "T071-chuoi-phan-loai-1",
+ "muc_dich": "Chuỗi độc lập với tín hiệu luật W4 dùng để phân loại phút theo results/T-071/khai-truoc-e2.json (khoa-1, b63f2e09…): B1/mat_quan_sat (up 3 đích, Prometheus khởi động lại, Collector), B2 (container restart), quota (throttling booking). Xuất bằng xuat_chuoi.py (đọc mục xuat_cho_T071, cùng cách xuất mẫu thô của bieu-thuc.json).",
+ "xuat_cho_T071": {
+  "bat_buoc": [],
+  "khuyen_nghi_tho": [
+   {"ten": "doc-lap/up", "selector": "up"},
+   {"ten": "doc-lap/prom-start", "selector": "process_start_time_seconds{job=\"prometheus\"}"},
+   {"ten": "doc-lap/otel-uptime", "selector": "otelcol_process_uptime_total"},
+   {"ten": "doc-lap/otel-loi", "selector": "{__name__=~\"otelcol_exporter_send_failed_.*|otelcol_exporter_enqueue_failed_.*|otelcol_receiver_refused_.*\"}"},
+   {"ten": "doc-lap/restarts", "selector": "container_restarts_total"},
+   {"ten": "doc-lap/throttle-booking", "selector": "{__name__=~\"container_cpu_throttling_data_(throttled_)?periods_total\",service_name=\"booking-service\"}"}
+  ]
+ }
+}

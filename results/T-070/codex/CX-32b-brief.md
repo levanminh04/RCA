@@ -1,0 +1,3 @@
+Yêu cầu của Minh (22/11): KHÔNG dùng subagent hay agent con; tự làm toàn bộ trong phiên này. Đọc có chọn lọc (grep, đọc đúng đoạn cần), không đọc lại toàn bộ file lớn khi không cần.
+
+Bạn là phiên Codex THỨ HAI, độc lập với phiên trước. Chỉ đọc; không sửa file, không SSH, không commit, không subagent. Bước 1 (trước khi mở kết luận phiên trước): tự soát T-074 bản 5 (W6 + nháp E6 bản 2) theo đúng prompt gốc ở results/T-070/codex/CX-32-brief.md. Bước 2: đọc results/T-070/codex/CX-32-tin-cuoi.md; với từng điểm ghi ĐÚNG / ĐÚNG MỘT PHẦN / SAI / CHƯA KIỂM ĐƯỢC kèm bằng chứng riêng; nêu riêng lỗi mới. Không tìm cho đủ số lượng. Cuối: bảng (điểm, nguồn, kết luận, CHẶN/KHÔNG CHẶN, sửa tối thiểu, loại) và kết luận phần A đủ để Minh duyệt phát E6 chưa. Tiếng Việt, ngắn.

@@ -1,0 +1,38 @@
+{
+ "phien_ban": "T073-khoa-boc-e5-1",
+ "mo_ta": "Phần khóa của bảng chọn ô nghiệm thu E5 (results/T-073/bang-o-e5.md bản 3): tập ô, trọng số, thứ tự, cách bốc. sha256 của file này ghi vào LOG T-073 trước khi Minh cấp hạt; sau đó không sửa file.",
+ "quyet_dinh": "Minh, chat 20/11/2026 ~22:03Z, \"Duyệt cả năm\" (LOG T-070 lượt 6, D3): mỗi ô một phiếu (9 ô), giữ RECREATE-PAY (sau khi T-073 sửa P7 lỗi → V082 chạy tiếp), không lọc biên độ; khóa danh sách rồi Minh cấp hạt.",
+ "tap_o": [
+  "CPU-BOOK-1",
+  "CPU-BOOK-2",
+  "EVENT-DB-LAT",
+  "HTTP5-EVENT",
+  "NET-GW-BOOK",
+  "PAUSE-PAYMENT",
+  "POOL-EVENT",
+  "RECREATE-PAY",
+  "REDIS-BOOK"
+ ],
+ "trong_so": "mỗi ô một phiếu (đều)",
+ "thu_tu": {
+  "0": "CPU-BOOK-1",
+  "1": "CPU-BOOK-2",
+  "2": "EVENT-DB-LAT",
+  "3": "HTTP5-EVENT",
+  "4": "NET-GW-BOOK",
+  "5": "PAUSE-PAYMENT",
+  "6": "POOL-EVENT",
+  "7": "RECREATE-PAY",
+  "8": "REDIS-BOOK"
+ },
+ "dieu_kien_RECREATE-PAY": "Theo D3: sửa CX-06 điểm 5 (P7 lỗi 'nhiều chuỗi runtime' thì V082 vẫn chạy) phải kiểm đạt trên gói cũ trước S4. Điều kiện này không đổi tập bốc.",
+ "loc_bien_do": false,
+ "hat": "Minh cấp sau khi file này đã khóa (sha256 ghi LOG T-073). Người làm và các agent không đề xuất hạt.",
+ "cach_boc": {
+  "ngon_ngu": "Python 3 (thư viện chuẩn)",
+  "ma": "import hashlib, random\nTHU_TU = [\"CPU-BOOK-1\", \"CPU-BOOK-2\", \"EVENT-DB-LAT\", \"HTTP5-EVENT\", \"NET-GW-BOOK\", \"PAUSE-PAYMENT\", \"POOL-EVENT\", \"RECREATE-PAY\", \"REDIS-BOOK\"]\nhat_minh = \"<chuỗi Minh cấp, nguyên văn>\"\nr = random.Random(int(hashlib.sha256(hat_minh.encode(\"utf-8\")).hexdigest(), 16))\nprint(THU_TU[r.randrange(len(THU_TU))])\n",
+  "so_lan": "đúng một lần; không bốc lại vì không thích ô",
+  "ghi_lai": "LOG T-073: nguyên văn hạt, sha256 file khóa này, ô bốc được, giờ bốc UTC, đầu ra lệnh"
+ },
+ "quy_tac_lap": "results/T-073/bang-o-e5.md §5: lần đầu là kết quả chính; lặp cùng ô chỉ khi lỗi hạ tầng có bằng chứng; không bốc lại"
+}
