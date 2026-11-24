@@ -1,0 +1,417 @@
+### compose_env_labels
+/flash-ticket-payment-service-payment-service-1	envfile=	img=ft-local/payment-service:arm64-t067-36a3725d	created=2026-11-19T18:08:21.906899224Z
+/flash-ticket-api-gateway-api-gateway-1	envfile=	img=ft-local/api-gateway:arm64-t067-36a3725d	created=2026-11-18T07:19:02.294675738Z
+/flash-ticket-booking-service-booking-service-1	envfile=	img=ft-local/booking-service:arm64-t067-36a3725d	created=2026-11-18T07:16:02.363804745Z
+/flash-ticket-ticket-service-ticket-service-1	envfile=	img=ft-local/ticket-service:arm64-t067-36a3725d	created=2026-11-18T07:14:46.882537362Z
+/flash-ticket-event-service-event-service-1	envfile=	img=ft-local/event-service:arm64-t067-36a3725d	created=2026-11-18T07:14:05.352277762Z
+/flash-ticket-user-service-user-service-1	envfile=	img=ft-local/user-service:arm64-t067-36a3725d	created=2026-11-18T07:13:28.425207001Z
+/flash-ticket-discovery-server-discovery-server-1	envfile=	img=ft-local/discovery-server:arm64-t067-36a3725d	created=2026-11-18T07:13:01.560123076Z
+/flash-ticket-collector	envfile=/opt/rca-lab/inventory/oracle-exp.env	img=otel/opentelemetry-collector-contrib@sha256:e40d61f10c9a617cca1ffd1be4d7e2b3a4b0f0001798ff07e58cabe82e618cea	created=2026-11-18T06:56:32.373033141Z
+/flash-ticket-keycloak-keycloak-1	envfile=	img=ft-local/keycloak:arm64-776d9c9e	created=2026-11-12T23:36:35.735701399Z
+/flash-ticket-infra-postgres-1	envfile=/opt/flash-ticket-infra/.env	img=postgres:16.15	created=2026-11-12T23:29:36.089883755Z
+/flash-ticket-infra-user-db-1	envfile=/opt/flash-ticket-infra/.env	img=mongo:7.0	created=2026-11-12T23:29:35.091765503Z
+/flash-ticket-infra-rabbitmq-1	envfile=/opt/flash-ticket-infra/.env	img=rabbitmq:4.3.6-management	created=2026-11-12T23:29:35.045369148Z
+/flash-ticket-infra-redis-1	envfile=/opt/flash-ticket-infra/.env	img=redis:7.4.11-alpine	created=2026-11-12T23:29:34.771979347Z
+/rca-toxiproxy	envfile=	img=ghcr.io/shopify/toxiproxy:2.12.0	created=2026-11-11T18:57:25.693408164Z
+### vnpay_procs
+--- 4037005 cwd=/opt/flash-ticket-app/l1-vnpay/tunnel ppid=      1
+python3 /opt/flash-ticket-app/l1-vnpay/tunnel/tunnel-supervisor.py 
+
+--- 4037798 cwd=/opt/flash-ticket-app/l1-vnpay/tunnel ppid=4037005
+ssh -N -T -i <key-path> -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=/opt/flash-ticket-app/l1-vnpay/tunnel/tai-known-hosts -o ExitOnForwardFailure=yes -o ServerAliveInterval=20 -o ServerAliveCountMax=3 -o ConnectTimeout=15 -R 127.0.0.1:19091:127.0.0.1:19090 ubuntu@3.24.8.49 
+
+--- 4038368 cwd=/opt/flash-ticket-app/l1-vnpay ppid=      1
+python3 /opt/flash-ticket-app/l1-vnpay/mock-runner.py 
+
+### opt_app_tree
+find: ‘/opt/flash-ticket-app/rca-faults’: Permission denied
+find: ‘/opt/flash-ticket-app/secrets/ticket-qr’: Permission denied
+find: ‘/opt/flash-ticket-infra/docs’: Permission denied
+find: ‘/opt/flash-ticket-infra/keycloak’: Permission denied
+find: ‘/opt/flash-ticket-infra/services’: Permission denied
+drwxr-xr-x root:root 4096 2026-11-10T20:00 /opt/docs
+drwxr-xr-x root:root 4096 2026-11-10T20:00 /opt/docs/architecture
+drwxr-xr-x root:root 4096 2026-11-10T20:00 /opt/docs/architecture/data
+drwxr-xr-x root:root 4096 2026-11-10T20:00 /opt/docs/architecture/data/mongodb
+drwxr-xr-x ubuntu:ubuntu 4096 2026-11-12T22:16 /opt/flash-ticket-app
+drwx------ ubuntu:ubuntu 4096 2026-11-13T03:56 /opt/flash-ticket-app/collector
+-rw------- ubuntu:ubuntu 288 2026-11-10T20:12 /opt/flash-ticket-app/collector/collector.env
+-rw------- ubuntu:ubuntu 914 2026-11-10T21:47 /opt/flash-ticket-app/collector/compose.json
+-rw------- ubuntu:ubuntu 9871 2026-11-13T03:56 /opt/flash-ticket-app/collector/config.json
+-rw------- ubuntu:ubuntu 13937 2026-11-11T20:38 /opt/flash-ticket-app/collector/config.json.bak-T063-20261112
+-rw------- ubuntu:ubuntu 17031 2026-11-12T21:38 /opt/flash-ticket-app/collector/config.json.bak-T063-20261112-bt1
+-rw------- ubuntu:ubuntu 9171 2026-11-12T23:27 /opt/flash-ticket-app/collector/config.json.bak-T063-20261113-td09
+-rw------- ubuntu:ubuntu 16447 2026-11-10T21:47 /opt/flash-ticket-app/collector/config.json.truoc-sua-kp19-20261111
+-rw------- root:root 16447 2026-11-11T09:15 /opt/flash-ticket-app/collector/config.json.truoc-t062-20261111T203806Z
+-rw-rw-r-- ubuntu:ubuntu 9171 2026-11-12T23:27 /opt/flash-ticket-app/collector/config.new.json
+drwx------ ubuntu:ubuntu 4096 2026-11-18T06:56 /opt/flash-ticket-app/collector/data
+drwxr-xr-x ubuntu:ubuntu 4096 2026-11-10T19:59 /opt/flash-ticket-app/compose
+drwxr-xr-x ubuntu:ubuntu 4096 2026-11-12T23:36 /opt/flash-ticket-app/compose-exp
+-rw-rw-r-- ubuntu:ubuntu 503 2026-11-10T20:15 /opt/flash-ticket-app/compose-exp/_common.yml
+-rw-rw-r-- ubuntu:ubuntu 184 2026-11-10T19:55 /opt/flash-ticket-app/compose-exp/api-gateway.yml
+-rw-rw-r-- ubuntu:ubuntu 190 2026-11-10T21:47 /opt/flash-ticket-app/compose-exp/booking-service.yml
+-rw-rw-r-- ubuntu:ubuntu 194 2026-11-10T21:47 /opt/flash-ticket-app/compose-exp/discovery-server.yml
+-rw-rw-r-- ubuntu:ubuntu 186 2026-11-10T21:47 /opt/flash-ticket-app/compose-exp/event-service.yml
+-rw-rw-r-- ubuntu:ubuntu 1084 2026-11-12T23:36 /opt/flash-ticket-app/compose-exp/keycloak.yml
+-rw-rw-r-- ubuntu:ubuntu 690 2026-11-10T21:47 /opt/flash-ticket-app/compose-exp/keycloak.yml.bak-T063-20261112-bt1
+-rw-rw-r-- ubuntu:ubuntu 1014 2026-11-12T23:30 /opt/flash-ticket-app/compose-exp/keycloak.yml.bak-T063-20261112-bt1b
+-rw-rw-r-- ubuntu:ubuntu 191 2026-11-10T21:47 /opt/flash-ticket-app/compose-exp/payment-service.yml
+-rw-rw-r-- ubuntu:ubuntu 362 2026-11-10T19:55 /opt/flash-ticket-app/compose-exp/ticket-service.yml
+-rw-rw-r-- ubuntu:ubuntu 186 2026-11-10T19:55 /opt/flash-ticket-app/compose-exp/user-service.yml
+drwxrwxr-x ubuntu:ubuntu 4096 2026-11-12T23:30 /opt/flash-ticket-app/compose-t062
+-rw-rw-r-- ubuntu:ubuntu 527 2026-11-12T23:30 /opt/flash-ticket-app/compose-t062/_common.yml
+-rw-rw-r-- ubuntu:ubuntu 446 2026-11-11T18:45 /opt/flash-ticket-app/compose-t062/_common.yml.bak-T063-20261112-bt1
+-rw-rw-r-- ubuntu:ubuntu 189 2026-11-11T18:45 /opt/flash-ticket-app/compose-t062/api-gateway.yml
+-rw-rw-r-- ubuntu:ubuntu 392 2026-11-11T18:57 /opt/flash-ticket-app/compose-t062/booking-service.yml
+-rw-rw-r-- ubuntu:ubuntu 199 2026-11-11T18:45 /opt/flash-ticket-app/compose-t062/discovery-server.yml
+-rw-rw-r-- ubuntu:ubuntu 370 2026-11-11T18:45 /opt/flash-ticket-app/compose-t062/event-service.yml
+-rw-rw-r-- ubuntu:ubuntu 196 2026-11-11T18:45 /opt/flash-ticket-app/compose-t062/payment-service.yml
+-rw-rw-r-- ubuntu:ubuntu 367 2026-11-11T18:45 /opt/flash-ticket-app/compose-t062/ticket-service.yml
+-rw-rw-r-- ubuntu:ubuntu 191 2026-11-11T18:45 /opt/flash-ticket-app/compose-t062/user-service.yml
+-rw-rw-r-- root:root 446 2026-11-10T19:55 /opt/flash-ticket-app/compose/_common.yml
+-rw-rw-r-- root:root 184 2026-11-10T19:55 /opt/flash-ticket-app/compose/api-gateway.yml
+-rw-rw-r-- root:root 192 2026-11-10T19:55 /opt/flash-ticket-app/compose/booking-service.yml
+-rw-rw-r-- root:root 194 2026-11-10T19:55 /opt/flash-ticket-app/compose/discovery-server.yml
+-rw-rw-r-- root:root 188 2026-11-10T19:55 /opt/flash-ticket-app/compose/event-service.yml
+-rw-rw-r-- root:root 645 2026-11-10T19:59 /opt/flash-ticket-app/compose/keycloak.yml
+-rw-rw-r-- root:root 193 2026-11-10T19:59 /opt/flash-ticket-app/compose/payment-service.yml
+-rw-rw-r-- root:root 362 2026-11-10T19:55 /opt/flash-ticket-app/compose/ticket-service.yml
+-rw-rw-r-- root:root 186 2026-11-10T19:55 /opt/flash-ticket-app/compose/user-service.yml
+drwxr-xr-x ubuntu:ubuntu 4096 2026-11-12T22:14 /opt/flash-ticket-app/env
+drwx------ ubuntu:ubuntu 4096 2026-11-12T23:27 /opt/flash-ticket-app/env-t062
+-rw------- ubuntu:ubuntu 2113 2026-11-11T19:16 /opt/flash-ticket-app/env-t062/api-gateway.env
+-rw------- ubuntu:ubuntu 3293 2026-11-12T23:27 /opt/flash-ticket-app/env-t062/booking-service.env
+-rw------- ubuntu:ubuntu 3292 2026-11-11T19:16 /opt/flash-ticket-app/env-t062/booking-service.env.bak-T063-20261112-bt1
+-rw------- ubuntu:ubuntu 1656 2026-11-11T19:16 /opt/flash-ticket-app/env-t062/discovery-server.env
+-rw------- ubuntu:ubuntu 3884 2026-11-11T19:16 /opt/flash-ticket-app/env-t062/event-service.env
+-rw------- ubuntu:ubuntu 3676 2026-11-12T22:16 /opt/flash-ticket-app/env-t062/payment-service.env
+-rw------- ubuntu:ubuntu 3786 2026-11-11T19:16 /opt/flash-ticket-app/env-t062/ticket-service.env
+-rw------- ubuntu:ubuntu 3597 2026-11-11T19:16 /opt/flash-ticket-app/env-t062/user-service.env
+-rw------- ubuntu:ubuntu 0 2026-11-10T19:59 /opt/flash-ticket-app/env/.prepared
+-rw------- ubuntu:ubuntu 2293 2026-11-11T01:15 /opt/flash-ticket-app/env/api-gateway.env
+-rw------- ubuntu:ubuntu 2166 2026-11-10T20:33 /opt/flash-ticket-app/env/api-gateway.env.truoc-thu-redis-20261111
+-rw------- ubuntu:ubuntu 3276 2026-11-11T01:20 /opt/flash-ticket-app/env/booking-service.env
+-rw------- ubuntu:ubuntu 3212 2026-11-11T01:13 /opt/flash-ticket-app/env/booking-service.env.truoc-thu-rabbit-20261111
+-rw------- ubuntu:ubuntu 3085 2026-11-10T20:28 /opt/flash-ticket-app/env/booking-service.env.truoc-thu-redis-20261111
+-rw------- ubuntu:ubuntu 288 2026-11-10T19:59 /opt/flash-ticket-app/env/client-secrets.json
+-rw------- ubuntu:ubuntu 1841 2026-11-10T20:15 /opt/flash-ticket-app/env/discovery-server.env
+-rw------- ubuntu:ubuntu 3902 2026-11-11T01:20 /opt/flash-ticket-app/env/event-service.env
+-rw------- ubuntu:ubuntu 3838 2026-11-10T20:15 /opt/flash-ticket-app/env/event-service.env.truoc-thu-rabbit-20261111
+-rw------- ubuntu:ubuntu 1514 2026-11-10T20:16 /opt/flash-ticket-app/env/keycloak.env
+-rw------- ubuntu:ubuntu 3480 2026-11-12T22:15 /opt/flash-ticket-app/env/l1-buyers.json
+-rw------- ubuntu:ubuntu 3816 2026-11-11T01:20 /opt/flash-ticket-app/env/payment-service.env
+-rw------- ubuntu:ubuntu 3752 2026-11-10T20:15 /opt/flash-ticket-app/env/payment-service.env.truoc-thu-rabbit-20261111
+-rw------- ubuntu:ubuntu 725 2026-11-10T19:59 /opt/flash-ticket-app/env/test-users.json
+-rw------- ubuntu:ubuntu 3969 2026-11-11T01:20 /opt/flash-ticket-app/env/ticket-service.env
+-rw------- ubuntu:ubuntu 3905 2026-11-10T20:15 /opt/flash-ticket-app/env/ticket-service.env.truoc-thu-rabbit-20261111
+-rw------- ubuntu:ubuntu 3778 2026-11-10T20:15 /opt/flash-ticket-app/env/user-service.env
+drwx------ ubuntu:ubuntu 4096 2026-11-12T22:18 /opt/flash-ticket-app/l1-fixtures
+-rw------- ubuntu:ubuntu 4476 2026-11-12T22:16 /opt/flash-ticket-app/l1-fixtures/events.json
+-rw------- ubuntu:ubuntu 1854 2026-11-12T22:17 /opt/flash-ticket-app/l1-fixtures/transaction-20261112T221737Z.json
+-rw------- ubuntu:ubuntu 5536 2026-11-12T22:18 /opt/flash-ticket-app/l1-fixtures/transaction-20261112T221831Z.json
+drwx------ ubuntu:ubuntu 4096 2026-11-23T02:37 /opt/flash-ticket-app/l1-vnpay
+drwx------ ubuntu:ubuntu 4096 2026-11-12T22:16 /opt/flash-ticket-app/l1-vnpay/__pycache__
+-rw------- ubuntu:ubuntu 19499 2026-11-12T22:16 /opt/flash-ticket-app/l1-vnpay/__pycache__/mock_vnpay.cpython-312.pyc
+-rw------- ubuntu:ubuntu 27197397 2026-11-23T02:37 /opt/flash-ticket-app/l1-vnpay/audit.jsonl
+-rw------- ubuntu:ubuntu 3175 2026-11-12T22:16 /opt/flash-ticket-app/l1-vnpay/mock-runner.py
+-rw------- ubuntu:ubuntu 106 2026-11-12T22:16 /opt/flash-ticket-app/l1-vnpay/mock.env
+-rw------- ubuntu:ubuntu 11773 2026-11-12T22:16 /opt/flash-ticket-app/l1-vnpay/mock_vnpay.py
+-rw------- ubuntu:ubuntu 3632 2026-11-12T22:16 /opt/flash-ticket-app/l1-vnpay/payment-service.env.before
+-rw------- ubuntu:ubuntu 8 2026-11-13T02:55 /opt/flash-ticket-app/l1-vnpay/pid
+-rw------- ubuntu:ubuntu 0 2026-11-13T02:55 /opt/flash-ticket-app/l1-vnpay/process-recovery-20261113T025529488224Z.log
+-rw------- ubuntu:ubuntu 0 2026-11-12T22:16 /opt/flash-ticket-app/l1-vnpay/process.log
+-rw------- ubuntu:ubuntu 606 2026-11-13T02:55 /opt/flash-ticket-app/l1-vnpay/recovery-20261113T025529488224Z.json
+-rw------- ubuntu:ubuntu 6033779 2026-11-23T02:37 /opt/flash-ticket-app/l1-vnpay/state.json
+drwx------ ubuntu:ubuntu 4096 2026-11-13T02:54 /opt/flash-ticket-app/l1-vnpay/tunnel
+-rw------- ubuntu:ubuntu 370 2026-11-13T02:55 /opt/flash-ticket-app/l1-vnpay/tunnel/events.jsonl
+-rw------- ubuntu:ubuntu 411 2026-11-13T02:53 /opt/flash-ticket-app/l1-vnpay/tunnel/forward-only.key
+-rw------- ubuntu:ubuntu 102 2026-11-13T02:53 /opt/flash-ticket-app/l1-vnpay/tunnel/forward-only.key.pub
+-rw------- ubuntu:ubuntu 8 2026-11-13T02:55 /opt/flash-ticket-app/l1-vnpay/tunnel/ssh.pid
+-rw------- ubuntu:ubuntu 0 2026-11-13T02:54 /opt/flash-ticket-app/l1-vnpay/tunnel/ssh.stderr.log
+-rw------- ubuntu:ubuntu 0 2026-11-13T02:54 /opt/flash-ticket-app/l1-vnpay/tunnel/supervisor.lock
+-rw------- ubuntu:ubuntu 8 2026-11-13T02:54 /opt/flash-ticket-app/l1-vnpay/tunnel/supervisor.pid
+-rw-rw-r-- ubuntu:ubuntu 0 2026-11-13T02:54 /opt/flash-ticket-app/l1-vnpay/tunnel/supervisor.stderr.log
+-rw------- ubuntu:ubuntu 91 2026-11-13T02:54 /opt/flash-ticket-app/l1-vnpay/tunnel/tai-known-hosts
+-rw------- ubuntu:ubuntu 2158 2026-11-13T02:54 /opt/flash-ticket-app/l1-vnpay/tunnel/tunnel-supervisor.py
+drwxr-xr-x ubuntu:ubuntu 4096 2026-11-10T20:12 /opt/flash-ticket-app/otel
+drwxr-x--- 10001:10001 4096 2026-11-11T18:45 /opt/flash-ticket-app/rca-faults
+drwxr-xr-x ubuntu:ubuntu 4096 2026-11-12T23:27 /opt/flash-ticket-app/rca-toxiproxy
+-rw-r--r-- root:root 506 2026-11-12T23:27 /opt/flash-ticket-app/rca-toxiproxy/proxies.json
+-rw-r--r-- ubuntu:ubuntu 298 2026-11-11T18:57 /opt/flash-ticket-app/rca-toxiproxy/proxies.json.bak-T063-20261112
+drwxr-xr-x ubuntu:ubuntu 4096 2026-11-10T19:55 /opt/flash-ticket-app/secrets
+drwxr-x--- 10001:10001 4096 2026-11-10T19:59 /opt/flash-ticket-app/secrets/ticket-qr
+drwxr-xr-x ubuntu:ubuntu 4096 2026-11-10T20:09 /opt/flash-ticket-app/state
+-rw-rw-r-- ubuntu:ubuntu 72 2026-11-10T20:09 /opt/flash-ticket-app/state/booking-service.current
+-rw-rw-r-- ubuntu:ubuntu 72 2026-11-10T20:02 /opt/flash-ticket-app/state/discovery-server.current
+-rw-rw-r-- ubuntu:ubuntu 72 2026-11-10T20:02 /opt/flash-ticket-app/state/keycloak.current
+-rw-rw-r-- ubuntu:ubuntu 72 2026-11-10T20:03 /opt/flash-ticket-app/state/user-service.current
+drwxrwxr-x ubuntu:ubuntu 4096 2026-11-18T06:21 /opt/flash-ticket-build/t067-36a3725d-logs
+-rw-rw-r-- ubuntu:ubuntu 21 2026-11-18T06:20 /opt/flash-ticket-build/t067-36a3725d-logs/all.done
+-rw-rw-r-- ubuntu:ubuntu 5870 2026-11-18T06:17 /opt/flash-ticket-build/t067-36a3725d-logs/api-gateway-build.log
+-rw-rw-r-- ubuntu:ubuntu 39321 2026-11-18T06:03 /opt/flash-ticket-build/t067-36a3725d-logs/api-gateway-verify-plain.log
+-rw-rw-r-- ubuntu:ubuntu 7908 2026-11-18T06:20 /opt/flash-ticket-build/t067-36a3725d-logs/booking-service-build.log
+-rw-rw-r-- ubuntu:ubuntu 263111 2026-11-18T06:13 /opt/flash-ticket-build/t067-36a3725d-logs/booking-service-verify-plain.log
+-rw-rw-r-- ubuntu:ubuntu 2396675 2026-11-18T06:14 /opt/flash-ticket-build/t067-36a3725d-logs/booking-service-verify-rca-test.log
+-rw-rw-r-- ubuntu:ubuntu 7657 2026-11-18T06:21 /opt/flash-ticket-build/t067-36a3725d-logs/build-manifest-dem-lai.json
+-rw-rw-r-- ubuntu:ubuntu 4702 2026-11-18T06:20 /opt/flash-ticket-build/t067-36a3725d-logs/build-manifest.json
+-rw-rw-r-- ubuntu:ubuntu 753 2026-11-18T06:20 /opt/flash-ticket-build/t067-36a3725d-logs/build.out
+-rwxr-xr-x ubuntu:ubuntu 4199 2026-11-18T06:01 /opt/flash-ticket-build/t067-36a3725d-logs/build.sh
+-rw-rw-r-- ubuntu:ubuntu 6532 2026-11-18T06:17 /opt/flash-ticket-build/t067-36a3725d-logs/discovery-server-build.log
+-rw-rw-r-- ubuntu:ubuntu 12322 2026-11-18T06:02 /opt/flash-ticket-build/t067-36a3725d-logs/discovery-server-verify-plain.log
+drwxrwxr-x ubuntu:ubuntu 4096 2026-11-18T06:25 /opt/flash-ticket-build/t067-36a3725d-logs/doi-chung
+-rw-rw-r-- ubuntu:ubuntu 0 2026-11-18T06:21 /opt/flash-ticket-build/t067-36a3725d-logs/doi-chung/chay.out
+-rw-rw-r-- ubuntu:ubuntu 1131 2026-11-18T06:21 /opt/flash-ticket-build/t067-36a3725d-logs/doi-chung/chay.sh
+-rw-rw-r-- ubuntu:ubuntu 25004 2026-11-18T06:24 /opt/flash-ticket-build/t067-36a3725d-logs/doi-chung/t067-36a3725d-ticket-service-test__Dtest_TicketInfrastructureTests_.log
+-rw-rw-r-- ubuntu:ubuntu 254231 2026-11-18T06:25 /opt/flash-ticket-build/t067-36a3725d-logs/doi-chung/t067-dc-640dbaf9-booking-service-verify_.log
+-rw-rw-r-- ubuntu:ubuntu 386248 2026-11-18T06:22 /opt/flash-ticket-build/t067-36a3725d-logs/doi-chung/t067-dc-640dbaf9-ticket-service-verify_.log
+-rw-rw-r-- ubuntu:ubuntu 2382760 2026-11-18T06:27 /opt/flash-ticket-build/t067-36a3725d-logs/doi-chung/t067-dc-bb84d64f-booking-service-verify__P_rca_test_.log
+-rw-rw-r-- ubuntu:ubuntu 372785 2026-11-18T06:23 /opt/flash-ticket-build/t067-36a3725d-logs/doi-chung/t067-dc-bb84d64f-ticket-service-verify_.log
+-rw-rw-r-- ubuntu:ubuntu 907 2026-11-18T06:27 /opt/flash-ticket-build/t067-36a3725d-logs/doi-chung/tien-do.tsv
+-rw-rw-r-- ubuntu:ubuntu 7605 2026-11-18T06:18 /opt/flash-ticket-build/t067-36a3725d-logs/event-service-build.log
+-rw-rw-r-- ubuntu:ubuntu 67427 2026-11-18T06:08 /opt/flash-ticket-build/t067-36a3725d-logs/event-service-verify-plain.log
+-rw-rw-r-- ubuntu:ubuntu 61551 2026-11-18T06:10 /opt/flash-ticket-build/t067-36a3725d-logs/event-service-verify-rca-test.log
+-rw-rw-r-- ubuntu:ubuntu 7140 2026-11-18T06:20 /opt/flash-ticket-build/t067-36a3725d-logs/payment-service-build.log
+-rw-rw-r-- ubuntu:ubuntu 47094 2026-11-18T06:16 /opt/flash-ticket-build/t067-36a3725d-logs/payment-service-verify-plain.log
+drwxrwxr-x ubuntu:ubuntu 4096 2026-11-18T06:06 /opt/flash-ticket-build/t067-36a3725d-logs/thu-hieu-luc
+-rwxr-xr-x ubuntu:ubuntu 5303 2026-11-18T06:07 /opt/flash-ticket-build/t067-36a3725d-logs/thu-hieu-luc/hieu_luc.py
+drwxrwxr-x ubuntu:ubuntu 4096 2026-11-18T06:06 /opt/flash-ticket-build/t067-36a3725d-logs/thu-hieu-luc/out
+-rw-rw-r-- ubuntu:ubuntu 700 2026-11-18T06:07 /opt/flash-ticket-build/t067-36a3725d-logs/thu-hieu-luc/out/api-gateway.yml
+-rw-rw-r-- ubuntu:ubuntu 1046 2026-11-18T06:07 /opt/flash-ticket-build/t067-36a3725d-logs/thu-hieu-luc/out/booking-service.yml
+-rw-rw-r-- ubuntu:ubuntu 715 2026-11-18T06:07 /opt/flash-ticket-build/t067-36a3725d-logs/thu-hieu-luc/out/discovery-server.yml
+-rw-rw-r-- ubuntu:ubuntu 1024 2026-11-18T06:07 /opt/flash-ticket-build/t067-36a3725d-logs/thu-hieu-luc/out/event-service.yml
+-rw-rw-r-- ubuntu:ubuntu 713 2026-11-18T06:07 /opt/flash-ticket-build/t067-36a3725d-logs/thu-hieu-luc/out/payment-service.yml
+-rw-rw-r-- ubuntu:ubuntu 5167 2026-11-18T06:07 /opt/flash-ticket-build/t067-36a3725d-logs/thu-hieu-luc/out/so-sanh.json
+-rw-rw-r-- ubuntu:ubuntu 900 2026-11-18T06:07 /opt/flash-ticket-build/t067-36a3725d-logs/thu-hieu-luc/out/ticket-service.yml
+-rw-rw-r-- ubuntu:ubuntu 703 2026-11-18T06:07 /opt/flash-ticket-build/t067-36a3725d-logs/thu-hieu-luc/out/user-service.yml
+drwxrwxr-x ubuntu:ubuntu 4096 2026-11-18T06:06 /opt/flash-ticket-build/t067-36a3725d-logs/thu-hieu-luc/overrides
+-rw-r--r-- ubuntu:ubuntu 735 2026-11-18T06:06 /opt/flash-ticket-build/t067-36a3725d-logs/thu-hieu-luc/overrides/api-gateway.yml
+-rw-r--r-- ubuntu:ubuntu 968 2026-11-18T06:06 /opt/flash-ticket-build/t067-36a3725d-logs/thu-hieu-luc/overrides/booking-service.yml
+-rw-r--r-- ubuntu:ubuntu 780 2026-11-18T06:06 /opt/flash-ticket-build/t067-36a3725d-logs/thu-hieu-luc/overrides/discovery-server.yml
+-rw-r--r-- ubuntu:ubuntu 940 2026-11-18T06:06 /opt/flash-ticket-build/t067-36a3725d-logs/thu-hieu-luc/overrides/event-service.yml
+-rw-r--r-- ubuntu:ubuntu 1044 2026-11-18T06:06 /opt/flash-ticket-build/t067-36a3725d-logs/thu-hieu-luc/overrides/payment-service.yml
+-rw-r--r-- ubuntu:ubuntu 1082 2026-11-18T06:07 /opt/flash-ticket-build/t067-36a3725d-logs/thu-hieu-luc/overrides/ticket-service.yml
+-rw-r--r-- ubuntu:ubuntu 740 2026-11-18T06:06 /opt/flash-ticket-build/t067-36a3725d-logs/thu-hieu-luc/overrides/user-service.yml
+-rw-rw-r-- ubuntu:ubuntu 6851 2026-11-18T06:19 /opt/flash-ticket-build/t067-36a3725d-logs/ticket-service-build.log
+-rw-rw-r-- ubuntu:ubuntu 372755 2026-11-18T06:11 /opt/flash-ticket-build/t067-36a3725d-logs/ticket-service-verify-plain.log
+-rw-rw-r-- ubuntu:ubuntu 3150 2026-11-18T06:20 /opt/flash-ticket-build/t067-36a3725d-logs/tien-do.tsv
+-rw-rw-r-- ubuntu:ubuntu 6046 2026-11-18T06:18 /opt/flash-ticket-build/t067-36a3725d-logs/user-service-build.log
+-rw-rw-r-- ubuntu:ubuntu 40678 2026-11-18T06:05 /opt/flash-ticket-build/t067-36a3725d-logs/user-service-verify-plain.log
+drwxrwxr-x ubuntu:ubuntu 4096 2026-11-18T07:13 /opt/flash-ticket-build/t067-compose
+-rwxr-xr-x ubuntu:ubuntu 3097 2026-11-18T06:57 /opt/flash-ticket-build/t067-compose/deploy.sh
+drwxrwxr-x ubuntu:ubuntu 4096 2026-11-18T06:08 /opt/flash-ticket-build/t067-compose/hieu-luc
+-rw-rw-r-- ubuntu:ubuntu 672 2026-11-18T06:08 /opt/flash-ticket-build/t067-compose/hieu-luc/SHA256SUMS
+-rw-rw-r-- ubuntu:ubuntu 700 2026-11-18T06:08 /opt/flash-ticket-build/t067-compose/hieu-luc/api-gateway.yml
+-rw-rw-r-- ubuntu:ubuntu 1046 2026-11-18T06:08 /opt/flash-ticket-build/t067-compose/hieu-luc/booking-service.yml
+-rw-rw-r-- ubuntu:ubuntu 715 2026-11-18T06:08 /opt/flash-ticket-build/t067-compose/hieu-luc/discovery-server.yml
+-rw-rw-r-- ubuntu:ubuntu 1024 2026-11-18T06:08 /opt/flash-ticket-build/t067-compose/hieu-luc/event-service.yml
+-rw-rw-r-- ubuntu:ubuntu 713 2026-11-18T06:08 /opt/flash-ticket-build/t067-compose/hieu-luc/payment-service.yml
+-rw-rw-r-- ubuntu:ubuntu 5167 2026-11-18T06:08 /opt/flash-ticket-build/t067-compose/hieu-luc/so-sanh.json
+-rw-rw-r-- ubuntu:ubuntu 900 2026-11-18T06:08 /opt/flash-ticket-build/t067-compose/hieu-luc/ticket-service.yml
+-rw-rw-r-- ubuntu:ubuntu 703 2026-11-18T06:08 /opt/flash-ticket-build/t067-compose/hieu-luc/user-service.yml
+-rwxr-xr-x ubuntu:ubuntu 5303 2026-11-18T06:08 /opt/flash-ticket-build/t067-compose/hieu_luc.py
+-rw-rw-r-- ubuntu:ubuntu 2200 2026-11-18T07:12 /opt/flash-ticket-build/t067-compose/hoan-tac-1.out
+-rw-rw-r-- ubuntu:ubuntu 2268 2026-11-18T07:12 /opt/flash-ticket-build/t067-compose/hoan-tac-1.tsv
+-rw-rw-r-- ubuntu:ubuntu 1832 2026-11-18T07:12 /opt/flash-ticket-build/t067-compose/hoan-tac-1.tsv.compose
+drwxrwxr-x ubuntu:ubuntu 4096 2026-11-18T06:57 /opt/flash-ticket-build/t067-compose/migrations
+-rw-r--r-- ubuntu:ubuntu 1186 2026-11-18T06:57 /opt/flash-ticket-build/t067-compose/migrations/2026-11-13-event-image-roles.sql
+-rw-r--r-- ubuntu:ubuntu 309 2026-11-18T06:57 /opt/flash-ticket-build/t067-compose/migrations/2026-11-15-event-venue-details.sql
+-rw-r--r-- ubuntu:ubuntu 298 2026-11-18T06:57 /opt/flash-ticket-build/t067-compose/nguon.sha256
+drwxrwxr-x ubuntu:ubuntu 4096 2026-11-18T06:08 /opt/flash-ticket-build/t067-compose/overrides
+-rw-r--r-- ubuntu:ubuntu 735 2026-11-18T06:08 /opt/flash-ticket-build/t067-compose/overrides/api-gateway.yml
+-rw-r--r-- ubuntu:ubuntu 968 2026-11-18T06:08 /opt/flash-ticket-build/t067-compose/overrides/booking-service.yml
+-rw-r--r-- ubuntu:ubuntu 780 2026-11-18T06:08 /opt/flash-ticket-build/t067-compose/overrides/discovery-server.yml
+-rw-r--r-- ubuntu:ubuntu 940 2026-11-18T06:08 /opt/flash-ticket-build/t067-compose/overrides/event-service.yml
+-rw-r--r-- ubuntu:ubuntu 1044 2026-11-18T06:08 /opt/flash-ticket-build/t067-compose/overrides/payment-service.yml
+-rw-r--r-- ubuntu:ubuntu 1082 2026-11-18T06:08 /opt/flash-ticket-build/t067-compose/overrides/ticket-service.yml
+-rw-r--r-- ubuntu:ubuntu 740 2026-11-18T06:08 /opt/flash-ticket-build/t067-compose/overrides/user-service.yml
+-rw-rw-r-- ubuntu:ubuntu 2230 2026-11-18T07:05 /opt/flash-ticket-build/t067-compose/trien-khai-1.out
+-rw-rw-r-- ubuntu:ubuntu 2230 2026-11-18T07:05 /opt/flash-ticket-build/t067-compose/trien-khai-1.tsv
+-rw-rw-r-- ubuntu:ubuntu 1832 2026-11-18T07:04 /opt/flash-ticket-build/t067-compose/trien-khai-1.tsv.compose
+-rw-rw-r-- ubuntu:ubuntu 2230 2026-11-18T07:19 /opt/flash-ticket-build/t067-compose/trien-khai-2.out
+-rw-rw-r-- ubuntu:ubuntu 2230 2026-11-18T07:19 /opt/flash-ticket-build/t067-compose/trien-khai-2.tsv
+-rw-rw-r-- ubuntu:ubuntu 1832 2026-11-18T07:19 /opt/flash-ticket-build/t067-compose/trien-khai-2.tsv.compose
+drwxr-xr-x ubuntu:ubuntu 4096 2026-11-10T19:59 /opt/flash-ticket-infra
+-rw------- ubuntu:ubuntu 2797 2026-11-10T19:59 /opt/flash-ticket-infra/.env
+drwxrwxr-x root:root 4096 2026-11-12T23:29 /opt/flash-ticket-infra/deploy
+drwxr-xr-x root:root 4096 2026-11-10T20:00 /opt/flash-ticket-infra/deploy/10-user.js
+drwxr-xr-x root:root 4096 2026-11-10T20:00 /opt/flash-ticket-infra/deploy/99-collection-prefix.js
+-rw-rw-r-- root:root 373 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/Dockerfile.integration-java21
+-rw-rw-r-- root:root 26 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/Dockerfile.integration-java21.dockerignore
+-rw-rw-r-- root:root 10321 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/README.md
+-rw-rw-r-- root:root 8159 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/README.payment.md
+drwxrwxr-x root:root 4096 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/app
+-rw-rw-r-- root:root 8911 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/app/README.md
+-rw-rw-r-- root:root 446 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/app/_common.yml
+-rw-rw-r-- root:root 184 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/app/api-gateway.yml
+-rw-rw-r-- root:root 192 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/app/booking-service.yml
+-rw-rw-r-- root:root 194 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/app/discovery-server.yml
+-rw-rw-r-- root:root 188 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/app/event-service.yml
+-rw-rw-r-- root:root 143 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/app/frontend.yml
+-rw-rw-r-- root:root 642 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/app/keycloak.yml
+-rw-rw-r-- root:root 102 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/app/ngrok.yml
+-rw-rw-r-- root:root 883 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/app/payment-service.yml
+-rw-rw-r-- root:root 362 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/app/ticket-service.yml
+-rw-rw-r-- root:root 186 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/app/user-service.yml
+-rw-rw-r-- root:root 342 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/docker-compose.frontend.local.yml
+-rw-rw-r-- root:root 5358 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/docker-compose.integration.local.yml
+-rw-rw-r-- root:root 4093 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/docker-compose.payment.yml
+-rw-rw-r-- root:root 2771 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/docker-compose.postgresql.yml
+-rw-rw-r-- root:root 4536 2026-11-10T19:59 /opt/flash-ticket-infra/deploy/docker-compose.rabbitmq.yml
+-rw-r--r-- root:root 1064 2026-11-12T23:29 /opt/flash-ticket-infra/deploy/docker-compose.rca-log.yml
+-rw-rw-r-- root:root 770 2026-11-10T19:59 /opt/flash-ticket-infra/deploy/docker-compose.redis.yml
+drwxrwxr-x root:root 4096 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/keycloak
+drwxrwxr-x root:root 4096 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/keycloak/export
+drwxrwxr-x root:root 4096 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/keycloak/import
+drwxrwxr-x root:root 4096 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/keycloak/postman
+drwxrwxr-x root:root 4096 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/keycloak/themes
+drwxrwxr-x root:root 4096 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/mongodb
+-rw-rw-r-- root:root 1170 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/mongodb/10-user.js
+-rw-rw-r-- root:root 1733 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/mongodb/20-role-grant-actor.cjs
+-rw-rw-r-- root:root 3386 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/mongodb/30-seed-authoritative.js
+-rw-rw-r-- root:root 1135 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/mongodb/99-collection-prefix.js
+-rw-rw-r-- root:root 5726 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/mongodb/README.md
+-rw-rw-r-- root:root 1095 2026-11-10T19:59 /opt/flash-ticket-infra/deploy/mongodb/compose.yaml
+-rw-rw-r-- root:root 1037 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/mongodb/docker-compose.mongodb.yml
+-rw-rw-r-- root:root 1948 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/mongodb/migrate-organizer-reapplication.js
+-rw-rw-r-- root:root 1193 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/mongodb/migrate-user-profile.js
+drwxrwxr-x root:root 4096 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/ngrok
+-rw-rw-r-- root:root 100 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/ngrok/payment.yml
+drwxrwxr-x root:root 4096 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/postgres
+-rwxr-xr-x root:root 3395 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/postgres/00-business-databases.sh
+drwxrwxr-x root:root 4096 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/postgres/migrations
+drwxrwxr-x root:root 4096 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/rabbitmq
+-rw-rw-r-- root:root 19261 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/rabbitmq/definitions.json
+-rw-rw-r-- root:root 102 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/rabbitmq/rabbitmq.conf
+drwxrwxr-x root:root 4096 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/redis
+-rw-rw-r-- root:root 5504 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/redis/handoff.md
+drwxrwxr-x root:root 4096 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/scripts
+-rw-rw-r-- root:root 6186 2026-11-10T19:55 /opt/flash-ticket-infra/deploy/scripts/deploy-service.sh
+drwx------ root:root 4096 2026-11-10T19:59 /opt/flash-ticket-infra/docs
+drwx------ root:root 4096 2026-11-10T19:59 /opt/flash-ticket-infra/keycloak
+drwx------ root:root 4096 2026-11-10T20:00 /opt/flash-ticket-infra/services
+### collector_data_old
+total 1310876
+drwx------ 3 ubuntu ubuntu      4096 Nov 18 06:56 .
+drwx------ 3 ubuntu ubuntu      4096 Nov 13 03:56 ..
+-rw-r--r-- 1 root   root    52425164 Nov 18 05:41 logs-2026-11-18T05-41-21.464-size.jsonl
+-rw-r--r-- 1 root   root    52370491 Nov 18 05:59 logs-2026-11-18T05-59-27.943-size.jsonl
+-rw-r--r-- 1 root   root    52420382 Nov 18 06:19 logs-2026-11-18T06-19-08.325-size.jsonl
+-rw-r--r-- 1 root   root    52373555 Nov 18 06:37 logs-2026-11-18T06-37-55.780-size.jsonl
+-rw-r--r-- 1 root   root    52413137 Nov 18 06:55 logs-2026-11-18T06-56-00.111-size.jsonl
+-rw-r--r-- 1 root   root     1574432 Nov 18 06:56 logs.jsonl
+drwx------ 2 ubuntu ubuntu      4096 Nov 12 23:27 queue
+18
+### compose_path_refs
+--- /opt/flash-ticket-build/t067-compose/hieu-luc/api-gateway.yml
+9:    env_file:
+10:      - path: /opt/flash-ticket-app/env-t062/api-gateway.env
+11:    image: ft-local/api-gateway:arm64-t067-36a3725d
+18:    mem_limit: "805306368"
+25:      - /tmp:rw,nosuid,noexec,size=64m,mode=1777
+--- /opt/flash-ticket-build/t067-compose/hieu-luc/booking-service.yml
+7:    cpus: 1
+10:    env_file:
+11:      - path: /opt/flash-ticket-app/env-t062/booking-service.env
+12:    image: ft-local/booking-service:arm64-t067-36a3725d
+19:    mem_limit: "1073741824"
+26:      - /tmp:rw,nosuid,noexec,size=64m,mode=1777
+30:        source: /opt/flash-ticket-app/rca-faults/booking-service/control
+31:        target: /run/fault-control
+35:        source: /opt/flash-ticket-app/rca-faults/booking-service/audit
+36:        target: /run/fault-audit
+--- /opt/flash-ticket-build/t067-compose/hieu-luc/discovery-server.yml
+9:    env_file:
+10:      - path: /opt/flash-ticket-app/env-t062/discovery-server.env
+11:    image: ft-local/discovery-server:arm64-t067-36a3725d
+18:    mem_limit: "805306368"
+25:      - /tmp:rw,nosuid,noexec,size=64m,mode=1777
+--- /opt/flash-ticket-build/t067-compose/hieu-luc/event-service.yml
+9:    env_file:
+10:      - path: /opt/flash-ticket-app/env-t062/event-service.env
+11:    image: ft-local/event-service:arm64-t067-36a3725d
+18:    mem_limit: "1073741824"
+25:      - /tmp:rw,nosuid,noexec,size=64m,mode=1777
+29:        source: /opt/flash-ticket-app/rca-faults/event-service/control
+30:        target: /run/fault-control
+34:        source: /opt/flash-ticket-app/rca-faults/event-service/audit
+35:        target: /run/fault-audit
+--- /opt/flash-ticket-build/t067-compose/hieu-luc/payment-service.yml
+9:    env_file:
+10:      - path: /opt/flash-ticket-app/env-t062/payment-service.env
+11:    image: ft-local/payment-service:arm64-t067-36a3725d
+18:    mem_limit: "1073741824"
+25:      - /tmp:rw,nosuid,noexec,size=64m,mode=1777
+--- /opt/flash-ticket-build/t067-compose/hieu-luc/ticket-service.yml
+9:    env_file:
+10:      - path: /opt/flash-ticket-app/env-t062/ticket-service.env
+11:    image: ft-local/ticket-service:arm64-t067-36a3725d
+18:    mem_limit: "805306368"
+25:      - /tmp:rw,nosuid,noexec,size=64m,mode=1777
+29:        source: /opt/flash-ticket-app/secrets/ticket-qr
+30:        target: /run/ticket-qr
+--- /opt/flash-ticket-build/t067-compose/hieu-luc/user-service.yml
+9:    env_file:
+10:      - path: /opt/flash-ticket-app/env-t062/user-service.env
+11:    image: ft-local/user-service:arm64-t067-36a3725d
+18:    mem_limit: "805306368"
+25:      - /tmp:rw,nosuid,noexec,size=64m,mode=1777
+--- /opt/flash-ticket-app/compose-exp/_common.yml
+8:      - /tmp:rw,nosuid,noexec,size=64m,mode=1777
+19:      - /opt/flash-ticket-app/otel:/otel:ro
+--- /opt/flash-ticket-app/compose-exp/api-gateway.yml
+6:    image: ${IMAGE:?image digest required}
+7:    env_file: ../env/api-gateway.env
+8:    mem_limit: 768m
+--- /opt/flash-ticket-app/compose-exp/booking-service.yml
+6:    image: ${IMAGE:?image digest required}
+7:    env_file: ../env/booking-service.env
+8:    mem_limit: 1g
+--- /opt/flash-ticket-app/compose-exp/discovery-server.yml
+6:    image: ${IMAGE:?image digest required}
+7:    env_file: ../env/discovery-server.env
+8:    mem_limit: 768m
+--- /opt/flash-ticket-app/compose-exp/event-service.yml
+6:    image: ${IMAGE:?image digest required}
+7:    env_file: ../env/event-service.env
+8:    mem_limit: 1g
+--- /opt/flash-ticket-app/compose-exp/keycloak.yml
+3:    image: ${IMAGE:?image digest required}
+5:    env_file: ../env/keycloak.env
+9:    mem_limit: 1536m
+14:      - /opt/flash-ticket-app/otel:/otel:ro
+15:      - /opt/flash-ticket-infra/keycloak/keycloak/themes/flash-ticket:/opt/keycloak/themes/flash-ticket:ro
+16:      - /opt/flash-ticket-infra/keycloak/keycloak/import:/opt/keycloak/data/import:ro
+--- /opt/flash-ticket-app/compose-exp/payment-service.yml
+6:    image: ${IMAGE:?image digest required}
+7:    env_file: ../env/payment-service.env
+8:    mem_limit: 1g
+--- /opt/flash-ticket-app/compose-exp/ticket-service.yml
+6:    image: ${IMAGE:?image digest required}
+7:    env_file: ../env/ticket-service.env
+8:    mem_limit: 768m
+11:        source: ../secrets/ticket-qr
+12:        target: /run/ticket-qr
+--- /opt/flash-ticket-app/compose-exp/user-service.yml
+6:    image: ${IMAGE:?image digest required}
+7:    env_file: ../env/user-service.env
+8:    mem_limit: 768m
+--- /opt/rca-lab/observability/collector/agent-compose.yaml
+2:# docker compose -p flash-ticket-collector -f agent-compose.yaml --env-file ../../inventory/oracle-exp.env up -d
+5:    image: otel/opentelemetry-collector-contrib@sha256:e40d61f10c9a617cca1ffd1be4d7e2b3a4b0f0001798ff07e58cabe82e618cea
+6:    container_name: flash-ticket-collector
+10:    mem_limit: 512m
+13:    env_file:
+16:    - ./agent-docker-host.yaml:/etc/otel/config.yaml:ro
+18:    - /var/lib/docker/containers:/var/lib/docker/containers:ro
+19:    - /var/run/docker.sock:/var/run/docker.sock:ro
+### toxiproxy_inspect
+labels={"org.opencontainers.image.created":"2025-03-18T13:12:10Z","org.opencontainers.image.description":"toxiproxy","org.opencontainers.image.licenses":"MIT","org.opencontainers.image.revision":"3ccd6a79cbc6c6a72b884d295ad314b75cdf3962","org.opencontainers.image.source":"https://github.com/Shopify/toxiproxy","org.opencontainers.image.title":"toxiproxy","org.opencontainers.image.url":"https://github.com/Shopify/toxiproxy","org.opencontainers.image.version":"2.12.0","t062":"topology"} cmd=["-host=127.0.0.1","-port=8474","-config=/config/proxies.json"]
+### rca_faults_stat
+drwxr-x--- UNKNOWN:UNKNOWN /opt/flash-ticket-app/rca-faults
+stat: cannot statx '/opt/flash-ticket-app/rca-faults/*': Permission denied
+Matching Defaults entries for ubuntu on instance-20261111-0142:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
+
+User ubuntu may run the following commands on instance-20261111-0142:
+    (ALL : ALL) ALL
+    (ALL) NOPASSWD: ALL

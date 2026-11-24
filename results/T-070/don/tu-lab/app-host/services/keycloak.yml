@@ -1,0 +1,28 @@
+services:
+  keycloak:
+    image: ${IMAGE:?image digest required}
+    command: [start, --import-realm]
+    env_file: ../env/keycloak.env
+    environment:
+      OTEL_INSTRUMENTATION_METHODS_INCLUDE: "org.keycloak.services.scheduled.ScheduledTaskRunner[run];org.keycloak.events.outbox.OutboxDrainerTask[run];org.keycloak.models.jpa.session.UserSessionExpirationLogic[run];org.keycloak.models.jpa.session.JpaUserSessionPersisterProvider[removeExpired]"
+    restart: unless-stopped
+    mem_limit: 1536m
+    stop_grace_period: 30s
+    ports:
+      - "${APP_PRIVATE_IP}:8080:8080"
+    volumes:
+      - /opt/flash-ticket-app/otel:/otel:ro
+      - /opt/flash-ticket-infra/keycloak/keycloak/themes/flash-ticket:/opt/keycloak/themes/flash-ticket:ro
+      - /opt/flash-ticket-infra/keycloak/keycloak/import:/opt/keycloak/data/import:ro
+    networks: [infra]
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+        labels: "com.docker.compose.service,com.docker.compose.container-number"
+
+networks:
+  infra:
+    name: flash-ticket-infra
+    external: true

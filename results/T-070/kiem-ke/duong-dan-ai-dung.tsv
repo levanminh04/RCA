@@ -1,0 +1,51 @@
+may	duong_dan	ai_dung	loai	bang_chung	ma_task_trong_ten
+exp-obs	/opt/rca-lab/observability	compose project flash-ticket-obs-pinned và t073-webhook (working_dir); bind ro: prometheus.yaml, loki.yaml, tempo.yaml, collector/gateway.yaml, grafana/provisioning, grafana/dashboards, t072-bo-nhan/	container	docker inspect (tho/exp-obs/p1-obs.txt: docker_mounts, docker_ps)	khong (t072-bo-nhan: co)
+exp-obs	/opt/rca-lab/inventory/oracle-exp.env	compose env_file của flash-ticket-obs-pinned (5 container)	container	label com.docker.compose.project.environment_file (tho/exp-obs/p6-obs.txt)	khong
+exp-obs	/opt/rca-lab (cả cây)	tai_linux.py, chuoi_tai.py, runner4.py, orchestrator.py chạy theo lệnh; chuoi_tai.py từ chối khi commit /opt/rca-lab đổi hoặc cây bẩn	script	load/controller/chuoi_tai.py:31,194; campaigns/README.md	khong
+exp-obs	/etc/rca-lab/grafana.env	compose env_file của Grafana (RCA_LAB_SECRETS mặc định /etc/rca-lab); root 600	container	observability/compose.yaml:71; tên file trong p2-obs.txt (không đọc nội dung)	khong
+exp-obs	/etc/rca-lab/controller/	khóa SSH của bộ điều khiển (RCA_LAB_CONTROLLER_KEYS); ubuntu 700	script	load/controller/tai_linux.py:31; campaigns/runner/runner4.py:43	khong
+exp-obs	/etc/rca-lab/credential-hash-catalog.json	safe_export.py kiểm xuất ca (root 600)	script	campaigns/README.md	khong
+exp-obs	/srv/rca-lab/collector-gateway/	bind rw vào flash-ticket-obs-collector (/data); capture/ 53 file, vòng 100 MB x 10-20; stage_m1.py đọc (RCA_CAPTURE)	container+script	docker inspect; campaigns/runner/stage_m1.py:68; collector/gateway.yaml rotation	khong
+exp-obs	/srv/rca-lab/rca-results/	bind ro vào Grafana /usr/share/grafana/public/rca; dashboard đọc http://localhost:3000/public/rca/...; sau_v082.py mặc định --ra t065-l11-001	container+dashboard+script	docker inspect; lab-dashboard.tsv; campaigns/runner/sau_v082.py:147-159	co (t065-l11-001, t065-l3/l4/l8/l8b-001, t073-dev-001, t073-e5-001)
+exp-obs	/srv/rca-lab/rca-results/t065-l11-001	nguồn dữ liệu của 3 dashboard đang hiện (t065-l5-muc-luc, t065-l8b-rca, t065-l8b-phat-lai); service_graph.py, sau_v082.py ghi vào	dashboard+script	lab-dashboard.tsv; observability/grafana/README.md	co
+exp-obs	/srv/rca-lab/rca-results/{t065-l3-001,t065-l4-001,*.json gốc,chi-muc/}	dashboard lưu trữ 90-archive (không nạp) đọc t065-l3-001, t065-l4-001; rca-g2 đọc public/${thu_muc}/...	dashboard (không nạp)	lab-dashboard.tsv	co
+exp-obs	/srv/rca-lab/m1-snapshots/b0f79a4d...	run_m1.py, stage_m1.py (mặc định RCA_M1_CODE viết cứng hash)	script	campaigns/runner/run_m1.py:18; stage_m1.py:17	khong
+exp-obs	/srv/rca-lab/venv-m1	venv M1 (requirements-m1.txt)	script	campaigns/README.md	khong
+exp-obs	/srv/rca-lab/m1/	vùng phương pháp (root:rca 750); RCA_M1_ROOT của run_m1.py/stage_m1.py; orchestrator, check_old_case	script	campaigns/runner/run_m1.py:19; campaigns/online/README.md	khong
+exp-obs	/srv/rca-lab/ledger/	sổ tiêm (ledger 700), ghi bằng ledger_append.py qua sudo -u ledger; run_m1.py cấm đọc	script	campaigns/runner/run_m1.py:55; campaigns/README.md	khong
+exp-obs	/var/lib/flash-ticket-ledger	thư mục nhà của user ledger (ledger:ledger 750, mtime 10/11); run_m1.py liệt kê trong đường cấm	user hệ thống	getent passwd (p3-obs.txt); run_m1.py:55	khong
+exp-obs	/srv/rca-lab/runs/	đầu ra lượt (ubuntu 700); STOP của runner; kho của chuoi_tai	script	tai_linux.py, chuoi_tai.py, runner4.py docstring	co (thư mục con t068-*, t069-*, t071-*, t072-*, t073-*, tempo-do-t066)
+exp-obs	/srv/rca-lab/runs/t072-e3-01	bind rw vào flash-ticket-t072-bo-nhan (/ra/webhook.jsonl, ghi tới 23/11 02:33)	container	docker inspect	co
+exp-obs	/srv/rca-lab/runs/t072-e3-01-cfg/webhook.env	compose env_file của project t073-webhook (cần cho mọi lệnh compose, kể cả down)	container	label environment_file (p6-obs.txt); campaigns/online/README.md	co
+exp-obs	/srv/rca-lab/load-controller/	tai_linux.py RCA_LAB_LOAD_STATE (state, events, lock, STOP, tai-out/<tag> 47 tag)	script	load/controller/tai_linux.py:30; p7-obs-taiout.txt	khong (tag con: co)
+exp-obs	/srv/rca-lab/trace-goi/	gói trace ca lịch sử cho service_graph.py (--goi)	script	observability/grafana/README.md	khong
+exp-obs	/opt/unified-monitoring-agent	agent Oracle (unit unified-monitoring-agent, timer config_downloader)	hệ thống cloud	systemctl list-timers (p2-obs.txt)	khong
+exp-obs	/home/ubuntu/t063	8 KB; không thấy ai dùng	-	du_home (p1-obs.txt)	co
+exp-app	/opt/rca-lab/observability/collector	project flash-ticket-collector (working_dir, config agent-compose.yaml), bind agent-docker-host.yaml; env_file /opt/rca-lab/inventory/oracle-exp.env	container	docker inspect (p1-app.txt, p4-app.txt)	khong
+exp-app	/opt/rca-lab/faults/injectors/docker/inj3.py	runner4.py gọi qua SSH	script	campaigns/runner/runner4.py:48	khong
+exp-app	/srv/rca-lab/collector-agent/	bind rw vào flash-ticket-collector (/data): logs vòng 50 MB x 5, traces 100 MB x 10	container	docker inspect; agent-docker-host.yaml rotation	khong
+exp-app	/opt/flash-ticket-build/t067-compose/hieu-luc/	compose config files của 7 service FlashTicket đang chạy (working_dir); inj3.py đọc /home/ubuntu/t063/inj/compose-dir trỏ vào đây	container+script	docker compose ls; tho/exp-app/p5-app.txt	co (t067)
+exp-app	/opt/flash-ticket-app/env-t062/*.env	env_file của 7 service đang chạy (khai trong hieu-luc/*.yml)	container	compose_path_refs (p4-app.txt); không đọc nội dung	co (t062)
+exp-app	/opt/flash-ticket-app/rca-faults/<svc>/{control,audit}	bind vào booking-service, event-service (/run/fault-control ro, /run/fault-audit rw); uid 10001, 750	container	docker inspect	khong
+exp-app	/opt/flash-ticket-app/secrets/ticket-qr	bind ro vào ticket-service; safe_export.py đọc key-ring.json	container+script	docker inspect; campaigns/runner/safe_export.py:23	khong
+exp-app	/opt/flash-ticket-app/otel	bind ro vào Keycloak (/otel, javaagent)	container	docker inspect	khong
+exp-app	/opt/flash-ticket-app/compose-exp/keycloak.yml (+ ../env/keycloak.env)	compose config của Keycloak đang chạy	container	docker compose ls	khong
+exp-app	/opt/flash-ticket-app/env/	env_file của compose-exp (Keycloak); auth.py đọc test-users/l1-buyers; safe_export.py	container+script	compose-exp/*.yml; load/controller/support/auth.py:13	khong
+exp-app	/opt/flash-ticket-app/rca-toxiproxy/proxies.json	bind ro vào rca-toxiproxy (tạo bằng docker run, không compose, label t062=topology)	container	docker inspect (p4-app.txt)	khong
+exp-app	/opt/flash-ticket-app/l1-vnpay/ (+ tunnel/)	tiến trình trần ppid 1 từ 13/11: mock-runner.py, tunnel-supervisor.py, ssh -R 127.0.0.1:19091 tới máy tải; tai_linux.py preflight kiem-mock.py/tunnel-remote.py khôi phục khi chết	tiến trình+script	ps (p2-app.txt, p4-app.txt); load/controller/support/kiem-mock.py:4, tunnel-remote.py:4	khong
+exp-app	/opt/flash-ticket-app/collector/ (data 1,3 GB)	KHÔNG thấy container/tiến trình nào dùng; file mới nhất 18/11 06:56 (trước khi agent chuyển sang /srv/rca-lab/collector-agent); safe_export.py còn đọc collector.env	script	ls collector_data_old (p4-app.txt); safe_export.py:14	khong
+exp-app	/opt/flash-ticket-app/{compose,compose-t062,state}	không container nào đang chạy từ đây; compose-t062 là đích hoàn tác của deploy.sh	script (hoàn tác)	docker compose ls; app-host/scripts/deploy.sh:5	co (compose-t062)
+exp-app	/opt/flash-ticket-infra/deploy/ + .env	compose config + env_file của project flash-ticket-infra (postgres, mongo, rabbitmq, redis)	container	docker compose ls; label environment_file	khong
+exp-app	/opt/flash-ticket-infra/{services,docs,keycloak}	bind ro vào postgres, Keycloak (import, themes); không liệt kê được (thiếu quyền)	container	docker inspect	khong
+exp-app	/opt/docs/architecture/data/mongodb/schema.cjs	bind ro vào user-db (mongo)	container	docker inspect	khong
+exp-app	/opt/flash-ticket-build/<16 checkout>	không container nào mount; image ft-local/*:arm64-t067-36a3725d dựng từ t067-36a3725d	build	git_checkouts (p2-app.txt)	co (t062-*, t063-h3, t067-*)
+exp-app	/opt/flash-ticket-src	repo git có .git/worktrees (2,8 MB); safe_export.py đọc /opt/flash-ticket-src/.env	build+script	du_opt2 (p2-app.txt); campaigns/runner/safe_export.py:14	khong
+exp-app	/home/ubuntu/t063/inj/	trạng thái của inj3.py (STATE viết cứng): leases, het-han log, compose-dir	script	faults/injectors/docker/inj3.py:21	co
+exp-app	/home/ubuntu/{t058,t062,t071,*-t062.*,inj*.py}	không thấy ai dùng hiện tại (t071/db-moc là mốc PostgreSQL T-071)	-	home_files (p3-app.txt)	co
+exp-app	/srv/rca-lab/backups/t067-20261118	không đọc được (thiếu quyền); đường hoàn tác T-067 theo STATE	-	du_srv2 (p2-app.txt)	co
+may-tai	/srv/rca-lab/load-runs/<tag>/	tai_linux.py (SSH từ exp-obs): container k6 mount {out}:/scripts:ro và {out}:/out	script+container (khi chạy)	load/controller/tai_linux.py:232-281	co (tag t067-*, t069-*, t071-*, t073-*, t3-*)
+may-tai	/etc/rca-lab/load-secret/	container k6 mount /secret:ro; tai_linux.py, kiem-token-con-han.py đọc l1-tokens.json	script+container (khi chạy)	tai_linux.py:180,256	khong
+may-tai	127.0.0.1:19091	đầu nhận đường hầm ssh -R từ exp-app (VNPay giả)	mạng	ss -tln (p6-tai.txt)	khong
+may-tai	/opt/rca-lab	checkout @5a39028; tai_linux.py không trỏ /opt/rca-lab trên máy tải; không thấy ai dùng	-	grep tai_linux.py	khong
+may-tai	/opt/rca-tai/{out,k6,k6-e1,bo-sung-1,secret}	hệ tải cũ trước T-066; out/ đã có bản ở D:/RCA-archive/load-generator (cùng 56 thư mục); kiem-hop-dong.py nhắc /opt/rca-tai/out/contract-only	-	D:/RCA-archive/README.md; load/controller/kiem-hop-dong.py:115	khong
+may-tai	/home/ubuntu/{x86-check,uvenv,arm-check*.tgz,rec-x86linux.json,dump_rec.py}	không thấy ai dùng (10/11)	-	p6-tai.txt	khong

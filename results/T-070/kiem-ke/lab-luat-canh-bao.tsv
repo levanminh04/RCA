@@ -1,0 +1,18 @@
+doi_tuong	uid	loai	file_nguon	trang_thai_tren_exp-obs(theo_file)	noi_dung_uid_duoc_dung(da_thay)
+contact point t072-bo-nhan-nhe	t072-webhook	contact point webhook http://t072-bo-nhan:9172/t072	observability/grafana/provisioning/alerting/t072-luat.yaml	nạp (file .yaml trong thư mục gắn)	đích của 11 luật (notification_settings.receiver); tên host t072-bo-nhan = container flash-ticket-t072-bo-nhan trên mạng flash-ticket-obs-pinned_default
+nhóm luật t072-w4 (folder Grafana "T-072 W4 cảnh báo", interval 10s)	(folder theo tên, không đặt folderUid trong file)	nhóm luật	t072-luat.yaml	nạp	tên thư mục Grafana mang mã task
+luật p95 booking	t072-p95-booking	luật	t072-luat.yaml	nạp	results/T-072 (322 file đã track nhắc các UID t072-*), results/T-071 (25), T-073 (15), T-075 (8), T-070 (6), T-074 (1), docs/STATE.md, docs/WHY.md; t072-hoan-tac-n.yaml.mau
+luật p95 event	t072-p95-event	luật	t072-luat.yaml	nạp	như trên
+luật p95 payment	t072-p95-payment	luật	t072-luat.yaml	nạp	như trên
+luật p95 ticket	t072-p95-ticket	luật	t072-luat.yaml	nạp	như trên
+luật 5xx booking	t072-loi-booking	luật	t072-luat.yaml	nạp	như trên
+luật 5xx event	t072-loi-event	luật	t072-luat.yaml	nạp	như trên
+luật 5xx payment	t072-loi-payment	luật	t072-luat.yaml	nạp	như trên
+luật 5xx ticket	t072-loi-ticket	luật	t072-luat.yaml	nạp	như trên
+luật liveness	t072-live	luật	t072-luat.yaml	nạp	như trên; ca E5 dùng t̂ từ t072-live (STATE)
+luật mất quan sát (đầu dò)	t072-mat-do	luật	t072-luat.yaml	nạp	như trên
+luật mất quan sát (gateway)	t072-mat-gw	luật	t072-luat.yaml	nạp	như trên
+gỡ 4 luật thử	t072-thu-p95-booking/event/payment/ticket	deleteRules	observability/grafana/provisioning/alerting/t072-thu-e3-go.yaml	nạp mỗi lần Grafana khởi động (lệnh xóa)	commit G ecdeed2
+gỡ contact point E5	t073-webhook-e5	deleteContactPoints (theo file)	observability/grafana/provisioning/alerting/t073-e5-go.yaml	nạp mỗi lần Grafana khởi động (lệnh xóa)	commit H 1bb40ca
+mẫu hoàn tác N	11 uid t072-* + t072-webhook	deleteRules/contact points	t072-hoan-tac-n.yaml.mau	KHÔNG nạp (đuôi .mau)	—
+gom sự cố (b)	dùng __alert_rule_uid__ hoặc alertname	mã	campaigns/online/incidents.py	không chạy (bộ điều phối dừng)	incidents.py đọc nhãn __alert_rule_uid__/alertname từ webhook, không viết cứng UID t072-* (git grep không thấy)

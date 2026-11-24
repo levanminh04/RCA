@@ -1,0 +1,1 @@
+sudo -n find /opt /srv /etc /home -maxdepth 3 \( -name 'rca-lab' -o -name 'flash-ticket-app' -o -name 'flash-ticket-build' -o -name 'flash-ticket-src' -o -name 'flash-ticket-infra' -o -name 'rca-dieu-phoi' -o -iname 't0[0-9][0-9]*' -o -iname '*-t0[0-9][0-9]*' \) -not -path '/srv/flashticket-rca/archive/*' -not -path '/var/lib/docker/*' 2>/dev/null | sort | head -40

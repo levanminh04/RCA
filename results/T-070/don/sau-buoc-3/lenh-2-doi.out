@@ -1,0 +1,127 @@
++ N=/srv/flashticket-rca
++ F=/opt/flashticket
++ A=/srv/flashticket-rca/archive/2026-11
++ P=/opt/flash-ticket-app
++ test '!' -e /srv/flashticket-rca
++ test '!' -e /opt/flashticket
++ test '!' -e /etc/flashticket-rca
++ test '!' -e /opt/flashticket-rca
++ install -d -o root -g root -m 755 /srv/flashticket-rca /srv/flashticket-rca/archive /srv/flashticket-rca/archive/2026-11 /srv/flashticket-rca/archive/2026-11/home /srv/flashticket-rca/archive/2026-11/build /srv/flashticket-rca/faults /srv/flashticket-rca/faults/toxiproxy
++ install -d -o root -g root -m 755 /opt/flashticket /opt/flashticket/build
++ install -d -o ubuntu -g ubuntu -m 755 /opt/flashticket/compose
++ install -d -o ubuntu -g ubuntu -m 700 /opt/flashticket/env
++ mv /srv/rca-lab/collector-agent /srv/flashticket-rca/collector
++ mv /srv/rca-lab/backups /srv/flashticket-rca/archive/2026-11/backups
++ rmdir /srv/rca-lab
++ mv /etc/rca-lab /etc/flashticket-rca
++ mv /opt/rca-lab /opt/flashticket-rca
++ mv /opt/flash-ticket-src /opt/flashticket/src
++ mv /opt/flash-ticket-build/t067-36a3725d /opt/flashticket/build/36a3725d
++ mv /opt/flash-ticket-build/t067-36a3725d-logs /srv/flashticket-rca/archive/2026-11/build/
++ mv /opt/flash-ticket-infra /opt/flashticket/infra
++ for s in api-gateway booking-service discovery-server event-service payment-service ticket-service user-service
++ mv /opt/flash-ticket-app/env-t062/api-gateway.env /opt/flashticket/env/
++ for s in api-gateway booking-service discovery-server event-service payment-service ticket-service user-service
++ mv /opt/flash-ticket-app/env-t062/booking-service.env /opt/flashticket/env/
++ for s in api-gateway booking-service discovery-server event-service payment-service ticket-service user-service
++ mv /opt/flash-ticket-app/env-t062/discovery-server.env /opt/flashticket/env/
++ for s in api-gateway booking-service discovery-server event-service payment-service ticket-service user-service
++ mv /opt/flash-ticket-app/env-t062/event-service.env /opt/flashticket/env/
++ for s in api-gateway booking-service discovery-server event-service payment-service ticket-service user-service
++ mv /opt/flash-ticket-app/env-t062/payment-service.env /opt/flashticket/env/
++ for s in api-gateway booking-service discovery-server event-service payment-service ticket-service user-service
++ mv /opt/flash-ticket-app/env-t062/ticket-service.env /opt/flashticket/env/
++ for s in api-gateway booking-service discovery-server event-service payment-service ticket-service user-service
++ mv /opt/flash-ticket-app/env-t062/user-service.env /opt/flashticket/env/
++ for f in keycloak.env client-secrets.json test-users.json l1-buyers.json
++ mv /opt/flash-ticket-app/env/keycloak.env /opt/flashticket/env/
++ for f in keycloak.env client-secrets.json test-users.json l1-buyers.json
++ mv /opt/flash-ticket-app/env/client-secrets.json /opt/flashticket/env/
++ for f in keycloak.env client-secrets.json test-users.json l1-buyers.json
++ mv /opt/flash-ticket-app/env/test-users.json /opt/flashticket/env/
++ for f in keycloak.env client-secrets.json test-users.json l1-buyers.json
++ mv /opt/flash-ticket-app/env/l1-buyers.json /opt/flashticket/env/
++ mv /opt/flash-ticket-app/secrets /opt/flashticket/secrets
++ mv /opt/flash-ticket-app/otel /opt/flashticket/otel
++ cp -p /opt/flash-ticket-app/compose-exp/keycloak.yml /opt/flashticket/compose/keycloak.yml
++ sed -i -e 's#- /opt/flash-ticket-app/otel:/otel:ro#- /opt/flashticket/otel:/otel:ro#' -e 's#- /opt/flash-ticket-infra/keycloak/keycloak/themes/flash-ticket:#- /opt/flashticket/infra/keycloak/keycloak/themes/flash-ticket:#' -e 's#- /opt/flash-ticket-infra/keycloak/keycloak/import:#- /opt/flashticket/infra/keycloak/keycloak/import:#' /opt/flashticket/compose/keycloak.yml
++ chown ubuntu:ubuntu /opt/flashticket/compose/keycloak.yml
++ mv /opt/flash-ticket-app/rca-faults/booking-service /srv/flashticket-rca/faults/
++ mv /opt/flash-ticket-app/rca-faults/event-service /srv/flashticket-rca/faults/
++ rmdir /opt/flash-ticket-app/rca-faults
++ mv /opt/flash-ticket-app/rca-toxiproxy/proxies.json /srv/flashticket-rca/faults/toxiproxy/
++ mv /opt/flash-ticket-app/l1-vnpay /srv/flashticket-rca/faults/vnpay
++ mv /home/ubuntu/t063/inj /srv/flashticket-rca/faults/inject-state
++ printf '/opt/flashticket/compose\n'
++ chown ubuntu:ubuntu /srv/flashticket-rca/faults/inject-state/compose-dir
++ mv /home/ubuntu/t063 /srv/flashticket-rca/archive/2026-11/home/t063
++ for x in t058 t062 t071 inj.py inj2.py inj3.py build-t062.sh deploy-t062.sh prepare-t062.py rollback-t062.sh
++ mv /home/ubuntu/t058 /srv/flashticket-rca/archive/2026-11/home/
++ for x in t058 t062 t071 inj.py inj2.py inj3.py build-t062.sh deploy-t062.sh prepare-t062.py rollback-t062.sh
++ mv /home/ubuntu/t062 /srv/flashticket-rca/archive/2026-11/home/
++ for x in t058 t062 t071 inj.py inj2.py inj3.py build-t062.sh deploy-t062.sh prepare-t062.py rollback-t062.sh
++ mv /home/ubuntu/t071 /srv/flashticket-rca/archive/2026-11/home/
++ for x in t058 t062 t071 inj.py inj2.py inj3.py build-t062.sh deploy-t062.sh prepare-t062.py rollback-t062.sh
++ mv /home/ubuntu/inj.py /srv/flashticket-rca/archive/2026-11/home/
++ for x in t058 t062 t071 inj.py inj2.py inj3.py build-t062.sh deploy-t062.sh prepare-t062.py rollback-t062.sh
++ mv /home/ubuntu/inj2.py /srv/flashticket-rca/archive/2026-11/home/
++ for x in t058 t062 t071 inj.py inj2.py inj3.py build-t062.sh deploy-t062.sh prepare-t062.py rollback-t062.sh
++ mv /home/ubuntu/inj3.py /srv/flashticket-rca/archive/2026-11/home/
++ for x in t058 t062 t071 inj.py inj2.py inj3.py build-t062.sh deploy-t062.sh prepare-t062.py rollback-t062.sh
++ mv /home/ubuntu/build-t062.sh /srv/flashticket-rca/archive/2026-11/home/
++ for x in t058 t062 t071 inj.py inj2.py inj3.py build-t062.sh deploy-t062.sh prepare-t062.py rollback-t062.sh
++ mv /home/ubuntu/deploy-t062.sh /srv/flashticket-rca/archive/2026-11/home/
+== ket qua
+root:root 755 /srv/flashticket-rca
+root:root 755 /srv/flashticket-rca/collector
+root:root 755 /srv/flashticket-rca/faults
+UNKNOWN:UNKNOWN 750 /srv/flashticket-rca/faults/booking-service
+UNKNOWN:UNKNOWN 750 /srv/flashticket-rca/faults/event-service
+ubuntu:ubuntu 775 /srv/flashticket-rca/faults/inject-state
+root:root 755 /srv/flashticket-rca/faults/toxiproxy
+ubuntu:ubuntu 700 /srv/flashticket-rca/faults/vnpay
+root:root 644 /srv/flashticket-rca/faults/toxiproxy/proxies.json
+root:root 755 /srv/flashticket-rca/archive/2026-11
+root:root 755 /srv/flashticket-rca/archive/2026-11/home
+root:root 755 /opt/flashticket
+root:root 755 /opt/flashticket/build
+ubuntu:ubuntu 755 /opt/flashticket/compose
+ubuntu:ubuntu 700 /opt/flashticket/env
+ubuntu:ubuntu 755 /opt/flashticket/infra
+ubuntu:ubuntu 755 /opt/flashticket/otel
+ubuntu:ubuntu 755 /opt/flashticket/secrets
+ubuntu:ubuntu 755 /opt/flashticket/src
+root:root 755 /etc/flashticket-rca
+root:root 600 /etc/flashticket-rca/collector.env
+root:root 644 /etc/flashticket-rca/payment-ngrok-gia.env
+ubuntu:ubuntu 755 /opt/flashticket-rca
+api-gateway.env
+booking-service.env
+client-secrets.json
+discovery-server.env
+event-service.env
+keycloak.env
+l1-buyers.json
+payment-service.env
+test-users.json
+ticket-service.env
+user-service.env
+/opt/flashticket/compose
+14:      - /opt/flashticket/otel:/otel:ro
+15:      - /opt/flashticket/infra/keycloak/keycloak/themes/flash-ticket:/opt/keycloak/themes/flash-ticket:ro
+16:      - /opt/flashticket/infra/keycloak/keycloak/import:/opt/keycloak/data/import:ro
+keycloak.yml chi khac 3 duong bind
+collector
+compose
+compose-exp
+compose-t062
+env
+env-t062
+l1-fixtures
+rca-toxiproxy
+state
++ for x in t058 t062 t071 inj.py inj2.py inj3.py build-t062.sh deploy-t062.sh prepare-t062.py rollback-t062.sh
++ mv /home/ubuntu/prepare-t062.py /srv/flashticket-rca/archive/2026-11/home/
++ for x in t058 t062 t071 inj.py inj2.py inj3.py build-t062.sh deploy-t062.sh prepare-t062.py rollback-t062.sh
++ mv /home/ubuntu/rollback-t062.sh /srv/flashticket-rca/archive/2026-11/home/
++ set +x

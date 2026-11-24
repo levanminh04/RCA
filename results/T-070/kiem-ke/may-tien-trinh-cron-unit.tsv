@@ -1,0 +1,17 @@
+may	loai	ten	nguoi_chay	bat_dau(UTC)	duong_dan_dung	ghi_chu	nguon
+exp-obs	tiến trình (trong container)	python -B /app/bo_nhan.py --nghe 0.0.0.0:9172 --ra /ra/webhook.jsonl	ubuntu (uid 1001)	2026-11-22 05:16	/opt/rca-lab/observability/t072-bo-nhan → /app; /srv/rca-lab/runs/t072-e3-01 → /ra	t072-bo-nhan CÒN CHẠY (healthy), project t073-webhook	tho/exp-obs/p2-obs.txt ps; p1-obs.txt docker_mounts
+exp-obs	tiến trình (trong container)	prometheus, grafana (+ plugin), loki, tempo, otelcol	nobody/472/…	17/11 (grafana 23/11 05:34)	volume flash-ticket-obs-pinned_*; bind từ /opt/rca-lab/observability	5 container project flash-ticket-obs-pinned	p2-obs.txt ps
+exp-obs	cron	không có (crontab ubuntu, root rỗng; /etc/cron.d chỉ e2scrub_all, sysstat của hệ thống)	-	-	-	sudo -n crontab -l -u <mọi user> không trả gì	p2-obs.txt crontab_*
+exp-obs	systemd unit/timer tự tạo	không có (chỉ unit hệ thống, snap, Oracle agent; không có user unit)	-	-	-	timer duy nhất ngoài hệ thống: unified-monitoring-agent_config_downloader (Oracle)	p2-obs.txt systemd_custom_files, list_timers
+exp-obs	tmux/screen	không có	-	-	-	-	p2-obs.txt tmux_screen
+exp-app	tiến trình trần (ppid 1)	python3 /opt/flash-ticket-app/l1-vnpay/tunnel/tunnel-supervisor.py	ubuntu	2026-11-13 02:54	/opt/flash-ticket-app/l1-vnpay/tunnel/	không unit, không cron: khởi động lại máy thì không tự chạy lại; tai_linux.py preflight khôi phục	p4-app.txt vnpay_procs
+exp-app	tiến trình con	ssh -N -T -i <khóa> … -R 127.0.0.1:19091:127.0.0.1:19090 ubuntu@3.24.8.49	ubuntu	2026-11-13 02:55	/opt/flash-ticket-app/l1-vnpay/tunnel/{forward-only.key,tai-known-hosts}	đường hầm VNPay giả sang máy tải	p4-app.txt vnpay_procs
+exp-app	tiến trình trần (ppid 1)	python3 /opt/flash-ticket-app/l1-vnpay/mock-runner.py	ubuntu	2026-11-13 02:55	/opt/flash-ticket-app/l1-vnpay/ (cwd)	VNPay giả, cổng 19090 cục bộ	p4-app.txt vnpay_procs
+exp-app	tiến trình (trong container)	7 java FlashTicket, keycloak, postgres, mongod, rabbitmq, redis, otelcol, toxiproxy	10001/opc/ocarun/…	12/11–19/11	xem may-container.tsv	14 container	p2-app.txt ps
+exp-app	cron	không có	-	-	-	-	p2-app.txt
+exp-app	systemd unit/timer tự tạo	không có	-	-	-	-	p2-app.txt
+exp-app	tmux/screen	không có	-	-	-	-	p2-app.txt
+may-tai	tiến trình	không có tiến trình RCA nào (chỉ dockerd, sshd…); 0 containerd-shim	-	-	-	user ubuntu không thuộc nhóm docker → docker ps không đọc được; số shim = 0 cho thấy không container nào đang chạy	p2-tai.txt ps; p3-tai.txt shim_count
+may-tai	cổng nghe	127.0.0.1:19091	(sshd, đầu -R)	-	-	đầu nhận đường hầm từ exp-app	p6-tai.txt ss
+may-tai	cron	không có	-	-	-	-	p2-tai.txt
+may-tai	systemd unit/timer tự tạo	không có	-	-	-	-	p2-tai.txt

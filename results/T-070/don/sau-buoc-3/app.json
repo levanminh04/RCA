@@ -1,0 +1,1479 @@
+{
+ "utc": "2026-11-24T16:40:18Z",
+ "containers": [
+  {
+   "ten": "flash-ticket-collector",
+   "image": "otel/opentelemetry-collector-contrib@sha256:e40d61f10c9a617cca1ffd1be4d7e2b3a4b0f0001798ff07e58cabe82e618cea",
+   "image_id": "sha256:e40d61f10c9a617cca1ffd1be4d7e2b3a4b0f0001798ff07e58cabe82e618cea",
+   "trang_thai": "running",
+   "project": "flash-ticket-collector",
+   "config_files": "/opt/flashticket-rca/observability/collector/agent-compose.yaml",
+   "environment_file": "/opt/flashticket-rca/inventory/oracle-exp.env",
+   "nhan_khac": {},
+   "mounts": [
+    {
+     "loai": "bind",
+     "nguon": "/srv/flashticket-rca/collector",
+     "dich": "/data",
+     "rw": true,
+     "ten_volume": null
+    },
+    {
+     "loai": "bind",
+     "nguon": "/",
+     "dich": "/hostfs",
+     "rw": false,
+     "ten_volume": null
+    },
+    {
+     "loai": "bind",
+     "nguon": "/opt/flashticket-rca/observability/collector/agent-docker-host.yaml",
+     "dich": "/etc/otel/config.yaml",
+     "rw": false,
+     "ten_volume": null
+    },
+    {
+     "loai": "bind",
+     "nguon": "/var/run/docker.sock",
+     "dich": "/var/run/docker.sock",
+     "rw": false,
+     "ten_volume": null
+    },
+    {
+     "loai": "bind",
+     "nguon": "/var/lib/docker/containers",
+     "dich": "/var/lib/docker/containers",
+     "rw": false,
+     "ten_volume": null
+    }
+   ],
+   "memory": 536870912,
+   "network_mode": "host",
+   "log_config": {
+    "Type": "json-file",
+    "Config": {
+     "max-file": "3",
+     "max-size": "10m"
+    }
+   },
+   "restart": {
+    "Name": "unless-stopped",
+    "MaximumRetryCount": 0
+   },
+   "ports": {},
+   "user": "0:0",
+   "cmd": [
+    "--config=/etc/otel/config.yaml"
+   ],
+   "env": {
+    "RABBITMQ_MONITOR_PASSWORD": "sha256:32df3667f2ec6982",
+    "REDIS_PASSWORD": "sha256:07ec3649877eed04",
+    "OBS_PRIVATE_IP": "sha256:8271352992615f8c",
+    "APP_PRIVATE_IP": "sha256:55bb265b90c60dd2",
+    "POSTGRES_MONITOR_PASSWORD": "sha256:9175bc921af07f6b",
+    "MONGODB_MONITOR_PASSWORD": "sha256:34851ccc2a098c87",
+    "PATH": "sha256:ce908b8efad4aed2"
+   }
+  },
+  {
+   "ten": "flash-ticket-api-gateway-api-gateway-1",
+   "image": "ft-local/api-gateway:arm64-t067-36a3725d",
+   "image_id": "sha256:b4b5f686e2e4fc6917d9d0d1552b4c21391f019e577f9a96ff3b8d9b0cb9f8a3",
+   "trang_thai": "running",
+   "project": "flash-ticket-api-gateway",
+   "config_files": "/opt/flashticket/compose/api-gateway.yml",
+   "environment_file": null,
+   "nhan_khac": {
+    "io.flashticket.runtime-tools": "curl,jq",
+    "rca-lab.build-label": "t067",
+    "rca-lab.maven-profile": "none"
+   },
+   "mounts": [],
+   "memory": 805306368,
+   "network_mode": "host",
+   "log_config": {
+    "Type": "json-file",
+    "Config": {
+     "labels": "com.docker.compose.service,com.docker.compose.container-number",
+     "max-file": "3",
+     "max-size": "10m"
+    }
+   },
+   "restart": {
+    "Name": "unless-stopped",
+    "MaximumRetryCount": 0
+   },
+   "ports": {},
+   "user": "10001:10001",
+   "cmd": [],
+   "env": {
+    "KEYCLOAK_IDENTITY_REALM_ID": "sha256:4a9d7c507c0e2dcd",
+    "SPRING_AUTOCONFIGURE_EXCLUDE": "sha256:ebfaa604b02f88db",
+    "SERVER_ADDRESS": "sha256:55bb265b90c60dd2",
+    "OTEL_INSTRUMENTATION_COMMON_LOGGING_SPAN_ID_KEY": "sha256:6379c1ca1f189ed6",
+    "OTEL_AGENT_ENABLED": "sha256:b5bea41b6c623f7c",
+    "KEYCLOAK_JWK_SET_URI": "sha256:b33d044746af2f72",
+    "OTEL_EXPORTER_OTLP_PROTOCOL": "sha256:4d23dca5a8108957",
+    "LOGGING_STRUCTURED_FORMAT_CONSOLE": "sha256:76cd2c0d589e2245",
+    "HOST_ID": "sha256:9bbaeb01c94113ef",
+    "INTERNAL_SERVICE_CLIENT_SECRET": "sha256:bd2ee54de90a5d05",
+    "EUREKA_CLIENT_ENABLED": "sha256:b5bea41b6c623f7c",
+    "JAVA_TOOL_OPTIONS": "sha256:cb87ac0f42aca550",
+    "REDIS_HOST": "sha256:12ca17b49af22894",
+    "INTEGRATION_USER_GATEWAY_TIME_LIMIT": "sha256:189ec27b0e55a4eb",
+    "ENVIRONMENT": "sha256:dd7a946de80abf41",
+    "REDIS_PASSWORD": "sha256:07ec3649877eed04",
+    "OTEL_LOGS_EXPORTER": "sha256:140bedbf9c3f6d56",
+    "RABBITMQ_USERNAME": "sha256:ace72b81b787db5c",
+    "SERVICE_VERSION": "sha256:af8a1a7689928b10",
+    "KEYCLOAK_AUDIENCE": "sha256:80a16654317931ff",
+    "INTEGRATION_PAYMENT_GATEWAY_TIME_LIMIT": "sha256:189ec27b0e55a4eb",
+    "INTEGRATION_GATEWAY_HTTP_RESPONSE_TIMEOUT": "sha256:189ec27b0e55a4eb",
+    "OTEL_INSTRUMENTATION_COMMON_LOGGING_TRACE_ID_KEY": "sha256:3cd81d346c5706ba",
+    "RABBITMQ_VHOST": "sha256:8a5edab282632443",
+    "INTEGRATION_BOOKING_GATEWAY_TIME_LIMIT": "sha256:189ec27b0e55a4eb",
+    "OTEL_SERVICE_NAME": "sha256:fae39eb1cfc73239",
+    "RABBITMQ_HOST": "sha256:12ca17b49af22894",
+    "KEYCLOAK_ISSUER_URI": "sha256:b4029eb0eef0312f",
+    "KEYCLOAK_TOKEN_URI": "sha256:d7739037d2295bad",
+    "OTEL_TRACES_SAMPLER": "sha256:8dbea958f0ab192c",
+    "INTEGRATION_EVENT_GATEWAY_TIME_LIMIT": "sha256:189ec27b0e55a4eb",
+    "GATEWAY_REDIS_TIMEOUT": "sha256:7819f63beefe24e8",
+    "INTEGRATION_TICKET_GATEWAY_TIME_LIMIT": "sha256:189ec27b0e55a4eb",
+    "CORS_ALLOWED_ORIGINS": "sha256:4e90ec8f9d9b8d5b",
+    "REDIS_PORT": "sha256:48f599a9094eb9a4",
+    "OTEL_METRIC_EXPORT_INTERVAL": "sha256:39e5b4830d4d9c14",
+    "RABBITMQ_PASSWORD": "sha256:4ea475d1c900b391",
+    "OTEL_EXPORTER_OTLP_ENDPOINT": "sha256:7cffd9399162b658",
+    "RABBITMQ_PORT": "sha256:f669dd4f81d2b9bb",
+    "EVENT_IMAGES_GATEWAY_TIME_LIMIT": "sha256:4133621f58c1c3ca",
+    "EUREKA_SERVER_URL": "sha256:c316ecd7548d095e",
+    "EUREKA_INSTANCE_PREFER_IP_ADDRESS": "sha256:b5bea41b6c623f7c",
+    "API_GATEWAY_PORT": "sha256:a7fc04e4c6f7823a",
+    "INSTANCE_ID": "sha256:06d3f4df38bd16ad",
+    "EUREKA_INSTANCE_IP_ADDRESS": "sha256:55bb265b90c60dd2",
+    "RABBITMQ_BUSINESS_EXCHANGE": "sha256:3df8483316437612",
+    "PATH": "sha256:18fd332762afe2dd",
+    "JAVA_HOME": "sha256:0c0b3b4ed12beb88",
+    "LANG": "sha256:65ce8c93514741c9",
+    "LANGUAGE": "sha256:fb4f8ed5e18c083b",
+    "LC_ALL": "sha256:65ce8c93514741c9",
+    "JAVA_VERSION": "sha256:269c98b9c63e009c",
+    "SERVICE_NAME": "sha256:fae39eb1cfc73239"
+   }
+  },
+  {
+   "ten": "flash-ticket-payment-service-payment-service-1",
+   "image": "ft-local/payment-service:arm64-t067-36a3725d",
+   "image_id": "sha256:610aa04165d91fa585126f6630c2cd2484e2a5e96d75b6f0752a76b93f90bd20",
+   "trang_thai": "running",
+   "project": "flash-ticket-payment-service",
+   "config_files": "/opt/flashticket/compose/payment-service.yml",
+   "environment_file": null,
+   "nhan_khac": {
+    "io.flashticket.runtime-tools": "curl,jq",
+    "rca-lab.build-label": "t067",
+    "rca-lab.maven-profile": "none"
+   },
+   "mounts": [],
+   "memory": 1073741824,
+   "network_mode": "host",
+   "log_config": {
+    "Type": "json-file",
+    "Config": {
+     "labels": "com.docker.compose.service,com.docker.compose.container-number",
+     "max-file": "3",
+     "max-size": "10m"
+    }
+   },
+   "restart": {
+    "Name": "unless-stopped",
+    "MaximumRetryCount": 0
+   },
+   "ports": {},
+   "user": "10001:10001",
+   "cmd": [],
+   "env": {
+    "PAYMENT_VNPAY_CALLBACKS_ENABLED": "sha256:fcbcf165908dd18a",
+    "PAYMENT_SERVICE_CLIENT_ID": "sha256:77f5b67910219199",
+    "PAYMENT_VNPAY_ENABLED": "sha256:fcbcf165908dd18a",
+    "KEYCLOAK_IDENTITY_REALM_ID": "sha256:4a9d7c507c0e2dcd",
+    "PAYMENT_RABBITMQ_USERNAME": "sha256:ace72b81b787db5c",
+    "PAYMENT_SERVICE_CLIENT_SECRET": "sha256:bd2ee54de90a5d05",
+    "PAYMENT_ENVIRONMENT": "sha256:dd7a946de80abf41",
+    "OTEL_INSTRUMENTATION_COMMON_LOGGING_TRACE_ID_KEY": "sha256:3cd81d346c5706ba",
+    "PAYMENT_DB_PASSWORD": "sha256:12281ce9f782dfc0",
+    "ENVIRONMENT": "sha256:dd7a946de80abf41",
+    "PAYMENT_KEYCLOAK_JWK_SET_URI": "sha256:b33d044746af2f72",
+    "PAYMENT_RABBITMQ_PASSWORD": "sha256:4ea475d1c900b391",
+    "INTERNAL_SERVICE_CLIENT_SECRET": "sha256:bd2ee54de90a5d05",
+    "OTEL_EXPORTER_OTLP_PROTOCOL": "sha256:4d23dca5a8108957",
+    "PAYMENT_RABBITMQ_HOST": "sha256:12ca17b49af22894",
+    "PAYMENT_RABBITMQ_BUSINESS_EXCHANGE": "sha256:3df8483316437612",
+    "RABBITMQ_PORT": "sha256:f669dd4f81d2b9bb",
+    "RABBITMQ_PASSWORD": "sha256:4ea475d1c900b391",
+    "PAYMENT_RABBITMQ_VHOST": "sha256:8a5edab282632443",
+    "SERVICE_VERSION": "sha256:af8a1a7689928b10",
+    "PAYMENT_DB_USERNAME": "sha256:60e7940296ea6bff",
+    "PAYMENT_DB_URL": "sha256:5223c925322784cd",
+    "PAYMENT_RABBITMQ_PORT": "sha256:f669dd4f81d2b9bb",
+    "VNPAY_APP_RETURN_URL": "sha256:261d842b87c49119",
+    "PAYMENT_INTERNAL_SERVICE_CLIENT_SECRET": "sha256:bd2ee54de90a5d05",
+    "PAYMENT_SERVICE_PORT": "sha256:b6a8f919326b6079",
+    "OTEL_METRIC_EXPORT_INTERVAL": "sha256:39e5b4830d4d9c14",
+    "KEYCLOAK_AUDIENCE": "sha256:80a16654317931ff",
+    "VNPAY_API_URL": "sha256:33bbedab5c11555a",
+    "VNPAY_IPN_URL": "sha256:15f628271826ea13",
+    "PAYMENT_HOST_ID": "sha256:9bbaeb01c94113ef",
+    "VNPAY_HASH_SECRET": "sha256:4c6d8c6df56a06d1",
+    "EUREKA_CLIENT_ENABLED": "sha256:b5bea41b6c623f7c",
+    "PAYMENT_KEYCLOAK_IDENTITY_REALM_ID": "sha256:4a9d7c507c0e2dcd",
+    "RABBITMQ_USERNAME": "sha256:ace72b81b787db5c",
+    "REDIS_PORT": "sha256:48f599a9094eb9a4",
+    "PAYMENT_KEYCLOAK_ISSUER_URI": "sha256:b4029eb0eef0312f",
+    "PAYMENT_SERVICE_TOKEN_URI": "sha256:d7739037d2295bad",
+    "PAYMENT_SERVICE_VERSION": "sha256:d602a2b47838cde9",
+    "PAYMENT_DOCKER_BOOKING_URL": "sha256:6bf4bc2f5d722cee",
+    "PAYMENT_INSTANCE_ID": "sha256:41e37c74a99329f6",
+    "PAYMENT_KEYCLOAK_TOKEN_URI": "sha256:d7739037d2295bad",
+    "RABBITMQ_BUSINESS_EXCHANGE": "sha256:3df8483316437612",
+    "HOST_ID": "sha256:9bbaeb01c94113ef",
+    "INSTANCE_ID": "sha256:41e37c74a99329f6",
+    "PAYMENT_WORKER_ENABLED": "sha256:b5bea41b6c623f7c",
+    "OTEL_INSTRUMENTATION_COMMON_LOGGING_SPAN_ID_KEY": "sha256:6379c1ca1f189ed6",
+    "PAYMENT_VNPAY_API_URL": "sha256:a7de6a870e57fe7b",
+    "OTEL_SERVICE_NAME": "sha256:13d3efdc3a77509c",
+    "RABBITMQ_VHOST": "sha256:8a5edab282632443",
+    "EUREKA_INSTANCE_PREFER_IP_ADDRESS": "sha256:b5bea41b6c623f7c",
+    "OTEL_AGENT_ENABLED": "sha256:b5bea41b6c623f7c",
+    "OTEL_TRACES_SAMPLER": "sha256:8dbea958f0ab192c",
+    "SERVER_ADDRESS": "sha256:12ca17b49af22894",
+    "OTEL_LOGS_EXPORTER": "sha256:140bedbf9c3f6d56",
+    "VNPAY_RETURN_URL": "sha256:98550b0d2e6222a5",
+    "BOOKING_SERVICE_URL": "sha256:6bf4bc2f5d722cee",
+    "LOGGING_STRUCTURED_FORMAT_CONSOLE": "sha256:76cd2c0d589e2245",
+    "REDIS_HOST": "sha256:12ca17b49af22894",
+    "RABBITMQ_HOST": "sha256:12ca17b49af22894",
+    "VNPAY_TMN_CODE": "sha256:ca51f5628a83fb26",
+    "VNPAY_PAYMENT_URL": "sha256:d9965e7477390725",
+    "EUREKA_SERVER_URL": "sha256:c316ecd7548d095e",
+    "PAYMENT_VNPAY_ENVIRONMENT": "sha256:b7ad567477c83756",
+    "JAVA_TOOL_OPTIONS": "sha256:cb87ac0f42aca550",
+    "OTEL_INSTRUMENTATION_RABBITMQ_EXPERIMENTAL_SPAN_ATTRIBUTES": "sha256:b5bea41b6c623f7c",
+    "EUREKA_INSTANCE_IP_ADDRESS": "sha256:12ca17b49af22894",
+    "PAYMENT_KEYCLOAK_AUDIENCE": "sha256:80a16654317931ff",
+    "KEYCLOAK_ISSUER_URI": "sha256:b4029eb0eef0312f",
+    "KEYCLOAK_JWK_SET_URI": "sha256:b33d044746af2f72",
+    "REDIS_PASSWORD": "sha256:07ec3649877eed04",
+    "KEYCLOAK_TOKEN_URI": "sha256:d7739037d2295bad",
+    "OTEL_EXPORTER_OTLP_ENDPOINT": "sha256:7cffd9399162b658",
+    "PATH": "sha256:18fd332762afe2dd",
+    "JAVA_HOME": "sha256:0c0b3b4ed12beb88",
+    "LANG": "sha256:65ce8c93514741c9",
+    "LANGUAGE": "sha256:fb4f8ed5e18c083b",
+    "LC_ALL": "sha256:65ce8c93514741c9",
+    "JAVA_VERSION": "sha256:269c98b9c63e009c",
+    "SERVICE_NAME": "sha256:13d3efdc3a77509c"
+   }
+  },
+  {
+   "ten": "flash-ticket-booking-service-booking-service-1",
+   "image": "ft-local/booking-service:arm64-t067-36a3725d",
+   "image_id": "sha256:854b98113948577170e45e80e7a178b24d081a752104494be7426f4629dc916e",
+   "trang_thai": "running",
+   "project": "flash-ticket-booking-service",
+   "config_files": "/opt/flashticket/compose/booking-service.yml",
+   "environment_file": null,
+   "nhan_khac": {
+    "io.flashticket.runtime-tools": "curl,jq",
+    "rca-lab.build-label": "t067",
+    "rca-lab.maven-profile": "rca-test"
+   },
+   "mounts": [
+    {
+     "loai": "bind",
+     "nguon": "/srv/flashticket-rca/faults/booking-service/audit",
+     "dich": "/run/fault-audit",
+     "rw": true,
+     "ten_volume": null
+    },
+    {
+     "loai": "bind",
+     "nguon": "/srv/flashticket-rca/faults/booking-service/control",
+     "dich": "/run/fault-control",
+     "rw": false,
+     "ten_volume": null
+    }
+   ],
+   "memory": 1073741824,
+   "network_mode": "host",
+   "log_config": {
+    "Type": "json-file",
+    "Config": {
+     "labels": "com.docker.compose.service,com.docker.compose.container-number",
+     "max-file": "3",
+     "max-size": "10m"
+    }
+   },
+   "restart": {
+    "Name": "unless-stopped",
+    "MaximumRetryCount": 0
+   },
+   "ports": {},
+   "user": "10001:10001",
+   "cmd": [],
+   "env": {
+    "LOGGING_STRUCTURED_FORMAT_CONSOLE": "sha256:76cd2c0d589e2245",
+    "OTEL_AGENT_ENABLED": "sha256:b5bea41b6c623f7c",
+    "OTEL_INSTRUMENTATION_RABBITMQ_EXPERIMENTAL_SPAN_ATTRIBUTES": "sha256:b5bea41b6c623f7c",
+    "BOOKING_KEYCLOAK_IDENTITY_REALM_ID": "sha256:4a9d7c507c0e2dcd",
+    "RABBITMQ_USERNAME": "sha256:ace72b81b787db5c",
+    "RABBITMQ_PORT": "sha256:d82f515aeed0e1c8",
+    "BOOKING_KEYCLOAK_TOKEN_URI": "sha256:d7739037d2295bad",
+    "EUREKA_INSTANCE_PREFER_IP_ADDRESS": "sha256:b5bea41b6c623f7c",
+    "KEYCLOAK_ISSUER_URI": "sha256:b4029eb0eef0312f",
+    "RABBITMQ_VHOST": "sha256:8a5edab282632443",
+    "EUREKA_INSTANCE_IP_ADDRESS": "sha256:12ca17b49af22894",
+    "BOOKING_KEYCLOAK_JWK_SET_URI": "sha256:b33d044746af2f72",
+    "BOOKING_DDL_AUTO": "sha256:140bedbf9c3f6d56",
+    "JAVA_TOOL_OPTIONS": "sha256:cb87ac0f42aca550",
+    "RABBITMQ_HOST": "sha256:12ca17b49af22894",
+    "SERVICE_VERSION": "sha256:af8a1a7689928b10",
+    "PAYMENT_SERVICE_CLIENT_ID": "sha256:77f5b67910219199",
+    "SERVER_ADDRESS": "sha256:12ca17b49af22894",
+    "ENVIRONMENT": "sha256:dd7a946de80abf41",
+    "REDIS_PORT": "sha256:70d88acd016b4bb5",
+    "BOOKING_DB_URL": "sha256:60ea6b066df27209",
+    "BOOKING_INTERNAL_SERVICE_CLIENT_SECRET": "sha256:bd2ee54de90a5d05",
+    "BOOKING_HOST_ID": "sha256:9bbaeb01c94113ef",
+    "RABBITMQ_PASSWORD": "sha256:4ea475d1c900b391",
+    "FT_FAULT_CONTROL_FILE": "sha256:ff036fcaaca04539",
+    "BOOKING_RABBITMQ_USERNAME": "sha256:ace72b81b787db5c",
+    "OTEL_LOGS_EXPORTER": "sha256:140bedbf9c3f6d56",
+    "INTERNAL_SERVICE_CLIENT_SECRET": "sha256:bd2ee54de90a5d05",
+    "KEYCLOAK_JWK_SET_URI": "sha256:b33d044746af2f72",
+    "KEYCLOAK_AUDIENCE": "sha256:80a16654317931ff",
+    "BOOKING_DB_PASSWORD": "sha256:5d7c24d51ea68ef9",
+    "REDIS_PASSWORD": "sha256:07ec3649877eed04",
+    "SPRING_PROFILES_ACTIVE": "sha256:7883898df34ef59c",
+    "KEYCLOAK_IDENTITY_REALM_ID": "sha256:4a9d7c507c0e2dcd",
+    "OTEL_EXPORTER_OTLP_PROTOCOL": "sha256:4d23dca5a8108957",
+    "SPRING_AUTOCONFIGURE_EXCLUDE": "sha256:ebfaa604b02f88db",
+    "KEYCLOAK_TOKEN_URI": "sha256:d7739037d2295bad",
+    "OTEL_INSTRUMENTATION_COMMON_LOGGING_TRACE_ID_KEY": "sha256:3cd81d346c5706ba",
+    "BOOKING_RABBITMQ_HOST": "sha256:12ca17b49af22894",
+    "SPRING_JPA_HIBERNATE_DDL_AUTO": "sha256:140bedbf9c3f6d56",
+    "PAYMENT_SERVICE_TOKEN_URI": "sha256:a3151e83e971eb77",
+    "EUREKA_SERVER_URL": "sha256:c316ecd7548d095e",
+    "EUREKA_INSTANCE_NONSECUREPORT": "sha256:4d1ccd3b13934381",
+    "INSTANCE_ID": "sha256:b4f6bff82b284891",
+    "BOOKING_KEYCLOAK_ISSUER_URI": "sha256:b4029eb0eef0312f",
+    "HOST_ID": "sha256:9bbaeb01c94113ef",
+    "RABBITMQ_BUSINESS_EXCHANGE": "sha256:3df8483316437612",
+    "OTEL_EXPORTER_OTLP_ENDPOINT": "sha256:7cffd9399162b658",
+    "BOOKING_INSTANCE_ID": "sha256:b4f6bff82b284891",
+    "EUREKA_CLIENT_ENABLED": "sha256:b5bea41b6c623f7c",
+    "BOOKING_RABBITMQ_BUSINESS_EXCHANGE": "sha256:3df8483316437612",
+    "OTEL_INSTRUMENTATION_COMMON_LOGGING_SPAN_ID_KEY": "sha256:6379c1ca1f189ed6",
+    "REDIS_HOST": "sha256:12ca17b49af22894",
+    "BOOKING_ENVIRONMENT": "sha256:dd7a946de80abf41",
+    "FT_FAULTS_ENABLED": "sha256:b5bea41b6c623f7c",
+    "BOOKING_SERVICE_PORT": "sha256:a36e5c3dbd6398cf",
+    "BOOKING_DB_USERNAME": "sha256:b189f1d1ede8b96e",
+    "BOOKING_RABBITMQ_PASSWORD": "sha256:4ea475d1c900b391",
+    "OTEL_SERVICE_NAME": "sha256:ca3d4729dd15cdb8",
+    "BOOKING_RABBITMQ_VHOST": "sha256:8a5edab282632443",
+    "BOOKING_RABBITMQ_PORT": "sha256:f669dd4f81d2b9bb",
+    "OTEL_TRACES_SAMPLER": "sha256:8dbea958f0ab192c",
+    "FT_FAULT_AUDIT_FILE": "sha256:adb2695956766d38",
+    "BOOKING_SERVICE_VERSION": "sha256:d26a9e69f7f77133",
+    "OTEL_METRIC_EXPORT_INTERVAL": "sha256:39e5b4830d4d9c14",
+    "BOOKING_KEYCLOAK_AUDIENCE": "sha256:80a16654317931ff",
+    "PATH": "sha256:18fd332762afe2dd",
+    "JAVA_HOME": "sha256:0c0b3b4ed12beb88",
+    "LANG": "sha256:65ce8c93514741c9",
+    "LANGUAGE": "sha256:fb4f8ed5e18c083b",
+    "LC_ALL": "sha256:65ce8c93514741c9",
+    "JAVA_VERSION": "sha256:269c98b9c63e009c",
+    "SERVICE_NAME": "sha256:ca3d4729dd15cdb8"
+   }
+  },
+  {
+   "ten": "flash-ticket-ticket-service-ticket-service-1",
+   "image": "ft-local/ticket-service:arm64-t067-36a3725d",
+   "image_id": "sha256:266ee6433223ac27752748ac2fa1a0453bee1eee64501368ebc851f2c2eb9750",
+   "trang_thai": "running",
+   "project": "flash-ticket-ticket-service",
+   "config_files": "/opt/flashticket/compose/ticket-service.yml",
+   "environment_file": null,
+   "nhan_khac": {
+    "io.flashticket.runtime-tools": "curl,jq",
+    "rca-lab.build-label": "t067",
+    "rca-lab.maven-profile": "none"
+   },
+   "mounts": [
+    {
+     "loai": "bind",
+     "nguon": "/opt/flashticket/secrets/ticket-qr",
+     "dich": "/run/ticket-qr",
+     "rw": false,
+     "ten_volume": null
+    }
+   ],
+   "memory": 805306368,
+   "network_mode": "host",
+   "log_config": {
+    "Type": "json-file",
+    "Config": {
+     "labels": "com.docker.compose.service,com.docker.compose.container-number",
+     "max-file": "3",
+     "max-size": "10m"
+    }
+   },
+   "restart": {
+    "Name": "unless-stopped",
+    "MaximumRetryCount": 0
+   },
+   "ports": {},
+   "user": "10001:10001",
+   "cmd": [],
+   "env": {
+    "TICKET_QR_ACTIVE_KEY_VERSION": "sha256:3bfc269594ef6492",
+    "EUREKA_SERVER_URL": "sha256:c316ecd7548d095e",
+    "OTEL_AGENT_ENABLED": "sha256:b5bea41b6c623f7c",
+    "TICKET_SERVICE_PORT": "sha256:7c7fead4c7112bf7",
+    "TICKET_KEYCLOAK_ISSUER_URI": "sha256:b4029eb0eef0312f",
+    "TICKET_QR_KEY_RING_LOCATION": "sha256:4c552e63fe780054",
+    "SERVICE_VERSION": "sha256:af8a1a7689928b10",
+    "TICKET_COMPLETED_RESULT_MESSAGE_TYPE": "sha256:884709a85324f63a",
+    "TICKET_INSTANCE_ID": "sha256:64416ccd8d059d80",
+    "OTEL_METRIC_EXPORT_INTERVAL": "sha256:39e5b4830d4d9c14",
+    "RABBITMQ_USERNAME": "sha256:ace72b81b787db5c",
+    "INTERNAL_SERVICE_CLIENT_SECRET": "sha256:bd2ee54de90a5d05",
+    "RABBITMQ_BUSINESS_EXCHANGE": "sha256:3df8483316437612",
+    "MAIL_PASSWORD": "sha256:809f91e5eb1e5bd6",
+    "TICKET_KEYCLOAK_TOKEN_URI": "sha256:d7739037d2295bad",
+    "TICKET_FAILED_RESULT_ROUTING_KEY": "sha256:884709a85324f63a",
+    "RABBITMQ_HOST": "sha256:12ca17b49af22894",
+    "TICKET_DELIVERY_CLAIM_LEASE": "sha256:f79f071ab5b033ca",
+    "TICKET_WORKER_BATCH_SIZE": "sha256:f5ca38f748a1d6ea",
+    "TICKET_RABBITMQ_USERNAME": "sha256:ace72b81b787db5c",
+    "OTEL_TRACES_SAMPLER": "sha256:8dbea958f0ab192c",
+    "TICKET_OUTBOX_CONFIRM_TIMEOUT": "sha256:93e3d8c5b10657d2",
+    "TICKET_ISSUANCE_QUEUE": "sha256:9c56ddaddb2b7306",
+    "TICKET_RABBITMQ_BUSINESS_EXCHANGE": "sha256:3df8483316437612",
+    "TICKET_INTERNAL_SERVICE_CLIENT_SECRET": "sha256:bd2ee54de90a5d05",
+    "TICKET_EVENT_CANCELLED_QUEUE": "sha256:bf0093ad8412795b",
+    "TICKET_RABBITMQ_PASSWORD": "sha256:4ea475d1c900b391",
+    "REDIS_PORT": "sha256:48f599a9094eb9a4",
+    "TICKET_DB_URL": "sha256:79447d68ef049f86",
+    "TICKET_BUYER_BASE_URL": "sha256:04f38fc06ceea50a",
+    "KEYCLOAK_ISSUER_URI": "sha256:b4029eb0eef0312f",
+    "EUREKA_INSTANCE_PREFER_IP_ADDRESS": "sha256:b5bea41b6c623f7c",
+    "TICKET_RABBITMQ_PORT": "sha256:f669dd4f81d2b9bb",
+    "LOGGING_STRUCTURED_FORMAT_CONSOLE": "sha256:76cd2c0d589e2245",
+    "OTEL_LOGS_EXPORTER": "sha256:140bedbf9c3f6d56",
+    "TICKET_OUTBOX_CLAIM_LEASE": "sha256:d3382a4f0e03f8b1",
+    "RABBITMQ_PORT": "sha256:f669dd4f81d2b9bb",
+    "MAIL_HOST": "sha256:12ca17b49af22894",
+    "TICKET_ENVIRONMENT": "sha256:dd7a946de80abf41",
+    "KEYCLOAK_TOKEN_URI": "sha256:d7739037d2295bad",
+    "TICKET_KEYCLOAK_IDENTITY_REALM_ID": "sha256:4a9d7c507c0e2dcd",
+    "OTEL_EXPORTER_OTLP_ENDPOINT": "sha256:7cffd9399162b658",
+    "REDIS_PASSWORD": "sha256:07ec3649877eed04",
+    "EUREKA_INSTANCE_IP_ADDRESS": "sha256:12ca17b49af22894",
+    "MAIL_SMTP_STARTTLS_REQUIRED": "sha256:fcbcf165908dd18a",
+    "INSTANCE_ID": "sha256:64416ccd8d059d80",
+    "MAIL_USERNAME": "sha256:a530c507fd893f52",
+    "TICKET_DB_PASSWORD": "sha256:fbec93c3a3073573",
+    "HOST_ID": "sha256:9bbaeb01c94113ef",
+    "TICKET_COMPLETED_RESULT_ROUTING_KEY": "sha256:884709a85324f63a",
+    "TICKET_RABBITMQ_VHOST": "sha256:8a5edab282632443",
+    "TICKET_WORKER_POLL_DELAY": "sha256:64c83df872d808a1",
+    "TICKET_SERVICE_VERSION": "sha256:d602a2b47838cde9",
+    "TICKET_KEYCLOAK_JWK_SET_URI": "sha256:b33d044746af2f72",
+    "TICKET_ACCESS_CONFIGURED_QUEUE": "sha256:b28719cf5fd7b529",
+    "OTEL_INSTRUMENTATION_RABBITMQ_EXPERIMENTAL_SPAN_ATTRIBUTES": "sha256:b5bea41b6c623f7c",
+    "OTEL_EXPORTER_OTLP_PROTOCOL": "sha256:4d23dca5a8108957",
+    "ENVIRONMENT": "sha256:dd7a946de80abf41",
+    "TICKET_LISTENERS_ENABLED": "sha256:b5bea41b6c623f7c",
+    "TICKET_WORKERS_ENABLED": "sha256:b5bea41b6c623f7c",
+    "KEYCLOAK_JWK_SET_URI": "sha256:b33d044746af2f72",
+    "TICKET_DELIVERY_DISPLAY_ZONE": "sha256:0a710a81f69c49b5",
+    "REDIS_HOST": "sha256:12ca17b49af22894",
+    "TICKET_DB_USERNAME": "sha256:81a3940192067097",
+    "MAIL_SMTP_AUTH": "sha256:fcbcf165908dd18a",
+    "OTEL_INSTRUMENTATION_COMMON_LOGGING_SPAN_ID_KEY": "sha256:6379c1ca1f189ed6",
+    "RABBITMQ_VHOST": "sha256:8a5edab282632443",
+    "MAIL_PORT": "sha256:83e19a9ce479dc06",
+    "MAIL_SMTP_STARTTLS_ENABLE": "sha256:fcbcf165908dd18a",
+    "TICKET_HOST_ID": "sha256:9bbaeb01c94113ef",
+    "OTEL_SERVICE_NAME": "sha256:62936fe0cfaca182",
+    "KEYCLOAK_AUDIENCE": "sha256:80a16654317931ff",
+    "TICKET_MAIL_HEALTH_ENABLED": "sha256:fcbcf165908dd18a",
+    "TICKET_KEYCLOAK_AUDIENCE": "sha256:80a16654317931ff",
+    "JAVA_TOOL_OPTIONS": "sha256:cb87ac0f42aca550",
+    "EUREKA_CLIENT_ENABLED": "sha256:b5bea41b6c623f7c",
+    "RABBITMQ_PASSWORD": "sha256:4ea475d1c900b391",
+    "SERVER_ADDRESS": "sha256:12ca17b49af22894",
+    "OTEL_INSTRUMENTATION_COMMON_LOGGING_TRACE_ID_KEY": "sha256:3cd81d346c5706ba",
+    "KEYCLOAK_IDENTITY_REALM_ID": "sha256:4a9d7c507c0e2dcd",
+    "TICKET_RABBITMQ_HOST": "sha256:12ca17b49af22894",
+    "TICKET_MAIL_FROM": "sha256:9be927e954736d05",
+    "TICKET_BUSINESS_ENABLED": "sha256:b5bea41b6c623f7c",
+    "PATH": "sha256:18fd332762afe2dd",
+    "JAVA_HOME": "sha256:0c0b3b4ed12beb88",
+    "LANG": "sha256:65ce8c93514741c9",
+    "LANGUAGE": "sha256:fb4f8ed5e18c083b",
+    "LC_ALL": "sha256:65ce8c93514741c9",
+    "JAVA_VERSION": "sha256:269c98b9c63e009c",
+    "SERVICE_NAME": "sha256:62936fe0cfaca182"
+   }
+  },
+  {
+   "ten": "flash-ticket-event-service-event-service-1",
+   "image": "ft-local/event-service:arm64-t067-36a3725d",
+   "image_id": "sha256:7578922f9dabfb67f22ab85d03f08be40562e77f617a43cfc9fa111c9c04628f",
+   "trang_thai": "running",
+   "project": "flash-ticket-event-service",
+   "config_files": "/opt/flashticket/compose/event-service.yml",
+   "environment_file": null,
+   "nhan_khac": {
+    "io.flashticket.runtime-tools": "curl,jq",
+    "rca-lab.build-label": "t067",
+    "rca-lab.maven-profile": "rca-test"
+   },
+   "mounts": [
+    {
+     "loai": "bind",
+     "nguon": "/srv/flashticket-rca/faults/event-service/audit",
+     "dich": "/run/fault-audit",
+     "rw": true,
+     "ten_volume": null
+    },
+    {
+     "loai": "bind",
+     "nguon": "/srv/flashticket-rca/faults/event-service/control",
+     "dich": "/run/fault-control",
+     "rw": false,
+     "ten_volume": null
+    }
+   ],
+   "memory": 1073741824,
+   "network_mode": "host",
+   "log_config": {
+    "Type": "json-file",
+    "Config": {
+     "labels": "com.docker.compose.service,com.docker.compose.container-number",
+     "max-file": "3",
+     "max-size": "10m"
+    }
+   },
+   "restart": {
+    "Name": "unless-stopped",
+    "MaximumRetryCount": 0
+   },
+   "ports": {},
+   "user": "10001:10001",
+   "cmd": [],
+   "env": {
+    "EVENT_OUTBOX_ENABLED": "sha256:b5bea41b6c623f7c",
+    "EVENT_ENVIRONMENT": "sha256:dd7a946de80abf41",
+    "EVENT_KEYCLOAK_IDENTITY_REALM_ID": "sha256:4a9d7c507c0e2dcd",
+    "EVENT_IMAGES_MAX_BYTES": "sha256:1e8c1c7e50e5595c",
+    "RABBITMQ_VHOST": "sha256:8a5edab282632443",
+    "SPRING_PROFILES_ACTIVE": "sha256:7883898df34ef59c",
+    "EVENT_IMAGES_MAX_REQUEST_BYTES": "sha256:0471416d1cccd070",
+    "EVENT_IMAGES_CLOUD_NAME": "sha256:e3b0c44298fc1c14",
+    "OTEL_METRIC_EXPORT_INTERVAL": "sha256:39e5b4830d4d9c14",
+    "OTEL_INSTRUMENTATION_COMMON_LOGGING_SPAN_ID_KEY": "sha256:6379c1ca1f189ed6",
+    "EVENT_OUTBOX_MAXIMUM_RETRY": "sha256:c3258ca966a42203",
+    "REDIS_PASSWORD": "sha256:07ec3649877eed04",
+    "EUREKA_SERVER_URL": "sha256:c316ecd7548d095e",
+    "EVENT_KEYCLOAK_TOKEN_URI": "sha256:d7739037d2295bad",
+    "EVENT_KEYCLOAK_JWK_SET_URI": "sha256:b33d044746af2f72",
+    "INTERNAL_SERVICE_CLIENT_SECRET": "sha256:bd2ee54de90a5d05",
+    "EVENT_IMAGES_MAX_COUNT": "sha256:f5ca38f748a1d6ea",
+    "EVENT_SERVER_ADDRESS": "sha256:12ca17b49af22894",
+    "FT_FAULTS_ENABLED": "sha256:b5bea41b6c623f7c",
+    "FT_FAULT_CONTROL_FILE": "sha256:ff036fcaaca04539",
+    "KEYCLOAK_TOKEN_URI": "sha256:d7739037d2295bad",
+    "EVENT_DB_USERNAME": "sha256:f9534e69ae485e64",
+    "JAVA_TOOL_OPTIONS": "sha256:cb87ac0f42aca550",
+    "REDIS_PORT": "sha256:48f599a9094eb9a4",
+    "EVENT_DB_PASSWORD": "sha256:682024919bec814a",
+    "REDIS_HOST": "sha256:12ca17b49af22894",
+    "EVENT_RABBITMQ_VHOST": "sha256:8a5edab282632443",
+    "HOST_ID": "sha256:9bbaeb01c94113ef",
+    "EVENT_MEMORY_LIMIT": "sha256:e29fde5dc67c01f3",
+    "EVENT_KEYCLOAK_AUDIENCE": "sha256:80a16654317931ff",
+    "EVENT_SERVICE_PORT": "sha256:824bd8704dd8ed22",
+    "EVENT_IMAGES_API_KEY": "sha256:e3b0c44298fc1c14",
+    "EVENT_RABBITMQ_PORT": "sha256:f669dd4f81d2b9bb",
+    "EVENT_OUTBOX_LEASE": "sha256:d3382a4f0e03f8b1",
+    "KEYCLOAK_AUDIENCE": "sha256:80a16654317931ff",
+    "OTEL_EXPORTER_OTLP_ENDPOINT": "sha256:7cffd9399162b658",
+    "OTEL_INSTRUMENTATION_COMMON_LOGGING_TRACE_ID_KEY": "sha256:3cd81d346c5706ba",
+    "EUREKA_CLIENT_ENABLED": "sha256:b5bea41b6c623f7c",
+    "KEYCLOAK_ISSUER_URI": "sha256:b4029eb0eef0312f",
+    "EVENT_OUTBOX_POLL_DELAY": "sha256:64c83df872d808a1",
+    "EVENT_OUTBOX_CONFIRM_TIMEOUT": "sha256:93e3d8c5b10657d2",
+    "OTEL_INSTRUMENTATION_RABBITMQ_EXPERIMENTAL_SPAN_ATTRIBUTES": "sha256:b5bea41b6c623f7c",
+    "EVENT_BOOKING_BASE_URL": "sha256:6bf4bc2f5d722cee",
+    "EVENT_KEYCLOAK_ISSUER_URI": "sha256:b4029eb0eef0312f",
+    "RABBITMQ_USERNAME": "sha256:ace72b81b787db5c",
+    "EVENT_READ_CONNECT_TIMEOUT": "sha256:7819f63beefe24e8",
+    "OTEL_TRACES_SAMPLER": "sha256:8dbea958f0ab192c",
+    "OTEL_LOGS_EXPORTER": "sha256:140bedbf9c3f6d56",
+    "EVENT_PAYMENT_BASE_URL": "sha256:4486bd2ad3363319",
+    "EVENT_READ_RESPONSE_TIMEOUT": "sha256:aa324e320b460528",
+    "EVENT_CANCELLATION_SUMMARY_MAX_AGE": "sha256:d3382a4f0e03f8b1",
+    "EVENT_RABBITMQ_HOST": "sha256:12ca17b49af22894",
+    "RABBITMQ_HOST": "sha256:12ca17b49af22894",
+    "SERVER_ADDRESS": "sha256:12ca17b49af22894",
+    "EVENT_SERVICE_VERSION": "sha256:b465a7cdc8973cc0",
+    "SERVICE_VERSION": "sha256:af8a1a7689928b10",
+    "EUREKA_INSTANCE_PREFER_IP_ADDRESS": "sha256:b5bea41b6c623f7c",
+    "EVENT_JAVA_OPTIONS": "sha256:e69c5c78310c336a",
+    "KEYCLOAK_JWK_SET_URI": "sha256:b33d044746af2f72",
+    "EVENT_INSTANCE_ID": "sha256:d9f1ac301794d836",
+    "EVENT_INTERNAL_SERVICE_CLIENT_SECRET": "sha256:bd2ee54de90a5d05",
+    "EVENT_IMAGES_MAX_PIXELS": "sha256:741fea70e24108bf",
+    "EVENT_IMAGES_TIMEOUT": "sha256:7819f63beefe24e8",
+    "EVENT_RABBITMQ_USERNAME": "sha256:ace72b81b787db5c",
+    "EVENT_RABBITMQ_PASSWORD": "sha256:4ea475d1c900b391",
+    "EVENT_OUTBOX_INITIAL_RETRY": "sha256:64c83df872d808a1",
+    "OTEL_SERVICE_NAME": "sha256:1ed5ed1e1107172c",
+    "KEYCLOAK_IDENTITY_REALM_ID": "sha256:4a9d7c507c0e2dcd",
+    "RABBITMQ_PASSWORD": "sha256:4ea475d1c900b391",
+    "RABBITMQ_BUSINESS_EXCHANGE": "sha256:3df8483316437612",
+    "EVENT_HOST_ID": "sha256:9bbaeb01c94113ef",
+    "FT_FAULT_AUDIT_FILE": "sha256:adb2695956766d38",
+    "LOGGING_STRUCTURED_FORMAT_CONSOLE": "sha256:76cd2c0d589e2245",
+    "EVENT_RABBITMQ_BUSINESS_EXCHANGE": "sha256:3df8483316437612",
+    "EVENT_IMAGES_FOLDER": "sha256:a5033d7080ef4716",
+    "EVENT_IMAGES_API_SECRET": "sha256:e3b0c44298fc1c14",
+    "PAYMENT_SERVICE_TOKEN_URI": "sha256:a3151e83e971eb77",
+    "PAYMENT_SERVICE_CLIENT_ID": "sha256:77f5b67910219199",
+    "EVENT_READ_CLOCK_SKEW": "sha256:93e3d8c5b10657d2",
+    "EVENT_OUTBOX_BATCH_SIZE": "sha256:f5ca38f748a1d6ea",
+    "OTEL_AGENT_ENABLED": "sha256:b5bea41b6c623f7c",
+    "EUREKA_INSTANCE_IP_ADDRESS": "sha256:12ca17b49af22894",
+    "RABBITMQ_PORT": "sha256:f669dd4f81d2b9bb",
+    "ENVIRONMENT": "sha256:dd7a946de80abf41",
+    "EVENT_IMAGES_GATEWAY_TIME_LIMIT": "sha256:4133621f58c1c3ca",
+    "INSTANCE_ID": "sha256:d9f1ac301794d836",
+    "EVENT_READ_MODEL_ENABLED": "sha256:b5bea41b6c623f7c",
+    "EVENT_DB_URL": "sha256:ba9a7bb9bbcf8e04",
+    "OTEL_EXPORTER_OTLP_PROTOCOL": "sha256:4d23dca5a8108957",
+    "PATH": "sha256:18fd332762afe2dd",
+    "JAVA_HOME": "sha256:0c0b3b4ed12beb88",
+    "LANG": "sha256:65ce8c93514741c9",
+    "LANGUAGE": "sha256:fb4f8ed5e18c083b",
+    "LC_ALL": "sha256:65ce8c93514741c9",
+    "JAVA_VERSION": "sha256:269c98b9c63e009c",
+    "SERVICE_NAME": "sha256:1ed5ed1e1107172c"
+   }
+  },
+  {
+   "ten": "flash-ticket-user-service-user-service-1",
+   "image": "ft-local/user-service:arm64-t067-36a3725d",
+   "image_id": "sha256:30ef9830a41418d21df4fec635780023f4adf19ad1f72975889e6e98aef85f32",
+   "trang_thai": "running",
+   "project": "flash-ticket-user-service",
+   "config_files": "/opt/flashticket/compose/user-service.yml",
+   "environment_file": null,
+   "nhan_khac": {
+    "io.flashticket.runtime-tools": "curl,jq",
+    "rca-lab.build-label": "t067",
+    "rca-lab.maven-profile": "none"
+   },
+   "mounts": [],
+   "memory": 805306368,
+   "network_mode": "host",
+   "log_config": {
+    "Type": "json-file",
+    "Config": {
+     "labels": "com.docker.compose.service,com.docker.compose.container-number",
+     "max-file": "3",
+     "max-size": "10m"
+    }
+   },
+   "restart": {
+    "Name": "unless-stopped",
+    "MaximumRetryCount": 0
+   },
+   "ports": {},
+   "user": "10001:10001",
+   "cmd": [],
+   "env": {
+    "USER_KEYCLOAK_JWK_SET_URI": "sha256:b33d044746af2f72",
+    "KEYCLOAK_TOKEN_URI": "sha256:d7739037d2295bad",
+    "OTEL_EXPORTER_OTLP_ENDPOINT": "sha256:7cffd9399162b658",
+    "USER_JAVA_OPTIONS": "sha256:909bd0ae170e45c7",
+    "USER_RABBITMQ_PORT": "sha256:f669dd4f81d2b9bb",
+    "RABBITMQ_USERNAME": "sha256:ace72b81b787db5c",
+    "USER_INSTANCE_ID": "sha256:cb0ef4d3acf3473e",
+    "USER_IMAGE_MAX_BYTES": "sha256:107f41ed92e01eb5",
+    "OTEL_METRIC_EXPORT_INTERVAL": "sha256:39e5b4830d4d9c14",
+    "EUREKA_SERVER_URL": "sha256:c316ecd7548d095e",
+    "USER_MONGO_COLLECTION_PREFIX": "sha256:c6871f3ff4c98901",
+    "SERVER_ADDRESS": "sha256:12ca17b49af22894",
+    "USER_MEMORY_LIMIT": "sha256:a9410685e6fb23c9",
+    "RABBITMQ_VHOST": "sha256:8a5edab282632443",
+    "KEYCLOAK_JWK_SET_URI": "sha256:b33d044746af2f72",
+    "USER_KEYCLOAK_ISSUER_URI": "sha256:b4029eb0eef0312f",
+    "RABBITMQ_HOST": "sha256:12ca17b49af22894",
+    "USER_RECOVERY_DELAY": "sha256:d3382a4f0e03f8b1",
+    "USER_IMAGE_API_SECRET": "sha256:e3b0c44298fc1c14",
+    "USER_HOST_ID": "sha256:9bbaeb01c94113ef",
+    "USER_SERVER_ADDRESS": "sha256:19e36255972107d4",
+    "USER_IDENTITY_MAX_MESSAGE_BYTES": "sha256:0f255ec16482c343",
+    "JAVA_TOOL_OPTIONS": "sha256:cb87ac0f42aca550",
+    "KEYCLOAK_AUDIENCE": "sha256:80a16654317931ff",
+    "USER_RABBITMQ_USERNAME": "sha256:ace72b81b787db5c",
+    "REDIS_HOST": "sha256:12ca17b49af22894",
+    "USER_IMAGE_MAX_PIXELS": "sha256:741fea70e24108bf",
+    "OTEL_INSTRUMENTATION_COMMON_LOGGING_TRACE_ID_KEY": "sha256:3cd81d346c5706ba",
+    "MONGO_URI": "sha256:3f3f68aaa1f05287",
+    "USER_ROLE_GRANT_LEASE_DURATION": "sha256:f79f071ab5b033ca",
+    "REDIS_PORT": "sha256:48f599a9094eb9a4",
+    "USER_INTERNAL_SERVICE_CLIENT_SECRET": "sha256:bd2ee54de90a5d05",
+    "USER_RABBITMQ_PASSWORD": "sha256:4ea475d1c900b391",
+    "RABBITMQ_BUSINESS_EXCHANGE": "sha256:3df8483316437612",
+    "USER_ENVIRONMENT": "sha256:dd7a946de80abf41",
+    "KEYCLOAK_IDENTITY_REALM_ID": "sha256:4a9d7c507c0e2dcd",
+    "USER_KEYCLOAK_ADMIN_CLIENT_SECRET": "sha256:380193783f2a950a",
+    "OTEL_SERVICE_NAME": "sha256:32ca39e021b327dc",
+    "HOST_ID": "sha256:9bbaeb01c94113ef",
+    "USER_IMAGE_FOLDER": "sha256:55e0f7801be5ff80",
+    "USER_RABBITMQ_BUSINESS_EXCHANGE": "sha256:3df8483316437612",
+    "REDIS_PASSWORD": "sha256:07ec3649877eed04",
+    "USER_KEYCLOAK_TOKEN_URI": "sha256:d7739037d2295bad",
+    "OTEL_LOGS_EXPORTER": "sha256:140bedbf9c3f6d56",
+    "USER_MONGO_URI": "sha256:3f3f68aaa1f05287",
+    "USER_RABBITMQ_VHOST": "sha256:8a5edab282632443",
+    "USER_IDENTITY_QUEUE": "sha256:ee78f98f8e907f02",
+    "INTERNAL_SERVICE_CLIENT_SECRET": "sha256:bd2ee54de90a5d05",
+    "USER_IDENTITY_ENABLED": "sha256:b5bea41b6c623f7c",
+    "USER_SERVICE_VERSION": "sha256:788678e3f31c32e7",
+    "RABBITMQ_PASSWORD": "sha256:4ea475d1c900b391",
+    "RABBITMQ_PORT": "sha256:f669dd4f81d2b9bb",
+    "USER_RECOVERY_ENABLED": "sha256:b5bea41b6c623f7c",
+    "USER_KEYCLOAK_ADMIN_BASE_URL": "sha256:7ddc2026bfdb6705",
+    "OTEL_INSTRUMENTATION_COMMON_LOGGING_SPAN_ID_KEY": "sha256:6379c1ca1f189ed6",
+    "LOGGING_STRUCTURED_FORMAT_CONSOLE": "sha256:76cd2c0d589e2245",
+    "OTEL_EXPORTER_OTLP_PROTOCOL": "sha256:4d23dca5a8108957",
+    "KEYCLOAK_ISSUER_URI": "sha256:b4029eb0eef0312f",
+    "USER_ROLE_GRANT_WAIT_TIMEOUT": "sha256:93e3d8c5b10657d2",
+    "SERVICE_VERSION": "sha256:af8a1a7689928b10",
+    "INSTANCE_ID": "sha256:cb0ef4d3acf3473e",
+    "EUREKA_INSTANCE_IP_ADDRESS": "sha256:12ca17b49af22894",
+    "USER_IMAGE_API_KEY": "sha256:e3b0c44298fc1c14",
+    "OTEL_AGENT_ENABLED": "sha256:b5bea41b6c623f7c",
+    "USER_RECOVERY_BATCH_SIZE": "sha256:f5ca38f748a1d6ea",
+    "USER_IMAGE_MAX_REQUEST_SIZE": "sha256:dd26b0127e678a8d",
+    "USER_IMAGE_CLOUD_NAME": "sha256:e3b0c44298fc1c14",
+    "USER_KEYCLOAK_ADMIN_REALM": "sha256:b4b7164f6f7b5492",
+    "ENVIRONMENT": "sha256:dd7a946de80abf41",
+    "USER_KEYCLOAK_ADMIN_TIMEOUT": "sha256:93e3d8c5b10657d2",
+    "USER_IMAGE_MAX_FILE_SIZE": "sha256:3745f857ee4b11a9",
+    "USER_SERVICE_PORT": "sha256:98dc0608a3ae43fc",
+    "USER_KEYCLOAK_AUDIENCE": "sha256:80a16654317931ff",
+    "USER_KEYCLOAK_IDENTITY_REALM_ID": "sha256:4a9d7c507c0e2dcd",
+    "EUREKA_CLIENT_ENABLED": "sha256:b5bea41b6c623f7c",
+    "EUREKA_INSTANCE_PREFER_IP_ADDRESS": "sha256:b5bea41b6c623f7c",
+    "USER_RABBITMQ_HOST": "sha256:12ca17b49af22894",
+    "USER_IMAGE_TIMEOUT": "sha256:93e3d8c5b10657d2",
+    "USER_KEYCLOAK_ADMIN_CLIENT_ID": "sha256:f18711d7c220c3d9",
+    "OTEL_TRACES_SAMPLER": "sha256:8dbea958f0ab192c",
+    "PATH": "sha256:18fd332762afe2dd",
+    "JAVA_HOME": "sha256:0c0b3b4ed12beb88",
+    "LANG": "sha256:65ce8c93514741c9",
+    "LANGUAGE": "sha256:fb4f8ed5e18c083b",
+    "LC_ALL": "sha256:65ce8c93514741c9",
+    "JAVA_VERSION": "sha256:269c98b9c63e009c",
+    "SERVICE_NAME": "sha256:32ca39e021b327dc"
+   }
+  },
+  {
+   "ten": "flash-ticket-discovery-server-discovery-server-1",
+   "image": "ft-local/discovery-server:arm64-t067-36a3725d",
+   "image_id": "sha256:054cd4c96d3142241452b643316dfe125b86f467727c2076b800206c5b0717cb",
+   "trang_thai": "running",
+   "project": "flash-ticket-discovery-server",
+   "config_files": "/opt/flashticket/compose/discovery-server.yml",
+   "environment_file": null,
+   "nhan_khac": {
+    "io.flashticket.runtime-tools": "curl,jq",
+    "rca-lab.build-label": "t067",
+    "rca-lab.maven-profile": "none"
+   },
+   "mounts": [],
+   "memory": 805306368,
+   "network_mode": "host",
+   "log_config": {
+    "Type": "json-file",
+    "Config": {
+     "labels": "com.docker.compose.service,com.docker.compose.container-number",
+     "max-file": "3",
+     "max-size": "10m"
+    }
+   },
+   "restart": {
+    "Name": "unless-stopped",
+    "MaximumRetryCount": 0
+   },
+   "ports": {},
+   "user": "10001:10001",
+   "cmd": [],
+   "env": {
+    "OTEL_INSTRUMENTATION_COMMON_LOGGING_TRACE_ID_KEY": "sha256:3cd81d346c5706ba",
+    "INSTANCE_ID": "sha256:38ea5e1cdd3b8878",
+    "EUREKA_INSTANCE_PREFER_IP_ADDRESS": "sha256:b5bea41b6c623f7c",
+    "JAVA_TOOL_OPTIONS": "sha256:cb87ac0f42aca550",
+    "REDIS_PORT": "sha256:48f599a9094eb9a4",
+    "EUREKA_SERVER_URL": "sha256:c316ecd7548d095e",
+    "DISCOVERY_SERVER_PORT": "sha256:043abe2dd08872fc",
+    "INTERNAL_SERVICE_CLIENT_SECRET": "sha256:bd2ee54de90a5d05",
+    "SERVICE_VERSION": "sha256:af8a1a7689928b10",
+    "SERVER_ADDRESS": "sha256:12ca17b49af22894",
+    "OTEL_METRIC_EXPORT_INTERVAL": "sha256:39e5b4830d4d9c14",
+    "RABBITMQ_PASSWORD": "sha256:4ea475d1c900b391",
+    "OTEL_EXPORTER_OTLP_PROTOCOL": "sha256:4d23dca5a8108957",
+    "OTEL_SERVICE_NAME": "sha256:4a662b462c744803",
+    "OTEL_AGENT_ENABLED": "sha256:b5bea41b6c623f7c",
+    "OTEL_LOGS_EXPORTER": "sha256:140bedbf9c3f6d56",
+    "RABBITMQ_USERNAME": "sha256:ace72b81b787db5c",
+    "RABBITMQ_PORT": "sha256:f669dd4f81d2b9bb",
+    "KEYCLOAK_ISSUER_URI": "sha256:b4029eb0eef0312f",
+    "RABBITMQ_BUSINESS_EXCHANGE": "sha256:3df8483316437612",
+    "EUREKA_INSTANCE_IP_ADDRESS": "sha256:12ca17b49af22894",
+    "KEYCLOAK_TOKEN_URI": "sha256:d7739037d2295bad",
+    "LOGGING_STRUCTURED_FORMAT_CONSOLE": "sha256:76cd2c0d589e2245",
+    "RABBITMQ_VHOST": "sha256:8a5edab282632443",
+    "HOST_ID": "sha256:9bbaeb01c94113ef",
+    "OTEL_INSTRUMENTATION_COMMON_LOGGING_SPAN_ID_KEY": "sha256:6379c1ca1f189ed6",
+    "ENVIRONMENT": "sha256:dd7a946de80abf41",
+    "EUREKA_CLIENT_ENABLED": "sha256:b5bea41b6c623f7c",
+    "RABBITMQ_HOST": "sha256:12ca17b49af22894",
+    "SERVER_PORT": "sha256:043abe2dd08872fc",
+    "KEYCLOAK_JWK_SET_URI": "sha256:b33d044746af2f72",
+    "OTEL_EXPORTER_OTLP_ENDPOINT": "sha256:7cffd9399162b658",
+    "KEYCLOAK_AUDIENCE": "sha256:80a16654317931ff",
+    "REDIS_HOST": "sha256:12ca17b49af22894",
+    "OTEL_TRACES_SAMPLER": "sha256:8dbea958f0ab192c",
+    "REDIS_PASSWORD": "sha256:07ec3649877eed04",
+    "KEYCLOAK_IDENTITY_REALM_ID": "sha256:4a9d7c507c0e2dcd",
+    "PATH": "sha256:18fd332762afe2dd",
+    "JAVA_HOME": "sha256:0c0b3b4ed12beb88",
+    "LANG": "sha256:65ce8c93514741c9",
+    "LANGUAGE": "sha256:fb4f8ed5e18c083b",
+    "LC_ALL": "sha256:65ce8c93514741c9",
+    "JAVA_VERSION": "sha256:269c98b9c63e009c",
+    "SERVICE_NAME": "sha256:4a662b462c744803"
+   }
+  },
+  {
+   "ten": "flash-ticket-keycloak-keycloak-1",
+   "image": "ft-local/keycloak:arm64-776d9c9e",
+   "image_id": "sha256:16cff9e9fe2bbf3a224912c2147c794612ea0e7361a3877e1ee62c525ee008eb",
+   "trang_thai": "running",
+   "project": "flash-ticket-keycloak",
+   "config_files": "/opt/flashticket/compose/keycloak.yml",
+   "environment_file": null,
+   "nhan_khac": {
+    "architecture": "aarch64",
+    "build-date": "2026-09-14T00:33:47Z",
+    "com.redhat.build-host": "",
+    "com.redhat.component": "",
+    "com.redhat.license_terms": "",
+    "cpe": "cpe:/a:redhat:enterprise_linux:9::appstream",
+    "description": "Keycloak Server Image",
+    "distribution-scope": "public",
+    "io.buildah.version": "1.44.0",
+    "io.k8s.description": "Keycloak Server Image",
+    "io.k8s.display-name": "Keycloak Server",
+    "io.openshift.expose-services": "",
+    "io.openshift.tags": "keycloak security identity",
+    "maintainer": "https://www.keycloak.org/",
+    "name": "keycloak",
+    "release": "",
+    "summary": "Keycloak Server Image",
+    "url": "https://www.keycloak.org/",
+    "vcs-ref": "",
+    "vcs-type": "git",
+    "vendor": "https://www.keycloak.org/",
+    "version": "26.8.0"
+   },
+   "mounts": [
+    {
+     "loai": "bind",
+     "nguon": "/opt/flashticket/otel",
+     "dich": "/otel",
+     "rw": false,
+     "ten_volume": null
+    },
+    {
+     "loai": "bind",
+     "nguon": "/opt/flashticket/infra/keycloak/keycloak/import",
+     "dich": "/opt/keycloak/data/import",
+     "rw": false,
+     "ten_volume": null
+    },
+    {
+     "loai": "bind",
+     "nguon": "/opt/flashticket/infra/keycloak/keycloak/themes/flash-ticket",
+     "dich": "/opt/keycloak/themes/flash-ticket",
+     "rw": false,
+     "ten_volume": null
+    }
+   ],
+   "memory": 1610612736,
+   "network_mode": "flash-ticket-infra",
+   "log_config": {
+    "Type": "json-file",
+    "Config": {
+     "labels": "com.docker.compose.service,com.docker.compose.container-number",
+     "max-file": "3",
+     "max-size": "10m"
+    }
+   },
+   "restart": {
+    "Name": "unless-stopped",
+    "MaximumRetryCount": 0
+   },
+   "ports": {
+    "8080/tcp": [
+     {
+      "HostIp": "10.0.0.158",
+      "HostPort": "8080"
+     }
+    ]
+   },
+   "user": "1000",
+   "cmd": [
+    "start",
+    "--import-realm"
+   ],
+   "env": {
+    "KC_BOOTSTRAP_ADMIN_USERNAME": "sha256:8c6976e5b5410415",
+    "KC_HTTP_MAX_QUEUED_REQUESTS": "sha256:ad57366865126e55",
+    "OTEL_METRIC_EXPORT_INTERVAL": "sha256:39e5b4830d4d9c14",
+    "KC_DB_POOL_MAX_SIZE": "sha256:4a44dc15364204a8",
+    "FT_IDENTITY_RABBITMQ_VHOST": "sha256:8a5edab282632443",
+    "KC_DB_POOL_INITIAL_SIZE": "sha256:d4735e3a265e16ee",
+    "OTEL_EXPORTER_OTLP_ENDPOINT": "sha256:c1302d7a636a0bc1",
+    "KC_DB": "sha256:a942b37ccfaf5a81",
+    "KC_HTTP_ENABLED": "sha256:b5bea41b6c623f7c",
+    "OTEL_INSTRUMENTATION_COMMON_LOGGING_SPAN_ID_KEY": "sha256:6379c1ca1f189ed6",
+    "KC_DB_POOL_MIN_SIZE": "sha256:d4735e3a265e16ee",
+    "FT_IDENTITY_OUTBOX_ENABLED": "sha256:b5bea41b6c623f7c",
+    "FT_IDENTITY_RABBITMQ_HOST": "sha256:7b173343f539cdc4",
+    "FT_IDENTITY_OUTBOX_INTERVAL_MS": "sha256:40510175845988f1",
+    "KC_HOSTNAME": "sha256:7ddc2026bfdb6705",
+    "FT_IDENTITY_RABBITMQ_PORT": "sha256:f669dd4f81d2b9bb",
+    "FT_IDENTITY_RABBITMQ_USERNAME": "sha256:9439c27fee660be2",
+    "INTERNAL_SERVICE_CLIENT_SECRET": "sha256:bd2ee54de90a5d05",
+    "OTEL_SERVICE_NAME": "sha256:d63f4a0cdaab5272",
+    "KC_DB_PASSWORD": "sha256:d175324fc046bede",
+    "OTEL_RESOURCE_ATTRIBUTES": "sha256:8508510e6c26110f",
+    "KC_DB_URL": "sha256:70a126b680c91f0c",
+    "FT_IDENTITY_RABBITMQ_PASSWORD": "sha256:0e25da70490b7588",
+    "OTEL_INSTRUMENTATION_COMMON_LOGGING_TRACE_ID_KEY": "sha256:3cd81d346c5706ba",
+    "OTEL_INSTRUMENTATION_METHODS_INCLUDE": "sha256:a0353356491a2b64",
+    "JAVA_TOOL_OPTIONS": "sha256:1b076e381ac88361",
+    "KC_BOOTSTRAP_ADMIN_PASSWORD": "sha256:2b544723378ce266",
+    "OTEL_TRACES_SAMPLER": "sha256:8dbea958f0ab192c",
+    "OTEL_EXPORTER_OTLP_PROTOCOL": "sha256:4d23dca5a8108957",
+    "KC_DB_USERNAME": "sha256:a942b37ccfaf5a81",
+    "OTEL_LOGS_EXPORTER": "sha256:140bedbf9c3f6d56",
+    "PATH": "sha256:ce908b8efad4aed2",
+    "LANG": "sha256:65ce8c93514741c9",
+    "KC_RUN_IN_CONTAINER": "sha256:b5bea41b6c623f7c"
+   }
+  },
+  {
+   "ten": "rca-toxiproxy",
+   "image": "ghcr.io/shopify/toxiproxy:2.12.0",
+   "image_id": "sha256:9378ed52a28bc50edc1350f936f518f31fa95f0d15917d6eb40b8e376d1a214e",
+   "trang_thai": "running",
+   "project": null,
+   "config_files": null,
+   "environment_file": null,
+   "nhan_khac": {
+    "t062": "topology"
+   },
+   "mounts": [
+    {
+     "loai": "bind",
+     "nguon": "/srv/flashticket-rca/faults/toxiproxy/proxies.json",
+     "dich": "/config/proxies.json",
+     "rw": false,
+     "ten_volume": null
+    }
+   ],
+   "memory": 134217728,
+   "network_mode": "host",
+   "log_config": {
+    "Type": "json-file",
+    "Config": {}
+   },
+   "restart": {
+    "Name": "unless-stopped",
+    "MaximumRetryCount": 0
+   },
+   "ports": {},
+   "user": "",
+   "cmd": [
+    "-host=127.0.0.1",
+    "-port=8474",
+    "-config=/config/proxies.json"
+   ],
+   "env": {
+    "PATH": "sha256:ce908b8efad4aed2",
+    "LOG_LEVEL": "sha256:06271baf49532c87"
+   }
+  },
+  {
+   "ten": "flash-ticket-infra-postgres-1",
+   "image": "postgres:16.15",
+   "image_id": "sha256:f9a7b9ebf6f56201f949db745e47bc423c0f0f8294bafe991cc10bf74b029657",
+   "trang_thai": "running",
+   "project": "flash-ticket-infra",
+   "config_files": "/opt/flashticket/infra/deploy/docker-compose.postgresql.yml,/opt/flashticket/infra/deploy/docker-compose.redis.yml,/opt/flashticket/infra/deploy/docker-compose.rabbitmq.yml,/opt/flashticket/infra/deploy/mongodb/compose.yaml,/opt/flashticket/infra/deploy/docker-compose.rca-log.yml",
+   "environment_file": "/opt/flashticket/infra/.env",
+   "nhan_khac": {},
+   "mounts": [
+    {
+     "loai": "bind",
+     "nguon": "/opt/flashticket/infra/deploy/postgres/00-business-databases.sh",
+     "dich": "/docker-entrypoint-initdb.d/00-business-databases.sh",
+     "rw": false,
+     "ten_volume": null
+    },
+    {
+     "loai": "bind",
+     "nguon": "/opt/flashticket/infra/services/99-table-prefix.sql",
+     "dich": "/opt/flash-ticket/99-table-prefix.sql",
+     "rw": false,
+     "ten_volume": null
+    },
+    {
+     "loai": "bind",
+     "nguon": "/opt/flashticket/infra/docs/architecture/data/postgres",
+     "dich": "/opt/flash-ticket/postgres",
+     "rw": false,
+     "ten_volume": null
+    },
+    {
+     "loai": "bind",
+     "nguon": "/opt/flashticket/infra/services/booking-service/database/90-erd-reader.sql",
+     "dich": "/opt/flash-ticket/readers/booking.sql",
+     "rw": false,
+     "ten_volume": null
+    },
+    {
+     "loai": "bind",
+     "nguon": "/opt/flashticket/infra/services/event-service/database/90-erd-reader.sql",
+     "dich": "/opt/flash-ticket/readers/event.sql",
+     "rw": false,
+     "ten_volume": null
+    },
+    {
+     "loai": "bind",
+     "nguon": "/opt/flashticket/infra/services/payment-service/database/90-erd-reader.sql",
+     "dich": "/opt/flash-ticket/readers/payment.sql",
+     "rw": false,
+     "ten_volume": null
+    },
+    {
+     "loai": "bind",
+     "nguon": "/opt/flashticket/infra/services/ticket-service/database/90-erd-reader.sql",
+     "dich": "/opt/flash-ticket/readers/ticket.sql",
+     "rw": false,
+     "ten_volume": null
+    },
+    {
+     "loai": "volume",
+     "nguon": "/var/lib/docker/volumes/flash-ticket-infra_postgres-data/_data",
+     "dich": "/var/lib/postgresql/data",
+     "rw": true,
+     "ten_volume": "flash-ticket-infra_postgres-data"
+    }
+   ],
+   "memory": 1610612736,
+   "network_mode": "flash-ticket-infra",
+   "log_config": {
+    "Type": "json-file",
+    "Config": {
+     "labels": "com.docker.compose.service,com.docker.compose.container-number",
+     "max-file": "3",
+     "max-size": "10m"
+    }
+   },
+   "restart": {
+    "Name": "unless-stopped",
+    "MaximumRetryCount": 0
+   },
+   "ports": {
+    "5432/tcp": [
+     {
+      "HostIp": "127.0.0.1",
+      "HostPort": "5432"
+     }
+    ]
+   },
+   "user": "",
+   "cmd": {
+    "sha256": "c909101721a02b22",
+    "so_doi_so": 17
+   },
+   "env": {
+    "PAYMENT_DB_VIEWER_PASSWORD": "sha256:da2de3289cadbfb7",
+    "TICKET_DB_ADMIN_PASSWORD": "sha256:fbec93c3a3073573",
+    "POSTGRES_DB": "sha256:1fd6542a1be076c5",
+    "BOOKING_DB_ADMIN_PASSWORD": "sha256:5d7c24d51ea68ef9",
+    "PAYMENT_DB_ADMIN_PASSWORD": "sha256:12281ce9f782dfc0",
+    "EVENT_DB_VIEWER_PASSWORD": "sha256:488b47dd5b0ea653",
+    "TICKET_DB_VIEWER_PASSWORD": "sha256:e7411cd4f1910509",
+    "BOOKING_DB_VIEWER_PASSWORD": "sha256:106e3048d6518624",
+    "POSTGRES_USER": "sha256:a942b37ccfaf5a81",
+    "EVENT_DB_ADMIN_PASSWORD": "sha256:682024919bec814a",
+    "POSTGRES_PASSWORD": "sha256:d175324fc046bede",
+    "POSTGRES_INITDB_ARGS": "sha256:86315a0d332573a0",
+    "PATH": "sha256:c662f4ea439dc7ae",
+    "GOSU_VERSION": "sha256:a93d4fa2a792e52c",
+    "LANG": "sha256:7e96a58f58eab59a",
+    "PG_MAJOR": "sha256:b17ef6d19c7a5b1e",
+    "PG_VERSION": "sha256:a4ca31e082584dd9",
+    "PGDATA": "sha256:dc8f97c32d813e28"
+   }
+  },
+  {
+   "ten": "flash-ticket-infra-rabbitmq-1",
+   "image": "rabbitmq:4.3.6-management",
+   "image_id": "sha256:54cb013d76cd1fd6c0a0708f34062ad61c452bb6f016b434c6c33f1a765d2b58",
+   "trang_thai": "running",
+   "project": "flash-ticket-infra",
+   "config_files": "/opt/flashticket/infra/deploy/docker-compose.postgresql.yml,/opt/flashticket/infra/deploy/docker-compose.redis.yml,/opt/flashticket/infra/deploy/docker-compose.rabbitmq.yml,/opt/flashticket/infra/deploy/mongodb/compose.yaml,/opt/flashticket/infra/deploy/docker-compose.rca-log.yml",
+   "environment_file": "/opt/flashticket/infra/.env",
+   "nhan_khac": {},
+   "mounts": [
+    {
+     "loai": "bind",
+     "nguon": "/opt/flashticket/infra/deploy/rabbitmq/definitions.json",
+     "dich": "/etc/rabbitmq/definitions.json",
+     "rw": false,
+     "ten_volume": null
+    },
+    {
+     "loai": "bind",
+     "nguon": "/opt/flashticket/infra/deploy/rabbitmq/rabbitmq.conf",
+     "dich": "/etc/rabbitmq/rabbitmq.conf",
+     "rw": false,
+     "ten_volume": null
+    },
+    {
+     "loai": "volume",
+     "nguon": "/var/lib/docker/volumes/flash-ticket-infra_rabbitmq-data/_data",
+     "dich": "/var/lib/rabbitmq",
+     "rw": true,
+     "ten_volume": "flash-ticket-infra_rabbitmq-data"
+    }
+   ],
+   "memory": 1073741824,
+   "network_mode": "flash-ticket-infra",
+   "log_config": {
+    "Type": "json-file",
+    "Config": {
+     "labels": "com.docker.compose.service,com.docker.compose.container-number",
+     "max-file": "3",
+     "max-size": "10m"
+    }
+   },
+   "restart": {
+    "Name": "unless-stopped",
+    "MaximumRetryCount": 0
+   },
+   "ports": {
+    "15672/tcp": [
+     {
+      "HostIp": "127.0.0.1",
+      "HostPort": "15672"
+     }
+    ],
+    "5672/tcp": [
+     {
+      "HostIp": "127.0.0.1",
+      "HostPort": "5672"
+     }
+    ]
+   },
+   "user": "",
+   "cmd": [
+    "rabbitmq-server"
+   ],
+   "env": {
+    "RABBITMQ_ADMIN_USERNAME": "sha256:1d087d0817be3732",
+    "RABBITMQ_ADMIN_PASSWORD": "sha256:182a4f4d72af8a4f",
+    "RABBITMQ_USERNAME": "sha256:ace72b81b787db5c",
+    "RABBITMQ_PASSWORD": "sha256:4ea475d1c900b391",
+    "RABBITMQ_IDENTITY_USERNAME": "sha256:9439c27fee660be2",
+    "RABBITMQ_IDENTITY_PASSWORD": "sha256:0e25da70490b7588",
+    "RABBITMQ_NODENAME": "sha256:2a315f71aaa1f5e5",
+    "PATH": "sha256:20f28b2b1167c14c",
+    "ERLANG_INSTALL_PATH_PREFIX": "sha256:7a916f10c57cdba6",
+    "OPENSSL_INSTALL_PATH_PREFIX": "sha256:0d1181569611616b",
+    "RABBITMQ_DATA_DIR": "sha256:2f8a842b24ba94d0",
+    "RABBITMQ_VERSION": "sha256:850e648b867a3a1f",
+    "RABBITMQ_PGP_KEY_ID": "sha256:823e13c64ee2c315",
+    "RABBITMQ_HOME": "sha256:dd42bf9639333bd3",
+    "HOME": "sha256:2f8a842b24ba94d0",
+    "LANG": "sha256:99fed2d548c2eb10",
+    "LANGUAGE": "sha256:99fed2d548c2eb10",
+    "LC_ALL": "sha256:99fed2d548c2eb10",
+    "RUNNING_UNDER_SYSTEMD": "sha256:b5bea41b6c623f7c"
+   }
+  },
+  {
+   "ten": "flash-ticket-infra-redis-1",
+   "image": "redis:7.4.11-alpine",
+   "image_id": "sha256:d9436322172a5b482c187bf1f363d3c4fea086fcca6b9c8a94de8f0f39ed3193",
+   "trang_thai": "running",
+   "project": "flash-ticket-infra",
+   "config_files": "/opt/flashticket/infra/deploy/docker-compose.postgresql.yml,/opt/flashticket/infra/deploy/docker-compose.redis.yml,/opt/flashticket/infra/deploy/docker-compose.rabbitmq.yml,/opt/flashticket/infra/deploy/mongodb/compose.yaml,/opt/flashticket/infra/deploy/docker-compose.rca-log.yml",
+   "environment_file": "/opt/flashticket/infra/.env",
+   "nhan_khac": {},
+   "mounts": [
+    {
+     "loai": "volume",
+     "nguon": "/var/lib/docker/volumes/flash-ticket-infra_redis-data/_data",
+     "dich": "/data",
+     "rw": true,
+     "ten_volume": "flash-ticket-infra_redis-data"
+    }
+   ],
+   "memory": 0,
+   "network_mode": "flash-ticket-infra",
+   "log_config": {
+    "Type": "json-file",
+    "Config": {
+     "labels": "com.docker.compose.service,com.docker.compose.container-number",
+     "max-file": "3",
+     "max-size": "10m"
+    }
+   },
+   "restart": {
+    "Name": "unless-stopped",
+    "MaximumRetryCount": 0
+   },
+   "ports": {
+    "6379/tcp": [
+     {
+      "HostIp": "127.0.0.1",
+      "HostPort": "6379"
+     }
+    ]
+   },
+   "user": "",
+   "cmd": {
+    "sha256": "765ff5a8a31ac16e",
+    "so_doi_so": 3
+   },
+   "env": {
+    "REDIS_PASSWORD": "sha256:07ec3649877eed04",
+    "REDIS_AOF_ENABLED": "sha256:8a798890fe938171",
+    "PATH": "sha256:ce908b8efad4aed2",
+    "REDIS_VERSION": "sha256:f4e8ea094b692d6a"
+   }
+  },
+  {
+   "ten": "flash-ticket-infra-user-db-1",
+   "image": "mongo:7.0",
+   "image_id": "sha256:8bb4442761a63a8dda452744082cdac9644b429807eb977b42324a63cef59ca4",
+   "trang_thai": "running",
+   "project": "flash-ticket-infra",
+   "config_files": "/opt/flashticket/infra/deploy/docker-compose.postgresql.yml,/opt/flashticket/infra/deploy/docker-compose.redis.yml,/opt/flashticket/infra/deploy/docker-compose.rabbitmq.yml,/opt/flashticket/infra/deploy/mongodb/compose.yaml,/opt/flashticket/infra/deploy/docker-compose.rca-log.yml",
+   "environment_file": "/opt/flashticket/infra/.env",
+   "nhan_khac": {},
+   "mounts": [
+    {
+     "loai": "volume",
+     "nguon": "/var/lib/docker/volumes/8c4f99bcc60a47760a686dfe9e9da49893a3ff1e54bdfcec95e1121033e6fb6f/_data",
+     "dich": "/data/configdb",
+     "rw": true,
+     "ten_volume": "8c4f99bcc60a47760a686dfe9e9da49893a3ff1e54bdfcec95e1121033e6fb6f"
+    },
+    {
+     "loai": "volume",
+     "nguon": "/var/lib/docker/volumes/flash-ticket-infra_user-data/_data",
+     "dich": "/data/db",
+     "rw": true,
+     "ten_volume": "flash-ticket-infra_user-data"
+    },
+    {
+     "loai": "bind",
+     "nguon": "/opt/flashticket/infra/deploy/10-user.js",
+     "dich": "/docker-entrypoint-initdb.d/10-user.js",
+     "rw": false,
+     "ten_volume": null
+    },
+    {
+     "loai": "bind",
+     "nguon": "/opt/flashticket/infra/deploy/99-collection-prefix.js",
+     "dich": "/docker-entrypoint-initdb.d/99-collection-prefix.js",
+     "rw": false,
+     "ten_volume": null
+    },
+    {
+     "loai": "bind",
+     "nguon": "/opt/flashticket/docs/architecture/data/mongodb/schema.cjs",
+     "dich": "/opt/flash-ticket/schema.cjs",
+     "rw": false,
+     "ten_volume": null
+    }
+   ],
+   "memory": 0,
+   "network_mode": "flash-ticket-infra_default",
+   "log_config": {
+    "Type": "json-file",
+    "Config": {
+     "labels": "com.docker.compose.service,com.docker.compose.container-number",
+     "max-file": "3",
+     "max-size": "10m"
+    }
+   },
+   "restart": {
+    "Name": "unless-stopped",
+    "MaximumRetryCount": 0
+   },
+   "ports": {
+    "27017/tcp": [
+     {
+      "HostIp": "127.0.0.1",
+      "HostPort": "27017"
+     }
+    ]
+   },
+   "user": "",
+   "cmd": [
+    "mongod"
+   ],
+   "env": {
+    "MONGO_INITDB_ROOT_PASSWORD": "sha256:4508fbc1911e0fd4",
+    "MONGO_INITDB_DATABASE": "sha256:3183bf0e0dd6ac5f",
+    "USER_DB_VIEWER_PASSWORD": "sha256:34b52b84b2f14609",
+    "TZ": "sha256:7e5f76c94a635c21",
+    "MONGO_INITDB_ROOT_USERNAME": "sha256:819f725e53621059",
+    "PATH": "sha256:ce908b8efad4aed2",
+    "GOSU_VERSION": "sha256:a93d4fa2a792e52c",
+    "JSYAML_VERSION": "sha256:af38bb8d6587efd1",
+    "JSYAML_CHECKSUM": "sha256:88c5d40f4f9ae4a4",
+    "MONGO_PACKAGE": "sha256:a147f5ee4b10632c",
+    "MONGO_REPO": "sha256:ceaa093ea2c2a88e",
+    "MONGO_MAJOR": "sha256:0de7cf39e1e63661",
+    "MONGO_VERSION": "sha256:8a7e99595c60b293",
+    "HOME": "sha256:c509dc08dd2e6047"
+   }
+  },
+  {
+   "ten": "rca-toxiproxy-cu",
+   "image": "ghcr.io/shopify/toxiproxy:2.12.0",
+   "image_id": "sha256:9378ed52a28bc50edc1350f936f518f31fa95f0d15917d6eb40b8e376d1a214e",
+   "trang_thai": "exited",
+   "project": null,
+   "config_files": null,
+   "environment_file": null,
+   "nhan_khac": {
+    "t062": "topology"
+   },
+   "mounts": [
+    {
+     "loai": "bind",
+     "nguon": "/opt/flash-ticket-app/rca-toxiproxy/proxies.json",
+     "dich": "/config/proxies.json",
+     "rw": false,
+     "ten_volume": null
+    }
+   ],
+   "memory": 134217728,
+   "network_mode": "host",
+   "log_config": {
+    "Type": "json-file",
+    "Config": {}
+   },
+   "restart": {
+    "Name": "unless-stopped",
+    "MaximumRetryCount": 0
+   },
+   "ports": {},
+   "user": "",
+   "cmd": [
+    "-host=127.0.0.1",
+    "-port=8474",
+    "-config=/config/proxies.json"
+   ],
+   "env": {
+    "PATH": "sha256:ce908b8efad4aed2",
+    "LOG_LEVEL": "sha256:06271baf49532c87"
+   }
+  }
+ ],
+ "volume_ls": [
+  "8c4f99bcc60a47760a686dfe9e9da49893a3ff1e54bdfcec95e1121033e6fb6f",
+  "6360e5cb962dc8075aa003b4030c6272b9eefbf2a2ca7644b49c6ddf4913f8d4",
+  "flash-ticket-infra_postgres-data",
+  "flash-ticket-infra_rabbitmq-data",
+  "flash-ticket-infra_redis-data",
+  "flash-ticket-infra_user-data",
+  "ft-init-verify-data"
+ ],
+ "volume_dung_boi": {
+  "8c4f99bcc60a47760a686dfe9e9da49893a3ff1e54bdfcec95e1121033e6fb6f": [
+   "flash-ticket-infra-user-db-1"
+  ],
+  "6360e5cb962dc8075aa003b4030c6272b9eefbf2a2ca7644b49c6ddf4913f8d4": [],
+  "flash-ticket-infra_postgres-data": [
+   "flash-ticket-infra-postgres-1"
+  ],
+  "flash-ticket-infra_rabbitmq-data": [
+   "flash-ticket-infra-rabbitmq-1"
+  ],
+  "flash-ticket-infra_redis-data": [
+   "flash-ticket-infra-redis-1"
+  ],
+  "flash-ticket-infra_user-data": [
+   "flash-ticket-infra-user-db-1"
+  ],
+  "ft-init-verify-data": []
+ },
+ "env_file_sha256": {
+  "/opt/flashticket/env/api-gateway.env": "3abdaba4311d39be78afc80085988ff6cbf68b5f4817f84c8f09d2a8ab1f2158",
+  "/opt/flashticket/env/booking-service.env": "a0f4955b8a4761c8c7b0be1157f83521ec82bbe9986918d6f60a2a5814400f8e",
+  "/opt/flashticket/env/client-secrets.json": "1685910c14666bd2b09762b6fb292656c67cb66390a0b34605dd0a6fa5935bf3",
+  "/opt/flashticket/env/discovery-server.env": "8114ad49c92d0dda21aa3fc0bd7f4cd882b2df478cf5064e93a5f445b4e8793b",
+  "/opt/flashticket/env/event-service.env": "37575b2f890ffa5ff0d7f88b7f64d4d38aa68e1b37b2357083ce16ea06626fbf",
+  "/opt/flashticket/env/keycloak.env": "51bb30a8ec3d8dff5050324b144a4b8f8f7e5b137f17bbd37f92b87944219ec1",
+  "/opt/flashticket/env/l1-buyers.json": "cc0d9f1fd1f45f143c301874482236b62d8c641616cdec2b6cc563680256102a",
+  "/opt/flashticket/env/payment-service.env": "d8ec26f8c6df42718f3d1c45c0bba5f4a72cbdb37def50ea0326d4602076f7ed",
+  "/opt/flashticket/env/test-users.json": "8dc44e1773e97993d29df6713713c3aeabcb8e1aef3a1816fd1fb010b9fb68f7",
+  "/opt/flashticket/env/ticket-service.env": "28245186fdc0df1e80d59ba58bf102779007212d2ec9f56a61fc820c335bf1da",
+  "/opt/flashticket/env/user-service.env": "a755c2690a3d027158c658c31fcc9d2d90f4e979c776e41ebe671e0fa766842a"
+ },
+ "db_don": {
+  "rc": 0,
+  "ket_qua": [
+   "BEGIN",
+   "CANCELLED|10510",
+   "COMPLETED|41705",
+   "EXPIRED|11398",
+   "ROLLBACK"
+  ],
+  "loi": ""
+ },
+ "compose_dir": "/opt/flashticket/compose",
+ "schema_cjs": "directory 4096",
+ "con_duong_cu": [],
+ "git_lab": "85ace52d304712303097ca0f99faa16f0b52805c"
+}

@@ -1,0 +1,3 @@
+cd /opt; sha256sum flash-ticket-app/l1-vnpay/mock-runner.py flash-ticket-app/l1-vnpay/mock_vnpay.py flash-ticket-app/l1-vnpay/tunnel/tunnel-supervisor.py flash-ticket-app/rca-toxiproxy/proxies.json flash-ticket-app/compose-t062/*.yml flash-ticket-app/compose-exp/*.yml flash-ticket-build/t067-compose/hieu-luc/*.yml /home/ubuntu/inj*.py /home/ubuntu/*t062* flash-ticket-infra/deploy/docker-compose.rca-log.yml rca-lab/faults/injectors/docker/inj3.py 2>&1
+echo "### t063_home"; find /home/ubuntu/t063 /home/ubuntu/t071 -maxdepth 2 -printf '%M %u %s %TY-%Tm-%TdT%TH:%TM %p\n' 2>&1 | head -60
+echo "### t067_compose"; find /opt/flash-ticket-build/t067-compose -printf '%M %u %s %TY-%Tm-%TdT%TH:%TM %p\n' | sort -k5

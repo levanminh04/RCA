@@ -1,0 +1,86 @@
+### date
+2026-11-24T10:45:46Z
+uid=1001(ubuntu) gid=1001(ubuntu) groups=1001(ubuntu),4(adm),24(cdrom),27(sudo),30(dip),104(lxd),988(docker)
+SUDO_NOPASS_OK
+### df
+Filesystem      Size  Used Avail Use% Mounted on
+efivarfs        256K  3.5K  253K   2% /sys/firmware/efi/efivars
+/dev/sda1       135G   59G   76G  44% /
+/dev/sda16      891M  186M  643M  23% /boot
+/dev/sda15       98M  6.4M   92M   7% /boot/efi
+### stat
+drwxr-xr-x root:root /opt
+drwx--x--x root:root /opt/containerd
+drwxr-xr-x ubuntu:ubuntu /opt/rca-lab
+drwxr-xr-x root:root /opt/unified-monitoring-agent
+drwxr-xr-x root:root /srv
+drwxr-xr-x root:root /srv/rca-lab
+drwxr-xr-x root:root /etc/rca-lab
+drwxr-xr-x ubuntu:ubuntu /home/ubuntu
+drwxr-x--- ledger:ledger /var/lib/flash-ticket-ledger
+drwx--x--- root:root /var/lib/docker
+### du_top
+du: cannot read directory '/opt/containerd': Permission denied
+4.0K	/opt/containerd
+3.5M	/opt/rca-lab
+345M	/opt/unified-monitoring-agent
+du: cannot read directory '/srv/rca-lab/ledger': Permission denied
+du: cannot read directory '/srv/rca-lab/m1': Permission denied
+14G	/srv/rca-lab
+28K	/etc/rca-lab
+du: cannot read directory '/var/lib/flash-ticket-ledger': Permission denied
+4.0K	/var/lib/flash-ticket-ledger
+### du_home
+8.0K	t063
+4.0K	.Xauthority
+4.0K	.bash_logout
+4.0K	.bashrc
+4.0K	.cache
+4.0K	.profile
+0	.sudo_as_admin_successful
+### docker_ps
+flash-ticket-t072-bo-nhan	5e2bdb1b0d54	Up 2 days (healthy)	t073-webhook	/opt/rca-lab/observability	/opt/rca-lab/observability/compose.t073-webhook.yaml	t072-bo-nhan
+flash-ticket-obs-prometheus	e04987641b57	Up 6 days	flash-ticket-obs-pinned	/opt/rca-lab/observability	/opt/rca-lab/observability/compose.yaml	prometheus
+flash-ticket-obs-grafana	488984b716c0	Up 29 hours	flash-ticket-obs-pinned	/opt/rca-lab/observability	/opt/rca-lab/observability/compose.yaml	grafana
+flash-ticket-obs-loki	0db216b630ae	Up 6 days	flash-ticket-obs-pinned	/opt/rca-lab/observability	/opt/rca-lab/observability/compose.yaml	loki
+flash-ticket-obs-tempo	64e2fbd56d9c	Up 6 days	flash-ticket-obs-pinned	/opt/rca-lab/observability	/opt/rca-lab/observability/compose.yaml	tempo
+flash-ticket-obs-collector	e40d61f10c9a	Up 6 days	flash-ticket-obs-pinned	/opt/rca-lab/observability	/opt/rca-lab/observability/compose.yaml	collector
+### docker_compose_ls
+NAME                      STATUS              CONFIG FILES
+flash-ticket-obs-pinned   running(5)          /opt/rca-lab/observability/compose.yaml
+t073-webhook              running(1)          /opt/rca-lab/observability/compose.t073-webhook.yaml
+### docker_mounts
+/flash-ticket-t072-bo-nhan	restart=unless-stopped	net=flash-ticket-obs-pinned_default	bind:/opt/rca-lab/observability/t072-bo-nhan->/app:rw=false	bind:/srv/rca-lab/runs/t072-e3-01->/ra:rw=true
+/flash-ticket-obs-prometheus	restart=unless-stopped	net=flash-ticket-obs-pinned_default	volume:/var/lib/docker/volumes/flash-ticket-obs-pinned_prometheus-data/_data->/prometheus:rw=true	bind:/opt/rca-lab/observability/prometheus/prometheus.yaml->/etc/prometheus/config.yaml:rw=false
+/flash-ticket-obs-grafana	restart=unless-stopped	net=flash-ticket-obs-pinned_default	bind:/opt/rca-lab/observability/grafana/dashboards->/etc/grafana/dashboards:rw=false	bind:/opt/rca-lab/observability/grafana/provisioning->/etc/grafana/provisioning:rw=false	volume:/var/lib/docker/volumes/flash-ticket-obs-pinned_grafana-data/_data->/var/lib/grafana:rw=true	bind:/srv/rca-lab/rca-results->/usr/share/grafana/public/rca:rw=false
+/flash-ticket-obs-loki	restart=unless-stopped	net=flash-ticket-obs-pinned_default	volume:/var/lib/docker/volumes/flash-ticket-obs-pinned_loki-data/_data->/loki:rw=true	bind:/opt/rca-lab/observability/loki/loki.yaml->/etc/loki/config.yaml:rw=false
+/flash-ticket-obs-tempo	restart=unless-stopped	net=flash-ticket-obs-pinned_default	volume:/var/lib/docker/volumes/flash-ticket-obs-pinned_tempo-data/_data->/var/tempo:rw=true	bind:/opt/rca-lab/observability/tempo/tempo.yaml->/etc/tempo/config.yaml:rw=false
+/flash-ticket-obs-collector	restart=unless-stopped	net=host	bind:/srv/rca-lab/collector-gateway->/data:rw=true	bind:/opt/rca-lab/observability/collector/gateway.yaml->/etc/otel/config.yaml:rw=false
+### docker_ports
+flash-ticket-t072-bo-nhan	
+flash-ticket-obs-prometheus	127.0.0.1:9090->9090/tcp
+flash-ticket-obs-grafana	10.0.0.215:3000->3000/tcp
+flash-ticket-obs-loki	127.0.0.1:3100->3100/tcp
+flash-ticket-obs-tempo	127.0.0.1:3200->3200/tcp, 127.0.0.1:14317->4317/tcp
+flash-ticket-obs-collector	
+### docker_volumes
+DRIVER    VOLUME NAME
+local     flash-ticket-obs-pinned_grafana-data
+local     flash-ticket-obs-pinned_loki-data
+local     flash-ticket-obs-pinned_prometheus-data
+local     flash-ticket-obs-pinned_tempo-data
+### docker_system_df
+TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE
+Images          8         6         3.384GB   104.8MB (3%)
+Containers      6         6         139.3kB   0B (0%)
+Local Volumes   4         4         21.33GB   0B (0%)
+Build Cache     0         0         0B        0B
+### docker_images
+otel/opentelemetry-collector-contrib:0.165.0	e40d61f10c9a	484MB	2 weeks ago
+prom/prometheus:v3.16.0	e04987641b57	364MB	2 weeks ago
+python:3.12-slim	5e2bdb1b0d54	205MB	2 weeks ago
+grafana/grafana:13.3.0	488984b716c0	1.87GB	4 weeks ago
+grafana/tempo:3.1.1	64e2fbd56d9c	161MB	4 weeks ago
+grafana/loki:3.7.9	0db216b630ae	191MB	4 weeks ago
+hello-world:latest	c567b231f656	22.6kB	8 months ago
+grafana/k6:<none>	3656673de3f3	105MB	12 months ago
