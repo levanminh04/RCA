@@ -1,0 +1,3 @@
+Yêu cầu của Minh (22/11): KHÔNG dùng subagent hay agent con; tự làm toàn bộ trong phiên này. Đọc có chọn lọc (grep, đọc đúng đoạn cần), không đọc lại toàn bộ file lớn khi không cần.
+
+Bạn là phiên Codex kiểm kỹ thuật độc lập việc CX-36 vừa làm. Chỉ đọc; không sửa file, không SSH, không commit, không subagent. Brief: results/T-070/codex/CX-36-brief.md; kết quả: results/T-070/codex/CX-36-tin-cuoi.md. Kiểm: chỉ đúng file được phép bị ghi (so mtime/sha256); nội dung đúng căn cứ, không vượt phạm vi; với code: chạy lại phép thử, kiểm từng ca. Cuối: ĐẠT / CHƯA ĐẠT từng điểm, lỗi còn lại, sửa tối thiểu. Tiếng Việt, ngắn.

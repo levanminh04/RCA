@@ -1539,7 +1539,7 @@ Chọn chạy lại toàn bộ dưới v2 vì vân tay job gồm mọi pin code 
 **Vì sao chọn như vậy.** LOG lượt 7 không ghi căn cứ cho riêng hai con số 30 s và hệ số 4. Phần dưới là căn cứ dựng lại lúc viết mục này. Ghi rõ như vậy để không trình bày như lý do đã có từ lúc đặt.
 - **Tính theo mẫu thực thay cho biên min/max.** Quy tắc biên cũ (`nguon_khong_phu_tron`, như `m1_ft.doi_moc._phu`) chỉ xét mẫu đầu và mẫu cuối, nên không bắt được lỗ ở giữa. Phép thử tổng hợp ở lượt 7 cho thấy điều này: bỏ 8 mẫu giữa của chuỗi 15 s thì lỗ là 135 s, quy tắc biên không báo (LOG T-073 lượt 7, mục 22:03Z kiểm).
 - **Metric 4 × bước.** Ngưỡng này cho phép tối đa 3 lần lấy mẫu liên tiếp bị hụt trước khi gọi là thiếu, nhằm không báo thiếu vì một vài lần scrape trễ. Cùng quy ước "4 bước" như ngưỡng 60 s = 4 bước dò 15 s của H5 trong V082. Quan sát nền: ở các nguồn không bị can thiệp của E5 và lượt dưới tải E3 (`t073-dev-008`), lỗ lớn nhất là 15 s với nguồn bước 15 s và 20,001–20,088 s với nguồn bước 10 s (E3: `results/T-073/kiem/dev/t073-dev-008/su-co/b08d6da4d1.json` `#/…/phu/nguon`, 32 nguồn 15 s, 29 nguồn 10 s). Cả hai đều dưới ngưỡng với khoảng cách lớn.
-- **Trace 30 s.** Dưới tải ×1, span đến liên tục. Lỗ lớn nhất quan sát được là 0,35–0,395 s ở dev, E3 và E5. Lỗ 30 s lớn hơn mức bình thường khoảng 75 lần, nên chỉ một lần mất dữ liệu thật mới vượt ngưỡng. Ngưỡng tính trên trace gộp toàn hệ thống, không theo từng dịch vụ.
+- **Trace 30 s.** Dưới tải ×1, span đến liên tục. Lỗ lớn nhất quan sát được là 0,35–0,395 s ở dev, E3 và E5. Lỗ 30 s là quy ước, lớn hơn khoảng 75 lần lỗ lớn nhất quan sát được ở dev, E3 và E5. Vượt ngưỡng cho biết cửa sổ thiếu span, không tự cho biết do mất thu hay do không phát sinh span. Ngưỡng tính trên trace gộp toàn hệ thống, không theo từng dịch vụ.
 - **Log không bắt buộc.** Dịch vụ có thể không ghi log trong khoảng khỏe, nên thiếu log không có nghĩa là mất dữ liệu.
 
 **Phương án đã xét.**
@@ -1568,3 +1568,4 @@ Chọn chạy lại toàn bộ dưới v2 vì vân tay job gồm mọi pin code 
 
 *Minh duyệt chữ ngày 23/11/2026 ("Approve WHY-111"). Nguồn nháp: `results/T-073/dap-cx21/nhap-why-nguong-phu.md` (sha256 `91fb63f2…`), ghi bởi điều phối T-070.*
 *Sửa 23/11/2026 (Minh duyệt "Approve update"): điều kiện (d) thay theo nháp T-073 đã cập nhật sau Q1 (16 nguồn `live-*` kiểm tay, đủ phủ; `results/T-073/dap-cx21/dinh-chinh-e5-2.md`).*
+*Sửa 24/11/2026 (Minh "Duyệt cả 6", mục 4): câu về ngưỡng trace 30 s thay theo `results/T-073/dap-cx21/dinh-chinh-e5-3.md` §4.*

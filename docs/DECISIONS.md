@@ -782,3 +782,17 @@ Nguồn: LOG T-070 ngày 23/11; đề xuất `results/T-070/de-xuat-quyet-2026-1
   - **Q9:** nếu W5, W8 sẵn và S4 đã trả trước khi E6 được duyệt, diễn tập E7 được đi trước E6 khi máy rảnh; nếu không, giữ thứ tự E6 → E7.
   - **Q10:** ghi khối này.
   - **Q11:** commit + push phần R2(b) theo danh sách file Codex lập và điều phối kiểm; phần phát sinh ngoài R2(b) nằm trong danh sách đó và được commit cùng.
+
+## Điều phối giai đoạn 2: duyệt danh sách chiều 23/11 và 6 quyết định sáng 24/11 (T-070)
+
+Nguồn: `results/T-070/cho-duyet-2026-11-23-chieu.md`, `results/T-070/bao-cao-sang-2026-11-24.md`; LOG T-070.
+
+- **23/11 (chat):** "duyệt toàn bộ trừ E và F, codex phản biện xong thì, hoãn toàn bộ bước tích hợp LLM" — duyệt mục 1–24 (A–D) đúng nội dung đề xuất (mục "sau Codex" chỉ chốt khi lượt Codex kiểm lại tương ứng không còn bất đồng); không duyệt mục 25–32; hoãn toàn bộ tích hợp LLM (W8) sau khi Codex phản biện xong T-075.
+- **23/11 (chat):** "duyệt phương án C" — song song theo tài nguyên: E6 là khung máy đầu tiên; W7 chạy đêm sau E6; diễn tập W9a ban ngày giữa các khối; dọn repo để sau W7.
+- **24/11 (chat, "Duyệt cả 6"):**
+  1. **Sức chứa E6:** giữ 100.000 (không ghi sức chứa); E6 chỉ sửa ngày bán/diễn/check-in. Thay công thức A3 mục 15 (theo A3 cho 96.000, thấp hơn sức chứa hiện có).
+  2. **Bộ chấm W4 v2:** dùng `results/T-072/v2/cham_offline_v2d.py` khi lưới dữ liệu đủ; khi lưới khuyết báo "chưa phân xử" và đếm riêng; dừng sửa tiếp lúc này (AGENTS §5a, ba lượt cùng chỗ).
+  3. **WHY-110:** chưa duyệt chữ sửa; T-072 sửa câu nhầm "trạng thái/lần chuyển" rồi trình lại.
+  4. **T-073:** sửa câu WHY-111 theo `results/T-073/dap-cx21/dinh-chinh-e5-3.md` §4; chỉ 13 file `m1/` (và manifest) của ca `7577dd5b` vào git, 45 file hiển thị giữ trên đĩa; hai giới hạn H5 (không kích hoạt cho thành phần sinh t̂ ở chế độ (b); tên cổng 8761 `discovery-server` vs `config-discovery`) chuyển thành câu hỏi mở của W6.
+  5. Ghi khối này.
+  6. Commit + push `docs/READING-GUIDE.md` và hồ sơ đêm 23→24/11.
