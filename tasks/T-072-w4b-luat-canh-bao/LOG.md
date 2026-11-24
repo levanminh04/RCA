@@ -328,3 +328,206 @@ Tự soát yêu cầu và đầu ra gốc trước; sau đó đọc phản biệ
 Đối chiếu từng điểm với bằng chứng hiện tại, quyền sửa và hậu quả. Có điểm đúng nhưng chưa được Minh duyệt sửa thì ghi đúng trạng thái; không tự coi đã xử lý hoặc ép người làm sửa.
 Chỉ ghi bản phản biện lượt mới được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ lịch sử, không ghi LOG/STATE hay sửa thay người làm. Nêu bất đồng còn lại và soạn prompt để người làm đáp.
 ```
+- 2026-11-23T18:07Z **lượt 14** (điều phối giao: sửa 2 lỗi CX-36b ở v2c trong file mới v2d; phần còn lại CX-33/33b; không máy, không commit).
+- 18:09Z: đọc CX-36 (brief, tin cuối), CX-36b; diff v2_claude→v2c: lỗ lưới xử lý bằng `day_sau_lo` + `can_doi_chieu` (suy đoán theo trường hợp); A (tử số/mẫu số cùng tập phút `phut_khoe`) đúng.
+- 18:11Z: **tự kiểm 2 lỗi CX-36b trên code v2c** — đúng cả hai: (1) v2c:134 chỉ tạo `day` khi bước đúng đầu tiên sau lỗ mở dãy mới; dãy đúng trước lỗ có thể đủ `for` ngay trong lỗ rồi hết ở mẫu kế không được xét → chốt 0 sai. (2) v2c:265 xét mọi phút khỏe trong [mốc sớm, mốc offline], kể cả phút không thể là mốc Alerting → báo chưa phân xử khi tử số chắc chắn.
+- 18:11Z: **v2d** (`v2/cham_offline_v2d.py`, sinh bởi `v2/tao_v2d.py` từ v2c; v2, v2_claude, v2c giữ hash): thay heuristic lỗ lưới bằng liệt kê chính xác — cắt chuỗi mỗi luật thành đơn vị ngăn bởi bước đã thấy SAI; bước khuyết = bước lưới không có trong xuất hoặc thuộc khúc lỗi; liệt kê 2^k cách điền mỗi đơn vị (k ≤ 14), tổ hợp đơn vị hệ thống (≤ 4096), mỗi tổ hợp gom (T072-gom-3) và đếm tử số như phép chấm khóa; một giá trị → chốt, nhiều → `chua-phan-xu` kèm `tu_so_kha_di`. Bảng liệt kê = điền mọi bước khuyết SAI (trùng hành vi cũ). Giữ sửa A của v2c (tử số và mẫu số cùng `phut_khoe`). Không đổi quy tắc khóa; không chấm lại E4.
+- 18:11Z: **ca giả** `v2/thu_ca_gia_v2d.py` → `v2/ra/thu-ca-gia-v2d.txt` (ghi hash 7 file mã thực chạy): A ĐẠT; D1–D7 ĐẠT, trong đó **D4 khác kỳ vọng v2c có chủ ý** (lỗ 30–110, bước 120 sai, đúng 130–240, đầu chấm 180: v2c chốt 1; v2d `chua-phan-xu` {0,1} vì nếu 30–110 đúng thì khoảng cháy [90,120) ghép với sự cố 190 qua 300 s, t̂ = 90 ngoài phút tính — đối chứng chuỗi đủ cho đúng 0 và 1); CX-36b-1 `chua-phan-xu` {0,1} (v2c chốt 0); CX-36b-2 chốt 1 (v2c báo chưa phân xử); hồi quy bộ cũ 9/9, `len(khoang_chay)` = [0,1,2,2,2,2,2,2]; `tu_kiem()` [] . Đột biến 5/5 bị bắt (bỏ liệt kê, CAP=0, bỏ gom khi đếm, bỏ trạng thái chưa phân xử, bỏ đơn vị bất định).
+- 18:12Z: **CX-33 B (phạm vi "bảo đảm p95")** — đúng: `dap-cx19.md` §2 bỏ điều kiện "bước thuộc phút khỏe ×1 và đủ mẫu" khi rút kết luận; phản ví dụ booking 18:21:50Z (flash) S ≥ 0,0508 > M 0,0475. Thêm: câu `dap-cx19.md` §2 "luật thật có thêm hai chặn ≥ 30 request và ≥ 3 lỗi" sai một nửa — chuỗi `phu/ty-le-loi-chua-chan-5xx-*` đã chặn ≥ 30 (kiểm `bieu-thuc.json`); chặn thêm chỉ ≥ 3 lỗi. Viết `results/T-072/dap-cx33.md` (v2d; phạm vi bảo đảm đúng; chữ sửa WHY-110 cập nhật, thay `dap-cx19.md` §2 ý 1 và §4); `dap-cx19.md` giữ nguyên. Đã kiểm `nguong.json#/trong_mau` = {} và chặn ≥ 30 trong biểu thức. sha256 `results/T-072/SHA256SUMS-dap-cx33` (gồm hash v2, v2_claude, v2c, thu_ca_gia_v2c: không đổi).
+
+**Bảng đáp CX-33/33b (phần T-072) và CX-36b** (cột "Minh quyết" để trống):
+
+| Điểm | Kết luận | Việc đã làm | Còn lại | Minh quyết |
+|---|---|---|---|---|
+| CX-33 A tử số/mẫu số phút đầu | **Đúng** (Codex sửa ở v2c) | Giữ nguyên trong v2d; ca A đạt | — | |
+| CX-33 B bảo đảm p95 | **Đúng** | `dap-cx33.md` §2; chữ WHY-110 cập nhật §3 | Minh duyệt chữ WHY-110 | |
+| CX-33 B chi tiết 5xx (chuỗi M đã chặn ≥ 30) | **Đúng**; câu của tôi ở `dap-cx19.md` §2 sai một nửa | Đính chính ở `dap-cx33.md` §2 | — | |
+| CX-33b lưới đứt (D) | **Đúng** | v2d liệt kê chính xác; D1–D7 đạt | — | |
+| CX-36b (1) chốt 0 khi có thể 1 | **Đúng** | v2d: `chua-phan-xu` {0,1}; ca hồi quy CX-36b-1 | — | |
+| CX-36b (2) chưa phân xử khi chắc 1 | **Đúng** | v2d: chốt 1; ca hồi quy CX-36b-2 | — | |
+| Kỳ vọng D4 của `thu_ca_gia_v2c.py` (chốt 1) | **Sai** theo quy tắc gom khóa (ghép 300 s qua lỗ) | v2d `chua-phan-xu` {0,1}, đối chứng chuỗi đủ | Codex kiểm lại lập luận này | |
+
+### Kết thúc lượt 14 (18:12Z)
+
+1. **Đã làm:** tự kiểm 2 lỗi CX-36b (đúng); v2d liệt kê chính xác bước khuyết; bộ ca v2d (A, D1–D7, 2 ca CX-36b, hồi quy 9/9 với len(khoang_chay), tu_kiem) + đột biến 5/5; phạm vi "bảo đảm p95" và chi tiết 5xx; chữ sửa WHY-110 cập nhật.
+2. **File đã đổi:** mới `results/T-072/dap-cx33.md`, `v2/tao_v2d.py`, `v2/cham_offline_v2d.py`, `v2/thu_ca_gia_v2d.py`, `v2/ra/thu-ca-gia-v2d.txt`, `v2/ra/tu-kiem-v2d.json`, `SHA256SUMS-dap-cx33`; LOG này; dòng T-072 STATE. Không sửa v2, v2_claude, v2c, `dap-cx19.md`, `docs/WHY.md`, file khóa. Không chấm lại E4.
+3. **Kiểm:** `thu_ca_gia_v2d.py` đạt toàn bộ; đột biến 5/5 bị bắt.
+4. **Còn mở / cần quyết:** Minh chọn bộ chấm cho lần sau (v2d) và duyệt chữ WHY-110 (`dap-cx33.md` §3); Codex kiểm lại v2d, đặc biệt D4 khác v2c; giới hạn liệt kê (CAP 14 bước/đơn vị, 4096 tổ hợp) → vượt thì trả chưa phân xử. Tài nguyên giữ: container bộ nhận, worktree. Lệnh cuối: `sha256sum … > results/T-072/SHA256SUMS-dap-cx33`.
+
+**Prompt cho Codex kiểm lại** (Minh chuyển; chép nguyên văn Prompt chung và khối "Kiểm lại phản hồi và sửa"):
+
+```text
+Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
+Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
+
+Thông tin lượt này:
+- Task hoặc đề xuất: T-072 (tasks/T-072-w4b-luat-canh-bao/), phản hồi người làm cho CX-33/33b (phần B) và CX-36b; bộ chấm v2d.
+- Công đoạn: kiểm lại phản hồi và sửa.
+- Gói/cổng: P10 (W4 luật cảnh báo), chuẩn bị G6.
+- Người làm và người phản biện chính thức: người làm Claude, người phản biện Codex.
+- Tài liệu gốc: tasks/T-072-w4b-luat-canh-bao/SPEC.md; results/T-072/{quy-tac-gom.json,quy-tac-chon-nguong.json,nguong.json,bieu-thuc.json}; docs/WHY.md WHY-110.
+- Phản biện và phản hồi trước: results/T-070/codex/CX-19*, CX-33-tin-cuoi.md, CX-33b-tin-cuoi.md, CX-36-tin-cuoi.md, CX-36b-tin-cuoi.md; phản hồi người làm: tasks/T-072-w4b-luat-canh-bao/LOG.md lượt 13–14, results/T-072/dap-cx19.md, results/T-072/dap-cx33.md.
+- Code và kết quả liên quan: results/T-072/v2/ (cham_offline_v2c.py, tao_v2d.py, cham_offline_v2d.py, thu_ca_gia_v2d.py, ra/thu-ca-gia-v2d.txt), SHA256SUMS-dap-cx33; lệnh: py -3 -X utf8 -B results/T-072/v2/thu_ca_gia_v2d.py.
+- Phạm vi ghi được Minh cho phép trong lượt này: <Minh điền: chỉ trả lời trong chat, hoặc file được phép>.
+
+Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
+
+Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
+Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
+Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
+
+Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
+hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
+Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
+số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
+có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
+
+Bổ sung yêu cầu phản biện:
+1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
+2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
+3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
+4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
+5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
+6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
+7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
+8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
+9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
+10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
+11. Rà cả phần không được nêu trong LOG, báo cáo hay phản biện trước. Với mỗi bước dữ liệu đi qua (đọc → chuyển đổi → tính → chấm), hỏi quy ước của dữ liệu nguồn (giá trị đặc biệt, đơn vị, gốc, alias, rỗng) có được xử lý đúng không. Không coi phần không ai nêu là đã đúng.
+12. Một trạng thái xảy ra đồng loạt (100% lỗi, 100% không hỗ trợ, toàn hòa, toàn rỗng) là dấu hiệu cần lần tới đầu vào, không phải kết quả để diễn giải. Không dùng nó làm căn cứ thiết kế trước khi lần.
+13. Điểm cuối khớp số công bố, hay "chạy không lỗi", chưa chứng minh thành phần chạy đúng. Kiểm trung gian và phép kiểm không cần nhãn.
+14. Câu có "mọi", "đều", "không đổi", "trùng" phải nói rõ đại lượng và có lệnh đếm trên đủ đối tượng.
+15. Trước khi đề xuất sửa hoặc ghi vào một file dùng chung (code, script, tài liệu), kiểm file đó có bị ghim trong manifest, plan hoặc vân tay job nào không. Nêu rõ thao tác nào làm đổi hash và ảnh hưởng tới đâu.
+16. Kiểm tiêu chí so sánh hoặc chấp nhận được khai trước khi xem kết quả. Đổi tiêu chí sau khi xem phải khai là sửa sau.
+17. Với lượt chạy, tách lỗi hạ tầng và điều phối (tiến trình, nguồn điện, kết nối, giới hạn thời gian) khỏi lỗi phương pháp; lỗi hạ tầng không được ghi thành kết quả khoa học.
+18. Phản biện một kế hoạch thì kiểm cả đường thực thi thật: code có cho phép làm đúng như kế hoạch nói không (guard, thư mục, trạng thái đã khóa). Không chỉ kiểm lập luận trên giấy.
+19. Mỗi phần ghi "chưa xác định", "chưa phân xử", "chưa biết" hoặc OPEN phải kèm giải thích: vì sao chưa xác định được (thiếu dữ kiện gì, hay dữ liệu đã lưu không tách được các giải thích); các giải thích khả thi còn lại; bằng chứng hoặc phép phân tích nào phân xử được, trên dữ liệu nào, chi phí; kết luận nào phụ thuộc. Không dừng ở một câu "chưa xác định".
+20. Mỗi phần chờ Minh quyết phải kèm đề xuất của agent trong chính lượt đó: chọn gì, vì sao, mặt trái, phương án khác đã xét. Prompt bàn giao yêu cầu agent đối phương phản biện các đề xuất ấy. Đề xuất không thay quyết định của Minh.
+
+Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
+Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
+
+Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
+bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
+Tiếng Việt, câu ngắn.
+
+Cuối lượt báo:
+1. Đã làm gì.
+2. File đã thay đổi, hoặc không sửa file nào.
+3. Kiểm đã chạy và kết quả.
+4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
+
+Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
+
+Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
+```
+
+```text
+Công đoạn: người phản biện kiểm lại phản hồi và sửa.
+Tự soát yêu cầu và đầu ra gốc trước; sau đó đọc phản biện, phản hồi và các thay đổi được duyệt. Kiểm cả ý kiến phản bác reviewer; không mặc định phản hồi hoặc bản sửa đúng.
+Đối chiếu từng điểm với bằng chứng hiện tại, quyền sửa và hậu quả. Có điểm đúng nhưng chưa được Minh duyệt sửa thì ghi đúng trạng thái; không tự coi đã xử lý hoặc ép người làm sửa.
+Chỉ ghi bản phản biện lượt mới được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ lịch sử, không ghi LOG/STATE hay sửa thay người làm. Nêu bất đồng còn lại và soạn prompt để người làm đáp.
+```
+- 2026-11-24T01:29Z **lượt 15** (điều phối giao: v2e chế độ lưới khuyết → chưa phân xử, lỗi file chồng CX-40b, chữ WHY-110 sửa theo CX-40/40b; không máy, không commit).
+- 01:30Z: đọc DECISIONS 24/11 mục 2–3 (v2d khi lưới đủ; lưới khuyết → chưa phân xử, đếm riêng; dừng sửa logic lỗ; WHY-110 sửa câu trạng thái/lần chuyển), CX-40, CX-40b.
+- (tiếp sau khi bị cắt ~01:5xZ; 2026-11-24T02:06Z) kiểm lại file đã ghi: `v2/tao_v2e.py` và `v2/thu_ca_gia_v2e.py` đọc lại, sinh lại `v2/cham_offline_v2e.py` từ v2d (v2d vẫn `cf3871f1…`).
+- **v2e** (`v2/cham_offline_v2e.py` sinh bởi `v2/tao_v2e.py`): (1) `Du.them` theo dõi bước có quan sát hợp lệ theo chuỗi; khuyết = không file nào cho quan sát hợp lệ (sửa CX-40b); (2) chế độ lưới khuyết theo DECISIONS 24/11 mục 2: luật hệ thống có bước khuyết trong lưới hoặc phút khỏe (phân loại) không có bước lưới nào → `chua-phan-xu`, `tu_so_kha_di` = None, mục `luoi_khuyet` đếm riêng (đoạn, bước, phút, phút khỏe bị ảnh hưởng, phút khỏe ngoài lưới); bảng liệt kê giữ làm tham khảo; không dùng phép liệt kê của v2d để kết luận (CX-40 CHẶN 1–2 không còn kết luận sai; không sửa tiếp logic lỗ theo quyết định); (3) cờ `pending-sau-lo-luoi` chỉ khi bước khuyết đứng trước Pending trong cùng đơn vị. Lưới đủ: trùng v2d.
+- Ca giả `v2/thu_ca_gia_v2e.py` → `v2/ra/thu-ca-gia-v2e.txt`: lưới đủ 8 ca trùng v2d từng trường; lưới khuyết (D2, D3, D4, D6, D7, CX-40 CHẶN 1a/1b, CHẶN 2, phút khỏe ngoài lưới) chưa phân xử + đếm riêng đúng, đồng thời tái hiện lỗi v2d (1a chốt 1, 1b [0], CHẶN 2 mẫu số 2); CX-40b hai file chồng → 1/3 cả hai thứ tự, chỉ file lỗi → chưa phân xử, tái hiện lỗi v2d {0,1}; cờ Pending 3 ca; hồi quy 9/9, `len(khoang_chay)` [0,1,2,2,2,2,2,2]; `tu_kiem()` []. Hai lần sửa kỳ vọng ca thử (không sửa code): ca cờ "lỗ sau Pending" ban đầu có dãy mới sau lỗ cùng sự cố; ca "lỗ 10" bị bước sai 20 ngăn với Pending 30. Một lần sửa code: `so_phut_khoe_bi_anh_huong` đếm trùng phút vừa có bước khuyết vừa ngoài lưới → dùng hợp tập. Đột biến 3/3 bị bắt (bỏ theo dõi quan sát hợp lệ, tắt chế độ lưới khuyết, bỏ điều kiện thứ tự của cờ).
+- 2026-11-24T02:07Z: `results/T-072/dap-cx40.md` (v2e; chữ WHY-110 bản sửa thay `dap-cx33.md` §3; đơn vị rủi ro ticket). sha256 `results/T-072/SHA256SUMS-dap-cx40` (kèm hash v2, v2_claude, v2c, v2d, `dap-cx19.md`, `dap-cx33.md`, `troi-p95-e2-e4.md`: không đổi).
+
+**Bảng đáp CX-40 / CX-40b** (cột "Minh quyết" để trống):
+
+| Điểm | Kết luận | Việc đã làm | Còn lại | Minh quyết |
+|---|---|---|---|---|
+| CX-40 CHẶN 1 lỗ > 14 bước (chốt sai; danh sách tử số thiếu) | **Đúng** | Tái hiện trên v2d (1a chốt 1, 1b [0]); v2e: lưới khuyết → chưa phân xử, `tu_so_kha_di` = None (không sửa phép liệt kê, theo DECISIONS 24/11 mục 2) | — | |
+| CX-40 CHẶN 2 mất trọn phút khỏe | **Đúng** | Tái hiện (v2d mẫu số 2 thay 3); v2e: phút khỏe phân loại có bước khuyết hoặc ngoài lưới → chưa phân xử, đếm `so_phut_khoe_bi_anh_huong`, `phut_khoe_phan_loai` | Tỷ lệ trên lưới khuyết không tính (đếm bằng lịch sử Grafana) | |
+| CX-40 CHẶN 3 WHY-110 trạng thái ≠ lần chuyển | **Đúng** | Chữ sửa `dap-cx40.md` §2 (S(t) > θ ⇔ duy trì suốt cửa sổ = đang Alerting; t̂ = bước đầu đủ `for`); thu hẹp câu bảo đảm về bộ chấm | Minh duyệt chữ | |
+| CX-40b mục 3 đổi tên phương án "tối ưu tỷ lệ trên E2"; E2 356 < 360 | **Đúng** | Đưa vào chữ sửa §2 | — | |
+| CX-33 C / CX-40 đơn vị rủi ro ticket | **Đúng**; câu "chạm ngưỡng R5" và "≈ 1/6 giờ" trong STATE sai đơn vị | Đính chính `dap-cx40.md` §3 (cửa sổ, không sự cố; chưa áp `for` và ghép); sửa dòng STATE | Tần suất sự cố ở kịch bản mô hình: mở | |
+| CX-40 cờ `pending-sau-lo-luoi` ngược thời gian | **Đúng** | v2e chỉ gắn khi bước khuyết trước Pending cùng đơn vị; 3 ca | — | |
+| CX-40b lỗi mới hai file chồng thời gian | **Đúng**, lỗi cơ học | v2e theo dõi quan sát hợp lệ theo chuỗi; ca hai thứ tự → 1/3 | — | |
+| CX-40b "trình tự tự soát" (lượt 14 đọc CX-36b 18:09Z trước tự kiểm 18:11Z) | **Đúng** về hồ sơ | Lượt 14 không có mục tự soát độc lập trước khi đọc CX-36b; tự kiểm làm trên code sau khi đọc. Ghi đúng thứ tự ở đây | — | |
+| CX-40b "quyền ghi tạm" (scratchpad) | **Chưa kiểm được** từ phía tôi | Thư mục tạm thuộc phiên trên laptop (`dap-cx19.md` §3); không có dòng duyệt riêng của Minh cho nó | Minh xác nhận có chấp nhận dùng thư mục tạm của phiên | |
+| CX-36b sửa + kỳ vọng D4 của Claude | Codex xác nhận **đúng** | Giữ làm hồi quy trong v2e | — | |
+
+### Kết thúc lượt 15 (2026-11-24T02:07Z)
+
+1. **Đã làm:** v2e (lưới khuyết → chưa phân xử + đếm riêng; sửa file chồng; cờ Pending đúng thứ tự); bộ ca v2e + đột biến 3/3; chữ WHY-110 bản sửa; đính chính đơn vị rủi ro ticket; bảng đáp CX-40/40b.
+2. **File đã đổi:** mới `v2/tao_v2e.py`, `v2/cham_offline_v2e.py`, `v2/thu_ca_gia_v2e.py`, `v2/ra/thu-ca-gia-v2e.txt`, `v2/ra/tu-kiem-v2e.json`, `results/T-072/dap-cx40.md`, `SHA256SUMS-dap-cx40`; LOG này; dòng T-072 STATE. Không sửa file cũ có hash, `docs/WHY.md`, file khóa. Không chấm lại E4.
+3. **Kiểm:** `thu_ca_gia_v2e.py` đạt toàn bộ (lưới đủ trùng v2d 8 ca; lưới khuyết 9 tình huống; file chồng; cờ; hồi quy 9/9; `tu_kiem` []); đột biến 3/3.
+4. **Còn mở / cần quyết:** Minh duyệt chữ WHY-110 (`dap-cx40.md` §2) và chọn v2e (= v2d khi lưới đủ, thêm phát hiện lưới khuyết và sửa file chồng) cho lần chấm sau; Codex kiểm lại; tần suất sự cố ticket ở kịch bản mô hình còn mở. Tài nguyên giữ: container bộ nhận, worktree. Lệnh cuối: `sha256sum … > results/T-072/SHA256SUMS-dap-cx40`.
+
+**Prompt cho Codex kiểm lại** (Minh chuyển; chép nguyên văn Prompt chung và khối "Kiểm lại phản hồi và sửa"):
+
+```text
+Bạn thực hiện một lượt đánh giá độc lập trong repo D:\RCA-flashticket.
+Đọc AGENTS.md trước. Giữ đúng vai trò và phạm vi đã được Minh duyệt.
+
+Thông tin lượt này:
+- Task hoặc đề xuất: T-072 (tasks/T-072-w4b-luat-canh-bao/), phản hồi người làm cho CX-40/CX-40b; bộ chấm v2e; chữ WHY-110 bản sửa.
+- Công đoạn: kiểm lại phản hồi và sửa.
+- Gói/cổng: P10 (W4 luật cảnh báo), chuẩn bị G6.
+- Người làm và người phản biện chính thức: người làm Claude, người phản biện Codex.
+- Tài liệu gốc: tasks/T-072-w4b-luat-canh-bao/SPEC.md; docs/DECISIONS.md khối 24/11 (mục 2, 3); results/T-072/{quy-tac-gom.json,quy-tac-chon-nguong.json,nguong.json,bieu-thuc.json,troi-p95-e2-e4.md,troi-p95-rui-ro.json}; docs/WHY.md WHY-110.
+- Phản biện và phản hồi trước: results/T-070/codex/CX-33*, CX-36*, CX-40-tin-cuoi.md, CX-40b-tin-cuoi.md; phản hồi người làm: tasks/T-072-w4b-luat-canh-bao/LOG.md lượt 13–15, results/T-072/dap-cx19.md, dap-cx33.md, dap-cx40.md.
+- Code và kết quả liên quan: results/T-072/v2/ (cham_offline_v2d.py, tao_v2e.py, cham_offline_v2e.py, thu_ca_gia_v2e.py, ra/thu-ca-gia-v2e.txt), SHA256SUMS-dap-cx40; lệnh: py -3 -X utf8 -B results/T-072/v2/thu_ca_gia_v2e.py.
+- Phạm vi ghi được Minh cho phép trong lượt này: <Minh điền: chỉ trả lời trong chat, hoặc file được phép>.
+
+Không sửa ngoài phạm vi trên, không commit. Chưa có quyền ghi rõ ràng thì chỉ đọc và trả lời trong chat. Giữ các bản lượt cũ. Không đọc dữ liệu khóa hoặc chạy thực nghiệm ngoài quyền được duyệt.
+
+Đọc nguồn và đầu ra gốc trước khi đọc kết luận các lượt phản biện/phản hồi. Lập nhận xét độc lập trước, không lấy tóm tắt trong LOG thay bằng chứng trên file thật.
+Nguồn đối chiếu: docs/STATE.md, SPEC và LOG nếu có; phần trực tiếp chi phối trong docs/MRP.md, docs/WHY.md, docs/DECISIONS.md, docs/LESSONS.md.
+Nguồn đề tài: docs/reference/sources/DT18-de-tai-va-nhiem-vu.md và docs/reference/sources/advisor-2026-09-23.md.
+
+Nhiệm vụ: tìm lỗi ảnh hưởng tới (1) tính đúng của lập luận, phương pháp hoặc kết quả,
+hoặc (2) độ khớp với DT18 và hướng dẫn của cô.
+Kiểm cụ thể: đầu ra có đạt "Tiêu chí xong" trong SPEC không; có ghi ra ngoài "Phạm vi ghi" không;
+số trong văn bản có khớp file kết quả không (chạy lại nếu rẻ và được phép); có nhãn nào lọt vào phương pháp không;
+có lựa chọn nào thiếu lý do trong docs/WHY.md không; có lặp sai lầm nào trong docs/LESSONS.md không.
+
+Bổ sung yêu cầu phản biện:
+1. Phân biệt yêu cầu của DT18/cô, quyết định của Minh, đề xuất và ứng viên. Đối chiếu các câu “chọn”, “sẽ”, “dùng để” với thời điểm bằng chứng phải có. Tìm trường hợp kế hoạch nói chọn sau thực nghiệm nhưng đã cam kết cơ chế trước đó.
+2. Kiểm lập luận trong WHY, không chỉ kiểm có mục “tại sao”. Tìm phương án đối lập giả và kết luận mạnh hơn bằng chứng. Khi nêu lỗi, xét cả đoạn có thể phản bác finding đó.
+3. Khi tính đúng phụ thuộc vào phương pháp hoặc benchmark được dẫn, đọc bài/code chính thức ở revision liên quan. Lần theo phần chọn đầu vào, tiền xử lý, dùng nhãn, xử lý ngoại lệ và lưu kết quả. Không mặc định code chính thức hoặc bản mới nhất cho kết quả hợp lệ.
+4. Lần theo thông tin đồ thị và nhãn từ đầu vào → đặc trưng → điểm bất thường → tập ứng viên → xếp hạng. Với đối chứng “không đồ thị”, xác định thông tin cấu trúc còn lại và phạm vi kết luận phép so sánh thực sự hỗ trợ.
+5. Phân biệt lỗi đã xảy ra, mâu thuẫn thiết kế và nguy cơ chưa kiểm. Không biến OPEN thành lỗi chỉ vì chưa hoàn thành công việc thuộc gói sau. Không yêu cầu làm xong P4 ngay tại G0.
+6. Mỗi finding ghi rõ bước chịu ảnh hưởng, bằng chứng, hậu quả và sửa tối thiểu. Không tìm cho đủ số lượng. Không đề xuất thêm quy trình, cổng hoặc phép kiểm “cho chắc”. Không chạy thực nghiệm mới hay mở dữ liệu khóa ngoài phạm vi được phép.
+7. Kiểm cả đạt SPEC và đạt phần mục tiêu nguồn. Nếu chỉ đạt một phần, nêu phần thiếu và quyết định phụ thuộc. Không dùng “chưa kiểm” làm căn cứ đã xác nhận hoặc “ngoài SPEC” để bỏ nghĩa vụ nghiên cứu. Không ép một nguyên nhân vào chỗ chưa biết.
+8. Với nhận định quan trọng, hỏi còn nguyên nhân khả thi nào khác giải thích kết quả và bằng chứng có phân xử được không. Trước khi dùng đầu ra cũ, kiểm hash theo manifest phù hợp; lệch thì dừng phần phụ thuộc và báo Minh. Số làm bằng chứng phải có đường dẫn và con trỏ JSON hoặc lệnh đã chạy kèm kết quả.
+9. Kiểm tuân thủ quy trình bằng việc thực tế: vai trò, quyền ghi và duyệt phạm vi; nguồn quyết định; tự kiểm; LOG/STATE/bàn giao theo nghĩa vụ của vai trò; tự đổi mục tiêu/tiêu chí/thiết kế; đề nghị chuyển bước khi thiếu căn cứ. Áp dụng luật và quyền có hiệu lực ở thời điểm việc được làm, không tự mở lại task đã đóng. Chỉ báo vi phạm có bằng chứng và ảnh hưởng cụ thể, không chỉ xác nhận đã đọc AGENTS.
+10. Sau tự soát, kiểm từng điểm và phản hồi các lượt trước: đúng / đúng một phần / sai / chưa kiểm được, với bằng chứng riêng. Không mặc nhiên đồng ý với bên nào. Nêu phạm vi lỗi rộng/hẹp hơn hoặc mặt trái của đề xuất sửa.
+11. Rà cả phần không được nêu trong LOG, báo cáo hay phản biện trước. Với mỗi bước dữ liệu đi qua (đọc → chuyển đổi → tính → chấm), hỏi quy ước của dữ liệu nguồn (giá trị đặc biệt, đơn vị, gốc, alias, rỗng) có được xử lý đúng không. Không coi phần không ai nêu là đã đúng.
+12. Một trạng thái xảy ra đồng loạt (100% lỗi, 100% không hỗ trợ, toàn hòa, toàn rỗng) là dấu hiệu cần lần tới đầu vào, không phải kết quả để diễn giải. Không dùng nó làm căn cứ thiết kế trước khi lần.
+13. Điểm cuối khớp số công bố, hay "chạy không lỗi", chưa chứng minh thành phần chạy đúng. Kiểm trung gian và phép kiểm không cần nhãn.
+14. Câu có "mọi", "đều", "không đổi", "trùng" phải nói rõ đại lượng và có lệnh đếm trên đủ đối tượng.
+15. Trước khi đề xuất sửa hoặc ghi vào một file dùng chung (code, script, tài liệu), kiểm file đó có bị ghim trong manifest, plan hoặc vân tay job nào không. Nêu rõ thao tác nào làm đổi hash và ảnh hưởng tới đâu.
+16. Kiểm tiêu chí so sánh hoặc chấp nhận được khai trước khi xem kết quả. Đổi tiêu chí sau khi xem phải khai là sửa sau.
+17. Với lượt chạy, tách lỗi hạ tầng và điều phối (tiến trình, nguồn điện, kết nối, giới hạn thời gian) khỏi lỗi phương pháp; lỗi hạ tầng không được ghi thành kết quả khoa học.
+18. Phản biện một kế hoạch thì kiểm cả đường thực thi thật: code có cho phép làm đúng như kế hoạch nói không (guard, thư mục, trạng thái đã khóa). Không chỉ kiểm lập luận trên giấy.
+19. Mỗi phần ghi "chưa xác định", "chưa phân xử", "chưa biết" hoặc OPEN phải kèm giải thích: vì sao chưa xác định được (thiếu dữ kiện gì, hay dữ liệu đã lưu không tách được các giải thích); các giải thích khả thi còn lại; bằng chứng hoặc phép phân tích nào phân xử được, trên dữ liệu nào, chi phí; kết luận nào phụ thuộc. Không dừng ở một câu "chưa xác định".
+20. Mỗi phần chờ Minh quyết phải kèm đề xuất của agent trong chính lượt đó: chọn gì, vì sao, mặt trái, phương án khác đã xét. Prompt bàn giao yêu cầu agent đối phương phản biện các đề xuất ấy. Đề xuất không thay quyết định của Minh.
+
+Không báo: chính tả, văn phong, đề xuất thêm quy trình, thêm phép kiểm "cho chắc".
+Nếu không có lỗi đáng kể, nói thẳng là không có. Không cần tìm cho đủ số lượng.
+
+Mỗi điểm: CHẶN hoặc KHÔNG CHẶN; chặn kết luận/quyết định nào; ở đâu; sai gì;
+bằng chứng (trích dẫn, số, phản ví dụ, lệnh đã chạy); hậu quả; đề xuất sửa tối thiểu hoặc bằng chứng còn thiếu.
+Tiếng Việt, câu ngắn.
+
+Cuối lượt báo:
+1. Đã làm gì.
+2. File đã thay đổi, hoặc không sửa file nào.
+3. Kiểm đã chạy và kết quả.
+4. Bất đồng có bằng chứng, câu hỏi mở, phần thiếu và quyết định bị ảnh hưởng; điều cần Minh quyết.
+
+Đề xuất tiếp tục hoặc dừng phản biện, kèm lý do. Nếu không còn phản đối chưa xử lý ảnh hưởng tính đúng, phạm vi kết luận hoặc quyết định đang xin duyệt, đề xuất dừng; không che bất đồng bên kia còn giữ. Có thể thống nhất giới hạn khi thiếu bằng chứng; kết luận phụ thuộc vẫn OPEN. Minh quyết cuối. Hai agent đồng ý không thay bằng chứng khoa học; dừng phản biện không tự duyệt SPEC, đóng task hoặc mở test.
+
+Sau đó soạn prompt bàn giao cho agent đối phương: chép nguyên văn Prompt chung + đúng Khối công đoạn + Khối cổng hiện có trong docs/review-prompt.md, chỉ điền thông tin trung tính. Giữ vai trò; người làm nhận prompt đáp phản biện, người phản biện nhận prompt kiểm độc lập. Vẫn soạn khi đề xuất dừng để Minh chọn gửi hay dừng; không tự gửi.
+```
+
+```text
+Công đoạn: người phản biện kiểm lại phản hồi và sửa.
+Tự soát yêu cầu và đầu ra gốc trước; sau đó đọc phản biện, phản hồi và các thay đổi được duyệt. Kiểm cả ý kiến phản bác reviewer; không mặc định phản hồi hoặc bản sửa đúng.
+Đối chiếu từng điểm với bằng chứng hiện tại, quyền sửa và hậu quả. Có điểm đúng nhưng chưa được Minh duyệt sửa thì ghi đúng trạng thái; không tự coi đã xử lý hoặc ép người làm sửa.
+Chỉ ghi bản phản biện lượt mới được Minh cho phép theo tasks/_MAU/REVIEW.md, hoặc trả lời trong chat. Giữ lịch sử, không ghi LOG/STATE hay sửa thay người làm. Nêu bất đồng còn lại và soạn prompt để người làm đáp.
+```

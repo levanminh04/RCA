@@ -1,0 +1,91 @@
+{
+ "danh_sach": [
+  {
+   "db": "event_db",
+   "bang": "event_schema.tbl_events",
+   "khoa": {
+    "id": "3e7c1df9-ada4-4081-94a1-548b80a5da86"
+   },
+   "cot": [
+    "sale_ends_at",
+    "starts_at",
+    "ends_at",
+    "checkin_starts_at",
+    "checkin_ends_at"
+   ],
+   "rang_buoc": [
+    "checkin_starts_at = starts_at",
+    "checkin_ends_at = ends_at",
+    "sale_ends_at <= ends_at"
+   ]
+  },
+  {
+   "db": "event_db",
+   "bang": "event_schema.tbl_ticket_types",
+   "khoa": {
+    "id": "ffb36fc7-e30a-4efe-987f-ca5533520453"
+   },
+   "cot": [
+    "configured_quantity"
+   ]
+  },
+  {
+   "db": "booking_db",
+   "bang": "booking_schema.tbl_event_sales_snapshots",
+   "khoa": {
+    "event_id": "3e7c1df9-ada4-4081-94a1-548b80a5da86"
+   },
+   "cot": [
+    "sale_ends_at"
+   ],
+   "json": [
+    "{saleEndsAt} number",
+    "{eventStartsAt} number",
+    "{eventEndsAt} number",
+    "{ticketTypes,<k: ticketTypeId=ffb36fc7…>,configuredQuantity} string"
+   ]
+  },
+  {
+   "db": "booking_db",
+   "bang": "booking_schema.tbl_ticket_type_inventory",
+   "khoa": {
+    "ticket_type_id": "ffb36fc7-e30a-4efe-987f-ca5533520453"
+   },
+   "cot": [
+    "configured_capacity"
+   ],
+   "dieu_kien": "held = 0, purchased = 41705 (bước 1)"
+  },
+  {
+   "db": "ticket_db",
+   "bang": "ticket_schema.tbl_event_access_snapshots",
+   "khoa": {
+    "event_id": "3e7c1df9-ada4-4081-94a1-548b80a5da86"
+   },
+   "cot": [
+    "event_starts_at",
+    "event_ends_at"
+   ]
+  },
+  {
+   "db": "payment_db",
+   "bang": "payment_schema.tbl_event_finance_snapshots",
+   "khoa": {
+    "event_id": "3e7c1df9-ada4-4081-94a1-548b80a5da86"
+   },
+   "cot": [
+    "event_ends_at"
+   ],
+   "dieu_kien": "tbl_event_payouts của sự kiện = 0"
+  }
+ ],
+ "da_xet_khong_sua": {
+  "event_schema.tbl_event_sectors": "0 dòng của sự kiện",
+  "booking_schema.tbl_sector_inventory": "0",
+  "event_schema.tbl_promotions": "0",
+  "booking_schema.tbl_promotion_inventory": "0",
+  "payment_schema.tbl_event_payouts": "0",
+  "JSON theo đơn (frozen_purchase_snapshot, selection_snapshot, purchase_snapshot, display_snapshot, order_payment_snapshots)": "lịch sử giao dịch, ngoài phạm vi §3"
+ },
+ "trigger": "không trigger cập nhật trên các bảng sửa (chỉ draft_delete_guard trên bảng con của Event)"
+}

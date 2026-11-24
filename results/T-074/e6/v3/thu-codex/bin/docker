@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# Đối chiếu câu gọi thực của script với giao diện đã biết; lệnh lạ là lỗi.
+set -eu
+case "$*" in
+  'exec flash-ticket-infra-rabbitmq-1 rabbitmqctl list_queues -q name messages messages_unacknowledged')
+    case $CA in
+      rabbit-loi) echo 'broker fixture unavailable' >&2; exit 1 ;;
+      rabbit-thieu) echo $'name\tmessages\tmessages_unacknowledged';;
+      rabbit-sai) echo $'jobs\t0\t?';;
+      rabbit-ban) printf 'first\t2\t1\nsecond\t0\t0\n';;
+      *) printf 'name\tmessages\tmessages_unacknowledged\njobs\t0\t0\n';;
+    esac ;;
+  'exec -i flash-ticket-infra-postgres-1 psql -U postgres -X -At -v ON_ERROR_STOP=1 -d '*)
+    db=${12} sql=${14}
+    [[ $# = 14 && ${13} = -c ]] || exit 90
+    case "$db:$sql" in
+      'booking_db:WITH dem AS ('*'FROM booking_schema.tbl_orders GROUP BY lifecycle_state'*)
+        [[ $sql == *"VALUES ('PENDING_PAYMENT'), ('ISSUING'), ('COMPLETED'), ('CANCELLED'), ('EXPIRED'), ('ISSUANCE_FAILED')"* &&
+           $sql == *'etats FULL JOIN dem USING (lifecycle_state)'* ]] || exit 91
+        case $CA in
+          don-loi) echo 'psql fixture error' >&2; exit 3 ;;
+          don-thieu) echo 'COMPLETED|7'; exit 0 ;;
+          don-ban) printf 'ISSUING|1\nPENDING_PAYMENT|2\n';;
+          *) printf 'ISSUING|0\nPENDING_PAYMENT|0\n';;
+        esac
+        printf 'COMPLETED|7\nCANCELLED|0\nEXPIRED|0\nISSUANCE_FAILED|1\n' ;;
+      "booking_db:SELECT held, purchased FROM booking_schema.tbl_ticket_type_inventory"*"WHERE ticket_type_id='ffb36fc7-e30a-4efe-987f-ca5533520453'")
+        case $CA in kho-thieu) :;; kho-ban) echo '2|7';; *) echo '0|7';; esac ;;
+      'event_db:SELECT count(*) FROM event_schema.tbl_outbox_messages WHERE published_at IS NULL'|\
+      'booking_db:SELECT count(*) FROM booking_schema.tbl_outbox_messages WHERE published_at IS NULL'|\
+      'ticket_db:SELECT count(*) FROM ticket_schema.tbl_outbox_messages WHERE published_at IS NULL'|\
+      'payment_db:SELECT count(*) FROM payment_schema.tbl_outbox_messages WHERE published_at IS NULL')
+        case "$db/$CA" in
+          ticket_db/bang-thieu) echo 'relation ticket_schema.tbl_outbox_messages does not exist' >&2; exit 3 ;;
+          payment_db/outbox-thieu) : ;;
+          booking_db/outbox-sai) printf '0\n0\n' ;;
+          event_db/outbox-ban) echo 2 ;;
+          *) echo 0 ;;
+        esac ;;
+      *) echo "SQL ngoài fixture: $db / $sql" >&2; exit 92 ;;
+    esac ;;
+  'ps -a --format '*)
+    [[ $CA != docker-loi ]] || exit 4
+    echo 'fixture|running|Up' ;;
+  'ps -aq') echo 'fixture123' ;;
+  'inspect -f '*fixture123) echo 'fixture paused=false running=true' ;;
+  'compose ls -a') echo 'lab running' ;;
+  'ps -a --filter name=rca-tai- --format {{.State}}')
+    [[ $CA != tai-docker-loi ]] || exit 5
+    echo exited ;;
+  *) echo "docker ngoài fixture: $*" >&2; exit 93 ;;
+esac

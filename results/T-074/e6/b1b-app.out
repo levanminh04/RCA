@@ -1,0 +1,53 @@
+== utc 2026-11-23T18:04:42.461857274Z
+== sectors event_db
+0
+== sector_inventory booking
+0
+== promotions
+0
+0
+== rang buoc tbl_events
+events_row_version_check: CHECK ((row_version >= 0))
+events_check: CHECK (((starts_at < ends_at) AND (sale_starts_at < sale_ends_at) AND (checkin_starts_at < checkin_ends_at)))
+events_check1: CHECK ((sale_ends_at <= ends_at))
+events_check2: CHECK (((checkin_starts_at = starts_at) AND (checkin_ends_at = ends_at)))
+events_check3: CHECK ((((approved_by IS NULL) AND (approved_at IS NULL) AND (fee_rate IS NULL)) OR ((approved_by IS NOT NULL) AND (approved_at IS NOT NULL) AND (fee_rate IS NOT NULL))))
+events_check4: CHECK (((status <> ALL (ARRAY['APPROVED'::text, 'PUBLISHED'::text])) OR (approved_at IS NOT NULL)))
+events_fee_rate_check: CHECK (((fee_rate >= (0)::numeric) AND (fee_rate <= (1)::numeric)))
+events_purchase_limit_check: CHECK ((purchase_limit > 0))
+events_sales_mode_check: CHECK ((sales_mode = ANY (ARRAY['QUANTITY'::text, 'SEAT_MAP'::text])))
+events_source_config_version_check: CHECK ((source_config_version > 0))
+events_status_check: CHECK ((status = ANY (ARRAY['DRAFT'::text, 'PENDING_APPROVAL'::text, 'APPROVED'::text, 'PUBLISHED'::text, 'CANCELLED'::text])))
+== rang buoc tbl_ticket_types
+ticket_types_configured_quantity_check: CHECK ((configured_quantity >= 0))
+ticket_types_check: CHECK ((((sales_mode = 'QUANTITY'::text) AND (sector_id IS NULL) AND (configured_quantity IS NOT NULL)) OR ((sales_mode = 'SEAT_MAP'::text) AND (sector_id IS NOT NULL) AND (configured_quantity IS NULL))))
+ticket_types_color_code_check: CHECK (((color_code)::text ~ '^#[0-9A-Fa-f]{6}$'::text))
+ticket_types_unit_price_check: CHECK (((unit_price)::numeric > (0)::numeric))
+== rang buoc inventory
+ticket_type_inventory_held_check: CHECK ((held >= 0))
+ticket_type_inventory_configured_capacity_check: CHECK ((configured_capacity >= 0))
+ticket_type_inventory_purchased_check: CHECK ((purchased >= 0))
+ticket_type_inventory_source_config_version_check: CHECK ((source_config_version > 0))
+ticket_type_inventory_row_version_check: CHECK ((row_version >= 0))
+ticket_type_inventory_check: CHECK (((purchased <= configured_capacity) AND (held <= (configured_capacity - purchased))))
+== rang buoc sales_snapshot
+event_sales_snapshots_sales_mode_check: CHECK ((sales_mode = ANY (ARRAY['QUANTITY'::text, 'SEAT_MAP'::text])))
+event_sales_snapshots_purchase_limit_check: CHECK ((purchase_limit > 0))
+event_sales_snapshots_configuration_snapshot_check: CHECK (((jsonb_typeof(configuration_snapshot) = 'object'::text) AND (configuration_snapshot @> '{"schemaVersion": 1}'::jsonb)))
+event_sales_snapshots_source_config_version_check: CHECK ((source_config_version > 0))
+event_sales_snapshots_row_version_check: CHECK ((row_version >= 0))
+event_sales_snapshots_check: CHECK ((sale_starts_at < sale_ends_at))
+== trigger
+-- event_db
+event_schema.tbl_event_images: draft_delete_guard
+event_schema.tbl_event_layouts: draft_delete_guard
+event_schema.tbl_event_seats: draft_delete_guard
+event_schema.tbl_event_sectors: draft_delete_guard
+event_schema.tbl_promotions: draft_delete_guard
+event_schema.tbl_ticket_types: draft_delete_guard
+-- booking_db
+-- ticket_db
+-- payment_db
+== cot trang thai don
+lifecycle_state
+== utc ket thuc 2026-11-23T18:04:43.761450581Z

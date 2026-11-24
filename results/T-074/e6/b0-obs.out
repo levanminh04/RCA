@@ -1,0 +1,47 @@
+== utc 2026-11-23T18:03:59.608550502Z host exp-obs
+== git
+1bb40ca48fdea145a3dcba97b034a412b245c523
+dirty_lines=0
+== STOP
+khong /srv/rca-lab/runs/STOP
+khong /srv/rca-lab/load-controller/STOP
+== ps
+(khong co)
+== docker ps -a
+flash-ticket-t072-bo-nhan|5e2bdb1b0d54|Up 37 hours (healthy)
+flash-ticket-obs-prometheus|e04987641b57|Up 6 days
+flash-ticket-obs-grafana|488984b716c0|Up 12 hours
+flash-ticket-obs-loki|0db216b630ae|Up 6 days
+flash-ticket-obs-tempo|64e2fbd56d9c|Up 6 days
+flash-ticket-obs-collector|e40d61f10c9a|Up 6 days
+== compose ls
+NAME                      STATUS              CONFIG FILES
+flash-ticket-obs-pinned   running(5)          /opt/rca-lab/observability/compose.yaml
+t073-webhook              running(1)          /opt/rca-lab/observability/compose.t073-webhook.yaml
+== cron
+no crontab for ubuntu
+-- timers
+(khong timer khop)
+== clock
+Reference ID    : 81D4D97E (129.212.217.126)
+Stratum         : 3
+Ref time (UTC)  : Mon Nov 23 17:50:43 2026
+System time     : 0.000001191 seconds slow of NTP time
+Last offset     : -0.000001214 seconds
+RMS offset      : 0.002084053 seconds
+== MAY TAI
+tai_ip=3.24.8.49
+utc 2026-11-23T18:04:02.726561213Z host ip-172-31-2-212
+-- rca-tai dang chay:
+-- rca-tai tong (ps -a): 106
+-- k6 ps:
+ 324096 bash -c echo "utc $(date -u +%FT%T.%NZ) host $(hostname)"; echo "-- rca-tai dang chay:"; sudo -n docker ps --filter name=rca-tai- --format "{{.Names}}|{{.Status}}"; echo "-- rca-tai tong (ps -a): $(sudo -n docker ps -a -q --filter name=rca-tai- | wc -l)"; echo "-- k6 ps:"; ps -eo pid,args | grep -E "[k]6 " || echo "(khong)"; echo "-- cron:"; crontab -l 2>&1 | head -3; echo "-- images k6:"; sudo -n docker images --format "{{.Repository}}:{{.Tag}}|{{.ID}}" | grep -i k6; echo "-- clock:"; chronyc tracking 2>&1 | head -4
+-- cron:
+no crontab for ubuntu
+-- images k6:
+grafana/k6:1.4.2|3656673de3f3
+-- clock:
+Reference ID    : A9FEA97B (169.254.169.123)
+Stratum         : 2
+Ref time (UTC)  : Mon Nov 23 18:03:31 2026
+System time     : 0.000000289 seconds fast of NTP time

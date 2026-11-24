@@ -1,0 +1,7 @@
+1. **Đã làm.** Đã soát diff v2 → v3 của `b0.sh` và `b1c-yen.sh` theo CX-41/CX-41b. Cả bốn truy vấn outbox khớp bảng và cột `published_at` trong mã FlashTicket tại `36a3725`. Hai script và bộ thử hiện có đáp ứng brief.
+
+2. **File của lượt này.** Tạo [luot-3.out](/D:/RCA-flashticket/results/T-074/e6/v3/thu-codex/luot-3.out) và [SHA256SUMS](/D:/RCA-flashticket/results/T-074/e6/v3/thu-codex/SHA256SUMS). Cập nhật [GHI-CHU.md](/D:/RCA-flashticket/results/T-074/e6/v3/thu-codex/GHI-CHU.md). Đối chiếu Git trước/sau và hash trong `v3/` xác nhận lượt này chỉ thay đổi đúng ba file trên.
+
+3. **Kết quả kiểm.** Cả hai script qua `bash -n`. **36/36 ca giả lập đạt**, gồm ca sạch, lỗi `psql` và RabbitMQ, thiếu bảng outbox, hai tiến trình từng bị bỏ sót và cron lạ ở dòng 5. Manifest mới khớp **9/9 file**, gồm cả ba lượt chạy. [Kết quả lượt 3](/D:/RCA-flashticket/results/T-074/e6/v3/thu-codex/luot-3.out:751)
+
+4. **Còn mở.** Kết quả mới xác nhận trên giả lập. Claude cần ghi rõ vai trò `app`/`obs` khi gọi `b0.sh` và truyền `--phut-khong-tai N` với số phút thực tế đã xác nhận khi gọi `b1c-yen.sh`. Lệnh trong nháp 6 đang thiếu đối số này, nên dù các số đo đều sạch, script vẫn trả mã `2`. Bước tiếp theo là phiên Codex khác kiểm độc lập. [Prompt bàn giao CX-45b](/D:/RCA-flashticket/results/T-070/codex/CX-45b-brief.md)
