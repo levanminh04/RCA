@@ -1,0 +1,402 @@
+{
+ "cua_so": {
+  "start": 1795576885,
+  "end": 1795577488
+ },
+ "bat_dau": "2026-11-25T03:32:59Z",
+ "span": {
+  "server_http_route/api-gateway": {
+   "ket_qua": "dat",
+   "so_trace_mau": 5
+  },
+  "server_http_route/booking-service": {
+   "ket_qua": "dat",
+   "so_trace_mau": 5
+  },
+  "server_http_route/event-service": {
+   "ket_qua": "dat",
+   "so_trace_mau": 5
+  },
+  "server_http_route/payment-service": {
+   "ket_qua": "dat",
+   "so_trace_mau": 5
+  },
+  "client_gateway/booking-service": {
+   "ket_qua": "dat",
+   "so_trace_mau": 5
+  },
+  "client_gateway/event-service": {
+   "ket_qua": "dat",
+   "so_trace_mau": 5
+  },
+  "client_gateway/payment-service": {
+   "ket_qua": "dat",
+   "so_trace_mau": 5
+  },
+  "db/event_db": {
+   "ket_qua": "dat",
+   "so_trace_mau": 5
+  },
+  "db/booking_db": {
+   "ket_qua": "dat",
+   "so_trace_mau": 5
+  },
+  "db/payment_db": {
+   "ket_qua": "dat",
+   "so_trace_mau": 5
+  },
+  "db/ticket_db": {
+   "ket_qua": "dat",
+   "so_trace_mau": 5
+  },
+  "redis/booking-service": {
+   "ket_qua": "dat",
+   "so_trace_mau": 5
+  },
+  "redis/api-gateway": {
+   "ket_qua": "dat",
+   "so_trace_mau": 5
+  },
+  "user_mongo": {
+   "ket_qua": "dat",
+   "so_trace_mau": 3,
+   "trace": [
+    "1fdc67a343f7efc3e6a6a0951934b6a0",
+    "8a355f925168cbf769bec49ff3f930d",
+    "dbcd6da59e5357910db68d35662b6657"
+   ]
+  }
+ },
+ "rabbitmq_cua_so": {
+  "P1": {
+   "ket_qua": "dat",
+   "so_trace_mau": 20
+  },
+  "P2": {
+   "ket_qua": "dat",
+   "so_trace_mau": 20
+  },
+  "P3": {
+   "ket_qua": "dat",
+   "so_trace_mau": 20
+  },
+  "P4": {
+   "ket_qua": "dat",
+   "so_trace_mau": 20
+  },
+  "P5": {
+   "ket_qua": "dat",
+   "so_trace_mau": 20
+  },
+  "P6": {
+   "ket_qua": "dat",
+   "so_trace_mau": 20
+  }
+ },
+ "luong_chinh": {
+  "don": "0058ea5c-011e-44e3-b702-db8a143688e1",
+  "service_co_log_correlation": [
+   "booking-service",
+   "payment-service",
+   "ticket-service"
+  ],
+  "so_dong_log": 19,
+  "correlation_qua_service": {
+   "ket_qua": "dat",
+   "can_co": [
+    "booking-service",
+    "payment-service",
+    "ticket-service"
+   ]
+  },
+  "db": {
+   "nguon": "psql tren exp-app 25/11 sau luot kiem-sau-don-001",
+   "orderId": "0058ea5c-011e-44e3-b702-db8a143688e1",
+   "lifecycle_state": "COMPLETED",
+   "so_luong": 1,
+   "so_ve": 1,
+   "so_issuance": 1
+  },
+  "mot_ve": {
+   "ket_qua": "dat"
+  },
+  "rabbitmq_cua_don": {
+   "P1": {
+    "ket_qua": "dat",
+    "so_cap": 4,
+    "mau": [
+     {
+      "trace": "d126c684d97ade3944449d0e93f57a09",
+      "producer": "57ca5e16b9b3b701",
+      "consumer": "f165c72a6be1ed9f"
+     },
+     {
+      "trace": "d126c684d97ade3944449d0e93f57a09",
+      "producer": "a9cd060998db6738",
+      "consumer": "472505352beb412f"
+     }
+    ],
+    "phat": "payment-service",
+    "routing_key": "booking.accept-payment.v1",
+    "queue": "booking.accept-payment.q",
+    "nhan": "booking-service"
+   },
+   "P2": {
+    "ket_qua": "dat",
+    "so_cap": 5,
+    "mau": [
+     {
+      "trace": "cf67f5ee227e412bf4e033630f4acdde",
+      "producer": "16b4980be2a403df",
+      "consumer": "00caed0506cd872b"
+     },
+     {
+      "trace": "f8e74b49344c58b31c1a5fd47fad8ab9",
+      "producer": "3a3fc954163906dc",
+      "consumer": "23648d317901da26"
+     }
+    ],
+    "phat": "booking-service",
+    "routing_key": "booking.payment-decision.v1",
+    "queue": "payment.decision.q",
+    "nhan": "payment-service"
+   },
+   "P3": {
+    "ket_qua": "dat",
+    "so_cap": 1,
+    "mau": [
+     {
+      "trace": "6e2422fb7dfab9bf6cc9b59f5bd3946d",
+      "producer": "07d17c72e1e57814",
+      "consumer": "d41d39fe32911da2"
+     }
+    ],
+    "phat": "payment-service",
+    "routing_key": "ticket.issue.v1",
+    "queue": "ticket.issuance.q",
+    "nhan": "ticket-service"
+   },
+   "P4": {
+    "ket_qua": "dat",
+    "so_cap": 1,
+    "mau": [
+     {
+      "trace": "931b8dab8c1cb918b651b3a7449ef488",
+      "producer": "04dc9f20a88035f5",
+      "consumer": "5c51a499371abf22"
+     }
+    ],
+    "phat": "ticket-service",
+    "routing_key": "ticket.issuance-result.v1",
+    "queue": "payment.ticket-issuance-failed.q",
+    "nhan": "payment-service"
+   },
+   "P5": {
+    "ket_qua": "dat",
+    "so_cap": 1,
+    "mau": [
+     {
+      "trace": "b209f84e08059471eedf1f70a3abcb44",
+      "producer": "46cedf4bb2c5ec67",
+      "consumer": "ca6427d7856bdde1"
+     }
+    ],
+    "phat": "payment-service",
+    "routing_key": "ticket.issued.v1",
+    "queue": "booking.tickets-issued.q",
+    "nhan": "booking-service"
+   },
+   "P6": {
+    "ket_qua": "dat",
+    "so_cap": 4,
+    "mau": [
+     {
+      "trace": "cf67f5ee227e412bf4e033630f4acdde",
+      "producer": "3603d10c10fa5074",
+      "consumer": "070f8690372e7dc1"
+     },
+     {
+      "trace": "cf67f5ee227e412bf4e033630f4acdde",
+      "producer": "dfda4a0d7282c779",
+      "consumer": "bf41b658ab665412"
+     }
+    ],
+    "phat": "booking-service",
+    "routing_key": "booking.order-completed.v1",
+    "queue": "payment.order-completed.q",
+    "nhan": "payment-service"
+   }
+  }
+ },
+ "metric": {
+  "jvm": {
+   "ket_qua": "dat",
+   "metric": "jvm_memory_used_bytes",
+   "so_chuoi": 56,
+   "thieu_service": []
+  },
+  "http_server": {
+   "ket_qua": "dat",
+   "metric": "http_server_request_duration_seconds_count",
+   "so_chuoi": 39,
+   "thieu_service": []
+  },
+  "pool_db": {
+   "ket_qua": "dat",
+   "metric": "db_client_connections_usage",
+   "so_chuoi": 8,
+   "nhan_mau": {
+    "service_name": [
+     "booking-service",
+     "event-service",
+     "payment-service",
+     "ticket-service"
+    ]
+   }
+  },
+  "queue_rabbitmq": {
+   "ket_qua": "dat",
+   "metric": "rabbitmq_message_current",
+   "so_chuoi": 60,
+   "nhan_mau": {
+    "rabbitmq_queue_name": [
+     "booking.accept-payment.dlq",
+     "booking.accept-payment.q",
+     "booking.event-cancelled.dlq",
+     "booking.event-cancelled.q",
+     "booking.issuance-failed.dlq",
+     "booking.issuance-failed.q",
+     "booking.sales-configured.dlq",
+     "booking.sales-configured.q",
+     "booking.tickets-issued.dlq",
+     "booking.tickets-issued.q",
+     "payment.decision.dlq",
+     "payment.decision.q",
+     "payment.event-cancelled.dlq",
+     "payment.event-cancelled.q",
+     "payment.finance-configured.dlq",
+     "payment.finance-configured.q",
+     "payment.order-completed.dlq",
+     "payment.order-completed.q",
+     "payment.start.dlq",
+     "payment.start.q"
+    ]
+   }
+  },
+  "docker_stats": {
+   "ket_qua": "dat",
+   "metric": "container_cpu_usage_nanoseconds_total",
+   "so_chuoi": 12,
+   "thieu_container": [],
+   "nhan_mau": {
+    "container_name": [
+     "flash-ticket-api-gateway-api-gateway-1",
+     "flash-ticket-booking-service-booking-service-1",
+     "flash-ticket-discovery-server-discovery-server-1",
+     "flash-ticket-event-service-event-service-1",
+     "flash-ticket-infra-postgres-1",
+     "flash-ticket-infra-rabbitmq-1",
+     "flash-ticket-infra-redis-1",
+     "flash-ticket-infra-user-db-1",
+     "flash-ticket-keycloak-keycloak-1",
+     "flash-ticket-payment-service-payment-service-1",
+     "flash-ticket-ticket-service-ticket-service-1",
+     "flash-ticket-user-service-user-service-1"
+    ],
+    "service_name": [
+     "api-gateway",
+     "booking-service",
+     "discovery-server",
+     "event-service",
+     "keycloak",
+     "payment-service",
+     "postgres",
+     "rabbitmq",
+     "redis",
+     "ticket-service",
+     "user-db",
+     "user-service"
+    ]
+   }
+  },
+  "httpcheck": {
+   "ket_qua": "dat",
+   "metric": "httpcheck_status",
+   "so_chuoi": 40,
+   "nhan_mau": {
+    "http_url": [
+     "http://10.0.0.158:8080/realms/master",
+     "http://10.0.0.158:8081/actuator/health/liveness",
+     "http://127.0.0.1:8082/actuator/health/liveness",
+     "http://127.0.0.1:8083/actuator/health/liveness",
+     "http://127.0.0.1:8084/actuator/health/liveness",
+     "http://127.0.0.1:8085/actuator/health/liveness",
+     "http://127.0.0.1:8086/actuator/health/liveness",
+     "http://127.0.0.1:8761/actuator/health/liveness"
+    ]
+   }
+  }
+ },
+ "log": {
+  "api-gateway": {
+   "ket_qua": "dat",
+   "mau_so": 3186,
+   "tu_so": 3126,
+   "ty_le": 0.9811676082862524,
+   "thieu_traceId_spanId": 0,
+   "du_truong_B16": 3186,
+   "dem_theo_diem": {
+    "gateway.request.completed|gateway.request.rejected|gateway.request.failed|gateway.request.cancelled": 3186
+   },
+   "diem_khong_co_dong": []
+  },
+  "booking-service": {
+   "ket_qua": "dat",
+   "mau_so": 936,
+   "tu_so": 936,
+   "ty_le": 1.0,
+   "thieu_traceId_spanId": 0,
+   "du_truong_B16": 936,
+   "dem_theo_diem": {
+    "booking.reserve": 216,
+    "booking.freeze": 144,
+    "booking.accept-payment": 144,
+    "booking.issuance-result": 144,
+    "booking.message.processed": 288
+   },
+   "diem_khong_co_dong": []
+  },
+  "payment-service": {
+   "ket_qua": "dat",
+   "mau_so": 1440,
+   "tu_so": 1440,
+   "ty_le": 1.0,
+   "thieu_traceId_spanId": 0,
+   "du_truong_B16": 1440,
+   "dem_theo_diem": {
+    "payment.attempt-created": 144,
+    "payment.callback-confirmed": 144,
+    "payment.saga-step": 288,
+    "payment.message.processed": 432,
+    "payment.outbox.result": 432
+   },
+   "diem_khong_co_dong": []
+  },
+  "ticket-service": {
+   "ket_qua": "dat",
+   "mau_so": 432,
+   "tu_so": 432,
+   "ty_le": 1.0,
+   "thieu_traceId_spanId": 0,
+   "du_truong_B16": 432,
+   "dem_theo_diem": {
+    "ticket.issuance": 144,
+    "ticket.message.processed": 144,
+    "ticket.outbox.result": 144
+   },
+   "diem_khong_co_dong": []
+  }
+ },
+ "thoi_gian_s": 366.9,
+ "so_trace_da_doc": 4004
+}
