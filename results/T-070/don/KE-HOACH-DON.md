@@ -534,10 +534,10 @@ Việc làm lại được, không cần bàn. Mọi lệnh xóa vẫn trình Mi
 |---|---|---|
 | Cho VNPay giả và đường hầm chạy dưới Compose | `tai_linux.py:189-210` tự khôi phục bằng tiến trình chạy trần qua hai helper | Lượt riêng. Sửa hai helper để chỉ một nơi khởi chạy |
 | Hai test lỗi trong `kiem-hop-dong.py` | `ctl.start(args, {})` rồi đọc `manifest['labCommit']`; test hash nguồn chờ kiểm hash cũ, trong khi `verify_sources()` kiểm git | Sửa đầu vào và kỳ vọng của test theo hợp đồng commit hiện hành. Không sửa bộ tải để chiều test cũ |
-| Bật agent OTel trên FlashTicket thật (K8s, máy 84) | Image có agent, mặc định tắt; K8s chưa có nơi nhận | Bật khi máy 84 nối được với obs (Y11) |
+| Bật agent OTel trên FlashTicket thật (K8s, máy 84) | **Sửa 26/11:** image trên `main` **chưa có agent** (agent chỉ có trong PR #17, mặc định tắt); K8s chưa có nơi nhận | Chuyển thành task T-076 (làm lại PR #17 trên main mới nhất, bật agent qua `deploy/k8s` và CD) |
 | Nối máy 84 vào obs | Gateway chỉ nghe IP nội bộ `10.0.0.215`; iptables của obs chỉ nhận `10.0.0.0/24` và SSH | Sửa 4 chỗ: cho gateway nghe IP công khai, mở iptables cho IP máy 84, mở Security List Oracle (Minh làm trên giao diện), thêm xác thực. Luật và dashboard lọc theo `deployment.environment` |
 | Merge PR #17 vào main của nhóm | 13 file xung đột. Hook tiêm lỗi chỉ ở `src/rca-test/` | Trước khi merge, đọc từng dòng 39 file nghiệp vụ được chèn lệnh ghi log |
-| Dùng FlashTicket bản mới nhất trên app (Y12) | App chạy bản ghim `36a3725` | Đổi bản là đổi hệ thống được đo, nên kết quả trước và sau không so trực tiếp. Làm thành bước riêng sau đợt dọn, có kiểm tín hiệu lại |
+| Dùng FlashTicket bản mới nhất trên app (Y12) | App chạy bản ghim `36a3725` (main 18/11 + PR #17); main 22/11 `f178870` hơn 52 commit. Nằm ở pha 4 của T-076 | Đổi bản là đổi hệ thống được đo, nên kết quả trước và sau không so trực tiếp. Làm thành bước riêng sau đợt dọn, có kiểm tín hiệu lại |
 | Lỗi mount `schema.cjs` của MongoDB | Nguồn là thư mục rỗng do Docker tự tạo | Báo nhóm hệ thống hoặc sửa khi nâng bản FlashTicket |
 | Đổi UID / tên luật sang tên không mã task | Bị chặn bởi dữ liệu đồ thị và hợp đồng gom sự cố (§7.5) | Chỉ làm nếu Minh muốn, kèm bộ hiển thị dẫn xuất và sửa `incidents.py` |
 | `/opt/rca-tai` (Q5) | Còn được `fixture.py` dùng | Minh quyết khi bỏ hoặc thay CLI `fixture.py` |
