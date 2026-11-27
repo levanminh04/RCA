@@ -1,0 +1,24 @@
+# T-076 bước 4 bản 6: Collector thử đặt tên otel-collector như Service trong cụm (đích của ConfigMap).
+# OTLP/HTTP không TLS, không token, KHÔNG processor: ghi nguyên payload agent gửi ra.
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+exporters:
+  file/traces:
+    path: /out/traces.jsonl
+  file/metrics:
+    path: /out/metrics.jsonl
+service:
+  extensions: [health_check]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [file/traces]
+    metrics:
+      receivers: [otlp]
+      exporters: [file/metrics]

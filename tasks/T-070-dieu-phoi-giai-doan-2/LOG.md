@@ -516,3 +516,4 @@ odejs\codex.cmd`); chạy lại, đầu ra `chuoi/chay-2b.out`.
   - **Bước tiếp:** Minh gửi `prompt-codex-6.md` cho Codex. Còn chờ Minh: `TRANG-THAI.json`, A1/A2, D1, SPEC T-076, commit/push repo RCA.
   - Lệnh cuối: `sha256sum -c SHA256SUMS` trong `results/T-070/don/q4/` (12/12).
 - 14:45Z (26/11) — **Minh "Duyệt cập nhật"**: `TRANG-THAI.json` — `cap_nhat_utc`, `phien_ban` (lab `c1da15f` trên obs, app, tải), `buoc_tiep_dieu_phoi` (thêm REVIEW-4, hai đường chưa dùng, trỏ `prompt-codex-6.md`). Bước tiếp không đổi: Minh gửi `prompt-codex-6.md` cho Codex.
+- 15:10Z (26/11) — Minh "Duyệt commit push", "Đẩy master": commit `672391b` (13 file: hồ sơ REVIEW-3/4, đính chính Q4 + manifest, STATE, TRANG-THAI, LOG, prompt Codex 4–6, §12 kế hoạch, SPEC/LOG T-076; không gồm `codex/*.jsonl`, `docs/KHUNG-DO-AN.md`), push nhánh và master (fast-forward từ `ee16127`). Dòng LOG này chưa commit.

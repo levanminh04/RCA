@@ -1,0 +1,50 @@
+# T-076 bước 4: Booking có agent → Collector thử (TLS + token, không processor). Hạ tầng giả, dữ liệu giả.
+# Biến ${...} do chay-agent.sh đặt. Không nối tới máy thật nào (Keycloak giả không phân giải được).
+name: pr17-agent-thu
+services:
+  pg:
+    image: postgres:16.15
+    environment:
+      POSTGRES_DB: booking_db
+      POSTGRES_USER: booking_admin
+      POSTGRES_PASSWORD: thu
+    command: ["postgres", "-c", "log_statement=none"]
+    volumes:
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "booking_admin", "-d", "booking_db"]
+      interval: 3s
+      retries: 30
+  redis:
+    image: redis:7.4.11-alpine
+    command: ["redis-server", "--requirepass", "thu"]
+  rabbit:
+    image: rabbitmq:4.3.6-management
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      retries: 30
+  otel-thu:
+    image: otel/opentelemetry-collector-contrib@sha256:e40d61f10c9a617cca1ffd1be4d7e2b3a4b0f0001798ff07e58cabe82e618cea
+    command: ["--config=/etc/otelcol/collector.yaml"]
+    environment:
+      TOKEN_THU: ${TOKEN_THU:?}
+    volumes:
+      - ./collector-tho.yaml:/etc/otelcol/collector.yaml:ro
+      - ${WORK:?}/tls:/tls:ro
+      - ${WORK:?}/out:/out
+    user: "0:0"
+  booking:
+    image: pr17-thu/booking-service:${SERVICE_VERSION:?}
+    mem_limit: ${BOOKING_MEM_LIMIT:-768m}  # bằng limits.memory của deploy/k8s/booking-service/deployment.yaml
+    env_file: ${WORK:?}/booking.env
+    ports:
+      - "127.0.0.1:18082:8082"
+    depends_on:
+      pg: {condition: service_healthy}
+      rabbit: {condition: service_healthy}
+      redis: {condition: service_started}
+      otel-thu: {condition: service_started}

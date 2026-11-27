@@ -249,6 +249,7 @@ Mục LOG phải đủ để **một agent khác, trên một máy khác, không
 - Windows 11. Có PowerShell và Git Bash. Python 3.12 gọi bằng `py -3`. Codex CLI 0.130.0.
 - Laptop i5-1240P, RAM 16 GB, không có GPU NVIDIA. Ổ D còn khoảng 65 GB (kiểm ngày 02/10/2026).
 - Repo hệ thống FlashTicket: `D:/Project/flash-ticket-platform`. Chỉ đọc. Chuẩn quan sát ở `docs/architecture/B16-observability-baseline.md`.
+  - Ngoại lệ (Minh duyệt 26/11/2026, SPEC T-076 Q5): riêng nhánh `rca/quan-sat-log` (PR #17, task T-076) được sửa và force-push khi Minh duyệt; không đẩy vào `main`, không đụng nhánh khác.
 - Repo vận hành RCA: `D:/Project/flashticket-rca-lab` (xem §4). Địa chỉ máy nằm ở `inventory/` của repo đó.
 - Nền tảng chính: Oracle (exp-app, exp-obs); máy tải ở AWS (Minh chọn 16/11/2026). Khóa máy ở `D:/RCA-ext/keys/`, không vào repo nào.
 - Dữ liệu lớn ngoài git: `D:/RCA-archive/` (danh sách sha256 kèm theo từng nhóm).

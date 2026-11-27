@@ -1,0 +1,85 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.ucUk
+#1 DONE 0.0s
+
+#1 [internal] load build definition from Dockerfile.ucUk
+#1 transferring dockerfile: 1.48kB done
+#1 DONE 0.0s
+
+#2 resolve image config for docker-image://docker.io/docker/dockerfile:1
+#2 DONE 0.9s
+
+#3 docker-image://docker.io/docker/dockerfile:1@sha256:572cebbc2b15e6f84c077742952674889cb63cd5e9b80abdffcbe587b6f19183
+#3 CACHED
+
+#4 [internal] load metadata for docker.io/library/eclipse-temurin:21-jre-alpine@sha256:b48e02e0ea88d7bfb305335df94923bdef394905f4147dccd52e873cf17b1088
+#4 DONE 0.0s
+
+#5 [context agentjar] load .dockerignore
+#5 transferring agentjar: 2B done
+#5 DONE 0.0s
+
+#6 [internal] load .dockerignore
+#6 transferring context: 133B 0.0s done
+#6 DONE 0.0s
+
+#7 [extract 1/4] FROM docker.io/library/eclipse-temurin:21-jre-alpine@sha256:b48e02e0ea88d7bfb305335df94923bdef394905f4147dccd52e873cf17b1088
+#7 DONE 0.0s
+
+#8 [extract 2/4] WORKDIR /builder
+#8 CACHED
+
+#9 [internal] load build context
+#9 ...
+
+#10 [context agentjar] load from client
+#10 transferring agentjar: 26.51MB 1.2s done
+#10 DONE 1.3s
+
+#9 [internal] load build context
+#9 transferring context: 71.55MB 2.6s done
+#9 DONE 2.6s
+
+#11 [extract 3/4] COPY target/assistant-service-*.jar app.jar
+#11 DONE 0.1s
+
+#12 [extract 4/4] RUN java -Djarmode=tools -jar app.jar extract --layers --destination extracted
+#12 DONE 1.1s
+
+#13 [stage-1  2/10] RUN apk add --no-cache curl jq     && addgroup -S -g 10001 app && adduser -S -D -u 10001 -G app app
+#13 CACHED
+
+#14 [stage-1  3/10] WORKDIR /app
+#14 CACHED
+
+#15 [stage-1  4/10] COPY --from=extract --chown=10001:10001 /builder/extracted/dependencies/ ./
+#15 DONE 0.2s
+
+#16 [stage-1  5/10] COPY --from=extract --chown=10001:10001 /builder/extracted/spring-boot-loader/ ./
+#16 DONE 0.0s
+
+#17 [stage-1  6/10] COPY --from=extract --chown=10001:10001 /builder/extracted/snapshot-dependencies/ ./
+#17 DONE 0.0s
+
+#18 [stage-1  7/10] COPY --from=extract --chown=10001:10001 /builder/extracted/application/ ./
+#18 DONE 0.0s
+
+#19 [stage-1  8/10] COPY --from=agentjar --chmod=0444 otel.jar /otel/opentelemetry-javaagent.jar
+#19 DONE 0.1s
+
+#20 [stage-1  9/10] RUN chmod 0755 /otel
+#20 DONE 0.2s
+
+#21 [stage-1 10/10] COPY --chmod=0555 docker-entrypoint.sh /app/docker-entrypoint.sh
+#21 DONE 0.0s
+
+#22 exporting to image
+#22 exporting layers
+#22 exporting layers 0.2s done
+#22 writing image sha256:b09b9a60458b5268824f6e623e5ee9277df9c7e3efaedd649a9ce8affd303314 done
+#22 naming to docker.io/pr17-thu/assistant-service:ae5a870cca2f22134894daf4147b509988c38b3d done
+#22 DONE 0.2s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/w6xaw1yixsat3yzzynnuf91gk
+sha256:b09b9a60458b5268824f6e623e5ee9277df9c7e3efaedd649a9ce8affd303314 308024665

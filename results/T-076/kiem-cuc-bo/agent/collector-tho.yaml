@@ -1,0 +1,33 @@
+# T-076 bước 4 (lọc ở nguồn, REVIEW-2 N3): Collector thử KHÔNG có processor nào.
+# Nhận OTLP/HTTP qua TLS + token bearer giống đường máy 84, ghi nguyên payload agent gửi ra file.
+# Thấy gì trong file là thứ đã rời máy nguồn.
+extensions:
+  bearertokenauth:
+    scheme: Bearer
+    token: ${env:TOKEN_THU}
+  health_check:
+    endpoint: 0.0.0.0:13133
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+        tls:
+          cert_file: /tls/server.crt
+          key_file: /tls/server.key
+        auth:
+          authenticator: bearertokenauth
+exporters:
+  file/traces:
+    path: /out/traces.jsonl
+  file/metrics:
+    path: /out/metrics.jsonl
+service:
+  extensions: [bearertokenauth, health_check]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [file/traces]
+    metrics:
+      receivers: [otlp]
+      exporters: [file/metrics]

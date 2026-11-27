@@ -1,186 +1,180 @@
-# T-076 — Làm lại PR #17 trên main mới nhất, bật OTel agent cho FlashTicket chạy thật (máy 84)
+# T-076 — Làm lại PR #17 trên main mới nhất; FlashTicket mới chạy cho demo trên Oracle; mở đường quan sát máy 84
 
-- **Trạng thái:** đề xuất (Minh cho viết SPEC 26/11/2026; chờ duyệt SPEC)
+- **Trạng thái:** **Minh duyệt bản 6 ngày 27/11/2026** ("Duyệt luôn bản 6"), gồm Q1–Q10 theo cột đề xuất. Sửa theo `REVIEW-4.md` (Codex, R1–R4) của bản 5. Hướng H1 + H4 Minh duyệt 27/11. Bản cũ: `SPEC.ban-1.md` … `SPEC.ban-5.md`.
 - **Người làm:** Claude
 - **Người phản biện:** Codex
-- **Thuộc gói MRP:** P9 (kho quan sát và tích hợp), P10 (thực nghiệm trên FlashTicket và demo) — **Cổng:** ngoài G0–G4 (việc tích hợp, không phải đánh giá phương pháp)
+- **Thuộc gói MRP:** P9 (kho quan sát và tích hợp), P10 (thực nghiệm trên FlashTicket và demo) — **Cổng:** ngoài G0–G4 (tích hợp, không đánh giá phương pháp)
 
 ## Mục tiêu
 
-**Nguồn:**
-- DT18-NV1: hệ thống bán vé phân tán.
-- DT18-NV2: "Dữ liệu log, trace và metrics được thu thập…", đối chiếu `docs/reference/sources/DT18-de-tai-va-nhiem-vu.md` §2.
-- MRP P9a: yêu cầu quan sát cho RCA theo chuẩn B16; `service.name` thống nhất trên cả ba tín hiệu.
-- MRP P10: thực nghiệm và demo trên FlashTicket.
+**Nguồn:** DT18-NV1 (hệ thống bán vé phân tán), DT18-NV2 (thu log, trace, metric; `docs/reference/sources/DT18-de-tai-va-nhiem-vu.md` §2), MRP P9a (chuẩn B16, `service.name` thống nhất ba tín hiệu), MRP P10 (thực nghiệm và demo trên FlashTicket).
 
-**Mong muốn của Minh (chat 24–26/11/2026):**
-- Y11: phần log, telemetry, observability của FlashTicket do Minh toàn quyền quyết, miễn không ảnh hưởng hệ thống.
-- Y12: dùng bản FlashTicket mới nhất cho thống nhất.
-- Ngày 26/11: bật Java agent cho máy 84 **không sửa tay trên máy**. Dọn những chỗ lỗi thời của PR #17. **Chỉ một PR:** làm lại chính PR #17, không merge PR #17 rồi tạo thêm PR khác.
+**Mong muốn của Minh:**
+- 24/11: Y11 toàn quyền phần quan sát của FlashTicket, miễn không ảnh hưởng hệ thống; Y12 dùng bản mới nhất cho thống nhất.
+- 26/11: không sửa tay trên máy 84; dọn chỗ lỗi thời của PR #17; **chỉ một PR** (làm lại chính PR #17).
+- 27/11: chọn H1 + H4. **Demo phải chỉn chu.** **Thiết kế mở:** sau này chuyển sang quan sát máy 84 (AWS) thì chỉ **thêm**, hoặc sửa nhỏ (IP, cổng, thông tin kết nối); không xóa, không đổi cấu trúc thư mục.
 
-**Task này là cài đặt và tích hợp:**
-- Đưa chuẩn quan sát B16 (log JSON, OTel agent) từ PR #17 vào main mới nhất của nhóm.
-- Bật agent cho bản chạy thật trên K8s (máy 84), gửi dữ liệu về máy quan sát exp-obs.
+**Task này gồm hai phần:**
+- **Phần A — PR #17:** đưa chuẩn quan sát B16 vào main mới nhất của nhóm. Agent có sẵn trong image và **bị tắt cứng** trên K8s. Máy 84 không gửi dữ liệu quan sát đi đâu (H1).
+- **Phần B — exp-app cho demo:** dựng lại bản FlashTicket thử nghiệm trên exp-app (Oracle) từ main mới nhất có PR #17, kiểm tín hiệu, diễn tập demo trọn vòng tải → sự cố → cảnh báo → RCA (H4). Chỉ phục vụ demo; **không** chọn bản cho W7 (xem C5).
 
-**Task không đánh giá phương pháp RCA** và không đổi phương pháp. Đạt task này cho:
-- (a) FlashTicket chạy thật có trace và metric (log tùy Q1) trên Grafana;
-- (b) một nhánh "main mới nhất + quan sát" để sau này ghim lại bản thử nghiệm trên exp-app.
+**Không thuộc task (mục "Mở rộng sang máy 84"):** bật quan sát cho máy 84. Bị chặn bởi RAM của cụm và việc triển khai Collector qua CD của nhóm.
 
-Task không cho kết luận nào về chất lượng RCA trên bản chạy thật.
+Task không đánh giá phương pháp RCA, không đổi phương pháp. Một lần demo chạy đúng chỉ chứng minh đường tích hợp; không cho kết luận về tỷ lệ báo động giả, độ nhạy hay độ đúng vùng (thuộc W7 hoặc đánh giá đã khai riêng).
 
-## Hiện trạng đã kiểm (26/11/2026, chỉ đọc)
+## Hiện trạng đã kiểm (26–27/11/2026, chỉ đọc trừ phần ghi rõ)
 
 | Điều | Thực tế | Nguồn |
 |---|---|---|
-| Repo FlashTicket trên laptop | Nhánh `rca/exp-2026-11` @`36a3725` = main `640dbaf` (18/11) + PR #17 `bb84d64` | `git log` |
-| Main trên GitHub | `f178870` (22/11), hơn `640dbaf` **52 commit / 171 file** (chủ yếu assistant, frontend) | `gh api compare` |
-| PR #17 (`rca/quan-sat-log`) | OPEN, CONFLICTING; đi trước main 10 commit, **tụt 92**; sửa 124 file (+5.028/−214) | `gh pr view 17`; `git diff --stat` |
-| Xung đột với main | 13 file: 7 Dockerfile; `OrderServiceImpl`, `PromotionServiceImpl`, `RefundServiceImpl`; `payment-service/.env.example`; `deploy/app/{README.md,payment-service.yml}` | `git merge-tree --write-tree origin/main origin/rca/quan-sat-log` |
-| Triển khai trên main | 10/10 service `runtime: k8s` (`.github/services.json`); Compose chỉ còn là đường dự phòng. CD (`cd.yml`, `_deploy-service.yml`) chạy khi push vào `main`: build image, SSH vào máy 84 rồi triển khai. Cấu hình ở `deploy/k8s/<svc>/configmap.yaml`, bí mật ở GitHub Secrets `ENV_<SVC>` | main `f178870` |
-| Agent trên main | **Không có.** Dockerfile chỉ có `JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=50.0 -Duser.timezone=UTC"` | `services/booking-service/Dockerfile` @main |
-| Agent trong PR #17 | Agent 2.33.1 (tải theo checksum) và `docker-entrypoint.sh`, mặc định `OTEL_AGENT_ENABLED=false`. Khi bật thì **`OTEL_LOGS_EXPORTER=none`**: agent gửi trace, metric, **không gửi log** | `docker-entrypoint.sh` @`bb84d64` |
-| Thu log trên exp-app | Collector agent đọc file log Docker (filelog) → gateway → Loki. Máy 84 không có thành phần tương tự | lab `observability/collector/agent-docker-host.yaml` |
-| PR #17 chưa có | `deploy/k8s` (agent không bật được trên 84); `assistant-service` (service Java mới trên main) | `git diff` |
-| Máy quan sát | Gateway OTLP chỉ nghe `10.0.0.215:4317/4318` (IP nội bộ Oracle); iptables chỉ nhận `10.0.0.0/24` và SSH. Máy 84 dùng hạ tầng dải `172.31.x` (AWS), nên dữ liệu đi qua Internet giữa hai nhà cung cấp | lab `gateway.yaml`; `results/T-070/kiem-ke/` |
-| RCA đọc dữ liệu | Bước chụp dữ liệu (`stage_m1.py`, `stage_b.py`) đọc **file ghi vòng của gateway** (`/srv/flashticket-rca/collector/capture`), không lọc theo môi trường. Luật cảnh báo lọc theo `service_name`, không theo môi trường | lab `rca/lib/stage_m1.py`, `alerting/rules.yaml` |
+| Main, PR | `origin/main` `f178870`; PR #17 `bb84d64` OPEN, CONFLICTING, 124 file, 13 xung đột | `git`, `gh` (LOG phiên 4) |
+| Bảng file PR | Giữ 93 / sửa 17 / bỏ 14; Minh duyệt 26/11. Phần thêm khi dựng (K8s) ghi theo bản 3, bản 5 đổi (chênh ghi ở bước 3) | `results/T-076/bang-file-pr17.md` |
+| Nhánh dựng lại | Local `rca/quan-sat-log-dung-lai` (worktree `D:/Project/ft-pr17-dung-lai`), 6 commit trên `f178870`, chưa push. Commit cuối `ae5a870` theo bản 3 | LOG phiên 4 |
+| Kiểm cục bộ bản 3 | 8/8 `verify`, 7/7 kiểm B16 đạt; Event `-P rca-test` đạt; **Booking `-P rca-test` 67 error** (3 lớp `@WebMvcTest` thiếu bean `RcaFaults`; có từ `bb84d64`) | `results/T-076/kiem-cuc-bo/README.md` |
+| Agent gửi gì (Collector thử không processor) | Lộ query (`url.query`, exemplar metric); không lộ header Authorization/Cookie, body, client secret; SQL đã sanitize; event `exception` có `exception.message` và `exception.stacktrace` (12/12 message khác rỗng nằm cả trong stacktrace, đếm của Codex REVIEW-3 R6) | như trên, §3 |
+| Thứ tự biến môi trường trong pod | `envFrom`: ConfigMap rồi Secret (Secret thắng khi trùng khóa); `env:` thắng cả hai (quy tắc K8s). CD đưa vào Secret mọi khóa có tên trong file mẫu và có giá trị trong `ENV_<SVC>`; giá trị hiện có của `ENV_<SVC>` không ai đọc được | `deployment.yaml:59–63`, `deploy-k8s-service.sh:198–221` @main |
+| Biến tác động khi agent tắt | `SPRING_AUTOCONFIGURE_EXCLUDE` do Spring đọc (đổi hành vi app). Các biến `OTEL_*` chỉ agent đọc: không service nào có starter OpenTelemetry/Micrometer tracing của Spring | `grep` `pom.xml` @nhánh |
+| VNPay, tham số query | `vnpay/return`, `vnpay/ipn` là GET có `vnp_*` ở query; cần che `q` và 28 tên `vnp_*` | `PaymentController.java:52,59` @nhánh |
+| Cụm máy 84 | K3s 3 node: `ft84` 7,6 GiB (55%; kèm Postgres, Mongo, RabbitMQ, Redis), `server-1` 1,9 GiB, `server-2` 3,7 GiB (83%, limits 115%). Booking 654/411, Payment 689/368 MiB ở hai bản cùng service; nhóm đang triển khai lúc đo | SSH chỉ đọc 27/11 (LOG phiên 4) |
+| CD của nhóm | Chỉ build `maven`/`node`, triển khai tuần tự từng service. Trạng thái mỗi service ở `<app_root>/state/k8s/<svc>/`: `current`, `previous`, mỗi revision có `image` (và `secret-env.json` — không đọc). `rollback` chỉ về `previous` và digest phải khớp `image` của nó; `previous` đổi sau mỗi lần triển khai thành công; service chưa có revision trước thì CD không quay lại được (chỉ in hướng dẫn) | `_deploy-service.yml:134–136`, `deploy-k8s-service.sh:13,24,170–175,261–271,285–295` @nhánh |
+| exp-app | Bản ghim `36a3725d` (T-067): Payment image `arm64-t067-36a3725d`, Keycloak ghim riêng `arm64-776d9c9e`, Collector theo lab. Dựng từ `deploy/app/<svc>.yml` của nhóm + file phủ lab. Main bỏ service ngrok trong `payment-service.yml`; file phủ lab và `hieu_luc.py` vẫn khai ngrok | REVIEW-3 R5, R7; lab `test-environment/` |
+| Sự kiện tải | Hết hạn bán 02/12/2026 22:16Z | `results/T-070/don/KE-HOACH-DON.md` §2 |
+| Tuyến vận hành trên lab `c1da15f` | Bộ chuỗi tải và RCA trực tuyến chưa dùng lại: chờ Codex kiểm bản sửa (T-070, chưa có `REVIEW-5.md`). Q4 của T-070 chạy thẳng `tai_linux.py start` từ obs (ghi nhật ký/trạng thái obs, làm mới token, có thể khôi phục mock/đường hầm, ghi đầu ra trên máy tải). Trên obs: bộ nhận `t072-bo-nhan` chạy, `t073-webhook` không chạy; integration T-073 đã gỡ. G1 trực tuyến ghi `rca/results/online-<lượt>`; dashboard hiện đọc `public/rca/dev`; `build_dashboards.py` sinh được bản đọc nguồn `online-*`. Runbook hoàn tác E5 (`results/T-073/trien-khai-e5.md` §5) dùng đường và checkout trước đợt dọn (`/opt/rca-lab`, `1bb40ca`, `t065-l11-001`) — không dùng lại nguyên | LOG T-070, `docker ps` obs (REVIEW-3 R3, REVIEW-4 R2) |
+| Obs | CA và chứng chỉ máy nhận đã tạo 27/11 (root 600); script `observability/tls/tao-chung-chi.sh` và `ca.crt` ở lab (chưa commit) | LOG phiên 4 |
 
 ## Câu hỏi, bằng chứng và quyết định
 
-| Câu hỏi | Lựa chọn và giải thích khác | Phép kiểm, bằng chứng | Phần còn mở |
+| Câu hỏi | Lựa chọn | Phép kiểm | Còn mở |
 |---|---|---|---|
-| **C1.** Phần nào của PR #17 còn cần, phần nào lỗi thời so với main K8s? | Giữ: log B16, kiểm log trong CI, agent và entrypoint, hook `rca-test`. Xét từng file: sửa Compose (`deploy/app/*`, `.env.example`, `docker-compose.postgresql.yml`, `deploy/postgres`), sửa CI/CD thời Compose, build đa kiến trúc, `decision-register.md` | Bước 1: bảng từng file (giữ / bỏ / sửa), mỗi dòng có lý do và đối chiếu main. Minh duyệt bảng | Có thể có phần exp-app còn dùng: đối chiếu với file phủ ở lab `test-environment/overrides` |
-| **C2.** Lấy log của máy 84 thế nào? (Q1) | (a) Thêm biến cho entrypoint: `OTEL_LOGS_EXPORTER=otlp` khi bật trên K8s, giữ `none` trên exp-app để không thu trùng. (b) Collector dạng DaemonSet trên K3s đọc log pod. (c) Chỉ lấy trace và metric | (a): log tới Loki đủ 13 trường B16, có `traceId`/`spanId`. **Chưa kiểm**: bản ghi log OTLP có giữ trường `outcome` và cấu trúc như log JSON không | Ảnh hưởng việc chạy H8 (kênh log) trên dữ liệu máy 84 về sau |
-| **C3.** Bảo mật đường gửi từ máy 84 tới máy quan sát (Q4) | (a) TLS với CA tự ký (CA công khai để trong repo) + token bearer trên gateway, cổng riêng, chỉ mở cho IP máy 84. (b) TLS bằng chứng chỉ Let's Encrypt (cần tên miền). (c) Chỉ chặn theo IP, không TLS | Gửi thử từ ngoài: có token đạt, sai token bị từ chối, không TLS bị từ chối. iptables và Security List chỉ mở cho IP máy 84 | Cần IP ra Internet của máy 84 (Minh cung cấp hoặc đọc qua CD) |
-| **C4.** Dữ liệu máy 84 có làm bẩn thực nghiệm RCA trên exp-app không? | Phải tách: (i) bước chụp dữ liệu chỉ lấy `deployment.environment` của exp-app; (ii) luật cảnh báo và dashboard thực nghiệm lọc theo môi trường | Trên một cửa sổ có cả hai nguồn: gói ca chỉ có span của exp-app; luật cảnh báo không cháy vì dữ liệu máy 84; hồi quy V082 hai ca vẫn trùng byte | Nhãn môi trường hiện tại của exp-app: đọc ở bước 0 |
-| **C5.** Agent có làm hỏng hệ thống chạy thật không? | Agent tốn thêm bộ nhớ; giới hạn K8s hiện ví dụ booking 768 MiB. Thêm nữa: log đổi sang JSON, 39 file nghiệp vụ được chèn lệnh ghi log | Sau khi triển khai: pod Ready, 0 OOM, 0 restart trong một khoảng theo dõi khai trước; p95 của gateway không xấu đi quá ngưỡng khai trước. Đọc từng dòng 39 file nghiệp vụ | Mức tăng bộ nhớ thật trên K8s: đo sau triển khai |
-| **C6.** `assistant-service` (Q2) | (a) Chỉ thêm agent vào Dockerfile. (b) Agent + log B16. (c) Không đụng | (a): có trace của assistant trong Tempo | Log B16 cho assistant: để sau nếu Minh cần |
+| **C1.** PR #17 giữ gì | Theo bảng đã duyệt; phần K8s theo C2 (chênh ghi ở bước 3) | Đã có | — |
+| **C2.** Cấu hình trong PR để agent tắt chắc chắn và sau này chỉ cần thêm | **Tắt cứng:** `OTEL_AGENT_ENABLED: "false"` trong `env:` của 7 `deployment.yaml` (thắng mọi giá trị từ ConfigMap/Secret), cạnh `HOST_ID` = `spec.nodeName`. **File mẫu Secret không đổi so với main** (không thêm khóa OTEL). **ConfigMap 7 service:** `ENVIRONMENT=production` (entrypoint ghi vào log); các biến chỉ agent đọc: `OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318` (Service trong cụm, thêm ở giai đoạn sau), `http/protobuf`, lấy mẫu 10%, metric `otlp`, log `none`, `OTEL_METRICS_EXEMPLAR_FILTER=always_off`, khóa log `traceId`/`spanId`, `…SENSITIVE_QUERY_PARAMETERS` = `q` + 28 tên `vnp_*`, thuộc tính RabbitMQ (event, booking, payment, ticket). **Bỏ:** `SPRING_AUTOCONFIGURE_EXCLUDE` (chuyển sang giai đoạn sau, áp cùng lúc bật agent), `OTEL_CA_PEM_B64`, khối CA trong entrypoint | Bước 4: (a) Collector thử tên `otel-collector`, không TLS, không processor: agent bật (ghi đè thủ công trong lượt thử) gửi được, tham số trong danh sách thành `REDACTED`, không có exemplar; (b) agent tắt: log không có dòng khởi động agent, Collector không nhận gì; (c) render manifest: `env` của container có `OTEL_AGENT_ENABLED=false` | Thứ tự `env` > `envFrom` là quy tắc K8s, không mô phỏng được trên laptop; kiểm thật ở bước 7 |
+| **C3.** Lỗi Booking `-P rca-test` (Q1) | Sửa trong `src/rca-test`: `RcaFaultsWebConfig` bỏ qua đăng ký khi không có bean `RcaFaults` (chỉ xảy ra trong test slice). Lỗi này chặn `build.sh verify|all` của exp-app (có `set -e`); mode `build` (`-DskipTests`) không bị | `-P rca-test verify` Booking 0 error; jar production không có lớp `rca-test`; trên exp-app (bước 9): hook Booking nhận lệnh từ file điều khiển như T-067 | — |
+| **C4.** Merge có ảnh hưởng máy 84 không? (Q7, Q8, Q10) | Agent tắt cứng; `SPRING_AUTOCONFIGURE_EXCLUDE` không áp ở Phần A. Code B16 **vẫn chạy thật** khi agent tắt: log JSON, filter correlation (gateway, booking), bọc listener RabbitMQ (`RabbitTelemetry`), bỏ `@Valid` trùng ở 6 DTO; đã qua `verify` và kiểm B16, phần ngữ nghĩa (outcome, MDC, ACK) đánh giá ở lượt soát PR bước 5. **Trước merge (bước 6):** đọc chỉ-đọc trạng thái CD của từng service trong plan CD của diff sắp merge (`current`, `previous`, `image`; không đọc `secret-env.json`); service không có đích quay lại thì báo Minh trước khi merge; hẹn nhóm không triển khai trong 60 phút theo dõi; nền bộ nhớ ≤ 30 phút trước merge và GET Q8. **Quay lại:** CD `rollback` khi `previous` còn đúng đích (đối chiếu lại lúc cần); không còn thì PR revert khẩn cấp (Q10). Người bấm: Minh | Bước 7, 60 phút: pod Ready, 0 OOM/restart do bản mới; log không có dòng khởi động agent; log có `environment=production`, `hostId` = tên node; bộ nhớ so Q7; GET Q8 đạt như trước. **Dừng và quay lại** khi pod crash/OOM hoặc GET Q8 trượt mà trước merge đạt. **Báo và trình** khi bộ nhớ vượt Q7 hoặc thiếu mẫu | Kết luận giới hạn ở rollout, tài nguyên và vài request công khai quan sát được; không suy ra đã kiểm toàn bộ giao dịch hay p95 dưới tải |
+| **C5.** Dựng exp-app bản mới cho demo (Q5) | Chỉ cho demo. Ghi bản ghim demo: commit, digest image, cấu hình Compose hiệu lực, thành phần giữ nguyên (Keycloak `776d9c9e`, Collector lab, hạ tầng), đích hoàn tác. Chọn bản nào cho W7 để khi Minh mở lại W6/W7 (đối chiếu ngưỡng, fixture, luật, collector, nguồn đầu dò). Kết quả E2/E4, Q4, T-069, T-073 giữ theo pin gốc | Bước 9: kiểm tín hiệu như Q4 T-070; hồi quy V082 hai ca dev (chỉ chứng minh lõi lặp lại trên dữ liệu cũ) | Bản mới có thể khác p95 so với ngưỡng T-072: phát hiện ở lượt nền bước 10 |
+| **C6.** Demo đạt nghĩa là gì? (Q6) | Dùng lại tiêu chí chức năng đã khóa của E5 (`results/T-073/khai-truoc-e5.json#/tieu_chi/ket_qua_chuc_nang`, `#/N`, `#/ca_nghiem_thu`). Kịch bản: tải k6 ×1 hành trình mua vé chạy liên tục ≥ 600 s → tiêm `PAUSE-PAYMENT` `--seconds 600` (Docker, không cần hook Booking) → cảnh báo → RCA trực tuyến (W5) → dashboard. **Điều kiện trước khi tiêm:** mọi luật ở trạng thái bình thường, cảnh báo lớp quan sát (mất mẫu) đã hết, và **không có sự cố lớp `he-thong` nào đang mở** trong bộ điều phối (để ca mới không bị gom vào ca cũ, `incidents.py:138–144,183–207`). **Đạt khi:** có sự cố lớp `he-thong` với t̂ ∈ [mốc tiêm, mốc tiêm + 600 s); `che_do_b.kiem_t.t_loi_bang_t_hat = true`; V082 `trung_sha = true`; **mở được** trang ca của chính sự cố đó trên Grafana trong N = 25 phút từ t̂, có đồ thị con và danh sách hạng. **Bỏ sót** (không có sự cố trong cửa sổ) và **quá N** ghi đúng tên như E5. Thiếu phủ đầu vào V082 báo riêng theo WHY-111, không tính là hỏng tuyến khi chức năng đạt. Sổ tiêm chỉ đọc sau lượt. Cảnh báo lớp quan sát ghi riêng. Frontend: không | Bước 10 | Luật im vì thiếu mẫu: kiểm đường thu hoặc kéo dài nền trong thời lượng đã khai; nền khỏe đủ mẫu vẫn cháy: trình T-072 xét ngưỡng cho demo. Một ca đạt chỉ chứng minh đường tích hợp trên bản mới. Phương án trình bày dự phòng: phát lại offline ca E5 (ghi rõ là phát lại) |
 
 ## Đầu vào
 
-- Repo FlashTicket `D:/Project/flash-ticket-platform`: `origin/main` @`f178870`, `origin/rca/quan-sat-log` @`bb84d64`, `origin/rca/exp-2026-11` @`36a3725`.
-- Repo lab `D:/Project/flashticket-rca-lab` @`85ace52`.
-- Chuẩn B16: `docs/architecture/B16-observability-baseline.md` (repo FlashTicket).
-- Kết quả T-067 (bản ghim, kiểm tín hiệu), T-070 (đợt dọn, Q4), T-072 (luật cảnh báo).
-- Đọc máy bằng `results/T-070/kiem-ke/tho/lenh/ssh.sh`, chỉ lệnh đọc, trừ các bước ghi đã duyệt ở dưới.
-- **Không** đọc dữ liệu khóa. **Không** vào máy 84 bằng tay; mọi thay đổi trên máy 84 đi qua CD của nhóm.
+- Repo FlashTicket `D:/Project/flash-ticket-platform` và worktree `D:/Project/ft-pr17-dung-lai`; chốt `origin/main` và đầu `origin/rca/quan-sat-log` lúc push.
+- Repo lab `D:/Project/flashticket-rca-lab` @ main hiện tại (`c1da15f`); đổi file lab thì ghi commit mới và xét lại bước phụ thuộc.
+- Chuẩn B16; kết quả T-067, T-069, T-070 (Q4), T-072, T-073 (`khai-truoc-e5.json`); `results/T-076/`.
+- Đọc máy: `results/T-070/kiem-ke/tho/lenh/ssh.sh` (exp-app, obs, máy tải); máy 84 chỉ đọc bằng `plink` như LOG phiên 4.
+- Không đọc dữ liệu khóa. Không sửa gì trên máy 84.
 
 ## Đầu ra
 
-- **PR #17 làm lại** trên `main` mới nhất: nhánh `rca/quan-sat-log` được dựng lại và đẩy đè (force-push), PR cũ tự cập nhật. Mô tả PR ghi phần giữ, phần bỏ và lý do, cách bật agent, cách hoàn tác.
-- `results/T-076/bang-file-pr17.md`: bảng giữ / bỏ / sửa từng file của PR (C1).
-- `results/T-076/kiem-cuc-bo/`: kết quả build và test cục bộ (CI tương đương), kiểm entrypoint, render manifest K8s.
-- **Commit repo lab:** cổng OTLP có TLS và token trên gateway; tách dữ liệu theo môi trường cho bước chụp dữ liệu, luật cảnh báo và dashboard (C4); script tường lửa; tài liệu.
-- `results/T-076/kiem-sau-trien-khai/`: kiểm theo C3, C4, C5 sau khi merge.
-- (Pha 4, nếu Minh duyệt riêng) `results/T-076/ban-ghim-moi/`: bản ghim thử nghiệm mới trên exp-app.
+- **PR #17 làm lại** (một PR): `rca/quan-sat-log` đẩy đè bằng `--force-with-lease` khớp đầu nhánh đã soát. Mô tả PR có bảng giữ/bỏ, nói rõ agent tắt cứng, cách mở rộng sau.
+- `results/T-076/bang-file-pr17.md` thêm mục "Chênh bản 5" (không sửa số và bằng chứng bản 3).
+- `results/T-076/kiem-cuc-bo/` thêm lượt bản 5.
+- `results/T-076/sau-merge/`: nền trước merge, digest, kiểm C4 trong 60 phút (chỉ đọc máy 84, cộng request Q8).
+- `results/T-076/exp-app/`: kiểm trước, build, cấu hình hiệu lực, triển khai, kiểm tín hiệu, hồi quy V082, lượt nền, diễn tập, `demo.md` (lệnh chạy demo).
+- `results/T-076/mo-rong-may-84.md`: việc thêm khi chuyển sang quan sát máy 84.
 
 ## Phạm vi ghi
 
 Ngoài `LOG.md` của task và dòng T-076 trong `docs/STATE.md`:
 - `results/T-076/`.
-- **Repo FlashTicket:** chỉ nhánh `rca/quan-sat-log` (PR #17), kể cả force-push nhánh này. **Không** đẩy vào `main`, không đụng nhánh khác. Merge PR là việc của Minh.
-  - Cần thêm ngoại lệ vào `AGENTS.md` §12. Đề xuất chữ: "Riêng nhánh `rca/quan-sat-log` (PR #17) được sửa khi Minh duyệt; không đẩy thẳng vào `main`."
-  - Minh duyệt chữ cùng lúc duyệt SPEC.
-- **Repo lab:** `observability/collector/gateway.yaml`, `observability/compose.yaml`, `observability/grafana/provisioning/alerting/rules.yaml`, `observability/grafana/dashboards/*`, `observability/grafana/build_dashboards.py`, `rca/lib/stage_m1.py`, `rca/online/stage_b.py` (chỉ phần lọc môi trường), thư mục mới `observability/tls/` (CA công khai, script tạo chứng chỉ; **không** đưa khóa riêng vào git), `inventory/`, `docs/`.
-  - Thay đổi ở `stage_m1.py` và `stage_b.py` chạm đường dữ liệu vào phương pháp. Phải qua phép kiểm C4 (hồi quy, gói ca) trước khi dùng.
-- **Máy obs:** chỉ bộ quan sát (compose, iptables), theo bước 5 đã duyệt; chứng chỉ và token để ở `/etc/flashticket-rca/`.
-- **GitHub Secrets** của repo FlashTicket: thêm token OTLP vào `ENV_<SVC>` bằng `gh secret set`, có Minh duyệt riêng lúc làm.
-- **Ngoài quyền của agent, Minh tự làm:** Security List trên Oracle, merge PR, báo nhóm hệ thống.
+- **Repo FlashTicket:** chỉ nhánh `rca/quan-sat-log` (ngoại lệ `AGENTS.md` §12 đã ghi); nhánh local tạm và worktree của nó. Commit `ae5a870` (chưa push) được thay bằng commit theo bản 5.
+- **Repo lab:** `observability/tls/` (đã có); `test-environment/` khi bản mới cần (file phủ, xử lý ngrok, `build.sh`, `deploy.sh`) — trình diff trước khi dùng. Không sửa `rca/`, `observability/collector/`, `observability/prometheus/`, luật cảnh báo.
+- **exp-app (Phần B, Minh duyệt từng lần dừng/đổi service):** worktree build mới dưới `/opt/flashticket/build/`; cấu hình hiệu lực ghi vào thư mục mới (không ghi đè bộ đang dùng); image mới; triển khai bằng `deploy.sh`; dấu vết tiêm/gỡ lỗi; đổi ngày bán sự kiện tải nếu Q9 cần. Giữ image, cấu hình cũ để hoàn tác.
+- **Máy tải (Phần B):** lượt k6 (Q4 bước 9, nền và lượt demo bước 10); đầu ra lượt theo `tai_linux.py`.
+- **Obs (Phần B, bước 9):** chạy thẳng `tai_linux.py start` như Q4 T-070 (không dùng `chuoi_tai`): nhật ký và trạng thái ở `/srv/flashticket-rca/load/`, làm mới token pool, khôi phục mock VNPay/đường hầm nếu xảy ra, nhận đầu ra; chạy bộ kiểm tín hiệu (đọc).
+- **Obs (Phần B, bước 10, theo runbook `results/T-076/exp-app/runbook-online.md` Minh duyệt trước):** bật bộ nhận T-073 (spool, container), thêm integration vào contact point hiện có qua API Grafana (lưu JSON trước/sau), bộ điều phối RCA trực tuyến ghi `rca/results/online-<lượt>`, sinh dashboard đọc nguồn đó bằng `build_dashboards.py` (sao lưu dashboard hiện tại). Hoàn tác: trả dashboard về `dev`, gỡ integration, dừng bộ nhận T-073. Giữ `t072-bo-nhan` và luật. Không checkout lại bản lab cũ.
+- **exp-app (Phần B):** cũng gồm đơn mua phát sinh trong DB thử do lượt k6 (không hoàn tác được bằng đổi image).
+- **Máy 84:** không ghi gì; chỉ đọc (pod, bộ nhớ, log, trạng thái CD `current`/`previous`/`image`) và request Q8.
+- **Ngoài quyền agent, Minh làm:** merge PR, bấm `rollback` nếu cần, báo nhóm hệ thống.
 
 ## Các bước
 
-**Pha 1: PR (chưa đụng máy)**
-1. **Kiểm kê C1** — bảng từng file của PR so với main `f178870` và với file phủ ở lab. Minh duyệt bảng. Kiểm bằng: mỗi file "bỏ" có lý do; mỗi file "giữ" còn cần trên main.
-2. **Dựng lại nhánh.** Tạo nhánh tạm từ `origin/main`, áp phần giữ thành vài commit theo chủ đề (log B16, CI kiểm log, agent và entrypoint, hook `rca-test`, K8s, assistant). Gỡ 13 xung đột theo code mới của main; với 3 file Java, giữ logic nghiệp vụ của main, chỉ chèn lệnh ghi log. Kiểm bằng: `git diff origin/main` chỉ gồm các nhóm trên.
-3. **Thêm K8s.** Trong `deploy/k8s/<svc>/configmap.yaml` của các service Java: `OTEL_AGENT_ENABLED`, `ENVIRONMENT=production`, `HOST_ID`, `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_CERTIFICATE`, biến log theo Q1. Trong deployment: mount CA công khai. Token để ở secret `ENV_<SVC>`. Kiểm bằng: script kiểm K8s có sẵn của nhóm (`.github/scripts/test-k8s-*.py`), render manifest.
-4. **Kiểm cục bộ:**
-   - `mvnw verify` các service bị đổi, kể cả bước kiểm log B16, `-P rca-test` cho Booking và Event;
-   - build image amd64 một service;
-   - chạy entrypoint với agent bật và tắt.
+**Phần A — PR #17**
+1. ✔ Bảng file (Minh duyệt 26/11).
+2. ✔ Dựng lại nhánh (5 commit: log B16, `rca-test`, CI, agent, GOV).
+3. **K8s theo C2:** thay commit `ae5a870` bằng commit mới; ghi "Chênh bản 5" vào bảng file. Kiểm bằng bộ kiểm K8s của nhóm (`test-k8s-*.py`).
+4. **Sửa lỗi `rca-test` (C3)** và **kiểm cục bộ lại** bằng script đã có (lượt mới dùng Collector HTTP tên `otel-collector`, bỏ phần TLS/token của lượt bản 3): đủ phép kiểm C2, C3.
+5. Push có lease; CI GitHub; Codex soát PR (khối Soát kết quả); Minh đọc theo hướng dẫn review (44 file Java ngoài test).
+6. Trước merge (C4): đọc trạng thái CD từng service trong plan CD; hẹn nhóm không triển khai trong 60 phút; nền bộ nhớ và GET Q8. Ghi `results/T-076/sau-merge/truoc.md`. Service không có đích quay lại: báo Minh, Minh quyết merge hay dời. Minh merge vào giờ chọn với nhóm. CD tự triển khai.
+7. **Sau merge (C4)**, 60 phút, ghi `results/T-076/sau-merge/`.
 
-   Kết quả vào `results/T-076/kiem-cuc-bo/`.
+**Phần B — exp-app cho demo** (sau bước 7)
 
-   **Sau đó:** force-push `rca/quan-sat-log`, CI trên GitHub chạy. **Chưa merge.**
-5. **Phản biện.** Codex soát PR theo prompt (khối Soát kết quả). Minh đọc theo hướng dẫn review (danh sách chỗ cần đọc kỹ, gồm 39 file nghiệp vụ).
+8. **Kiểm trước, không đổi gì đang chạy:** diff `deploy/app/*.yml` main mới với `36a3725d`; xử lý ngrok trong file phủ lab; dựng cấu hình hiệu lực bằng `hieu_luc.py` vào thư mục mới và so với bộ đang dùng; tag image cũ còn tồn tại; nơi đặt mock VNPay; schema/realm/fixture bản mới có cần đổi dữ liệu không (đổi thì trình riêng quyền và thời gian); ngày bán sự kiện tải so với lịch demo (Q9); mode `build.sh` dùng; dự toán thời gian build (dựa trên lượt build ARM của T-067) và thời gian dừng; các bước hoàn tác và giới hạn (hoàn tác image không hoàn tác đơn mua đã ghi vào DB thử). Trình Minh.
+9. Build ARM trên exp-app từ commit merge, triển khai (`deploy.sh`), kiểm tín hiệu như Q4 T-070 (lượt `tai_linux.py start` 10 phút ×1, đơn COMPLETED, bộ kiểm tín hiệu), hồi quy V082 hai ca dev, hook Booking/Event nhận lệnh như T-067. Ghi bản ghim demo (C5).
+10. **Diễn tập demo** theo C6. Điều kiện bắt đầu: T-070 `REVIEW-5` đã kiểm bản sửa lab và Minh kết luận về RCA trực tuyến; Minh duyệt `runbook-online.md` (áp và hoàn tác trên `c1da15f`, thời lượng nền ≥ 600 s, tiêm 600 s, chờ kết quả tới N = 25 phút, tổng ≤ 1 giờ). Trước khi tiêm kiểm hai đường: Grafana → spool của bộ nhận, và dashboard đọc đúng bộ `online-<lượt>`. Ghi mốc thời gian, `results/T-076/exp-app/demo.md`. Xong: hoàn tác theo runbook nếu Minh không muốn giữ.
 
-**Pha 2: máy quan sát sẵn sàng (trước khi merge)**
+## Mở rộng sang máy 84 (giai đoạn sau, không làm trong task)
 
-6. **Gateway nhận từ ngoài.** Thêm cổng OTLP có TLS và token bearer, chỉ cho IP máy 84. Cổng nội bộ cũ giữ nguyên để không đổi đường thu của exp-app (bất biến B7 ở T-070). iptables qua script trong lab. Minh mở Security List. Kiểm bằng: gửi span thử từ ngoài (từ máy tải) với token đúng, token sai, không TLS.
-7. **Tách môi trường (C4):**
-   - bước chụp dữ liệu và luật cảnh báo chỉ lấy dữ liệu của exp-app;
-   - dashboard có biến chọn môi trường.
+Phần A được thiết kế để giai đoạn này **chỉ thêm**, cùng vài sửa nhỏ đã biết trước:
 
-   Kiểm bằng:
-   - hồi quy V082 trên 2 ca trùng byte như T-070;
-   - phát lại một ca dev trùng;
-   - gửi span thử gắn nhãn `production`: không vào file chụp, không làm luật nào cháy.
+| Việc | Ở đâu |
+|---|---|
+| **Thêm** Collector 1 pod (Deployment, Service `otel-collector`, ConfigMap): nhận OTLP trong cụm, lọc như exp-app (`filter/health`, `transform/sanitize` xóa query) và thêm xóa `exception.message`, lọc hoặc bỏ `exception.stacktrace`; nén; gửi obs qua TLS + token; hàng đợi gửi lại; không ghi dữ liệu thô ra file | FlashTicket `deploy/k8s/otel-collector/` (mới) |
+| **Thêm** đường CD cho image dựng sẵn: `.github/services.json`, nhánh "image" trong `_deploy-service.yml`, tên Collector và quy tắc kiểm (không Eureka) trong `deploy-k8s-service.sh`, bộ kiểm CD | FlashTicket `.github/`, `deploy/scripts/` (nhóm duyệt) |
+| **Thêm** Secret token của Collector | File mẫu mới trong `deploy/k8s/examples/` |
+| **Thêm** đường nhận trên obs: Collector + Prometheus riêng, datasource và dashboard chạy thật, truy vấn Tempo thực nghiệm lọc `exp`, tường lửa cho IP máy 84 | Lab `observability/` (file mới); CA đã có |
+| **Thêm** `SPRING_AUTOCONFIGURE_EXCLUDE` (Lettuce observation) ở gateway, booking, assistant | ConfigMap của các service đó |
+| **Sửa nhỏ** `OTEL_AGENT_ENABLED: "false"` → `"true"` cho service bật | `deployment.yaml` của service đó |
+| **Sửa nhỏ** giới hạn bộ nhớ của service bật agent | `deployment.yaml` (nhóm quyết RAM cụm) |
 
-**Pha 3: bật trên máy 84**
-
-8. **Lưu token** vào `ENV_<SVC>` (Minh duyệt lúc làm). Báo nhóm hệ thống. Minh merge PR vào giờ đã chọn. CD tự triển khai.
-9. **Kiểm sau triển khai (C5):**
-   - pod Ready, 0 OOM, 0 restart trong 1 giờ;
-   - Tempo có trace, Prometheus có metric của `deployment.environment=production`, Loki có log nếu theo Q1(a);
-   - exp-app và RCA không bị ảnh hưởng (như bước 7).
-
-   **Hoàn tác** nếu hỏng: đặt `OTEL_AGENT_ENABLED: 'false'` qua PR, hoặc rollback digest qua CD (`cd.yml` có `rollback`).
-
-**Pha 4 (tùy chọn, Minh duyệt riêng): bản ghim thử nghiệm mới trên exp-app**
-
-10. Build "main mới nhất + PR #17 mới" trên exp-app, triển khai bằng `deploy.sh`, kiểm tín hiệu như Q4 của T-070, ghi bản ghim mới. Đổi bản là đổi hệ thống được đo: kết quả RCA trước và sau không so thẳng với nhau.
+**Điều kiện trước khi bật (OPEN):** kiểm payload thô bằng bộ sentinel giả ở nguồn và ở bản ghi đầu tiên gửi ra ngoài, gồm span event; Minh quyết Collector trong cụm có được coi là biên lọc của B16 §6 ("whitelist trước khi ghi/xuất") hay phải lọc trước khi rời tiến trình Java (khi đó cần hạn chế instrumentation hoặc lọc trong Java); số đo bộ nhớ thật dưới tải của từng service (+118 MiB chỉ là số Booking trên laptop, không dùng làm dự báo chung); phí AWS cho lượng gửi ra Internet (**chưa kiểm**).
 
 ## Kiểm đúng đắn
 
-- **Không đổi phương pháp:** `src/m1`, `src/m1_ft`, `src/p3` và bản chụp `b0f79a4d…` không đụng. Hồi quy V082 hai ca trùng byte sau mọi thay đổi ở lab (bước 7).
-- **Không đổi đường thu của exp-app:** cấu hình Collector agent không đổi. Cổng nội bộ của gateway không đổi. Kiểm tín hiệu như Q4 sau bước 6–7, và sau pha 4 nếu làm.
-- **Không lọt dữ liệu chạy thật vào gói ca:** phép kiểm span thử gắn nhãn `production` (bước 7).
-- **Không lộ bí mật:** khóa riêng TLS và token không vào git; kiểm bằng `git grep` trước mỗi commit.
-- **Thay đổi trên main của nhóm có đúng nghĩa không:** bảng C1 và diff của 3 file Java xung đột đối chiếu với code mới của main; CI xanh.
+- **Không đổi phương pháp:** `src/m1`, `src/m1_ft`, `src/p3`, bản chụp `b0f79a4d…`, lab `rca/` không đổi. Hồi quy V082 hai ca trùng byte ở bước 9.
+- **Máy 84 không gửi dữ liệu:** tắt cứng bằng `env:`; kiểm bước 4 và bước 7.
+- **Agent tắt và biến Spring không áp:** diff ConfigMap ở bước 3 không có biến Spring mới. Code B16 vẫn chạy thật (C4); ngữ nghĩa đánh giá ở lượt soát PR, vận hành kiểm ở bước 7 trong giới hạn Q8.
+- **Không lộ bí mật:** không có khóa riêng, token trong git (`git grep` trước mỗi commit).
+- **Đúng nghĩa thay đổi trên main:** bảng C1, 3 file Java xung đột qua test, CI xanh.
+- **Thiết kế mở:** mục "Mở rộng" không đòi xóa file nào của Phần A; sửa chỉ ở giá trị công tắc, giới hạn bộ nhớ và thông tin kết nối.
 
 ## Tiêu chí xong
 
-1. PR #17 (một PR duy nhất) nằm trên main mới nhất, không xung đột, CI xanh, đã qua phản biện Codex và Minh đọc. Mô tả PR có bảng giữ / bỏ.
-2. Máy quan sát nhận được dữ liệu từ ngoài qua TLS và token; sai token bị từ chối.
-3. Dữ liệu của máy 84 không vào gói ca RCA và không làm cháy luật cảnh báo của thực nghiệm. Hồi quy V082 trùng byte.
-4. Sau khi Minh merge: máy 84 gửi trace và metric (log theo Q1) về máy quan sát; hệ thống chạy thật không OOM, không restart trong 1 giờ.
-5. Pha 4 chỉ tính vào tiêu chí xong nếu Minh duyệt làm.
+1. PR #17 (một PR) trên main mới nhất, không xung đột, CI xanh, qua phản biện Codex và Minh đọc; Minh merge.
+2. Sau merge: agent không chạy trên máy 84 (log không có dòng khởi động agent), pod ổn định 60 phút và trong ngưỡng theo C4, kiểm chức năng đạt.
+3. exp-app chạy bản demo mới, kiểm tín hiệu đạt như Q4, hồi quy V082 có kết quả; bản ghim demo ghi đủ; bản cũ còn hoàn tác được.
+4. Diễn tập demo đạt theo C6, có `demo.md`.
+5. `mo-rong-may-84.md` liệt kê đủ việc thêm, sửa nhỏ, điều kiện OPEN và số liệu RAM.
 
 ## Không làm
 
-- Không merge PR, không đẩy vào `main`, không vào máy 84 sửa tay.
-- Không đổi phương pháp RCA, không chạy RCA trên dữ liệu máy 84.
-- Không thêm log B16 cho assistant-service, trừ khi Minh chọn Q2(b).
-- Không đụng frontend, keycloak-spi, trừ khi xung đột buộc phải đụng.
+- Không bật agent hay gửi dữ liệu từ máy 84; không sửa CD chung của nhóm.
+- Không đổi phương pháp RCA; không chọn lại ngưỡng cảnh báo (nếu C6 cho thấy cần, trình riêng cho T-072).
+- Không chọn bản FlashTicket cho W7.
+- Không đưa frontend vào exp-app.
 
 ## Chi phí ước lượng
 
-| Pha | Ước lượng |
+| Phần | Ước lượng |
 |---|---|
-| 1 | 1–2 phiên; build Maven trên laptop vài lần (mỗi lần cỡ vài phút tới chục phút, chưa đo) |
-| 2 | 1 phiên; gateway và Grafana trên obs dừng vài phút |
-| 3 | Theo giờ merge Minh chọn; 1 giờ theo dõi |
+| A (bước 3–5) | 1 phiên; kiểm cục bộ khoảng 30 phút máy (lượt bản 3: verify ~16 phút) |
+| A (bước 6–7) | Theo giờ merge; 60 phút theo dõi chỉ đọc |
+| B | 1–2 phiên; build ARM (dự toán ở bước 8 từ lượt T-067); exp-app dừng khoảng 10 phút khi đổi bản (mốc T-070, cập nhật ở bước 8); nền + diễn tập khai thời lượng trước, mỗi lượt ≤ 1 giờ |
 
-Không có lượt chạy dài hơn 1 giờ ngoài việc theo dõi; không tải hơn 5 GB.
+Không lượt nào dài hơn 1 giờ ngoài theo dõi; nếu dự toán bước 8 cho thấy vượt, trình chi phí và cách giữ phần đã xong (AGENTS §3.21). Không tải hơn 5 GB.
 
 ## Rủi ro và điều chưa chắc
 
-- **Merge là triển khai ngay** (CD tự chạy). Lỗi trong PR ảnh hưởng hệ thống thật của nhóm. Giảm rủi ro: CI, phản biện, chọn giờ merge, đường hoàn tác qua CD.
-- **Bộ nhớ (chưa kiểm):** agent có thể đẩy pod vượt giới hạn K8s, ví dụ booking 768 MiB, gây OOM. Kiểm ở bước 9. Nếu cần nâng giới hạn thì là thay đổi trong cùng PR, trình Minh trước.
-- **Log qua OTLP (chưa kiểm):** có giữ đủ trường B16 và `outcome` không (C2). Kiểm ở bước 4 hoặc 6 trước khi chọn Q1(a) làm mặc định.
-- **Dung lượng obs:** lấy mẫu trace 100% từ máy chạy thật làm tăng dữ liệu Tempo và Loki. Đĩa obs hiện dùng 44%. Theo dõi sau bước 9; tỷ lệ lấy mẫu là quyết định của Minh nếu cần.
-- **Thay đổi ở `stage_*.py`** chạm đường dữ liệu vào phương pháp. Bắt buộc hồi quy (bước 7) trước khi dùng cho thực nghiệm.
-- **IP ra Internet của máy 84:** chưa biết. Cần cho tường lửa.
+- **Merge là triển khai ngay** trên máy 84; nhóm đang triển khai liên tục: chọn giờ merge với nhóm. Đường `rollback` hết hiệu lực sau lần triển khai thành công kế tiếp.
+- **Bản mới trên exp-app** có thể khác hành vi so với `36a3725d` (p95, luồng mua vé, dữ liệu): phát hiện ở bước 8–10.
+- **Tuyến vận hành lab** (bộ chuỗi tải, RCA trực tuyến) phụ thuộc kết luận T-070 REVIEW-5.
+- **Hạn bán sự kiện tải** 02/12/2026 22:16Z: demo sau mốc này cần đổi ngày bán (Q9).
+- **Danh sách chặn query** và tắt exemplar chỉ là lớp giảm dữ liệu cho giai đoạn sau.
 
 ## Quyết định cần Minh khi duyệt SPEC
 
+Giữ quyết định đã duyệt ở bản 3: Assistant chỉ agent; build hai kiến trúc của main; ngoại lệ AGENTS §12 (đã ghi). Các mục bản 3 về đường nhận, ngưỡng bật agent, người giữ `ENV_<SVC>`, giới hạn rollback khi bật chuyển sang giai đoạn mở rộng.
+
 | Mã | Câu hỏi | Đề xuất |
 |---|---|---|
-| Q1 | Log của máy 84 | (a) Agent gửi log qua OTLP trên K8s, exp-app giữ như cũ. Kiểm trường B16 trước |
-| Q2 | assistant-service | (a) Chỉ thêm agent |
-| Q3 | Build đa kiến trúc trong PR | Bỏ: CD của main build amd64; exp-app tự build ARM bằng `build.sh` |
-| Q4 | Bảo mật đường gửi | (a) TLS với CA tự ký + token, cổng riêng, chỉ mở cho IP máy 84 |
-| Q5 | Ngoại lệ `AGENTS.md` §12 | Chữ ở mục "Phạm vi ghi" |
-| Q6 | Pha 4 (bản ghim thử nghiệm mới) | Làm sau pha 3, duyệt riêng |
+| Q1 | Sửa lỗi Booking `-P rca-test` trong PR này | Có |
+| Q2 | Đích agent | `http://otel-collector:4318` trong cụm |
+| Q3 | Lớp giảm dữ liệu ở nguồn | `q` + 28 tên `vnp_*`; tắt exemplar |
+| Q4 | Công tắc agent | Tắt cứng bằng `env:` trong `deployment.yaml`; file mẫu Secret không đổi; bỏ CA/token khỏi pod |
+| Q5 | Dựng exp-app cho demo | Sau bước 7; chỉ cho demo; chọn bản W7 để khi mở lại W6/W7 |
+| Q6 | Nội dung demo | Kịch bản và tiêu chí C6, không frontend, có phương án phát lại offline dự phòng |
+| Q7 | Ngưỡng bộ nhớ sau merge | Trung bình mỗi bản của từng service tăng quá 10% so với nền đo ngay trước merge thì **báo và trình** (không tự quay lại); số bản đổi hoặc thiếu mẫu thì báo riêng |
+| Q8 | Kiểm chức năng ngắn trên máy 84 trước và sau merge | Có. Khai trước ở `sau-merge/truoc.md`: 2–3 GET công khai qua `http://52.64.237.84` (danh sách sự kiện; availability một sự kiện lấy từ danh sách), mỗi cái 3 lần; đạt khi HTTP 200 và có các trường chính của JSON như lần trước merge. Không phải kiểm giao dịch đầy đủ |
+| Q9 | Ngày bán sự kiện tải nếu demo sau 02/12/2026 22:16Z | Kiểm ở bước 8, trình cách đổi (ghi DB thử trên exp-app) trước khi làm |
+| Q10 | Đường quay lại khi CD không về được | Minh duyệt trước một PR revert khẩn cấp của commit merge PR #17, chỉ dùng khi sự cố (ngoại lệ có chủ đích với nguyên tắc một PR) |
 
 ## Prompt bàn giao
 
-Prompt cho Codex soát SPEC nằm ở cuối `LOG.md` của task này (phiên 1).
+Prompt cho Codex kiểm lại bản 6 nằm ở cuối `LOG.md` của task này.
