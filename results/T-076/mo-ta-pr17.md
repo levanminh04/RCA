@@ -1,6 +1,6 @@
 # Chuẩn quan sát B16 (log JSON, CI kiểm log, OpenTelemetry Java agent tắt) trên main mới nhất
 
-PR này **làm lại** PR #17 trên `main` `f0a5d30` (28/11/2026). Nhánh `rca/quan-sat-log` được dựng lại từ main và đẩy đè; nội dung cũ `bb84d64` được giữ theo bảng giữ/bỏ bên dưới. Chỉ một PR.
+PR này **làm lại** PR #17 trên `main` `85b5033` (28/11/2026). Nhánh `rca/quan-sat-log` được dựng lại từ main và đẩy đè; nội dung cũ `bb84d64` được giữ theo bảng giữ/bỏ bên dưới. Chỉ một PR.
 
 ## Thay đổi khi chạy thật (máy 84)
 
@@ -23,7 +23,7 @@ PR này **làm lại** PR #17 trên `main` `f0a5d30` (28/11/2026). Nhánh `rca/q
 | Sửa khi áp | 17 | 7 Dockerfile (dựng trên Dockerfile main, chèn agent), 7 entrypoint, 2 file CI (B16 theo danh sách), README quan sát (viết lại theo K8s) |
 | Bỏ | 14 | `deploy/app/*` (Compose dự phòng), tracing Keycloak, chẩn đoán Postgres, `.env.example`/`.gitignore` gốc |
 
-Gỡ 13 xung đột của PR cũ với main `f178870` theo code main, rồi rebase lên `6b77144`: thêm 2 xung đột ở `deploy/k8s/{event,ticket}-service/configmap.yaml` (giữ dòng `SPRING_APPLICATION_JSON` của main, chỉ thêm khối `OTEL_*`); rebase lên `4d57225`: 1 xung đột ở `services/payment-service/.env.example` (giữ khối replica của main và khối `OTEL_*`); rebase lên `f0a5d30` (main tạm một Pod, đổi script CD): không xung đột. Ba file Java: `OrderServiceImpl` (giữ `orderViewAssembler`), `PromotionServiceImpl` (bỏ import `OrderMapper` main đã thay), `RefundServiceImpl` (main bỏ đường VNPay refund; telemetry `refund-result` chuyển vào `sendRefund`).
+Gỡ 13 xung đột của PR cũ với main `f178870` theo code main, rồi rebase lên `6b77144`: thêm 2 xung đột ở `deploy/k8s/{event,ticket}-service/configmap.yaml` (giữ dòng `SPRING_APPLICATION_JSON` của main, chỉ thêm khối `OTEL_*`); rebase lên `4d57225`: 1 xung đột ở `services/payment-service/.env.example` (giữ khối replica của main và khối `OTEL_*`); rebase lên `f0a5d30` (main tạm một Pod, đổi script CD): không xung đột; rebase lên `85b5033` (Payment định tuyến PostgreSQL theo transaction read-only, bỏ cờ reader): 1 xung đột ở `services/payment-service/.env.example` (giữ phần của main, thêm khối `OTEL_*`). Ba file Java: `OrderServiceImpl` (giữ `orderViewAssembler`), `PromotionServiceImpl` (bỏ import `OrderMapper` main đã thay), `RefundServiceImpl` (main bỏ đường VNPay refund; telemetry `refund-result` chuyển vào `sendRefund`).
 
 Thêm: `deploy/k8s/<svc>/configmap.yaml` có khối biến chỉ agent đọc (đích `http://otel-collector:4318` — Collector trong cụm, **chưa có**), `deploy/observability/b16-services.txt`, agent cho `assistant-service` (không log B16), sửa hook `rca-test` của Booking để test slice chạy được với `-P rca-test`.
 
@@ -51,18 +51,19 @@ Chỉ thêm: Collector 1 pod (`deploy/k8s/otel-collector/`, lọc dữ liệu nh
 
 ## Hoàn tác
 
-**Điều kiện trước merge:** nếu Booking, Event, Ticket hoặc Payment đang bật đọc replica, CD từ chối image mới khi thiếu bản writer-only cùng image; nhóm chuyển về writer-only trên bản đang chạy trước khi merge. Điều kiện số Pod của bản nền khác nhau theo service (`deploy-k8s-service.sh` tại đầu PR):
+**Điều kiện trước merge:** nếu Booking, Event hoặc Ticket đang bật đọc replica, CD từ chối image mới khi thiếu bản writer-only cùng image; nhóm chuyển về writer-only trên bản đang chạy trước khi merge. Điều kiện số Pod của bản nền khác nhau theo service (`deploy-k8s-service.sh` tại đầu PR):
 
-- **Booking, Payment:** bản nền cho reader phải là bản 2 Pod (HPA 2/2); bản một Pod chỉ là writer-only tạm.
+- **Booking:** bản nền cho reader phải là bản 2 Pod (HPA 2/2); bản một Pod chỉ là writer-only tạm.
 - **Event, Ticket:** bản writer đòi HPA 1/1, cùng cấu hình và cùng image với bản đích.
+- **Payment** (từ main `85b5033`): không còn cờ reader và `writer-baseline`; đọc replica theo transaction read-only qua `PG_RO_HOST`. CD từ chối Secret còn khóa cũ (`RETIRED_PAYMENT_DB_KEYS`). Payment không cần lịch writer-only khi merge PR này.
 
-Người giữ cấu hình xác nhận cả trạng thái reader **đang chạy** lẫn **định phát** của bốn service; `writer-baseline` có thể còn sau khi đã tắt reader.
+Người giữ cấu hình xác nhận cả trạng thái reader **đang chạy** lẫn **định phát** của ba service này; `writer-baseline` có thể còn sau khi đã tắt reader.
 
 **Đích hoàn tác.** CD `rollback` đọc file `previous` **ghi sau lần phát PR này**, không phải file `previous` đọc trước merge.
 
 - Trước merge: ghi `current` (gọi là C0) của từng service.
 - Sau lần phát, `previous` là:
-  - `writer-baseline` của revision mới, nếu CD ghi file này (Booking, Event, Ticket, Payment khi đang hoặc vừa dùng reader);
+  - `writer-baseline` của revision mới, nếu CD ghi file này (Booking, Event, Ticket khi đang hoặc vừa dùng reader);
   - Discovery: `compatible-previous`, nếu lần phát hoàn tất migration;
   - còn lại: C0.
 - Phát lỗi giữa chừng, CD **thử** khôi phục; kết quả tùy trường hợp:
