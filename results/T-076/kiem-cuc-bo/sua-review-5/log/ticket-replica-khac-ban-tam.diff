@@ -1,0 +1,8 @@
+118c118
+<     dk run -d --name "$rabbit" --label "$LABEL=$FIXTURE_ID" --network "$network" --env-file "$scratch_host/rabbit.env" -p 127.0.0.1:5672:5672 rabbitmq:4.3.6-management >/dev/null
+---
+>     dk run -d --user 999:999 --name "$rabbit" --label "$LABEL=$FIXTURE_ID" --network "$network" --env-file "$scratch_host/rabbit.env" -p 127.0.0.1:5672:5672 rabbitmq:4.3.6-management >/dev/null
+122c122
+<     if dk exec "$rabbit" rabbitmq-diagnostics -q ping >/dev/null 2>&1; then ready=true; break; fi
+---
+>     if dk exec "$rabbit" rabbitmq-diagnostics -q check_running >/dev/null 2>&1; then ready=true; break; fi

@@ -17,7 +17,7 @@ Nhánh local `rca/quan-sat-log-dung-lai` @`ae5a870` (worktree `D:/Project/ft-pr1
 
 ## 2. Image có agent (`agent/build-image.sh`)
 
-- Mạng laptop chặn tải asset GitHub Releases. Jar agent 2.33.1 lấy từ Maven Central, **SHA-256 trùng giá trị ghim** trong Dockerfile. Build dùng bản tạm của Dockerfile chỉ thay dòng `ADD` bằng `COPY` jar đó (script kiểm đúng 1 dòng khác); Dockerfile commit không đổi, CI GitHub chạy dòng `ADD` gốc.
+- Mạng laptop chặn tải asset GitHub Releases. Jar agent 2.33.1 lấy từ Maven Central, **SHA-256 trùng giá trị ghim** trong Dockerfile. Build dùng bản tạm của Dockerfile chỉ thay dòng `ADD` bằng `COPY` jar đó (script kiểm đúng 1 dòng khác); Dockerfile commit không đổi. Đính chính 28/11 (T-076 REVIEW-5 R9a): CI GitHub không build image, nên dòng `ADD` gốc chưa chạy ở đâu; nó chạy lần đầu ở bước build của CD sau merge (tải lỗi thì CD dừng ở build, bản đang chạy giữ nguyên). Checksum ghim khớp asset của release v2.33.1.
 - Booking (jar production, không có lớp `RcaFaults`) và Assistant: chạy bằng uid 10001, có `/app/app.jar`, entrypoint `/app/docker-entrypoint.sh`, checksum agent trong image đúng, `SERVICE_VERSION` = commit `ae5a870…` (không phải `local-dev`).
 
 ## 3. Agent gửi tới Collector thử (`agent/chay-agent.sh`, `agent/collector-tho.yaml`, `agent/phan-tich.py`)

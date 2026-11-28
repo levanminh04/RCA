@@ -1,0 +1,75 @@
+Picked up JAVA_TOOL_OPTIONS: -Duser.timezone=UTC
+[WARNING] Settings for server bl-maven uses legacy format
+[WARNING] Settings for server bl-maven uses legacy format
+[WARNING] Settings for server vnpt-oda-maven uses legacy format
+[WARNING] Settings for server vnpt-oda-maven uses legacy format
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------< com.flashticket:payment-service >-------------------
+[INFO] Building  0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-java-21) @ payment-service ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.version.RequireJavaVersion passed
+[INFO] 
+[INFO] --- jacoco:0.8.15:prepare-agent (prepare-agent) @ payment-service ---
+[INFO] argLine set to -javaagent:C:\\Users\\84583\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.15\\org.jacoco.agent-0.8.15-runtime.jar=destfile=D:\\Project\\ft-pr17-dung-lai\\services\\payment-service\\target\\jacoco.exec
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ payment-service ---
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ payment-service ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 141 source files with javac [debug parameters release 21] to target\classes
+[WARNING] /D:/Project/ft-pr17-dung-lai/services/payment-service/src/main/java/com/flashticket/payment_service/worker/PaymentWorker.java:[74,21] isAck() in org.springframework.amqp.rabbit.connection.CorrelationData.Confirm has been deprecated and marked for removal
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ payment-service ---
+[INFO] Copying 32 resources from src\test\resources to target\test-classes
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ payment-service ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 37 source files with javac [debug parameters release 21] to target\test-classes
+[INFO] /D:/Project/ft-pr17-dung-lai/services/payment-service/src/test/java/com/flashticket/payment_service/client/VNPayRefundClientTest.java: Some input files use or override a deprecated API.
+[INFO] /D:/Project/ft-pr17-dung-lai/services/payment-service/src/test/java/com/flashticket/payment_service/client/VNPayRefundClientTest.java: Recompile with -Xlint:deprecation for details.
+[INFO] /D:/Project/ft-pr17-dung-lai/services/payment-service/src/test/java/com/flashticket/payment_service/security/PaymentJwtSecurityTest.java: D:\Project\ft-pr17-dung-lai\services\payment-service\src\test\java\com\flashticket\payment_service\security\PaymentJwtSecurityTest.java uses unchecked or unsafe operations.
+[INFO] /D:/Project/ft-pr17-dung-lai/services/payment-service/src/test/java/com/flashticket/payment_service/security/PaymentJwtSecurityTest.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ payment-service ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+Picked up JAVA_TOOL_OPTIONS: -Duser.timezone=UTC
+[INFO] Running com.flashticket.payment_service.messaging.ListenerTelemetryTests
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (C:\Users\84583\.m2\repository\net\bytebuddy\byte-buddy-agent\1.18.11\byte-buddy-agent-1.18.11.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+Java HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+01:28:40.196 [main] INFO com.flashticket.payment_service.observability.RabbitTelemetry -eventName="payment.message.processed" operation="message-process" outcome="REJECTED" reasonCode="INVALID_CONTRACT" queue="payment.decision.q" durationMs="75"- Message processing result
+01:28:40.496 [main] INFO com.flashticket.payment_service.observability.BusinessTelemetry -eventName="payment.callback-confirmed" operation="callback-confirmed" outcome="SUCCESS" reasonCode="CALLBACK_VERIFIED" orderId="f1061498-f161-49ac-8dbc-10ebca284d95" correlationId="f1061498-f161-49ac-8dbc-10ebca284d95" stateBefore="PENDING" stateAfter="SUCCEEDED"- Business decision committed
+01:28:40.496 [main] INFO com.flashticket.payment_service.observability.BusinessTelemetry -eventName="payment.callback-confirmed" operation="callback-confirmed" outcome="FAILED" reasonCode="CALLBACK_VERIFIED" orderId="5f323515-1520-4201-a2f9-14d81157d646" correlationId="5f323515-1520-4201-a2f9-14d81157d646" stateBefore="PENDING" stateAfter="FAILED"- Business decision committed
+01:28:40.497 [main] INFO com.flashticket.payment_service.observability.BusinessTelemetry -eventName="payment.callback-confirmed" operation="callback-confirmed" outcome="UNKNOWN" reasonCode="CALLBACK_VERIFIED" orderId="3f6fffdf-cc7e-4314-8044-ec3eb6bfdd7c" correlationId="3f6fffdf-cc7e-4314-8044-ec3eb6bfdd7c" stateBefore="PENDING" stateAfter="UNKNOWN"- Business decision committed
+01:28:40.522 [main] INFO com.flashticket.payment_service.observability.RabbitTelemetry -eventName="payment.message.processed" operation="message-process" outcome="RETRY" reasonCode="TRANSACTION_UNAVAILABLE" queue="payment.decision.q" durationMs="1"- Message processing result
+01:28:40.544 [main] INFO com.flashticket.payment_service.observability.RabbitTelemetry -eventName="payment.message.processed" operation="message-process" outcome="UNKNOWN" reasonCode="BROKER_COMMAND_FAILED" queue="payment.decision.q" durationMs="4"- Message processing result
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.090 s -- in com.flashticket.payment_service.messaging.ListenerTelemetryTests
+[INFO] Running com.flashticket.payment_service.ObservabilityTests
+01:28:40.784 [main] INFO com.flashticket.payment_service.observability.RabbitTelemetry -eventName="payment.message.processed" operation="message-process" outcome="SUCCESS" reasonCode="TRANSACTION_COMMITTED" queue="actual.queue" durationMs="10"- Message processing result
+{"traceId":"22222222222222222222222222222222","spanId":"2222222222222222","correlationId":"00000000-0000-4000-8000-000000000001","eventName":"probe.success","operation":"probe","outcome":"SUCCESS","durationMs":12,"schemaVersion":1,"timestamp":"2026-11-28T01:28:47.237774700Z","severity":"INFO","serviceName":"payment-service","serviceVersion":"local-dev","instanceId":"8a8c9cd5-46b0-4bbb-84ca-80f9ee56c738","environment":"local","hostId":"local-test","loggerName":"com.flashticket.b16.probe","message":"Probe finished"}
+{"traceId":"22222222222222222222222222222222","spanId":"2222222222222222","correlationId":"00000000-0000-4000-8000-000000000001","eventName":"probe.failed","operation":"probe","outcome":"FAILED","schemaVersion":1,"timestamp":"2026-11-28T01:28:47.251716200Z","severity":"ERROR","serviceName":"payment-service","serviceVersion":"local-dev","instanceId":"8a8c9cd5-46b0-4bbb-84ca-80f9ee56c738","environment":"local","hostId":"local-test","loggerName":"com.flashticket.b16.probe","message":"Probe failed","stackTrace":"java.lang.IllegalStateException\n\tat com.flashticket.payment_service.ObservabilityTests.productionFormatterProducesTypedSafeCorrelatedRecords(ObservabilityTests.java:77)\n\tat java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)\n\tat java.base/java.lang.reflect.Method.invoke(Method.java:580)\n\tat org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:701)\n\tat org.junit.platform.commons.support.ReflectionSupport.invokeMethod(ReflectionSupport.java:502)\n\tat org.junit.jupiter.engine.support.MethodReflectionUtils.invoke(MethodReflectionUtils.java:45)\n\tat org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:61)\n\tat org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:124)\n\tat org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:163)\n\tat org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:148)\n\tat org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86)\n\tat org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:123)\n\tat org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:105)\n\tat org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:99)\n\tat org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:66)\n\tat org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:47)\n\tat org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:39)\n\tat org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:104)\n\tat org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:98)\n\tat org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invokeVoid(InterceptingExecutableInvoker.java:71)\n\tat org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$0(TestMethodTestDescriptor.java:219)\n\tat org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)\n\tat org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:215)\n\tat org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:157)\n\tat org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:70)\n\tat org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:176)\n\tat org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)\n\tat org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166)\n\tat org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138)\n\tat org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164)\n\tat org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)\n\tat org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163)\n","errorType":"java.lang.IllegalStateException"}
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.746 s -- in com.flashticket.payment_service.ObservabilityTests
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  28.110 s
+[INFO] Finished at: 2026-11-28T01:28:47Z
+[INFO] ------------------------------------------------------------------------
