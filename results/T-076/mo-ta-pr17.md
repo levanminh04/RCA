@@ -42,6 +42,7 @@ Thêm: `deploy/k8s/<svc>/configmap.yaml` có khối biến chỉ agent đọc (�
 - `BookingPersistenceIT` trỏ vào đúng hàm nhận tin; `-P integration` 173 test đạt.
 - Sau rebase lên `4d57225` (main đổi Payment): Payment `verify` 153 + 57 test, 0 lỗi, B16 đạt; manifest 8 service; bộ kiểm K8s chạy lại.
 - Lượt sau (REVIEW-6): kênh RabbitMQ đóng khi ACK/NACK ở Payment ghi `UNKNOWN`, không ghi `RETRY`; tạo đơn ghi dòng `order.correlation-linked` nối correlation tạm với orderId (B16 §3); outbox Payment/Ticket không dời lịch được (worker khác đã nhận) ghi `UNKNOWN/LEASE_CHANGED`.
+- Lượt sau (REVIEW-8): listener Payment chọn kết cục theo bước đã làm trên kênh (lệnh ACK/NACK ném lỗi, kể cả lỗi của proxy Spring khi kênh đóng, ghi `UNKNOWN`; chỉ NACK giao lại thành công mới ghi `RETRY`); log outbox Payment có `correlationId`.
 
 ## Bật agent sau này (không thuộc PR này)
 
@@ -49,7 +50,12 @@ Chỉ thêm: Collector 1 pod (`deploy/k8s/otel-collector/`, lọc dữ liệu nh
 
 ## Hoàn tác
 
-**Điều kiện trước merge:** nếu Booking, Event, Ticket hoặc Payment đang bật đọc replica, CD từ chối image mới khi thiếu bản writer-only cùng image; nhóm chuyển về writer-only trên bản đang chạy trước khi merge. Trên main hiện tại, bản một Pod không làm baseline cho reader được (baseline phải là bản 2 Pod).
+**Điều kiện trước merge:** nếu Booking, Event, Ticket hoặc Payment đang bật đọc replica, CD từ chối image mới khi thiếu bản writer-only cùng image; nhóm chuyển về writer-only trên bản đang chạy trước khi merge. Điều kiện số Pod của bản nền khác nhau theo service (`deploy-k8s-service.sh` tại đầu PR):
+
+- **Booking, Payment:** bản nền cho reader phải là bản 2 Pod (HPA 2/2); bản một Pod chỉ là writer-only tạm.
+- **Event, Ticket:** bản writer đòi HPA 1/1, cùng cấu hình và cùng image với bản đích.
+
+Người giữ cấu hình xác nhận cả trạng thái reader **đang chạy** lẫn **định phát** của bốn service; `writer-baseline` có thể còn sau khi đã tắt reader.
 
 **Đích hoàn tác.** CD `rollback` đọc file `previous` **ghi sau lần phát PR này**, không phải file `previous` đọc trước merge.
 
@@ -58,7 +64,11 @@ Chỉ thêm: Collector 1 pod (`deploy/k8s/otel-collector/`, lọc dữ liệu nh
   - `writer-baseline` của revision mới, nếu CD ghi file này (Booking, Event, Ticket, Payment khi đang hoặc vừa dùng reader);
   - Discovery: `compatible-previous`, nếu lần phát hoàn tất migration;
   - còn lại: C0.
-- Phát lỗi giữa chừng: CD tự khôi phục về cùng đích này.
+- Phát lỗi giữa chừng, CD **thử** khôi phục; kết quả tùy trường hợp:
+  - lỗi kiểm cấu hình (reader, profile) trước khi áp workload: CD dừng, workload cũ vẫn chạy, không có bước khôi phục;
+  - Discovery đang chuyển từ Deployment cũ mà áp/kiểm lỗi trước khi xong migration: CD khôi phục **Deployment cũ** (`RESTORED_LEGACY_DISCOVERY`), không phải `compatible-previous`; khôi phục lỗi thì `DISCOVERY_RESTORE_FAILED`, giữ cả hai workload;
+  - lỗi áp/kiểm thông thường: CD thử áp lại `previous`; chỉ khi áp và kiểm lại đều đạt mới in `RESTORED_PREVIOUS`; có thể ra `RESTORE_FAILED` (cần người xử lý) hoặc `NO_PREVIOUS_K8S_REVISION`.
+  - Vì vậy sau một lần phát lỗi, đọc thông báo CD và workload thật đang phục vụ (image, số Pod) trước khi kết luận đã về đích nào.
 - Trước khi bấm `rollback`: đọc file `previous` cùng image và profile (số Pod, reader) của đích. Đích không như mong muốn thì dùng PR revert (cũng qua CD).
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
