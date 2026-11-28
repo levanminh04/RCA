@@ -43,6 +43,7 @@ Thêm: `deploy/k8s/<svc>/configmap.yaml` có khối biến chỉ agent đọc (�
 - Sau rebase lên `4d57225` (main đổi Payment): Payment `verify` 153 + 57 test, 0 lỗi, B16 đạt; manifest 8 service; bộ kiểm K8s chạy lại.
 - Lượt sau (REVIEW-6): kênh RabbitMQ đóng khi ACK/NACK ở Payment ghi `UNKNOWN`, không ghi `RETRY`; tạo đơn ghi dòng `order.correlation-linked` nối correlation tạm với orderId (B16 §3); outbox Payment/Ticket không dời lịch được (worker khác đã nhận) ghi `UNKNOWN/LEASE_CHANGED`.
 - Lượt sau (REVIEW-8): listener Payment chọn kết cục theo bước đã làm trên kênh (lệnh ACK/NACK ném lỗi, kể cả lỗi của proxy Spring khi kênh đóng, ghi `UNKNOWN`; chỉ NACK giao lại thành công mới ghi `RETRY`); log outbox Payment có `correlationId`.
+- Lượt sau (REVIEW-10): listener Ticket và consumer định danh của User ghi `UNKNOWN/BROKER_COMMAND_FAILED` khi chính lệnh ACK/NACK/reject lỗi; User ghi quyết định sau khi lệnh trả về.
 
 ## Bật agent sau này (không thuộc PR này)
 
@@ -68,6 +69,7 @@ Người giữ cấu hình xác nhận cả trạng thái reader **đang chạy*
   - lỗi kiểm cấu hình (reader, profile) trước khi áp workload: CD dừng, workload cũ vẫn chạy, không có bước khôi phục;
   - Discovery đang chuyển từ Deployment cũ mà áp/kiểm lỗi trước khi xong migration: CD khôi phục **Deployment cũ** (`RESTORED_LEGACY_DISCOVERY`), không phải `compatible-previous`; khôi phục lỗi thì `DISCOVERY_RESTORE_FAILED`, giữ cả hai workload;
   - lỗi áp/kiểm thông thường: CD thử áp lại `previous`; chỉ khi áp và kiểm lại đều đạt mới in `RESTORED_PREVIOUS`; có thể ra `RESTORE_FAILED` (cần người xử lý) hoặc `NO_PREVIOUS_K8S_REVISION`.
+  - Discovery đang chuyển từ Deployment cũ có hai mã dừng **trước** mọi bước khôi phục: `DISCOVERY_MIGRATION_FINALIZE_FAILED` (bước kết thúc chuyển đổi lỗi sau khi áp và kiểm đích đạt; workload có thể đã đổi trong khi con trỏ còn cũ) và `LEGACY_APPLICATION_UNDRAIN_FAILED` (đưa ứng dụng cũ trở lại phục vụ lỗi). Gặp hai mã này thì CD chưa thử khôi phục: kiểm workload đang phục vụ và các con trỏ (`current`, `previous`) trước khi chọn đích.
   - Vì vậy sau một lần phát lỗi, đọc thông báo CD và workload thật đang phục vụ (image, số Pod) trước khi kết luận đã về đích nào.
 - Trước khi bấm `rollback`: đọc file `previous` cùng image và profile (số Pod, reader) của đích. Đích không như mong muốn thì dùng PR revert (cũng qua CD).
 
